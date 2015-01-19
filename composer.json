@@ -1,0 +1,43 @@
+{
+  "name": "dunglas/json-ld-api-bundle",
+  "type": "symfony-bundle",
+  "description": "JSON-LD / Hydra REST API for Symfony",
+  "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
+  "homepage": "http://dunglas.fr",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kévin Dunglas",
+      "email": "dunglas@gmail.com"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/dunglas/symfony"
+    }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "symfony/symfony": "dev-new_serializer as 2.7.0",
+    "doctrine/orm": "~2.2,>=2.2.3",
+    "doctrine/doctrine-bundle": "~1.2"
+  },
+  "require-dev": {
+    "phpspec/phpspec": "~2.0",
+    "behat/behat": "~3.0",
+    "behat/symfony2-extension": "~2.0",
+    "behat/mink": "~1.5",
+    "behat/mink-extension": "~2.0",
+    "behat/mink-browserkit-driver": "~1.1",
+    "behatch/contexts": "~2.2"
+  },
+  "autoload": {
+    "psr-4": { "Dunglas\\JsonLdApiBundle\\": "" }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  }
+}

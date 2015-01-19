@@ -1,0 +1,6 @@
+composer.phar
+composer.lock
+/vendor/
+/features/fixtures/TestApp/cache/*
+/features/fixtures/TestApp/logs/*
+

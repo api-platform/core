@@ -1,0 +1,7 @@
+services:
+    my_mailer:
+        class:     Dunglas\JsonLdApiBundle\Resource
+        arguments:
+          - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy
+        tags:
+          - { name: json-ld.resource }
