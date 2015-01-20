@@ -22,6 +22,10 @@ class Resources extends \ArrayObject
      * @var array<string, Resource>
      */
     private $entityClassIndex = [];
+    /**
+     * @var array<string, Resource>
+     */
+    private $shortNameIndex = [];
 
     /**
      * {@inheritdoc}
@@ -36,12 +40,18 @@ class Resources extends \ArrayObject
 
         $entityClass = $value->getEntityClass();
         if (isset($this->entityClassIndex[$entityClass])) {
-            throw new \InvalidArgumentException(sprintf('A Resource class already exist for %s.', $entityClass));
+            throw new \InvalidArgumentException(sprintf('A Resource class already exists for "%s".', $entityClass));
+        }
+
+        $shortName = $value->getShortName();
+        if (isset($this->shortNameIndex[$shortName])) {
+            throw new \InvalidArgumentException(sprintf('A Resource class with the short name "%s" already exists.', $shortName));
         }
 
         parent::append($value);
 
         $this->entityClassIndex[$entityClass] = $value;
+        $this->shortNameIndex[$shortName] = $value;
     }
 
     /**
@@ -54,5 +64,17 @@ class Resources extends \ArrayObject
     public function getResourceForEntity($entityClass)
     {
         return isset($this->entityClassIndex[$entityClass]) ? $this->entityClassIndex[$entityClass] : null;
+    }
+
+    /**
+     * Gets the Resource instance associated with the given short name or null if not found.
+     *
+     * @param string $shortName
+     *
+     * @return Resource|null
+     */
+    public function getResourceForShortName($shortName)
+    {
+        return isset($this->shortNameIndex[$shortName]) ? $this->shortNameIndex[$shortName] : null;
     }
 }

@@ -1,3 +1,7 @@
+api_doc:
+    resource: "@DunglasJsonLdApiBundle/Controller/"
+    type:     "annotation"
+
 api:
     resource: "."
     type:     "json-ld"

@@ -85,10 +85,17 @@ class JsonLdNormalizer extends AbstractNormalizer
         $data = [];
         $attributes = $this->getAllowedAttributes($object, $context);
 
+        $data['@context'] = $this->router->generate(
+            'json_ld_api_context',
+            ['shortName' => $resource->getShortName()]
+        );
+
         $data['@id'] = $this->router->generate(
             $resource->getIdRoute(),
             ['id' => $this->propertyAccessor->getValue($object, 'id')]
         );
+
+        $data['@type'] = $resource->getShortName();
 
         // If not using groups, detect manually
         if (false === $attributes) {

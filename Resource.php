@@ -36,6 +36,10 @@ class Resource
      */
     protected $entityClass;
     /**
+     * @var string
+     */
+    protected $shortName;
+    /**
      * @var array
      */
     protected $normalizationContext;
@@ -78,6 +82,7 @@ class Resource
 
     /**
      * @param string $entityClass
+     * @param string $shortName
      * @param array $normalizationContext
      * @param array $denormalizationContext
      * @param array|null $validationGroups
@@ -87,6 +92,7 @@ class Resource
      */
     public function __construct(
         $entityClass,
+        $shortName = null,
         array $normalizationContext = [],
         array $denormalizationContext = [],
         array $validationGroups = null,
@@ -121,6 +127,7 @@ class Resource
         }
 
         $this->entityClass = $entityClass;
+        $this->shortName = $shortName ?: substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
         $this->validationGroups = $validationGroups;
@@ -130,6 +137,8 @@ class Resource
     }
 
     /**
+     * Gets the associated entity class.
+     *
      * @return string
      */
     public function getEntityClass()
@@ -138,6 +147,18 @@ class Resource
     }
 
     /**
+     * Gets the short name (display name) of the resource.
+     *
+     * @return string
+     */
+    public function getShortName()
+    {
+        return $this->shortName;
+    }
+
+    /**
+     * Gets the normalization context.
+     *
      * @return array
      */
     public function getNormalizationContext()
@@ -146,6 +167,8 @@ class Resource
     }
 
     /**
+     * Gets the denormalization context.
+     *
      * @return array
      */
     public function getDenormalizationContext()
@@ -154,6 +177,8 @@ class Resource
     }
 
     /**
+     * Gets validation groups to use.
+     *
      * @return array|null
      */
     public function getValidationGroups()
@@ -183,8 +208,7 @@ class Resource
         }
 
         $this->routeCollection = new RouteCollection();
-        $singular = substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
-        $beautified = Inflector::pluralize(Inflector::tableize($singular));
+        $beautified = Inflector::pluralize(Inflector::tableize($this->shortName));
 
         foreach ($this->collectionOperations as $collectionOperation) {
             $this->addRoute($beautified, $this->routeCollection, $collectionOperation, true);
@@ -197,6 +221,11 @@ class Resource
         return $this->routeCollection;
     }
 
+    /**
+     * Sets the associated service id.
+     *
+     * @param string $serviceId
+     */
     public function setServiceId($serviceId)
     {
         $this->serviceId = $serviceId;

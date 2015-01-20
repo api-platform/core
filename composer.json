@@ -24,6 +24,7 @@
     "doctrine/doctrine-bundle": "~1.2"
   },
   "require-dev": {
+    "sensio/framework-extra-bundle": "~3.0",
     "phpspec/phpspec": "~2.0",
     "behat/behat": "~3.0",
     "behat/symfony2-extension": "~2.0",
@@ -31,6 +32,9 @@
     "behat/mink-extension": "~2.0",
     "behat/mink-browserkit-driver": "~1.1",
     "behatch/contexts": "~2.2"
+  },
+  "suggest": {
+    "sensio/framework-extra-bundle": "Automatically load documentation routes."
   },
   "autoload": {
     "psr-4": { "Dunglas\\JsonLdApiBundle\\": "" }
