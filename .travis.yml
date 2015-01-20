@@ -9,4 +9,5 @@ php:
 before_script:
   - composer update
 
+# E_ALL & ~E_USER_DEPRECATED
 script: vendor/bin/behat

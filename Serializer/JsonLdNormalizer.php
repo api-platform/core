@@ -14,7 +14,6 @@ namespace Dunglas\JsonLdApiBundle\Serializer;
 use Dunglas\JsonLdApiBundle\Resources;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
