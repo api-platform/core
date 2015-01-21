@@ -12,7 +12,7 @@
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 
-$loader = require __DIR__ . '/../../../vendor/autoload.php';
+$loader = require __DIR__.'/../../../vendor/autoload.php';
 require 'AppKernel.php';
 
 AnnotationRegistry::registerLoader([$loader, 'loadClass']);

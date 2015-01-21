@@ -43,7 +43,6 @@ class ClassMetadata
      */
     public $validatorClassMetadata;
 
-
     /**
      * @var \ReflectionClass
      */

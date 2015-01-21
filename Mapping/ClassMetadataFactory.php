@@ -59,7 +59,7 @@ class ClassMetadataFactory
      * {@link LoaderInterface::loadClassMetadata()} method for further
      * configuration. At last, the new object is returned.
      *
-     * @param string|object $value
+     * @param  string|object             $value
      * @return ClassMetadata
      * @throws \InvalidArgumentException
      */
@@ -113,7 +113,7 @@ class ClassMetadataFactory
     /**
      * Checks if class has metadata.
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @return bool
      */
     public function hasMetadataFor($value)

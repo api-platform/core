@@ -18,5 +18,4 @@ namespace Dunglas\JsonLdApiBundle;
  */
 class ApiDocumentationFactory
 {
-
 }

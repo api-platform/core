@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * CRUD operations for a JSON-LD/Hydra API.
  *
- * A Request class is injected to all actions method to ease the extension of this class.
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ResourceController extends Controller
@@ -39,7 +37,7 @@ class ResourceController extends Controller
     protected function getResource(Request $request)
     {
         if (!$request->attributes->has('_json_ld_api_resource')) {
-            throw new \InvalidArgumentException('The current request doesn\t have an associated resource.');
+            throw new \InvalidArgumentException('The current request doesn\'t have an associated resource.');
         }
 
         $serviceId = $request->attributes->get('_json_ld_api_resource');
@@ -77,7 +75,7 @@ class ResourceController extends Controller
     /**
      * Normalizes data using the Symfony Serializer.
      *
-     * @param Resource $resource
+     * @param Resource     $resource
      * @param array|object $data
      *
      * @return array
@@ -119,6 +117,7 @@ class ResourceController extends Controller
     public function cgetAction(Request $request)
     {
         $resource = $this->getResource($request);
+
         return new JsonLdResponse($this->normalize($resource, $this->getRepository($resource)->findAll()));
     }
 
@@ -159,7 +158,7 @@ class ResourceController extends Controller
      * Gets an element of the collection.
      *
      * @param Request $request
-     * @param int $id
+     * @param int     $id
      *
      * @return JsonLdResponse
      *

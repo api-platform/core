@@ -81,14 +81,14 @@ class Resource
     protected $idRoute = null;
 
     /**
-     * @param string $entityClass
-     * @param string $shortName
-     * @param array $normalizationContext
-     * @param array $denormalizationContext
+     * @param string     $entityClass
+     * @param string     $shortName
+     * @param array      $normalizationContext
+     * @param array      $denormalizationContext
      * @param array|null $validationGroups
-     * @param array $collectionOperations
-     * @param array $itemOperations
-     * @param string $controllerName
+     * @param array      $collectionOperations
+     * @param array      $itemOperations
+     * @param string     $controllerName
      */
     public function __construct(
         $entityClass,
@@ -234,10 +234,10 @@ class Resource
     /**
      * Adds a route to the collection.
      *
-     * @param string $beautified
+     * @param string          $beautified
      * @param RouteCollection $routeCollection
-     * @param array $operation
-     * @param boolean $isCollection
+     * @param array           $operation
+     * @param boolean         $isCollection
      */
     private function addRoute($beautified, RouteCollection $routeCollection, array $operation, $isCollection)
     {
