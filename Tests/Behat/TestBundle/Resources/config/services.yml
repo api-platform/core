@@ -1,5 +1,5 @@
 services:
-    my_mailer:
+    my_dummy_resource:
         class:     Dunglas\JsonLdApiBundle\Resource
         arguments:
           - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy
