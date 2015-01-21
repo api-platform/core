@@ -13,9 +13,14 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the response should be equal to
+    And the JSON should be equal to:
     """
-    {"@context":"\/contexts\/Dummy","@id":"\/dummies\/1","@type":"Dummy","name":"My Dummy"}
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "name": "My Dummy"
+    }
     """
 
   Scenario: Get a resource
@@ -23,9 +28,14 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the response should be equal to
+    And the JSON should be equal to:
     """
-    {"@context":"\/contexts\/Dummy","@id":"\/dummies\/1","@type":"Dummy","name":"My Dummy"}
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "name": "My Dummy"
+    }
     """
 
   Scenario: Get a collection
@@ -33,25 +43,37 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the response should be equal to
+    And the JSON should be equal to:
     """
-    [{"@context":"\/contexts\/Dummy","@id":"\/dummies\/1","@type":"Dummy","name":"My Dummy"}]
+    [
+      {
+        "@context": "/contexts/Dummy",
+        "@id":"/dummies/1",
+        "@type":"Dummy",
+        "name":"My Dummy"
+      }
+    ]
     """
 
   Scenario: Update a resource
       Given I send a "PUT" request to "/dummies/1" with body:
       """
       {
-        "@id":"\/dummies\/1",
-        "name":"A nice dummy"
+        "@id": "/dummies/1",
+        "name": "A nice dummy"
       }
       """
       Then the response status code should be 202
       And the response should be in JSON
       And the header "Content-Type" should be equal to "application/ld+json"
-      And the response should be equal to
+      And the JSON should be equal to:
       """
-      {"@context":"\/contexts\/Dummy","@id":"\/dummies\/1","@type":"Dummy","name":"A nice dummy"}
+      {
+        "@context": "/contexts/Dummy",
+        "@id": "/dummies/1",
+        "@type": "Dummy",
+        "name": "A nice dummy"
+      }
       """
 
   Scenario: Delete a resource
