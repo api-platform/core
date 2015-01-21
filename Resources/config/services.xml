@@ -13,10 +13,6 @@
             <tag name="routing.loader" />
         </service>
 
-        <service id="dunglas_json_ld_api.resource_listener" class="Dunglas\JsonLdApiBundle\EventListener\ResourceListener">
-            <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController" />
-        </service>
-
         <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
             <argument type="service" id="dunglas_json_ld_api.resources" />
             <argument type="service" id="router" />

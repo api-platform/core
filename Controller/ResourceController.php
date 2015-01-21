@@ -15,6 +15,7 @@ use Dunglas\JsonLdApiBundle\Resource;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * CRUD operations for a JSON-LD/Hydra API.
@@ -23,18 +24,102 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResourceController extends AbstractResourceController
+class ResourceController extends Controller
 {
+    /**
+     * Gets the Resource associated with the current Request.
+     * Must be called before manipulating the resource.
+     *
+     * @param Request $request
+     *
+     * @return Resource
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getResource(Request $request)
+    {
+        if (!$request->attributes->has('_json_ld_api_resource')) {
+            throw new \InvalidArgumentException('The current request doesn\t have an associated resource.');
+        }
+
+        $serviceId = $request->attributes->get('_json_ld_api_resource');
+        if (!$this->has($serviceId)) {
+            throw new \InvalidArgumentException(sprintf('The service "%s" isn\'t registered.', $serviceId));
+        }
+
+        return $this->get($serviceId);
+    }
+
+    /**
+     * Gets the Doctrine manager for this entity class.
+     *
+     * @param Resource $resource
+     *
+     * @return \Doctrine\Common\Persistence\ObjectManager|null
+     */
+    protected function getManager(Resource $resource)
+    {
+        return $this->getDoctrine()->getManagerForClass($resource->getEntityClass());
+    }
+
+    /**
+     * Gets the Doctrine repositories for this entity class.
+     *
+     * @param Resource $resource
+     *
+     * @return \Doctrine\Common\Persistence\ObjectRepository
+     */
+    protected function getRepository(Resource $resource)
+    {
+        return $this->getManager($resource)->getRepository($resource->getEntityClass());
+    }
+
+    /**
+     * Normalizes data using the Symfony Serializer.
+     *
+     * @param Resource $resource
+     * @param array|object $data
+     *
+     * @return array
+     */
+    protected function normalize(Resource $resource, $data)
+    {
+        return $this->get('serializer')->normalize($data, 'json-ld', $resource->getNormalizationContext());
+    }
+
+    /**
+     * Finds an object of throws a 404 error.
+     *
+     * @param Resource   $resource
+     * @param string|int $id
+     *
+     * @return object
+     *
+     * @throws NotFoundHttpException
+     */
+    protected function findOrThrowNotFound(Resource $resource, $id)
+    {
+        $object = $this->getRepository($resource)->find($id);
+        if (!$object) {
+            throw $this->createNotFoundException();
+        }
+
+        return $object;
+    }
+
     /**
      * Gets the collection.
      *
      * @param Request $request
      *
      * @return JsonLdResponse
+     *
+     * @throws \InvalidArgumentException
      */
     public function cgetAction(Request $request)
     {
-        return new JsonLdResponse($this->normalize($this->getRepository()->findAll()));
+        $resource = $this->getResource($request);
+        return new JsonLdResponse($this->normalize($resource, $this->getRepository($resource)->findAll()));
     }
 
     /**
@@ -43,23 +128,28 @@ class ResourceController extends AbstractResourceController
      * @param Request $request
      *
      * @return JsonLdResponse
+     *
+     * @throws \InvalidArgumentException
      */
     public function postAction(Request $request)
     {
+        $resource = $this->getResource($request);
         $object = $this->get('serializer')->deserialize(
             $request->getContent(),
-            $this->resource->getEntityClass(),
+            $resource->getEntityClass(),
             'json-ld',
-            $this->resource->getDenormalizationContext()
+            $resource->getDenormalizationContext()
         );
 
-        $violations = $this->get('validator')->validate($object, null, $this->resource->getValidationGroups());
+        $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
             // Validation succeed
-            $this->getManager()->persist($object);
-            $this->getManager()->flush();
+            $manager = $this->getManager($resource);
 
-            return new JsonLdResponse($this->normalize($object), 201);
+            $manager->persist($object);
+            $manager->flush();
+
+            return new JsonLdResponse($this->normalize($resource, $object), 201);
         }
 
         return new JsonLdResponse($violations, 400);
@@ -73,13 +163,15 @@ class ResourceController extends AbstractResourceController
      *
      * @return JsonLdResponse
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
+     * @throws \InvalidArgumentException
      */
     public function getAction(Request $request, $id)
     {
-        $object = $this->findOrThrowNotFound($id);
+        $resource = $this->getResource($request);
+        $object = $this->findOrThrowNotFound($resource, $id);
 
-        return new JsonLdResponse($this->normalize($object));
+        return new JsonLdResponse($this->normalize($resource, $object));
     }
 
     /**
@@ -90,28 +182,30 @@ class ResourceController extends AbstractResourceController
      *
      * @return JsonLdResponse
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
+     * @throws \InvalidArgumentException
      */
     public function putAction(Request $request, $id)
     {
-        $object = $this->findOrThrowNotFound($id);
+        $resource = $this->getResource($request);
+        $object = $this->findOrThrowNotFound($resource, $id);
 
-        $context = $this->resource->getDenormalizationContext();
+        $context = $resource->getDenormalizationContext();
         $context['object_to_populate'] = $object;
 
         $object = $this->get('serializer')->deserialize(
             $request->getContent(),
-            $this->resource->getEntityClass(),
+            $resource->getEntityClass(),
             'json-ld',
             $context
         );
 
-        $violations = $this->get('validator')->validate($object, null, $this->resource->getValidationGroups());
+        $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
             // Validation succeed
-            $this->getManager()->flush();
+            $this->getManager($resource)->flush();
 
-            return new JsonLdResponse($this->normalize($object), 202);
+            return new JsonLdResponse($this->normalize($resource, $object), 202);
         }
 
         return new JsonLdResponse($violations, 400);
@@ -125,13 +219,15 @@ class ResourceController extends AbstractResourceController
      *
      * @return JsonLdResponse
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
+     * @throws \InvalidArgumentException
      */
     public function deleteAction(Request $request, $id)
     {
-        $object = $this->findOrThrowNotFound($id);
+        $resource = $this->getResource($request);
+        $object = $this->findOrThrowNotFound($resource, $id);
 
-        $manager = $this->getManager();
+        $manager = $this->getManager($resource);
         $manager->remove($object);
         $manager->flush();
 
