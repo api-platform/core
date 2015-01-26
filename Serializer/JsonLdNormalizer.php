@@ -11,11 +11,13 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Resources;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -28,6 +30,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class JsonLdNormalizer extends AbstractNormalizer
 {
     const FORMAT = 'json-ld';
+    const HYDRA_COLLECTION = 'hydra:Collection';
+    const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
      * @var Resources
@@ -61,42 +65,84 @@ class JsonLdNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && self::FORMAT === $format;
+        return self::FORMAT === $format && (is_object($data) || is_array($data));
     }
 
     /**
      * {@inheritdoc}
      *
      * @throws CircularReferenceException
+     * @throws InvalidArgumentException
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $class = get_class($object);
-        $resource = $this->resources->getResourceForEntity($class);
-
-        if (!$resource) {
-            throw new \InvalidArgumentException(sprintf('There is no Resource associated with the class %s.', $class));
+        if (!$resource = $this->guessResource($object, $context)) {
+            throw new InvalidArgumentException('A resource object must be passed in the context.');
         }
 
-        if ($this->isCircularReference($object, $context)) {
+        if (is_object($object) && $this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
         }
 
         $data = [];
-        $attributes = $this->getAllowedAttributes($object, $context);
+        if (!isset($context['has_json_ld_context'])) {
+            $data['@context'] = $this->router->generate(
+                'json_ld_api_context',
+                ['shortName' => $resource->getShortName()]
+            );
+            $context['has_json_ld_context'] = true;
+        }
 
-        $data['@context'] = $this->router->generate(
-            'json_ld_api_context',
-            ['shortName' => $resource->getShortName()]
-        );
+        // Collection
+        if (is_array($object) || $object instanceof \Traversable) {
+            $data['@id'] = $this->router->generate($resource->getCollectionRoute());
+
+            if ($object instanceof Paginator) {
+                $data['@type'] = self::HYDRA_PAGED_COLLECTION;
+
+                $query = $object->getQuery();
+                $firstResult = $query->getFirstResult();
+                $maxResults = $query->getMaxResults();
+                $currentPage = floor($firstResult / $maxResults) + 1.;
+                $totalItems = count($object);
+                $lastPage = ceil($totalItems / $maxResults);
+
+                $baseUrl = $data['@id'];
+                $paginatedUrl = $baseUrl.'?page=';
+
+                if (1. !== $currentPage) {
+                    $previousPage = $currentPage - 1.;
+                    $data['@id'] .= $paginatedUrl.$currentPage;
+                    $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl.$previousPage;
+                }
+
+                if ($currentPage !== $lastPage) {
+                    $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
+                }
+
+                $data['hydra:totalItems'] = $totalItems;
+                $data['hydra:itemsPerPage'] = $maxResults;
+                $data['hydra:firstPage'] = $baseUrl;
+                $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
+            } else {
+                $data['@type'] = self::HYDRA_COLLECTION;
+            }
+
+            $data['member'] = [];
+            foreach ($object as $obj) {
+                $data['member'][] = $this->normalize($obj, $format, $context);
+            }
+
+            return $data;
+        }
 
         $data['@id'] = $this->router->generate(
-            $resource->getIdRoute(),
+            $resource->getElementRoute(),
             ['id' => $this->propertyAccessor->getValue($object, 'id')]
         );
-
         $data['@type'] = $resource->getShortName();
 
+        $attributes = $this->getAllowedAttributes($object, $context);
         // If not using groups, detect manually
         if (false === $attributes) {
             $attributes = [];
@@ -109,18 +155,19 @@ class JsonLdNormalizer extends AbstractNormalizer
                     !$reflMethod->isDestructor() &&
                     0 === $reflMethod->getNumberOfRequiredParameters()
                 ) {
-                    // getsetters (jQuery style, e.g. read: last(), write: last($item))
-                    $name = $reflMethod->getName();
+                    $methodName = $reflMethod->getName();
 
-                    if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
+                    if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0) {
                         // getters and hassers
-                        $name = lcfirst(substr($name, 3));
-                    } elseif (strpos($name, 'is') === 0) {
+                        $attributeName = lcfirst(substr($methodName, 3));
+                    } elseif (strpos($methodName, 'is') === 0) {
                         // issers
-                        $name = lcfirst(substr($name, 2));
+                        $attributeName = lcfirst(substr($methodName, 2));
                     }
 
-                    $attributes[$name] = true;
+                    if (isset($attributeName)) {
+                        $attributes[$attributeName] = true;
+                    }
                 }
             }
 
@@ -131,14 +178,13 @@ class JsonLdNormalizer extends AbstractNormalizer
             }
 
             unset($attributes['id']);
-            $attributes = array_keys($attributes);
         }
 
-        foreach ($attributes as $attribute) {
+        foreach ($attributes as $attribute => $type) {
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
             if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                $attributeValue = $this->serializer->normalize($attributeValue, $format);
+                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
             }
 
             $data[$attribute] = $attributeValue;
@@ -185,5 +231,25 @@ class JsonLdNormalizer extends AbstractNormalizer
         }
 
         return $object;
+    }
+
+    /**
+     * Guesses the associated resource.
+     *
+     * @param  mixed         $object
+     * @param  array         $context
+     * @return Resource|null
+     */
+    private function guessResource($object, array $context)
+    {
+        if (isset($context['resource'])) {
+            return $context['resource'];
+        }
+
+        if (is_object($object)) {
+            $this->resources->getResourceForEntity(get_class($object));
+        }
+
+        return;
     }
 }

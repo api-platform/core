@@ -20,6 +20,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ContextBuilder
 {
+    const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
+
     /**
      * @var RouterInterface
      */
@@ -41,6 +43,7 @@ class ContextBuilder
     {
         $context = [];
         $context['@vocab'] = $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#';
+        $context['hydra'] = self::HYDRA_NS;
 
         return $context;
     }

@@ -3,6 +3,7 @@ Feature: Create-Retrieve-Update-Delete
   As a client software developer
   I need to be able to retrieve, create, update and delete JSON-LD encoded resources.
 
+  @createSchema
   Scenario: Create a resource
     Given I send a "POST" request to "/dummies" with body:
     """
@@ -45,14 +46,22 @@ Feature: Create-Retrieve-Update-Delete
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:
     """
-    [
-      {
-        "@context": "/contexts/Dummy",
-        "@id":"/dummies/1",
-        "@type":"Dummy",
-        "name":"My Dummy"
-      }
-    ]
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies",
+      "@type": "hydra:PagedCollection",
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies",
+      "hydra:lastPage": "/dummies",
+      "member": [
+        {
+          "@id":"/dummies/1",
+          "@type":"Dummy",
+          "name":"My Dummy"
+        }
+      ]
+    }
     """
 
   Scenario: Update a resource
@@ -76,6 +85,7 @@ Feature: Create-Retrieve-Update-Delete
       }
       """
 
+  @dropSchema
   Scenario: Delete a resource
     Given I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204

@@ -17,7 +17,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
 /**
- * {@inheritdoc}
+ * The extension of this bundle.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class DunglasJsonLdApiExtension extends Extension
 {
@@ -28,6 +30,8 @@ class DunglasJsonLdApiExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+
+        $container->setParameter('dunglas_json_ld_api.elements_by_page', $config['elements_by_page']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');

@@ -22,3 +22,6 @@ doctrine:
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
         auto_mapping:                true
+
+dunglas_json_ld_api:
+    elements_by_page: 3

@@ -11,6 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Controller;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Resource;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -65,7 +66,7 @@ class ResourceController extends Controller
      *
      * @param Resource $resource
      *
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return \Doctrine\ORM\EntityRepository
      */
     protected function getRepository(Resource $resource)
     {
@@ -106,6 +107,29 @@ class ResourceController extends Controller
     }
 
     /**
+     * Gets collection data.
+     *
+     * @param Resource $resource
+     * @param Request  $request
+     *
+     * @return array|\Traversable
+     */
+    protected function getCollectionData(Resource $resource, Request $request)
+    {
+        $page = (int) $request->get('page', 1);
+        $byPage = $this->container->getParameter('dunglas_json_ld_api.elements_by_page');
+
+        $data = $this
+            ->getRepository($resource)
+            ->createQueryBuilder('o')
+            ->setFirstResult(($page - 1) * $byPage)
+            ->setMaxResults($byPage)
+        ;
+
+        return new Paginator($data);
+    }
+
+    /**
      * Gets the collection.
      *
      * @param Request $request
@@ -118,7 +142,7 @@ class ResourceController extends Controller
     {
         $resource = $this->getResource($request);
 
-        return new JsonLdResponse($this->normalize($resource, $this->getRepository($resource)->findAll()));
+        return new JsonLdResponse($this->normalize($resource, $this->getCollectionData($resource, $request)));
     }
 
     /**

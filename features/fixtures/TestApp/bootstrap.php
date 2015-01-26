@@ -10,7 +10,6 @@
  */
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\ORM\Tools\SchemaTool;
 
 $loader = require __DIR__.'/../../../vendor/autoload.php';
 require 'AppKernel.php';
@@ -18,14 +17,7 @@ require 'AppKernel.php';
 AnnotationRegistry::registerLoader([$loader, 'loadClass']);
 
 // Create database schema
-$kernel = new AppKernel('test', true);
-$kernel->boot();
-
-$manager = $kernel->getContainer()->get('doctrine')->getManager();
-
-$st = new SchemaTool($manager);
-$classes = $manager->getMetadataFactory()->getAllMetadata();
-$st->dropSchema($classes);
-$st->createSchema($classes);
+//$kernel = new AppKernel('test', true);
+//$kernel->boot();
 
 return $loader;

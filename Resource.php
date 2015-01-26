@@ -78,7 +78,11 @@ class Resource
     /**
      * @var string|null
      */
-    protected $idRoute = null;
+    protected $elementRoute = null;
+    /**
+     * @var string|null
+     */
+    protected $collectionRoute = null;
 
     /**
      * @param string     $entityClass
@@ -134,6 +138,9 @@ class Resource
         $this->collectionOperations = $collectionOperations;
         $this->itemOperations = $itemOperations;
         $this->controllerName = $controllerName;
+
+        $this->normalizationContext['resource'] = $this;
+        $this->denormalizationContext['resource'] = $this;
     }
 
     /**
@@ -281,10 +288,26 @@ class Resource
             $methods
         ));
 
-        // Set the identifier route
-        if (!$this->idRoute && !$isCollection && 'GET' === $method) {
-            $this->idRoute = $routeName;
+        // Set routes
+        if ('GET' === $method) {
+            if (!$this->collectionRoute && $isCollection) {
+                $this->collectionRoute = $routeName;
+            }
+
+            if (!$this->elementRoute && !$isCollection) {
+                $this->elementRoute = $routeName;
+            }
         }
+    }
+
+    public function getCollectionRoute()
+    {
+        if (!$this->collectionRoute) {
+            // Can be optimized
+            $this->getRouteCollection();
+        }
+
+        return $this->collectionRoute;
     }
 
     /**
@@ -292,13 +315,13 @@ class Resource
      *
      * @return string
      */
-    public function getIdRoute()
+    public function getElementRoute()
     {
-        if (!$this->idRoute) {
-            // Can be ootimized
+        if (!$this->elementRoute) {
+            // Can be optimized
             $this->getRouteCollection();
         }
 
-        return $this->idRoute;
+        return $this->elementRoute;
     }
 }
