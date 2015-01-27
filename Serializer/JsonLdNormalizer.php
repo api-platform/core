@@ -18,7 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -36,27 +36,35 @@ class JsonLdNormalizer extends AbstractNormalizer
     /**
      * @var Resources
      */
-    protected $resources;
+    private $resources;
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
+    /**
+     * @var ClassMetadataFactory
+     */
+    private $jsonLdClassMetadataFactory;
     /**
      * @var PropertyAccessorInterface
      */
-    protected $propertyAccessor;
+    private $propertyAccessor;
 
     public function __construct(
         Resources $resources,
         RouterInterface $router,
-        ClassMetadataFactory $classMetadataFactory = null,
+        ClassMetadataFactory $jsonLdClassMetadataFactory = null,
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null
     ) {
-        parent::__construct($classMetadataFactory, $nameConverter);
+        parent::__construct(
+            $jsonLdClassMetadataFactory ? $jsonLdClassMetadataFactory->getSerializerClassMetadataFactory() : null,
+            $nameConverter
+        );
 
         $this->resources = $resources;
         $this->router = $router;
+        $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
@@ -76,12 +84,12 @@ class JsonLdNormalizer extends AbstractNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$resource = $this->guessResource($object, $context)) {
-            throw new InvalidArgumentException('A resource object must be passed in the context.');
-        }
-
         if (is_object($object) && $this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
+        }
+
+        if (!$resource = $this->guessResource($object, $context)) {
+            throw new InvalidArgumentException('A resource object must be passed in the context.');
         }
 
         $data = [];
@@ -142,52 +150,22 @@ class JsonLdNormalizer extends AbstractNormalizer
         );
         $data['@type'] = $resource->getShortName();
 
-        $attributes = $this->getAllowedAttributes($object, $context);
-        // If not using groups, detect manually
-        if (false === $attributes) {
-            $attributes = [];
+        $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor($object)->getAttributes(
+            $resource->getNormalizationGroups(),
+            $resource->getDenormalizationGroups(),
+            $resource->getValidationGroups()
+        );
 
-            // methods
-            $reflClass = new \ReflectionClass($object);
-            foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-                if (
-                    !$reflMethod->isConstructor() &&
-                    !$reflMethod->isDestructor() &&
-                    0 === $reflMethod->getNumberOfRequiredParameters()
-                ) {
-                    $methodName = $reflMethod->getName();
+        foreach ($attributes as $attribute => $details) {
+            if ('id' !== $attribute) {
+                $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
-                    if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0) {
-                        // getters and hassers
-                        $attributeName = lcfirst(substr($methodName, 3));
-                    } elseif (strpos($methodName, 'is') === 0) {
-                        // issers
-                        $attributeName = lcfirst(substr($methodName, 2));
-                    }
-
-                    if (isset($attributeName)) {
-                        $attributes[$attributeName] = true;
-                    }
+                if (null !== $attributeValue && !is_scalar($attributeValue)) {
+                    $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
                 }
+
+                $data[$attribute] = $attributeValue;
             }
-
-            // properties
-            foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-                $name = $reflProperty->getName();
-                $attributes[$name] = true;
-            }
-
-            unset($attributes['id']);
-        }
-
-        foreach ($attributes as $attribute => $type) {
-            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-            if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
-            }
-
-            $data[$attribute] = $attributeValue;
         }
 
         return $data;
@@ -236,9 +214,10 @@ class JsonLdNormalizer extends AbstractNormalizer
     /**
      * Guesses the associated resource.
      *
-     * @param  mixed         $object
-     * @param  array         $context
-     * @return Resource|null
+     * @param mixed $object
+     * @param array $context
+     *
+     * @return \Dunglas\JsonLdApiBundle\Resource|null
      */
     private function guessResource($object, array $context)
     {
@@ -247,7 +226,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         }
 
         if (is_object($object)) {
-            $this->resources->getResourceForEntity(get_class($object));
+            return $this->resources->getResourceForEntity(get_class($object));
         }
 
         return;

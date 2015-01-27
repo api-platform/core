@@ -12,26 +12,33 @@
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
-use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactoryInterface;
+use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory as DoctrineClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
 
 /**
- * ClassMetadataFactory.
+ * ClassMetadata Factory for the JSON-LD normalizer.
+ *
+ * Reuse data available through Serializer, Validator and ORM mappings when possible.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ClassMetadataFactory
 {
     /**
-     * @var \Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface
+     * @var ValidatorMetadataFactory|null
      */
     private $validatorMetadataFactory;
     /**
-     * @var \Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory
+     * @var SerializerClassMetadataFactory|null
      */
     private $serializerClassMetadataFactory;
     /**
-     * @var \Doctrine\Common\Cache\Cache|null
+     * @var DoctrineClassMetadataFactory|null
+     */
+    private $doctrineClassMetadataFactory;
+    /**
+     * @var Cache|null
      */
     private $cache;
     /**
@@ -39,10 +46,15 @@ class ClassMetadataFactory
      */
     private $loadedClasses = [];
 
-    public function __construct(ValidatorMetadataFactoryInterface $validatorMetadataFactory, SerializerClassMetadataFactory $serializerClassMetadataFactory, Cache $cache = null)
-    {
+    public function __construct(
+        ValidatorMetadataFactory $validatorMetadataFactory = null,
+        SerializerClassMetadataFactory $serializerClassMetadataFactory = null,
+        DoctrineClassMetadataFactory $doctrineClassMetadataFactory = null,
+        Cache $cache = null
+    ) {
         $this->validatorMetadataFactory = $validatorMetadataFactory;
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
+        $this->doctrineClassMetadataFactory = $doctrineClassMetadataFactory;
         $this->cache = $cache;
     }
 
@@ -84,23 +96,18 @@ class ClassMetadataFactory
 
         $serializerMetadata = $this->serializerClassMetadataFactory ? $this->serializerClassMetadataFactory->getMetadataFor($class) : null;
         $validatorMetadata = $this->validatorMetadataFactory ? $this->validatorMetadataFactory->getMetadataFor($class) : null;
+        $doctrineMetadata = $this->doctrineClassMetadataFactory ? $this->doctrineClassMetadataFactory->getMetadataFor($class) : null;
 
-        $metadata = new ClassMetadata($class, $serializerMetadata, $validatorMetadata);
+        $metadata = new ClassMetadata($class, $serializerMetadata, $validatorMetadata, $doctrineMetadata);
 
         $reflClass = $metadata->getReflectionClass();
 
         // Include constraints from the parent class
         if ($parent = $reflClass->getParentClass()) {
-            //$metadata->mergeAttributesGroups($this->getMetadataFor($parent->name));
         }
 
         // Include constraints from all implemented interfaces
         foreach ($reflClass->getInterfaces() as $interface) {
-            //$metadata->mergeAttributesGroups($this->getMetadataFor($interface->name));
-        }
-
-        if ($this->loader) {
-            $this->loader->loadClassMetadata($metadata);
         }
 
         if ($this->cache) {
@@ -121,6 +128,16 @@ class ClassMetadataFactory
         $class = $this->getClass($value);
 
         return class_exists($class) || interface_exists($class);
+    }
+
+    /**
+     * Gets Serializer's ClassMetadataFactory
+     *
+     * @return SerializerClassMetadataFactory|null
+     */
+    public function getSerializerClassMetadataFactory()
+    {
+        return $this->serializerClassMetadataFactory;
     }
 
     /**

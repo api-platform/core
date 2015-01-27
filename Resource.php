@@ -174,6 +174,16 @@ class Resource
     }
 
     /**
+     * Gets normalization groups.
+     *
+     * @return string[]|null
+     */
+    public function getNormalizationGroups()
+    {
+        return isset($this->normalizationContext['groups']) ? $this->normalizationContext['groups'] : null;
+    }
+
+    /**
      * Gets the denormalization context.
      *
      * @return array
@@ -184,9 +194,19 @@ class Resource
     }
 
     /**
+     * Gets denormalization groups.
+     *
+     * @return string[]|null
+     */
+    public function getDenormalizationGroups()
+    {
+        return isset($this->denormalizationContext['groups']) ? $this->denormalizationContext['groups'] : null;
+    }
+
+    /**
      * Gets validation groups to use.
      *
-     * @return array|null
+     * @return string[]|null
      */
     public function getValidationGroups()
     {
