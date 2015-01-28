@@ -100,16 +100,6 @@ class ClassMetadataFactory
 
         $metadata = new ClassMetadata($class, $serializerMetadata, $validatorMetadata, $doctrineMetadata);
 
-        $reflClass = $metadata->getReflectionClass();
-
-        // Include constraints from the parent class
-        if ($parent = $reflClass->getParentClass()) {
-        }
-
-        // Include constraints from all implemented interfaces
-        foreach ($reflClass->getInterfaces() as $interface) {
-        }
-
         if ($this->cache) {
             $this->cache->save($class, $metadata);
         }

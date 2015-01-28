@@ -88,9 +88,7 @@ class JsonLdNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        if (!$resource = $this->guessResource($object, $context)) {
-            throw new InvalidArgumentException('A resource object must be passed in the context.');
-        }
+        $resource = $this->guessResource($object, $context);
 
         $data = [];
         if (!isset($context['has_json_ld_context'])) {
@@ -160,11 +158,15 @@ class JsonLdNormalizer extends AbstractNormalizer
             if ('id' !== $attribute) {
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
-                if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                    $attributeValue = $this->serializer->normalize($attributeValue, $format, $context);
+                if ($details['type']) {
+                    $attributeContext = $context;
+                    $attributeContext['resource'] = $this->resources->getResourceForEntity($details['type']);
+                    $data[$attribute] = $this->serializer->normalize($attributeValue, $format, $attributeContext);
+
+                    continue;
                 }
 
-                $data[$attribute] = $attributeValue;
+                $data[$attribute] = $this->serializer->normalize($attributeValue, 'json', $context);
             }
         }
 
@@ -214,21 +216,35 @@ class JsonLdNormalizer extends AbstractNormalizer
     /**
      * Guesses the associated resource.
      *
-     * @param mixed $object
+     * @param mixed $type
      * @param array $context
      *
      * @return \Dunglas\JsonLdApiBundle\Resource|null
+     *
+     * @throws InvalidArgumentException
      */
-    private function guessResource($object, array $context)
+    private function guessResource($type, array $context)
     {
         if (isset($context['resource'])) {
             return $context['resource'];
         }
 
-        if (is_object($object)) {
-            return $this->resources->getResourceForEntity(get_class($object));
+        if (is_object($type)) {
+            $type = get_class($type);
         }
 
-        return;
+        if (is_string($type)) {
+            if ($resource = $this->resources->getResourceForEntity($type)) {
+                return $resource;
+            }
+
+            throw new InvalidArgumentException(
+                sprintf('Cannot find a resource object for type "%s". Add a "resource" key in the context.', $type)
+            );
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Cannot find a resource object for type "%s". Add a "resource" key in the context.', gettype($type))
+        );
     }
 }
