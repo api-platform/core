@@ -13,6 +13,14 @@
             <tag name="routing.loader" />
         </service>
 
+        <service id="dunglas_json_ld_api.api_documentation" class="Dunglas\JsonLdApiBundle\ApiDocumentation">
+            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+            <argument>%dunglas_json_ld_api.title%</argument>
+            <argument>%dunglas_json_ld_api.description%</argument>
+        </service>
+
         <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
             <argument type="service" id="dunglas_json_ld_api.resources" />
             <argument type="service" id="router" />

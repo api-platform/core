@@ -112,7 +112,7 @@ class ResourceController extends Controller
      * @param Resource $resource
      * @param Request  $request
      *
-     * @return array|\Traversable
+     * @return Paginator
      */
     protected function getCollectionData(Resource $resource, Request $request)
     {

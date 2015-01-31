@@ -35,11 +35,9 @@ class ContextBuilder
     /**
      * Builds the JSON-LD context for the given resource.
      *
-     * @param Resource $resource
-     *
      * @return array
      */
-    public function buildContext(Resource $resource)
+    public function buildContext()
     {
         $context = [];
         $context['@vocab'] = $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#';

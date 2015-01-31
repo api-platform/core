@@ -25,3 +25,5 @@ doctrine:
 
 dunglas_json_ld_api:
     elements_by_page: 3
+    title: My Dummy API
+    description: This is a test API.

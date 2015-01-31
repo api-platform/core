@@ -16,8 +16,4 @@ require 'AppKernel.php';
 
 AnnotationRegistry::registerLoader([$loader, 'loadClass']);
 
-// Create database schema
-//$kernel = new AppKernel('test', true);
-//$kernel->boot();
-
 return $loader;

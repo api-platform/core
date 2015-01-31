@@ -24,6 +24,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class DocumentationController extends Controller
 {
     /**
+     * Serves the entrypoint of the API.
+     *
+     * @return JsonLdResponse
+     *
+     * @Route(name="json_ld_api_entrypoint", path="/")
+     */
+    public function entrypointAction()
+    {
+        return new JsonLdResponse([]);
+    }
+
+    /**
      * Namespace of types specific to the current API.
      *
      * @return Response
@@ -32,11 +44,11 @@ class DocumentationController extends Controller
      */
     public function vocabAction()
     {
-        return new Response('The app vocab.');
+        return new JsonLdResponse($this->get('dunglas_json_ld_api.api_documentation')->getDocumentation());
     }
 
     /**
-     * JSON-LD context for a given type
+     * JSON-LD context for a given type.
      *
      * @param string $shortName
      *

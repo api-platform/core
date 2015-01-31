@@ -40,6 +40,14 @@ class Resource
      */
     protected $shortName;
     /**
+     * @var string|null
+     */
+    protected $title;
+    /**
+     * @var string|null
+     */
+    protected $description;
+    /**
      * @var array
      */
     protected $normalizationContext;
@@ -85,43 +93,42 @@ class Resource
     protected $collectionRoute = null;
 
     /**
-     * @param string     $entityClass
-     * @param string     $shortName
-     * @param array      $normalizationContext
-     * @param array      $denormalizationContext
-     * @param array|null $validationGroups
-     * @param array      $collectionOperations
-     * @param array      $itemOperations
-     * @param string     $controllerName
+     * @param string      $entityClass
+     * @param array       $normalizationContext
+     * @param array       $denormalizationContext
+     * @param array|null  $validationGroups
+     * @param string|null $shortName
+     * @param string|null $title
+     * @param string|null $description
+     * @param array       $collectionOperations
+     * @param array       $itemOperations
+     * @param string      $controllerName
      */
     public function __construct(
         $entityClass,
-        $shortName = null,
         array $normalizationContext = [],
         array $denormalizationContext = [],
         array $validationGroups = null,
+        $shortName = null,
+        $title = null,
+        $description = null,
         array $collectionOperations = [
             [
-                '@type' => 'Operation',
-                'method' => 'GET',
+                'hydra:method' => 'GET',
             ],
             [
-                '@type' => 'CreateResourceOperation',
-                'method' => 'POST',
+                'hydra:method' => 'POST',
             ],
         ],
         array $itemOperations = [
             [
-                '@type' => 'Operation',
-                'method' => 'GET',
+                'hydra:method' => 'GET',
             ],
             [
-                '@type' => 'ReplaceResourceOperation',
-                'method' => 'PUT',
+                'hydra:method' => 'PUT',
             ],
             [
-                '@type' => 'DeleteResourceOperation',
-                'method' => 'DELETE'
+                'hydra:method' => 'DELETE'
             ],
         ],
         $controllerName = 'DunglasJsonLdApiBundle:Resource'
@@ -132,6 +139,8 @@ class Resource
 
         $this->entityClass = $entityClass;
         $this->shortName = $shortName ?: substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
+        $this->title = $title;
+        $this->description = $description;
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
         $this->validationGroups = $validationGroups;
@@ -161,6 +170,26 @@ class Resource
     public function getShortName()
     {
         return $this->shortName;
+    }
+
+    /**
+     * Gets the title of this resource (used in the Hydra documentation).
+     *
+     * @return string|null
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Gets the description of this resource (used in the Hydra documentation).
+     *
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
@@ -268,23 +297,24 @@ class Resource
      */
     private function addRoute($beautified, RouteCollection $routeCollection, array $operation, $isCollection)
     {
-        $method = isset($operation['method']) ? $operation['method'] : 'GET';
+        $method = isset($operation['hydra:method']) ? $operation['hydra:method'] : $operation['hydra:method'] = 'GET';
         $action = $method === 'GET' && $isCollection ? 'cget' : strtolower($method);
 
-        if (isset($operation['_controller'])) {
-            $controller = $operation['_controller'];
+        // Use ! as ignore character because @ and are _ reserver JSON-LD characters
+        if (isset($operation['!controller'])) {
+            $controller = $operation['!controller'];
         } else {
             $controller = sprintf('%s:%s', $this->controllerName, $action);
         }
 
-        if (isset($operation['_route_name'])) {
-            $routeName = $operation['_route_name'];
+        if (isset($operation['!route_name'])) {
+            $routeName = $operation['!route_name'];
         } else {
             $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $beautified, $action);
         }
 
-        if (isset($operation['_route_path'])) {
-            $routePath = $operation['_route_path'];
+        if (isset($operation['!route_path'])) {
+            $routePath = $operation['!route_path'];
         } else {
             $routePath = self::ROUTE_PATH_PREFIX.$beautified;
 
@@ -320,6 +350,11 @@ class Resource
         }
     }
 
+    /**
+     * Gets the route associated with the collection.
+     *
+     * @return null|string
+     */
     public function getCollectionRoute()
     {
         if (!$this->collectionRoute) {
@@ -331,7 +366,7 @@ class Resource
     }
 
     /**
-     * Gets route to generate an identifier.
+     * Gets route associated with an element.
      *
      * @return string
      */
@@ -343,5 +378,15 @@ class Resource
         }
 
         return $this->elementRoute;
+    }
+
+    public function getItemOperations()
+    {
+        return $this->itemOperations;
+    }
+
+    public function getCollectionOperations()
+    {
+        return $this->collectionOperations;
     }
 }

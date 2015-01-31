@@ -31,6 +31,8 @@ class DunglasJsonLdApiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter('dunglas_json_ld_api.title', $config['title']);
+        $container->setParameter('dunglas_json_ld_api.description', $config['description']);
         $container->setParameter('dunglas_json_ld_api.elements_by_page', $config['elements_by_page']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
