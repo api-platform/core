@@ -32,7 +32,7 @@ class DocumentationController extends Controller
      */
     public function entrypointAction()
     {
-        return new JsonLdResponse([]);
+        return new JsonLdResponse($this->get('dunglas_json_ld_api.entrypoint_builder')->getEntrypoint());
     }
 
     /**
@@ -44,7 +44,7 @@ class DocumentationController extends Controller
      */
     public function vocabAction()
     {
-        return new JsonLdResponse($this->get('dunglas_json_ld_api.api_documentation')->getDocumentation());
+        return new JsonLdResponse($this->get('dunglas_json_ld_api.api_documentation_builder')->getApiDocumentation());
     }
 
     /**
@@ -58,13 +58,15 @@ class DocumentationController extends Controller
      */
     public function contextAction($shortName)
     {
-        $resource = $this->get('dunglas_json_ld_api.resources')->getResourceForShortName($shortName);
-        if (!$resource) {
-            throw $this->createNotFoundException();
+        if ('Entrypoint' !== $shortName || 'ApiDocumentation' !== $shortName) {
+            $resource = $this->get('dunglas_json_ld_api.resources')->getResourceForShortName($shortName);
+            if (!$resource) {
+                throw $this->createNotFoundException();
+            }
         }
 
         return new JsonLdResponse(
-            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->buildContext($resource)]
+            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->buildContext()]
         );
     }
 }

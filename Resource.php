@@ -40,14 +40,6 @@ class Resource
      */
     protected $shortName;
     /**
-     * @var string|null
-     */
-    protected $title;
-    /**
-     * @var string|null
-     */
-    protected $description;
-    /**
      * @var array
      */
     protected $normalizationContext;
@@ -98,8 +90,6 @@ class Resource
      * @param array       $denormalizationContext
      * @param array|null  $validationGroups
      * @param string|null $shortName
-     * @param string|null $title
-     * @param string|null $description
      * @param array       $collectionOperations
      * @param array       $itemOperations
      * @param string      $controllerName
@@ -110,8 +100,6 @@ class Resource
         array $denormalizationContext = [],
         array $validationGroups = null,
         $shortName = null,
-        $title = null,
-        $description = null,
         array $collectionOperations = [
             [
                 'hydra:method' => 'GET',
@@ -139,8 +127,6 @@ class Resource
 
         $this->entityClass = $entityClass;
         $this->shortName = $shortName ?: substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
-        $this->title = $title;
-        $this->description = $description;
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
         $this->validationGroups = $validationGroups;
@@ -170,26 +156,6 @@ class Resource
     public function getShortName()
     {
         return $this->shortName;
-    }
-
-    /**
-     * Gets the title of this resource (used in the Hydra documentation).
-     *
-     * @return string|null
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * Gets the description of this resource (used in the Hydra documentation).
-     *
-     * @return string|null
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**
@@ -264,7 +230,7 @@ class Resource
         }
 
         $this->routeCollection = new RouteCollection();
-        $beautified = Inflector::pluralize(Inflector::tableize($this->shortName));
+        $beautified = $this->getBeautifiedName();
 
         foreach ($this->collectionOperations as $collectionOperation) {
             $this->addRoute($beautified, $this->routeCollection, $collectionOperation, true);
@@ -388,5 +354,15 @@ class Resource
     public function getCollectionOperations()
     {
         return $this->collectionOperations;
+    }
+
+    /**
+     * Gets the short name of the resource pluralized and camel cased.
+     *
+     * @return string
+     */
+    public function getBeautifiedName()
+    {
+        return Inflector::pluralize(Inflector::tableize($this->shortName));
     }
 }

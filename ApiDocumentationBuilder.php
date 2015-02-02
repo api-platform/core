@@ -15,11 +15,11 @@ use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * ApiDocumentation.
+ * Hydra's ApiDocumentation builder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiDocumentation
+class ApiDocumentationBuilder
 {
     /**
      * @var string
@@ -68,10 +68,10 @@ class ApiDocumentation
         $this->description = $description;
     }
 
-    public function getDocumentation()
+    public function getApiDocumentation()
     {
         $doc = [
-            '@context' => self::HYDRA_NS,
+            '@context' => $this->router->generate('json_ld_api_context', ['shortName' => 'ApiDocumentation']),
             '@id' => $this->router->generate('json_ld_api_vocab'),
             'hydra:title' => $this->title,
             'hydra:description' => $this->description,
@@ -79,6 +79,52 @@ class ApiDocumentation
             'hydra:supportedClass' => [],
         ];
 
+        // Entrypoint
+        $supportedProperties = [];
+        foreach ($this->resources as $resource) {
+            $shortName = $resource->getShortName();
+
+            $supportedProperty = [
+                '@type' => 'hydra:SupportedProperty',
+                'hydra:property' => $resource->getBeautifiedName(),
+                'hydra:title' => sprintf('The collection of %s resources', $shortName),
+                'hydra:readable' => true,
+                'hydra:writable' => false,
+                'hydra:supportedOperation' => [],
+            ];
+
+            foreach ($resource->getCollectionOperations() as $operation) {
+                $supportedOperation = [];
+
+                if('POST' === $operation['hydra:method']) {
+                    $supportedOperation['@type'] = 'hydra:CreateResourceOperation';
+                    $supportedOperation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
+                    $supportedOperation['hydra:expects'] = $shortName;
+                    $supportedOperation['hydra:returns'] = $shortName;
+                } else {
+                    $supportedOperation['@type'] = 'hydra:Operation';
+                    if ('GET' === $operation['hydra:method']) {
+                        $supportedOperation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $shortName);
+                        $supportedOperation['hydra:returns'] = 'hydra:PagedCollection';
+                    }
+                }
+
+                $this->populateSupportedOperation($supportedOperation, $operation);
+
+                $supportedProperty['hydra:supportedOperation'][] = $supportedOperation;
+            }
+
+            $supportedProperties[] = $supportedProperty;
+        }
+
+        $doc['hydra:supportedClass'][] = [
+            '@id' => 'Entrypoint',
+            '@type' => 'hydra:class',
+            'hydra:title' => 'The API entrypoint',
+            'hydra:supportedProperty' => $supportedProperties,
+        ];
+
+        // Resources
         foreach ($this->resources as $resource) {
             $metadata = $this->classMetadataFactory->getMetadataFor($resource->getEntityClass());
             $shortName = $resource->getShortName();
@@ -86,10 +132,10 @@ class ApiDocumentation
             $supportedClass = [
                 '@id' => $shortName,
                 '@type' => 'hydra:Class',
-                'hydra:title' => $resource->getTitle() ?: $resource->getShortName(),
+                'hydra:title' => $resource->getShortName(),
             ];
 
-            $description = $resource->getDescription() ?: $metadata->getDescription();
+            $description = $metadata->getDescription();
             if ($description) {
                 $supportedClass['hydra:description'] = $description;
             }
@@ -119,27 +165,6 @@ class ApiDocumentation
             }
 
             $supportedClass['hydra:supportedOperation'] = [];
-            foreach ($resource->getCollectionOperations() as $operation) {
-                $supportedOperation = [];
-
-                if('POST' === $operation['hydra:method']) {
-                    $supportedOperation['@type'] = 'hydra:CreateResourceOperation';
-                    $supportedOperation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
-                    $supportedOperation['hydra:expects'] = $shortName;
-                    $supportedOperation['hydra:returns'] = $shortName;
-                } else {
-                    $supportedOperation['@type'] = 'hydra:Operation';
-                    if ('GET' === $operation['hydra:method']) {
-                        $supportedOperation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $shortName);
-                        $supportedOperation['hydra:returns'] = 'hydra:PagedCollection';
-                    }
-                }
-
-                $this->populateSupportedOperation($supportedOperation, $operation);
-
-                $supportedClass['hydra:supportedOperation'][] = $supportedOperation;
-            }
-
             foreach ($resource->getItemOperations() as $operation) {
                 $supportedOperation = [];
 
@@ -172,7 +197,7 @@ class ApiDocumentation
     }
 
     /**
-     * Copy data from $operation to $supportedOperation except when the key start with "!".
+     * Copies data from $operation to $supportedOperation except when the key start with "!".
      *
      * @param array $supportedOperation
      * @param array $operation
