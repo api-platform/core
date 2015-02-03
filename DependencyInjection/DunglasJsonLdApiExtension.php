@@ -13,17 +13,29 @@ namespace Dunglas\JsonLdApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-
 
 /**
  * The extension of this bundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DunglasJsonLdApiExtension extends Extension
+class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        if (isset($container->getParameter('kernel.bundles')['FOSUserBundle'])) {
+            $container->prependExtensionConfig($this->getAlias(), ['enable_fos_user_event_subscriber' => true]);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -38,5 +50,15 @@ class DunglasJsonLdApiExtension extends Extension
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+
+        if ($config['enable_fos_user_event_subscriber']) {
+            $definition = new Definition(
+                'Dunglas\JsonLdApiBundle\EventListener\FOSUserEventSubscriber',
+                [new Reference('fos_user.user_manager')]
+            );
+            $definition->setTags(['kernel.event_subscriber' => []]);
+
+            $container->setDefinition('dunglas_json_ld_api.event_subscriber.fos_user', $definition);
+        }
     }
 }

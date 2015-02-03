@@ -9,11 +9,17 @@ This bundle *is not usable in production yet*.
 
 ## Features
 
-* Fully featured REST API
-* Validation groups support
-* Serialization groups support
-* Automatic CRUD routes registration
-* JSON-LD context generation
+* Create a fully featured hypermedia REST API in minutes with CRUD support and pagination
+* Automatic Doctrine ORM support
+* Validation groups
+* Serialization groups
+* Automatic routes registration
+* [JSON-LD](http://json-ld.org) serialization (hypermedia) including external contexts (for performance)
+* Automatic [Hydra](http://hydra-cg.com) documentation guessed from PHPDoc, Serializer, Validator and Doctrine ORM mappings
+* Automatic entrypoint generation giving access to all resources
+* [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) bridge
+* Fully customizable trough a powerful event system and strong OOP
+* Tested with Behat
 
 ## Resources
 
@@ -21,5 +27,7 @@ This bundle *is not usable in production yet*.
 
 ## TODO
 
-* [ ] Hydra support
+* [ ] Filters (hydra:search)
 * [ ] Externals IRIs support
+* [ ] Spec classes with PHPSpec
+* [ ] Documentation

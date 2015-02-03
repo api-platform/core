@@ -48,11 +48,11 @@ class ApiDocumentationBuilder
     private $description;
 
     /**
-     * @param Resources $resources
-     * @param RouterInterface $router
+     * @param Resources            $resources
+     * @param RouterInterface      $router
      * @param ClassMetadataFactory $classMetadataFactory
-     * @param string $title
-     * @param string $description
+     * @param string               $title
+     * @param string               $description
      */
     public function __construct(
         Resources $resources,
@@ -96,7 +96,7 @@ class ApiDocumentationBuilder
             foreach ($resource->getCollectionOperations() as $operation) {
                 $supportedOperation = [];
 
-                if('POST' === $operation['hydra:method']) {
+                if ('POST' === $operation['hydra:method']) {
                     $supportedOperation['@type'] = 'hydra:CreateResourceOperation';
                     $supportedOperation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
                     $supportedOperation['hydra:expects'] = $shortName;

@@ -35,7 +35,8 @@
     "behatch/contexts": "~2.2"
   },
   "suggest": {
-    "sensio/framework-extra-bundle": "Automatically load documentation routes."
+    "sensio/framework-extra-bundle": "Automatically load documentation routes.",
+    "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
   },
   "autoload": {
     "psr-4": { "Dunglas\\JsonLdApiBundle\\": "" }

@@ -309,6 +309,7 @@ class ClassMetadata
 
             if ($reflClass->hasProperty($name)) {
                 $attribute['description'] = (new DocBlock($reflClass->getProperty($name)))->getShortDescription();
+
                 return;
             }
 
@@ -324,6 +325,7 @@ class ClassMetadata
 
             if ($method) {
                 $attribute['description'] = (new DocBlock($reflClass->getMethod($method)))->getShortDescription();
+
                 return;
             }
 

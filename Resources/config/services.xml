@@ -51,6 +51,12 @@
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\ContextBuilder">
             <argument type="service" id="router" />
         </service>
+
+        <service id="dunglas_json_ld_api.event_subscriber.doctrine" class="Dunglas\JsonLdApiBundle\EventListener\DoctrineEventSubscriber">
+            <argument type="service" id="doctrine" />
+
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 
 </container>
