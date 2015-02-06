@@ -60,7 +60,7 @@ Feature: Documentation support
               "hydra:title": "id",
               "hydra:required": false,
               "hydra:readable": true,
-              "hydra:writable": true
+              "hydra:writable": false
             },
             {
               "@type": "hydra:SupportedProperty",

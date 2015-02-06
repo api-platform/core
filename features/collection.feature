@@ -26,17 +26,20 @@ Feature: Collections support
         {
           "@id": "/dummies/1",
           "@type": "Dummy",
-          "name": "Dummy #1"
+          "name": "Dummy #1",
+          "dummy": null
         },
         {
           "@id": "/dummies/2",
           "@type": "Dummy",
-          "name": "Dummy #2"
+          "name": "Dummy #2",
+          "dummy": null
         },
         {
           "@id": "/dummies/3",
           "@type": "Dummy",
-          "name": "Dummy #3"
+          "name": "Dummy #3",
+          "dummy": null
         }
       ]
     }
@@ -66,17 +69,20 @@ Feature: Collections support
         {
           "@id": "/dummies/19",
           "@type": "Dummy",
-          "name": "Dummy #19"
+          "name": "Dummy #19",
+          "dummy": null
         },
         {
           "@id": "/dummies/20",
           "@type": "Dummy",
-          "name": "Dummy #20"
+          "name": "Dummy #20",
+          "dummy": null
         },
         {
           "@id": "/dummies/21",
           "@type": "Dummy",
-          "name": "Dummy #21"
+          "name": "Dummy #21",
+          "dummy": null
         }
       ]
     }
@@ -105,17 +111,20 @@ Feature: Collections support
           {
             "@id": "/dummies/28",
             "@type": "Dummy",
-            "name": "Dummy #28"
+            "name": "Dummy #28",
+            "dummy": null
           },
           {
             "@id": "/dummies/29",
             "@type": "Dummy",
-            "name": "Dummy #29"
+            "name": "Dummy #29",
+            "dummy": null
           },
           {
             "@id": "/dummies/30",
             "@type": "Dummy",
-            "name": "Dummy #30"
+            "name": "Dummy #30",
+            "dummy": null
           }
       ]
     }

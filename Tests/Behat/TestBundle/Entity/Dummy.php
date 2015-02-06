@@ -28,13 +28,23 @@ class Dummy
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    public $id;
+    private $id;
 
     /**
      * @ORM\Column
      * @Assert\NotBlank
      */
     private $name;
+
+    /**
+     * @ORM\Column(nullable=true)
+     */
+    public $dummy;
+
+    public function getId()
+    {
+        return $this->id;
+    }
 
     public function setName($name)
     {
