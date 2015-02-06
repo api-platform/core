@@ -1,6 +1,5 @@
 api_doc:
-    resource: "@DunglasJsonLdApiBundle/Controller/"
-    type:     "annotation"
+    resource: "@DunglasJsonLdApiBundle/Resources/config/routing.xml"
 
 api:
     resource: "."

@@ -32,7 +32,6 @@ class AppKernel extends Kernel
         return [
             new FrameworkBundle(),
             new DoctrineBundle(),
-            new SensioFrameworkExtraBundle(),
             new DunglasJsonLdApiBundle(),
             new TestBundle(),
         ];

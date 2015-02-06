@@ -25,7 +25,6 @@
     "phpdocumentor/reflection-docblock": "~2.0"
   },
   "require-dev": {
-    "sensio/framework-extra-bundle": "~3.0",
     "phpspec/phpspec": "~2.0",
     "behat/behat": "~3.0",
     "behat/symfony2-extension": "~2.0",
@@ -35,7 +34,6 @@
     "behatch/contexts": "~2.2"
   },
   "suggest": {
-    "sensio/framework-extra-bundle": "Automatically load documentation routes.",
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
   },
   "autoload": {

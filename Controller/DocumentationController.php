@@ -13,8 +13,6 @@ namespace Dunglas\JsonLdApiBundle\Controller;
 
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Generates API documentation.
@@ -27,8 +25,6 @@ class DocumentationController extends Controller
      * Serves the entrypoint of the API.
      *
      * @return JsonLdResponse
-     *
-     * @Route(name="json_ld_api_entrypoint", path="/")
      */
     public function entrypointAction()
     {
@@ -38,9 +34,7 @@ class DocumentationController extends Controller
     /**
      * Namespace of types specific to the current API.
      *
-     * @return Response
-     *
-     * @Route(name="json_ld_api_vocab", path="/vocab")
+     * @return JsonLdResponse
      */
     public function vocabAction()
     {
@@ -53,8 +47,6 @@ class DocumentationController extends Controller
      * @param string $shortName
      *
      * @return JsonLdResponse
-     *
-     * @Route(name="json_ld_api_context", path="/contexts/{shortName}")
      */
     public function contextAction($shortName)
     {
