@@ -12,7 +12,6 @@
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Dunglas\JsonLdApiBundle\DunglasJsonLdApiBundle;
 use Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\TestBundle;
-use Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
