@@ -158,31 +158,27 @@ class ClassMetadata
             $reflClass = $this->getReflectionClass();
             // methods
             foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-                if (
-                    !$reflMethod->isConstructor() &&
-                    !$reflMethod->isDestructor() &&
-                    0 === $reflMethod->getNumberOfRequiredParameters()
-                ) {
-                    $methodName = $reflMethod->getName();
+                if ($reflMethod->isConstructor() || $reflMethod->isDestructor()) {
+                    continue;
+                }
 
-                    if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0) {
-                        // getters and hassers
-                        $attributeName = lcfirst(substr($methodName, 3));
-                    } elseif (strpos($methodName, 'is') === 0) {
-                        // issers
-                        $attributeName = lcfirst(substr($methodName, 2));
-                    }
+                $methodName = $reflMethod->getName();
+                if (null === ($attributeName = $this->guessAttributeName($methodName))) {
+                    continue;
+                }
 
-                    if (isset($attributeName)) {
-                        $attributes[$attributeName] = [
-                            'readable' => true,
-                            'writable' => true,
-                            'description' => (new DocBlock($reflMethod))->getShortDescription(),
-                        ];
+                if (!isset($attributes[$attributeName])) {
+                    $attributes[$attributeName] = [
+                        'readable' => false,
+                        'writable' => false,
+                        'description' => (new DocBlock($reflMethod))->getShortDescription(),
+                    ];
+                }
 
-                        $this->populateAttribute($attributeName, $attributes[$attributeName], $validationGroups);
-                        unset($attributeName);
-                    }
+                if (0 === $reflMethod->getNumberOfRequiredParameters()) {
+                    $attributes[$attributeName]['readable'] = true;
+                } else {
+                    $attributes[$attributeName]['writable'] = true;
                 }
             }
 
@@ -195,9 +191,12 @@ class ClassMetadata
                         'writable' => true,
                         'description' => (new DocBlock($reflProperty))->getShortDescription(),
                     ];
-
-                    $this->populateAttribute($attributeName, $attributes[$attributeName], $validationGroups);
                 }
+            }
+
+            // populate attributes
+            foreach ($attributes as $attributeName => $attribute) {
+                $this->populateAttribute($attributeName, $attributes[$attributeName], $validationGroups);
             }
         }
 
@@ -224,6 +223,25 @@ class ClassMetadata
         }
 
         return $this->reflClass;
+    }
+
+    /**
+     * Guess an attribute name by its method name.
+     *
+     * @param $methodName
+     * @return null|string
+     */
+    private function guessAttributeName($methodName)
+    {
+        if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0 || strpos($methodName, 'set') === 0) {
+            // getters, setters and hassers
+            return lcfirst(substr($methodName, 3));
+        } elseif (strpos($methodName, 'is') === 0) {
+            // issers
+            return lcfirst(substr($methodName, 2));
+        }
+
+        return null;
     }
 
     /**
