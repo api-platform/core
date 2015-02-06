@@ -155,7 +155,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         );
 
         foreach ($attributes as $attribute => $details) {
-            if ('id' !== $attribute) {
+            if ($details['readable'] && 'id' !== $attribute) {
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 if ($details['type']) {
