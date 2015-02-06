@@ -34,6 +34,16 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
         if (isset($container->getParameter('kernel.bundles')['FOSUserBundle'])) {
             $container->prependExtensionConfig($this->getAlias(), ['enable_fos_user_event_subscriber' => true]);
         }
+
+        if (null !== ($frameworkConfiguration = $container->getExtensionConfig('framework'))) {
+            if (!isset($frameworkConfiguration['serializer']) || !isset($frameworkConfiguration['serializer']['enabled'])) {
+                $container->prependExtensionConfig('framework', [
+                    'serializer' => [
+                        'enabled' => true
+                    ]
+                ]);
+            }
+        }
     }
 
     /**
