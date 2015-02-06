@@ -169,15 +169,13 @@ class ClassMetadata
 
                 if (!isset($attributes[$attributeName])) {
                     $attributes[$attributeName] = [
-                        'readable' => false,
-                        'writable' => false,
                         'description' => (new DocBlock($reflMethod))->getShortDescription(),
                     ];
                 }
 
                 if (0 === $reflMethod->getNumberOfRequiredParameters()) {
                     $attributes[$attributeName]['readable'] = true;
-                } else {
+                } elseif (0 === strpos($methodName, 'set')) {
                     $attributes[$attributeName]['writable'] = true;
                 }
             }
@@ -196,6 +194,11 @@ class ClassMetadata
 
             // populate attributes
             foreach ($attributes as $attributeName => $attribute) {
+                if (!isset($attribute['readable']) && !isset($attribute['writable'])) {
+                    unset($attributes[$attributeName]);
+                    continue;
+                }
+
                 $this->populateAttribute($attributeName, $attributes[$attributeName], $validationGroups);
             }
         }
@@ -288,8 +291,8 @@ class ClassMetadata
             $attribute['readable'] = false;
         }
 
-        if (!isset($attribute['writeable'])) {
-            $attribute['writeable'] = false;
+        if (!isset($attribute['writable'])) {
+            $attribute['writable'] = false;
         }
 
         foreach ($this->validatorClassMetadata->getPropertyMetadata($name) as $propertyMetadata) {

@@ -55,4 +55,9 @@ class Dummy
     {
         return $this->name;
     }
+
+    public function hasRole($role)
+    {
+
+    }
 }
