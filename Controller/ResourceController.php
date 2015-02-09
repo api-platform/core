@@ -28,6 +28,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ResourceController extends Controller
 {
     /**
+     * @var Resource
+     */
+    private $resource;
+
+    /**
      * Gets the Resource associated with the current Request.
      * Must be called before manipulating the resource.
      *
@@ -39,16 +44,20 @@ class ResourceController extends Controller
      */
     protected function getResource(Request $request)
     {
-        if (!$request->attributes->has('_json_ld_api_resource')) {
+        if ($this->resource) {
+            return $this->resource;
+        }
+
+        if (!$request->attributes->has('_json_ld_resource')) {
             throw new \InvalidArgumentException('The current request doesn\'t have an associated resource.');
         }
 
-        $serviceId = $request->attributes->get('_json_ld_api_resource');
-        if (!$this->has($serviceId)) {
-            throw new \InvalidArgumentException(sprintf('The service "%s" isn\'t registered.', $serviceId));
+        $shortName = $request->attributes->get('_json_ld_resource');
+        if (!($this->resource = $this->get('dunglas_json_ld_api.resources')->getResourceForShortName($shortName))) {
+            throw new \InvalidArgumentException(sprintf('The resource "%s" cannot be found.', $shortName));
         }
 
-        return $this->get($serviceId);
+        return $this->resource;
     }
 
     /**

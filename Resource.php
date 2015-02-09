@@ -68,10 +68,6 @@ class Resource
      */
     protected $controllerName;
     /**
-     * @var string
-     */
-    protected $serviceId;
-    /**
      * @var RouteCollection|null
      */
     protected $routeCollection = null;
@@ -116,7 +112,7 @@ class Resource
                 'hydra:method' => 'PUT',
             ],
             [
-                'hydra:method' => 'DELETE'
+                'hydra:method' => 'DELETE',
             ],
         ],
         $controllerName = 'DunglasJsonLdApiBundle:Resource'
@@ -244,16 +240,6 @@ class Resource
     }
 
     /**
-     * Sets the associated service id.
-     *
-     * @param string $serviceId
-     */
-    public function setServiceId($serviceId)
-    {
-        $this->serviceId = $serviceId;
-    }
-
-    /**
      * Adds a route to the collection.
      *
      * @param string          $beautified
@@ -295,7 +281,7 @@ class Resource
             $routePath,
             [
                 '_controller' => $controller,
-                '_json_ld_api_resource' => $this->serviceId,
+                '_json_ld_resource' => $this->shortName,
             ],
             [],
             [],
@@ -346,11 +332,21 @@ class Resource
         return $this->elementRoute;
     }
 
+    /**
+     * Gets item operations.
+     *
+     * @return array
+     */
     public function getItemOperations()
     {
         return $this->itemOperations;
     }
 
+    /**
+     * Get collection operations.
+     *
+     * @return array
+     */
     public function getCollectionOperations()
     {
         return $this->collectionOperations;

@@ -34,9 +34,6 @@ class ResourcesCompilerPass implements CompilerPassInterface
                 'append',
                 [new Reference($serviceId)]
             );
-
-            $resourceDefinition = $container->getDefinition($serviceId);
-            $resourceDefinition->addMethodCall('setServiceId', [$serviceId]);
         }
     }
 }

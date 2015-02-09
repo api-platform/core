@@ -244,7 +244,7 @@ class ClassMetadata
             return lcfirst(substr($methodName, 2));
         }
 
-        return null;
+        return;
     }
 
     /**

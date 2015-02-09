@@ -58,6 +58,5 @@ class Dummy
 
     public function hasRole($role)
     {
-
     }
 }
