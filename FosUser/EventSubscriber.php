@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\EventListener;
+namespace Dunglas\JsonLdApiBundle\FosUser;
 
-use Dunglas\JsonLdApiBundle\DunglasJsonLdApiEvents;
+use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class FOSUserEventSubscriber implements EventSubscriberInterface
+class EventSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserManagerInterface
@@ -40,9 +40,9 @@ class FOSUserEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            DunglasJsonLdApiEvents::PRE_CREATE => ['persistObject', 1],
-            DunglasJsonLdApiEvents::PRE_UPDATE => ['persistObject', 1],
-            DunglasJsonLdApiEvents::PRE_DELETE => ['deleteObject', 1],
+            Events::PRE_CREATE => ['persistObject', 1],
+            Events::PRE_UPDATE => ['persistObject', 1],
+            Events::PRE_DELETE => ['deleteObject', 1],
         ];
     }
 

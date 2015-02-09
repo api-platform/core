@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Controller;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Dunglas\JsonLdApiBundle\DunglasJsonLdApiEvents;
+use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use Dunglas\JsonLdApiBundle\Resource;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
@@ -169,7 +169,7 @@ class ResourceController extends Controller
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
             // Validation succeed
-            $this->get('event_dispatcher')->dispatch(DunglasJsonLdApiEvents::PRE_CREATE, new ObjectEvent($resource, $object));
+            $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE, new ObjectEvent($resource, $object));
 
             return new JsonLdResponse($this->normalize($resource, $object), 201);
         }
@@ -225,7 +225,7 @@ class ResourceController extends Controller
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
             // Validation succeed
-            $this->get('event_dispatcher')->dispatch(DunglasJsonLdApiEvents::PRE_UPDATE, new ObjectEvent($resource, $object));
+            $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE, new ObjectEvent($resource, $object));
 
             return new JsonLdResponse($this->normalize($resource, $object), 202);
         }
@@ -249,7 +249,7 @@ class ResourceController extends Controller
         $resource = $this->getResource($request);
         $object = $this->findOrThrowNotFound($resource, $id);
 
-        $this->get('event_dispatcher')->dispatch(DunglasJsonLdApiEvents::PRE_DELETE, new ObjectEvent($resource, $object));
+        $this->get('event_dispatcher')->dispatch(Events::PRE_DELETE, new ObjectEvent($resource, $object));
 
         return new JsonLdResponse(null, 204);
     }

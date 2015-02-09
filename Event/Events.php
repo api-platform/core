@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\JsonLdApiBundle\Event;
 
 /**
  * API Events.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DunglasJsonLdApiEvents
+final class Events
 {
     /**
      * The PRE_CREATE event occurs after the object validation and before its persistence during POST request.

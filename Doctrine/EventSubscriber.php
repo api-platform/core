@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\EventListener;
+namespace Dunglas\JsonLdApiBundle\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\JsonLdApiBundle\DunglasJsonLdApiEvents;
+use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Doctrine Event Listener.
+ * Bridges between Doctrine and DunglasJsonLdApiBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineEventSubscriber implements EventSubscriberInterface
+class EventSubscriber implements EventSubscriberInterface
 {
     /**
      * @var ManagerRegistry
@@ -39,9 +39,9 @@ class DoctrineEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            DunglasJsonLdApiEvents::PRE_CREATE => ['persistObject', 0],
-            DunglasJsonLdApiEvents::PRE_UPDATE => ['persistObject', 0],
-            DunglasJsonLdApiEvents::PRE_DELETE => ['deleteObject', 0],
+            Events::PRE_CREATE => ['persistObject', 0],
+            Events::PRE_UPDATE => ['persistObject', 0],
+            Events::PRE_DELETE => ['deleteObject', 0],
         ];
     }
 
