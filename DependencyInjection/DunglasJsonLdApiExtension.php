@@ -39,8 +39,8 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
             if (!isset($frameworkConfiguration['serializer']) || !isset($frameworkConfiguration['serializer']['enabled'])) {
                 $container->prependExtensionConfig('framework', [
                     'serializer' => [
-                        'enabled' => true
-                    ]
+                        'enabled' => true,
+                    ],
                 ]);
             }
         }
