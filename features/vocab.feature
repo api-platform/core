@@ -6,18 +6,18 @@ Feature: Documentation support
   @createSchema
   @dropSchema
   Scenario: Retrieve the first page of a collection
-    And I send a "GET" request to "/vocab"
+    Given I send a "GET" request to "/vocab"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/ApiDocumentation",
-      "@id": "\/vocab",
+      "@context": "/contexts/ApiDocumentation",
+      "@id": "/vocab",
       "hydra:title": "My Dummy API",
       "hydra:description": "This is a test API.",
-      "hydra:entrypoint": "\/",
+      "hydra:entrypoint": "/",
       "hydra:supportedClass": [
         {
           "@id": "Entrypoint",
@@ -45,6 +45,28 @@ Feature: Documentation support
                   "hydra:method": "POST"
                 }
               ]
+            },
+            {
+              "@type": "hydra:SupportedProperty",
+              "hydra:property": "related_dummies",
+              "hydra:title": "The collection of RelatedDummy resources",
+              "hydra:readable": true,
+              "hydra:writable": false,
+              "hydra:supportedOperation": [
+                {
+                  "@type": "hydra:Operation",
+                  "hydra:title": "Retrieves the collection of RelatedDummy resources.",
+                  "hydra:returns": "hydra:PagedCollection",
+                  "hydra:method": "GET"
+                },
+                {
+                  "@type": "hydra:CreateResourceOperation",
+                  "hydra:title": "Creates a RelatedDummy resource.",
+                  "hydra:expects": "RelatedDummy",
+                  "hydra:returns": "RelatedDummy",
+                  "hydra:method": "POST"
+                }
+              ]
             }
           ]
         },
@@ -56,7 +78,7 @@ Feature: Documentation support
           "hydra:supportedProperty": [
             {
               "@type": "hydra:SupportedProperty",
-              "hydra:property": "Dummy\/id",
+              "hydra:property": "Dummy/id",
               "hydra:title": "id",
               "hydra:required": false,
               "hydra:readable": true,
@@ -64,7 +86,7 @@ Feature: Documentation support
             },
             {
               "@type": "hydra:SupportedProperty",
-              "hydra:property": "Dummy\/name",
+              "hydra:property": "Dummy/name",
               "hydra:title": "name",
               "hydra:required": true,
               "hydra:readable": true,
@@ -72,8 +94,24 @@ Feature: Documentation support
             },
             {
               "@type": "hydra:SupportedProperty",
-              "hydra:property": "Dummy\/dummy",
+              "hydra:property": "Dummy/dummy",
               "hydra:title": "dummy",
+              "hydra:required": false,
+              "hydra:readable": true,
+              "hydra:writable": true
+            },
+            {
+              "@type": "hydra:SupportedProperty",
+              "hydra:property": "Dummy/relatedDummy",
+              "hydra:title": "relatedDummy",
+              "hydra:required": false,
+              "hydra:readable": true,
+              "hydra:writable": true
+            },
+            {
+              "@type": "hydra:SupportedProperty",
+              "hydra:property": "Dummy/relatedDummies",
+              "hydra:title": "relatedDummies",
               "hydra:required": false,
               "hydra:readable": true,
               "hydra:writable": true
@@ -97,6 +135,43 @@ Feature: Documentation support
               "@type": "hydra:Operation",
               "hydra:title": "Deletes the Dummy resource.",
               "hydra:expects": "Dummy",
+              "hydra:method": "DELETE"
+            }
+          ]
+        },
+        {
+          "@id": "RelatedDummy",
+          "@type": "hydra:Class",
+          "hydra:title": "RelatedDummy",
+          "hydra:description": "Related Dummy.",
+          "hydra:supportedProperty": [
+            {
+              "@type": "hydra:SupportedProperty",
+              "hydra:property": "RelatedDummy/id",
+              "hydra:title": "id",
+              "hydra:required": false,
+              "hydra:readable": true,
+              "hydra:writable": false
+            }
+          ],
+          "hydra:supportedOperation": [
+            {
+              "@type": "hydra:Operation",
+              "hydra:title": "Retrieves RelatedDummy resource.",
+              "hydra:returns": "RelatedDummy",
+              "hydra:method": "GET"
+            },
+            {
+              "@type": "hydra:ReplaceResourceOperation",
+              "hydra:title": "Replaces the RelatedDummy resource.",
+              "hydra:expects": "RelatedDummy",
+              "hydra:returns": "RelatedDummy",
+              "hydra:method": "PUT"
+            },
+            {
+              "@type": "hydra:Operation",
+              "hydra:title": "Deletes the RelatedDummy resource.",
+              "hydra:expects": "RelatedDummy",
               "hydra:method": "DELETE"
             }
           ]

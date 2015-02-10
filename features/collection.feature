@@ -27,19 +27,25 @@ Feature: Collections support
           "@id": "/dummies/1",
           "@type": "Dummy",
           "name": "Dummy #1",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         },
         {
           "@id": "/dummies/2",
           "@type": "Dummy",
           "name": "Dummy #2",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         },
         {
           "@id": "/dummies/3",
           "@type": "Dummy",
           "name": "Dummy #3",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         }
       ]
     }
@@ -70,19 +76,25 @@ Feature: Collections support
           "@id": "/dummies/19",
           "@type": "Dummy",
           "name": "Dummy #19",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         },
         {
           "@id": "/dummies/20",
           "@type": "Dummy",
           "name": "Dummy #20",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         },
         {
           "@id": "/dummies/21",
           "@type": "Dummy",
           "name": "Dummy #21",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         }
       ]
     }
@@ -112,19 +124,25 @@ Feature: Collections support
             "@id": "/dummies/28",
             "@type": "Dummy",
             "name": "Dummy #28",
-            "dummy": null
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": []
           },
           {
             "@id": "/dummies/29",
             "@type": "Dummy",
             "name": "Dummy #29",
-            "dummy": null
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": []
           },
           {
             "@id": "/dummies/30",
             "@type": "Dummy",
             "name": "Dummy #30",
-            "dummy": null
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": []
           }
       ]
     }

@@ -25,3 +25,18 @@ dunglas_json_ld_api:
     elements_by_page: 3
     title: My Dummy API
     description: This is a test API.
+
+services:
+    my_dummy_resource:
+        class:     Dunglas\JsonLdApiBundle\Resource
+        arguments:
+          - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy
+        tags:
+          - { name: json-ld.resource }
+
+    my_related_dummy_resource:
+        class:     Dunglas\JsonLdApiBundle\Resource
+        arguments:
+          - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy
+        tags:
+          - { name: json-ld.resource }

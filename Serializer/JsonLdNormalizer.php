@@ -111,46 +111,56 @@ class JsonLdNormalizer extends AbstractNormalizer
 
         // Collection
         if (is_array($object) || $object instanceof \Traversable) {
-            $data['@id'] = $this->router->generate($resource->getCollectionRoute());
-
-            if ($object instanceof Paginator) {
-                $data['@type'] = self::HYDRA_PAGED_COLLECTION;
-
-                $query = $object->getQuery();
-                $firstResult = $query->getFirstResult();
-                $maxResults = $query->getMaxResults();
-                $currentPage = floor($firstResult / $maxResults) + 1.;
-                $totalItems = count($object);
-                $lastPage = ceil($totalItems / $maxResults);
-
-                $baseUrl = $data['@id'];
-                $paginatedUrl = $baseUrl.'?page=';
-
-                if (1. !== $currentPage) {
-                    $previousPage = $currentPage - 1.;
-                    $data['@id'] .= $paginatedUrl.$currentPage;
-                    $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl.$previousPage;
+            if (isset($context['sub_level'])) {
+                $data = [];
+                foreach ($object as $obj) {
+                    $data[] = $this->normalize($obj, $format, $context);
                 }
-
-                if ($currentPage !== $lastPage) {
-                    $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
-                }
-
-                $data['hydra:totalItems'] = $totalItems;
-                $data['hydra:itemsPerPage'] = $maxResults;
-                $data['hydra:firstPage'] = $baseUrl;
-                $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
             } else {
-                $data['@type'] = self::HYDRA_COLLECTION;
-            }
+                $data['@id'] = $this->router->generate($resource->getCollectionRoute());
 
-            $data['member'] = [];
-            foreach ($object as $obj) {
-                $data['member'][] = $this->normalize($obj, $format, $context);
+                if ($object instanceof Paginator) {
+                    $data['@type'] = self::HYDRA_PAGED_COLLECTION;
+
+                    $query = $object->getQuery();
+                    $firstResult = $query->getFirstResult();
+                    $maxResults = $query->getMaxResults();
+                    $currentPage = floor($firstResult / $maxResults) + 1.;
+                    $totalItems = count($object);
+                    $lastPage = ceil($totalItems / $maxResults);
+
+                    $baseUrl = $data['@id'];
+                    $paginatedUrl = $baseUrl . '?page=';
+
+                    if (1. !== $currentPage) {
+                        $previousPage = $currentPage - 1.;
+                        $data['@id'] .= $paginatedUrl . $currentPage;
+                        $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl . $previousPage;
+                    }
+
+                    if ($currentPage !== $lastPage) {
+                        $data['hydra:nextPage'] = $paginatedUrl . ($currentPage + 1.);
+                    }
+
+                    $data['hydra:totalItems'] = $totalItems;
+                    $data['hydra:itemsPerPage'] = $maxResults;
+                    $data['hydra:firstPage'] = $baseUrl;
+                    $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl . $lastPage;
+                } else {
+                    $data['@type'] = self::HYDRA_COLLECTION;
+                }
+
+                $data['member'] = [];
+                foreach ($object as $obj) {
+                    $data['member'][] = $this->normalize($obj, $format, $context);
+                }
             }
 
             return $data;
         }
+
+        // Use standard arrays in sub levels
+        $context['sub_level'] = true;
 
         $data['@id'] = $this->router->generate(
             $resource->getElementRoute(),

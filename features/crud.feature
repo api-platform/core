@@ -21,7 +21,9 @@ Feature: Create-Retrieve-Update-Delete
       "@id": "/dummies/1",
       "@type": "Dummy",
       "name": "My Dummy",
-      "dummy": null
+      "dummy": null,
+      "relatedDummy": null,
+      "relatedDummies": []
     }
     """
 
@@ -37,7 +39,9 @@ Feature: Create-Retrieve-Update-Delete
       "@id": "/dummies/1",
       "@type": "Dummy",
       "name": "My Dummy",
-      "dummy": null
+      "dummy": null,
+      "relatedDummy": null,
+      "relatedDummies": []
     }
     """
 
@@ -61,7 +65,9 @@ Feature: Create-Retrieve-Update-Delete
           "@id":"/dummies/1",
           "@type":"Dummy",
           "name":"My Dummy",
-          "dummy": null
+          "dummy": null,
+          "relatedDummy": null,
+          "relatedDummies": []
         }
       ]
     }
@@ -85,7 +91,9 @@ Feature: Create-Retrieve-Update-Delete
         "@id": "/dummies/1",
         "@type": "Dummy",
         "name": "A nice dummy",
-        "dummy": null
+        "dummy": null,
+        "relatedDummy": null,
+        "relatedDummies": []
       }
       """
 
