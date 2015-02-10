@@ -159,7 +159,7 @@ class JsonLdNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        // Use standard arrays in sub levels
+        // Don'use hydra:Collection in sub levels
         $context['sub_level'] = true;
 
         $data['@id'] = $this->router->generate(
@@ -173,11 +173,16 @@ class JsonLdNormalizer extends AbstractNormalizer
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 if ($details['type']) {
-                    $attributeContext = $context;
-                    $attributeContext['resource'] = $this->resources->getResourceForEntity($details['type']);
-                    $data[$attribute] = $this->serializer->normalize($attributeValue, $format, $attributeContext);
+                    if (is_array($attributeValue) || $attributeValue instanceof \Traversable) {
+                        $uris = [];
+                        foreach ($attributeValue as $obj) {
+                            $uris[] = $this->getUriFromObject($obj, $details['type']);
+                        }
 
-                    continue;
+                        $attributeValue = $uris;
+                    } elseif (is_object($attributeValue)) {
+                        $attributeValue = $this->getUriFromObject($attributeValue, $details['type']);
+                    }
                 }
 
                 $data[$attribute] = $this->serializer->normalize($attributeValue, 'json', $context);
@@ -212,7 +217,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         $attributes = $this->getAttributes($resource, $object);
 
         foreach ($normalizedData as $attribute => $value) {
-            // Ignore JSON-LD attributes
+            // Ignore JSON-LD special attributes
             if ('@' === $attribute[0]) {
                 continue;
             }
@@ -249,13 +254,13 @@ class JsonLdNormalizer extends AbstractNormalizer
      * Guesses the associated resource.
      *
      * @param mixed $type
-     * @param array $context
+     * @param array|null $context
      *
      * @return \Dunglas\JsonLdApiBundle\Resource
      *
      * @throws InvalidArgumentException
      */
-    private function guessResource($type, array $context)
+    private function guessResource($type, array $context = null)
     {
         if (isset($context['resource'])) {
             return $context['resource'];
@@ -265,18 +270,16 @@ class JsonLdNormalizer extends AbstractNormalizer
             $type = get_class($type);
         }
 
-        if (is_string($type)) {
-            if ($resource = $this->resources->getResourceForEntity($type)) {
-                return $resource;
-            }
+        if (!is_string($type)) {
+            $type = gettype($type);
+        }
 
-            throw new InvalidArgumentException(
-                sprintf('Cannot find a resource object for type "%s". Add a "resource" key in the context.', $type)
-            );
+        if ($resource = $this->resources->getResourceForEntity($type)) {
+            return $resource;
         }
 
         throw new InvalidArgumentException(
-            sprintf('Cannot find a resource object for type "%s". Add a "resource" key in the context.', gettype($type))
+            sprintf('Cannot find a resource object for type "%s".', $type)
         );
     }
 
@@ -284,7 +287,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      * Gets attributes.
      *
      * @param Resource $resource
-     * @param object   $resource
+     * @param object   $object
      *
      * @return array
      */
@@ -298,6 +301,24 @@ class JsonLdNormalizer extends AbstractNormalizer
     }
 
     /**
+     * Gets an URI corresponding to an object.
+     *
+     * @param object $object
+     * @param string $type
+     *
+     * @throws InvalidArgumentException
+     */
+    private function getUriFromObject($object, $type)
+    {
+        $resource = $this->resources->getResourceForEntity($type);
+        if (!$resource) {
+            throw new InvalidArgumentException(sprintf('No resource associated with the type "%s"', $type));
+        }
+
+        return $this->router->generate($resource->getElementRoute(), ['id' => $object->getId()]);
+    }
+
+    /**
      * Gets object from an URI.
      *
      * @param string $uri
@@ -305,14 +326,13 @@ class JsonLdNormalizer extends AbstractNormalizer
      * @return object
      *
      * @throws InvalidArgumentException
-     * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException;
-     * @throws \Symfony\Component\Routing\Exception\MethodNotAllowedException;
      */
     private function getObjectFromUri($uri)
     {
         $request = Request::create($uri);
         $context = (new RequestContext())->fromRequest($request);
         $baseContext = $this->router->getContext();
+
         try {
             $this->router->setContext($context);
 

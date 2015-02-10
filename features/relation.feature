@@ -44,16 +44,9 @@ Feature: Relations support
       "@type": "Dummy",
       "name": "Dummy with relations",
       "dummy": null,
-      "relatedDummy": {
-          "@id": "/related_dummies/1",
-          "@type": "RelatedDummy"
-      },
+      "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
-          {
-              "@id": "/related_dummies/1",
-              "@type": "RelatedDummy"
-          }
+        "/related_dummies/1"
       ]
     }
-
     """
