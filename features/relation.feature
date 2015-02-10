@@ -27,7 +27,7 @@ Feature: Relations support
     """
     {
       "name": "Dummy with relations",
-      "relatedDummy": "/related_dummies/1",
+      "relatedDummy": "http://example.com/related_dummies/1",
       "relatedDummies": [
         "/related_dummies/1"
       ]
@@ -36,4 +36,24 @@ Feature: Relations support
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And print last JSON response
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "name": "Dummy with relations",
+      "dummy": null,
+      "relatedDummy": {
+          "@id": "/related_dummies/1",
+          "@type": "RelatedDummy"
+      },
+      "relatedDummies": [
+          {
+              "@id": "/related_dummies/1",
+              "@type": "RelatedDummy"
+          }
+      ]
+    }
+
+    """
