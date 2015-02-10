@@ -51,6 +51,7 @@
 
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\ContextBuilder">
             <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
         </service>
 
         <service id="dunglas_json_ld_api.event_subscriber.doctrine" class="Dunglas\JsonLdApiBundle\Doctrine\EventSubscriber">

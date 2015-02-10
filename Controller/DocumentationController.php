@@ -58,7 +58,7 @@ class DocumentationController extends Controller
         }
 
         return new JsonLdResponse(
-            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->buildContext()]
+            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->buildContext($resource)]
         );
     }
 }

@@ -1,7 +1,7 @@
 Feature: Documentation support
   In order to build an auto-discoverable API
   As a client software developer
-  I need to know the specifications of objects I send and receive
+  I need to know Hydra specifications of objects I send and receive
 
   @createSchema
   @dropSchema

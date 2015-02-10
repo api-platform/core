@@ -11,6 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle;
 
+use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -26,22 +27,41 @@ class ContextBuilder
      * @var RouterInterface
      */
     private $router;
+    /**
+     * @var ClassMetadataFactory
+     */
+    private $classMetadataFactory;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, ClassMetadataFactory $classMetadataFactory)
     {
         $this->router = $router;
+        $this->classMetadataFactory = $classMetadataFactory;
     }
 
     /**
      * Builds the JSON-LD context for the given resource.
      *
+     * @param Resource $resource
+     *
      * @return array
      */
-    public function buildContext()
+    public function buildContext(Resource $resource)
     {
         $context = [];
         $context['@vocab'] = $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#';
         $context['hydra'] = self::HYDRA_NS;
+
+        $attributes = $this->classMetadataFactory->getMetadataFor($resource->getEntityClass())->getAttributes(
+            $resource->getNormalizationGroups(),
+            $resource->getDenormalizationGroups(),
+            $resource->getValidationGroups()
+        );
+
+        foreach ($attributes as $attributeName => $data) {
+            if ($data['type']) {
+                $context[$attributeName] = ['@type' => '@id'];
+            }
+        }
 
         return $context;
     }
