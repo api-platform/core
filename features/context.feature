@@ -14,6 +14,20 @@ Feature: JSON-LD contexts generation
       "@context": {
         "@vocab": "http://example.com/vocab#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "domain": {
+          "@id": "rdfs:domain",
+          "@type": "@id"
+        },
+        "range": {
+          "@id": "rdfs:range",
+          "@type": "@id"
+        },
+        "subClassOf": {
+          "@id": "rdfs:subClassOf",
+          "@type": "@id"
+        },
         "relatedDummy": {
           "@type": "@id"
         },

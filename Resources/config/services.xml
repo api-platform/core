@@ -35,6 +35,12 @@
             <tag name="serializer.normalizer" />
         </service>
 
+        <service id="dunglas_json_ld_api.constraint_violation_list_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument type="service" id="router" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
         <service id="dunglas_json_ld_api.json_ld_encoder" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdEncoder" public="false">
             <tag name="serializer.encoder" />
         </service>

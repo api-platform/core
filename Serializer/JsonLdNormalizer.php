@@ -130,22 +130,22 @@ class JsonLdNormalizer extends AbstractNormalizer
                     $lastPage = ceil($totalItems / $maxResults);
 
                     $baseUrl = $data['@id'];
-                    $paginatedUrl = $baseUrl . '?page=';
+                    $paginatedUrl = $baseUrl.'?page=';
 
                     if (1. !== $currentPage) {
                         $previousPage = $currentPage - 1.;
-                        $data['@id'] .= $paginatedUrl . $currentPage;
-                        $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl . $previousPage;
+                        $data['@id'] .= $paginatedUrl.$currentPage;
+                        $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl.$previousPage;
                     }
 
                     if ($currentPage !== $lastPage) {
-                        $data['hydra:nextPage'] = $paginatedUrl . ($currentPage + 1.);
+                        $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
                     }
 
                     $data['hydra:totalItems'] = $totalItems;
                     $data['hydra:itemsPerPage'] = $maxResults;
                     $data['hydra:firstPage'] = $baseUrl;
-                    $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl . $lastPage;
+                    $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
                 } else {
                     $data['@type'] = self::HYDRA_COLLECTION;
                 }
@@ -253,7 +253,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     /**
      * Guesses the associated resource.
      *
-     * @param mixed $type
+     * @param mixed      $type
      * @param array|null $context
      *
      * @return \Dunglas\JsonLdApiBundle\Resource

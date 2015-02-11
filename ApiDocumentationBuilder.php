@@ -79,6 +79,67 @@ class ApiDocumentationBuilder
             'hydra:supportedClass' => [],
         ];
 
+        // Constraint violation
+        $doc['hydra:supportedClass'][] = [
+            '@id' => 'ConstraintViolation',
+            '@type' => 'hydra:class',
+            'hydra:title' => 'A constraint violation',
+            'hydra:supportedProperty' => [
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => 'ConstraintViolation/propertyPath',
+                        '@type' => 'rdf:Property',
+                        'rdfs:label' => 'propertyPath',
+                        'domain' => 'ConstraintViolation',
+                        'range' => 'rdf:string',
+                    ],
+                    'hydra:title' => 'propertyPath',
+                    'hydra:description' => 'The property path of the violation',
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ],
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => 'ConstraintViolation/message',
+                        '@type' => 'rdf:Property',
+                        'rdfs:label' => 'message',
+                        'domain' => 'ConstraintViolation',
+                        'range' => 'rdf:string',
+                    ],
+                    'hydra:title' => 'message',
+                    'hydra:description' => 'The message associated with the violation',
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ],
+            ],
+        ];
+
+        // Constraint violation list
+        $doc['hydra:supportedClass'][] = [
+            '@id' => 'ConstraintViolationList',
+            '@type' => 'hydra:Class',
+            'subClassOf' => 'hydra:Error',
+            'hydra:title' => 'A constraint violation list',
+            'hydra:supportedProperty' => [
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                            '@id' => 'ConstraintViolationList/violation',
+                            '@type' => 'rdf:Property',
+                            'rdfs:label' => 'violation',
+                            'domain' => 'ConstraintViolationList',
+                            'range' => 'ConstraintViolation',
+                        ],
+                    'hydra:title' => 'violation',
+                    'hydra:description' => 'The violations',
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ],
+            ],
+        ];
+
         // Entrypoint
         $supportedProperties = [];
         foreach ($this->resources as $resource) {
@@ -86,7 +147,13 @@ class ApiDocumentationBuilder
 
             $supportedProperty = [
                 '@type' => 'hydra:SupportedProperty',
-                'hydra:property' => $resource->getBeautifiedName(),
+                'hydra:property' => [
+                    '@id' => lcfirst($resource->getBeautifiedName()),
+                    '@type' => 'rdf:Property',
+                    'rdfs:label' => sprintf('The collection of %s resources', $shortName),
+                    'domain' => 'Entrypoint',
+                    'range' => $resource->getBeautifiedName(),
+                ],
                 'hydra:title' => sprintf('The collection of %s resources', $shortName),
                 'hydra:readable' => true,
                 'hydra:writable' => false,
@@ -150,7 +217,12 @@ class ApiDocumentationBuilder
             foreach ($attributes as $name => $details) {
                 $supportedProperty = [
                     '@type' => 'hydra:SupportedProperty',
-                    'hydra:property' => sprintf('%s/%s', $shortName, $name),
+                    'hydra:property' => [
+                        '@id' => sprintf('%s/%s', $shortName, $name),
+                        '@type' => 'rdf:Property',
+                        'rdfs:label' => $name,
+                        'domain' => $shortName,
+                    ],
                     'hydra:title' => $name,
                     'hydra:required' => $details['required'],
                     'hydra:readable' => $details['readable'],

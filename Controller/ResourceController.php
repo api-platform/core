@@ -19,6 +19,7 @@ use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * CRUD operations for a JSON-LD/Hydra API.
@@ -89,12 +90,30 @@ class ResourceController extends Controller
      *
      * @param Resource     $resource
      * @param array|object $data
+     * @param int          $status
+     * @param array        $headers
      *
      * @return array
      */
-    protected function normalize(Resource $resource, $data)
+    protected function getSuccessResponse(Resource $resource, $data, $status = 200, array $headers = [])
     {
-        return $this->get('serializer')->normalize($data, 'json-ld', $resource->getNormalizationContext());
+        return new JsonLdResponse(
+            $this->get('serializer')->normalize($data, 'json-ld', $resource->getNormalizationContext()),
+            $status,
+            $headers
+        );
+    }
+
+    /**
+     *
+     *
+     * @param ConstraintViolationListInterface $violations
+     *
+     * @return JsonLdResponse
+     */
+    protected function getErrorResponse(ConstraintViolationListInterface $violations)
+    {
+        return new JsonLdResponse($this->get('serializer')->normalize($violations, 'hydra-error'), 400);
     }
 
     /**
@@ -153,7 +172,7 @@ class ResourceController extends Controller
     {
         $resource = $this->getResource($request);
 
-        return new JsonLdResponse($this->normalize($resource, $this->getCollectionData($resource, $request)));
+        return $this->getSuccessResponse($resource, $this->getCollectionData($resource, $request));
     }
 
     /**
@@ -180,10 +199,10 @@ class ResourceController extends Controller
             // Validation succeed
             $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE, new ObjectEvent($resource, $object));
 
-            return new JsonLdResponse($this->normalize($resource, $object), 201);
+            return $this->getSuccessResponse($resource, $object, 201);
         }
 
-        return new JsonLdResponse($violations, 400);
+        return $this->getErrorResponse($violations);
     }
 
     /**
@@ -202,7 +221,7 @@ class ResourceController extends Controller
         $resource = $this->getResource($request);
         $object = $this->findOrThrowNotFound($resource, $id);
 
-        return new JsonLdResponse($this->normalize($resource, $object));
+        return $this->getSuccessResponse($resource, $object);
     }
 
     /**
@@ -236,10 +255,10 @@ class ResourceController extends Controller
             // Validation succeed
             $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE, new ObjectEvent($resource, $object));
 
-            return new JsonLdResponse($this->normalize($resource, $object), 202);
+            return $this->getSuccessResponse($resource, $object, 202);
         }
 
-        return new JsonLdResponse($violations, 400);
+        return $this->getErrorResponse($violations);
     }
 
     /**

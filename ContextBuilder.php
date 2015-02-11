@@ -22,6 +22,8 @@ use Symfony\Component\Routing\RouterInterface;
 class ContextBuilder
 {
     const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
+    const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
 
     /**
      * @var RouterInterface
@@ -41,25 +43,33 @@ class ContextBuilder
     /**
      * Builds the JSON-LD context for the given resource.
      *
-     * @param Resource $resource
+     * @param Resource|null $resource
      *
      * @return array
      */
-    public function buildContext(Resource $resource)
+    public function buildContext(Resource $resource = null)
     {
-        $context = [];
-        $context['@vocab'] = $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#';
-        $context['hydra'] = self::HYDRA_NS;
+        $context = [
+            '@vocab' => $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#',
+            'hydra' => self::HYDRA_NS,
+            'rdf' => self::RDF_NS,
+            'rdfs' => self::RDFS_NS,
+            'domain' => ['@id' => 'rdfs:domain', '@type' => '@id' ],
+            'range' => ['@id' => 'rdfs:range', '@type' => '@id' ],
+            'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id' ],
+        ];
 
-        $attributes = $this->classMetadataFactory->getMetadataFor($resource->getEntityClass())->getAttributes(
-            $resource->getNormalizationGroups(),
-            $resource->getDenormalizationGroups(),
-            $resource->getValidationGroups()
-        );
+        if ($resource) {
+            $attributes = $this->classMetadataFactory->getMetadataFor($resource->getEntityClass())->getAttributes(
+                $resource->getNormalizationGroups(),
+                $resource->getDenormalizationGroups(),
+                $resource->getValidationGroups()
+            );
 
-        foreach ($attributes as $attributeName => $data) {
-            if ($data['type']) {
-                $context[$attributeName] = ['@type' => '@id'];
+            foreach ($attributes as $attributeName => $data) {
+                if ($data['type']) {
+                    $context[$attributeName] = ['@type' => '@id'];
+                }
             }
         }
 

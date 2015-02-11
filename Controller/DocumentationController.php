@@ -21,6 +21,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class DocumentationController extends Controller
 {
+    private static $reservedShortNames = [
+        'Entrypoint' => true,
+        'ConstraintViolationList' => true,
+        'ApiDocumentation' => true,
+    ];
+
     /**
      * Serves the entrypoint of the API.
      *
@@ -50,7 +56,9 @@ class DocumentationController extends Controller
      */
     public function contextAction($shortName)
     {
-        if ('Entrypoint' !== $shortName || 'ApiDocumentation' !== $shortName) {
+        if (isset(self::$reservedShortNames[$shortName])) {
+            $resource = null;
+        } else {
             $resource = $this->get('dunglas_json_ld_api.resources')->getResourceForShortName($shortName);
             if (!$resource) {
                 throw $this->createNotFoundException();
