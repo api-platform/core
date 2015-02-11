@@ -46,7 +46,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface
                     'message' => $violation->getMessage(),
                 ];
 
-                $message .= sprintf("%s: %s\n", $violation->getPropertyPath(), $violation->getMessage());
+                $message .= ($violation->getPropertyPath() ? $violation->getPropertyPath().': ' : '').$violation->getMessage()."\n";
             }
         }
 
