@@ -185,6 +185,10 @@ class JsonLdNormalizer extends AbstractNormalizer
                     }
                 }
 
+                if ($attributeValue instanceof \DateTime) {
+                    $attributeValue = $attributeValue->format(\DateTime::ATOM);
+                }
+
                 $data[$attribute] = $this->serializer->normalize($attributeValue, 'json', $context);
             }
         }
