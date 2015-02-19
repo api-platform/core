@@ -23,7 +23,6 @@ Feature: Collections support
     }
     """
 
-  @dropSchema
   Scenario: Retrieve the first page of a collection
     Given there is "30" dummy objects
     And I send a "GET" request to "/dummies"
@@ -70,11 +69,8 @@ Feature: Collections support
     }
     """
 
-  @createSchema
-  @dropSchema
   Scenario: Retrieve a page of a collection
-    Given there is "30" dummy objects
-    And I send a "GET" request to "/dummies?page=7"
+    Given I send a "GET" request to "/dummies?page=7"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -119,11 +115,8 @@ Feature: Collections support
     }
     """
 
-  @createSchema
-  @dropSchema
   Scenario: Retrieve the last page of a collection
-    Given there is "30" dummy objects
-    And I send a "GET" request to "/dummies?page=10"
+    Given I send a "GET" request to "/dummies?page=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -159,6 +152,63 @@ Feature: Collections support
             "@id": "/dummies/30",
             "@type": "Dummy",
             "name": "Dummy #30",
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": []
+          }
+      ]
+    }
+    """
+
+  Scenario: Filter with exact match
+    Given I send a "GET" request to "/dummies?id=8"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies",
+      "@type": "hydra:PagedCollection",
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies",
+      "hydra:lastPage": "/dummies",
+      "member": [
+          {
+            "@id": "/dummies/8",
+            "@type": "Dummy",
+            "name": "Dummy #8",
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": []
+          }
+      ]
+    }
+    """
+
+  @dropSchema
+  Scenario: Filter with non-exact match
+    Given I send a "GET" request to "/dummies?name=Dummy%20%238"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies",
+      "@type": "hydra:PagedCollection",
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies",
+      "hydra:lastPage": "/dummies",
+      "member": [
+          {
+            "@id": "/dummies/8",
+            "@type": "Dummy",
+            "name": "Dummy #8",
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []

@@ -36,9 +36,9 @@ class Resource
      */
     protected $entityClass;
     /**
-     * @var string
+     * @var array
      */
-    protected $shortName;
+    protected $filters;
     /**
      * @var array
      */
@@ -55,6 +55,10 @@ class Resource
      * @var array
      */
     protected $serializerContext;
+    /**
+     * @var string
+     */
+    protected $shortName;
     /**
      * @var array
      */
@@ -82,6 +86,7 @@ class Resource
 
     /**
      * @param string      $entityClass
+     * @param array       $filters
      * @param array       $normalizationContext
      * @param array       $denormalizationContext
      * @param array|null  $validationGroups
@@ -92,6 +97,7 @@ class Resource
      */
     public function __construct(
         $entityClass,
+        array $filters = [],
         array $normalizationContext = [],
         array $denormalizationContext = [],
         array $validationGroups = null,
@@ -122,6 +128,7 @@ class Resource
         }
 
         $this->entityClass = $entityClass;
+        $this->filters = $filters;
         $this->shortName = $shortName ?: substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
@@ -145,13 +152,13 @@ class Resource
     }
 
     /**
-     * Gets the short name (display name) of the resource.
+     * Gets filters available for this resource.
      *
-     * @return string
+     * @return array
      */
-    public function getShortName()
+    public function getFilters()
     {
-        return $this->shortName;
+        return $this->filters;
     }
 
     /**
@@ -202,6 +209,16 @@ class Resource
     public function getValidationGroups()
     {
         return $this->validationGroups;
+    }
+
+    /**
+     * Gets the short name (display name) of the resource.
+     *
+     * @return string
+     */
+    public function getShortName()
+    {
+        return $this->shortName;
     }
 
     /**

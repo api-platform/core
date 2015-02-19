@@ -12,6 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Controller;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Dunglas\JsonLdApiBundle\Doctrine\DataManipulator;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use Dunglas\JsonLdApiBundle\Resource;
@@ -149,14 +150,18 @@ class ResourceController extends Controller
         $page = (int) $request->get('page', 1);
         $byPage = $this->container->getParameter('dunglas_json_ld_api.elements_by_page');
 
-        $data = $this
-            ->getRepository($resource)
-            ->createQueryBuilder('o')
-            ->setFirstResult(($page - 1) * $byPage)
-            ->setMaxResults($byPage)
-        ;
+        $dataManipulator = new DataManipulator($this->getDoctrine());
 
-        return new Paginator($data);
+        $filters = [];
+        foreach ($resource->getFilters() as $filter) {
+            if ($value = $request->get($filter['name'])) {
+                $filters[$filter['name']]['name'] = $filter['name'];
+                $filters[$filter['name']]['value'] = $value;
+                $filters[$filter['name']]['exact'] = isset($filter['exact']) ? $filter['exact'] : true;
+            }
+        }
+
+        return $dataManipulator->getCollection($resource, $page, $byPage, $filters);
     }
 
     /**
