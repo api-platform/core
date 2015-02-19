@@ -22,7 +22,8 @@
     "symfony/symfony": "dev-new_serializer as 2.7.0",
     "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/doctrine-bundle": "~1.2",
-    "phpdocumentor/reflection-docblock": "~2.0"
+    "dunglas/php-property-info": "~0.1",
+    "phpdocumentor/reflection": "~1.0"
   },
   "require-dev": {
     "phpspec/phpspec": "~2.0",
