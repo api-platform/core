@@ -4,6 +4,25 @@ Feature: Collections support
   I need to retrieve paged collections respecting the Hydra specification
 
   @createSchema
+  Scenario: Retrieve an empty collection
+    Given I send a "GET" request to "/dummies"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies",
+      "@type": "hydra:PagedCollection",
+      "hydra:totalItems": 0,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies",
+      "hydra:lastPage": "/dummies",
+      "member": []
+    }
+    """
+
   @dropSchema
   Scenario: Retrieve the first page of a collection
     Given there is "30" dummy objects

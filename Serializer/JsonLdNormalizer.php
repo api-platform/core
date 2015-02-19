@@ -127,7 +127,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                     $maxResults = $query->getMaxResults();
                     $currentPage = floor($firstResult / $maxResults) + 1.;
                     $totalItems = count($object);
-                    $lastPage = ceil($totalItems / $maxResults);
+                    $lastPage = ceil($totalItems / $maxResults) ?: 1.;
 
                     $baseUrl = $data['@id'];
                     $paginatedUrl = $baseUrl.'?page=';
@@ -159,7 +159,7 @@ class JsonLdNormalizer extends AbstractNormalizer
             return $data;
         }
 
-        // Don'use hydra:Collection in sub levels
+        // Don't use hydra:Collection in sub levels
         $context['sub_level'] = true;
 
         $data['@id'] = $this->router->generate(
