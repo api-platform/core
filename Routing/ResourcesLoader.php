@@ -40,7 +40,7 @@ class ResourcesLoader extends Loader
         $routeCollection = new RouteCollection();
 
         /**
-         * @var $resource \Dunglas\JsonLdApiBundle\Resource
+         * @var \Dunglas\JsonLdApiBundle\Resource
          */
         foreach ($this->resources as $resource) {
             $routeCollection->addCollection($resource->getRouteCollection());

@@ -33,8 +33,14 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('title')->cannotBeEmpty()->isRequired()->info('API\'s title.')->end()
                 ->scalarNode('description')->cannotBeEmpty()->isRequired()->info('API\'s description.')->end()
-                ->integerNode('elements_by_page')->min(1)->defaultValue(100)->cannotBeEmpty()->info('The number of elements by page in collections.')->end()
                 ->booleanNode('enable_fos_user_event_subscriber')->defaultFalse()->end()
+                ->arrayNode('default')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('elements_by_page')->min(1)->defaultValue(30)->cannotBeEmpty()->info('The default number of elements by page in collections.')->end()
+                        ->enumNode('order')->values([null, 'ASC', 'DESC'])->defaultNull()->info('The default order of results.')->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

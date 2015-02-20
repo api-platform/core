@@ -232,6 +232,7 @@ class ClassMetadata
      * Guess an attribute name by its method name.
      *
      * @param $methodName
+     *
      * @return null|string
      */
     private function guessAttributeName($methodName)
@@ -357,7 +358,8 @@ class ClassMetadata
     /**
      * Is this constraint making the related property required?
      *
-     * @param  Constraint $constraint
+     * @param Constraint $constraint
+     *
      * @return bool
      */
     private function isRequired(Constraint $constraint)

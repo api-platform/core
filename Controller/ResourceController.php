@@ -12,7 +12,6 @@
 namespace Dunglas\JsonLdApiBundle\Controller;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Dunglas\JsonLdApiBundle\Doctrine\DataManipulator;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use Dunglas\JsonLdApiBundle\Resource;
@@ -106,8 +105,6 @@ class ResourceController extends Controller
     }
 
     /**
-     *
-     *
      * @param ConstraintViolationListInterface $violations
      *
      * @return JsonLdResponse
@@ -148,9 +145,7 @@ class ResourceController extends Controller
     protected function getCollectionData(Resource $resource, Request $request)
     {
         $page = (int) $request->get('page', 1);
-        $byPage = $this->container->getParameter('dunglas_json_ld_api.elements_by_page');
-
-        $dataManipulator = new DataManipulator($this->getDoctrine());
+        $dataManipulator = $this->get('dunglas_json_ld_api.data_manipulator');
 
         $filters = [];
         foreach ($resource->getFilters() as $filter) {
@@ -161,7 +156,7 @@ class ResourceController extends Controller
             }
         }
 
-        return $dataManipulator->getCollection($resource, $page, $byPage, $filters);
+        return $dataManipulator->getCollection($resource, $page, $filters);
     }
 
     /**

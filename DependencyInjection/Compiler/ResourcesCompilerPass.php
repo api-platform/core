@@ -22,7 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ResourcesCompilerPass implements CompilerPassInterface
 {
-
     /**
      * {@inheritdoc}
      */

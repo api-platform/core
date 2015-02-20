@@ -22,9 +22,11 @@ doctrine:
         auto_mapping:                true
 
 dunglas_json_ld_api:
-    elements_by_page: 3
     title: My Dummy API
     description: This is a test API.
+    default:
+        elements_by_page: 3
+        order: ASC
 
 services:
     my_dummy_resource:

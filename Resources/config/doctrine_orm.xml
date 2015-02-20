@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="dunglas_json_ld_api.doctrine_orm.data_manipulator" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataManipulator">
+            <argument type="service" id="doctrine" />
+            <argument>%dunglas_json_ld_api.default.elements_by_page%</argument>
+            <argument>%dunglas_json_ld_api.default.order%</argument>
+        </service>
+
+        <service id="dunglas_json_ld_api.data_manipulator" alias="dunglas_json_ld_api.doctrine_orm.data_manipulator" />
+    </services>
+
+</container>
