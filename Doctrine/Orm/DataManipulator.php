@@ -105,10 +105,12 @@ class DataManipulator implements DataManipulatorInterface
                     ->setParameter($filter['name'], $filter['exact'] ? $filter['value'] : sprintf('%%%s%%', $filter['value']))
                 ;
             } elseif ($metadata->isSingleValuedAssociation($filter['name']) || $metadata->isCollectionValuedAssociation($filter['name'])) {
-
+                try {
+                    $object = $this->getObjectFromUri($filter)['value'];
+                } catch (\InvalidArgumentException $e) {
+                    // ignore this filter if the URI is invalid
+                }
             }
-
-
         }
 
         if ($order) {
@@ -153,12 +155,7 @@ class DataManipulator implements DataManipulatorInterface
             }
 
             $entityClass = $resource->getEntityClass();
-            $object = $this->managerRegistry->getManagerForClass($entityClass)->find($entityClass, $parameters['id']);
-            if (!$object) {
-                throw new \InvalidArgumentException(sprintf('The object for the URI "%s" cannot be found.', $uri));
-            }
-
-            return $object;
+            return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
         } finally {
             $this->router->setContext($baseContext);
         }
