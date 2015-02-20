@@ -148,11 +148,10 @@ class ResourceController extends Controller
         $dataManipulator = $this->get('dunglas_json_ld_api.data_manipulator');
 
         $filters = [];
-        foreach ($resource->getFilters() as $filter) {
-            if ($value = $request->get($filter['name'])) {
-                $filters[$filter['name']]['name'] = $filter['name'];
-                $filters[$filter['name']]['value'] = $value;
-                $filters[$filter['name']]['exact'] = isset($filter['exact']) ? $filter['exact'] : true;
+        foreach ($resource->getFilters() as $resourceFilter) {
+            if ($value = $request->get($resourceFilter['name'])) {
+                $resourceFilter['value'] = $value;
+                $filters[] = $resourceFilter;
             }
         }
 

@@ -32,6 +32,12 @@ class Resource
     const ROUTE_PATH_PREFIX = '/';
 
     /**
+     * @var array
+     */
+    protected static $defaultFilter = [
+        'exact' => true,
+    ];
+    /**
      * @var string
      */
     protected $entityClass;
@@ -128,7 +134,6 @@ class Resource
         }
 
         $this->entityClass = $entityClass;
-        $this->filters = $filters;
         $this->shortName = $shortName ?: substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
@@ -136,6 +141,11 @@ class Resource
         $this->collectionOperations = $collectionOperations;
         $this->itemOperations = $itemOperations;
         $this->controllerName = $controllerName;
+
+        foreach ($filters as &$filter) {
+            $filter = array_merge(self::$defaultFilter, $filter);
+        }
+        $this->filters = $filters;
 
         $this->normalizationContext['resource'] = $this;
         $this->denormalizationContext['resource'] = $this;
