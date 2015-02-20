@@ -23,10 +23,10 @@ interface DataManipulatorInterface
     /**
      * Retrieves a collection.
      *
-     * @param Resource $resource
-     * @param int $page
-     * @param array $filters
-     * @param int|null $byPage
+     * @param Resource    $resource
+     * @param int         $page
+     * @param array       $filters
+     * @param int|null    $byPage
      * @param string|null $order
      *
      * @return mixed

@@ -89,7 +89,7 @@ class DataManipulator implements DataManipulatorInterface
             $fieldNames = array_flip($metadata->getFieldNames());
         }
 
-        /**
+        /*
          * @var \Doctrine\ORM\QueryBuilder
          */
         $queryBuilder = $repository
@@ -155,6 +155,7 @@ class DataManipulator implements DataManipulatorInterface
             }
 
             $entityClass = $resource->getEntityClass();
+
             return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
         } finally {
             $this->router->setContext($baseContext);
