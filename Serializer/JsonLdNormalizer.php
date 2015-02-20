@@ -11,8 +11,8 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\Resource;
 use Dunglas\JsonLdApiBundle\Resources;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,9 +46,9 @@ class JsonLdNormalizer extends AbstractNormalizer
      */
     private $router;
     /**
-     * @var ManagerRegistry
+     * @var DataManipulatorInterface
      */
-    private $managerRegistry;
+    private $dataManipulator;
     /**
      * @var ClassMetadataFactory
      */
@@ -61,7 +61,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     public function __construct(
         Resources $resources,
         RouterInterface $router,
-        ManagerRegistry $managerRegistry,
+        DataManipulatorInterface $dataManipulator,
         ClassMetadataFactory $jsonLdClassMetadataFactory = null,
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null
@@ -73,7 +73,7 @@ class JsonLdNormalizer extends AbstractNormalizer
 
         $this->resources = $resources;
         $this->router = $router;
-        $this->managerRegistry = $managerRegistry;
+        $this->dataManipulator = $dataManipulator;
         $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -176,12 +176,12 @@ class JsonLdNormalizer extends AbstractNormalizer
                     if (is_array($attributeValue) || $attributeValue instanceof \Traversable) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
-                            $uris[] = $this->getUriFromObject($obj, $details['type']);
+                            $uris[] = $this->dataManipulator->getUriFromObject($obj, $details['type']);
                         }
 
                         $attributeValue = $uris;
                     } elseif (is_object($attributeValue)) {
-                        $attributeValue = $this->getUriFromObject($attributeValue, $details['type']);
+                        $attributeValue = $this->dataManipulator->getUriFromObject($attributeValue, $details['type']);
                     }
                 }
 
@@ -238,12 +238,12 @@ class JsonLdNormalizer extends AbstractNormalizer
                     if (is_array($value)) {
                         $collection = [];
                         foreach ($value as $uri) {
-                            $collection[] = $this->getObjectFromUri($uri);
+                            $collection[] = $this->dataManipulator->getObjectFromUri($uri);
                         }
 
                         $value = $collection;
                     } else {
-                        $value = $this->getObjectFromUri($value);
+                        $value = $this->dataManipulator->getObjectFromUri($value);
                     }
                 }
 
@@ -302,62 +302,5 @@ class JsonLdNormalizer extends AbstractNormalizer
             $resource->getDenormalizationGroups(),
             $resource->getValidationGroups()
         );
-    }
-
-    /**
-     * Gets an URI corresponding to an object.
-     *
-     * @param object $object
-     * @param string $type
-     *
-     * @throws InvalidArgumentException
-     */
-    private function getUriFromObject($object, $type)
-    {
-        $resource = $this->resources->getResourceForEntity($type);
-        if (!$resource) {
-            throw new InvalidArgumentException(sprintf('No resource associated with the type "%s"', $type));
-        }
-
-        return $this->router->generate($resource->getElementRoute(), ['id' => $object->getId()]);
-    }
-
-    /**
-     * Gets object from an URI.
-     *
-     * @param string $uri
-     *
-     * @return object
-     *
-     * @throws InvalidArgumentException
-     */
-    private function getObjectFromUri($uri)
-    {
-        $request = Request::create($uri);
-        $context = (new RequestContext())->fromRequest($request);
-        $baseContext = $this->router->getContext();
-
-        try {
-            $this->router->setContext($context);
-
-            $parameters = $this->router->match($request->getPathInfo());
-            if (
-                !isset($parameters['_json_ld_resource']) ||
-                !isset($parameters['id']) ||
-                !($resource = $this->resources->getResourceForShortName($parameters['_json_ld_resource']))
-            ) {
-                throw new InvalidArgumentException(sprintf('No resource associated with the URI "%s"', $uri));
-            }
-
-            $entityClass = $resource->getEntityClass();
-            $object = $this->managerRegistry->getManagerForClass($entityClass)->find($entityClass, $parameters['id']);
-            if (!$object) {
-                throw new InvalidArgumentException(sprintf('The object for the URI "%s" cannot be found.', $uri));
-            }
-
-            return $object;
-        } finally {
-            $this->router->setContext($baseContext);
-        }
     }
 }
