@@ -105,11 +105,10 @@ class DataManipulator implements DataManipulatorInterface
                     ->setParameter($filter['name'], $filter['exact'] ? $filter['value'] : sprintf('%%%s%%', $filter['value']))
                 ;
             } elseif ($metadata->isSingleValuedAssociation($filter['name']) || $metadata->isCollectionValuedAssociation($filter['name'])) {
-                try {
-                    $object = $this->getObjectFromUri($filter)['value'];
-                } catch (\InvalidArgumentException $e) {
-                    // ignore this filter if the URI is invalid
-                }
+                $queryBuilder
+                    ->andWhere(sprintf('o.%1$s = :%1$s', $filter['name']))
+                    ->setParameter($filter['name'], $this->getObjectFromUri($filter['value']))
+                ;
             }
         }
 
