@@ -34,6 +34,21 @@ class Resource
     /**
      * @var array
      */
+    protected static $defaultCollectionOperations = [
+        ['hydra:method' => 'GET'],
+        ['hydra:method' => 'POST'],
+    ];
+    /**
+     * @var array
+     */
+    protected static $defaultItemOperations = [
+        ['hydra:method' => 'GET'],
+        ['hydra:method' => 'PUT'],
+        ['hydra:method' => 'DELETE'],
+    ];
+    /**
+     * @var array
+     */
     protected static $defaultFilter = [
         'exact' => true,
     ];
@@ -97,8 +112,8 @@ class Resource
      * @param array       $denormalizationContext
      * @param array|null  $validationGroups
      * @param string|null $shortName
-     * @param array       $collectionOperations
-     * @param array       $itemOperations
+     * @param array|null  $collectionOperations
+     * @param array|null  $itemOperations
      * @param string      $controllerName
      */
     public function __construct(
@@ -108,25 +123,8 @@ class Resource
         array $denormalizationContext = [],
         array $validationGroups = null,
         $shortName = null,
-        array $collectionOperations = [
-            [
-                'hydra:method' => 'GET',
-            ],
-            [
-                'hydra:method' => 'POST',
-            ],
-        ],
-        array $itemOperations = [
-            [
-                'hydra:method' => 'GET',
-            ],
-            [
-                'hydra:method' => 'PUT',
-            ],
-            [
-                'hydra:method' => 'DELETE',
-            ],
-        ],
+        array $collectionOperations = null,
+        array $itemOperations = null,
         $controllerName = 'DunglasJsonLdApiBundle:Resource'
     ) {
         if (!class_exists($entityClass)) {
@@ -138,8 +136,8 @@ class Resource
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
         $this->validationGroups = $validationGroups;
-        $this->collectionOperations = $collectionOperations;
-        $this->itemOperations = $itemOperations;
+        $this->collectionOperations = null === $collectionOperations ? self::$defaultCollectionOperations : $collectionOperations;
+        $this->itemOperations = null === $itemOperations ? self::$defaultItemOperations : $itemOperations;
         $this->controllerName = $controllerName;
 
         foreach ($filters as &$filter) {
