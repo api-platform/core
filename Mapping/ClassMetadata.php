@@ -13,6 +13,8 @@ namespace Dunglas\JsonLdApiBundle\Mapping;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as DoctrineClassMetadata;
 use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\FileReflector;
+use PropertyInfo\PropertyInfoInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadata;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface as ValidatorClassMetadata;
@@ -26,7 +28,15 @@ class ClassMetadata
         'Symfony\Component\Validator\Constraints\NotBlank',
         'Symfony\Component\Validator\Constraints\NotNull',
     ];
+    /**
+     * @var FileReflector[]
+     */
+    private static $fileReflectors = [];
 
+    /**
+     * @var PropertyInfoInterface
+     */
+    private $propertyInfo;
     /**
      * @var string
      *
@@ -77,6 +87,10 @@ class ClassMetadata
      */
     private $reflClass;
     /**
+     * @var \phpDocumentor\Reflection\ClassReflector
+     */
+    private $classReflector;
+    /**
      * @var DocBlock
      */
     private $docBlock;
@@ -85,17 +99,20 @@ class ClassMetadata
      * Constructs a metadata for the given class.
      *
      * @param string                       $class
+     * @param PropertyInfoInterface        $propertyInfo
      * @param SerializerClassMetadata|null $serializerClassMetadata
      * @param ValidatorClassMetadata|null  $validatorClassMetadata
      * @param DoctrineClassMetadata|null   $doctrineClassMetadata
      */
     public function __construct(
         $class,
+        PropertyInfoInterface $propertyInfo,
         SerializerClassMetadata $serializerClassMetadata = null,
         ValidatorClassMetadata $validatorClassMetadata = null,
         DoctrineClassMetadata $doctrineClassMetadata = null
     ) {
         $this->name = $class;
+        $this->propertyInfo = $propertyInfo;
         $this->serializerClassMetadata = $serializerClassMetadata;
         $this->validatorClassMetadata = $validatorClassMetadata;
         $this->doctrineClassMetadata = $doctrineClassMetadata;
@@ -109,7 +126,7 @@ class ClassMetadata
     public function getDescription()
     {
         if (null === $this->description) {
-            $this->description = $this->getDocBlock()->getShortDescription();
+            $this->description = $this->getClassReflector()->getDocBlock()->getShortDescription();
         }
 
         return $this->description;
@@ -168,8 +185,14 @@ class ClassMetadata
                 }
 
                 if (!isset($attributes[$attributeName])) {
+                    if ($reflClass->hasProperty($attributeName)) {
+                        $description = $this->propertyInfo->getShortDescription($reflClass->getProperty($attributeName));
+                    } else {
+                        $description = $this->getClassReflector()->getMethod($methodName)->getDocBlock();
+                    }
+
                     $attributes[$attributeName] = [
-                        'description' => (new DocBlock($reflMethod))->getShortDescription(),
+                        'description' => $description,
                     ];
                 }
 
@@ -187,7 +210,7 @@ class ClassMetadata
                     $attributes[$attributeName] = [
                         'readable' => true,
                         'writable' => true,
-                        'description' => (new DocBlock($reflProperty))->getShortDescription(),
+                        'description' => $this->propertyInfo->getShortDescription($reflProperty),
                     ];
                 }
             }
@@ -249,17 +272,39 @@ class ClassMetadata
     }
 
     /**
-     * Returns a DocBlock instance for this class.
+     * Gets the ClassReflector associated with this class.
      *
-     * @return DocBlock
+     * @return \phpDocumentor\Reflection\ClassReflector
      */
-    private function getDocBlock()
+    private function getClassReflector()
     {
-        if (!$this->docBlock) {
-            $this->docBlock = new DocBlock($this->getReflectionClass());
+        if ($this->classReflector) {
+            return $this->classReflector;
         }
 
-        return $this->docBlock;
+        $reflectionClass = $this->getReflectionClass();
+
+        if (!($fileName = $reflectionClass->getFileName())) {
+            return;
+        }
+
+        if (isset(self::$fileReflectors[$fileName])) {
+            $fileReflector = self::$fileReflectors[$fileName];
+        } else {
+            $fileReflector = self::$fileReflectors[$fileName] = new FileReflector($fileName);
+            $fileReflector->process();
+        }
+
+        foreach ($fileReflector->getClasses() as $classReflector) {
+            $className = $classReflector->getName();
+            if ('\\' === $className[0]) {
+                $className = substr($className, 1);
+            }
+
+            if ($className === $reflectionClass->getName()) {
+                return $this->classReflector = $classReflector;
+            }
+        }
     }
 
     /**

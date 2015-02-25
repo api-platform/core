@@ -13,6 +13,7 @@ namespace Dunglas\JsonLdApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory as DoctrineClassMetadataFactory;
+use PropertyInfo\PropertyInfoInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
 
@@ -25,6 +26,10 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory as Seriali
  */
 class ClassMetadataFactory
 {
+    /**
+     * @var PropertyInfoInterface
+     */
+    private $propertyInfo;
     /**
      * @var ValidatorMetadataFactory|null
      */
@@ -47,11 +52,13 @@ class ClassMetadataFactory
     private $loadedClasses = [];
 
     public function __construct(
+        PropertyInfoInterface $propertyInfo,
         ValidatorMetadataFactory $validatorMetadataFactory = null,
         SerializerClassMetadataFactory $serializerClassMetadataFactory = null,
         DoctrineClassMetadataFactory $doctrineClassMetadataFactory = null,
         Cache $cache = null
     ) {
+        $this->propertyInfo = $propertyInfo;
         $this->validatorMetadataFactory = $validatorMetadataFactory;
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
         $this->doctrineClassMetadataFactory = $doctrineClassMetadataFactory;
@@ -100,7 +107,7 @@ class ClassMetadataFactory
         $validatorMetadata = $this->validatorMetadataFactory ? $this->validatorMetadataFactory->getMetadataFor($class) : null;
         $doctrineMetadata = $this->doctrineClassMetadataFactory ? $this->doctrineClassMetadataFactory->getMetadataFor($class) : null;
 
-        $metadata = new ClassMetadata($class, $serializerMetadata, $validatorMetadata, $doctrineMetadata);
+        $metadata = new ClassMetadata($class, $this->propertyInfo, $serializerMetadata, $validatorMetadata, $doctrineMetadata);
 
         if ($this->cache) {
             $this->cache->save($class, $metadata);

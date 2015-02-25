@@ -60,8 +60,9 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
         $container->setParameter('dunglas_json_ld_api.default.order', $config['default']['order']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
         $loader->load('doctrine_orm.xml');
+        $loader->load('property_info.xml');
+        $loader->load('api.xml');
 
         if ($config['enable_fos_user_event_subscriber']) {
             $definition = new Definition(

@@ -5,6 +5,16 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="dunglas_json_ld_api.doctrine_metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
+            <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
+        </service>
+
+        <service id="dunglas_json_ld_api.event_subscriber.doctrine" class="Dunglas\JsonLdApiBundle\Doctrine\EventSubscriber">
+            <argument type="service" id="doctrine" />
+
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <service id="dunglas_json_ld_api.doctrine_orm.data_manipulator" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataManipulator">
             <argument type="service" id="router" />
             <argument type="service" id="doctrine" />
