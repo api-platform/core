@@ -15,6 +15,7 @@ use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -25,12 +26,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EventSubscriber implements EventSubscriberInterface
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+    /**
      * @var UserManagerInterface
      */
     private $userManager;
 
-    public function __construct(UserManagerInterface $userManager)
+    public function __construct(EventDispatcherInterface $eventDispatcher, UserManagerInterface $userManager)
     {
+        $this->eventDispatcher = $eventDispatcher;
         $this->userManager = $userManager;
     }
 
@@ -41,7 +47,7 @@ class EventSubscriber implements EventSubscriberInterface
     {
         return [
             Events::PRE_CREATE => ['persistObject', 1],
-            Events::PRE_UPDATE => ['persistObject', 1],
+            Events::PRE_UPDATE => ['updateObject', 1],
             Events::PRE_DELETE => ['deleteObject', 1],
         ];
     }
@@ -56,7 +62,26 @@ class EventSubscriber implements EventSubscriberInterface
         $object = $event->getObject();
         if ($object instanceof UserInterface) {
             $this->userManager->updateUser($object);
+
             $event->stopPropagation();
+            $this->eventDispatcher->dispatch(Events::POST_CREATE, $event);
+        }
+    }
+
+    /**
+     * Updates the given user object.
+     *
+     * @param ObjectEvent $event
+     */
+    public function updateObject(ObjectEvent $event)
+    {
+        $object = $event->getObject();
+        if ($object instanceof UserInterface) {
+            $this->userManager->updateUser($object);
+
+            $event->stopPropagation();
+
+            $this->eventDispatcher->dispatch(Events::POST_UPDATE, $event);
         }
     }
 
@@ -70,7 +95,9 @@ class EventSubscriber implements EventSubscriberInterface
         $object = $event->getObject();
         if ($object instanceof UserInterface) {
             $this->userManager->deleteUser($event->getObject());
+
             $event->stopPropagation();
+            $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
         }
     }
 }

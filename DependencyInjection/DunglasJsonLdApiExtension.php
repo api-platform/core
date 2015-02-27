@@ -67,7 +67,7 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
         if ($config['enable_fos_user_event_subscriber']) {
             $definition = new Definition(
                 'Dunglas\JsonLdApiBundle\FosUser\EventSubscriber',
-                [new Reference('fos_user.user_manager')]
+                [ new Reference('event_dispatcher'), new Reference('fos_user.user_manager') ]
             );
             $definition->setTags(['kernel.event_subscriber' => []]);
 
