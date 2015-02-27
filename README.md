@@ -111,7 +111,7 @@ class Product
 }
 ```
 
-```
+```php
 <?php
 
 # src/AppBundle/Entity/Offer.php
@@ -166,7 +166,7 @@ services:
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
-*You're done!*
+**You're done!**
 
 You now have a fully featured API exposing your Doctrine entities 
 Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhos:8000/api`.
@@ -280,4 +280,4 @@ TODO
 * [x] Filters (hydra:search)
 * [ ] Externals IRIs support
 * [ ] Spec classes with PHPSpec
-* [~] Documentation
+* [ ] Extended documentation
