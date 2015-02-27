@@ -14,6 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Doctrine;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -24,12 +25,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EventSubscriber implements EventSubscriberInterface
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+    /**
      * @var ManagerRegistry
      */
     private $managerRegistry;
 
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(EventDispatcherInterface $eventDispatcher, ManagerRegistry $managerRegistry)
     {
+        $this->eventDispatcher = $eventDispatcher;
         $this->managerRegistry = $managerRegistry;
     }
 
@@ -40,7 +46,7 @@ class EventSubscriber implements EventSubscriberInterface
     {
         return [
             Events::PRE_CREATE => ['persistObject', 0],
-            Events::PRE_UPDATE => ['persistObject', 0],
+            Events::PRE_UPDATE => ['updateObject', 0],
             Events::PRE_DELETE => ['deleteObject', 0],
         ];
     }
@@ -53,9 +59,25 @@ class EventSubscriber implements EventSubscriberInterface
     public function persistObject(ObjectEvent $event)
     {
         $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
-
         $objectManager->persist($event->getObject());
         $objectManager->flush();
+
+        $event->stopPropagation();
+        $this->eventDispatcher->dispatch(Events::POST_CREATE, $event);
+    }
+
+    /**
+     * Updates the given object and flushes.
+     *
+     * @param ObjectEvent $event
+     */
+    public function updateObject(ObjectEvent $event)
+    {
+        $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
+        $objectManager->flush();
+
+        $event->stopPropagation();
+        $this->eventDispatcher->dispatch(Events::POST_UPDATE, $event);
     }
 
     /**
@@ -69,5 +91,8 @@ class EventSubscriber implements EventSubscriberInterface
 
         $objectManager->remove($event->getObject());
         $objectManager->flush();
+
+        $event->stopPropagation();
+        $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
     }
 }

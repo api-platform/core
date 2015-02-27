@@ -10,6 +10,7 @@
         </service>
 
         <service id="dunglas_json_ld_api.event_subscriber.doctrine" class="Dunglas\JsonLdApiBundle\Doctrine\EventSubscriber">
+            <argument type="service" id="event_dispatcher" />
             <argument type="service" id="doctrine" />
 
             <tag name="kernel.event_subscriber" />

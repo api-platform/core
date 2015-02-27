@@ -19,7 +19,7 @@ namespace Dunglas\JsonLdApiBundle\Event;
 final class Events
 {
     /**
-     * The PRE_CREATE event occurs after the object validation and before its persistence during POST request.
+     * The PRE_CREATE event occurs after the object validation and before its persistence during a POST request.
      *
      * @var string
      */
@@ -31,7 +31,28 @@ final class Events
      */
     const PRE_UPDATE = 'dunglas_json_ld_api.pre_update';
     /**
-     * The PRE_DELETE event occurs before the object deletion.
+     * The PRE_DELETE event occurs before the object deletion during a DELETE request.
+     *
+     * @var string
      */
     const PRE_DELETE = 'dunglas_json_ld_api.pre_delete';
+
+    /**
+     * The POST_CREATE event occurs after the object persistence during POST request.
+     *
+     * @var string
+     */
+    const POST_CREATE = 'dunglas_json_ld_api.post_create';
+    /**
+     * The POST_UPDATE event occurs after the object persistence during a PUT request.
+     *
+     * @var string
+     */
+    const POST_UPDATE = 'dunglas_json_ld_api.post_update';
+    /**
+     * The POST_DELETE event occurs after the object deletion during a DELETE request.
+     *
+     * @var string
+     */
+    const POST_DELETE = 'dunglas_json_ld_api.post_delete';
 }
