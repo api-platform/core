@@ -173,56 +173,46 @@ class ClassMetadata
             }
         } else {
             $reflClass = $this->getReflectionClass();
+
             // methods
             foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-                if ($reflMethod->isConstructor() || $reflMethod->isDestructor()) {
+                $methodName = $reflMethod->name;
+                $numberOfRequiredParameters = $reflMethod->getNumberOfRequiredParameters();
+
+                // setters
+                if (1 === $numberOfRequiredParameters && strpos($methodName, 'set') === 0) {
+                    $attributes[lcfirst(substr($methodName, 3))]['writable'] = true;
+
                     continue;
                 }
 
-                $methodName = $reflMethod->getName();
-                if (null === ($attributeName = $this->guessAttributeName($methodName))) {
+                if (0 !== $numberOfRequiredParameters) {
                     continue;
                 }
 
-                if (!isset($attributes[$attributeName])) {
-                    if ($reflClass->hasProperty($attributeName)) {
-                        $description = $this->propertyInfo->getShortDescription($reflClass->getProperty($attributeName));
-                    } else {
-                        $description = $this->getClassReflector()->getMethod($methodName)->getDocBlock();
-                    }
+                // getters and hassers
+                if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0) {
+                    $attributes[lcfirst(substr($methodName, 3))]['readable'] = true;
 
-                    $attributes[$attributeName] = [
-                        'description' => $description,
-                    ];
+                    continue;
                 }
 
-                if (0 === $reflMethod->getNumberOfRequiredParameters()) {
-                    $attributes[$attributeName]['readable'] = true;
-                } elseif (0 === strpos($methodName, 'set')) {
-                    $attributes[$attributeName]['writable'] = true;
+                // issers
+                if (strpos($methodName, 'is') === 0) {
+                    $attributes[lcfirst(substr($methodName, 2))]['readable'] = true;
                 }
             }
 
             // properties
             foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-                $attributeName = $reflProperty->getName();
-                if (!isset($attributes[$attributeName])) {
-                    $attributes[$attributeName] = [
-                        'readable' => true,
-                        'writable' => true,
-                        'description' => $this->propertyInfo->getShortDescription($reflProperty),
-                    ];
-                }
+                $attributes[$reflProperty->name] = [
+                    'readable' => true,
+                    'writable' => true,
+                ];
             }
 
-            // populate attributes
-            foreach ($attributes as $attributeName => $attribute) {
-                if (!isset($attribute['readable']) && !isset($attribute['writable'])) {
-                    unset($attributes[$attributeName]);
-                    continue;
-                }
-
-                $this->populateAttribute($attributeName, $attributes[$attributeName], $validationGroups);
+            foreach ($attributes as $attributeName => &$data) {
+                $this->populateAttribute($attributeName, $data, $validationGroups);
             }
         }
 
@@ -249,62 +239,6 @@ class ClassMetadata
         }
 
         return $this->reflClass;
-    }
-
-    /**
-     * Guess an attribute name by its method name.
-     *
-     * @param $methodName
-     *
-     * @return null|string
-     */
-    private function guessAttributeName($methodName)
-    {
-        if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0 || strpos($methodName, 'set') === 0) {
-            // getters, setters and hassers
-            return lcfirst(substr($methodName, 3));
-        } elseif (strpos($methodName, 'is') === 0) {
-            // issers
-            return lcfirst(substr($methodName, 2));
-        }
-
-        return;
-    }
-
-    /**
-     * Gets the ClassReflector associated with this class.
-     *
-     * @return \phpDocumentor\Reflection\ClassReflector
-     */
-    private function getClassReflector()
-    {
-        if ($this->classReflector) {
-            return $this->classReflector;
-        }
-
-        $reflectionClass = $this->getReflectionClass();
-
-        if (!($fileName = $reflectionClass->getFileName())) {
-            return;
-        }
-
-        if (isset(self::$fileReflectors[$fileName])) {
-            $fileReflector = self::$fileReflectors[$fileName];
-        } else {
-            $fileReflector = self::$fileReflectors[$fileName] = new FileReflector($fileName);
-            $fileReflector->process();
-        }
-
-        foreach ($fileReflector->getClasses() as $classReflector) {
-            $className = $classReflector->getName();
-            if ('\\' === $className[0]) {
-                $className = substr($className, 1);
-            }
-
-            if ($className === $reflectionClass->getName()) {
-                return $this->classReflector = $classReflector;
-            }
-        }
     }
 
     /**
@@ -346,6 +280,7 @@ class ClassMetadata
                 foreach ($propertyMetadata->findConstraints($this->validatorClassMetadata->getDefaultGroup()) as $constraint) {
                     if ($this->isRequired($constraint)) {
                         $attribute['required'] = true;
+
                         break 2;
                     }
                 }
@@ -354,6 +289,7 @@ class ClassMetadata
                     foreach ($propertyMetadata->findConstraints($validationGroup) as $constraint) {
                         if ($this->isRequired($constraint)) {
                             $attribute['required'] = true;
+
                             break 3;
                         }
                     }
@@ -371,32 +307,9 @@ class ClassMetadata
             $attribute['type'] = null;
         }
 
-        if (!isset($attribute['description'])) {
-            $reflClass = $this->getReflectionClass();
-
-            if ($reflClass->hasProperty($name)) {
-                $attribute['description'] = (new DocBlock($reflClass->getProperty($name)))->getShortDescription();
-
-                return;
-            }
-
-            $ucName = ucfirst($name);
-            $method = sprintf('get%s', $ucName);
-            if (!$reflClass->hasMethod($method)) {
-                $method = sprintf('has%s', $ucName);
-            } elseif (!$reflClass->hasMethod($method)) {
-                $method = sprintf('is%s', $ucName);
-            } else {
-                $method = false;
-            }
-
-            if ($method) {
-                $attribute['description'] = (new DocBlock($reflClass->getMethod($method)))->getShortDescription();
-
-                return;
-            }
-
-            $attribute['description'] = null;
+        $reflClass = $this->getReflectionClass();
+        if ($reflClass->hasProperty($name)) {
+            $attribute['description'] = $this->propertyInfo->getShortDescription($reflClass->getProperty($name));
         }
     }
 
@@ -416,5 +329,41 @@ class ClassMetadata
         }
 
         return false;
+    }
+
+    /**
+     * Gets the ClassReflector associated with this class.
+     *
+     * @return \phpDocumentor\Reflection\ClassReflector
+     */
+    private function getClassReflector()
+    {
+        if ($this->classReflector) {
+            return $this->classReflector;
+        }
+
+        $reflectionClass = $this->getReflectionClass();
+
+        if (!($fileName = $reflectionClass->getFileName())) {
+            return;
+        }
+
+        if (isset(self::$fileReflectors[$fileName])) {
+            $fileReflector = self::$fileReflectors[$fileName];
+        } else {
+            $fileReflector = self::$fileReflectors[$fileName] = new FileReflector($fileName);
+            $fileReflector->process();
+        }
+
+        foreach ($fileReflector->getClasses() as $classReflector) {
+            $className = $classReflector->getName();
+            if ('\\' === $className[0]) {
+                $className = substr($className, 1);
+            }
+
+            if ($className === $reflectionClass->getName()) {
+                return $this->classReflector = $classReflector;
+            }
+        }
     }
 }
