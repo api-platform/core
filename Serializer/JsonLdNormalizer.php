@@ -15,6 +15,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\Resource;
 use Dunglas\JsonLdApiBundle\Resources;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -60,7 +61,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         Resources $resources,
         RouterInterface $router,
         DataManipulatorInterface $dataManipulator,
-        ClassMetadataFactory $jsonLdClassMetadataFactory = null,
+        ClassMetadataFactory $jsonLdClassMetadataFactory,
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null
     ) {
@@ -245,7 +246,11 @@ class JsonLdNormalizer extends AbstractNormalizer
                     }
                 }
 
-                $this->propertyAccessor->setValue($object, $attribute, $value);
+                try {
+                    $this->propertyAccessor->setValue($object, $attribute, $value);
+                } catch (NoSuchPropertyException $exception) {
+                    // Properties not found are ignored
+                }
             }
         }
 
