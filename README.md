@@ -156,12 +156,12 @@ Register the following services (for example in `app/config/services.yml`):
 ```yaml
 services:
     "resource.product":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product" ]
         tags:      [ { name: "json-ld.resource" } ]
 
     "resource.offer":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Offer" ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
@@ -187,7 +187,7 @@ To allow filtering the list of offers:
 ```yaml
 services:
     "resource.offer":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments:
             - "AppBundle\Entity\Offer"
             -
@@ -206,7 +206,7 @@ It also possible to filter by relations:
 ```yaml
 services:
     "resource.offer":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments:
             - "AppBundle\Entity\Offer"
             -
@@ -228,7 +228,7 @@ in the Serializer component. Specifying to the API system the groups to use is d
 ```yaml
 services:
     "resource.product":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product", ~, [ "serialization_group1", "serialization_group2" ], [ "deserialization_group1", "deserialization_group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
@@ -245,7 +245,7 @@ No problem. Edit your service declaration and add groups you want to use when th
 ```yaml
 services:
     "resource.product":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product", ~, ~, ~, [ "group1", "group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```

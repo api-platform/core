@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="dunglas_json_ld_api.resources" class="Dunglas\JsonLdApiBundle\Resources" />
+        <service id="dunglas_json_ld_api.resources" class="Dunglas\JsonLdApiBundle\JsonLd\Resources" />
 
         <service id="dunglas_json_ld_api.routing.resources_loader" class="Dunglas\JsonLdApiBundle\Routing\ResourcesLoader">
             <argument type="service" id="dunglas_json_ld_api.resources" />
@@ -13,12 +13,12 @@
             <tag name="routing.loader" />
         </service>
 
-        <service id="dunglas_json_ld_api.entrypoint_builder" class="Dunglas\JsonLdApiBundle\EntrypointBuilder">
+        <service id="dunglas_json_ld_api.entrypoint_builder" class="Dunglas\JsonLdApiBundle\JsonLd\EntrypointBuilder">
             <argument type="service" id="dunglas_json_ld_api.resources" />
             <argument type="service" id="router" />
         </service>
 
-        <service id="dunglas_json_ld_api.api_documentation_builder" class="Dunglas\JsonLdApiBundle\ApiDocumentationBuilder">
+        <service id="dunglas_json_ld_api.api_documentation_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ApiDocumentationBuilder">
             <argument type="service" id="dunglas_json_ld_api.resources" />
             <argument type="service" id="router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
@@ -52,7 +52,7 @@
             <argument type="service" id="dunglas_json_ld_api.doctrine_metadata_factory" on-invalid="ignore" />
         </service>
 
-        <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\ContextBuilder">
+        <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
             <argument type="service" id="router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
         </service>

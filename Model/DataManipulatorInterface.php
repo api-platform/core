@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Model;
 
-use Dunglas\JsonLdApiBundle\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 
 /**
  * Manipulates data.

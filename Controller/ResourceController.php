@@ -14,7 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Controller;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
-use Dunglas\JsonLdApiBundle\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;

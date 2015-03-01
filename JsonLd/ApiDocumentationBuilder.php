@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Routing\RouterInterface;
@@ -21,11 +21,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ApiDocumentationBuilder
 {
-    /**
-     * @var string
-     */
-    const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
-
     /**
      * @var Resources
      */

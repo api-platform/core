@@ -13,8 +13,8 @@ namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
-use Dunglas\JsonLdApiBundle\Resource;
-use Dunglas\JsonLdApiBundle\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -212,7 +212,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     {
         $resource = $this->guessResource($data, $context);
 
-        $allowedAttributes = $this->getAllowedAttributes($class, $context);
+        $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
@@ -263,7 +263,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      * @param mixed      $type
      * @param array|null $context
      *
-     * @return \Dunglas\JsonLdApiBundle\Resource
+     * @return \Dunglas\JsonLdApiBundle\JsonLd\Resource
      *
      * @throws InvalidArgumentException
      */

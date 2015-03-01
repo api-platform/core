@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Hydra's Entrypoint builder.
+ * API Entrypoint builder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

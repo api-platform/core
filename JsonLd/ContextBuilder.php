@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Routing\RouterInterface;

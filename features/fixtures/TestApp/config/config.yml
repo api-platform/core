@@ -30,7 +30,7 @@ dunglas_json_ld_api:
 
 services:
     my_dummy_resource:
-        class:     Dunglas\JsonLdApiBundle\Resource
+        class:     Dunglas\JsonLdApiBundle\JsonLd\Resource
         arguments:
           - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy
           - [ { name: "id" }, { name: "name", "exact": false } ]
@@ -38,7 +38,7 @@ services:
           - { name: json-ld.resource }
 
     my_related_dummy_resource:
-        class:     Dunglas\JsonLdApiBundle\Resource
+        class:     Dunglas\JsonLdApiBundle\JsonLd\Resource
         arguments:
           - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy
         tags:
