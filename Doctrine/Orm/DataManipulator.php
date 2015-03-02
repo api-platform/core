@@ -49,7 +49,7 @@ class DataManipulator implements DataManipulatorInterface
     private $defaultOrder;
 
     /**
-     * @param RouterInterface $routerInterface
+     * @param RouterInterface $router
      * @param ManagerRegistry $managerRegistry
      * @param Resources       $resources
      * @param int             $defaultByPage
@@ -137,27 +137,17 @@ class DataManipulator implements DataManipulatorInterface
      */
     public function getObjectFromUri($uri)
     {
-        $request = Request::create($uri);
-        $context = (new RequestContext())->fromRequest($request);
-        $baseContext = $this->router->getContext();
-
-        try {
-            $this->router->setContext($context);
-
-            $parameters = $this->router->match($request->getPathInfo());
-            if (
-                !isset($parameters['_json_ld_resource']) ||
-                !isset($parameters['id']) ||
-                !($resource = $this->resources->getResourceForShortName($parameters['_json_ld_resource']))
-            ) {
-                throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s"', $uri));
-            }
-
-            $entityClass = $resource->getEntityClass();
-
-            return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
-        } finally {
-            $this->router->setContext($baseContext);
+        $parameters = $this->router->match($uri);
+        if (
+            !isset($parameters['_json_ld_resource']) ||
+            !isset($parameters['id']) ||
+            !($resource = $this->resources->getResourceForShortName($parameters['_json_ld_resource']))
+        ) {
+            throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s"', $uri));
         }
+
+        $entityClass = $resource->getEntityClass();
+
+        return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
     }
 }

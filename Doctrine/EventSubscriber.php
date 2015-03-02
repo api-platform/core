@@ -62,8 +62,8 @@ class EventSubscriber implements EventSubscriberInterface
         $objectManager->persist($event->getObject());
         $objectManager->flush();
 
-        $event->stopPropagation();
         $this->eventDispatcher->dispatch(Events::POST_CREATE, $event);
+        $event->stopPropagation();
     }
 
     /**
@@ -76,8 +76,8 @@ class EventSubscriber implements EventSubscriberInterface
         $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
         $objectManager->flush();
 
-        $event->stopPropagation();
         $this->eventDispatcher->dispatch(Events::POST_UPDATE, $event);
+        $event->stopPropagation();
     }
 
     /**
@@ -92,7 +92,7 @@ class EventSubscriber implements EventSubscriberInterface
         $objectManager->remove($event->getObject());
         $objectManager->flush();
 
-        $event->stopPropagation();
         $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
+        $event->stopPropagation();
     }
 }

@@ -168,7 +168,7 @@ services:
 **You're done!**
 
 You now have a fully featured API exposing your Doctrine entities 
-Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhos:8000/api`.
+Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhost:8000/api`.
 
 Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
 and take a look at the usage examples in the [the `features` directory](features/).
