@@ -16,8 +16,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\Resource;
 use Dunglas\JsonLdApiBundle\Resources;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -137,27 +135,17 @@ class DataManipulator implements DataManipulatorInterface
      */
     public function getObjectFromUri($uri)
     {
-        $request = Request::create($uri);
-        $context = (new RequestContext())->fromRequest($request);
-        $baseContext = $this->router->getContext();
-
-        try {
-            $this->router->setContext($context);
-
-            $parameters = $this->router->match($request->getPathInfo());
-            if (
-                !isset($parameters['_json_ld_resource']) ||
-                !isset($parameters['id']) ||
-                !($resource = $this->resources->getResourceForShortName($parameters['_json_ld_resource']))
-            ) {
-                throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s"', $uri));
-            }
-
-            $entityClass = $resource->getEntityClass();
-
-            return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
-        } finally {
-            $this->router->setContext($baseContext);
+        $parameters = $this->router->match($uri);
+        if (
+            !isset($parameters['_json_ld_resource']) ||
+            !isset($parameters['id']) ||
+            !($resource = $this->resources->getResourceForShortName($parameters['_json_ld_resource']))
+        ) {
+            throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s"', $uri));
         }
+
+        $entityClass = $resource->getEntityClass();
+
+        return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
     }
 }

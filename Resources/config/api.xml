@@ -13,14 +13,18 @@
             <tag name="routing.loader" />
         </service>
 
+        <service id="dunglas_json_ld_api.router" public="false" class="Dunglas\JsonLdApiBundle\Routing\Router">
+            <argument type="service" id="router" />
+        </service>
+
         <service id="dunglas_json_ld_api.entrypoint_builder" class="Dunglas\JsonLdApiBundle\EntrypointBuilder">
             <argument type="service" id="dunglas_json_ld_api.resources" />
-            <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
         </service>
 
         <service id="dunglas_json_ld_api.api_documentation_builder" class="Dunglas\JsonLdApiBundle\ApiDocumentationBuilder">
             <argument type="service" id="dunglas_json_ld_api.resources" />
-            <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
             <argument>%dunglas_json_ld_api.title%</argument>
             <argument>%dunglas_json_ld_api.description%</argument>
@@ -28,7 +32,7 @@
 
         <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
             <argument type="service" id="dunglas_json_ld_api.resources" />
-            <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.data_manipulator" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
 
@@ -36,7 +40,7 @@
         </service>
 
         <service id="dunglas_json_ld_api.constraint_violation_list_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
 
             <tag name="serializer.normalizer" />
         </service>
@@ -53,7 +57,7 @@
         </service>
 
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\ContextBuilder">
-            <argument type="service" id="router" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
         </service>
     </services>
