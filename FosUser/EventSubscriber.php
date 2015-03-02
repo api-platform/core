@@ -63,8 +63,8 @@ class EventSubscriber implements EventSubscriberInterface
         if ($object instanceof UserInterface) {
             $this->userManager->updateUser($object);
 
-            $event->stopPropagation();
             $this->eventDispatcher->dispatch(Events::POST_CREATE, $event);
+            $event->stopPropagation();
         }
     }
 
@@ -79,9 +79,8 @@ class EventSubscriber implements EventSubscriberInterface
         if ($object instanceof UserInterface) {
             $this->userManager->updateUser($object);
 
-            $event->stopPropagation();
-
             $this->eventDispatcher->dispatch(Events::POST_UPDATE, $event);
+            $event->stopPropagation();
         }
     }
 
@@ -96,8 +95,8 @@ class EventSubscriber implements EventSubscriberInterface
         if ($object instanceof UserInterface) {
             $this->userManager->deleteUser($event->getObject());
 
-            $event->stopPropagation();
             $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
+            $event->stopPropagation();
         }
     }
 }
