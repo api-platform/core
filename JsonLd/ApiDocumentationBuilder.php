@@ -188,7 +188,12 @@ class ApiDocumentationBuilder
 
         // Resources
         foreach ($this->resources as $resource) {
-            $metadata = $this->classMetadataFactory->getMetadataFor($resource->getEntityClass());
+            $classMetadata = $this->classMetadataFactory->getMetadataFor(
+                $resource->getEntityClass(),
+                $resource->getNormalizationGroups(),
+                $resource->getDenormalizationGroups(),
+                $resource->getValidationGroups()
+            );
             $shortName = $resource->getShortName();
 
             $supportedClass = [
@@ -197,35 +202,31 @@ class ApiDocumentationBuilder
                 'hydra:title' => $resource->getShortName(),
             ];
 
-            $description = $metadata->getDescription();
+            $description = $classMetadata->getDescription();
             if ($description) {
                 $supportedClass['hydra:description'] = $description;
             }
 
-            $attributes = $metadata->getAttributes(
-                $resource->getNormalizationGroups(),
-                $resource->getDenormalizationGroups(),
-                $resource->getValidationGroups()
-            );
+            $attributes = $classMetadata->getAttributes();
 
             $supportedClass['hydra:supportedProperty'] = [];
-            foreach ($attributes as $name => $details) {
+            foreach ($attributes as $attributeName => $attribute) {
                 $supportedProperty = [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => sprintf('%s/%s', $shortName, $name),
+                        '@id' => sprintf('%s/%s', $shortName, $attributeName),
                         '@type' => 'rdf:Property',
-                        'rdfs:label' => $name,
+                        'rdfs:label' => $attributeName,
                         'domain' => $shortName,
                     ],
-                    'hydra:title' => $name,
-                    'hydra:required' => $details['required'],
-                    'hydra:readable' => $details['readable'],
-                    'hydra:writable' => $details['writable'],
+                    'hydra:title' => $attributeName,
+                    'hydra:required' => $attribute->isRequired(),
+                    'hydra:readable' => $attribute->isReadable(),
+                    'hydra:writable' => $attribute->isWritable(),
                 ];
 
-                if ($details['description']) {
-                    $supportedProperty['hydra:description'] = $details['description'];
+                if ($description = $attribute->getDescription()) {
+                    $supportedProperty['hydra:description'] = $description;
                 }
 
                 $supportedClass['hydra:supportedProperty'][] = $supportedProperty;

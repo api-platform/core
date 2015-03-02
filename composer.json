@@ -19,7 +19,7 @@
   ],
   "require": {
     "php": ">=5.5",
-    "symfony/symfony": "dev-jsonld_ready as 2.7.0",
+    "symfony/symfony": "dev-new_serializer as 2.7.0",
     "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/doctrine-bundle": "~1.2",
     "dunglas/php-property-info": "~0.2",

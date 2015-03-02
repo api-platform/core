@@ -60,14 +60,15 @@ class ContextBuilder
         ];
 
         if ($resource) {
-            $attributes = $this->classMetadataFactory->getMetadataFor($resource->getEntityClass())->getAttributes(
+            $attributes = $this->classMetadataFactory->getMetadataFor(
+                $resource->getEntityClass(),
                 $resource->getNormalizationGroups(),
                 $resource->getDenormalizationGroups(),
                 $resource->getValidationGroups()
-            );
+            )->getAttributes();
 
-            foreach ($attributes as $attributeName => $data) {
-                if ($data['type']) {
+            foreach ($attributes as $attributeName => $attribute) {
+                if (isset($attribute->getTypes()[0]) && 'object' === $attribute->getTypes()[0]->getType()) {
                     $context[$attributeName] = ['@type' => '@id'];
                 }
             }

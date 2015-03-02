@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace spec\Dunglas\JsonLdApiBundle\Serializer;
 
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadata;
@@ -18,7 +17,6 @@ use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -26,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class JsonLdNormalizerSpec extends ObjectBehavior
 {
-    function let(
+    public function let(
         Resources $resources,
         RouterInterface $router,
         DataManipulatorInterface $dataManipulator,
@@ -36,7 +34,7 @@ class JsonLdNormalizerSpec extends ObjectBehavior
         $this->beConstructedWith($resources, $router, $dataManipulator, $classMetadataFactory);
     }
 
-    function it_is_initializable()
+    public function it_is_initializable()
     {
         $this->shouldHaveType('Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer');
         $this->shouldImplement('Symfony\Component\Serializer\Normalizer\NormalizerInterface');

@@ -49,7 +49,6 @@
             <argument type="service" id="property_info" />
             <argument type="service" id="validator" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
-            <argument type="service" id="dunglas_json_ld_api.doctrine_metadata_factory" on-invalid="ignore" />
         </service>
 
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
