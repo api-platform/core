@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Routing;
 
-use Dunglas\JsonLdApiBundle\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 

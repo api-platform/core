@@ -14,8 +14,10 @@ namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
-use Dunglas\JsonLdApiBundle\Resource;
-use Dunglas\JsonLdApiBundle\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -47,7 +49,7 @@ class DataManipulator implements DataManipulatorInterface
     private $defaultOrder;
 
     /**
-     * @param RouterInterface $routerInterface
+     * @param RouterInterface $router
      * @param ManagerRegistry $managerRegistry
      * @param Resources       $resources
      * @param int             $defaultByPage

@@ -2,7 +2,7 @@
 **JSON-LD + Hydra REST API generator for Symfony**
 
 This a work in progress under active development.
-This bundle *is not usable in production yet*.
+This bundle rely on Symfony 2.7 and *is not usable in production yet*.
 
 [![Build Status](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle.svg)](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552/mini.png)](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552)
@@ -29,7 +29,6 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
 ## Installation
 
 **This bundle relies heavily on features that will be introduced in Symfony 2.7.**
-To test it now, you must use an experimental Symfony branch, see https://github.com/symfony/symfony/pull/13257#issuecomment-68943401
 
 Use [Composer](http://getcomposer.org) to install the bundle:
 
@@ -156,12 +155,12 @@ Register the following services (for example in `app/config/services.yml`):
 ```yaml
 services:
     "resource.product":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product" ]
         tags:      [ { name: "json-ld.resource" } ]
 
     "resource.offer":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Offer" ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
@@ -187,7 +186,7 @@ To allow filtering the list of offers:
 ```yaml
 services:
     "resource.offer":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments:
             - "AppBundle\Entity\Offer"
             -
@@ -206,7 +205,7 @@ It also possible to filter by relations:
 ```yaml
 services:
     "resource.offer":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments:
             - "AppBundle\Entity\Offer"
             -
@@ -228,7 +227,7 @@ in the Serializer component. Specifying to the API system the groups to use is d
 ```yaml
 services:
     "resource.product":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product", ~, [ "serialization_group1", "serialization_group2" ], [ "deserialization_group1", "deserialization_group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
@@ -245,7 +244,7 @@ No problem. Edit your service declaration and add groups you want to use when th
 ```yaml
 services:
     "resource.product":
-        class:     "Dunglas\JsonLdApiBundle\Resource"
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product", ~, ~, ~, [ "group1", "group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Routing\Route;

@@ -13,8 +13,8 @@ namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
-use Dunglas\JsonLdApiBundle\Resource;
-use Dunglas\JsonLdApiBundle\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -65,10 +65,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null
     ) {
-        parent::__construct(
-            $jsonLdClassMetadataFactory ? $jsonLdClassMetadataFactory->getSerializerClassMetadataFactory() : null,
-            $nameConverter
-        );
+        parent::__construct(null, $nameConverter);
 
         $this->resources = $resources;
         $this->router = $router;
@@ -167,20 +164,29 @@ class JsonLdNormalizer extends AbstractNormalizer
         );
         $data['@type'] = $resource->getShortName();
 
-        foreach ($this->getAttributes($resource, $object) as $attribute => $details) {
-            if ($details['readable'] && 'id' !== $attribute) {
-                $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+        $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
+            $resource->getEntityClass(),
+            $resource->getNormalizationGroups(),
+            $resource->getDenormalizationGroups(),
+            $resource->getValidationGroups()
+        )->getAttributes();
 
-                if ($details['type']) {
-                    if (is_array($attributeValue) || $attributeValue instanceof \Traversable) {
+        foreach ($attributes as $attributeName => $attribute) {
+            if ($attribute->isReadable() && 'id' !== $attributeName) {
+                $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
+
+                if (isset($attribute->getTypes()[0])) {
+                    $type = $attribute->getTypes()[0];
+
+                    if ($type->isCollection()) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
-                            $uris[] = $this->dataManipulator->getUriFromObject($obj, $details['type']);
+                            $uris[] = $this->dataManipulator->getUriFromObject($obj, $type->getCollectionType()->getClass());
                         }
 
                         $attributeValue = $uris;
                     } elseif (is_object($attributeValue)) {
-                        $attributeValue = $this->dataManipulator->getUriFromObject($attributeValue, $details['type']);
+                        $attributeValue = $this->dataManipulator->getUriFromObject($attributeValue, $type->getClass());
                     }
                 }
 
@@ -188,7 +194,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                     $attributeValue = $attributeValue->format(\DateTime::ATOM);
                 }
 
-                $data[$attribute] = $this->serializer->normalize($attributeValue, 'json', $context);
+                $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json', $context);
             }
         }
 
@@ -211,13 +217,24 @@ class JsonLdNormalizer extends AbstractNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $resource = $this->guessResource($data, $context);
-
-        $allowedAttributes = $this->getAllowedAttributes($class, $context);
         $normalizedData = $this->prepareForDenormalization($data);
+
+        $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
+            $class,
+            $resource->getNormalizationGroups(),
+            $resource->getDenormalizationGroups(),
+            $resource->getValidationGroups()
+        )->getAttributes();
+
+        $allowedAttributes = [];
+        foreach ($attributes as $attributeName => $attribute) {
+            if ($attribute->isReadable()) {
+                $allowedAttributes[] = $attributeName;
+            }
+        }
 
         $reflectionClass = new \ReflectionClass($class);
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
-        $attributes = $this->getAttributes($resource, $object);
 
         foreach ($normalizedData as $attribute => $value) {
             // Ignore JSON-LD special attributes
@@ -233,8 +250,12 @@ class JsonLdNormalizer extends AbstractNormalizer
                     $attribute = $this->nameConverter->denormalize($attribute);
                 }
 
-                if (isset($attributes[$attribute]['type']) && !is_null($value)) {
-                    if (is_array($value)) {
+                if (
+                    isset($attributes[$attribute]->getTypes()[0]) &&
+                    !is_null($value) &&
+                    'object' === $attributes[$attribute]->getTypes()[0]->getType()
+                ) {
+                    if ($attributes[$attribute]->getTypes()[0]->isCollection()) {
                         $collection = [];
                         foreach ($value as $uri) {
                             $collection[] = $this->dataManipulator->getObjectFromUri($uri);
@@ -263,7 +284,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      * @param mixed      $type
      * @param array|null $context
      *
-     * @return \Dunglas\JsonLdApiBundle\Resource
+     * @return \Dunglas\JsonLdApiBundle\JsonLd\Resource
      *
      * @throws InvalidArgumentException
      */
@@ -287,23 +308,6 @@ class JsonLdNormalizer extends AbstractNormalizer
 
         throw new InvalidArgumentException(
             sprintf('Cannot find a resource object for type "%s".', $type)
-        );
-    }
-
-    /**
-     * Gets attributes.
-     *
-     * @param Resource $resource
-     * @param object   $object
-     *
-     * @return array
-     */
-    private function getAttributes(Resource $resource, $object)
-    {
-        return $this->jsonLdClassMetadataFactory->getMetadataFor($object)->getAttributes(
-            $resource->getNormalizationGroups(),
-            $resource->getDenormalizationGroups(),
-            $resource->getValidationGroups()
         );
     }
 }

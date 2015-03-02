@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\JsonLdApiBundle\JsonLd;
+
+use ArrayObject;
 
 /**
  * A collection of {@see Resource} classes.
