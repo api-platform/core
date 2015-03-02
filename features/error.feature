@@ -26,3 +26,49 @@ Feature: Error handling
       ]
     }
     """
+
+  Scenario: Get an error during deserialization
+    Given I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Foo",
+      "relatedDummy": {
+        "name": "bar"
+      }
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Error",
+      "@type": "Error",
+      "hydra:title": "An error occurred",
+      "hydra:description": "Type not supported (found \"array\" in attribute \"relatedDummy\")"
+    }
+    """
+
+  Scenario: Get an error during deserialization
+    Given I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Foo",
+      "relatedDummies": [{
+        "name": "bar"
+      }]
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Error",
+      "@type": "Error",
+      "hydra:title": "An error occurred",
+      "hydra:description": "Nested object are not supported (found in attribute \"relatedDummies\")"
+    }
+    """

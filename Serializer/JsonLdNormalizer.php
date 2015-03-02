@@ -264,12 +264,25 @@ class JsonLdNormalizer extends AbstractNormalizer
                     if ($attributes[$attribute]->getTypes()[0]->isCollection()) {
                         $collection = [];
                         foreach ($value as $uri) {
+                            if (!is_string($uri)) {
+                                throw new InvalidArgumentException(sprintf(
+                                    'Nested object are not supported (found in attribute "%s")',
+                                    $attribute
+                                ));
+                            }
+
                             $collection[] = $this->dataManipulator->getObjectFromUri($uri);
                         }
 
                         $value = $collection;
-                    } else {
+                    } else if (is_string($value)) {
                         $value = $this->dataManipulator->getObjectFromUri($value);
+                    } else {
+                        throw new InvalidArgumentException(sprintf(
+                            'Type not supported (found "%s" in attribute "%s")',
+                            gettype($value),
+                            $attribute
+                        ));
                     }
                 }
 

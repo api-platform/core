@@ -15,11 +15,13 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Serializer\Exception\Exception;
 
 /**
  * CRUD operations for a JSON-LD/Hydra API.
@@ -186,12 +188,16 @@ class ResourceController extends Controller
     public function postAction(Request $request)
     {
         $resource = $this->getResource($request);
-        $object = $this->get('serializer')->deserialize(
-            $request->getContent(),
-            $resource->getEntityClass(),
-            'json-ld',
-            $resource->getDenormalizationContext()
-        );
+        try {
+            $object = $this->get('serializer')->deserialize(
+                $request->getContent(),
+                $resource->getEntityClass(),
+                'json-ld',
+                $resource->getDenormalizationContext()
+            );
+        } catch (Exception $e) {
+            throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
+        }
 
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
@@ -242,12 +248,16 @@ class ResourceController extends Controller
         $context = $resource->getDenormalizationContext();
         $context['object_to_populate'] = $object;
 
-        $object = $this->get('serializer')->deserialize(
-            $request->getContent(),
-            $resource->getEntityClass(),
-            'json-ld',
-            $context
-        );
+        try {
+            $object = $this->get('serializer')->deserialize(
+                $request->getContent(),
+                $resource->getEntityClass(),
+                'json-ld',
+                $context
+            );
+        } catch (Exception $e) {
+            throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
+        }
 
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
