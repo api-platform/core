@@ -15,6 +15,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -178,15 +179,20 @@ class JsonLdNormalizer extends AbstractNormalizer
                 if (isset($attribute->getTypes()[0])) {
                     $type = $attribute->getTypes()[0];
 
-                    if ($type->isCollection()) {
+                    if (
+                        $attributeValue &&
+                        $type->isCollection() &&
+                        ($collectionType = $type->getCollectionType()) &&
+                        $class = $this->getClassHavingResource($collectionType)
+                    ) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
-                            $uris[] = $this->dataManipulator->getUriFromObject($obj, $type->getCollectionType()->getClass());
+                            $uris[] = $this->dataManipulator->getUriFromObject($obj, $class);
                         }
 
                         $attributeValue = $uris;
-                    } elseif (is_object($attributeValue)) {
-                        $attributeValue = $this->dataManipulator->getUriFromObject($attributeValue, $type->getClass());
+                    } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
+                        $attributeValue = $this->dataManipulator->getUriFromObject($attributeValue, $class);
                     }
                 }
 
@@ -309,5 +315,23 @@ class JsonLdNormalizer extends AbstractNormalizer
         throw new InvalidArgumentException(
             sprintf('Cannot find a resource object for type "%s".', $type)
         );
+    }
+
+    /**
+     * Returns the class if a resource is associated with it.
+     *
+     * @param Type $type
+     *
+     * @return string|null
+     */
+    private function getClassHavingResource(Type $type)
+    {
+        if (
+            'object' === $type->getType() &&
+            ($class = $type->getClass()) &&
+            $this->resources->getResourceForEntity($class)
+        ) {
+            return $class;
+        }
     }
 }
