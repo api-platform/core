@@ -59,11 +59,13 @@ class Router implements RouterInterface
     /*
      * {@inheritdoc}
      */
-    public function match($pathinfo)
+    public function match($pathInfo)
     {
-        $request = Request::create($pathinfo);
-        $context = (new RequestContext())->fromRequest($request);
         $baseContext = $this->router->getContext();
+
+        $request = Request::create($pathInfo);
+        $context = (new RequestContext())->fromRequest($request);
+        $context->setPathInfo($pathInfo);
 
         try {
             $this->router->setContext($context);
@@ -79,26 +81,20 @@ class Router implements RouterInterface
      */
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
     {
-        $hasGenerator = method_exists($this->router, 'getGenerator');
-
-        if ($hasGenerator) {
-            $baseContext = $this->router->getGenerator()->getContext();
-            $request = Request::create('');
-            $context = (new RequestContext())->fromRequest($request);
-            $context->setHost($baseContext->getHost());
-            $context->setScheme($baseContext->getScheme());
-            $context->setHttpPort($baseContext->getHttpPort());
-            $context->setHttpsPort($baseContext->getHttpsPort());
-            $context->setBaseUrl('');
-            $this->router->getGenerator()->setContext($context);
-        }
-
+        $baseContext = $this->router->getContext();
         try {
+            $this->router->setContext(new RequestContext(
+                '',
+                'GET',
+                $baseContext->getHost(),
+                $baseContext->getScheme(),
+                $baseContext->getHttpPort(),
+                $baseContext->getHttpsPort()
+            ));
+
             return $this->router->generate($name, $parameters, $referenceType);
         } finally {
-            if ($hasGenerator) {
-                $this->router->getGenerator()->setContext($baseContext);
-            }
+            $this->router->setContext($baseContext);
         }
     }
 }
