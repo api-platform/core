@@ -27,7 +27,7 @@ Feature: Error handling
     }
     """
 
-  Scenario: Get an error during deserialization
+  Scenario: Get an error during deserialization of simple relation
     Given I send a "POST" request to "/dummies" with body:
     """
     {
@@ -50,7 +50,7 @@ Feature: Error handling
     }
     """
 
-  Scenario: Get an error during deserialization
+  Scenario: Get an error during deserialization of collection
     Given I send a "POST" request to "/dummies" with body:
     """
     {
@@ -69,6 +69,26 @@ Feature: Error handling
       "@context": "/contexts/Error",
       "@type": "Error",
       "hydra:title": "An error occurred",
-      "hydra:description": "Nested object are not supported (found in attribute \"relatedDummies\")"
+      "hydra:description": "Nested objects are not supported (found in attribute \"relatedDummies\")"
+    }
+    """
+
+    Scenario: Get an error because of an invalid JSON
+    Given I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Foo",
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Error",
+      "@type": "Error",
+      "hydra:title": "An error occurred",
+      "hydra:description": "Syntax error"
     }
     """

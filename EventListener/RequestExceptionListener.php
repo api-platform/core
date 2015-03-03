@@ -13,6 +13,7 @@ namespace Dunglas\JsonLdApiBundle\EventListener;
 
 use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -53,7 +54,7 @@ class RequestExceptionListener
         if ($request->attributes->has('_json_ld_resource')) {
             $event->setResponse(new JsonLdResponse(
                 $this->normalizer->normalize($exception, 'hydra-error'),
-                $exception instanceof DeserializationException ? 400 : 500
+                $exception instanceof DeserializationException ? Response::HTTP_BAD_REQUEST : Response::HTTP_INTERNAL_SERVER_ERROR
             ));
         }
     }

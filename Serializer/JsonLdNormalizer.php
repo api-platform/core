@@ -266,7 +266,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         foreach ($value as $uri) {
                             if (!is_string($uri)) {
                                 throw new InvalidArgumentException(sprintf(
-                                    'Nested object are not supported (found in attribute "%s")',
+                                    'Nested objects are not supported (found in attribute "%s")',
                                     $attribute
                                 ));
                             }
@@ -275,7 +275,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         }
 
                         $value = $collection;
-                    } else if (is_string($value)) {
+                    } elseif (is_string($value)) {
                         $value = $this->dataManipulator->getObjectFromUri($value);
                     } else {
                         throw new InvalidArgumentException(sprintf(
