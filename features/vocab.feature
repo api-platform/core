@@ -185,6 +185,19 @@ Feature: Documentation support
             {
               "@type": "hydra:SupportedProperty",
               "hydra:property": {
+                "@id": "Dummy\/dummyDate",
+                "@type": "rdf:Property",
+                "rdfs:label": "dummyDate",
+                "domain": "Dummy"
+              },
+              "hydra:title": "dummyDate",
+              "hydra:required": false,
+              "hydra:readable": true,
+              "hydra:writable": true
+            },
+            {
+              "@type": "hydra:SupportedProperty",
+              "hydra:property": {
                 "@id": "Dummy/relatedDummy",
                 "@type": "rdf:Property",
                 "rdfs:label": "relatedDummy",

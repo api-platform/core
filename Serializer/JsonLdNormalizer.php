@@ -19,6 +19,7 @@ use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -251,46 +252,56 @@ class JsonLdNormalizer extends AbstractNormalizer
             $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
             $ignored = in_array($attribute, $this->ignoredAttributes);
 
-            if ($allowed && !$ignored) {
-                if ($this->nameConverter) {
-                    $attribute = $this->nameConverter->denormalize($attribute);
-                }
+            if (!$allowed || $ignored) {
+                continue;
+            }
 
-                if (
-                    isset($attributes[$attribute]->getTypes()[0]) &&
-                    !is_null($value) &&
-                    'object' === $attributes[$attribute]->getTypes()[0]->getType()
-                ) {
-                    if ($attributes[$attribute]->getTypes()[0]->isCollection()) {
-                        $collection = [];
-                        foreach ($value as $uri) {
-                            if (!is_string($uri)) {
-                                throw new InvalidArgumentException(sprintf(
-                                    'Nested objects are not supported (found in attribute "%s")',
-                                    $attribute
-                                ));
-                            }
+            if ($this->nameConverter) {
+                $attribute = $this->nameConverter->denormalize($attribute);
+            }
 
-                            $collection[] = $this->dataManipulator->getObjectFromUri($uri);
+            $types = $attributes[$attribute]->getTypes();
+            if (isset($types[0]) && !is_null($value) && 'object' === $types[0]->getType()) {
+                if ($attributes[$attribute]->getTypes()[0]->isCollection()) {
+                    $collection = [];
+                    foreach ($value as $uri) {
+                        if (!is_string($uri)) {
+                            throw new InvalidArgumentException(sprintf(
+                                'Nested objects are not supported (found in attribute "%s")',
+                                $attribute
+                            ));
                         }
 
-                        $value = $collection;
-                    } elseif (is_string($value)) {
-                        $value = $this->dataManipulator->getObjectFromUri($value);
+                        $collection[] = $this->dataManipulator->getObjectFromUri($uri);
+                    }
+
+                    $value = $collection;
+                } elseif (!$this->resources->getResourceForEntity($types[0]->getClass())) {
+                    $typeClass = $types[0]->getClass();
+                    if ('DateTime' === $typeClass) {
+                        $value = new \DateTime($value);
                     } else {
                         throw new InvalidArgumentException(sprintf(
-                            'Type not supported (found "%s" in attribute "%s")',
-                            gettype($value),
+                            'Property type not supported ("%s" in attribute "%s")',
+                            $typeClass,
                             $attribute
                         ));
                     }
+                } elseif (is_string($value)) {
+                    $value = $this->dataManipulator->getObjectFromUri($value);
+                } else {
+                    throw new InvalidArgumentException(sprintf(
+                        'Type not supported (found "%s" in attribute "%s")',
+                        gettype($value),
+                        $attribute
+                    ));
                 }
+            }
 
-                try {
-                    $this->propertyAccessor->setValue($object, $attribute, $value);
-                } catch (NoSuchPropertyException $exception) {
-                    // Properties not found are ignored
-                }
+            try {
+                $this->propertyAccessor->setValue($object, $attribute, $value);
+            } catch (NoSuchPropertyException $exception) {
+                // Properties not found are ignored
             }
         }
 

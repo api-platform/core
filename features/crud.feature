@@ -8,7 +8,8 @@ Feature: Create-Retrieve-Update-Delete
     Given I send a "POST" request to "/dummies" with body:
     """
     {
-      "name": "My Dummy"
+      "name": "My Dummy",
+      "dummyDate": "2015-03-01T10:00:00+00:00"
     }
     """
     Then the response status code should be 201
@@ -22,6 +23,7 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "Dummy",
       "name": "My Dummy",
       "dummy": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
       "relatedDummy": null,
       "relatedDummies": []
     }
@@ -40,6 +42,7 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "Dummy",
       "name": "My Dummy",
       "dummy": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
       "relatedDummy": null,
       "relatedDummies": []
     }
@@ -66,6 +69,7 @@ Feature: Create-Retrieve-Update-Delete
           "@type":"Dummy",
           "name":"My Dummy",
           "dummy": null,
+          "dummyDate": "2015-03-01T10:00:00+00:00",
           "relatedDummy": null,
           "relatedDummies": []
         }
@@ -92,6 +96,7 @@ Feature: Create-Retrieve-Update-Delete
         "@type": "Dummy",
         "name": "A nice dummy",
         "dummy": null,
+        "dummyDate": "2015-03-01T10:00:00+00:00",
         "relatedDummy": null,
         "relatedDummies": []
       }

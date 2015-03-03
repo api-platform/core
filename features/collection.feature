@@ -46,6 +46,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #1",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": null,
           "relatedDummies": []
         },
@@ -54,6 +55,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #2",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": null,
           "relatedDummies": []
         },
@@ -62,6 +64,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #3",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": null,
           "relatedDummies": []
         }
@@ -92,6 +95,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #19",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": null,
           "relatedDummies": []
         },
@@ -100,6 +104,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #20",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": null,
           "relatedDummies": []
         },
@@ -108,6 +113,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #21",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": null,
           "relatedDummies": []
         }
@@ -137,6 +143,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #28",
             "dummy": null,
+            "dummyDate": null,
             "relatedDummy": null,
             "relatedDummies": []
           },
@@ -145,6 +152,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #29",
             "dummy": null,
+            "dummyDate": null,
             "relatedDummy": null,
             "relatedDummies": []
           },
@@ -153,6 +161,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #30",
             "dummy": null,
+            "dummyDate": null,
             "relatedDummy": null,
             "relatedDummies": []
           }
@@ -181,6 +190,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #8",
             "dummy": null,
+            "dummyDate": null,
             "relatedDummy": null,
             "relatedDummies": []
           }
@@ -210,6 +220,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #8",
             "dummy": null,
+            "dummyDate": null,
             "relatedDummy": null,
             "relatedDummies": []
           }

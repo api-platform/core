@@ -43,6 +43,7 @@ Feature: Relations support
       "@type": "Dummy",
       "name": "Dummy with relations",
       "dummy": null,
+      "dummyDate": null,
       "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
         "/related_dummies/1"
@@ -72,6 +73,7 @@ Feature: Relations support
           "@type": "Dummy",
           "name": "Dummy with relations",
           "dummy": null,
+          "dummyDate": null,
           "relatedDummy": "/related_dummies/1",
           "relatedDummies": [
             "/related_dummies/1"
@@ -79,5 +81,4 @@ Feature: Relations support
         }
       ]
     }
-
     """
