@@ -45,6 +45,12 @@
             <tag name="serializer.normalizer" />
         </service>
 
+        <service id="dunglas_json_ld_api.error_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\ErrorNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.router" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
         <service id="dunglas_json_ld_api.json_ld_encoder" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdEncoder" public="false">
             <tag name="serializer.encoder" />
         </service>
@@ -58,6 +64,11 @@
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+        </service>
+
+        <service id="dunglas_json_ld_api.exception_listener" class="Dunglas\JsonLdApiBundle\EventListener\RequestExceptionListener">
+            <argument type="service" id="dunglas_json_ld_api.error_normalizer" />
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
     </services>
 

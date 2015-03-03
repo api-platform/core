@@ -25,6 +25,7 @@ class DocumentationController extends Controller
         'Entrypoint' => true,
         'ConstraintViolationList' => true,
         'ApiDocumentation' => true,
+        'Error' => true,
     ];
 
     /**
