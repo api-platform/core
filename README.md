@@ -21,6 +21,7 @@ Here is the fully-featured REST API you'll get in minutes, I promise:
 * Custom serialization (through the Symfony Serializer Component, supporting groups)
 * Automatic routes registration
 * Automatic entrypoint generation giving access to all resources
+* `\DateTime` serialization and deserialization
 * [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) integration
 
 Everything is fully customizable trough a powerful event system and strong OOP.
