@@ -28,6 +28,9 @@ Feature: JSON-LD contexts generation
           "@id": "rdfs:subClassOf",
           "@type": "@id"
         },
+        "dummyDate": {
+          "@type": "http:\/\/www.w3.org\/2001\/XMLSchema#dateTime"
+        },
         "relatedDummy": {
           "@type": "@id"
         },

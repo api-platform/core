@@ -40,6 +40,11 @@ class Dummy
      */
     public $dummy;
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\DateTime
+     */
+    public $dummyDate;
+    /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */
     public $relatedDummy;

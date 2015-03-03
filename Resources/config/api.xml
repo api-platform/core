@@ -64,6 +64,7 @@
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+            <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
         <service id="dunglas_json_ld_api.exception_listener" class="Dunglas\JsonLdApiBundle\EventListener\RequestExceptionListener">
