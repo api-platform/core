@@ -16,7 +16,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Loads {@see Dunglas\JsonLdApiBundle\Resources}.
+ * Loads {@see Resources}.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

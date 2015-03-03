@@ -25,6 +25,7 @@ class ContextBuilder
     const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
     const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
     const XML_NS = 'http://www.w3.org/2001/XMLSchema#';
+    const OWL_NS = 'http://www.w3.org/2002/07/owl#';
 
     /**
      * @var RouterInterface
@@ -60,6 +61,7 @@ class ContextBuilder
             'hydra' => self::HYDRA_NS,
             'rdf' => self::RDF_NS,
             'rdfs' => self::RDFS_NS,
+            'owl' => self::OWL_NS,
             'domain' => ['@id' => 'rdfs:domain', '@type' => '@id' ],
             'range' => ['@id' => 'rdfs:range', '@type' => '@id' ],
             'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id' ],
@@ -96,7 +98,7 @@ class ContextBuilder
      *
      * @param string $class
      *
-     * @return null|string
+     * @return string|null
      */
     private function guessNativeType($class)
     {

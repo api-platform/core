@@ -176,6 +176,10 @@ class ClassMetadataFactory
     ) {
         if ($serializerClassMetadata && null !== $normalizationGroups && null !== $denormalizationGroups) {
             foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
+                if ('id' === $name = $normalizationAttribute->getName()) {
+                    continue;
+                }
+
                 if (count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, $normalizationAttribute->getName(), $validationGroups);
                     $attribute->setReadable(true);
@@ -191,12 +195,15 @@ class ClassMetadataFactory
 
             // methods
             foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-                $methodName = $reflectionMethod->name;
+                if ('getId' === $reflectionMethod->name || 'setId' === $reflectionMethod->name) {
+                    continue;
+                }
+
                 $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
 
                 // setters
-                if (1 === $numberOfRequiredParameters && strpos($methodName, 'set') === 0) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($methodName, 3)), $validationGroups);
+                if (1 === $numberOfRequiredParameters && strpos($reflectionMethod->name, 'set') === 0) {
+                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
                     $attribute->setWritable(true);
 
                     continue;
@@ -207,22 +214,26 @@ class ClassMetadataFactory
                 }
 
                 // getters and hassers
-                if (strpos($methodName, 'get') === 0 || strpos($methodName, 'has') === 0) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($methodName, 3)), $validationGroups);
+                if (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0) {
+                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
                     $attribute->setReadable(true);
 
                     continue;
                 }
 
                 // issers
-                if (strpos($methodName, 'is') === 0) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($methodName, 2)), $validationGroups);
+                if (strpos($reflectionMethod->name, 'is') === 0) {
+                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 2)), $validationGroups);
                     $attribute->setReadable(true);
                 }
             }
 
             // properties
             foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
+                if ('id' === $reflectionProperty->name) {
+                    continue;
+                }
+
                 $attribute = $this->getOrCreateAttribute($classMetadata, $reflectionProperty->name, $validationGroups);
                 $attribute->setReadable(true);
                 $attribute->setWritable(true);

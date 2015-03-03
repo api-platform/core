@@ -42,7 +42,7 @@ class ClassMetadata
      *           class' serialized representation. Do not access it. Use
      *           {@link getAttributes()} instead.
      */
-    public $attributes;
+    public $attributes = [];
     /**
      * @var \ReflectionClass
      */
