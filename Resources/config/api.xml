@@ -67,8 +67,15 @@
             <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
-        <service id="dunglas_json_ld_api.exception_listener" class="Dunglas\JsonLdApiBundle\EventListener\RequestExceptionListener">
+        <service id="dunglas_json_ld_api.link_header_response_listener" class="Dunglas\JsonLdApiBundle\EventListener\LinkHeaderResponseListener">
+            <argument type="service" id="router" />
+
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+        </service>
+
+        <service id="dunglas_json_ld_api.request_exception_listener" class="Dunglas\JsonLdApiBundle\EventListener\RequestExceptionListener">
             <argument type="service" id="dunglas_json_ld_api.error_normalizer" />
+
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
     </services>

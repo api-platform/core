@@ -3,6 +3,10 @@ Feature: Documentation support
   As a client software developer
   I need to know Hydra specifications of objects I send and receive
 
+  Scenario: Checks that the Link pointing to the Hydra documentation is set
+    Given I send a "GET" request to "/"
+    Then the header "Link" should be equal to '</vocab>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
+
   Scenario: Retrieve the API vocabulary
     Given I send a "GET" request to "/vocab"
     Then the response status code should be 200
