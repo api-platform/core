@@ -19,7 +19,6 @@ use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -148,9 +147,9 @@ class JsonLdNormalizer extends AbstractNormalizer
                     $data['@type'] = self::HYDRA_COLLECTION;
                 }
 
-                $data['member'] = [];
+                $data['hydra:member'] = [];
                 foreach ($object as $obj) {
-                    $data['member'][] = $this->normalize($obj, $format, $context);
+                    $data['hydra:member'][] = $this->normalize($obj, $format, $context);
                 }
             }
 

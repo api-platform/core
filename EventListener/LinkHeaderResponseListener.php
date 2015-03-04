@@ -27,7 +27,8 @@ class LinkHeaderResponseListener
      */
     private $router;
 
-    public function __construct(RouterInterface $router) {
+    public function __construct(RouterInterface $router)
+    {
         $this->router = $router;
     }
 
@@ -39,7 +40,7 @@ class LinkHeaderResponseListener
 
         $event->getResponse()->headers->set('Link', sprintf(
             '<%s>; rel="%sapiDocumentation"',
-            $this->router->generate('json_ld_api_vocab'), ContextBuilder::HYDRA_NS)
+            $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL), ContextBuilder::HYDRA_NS)
         );
     }
 }

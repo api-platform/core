@@ -76,40 +76,44 @@ class ApiDocumentationBuilder
 
         foreach ($this->resources as $resource) {
             $shortName = $resource->getShortName();
+            $prefixedShortName = sprintf('#%s', $shortName);
 
             $collectionOperations = [];
-            foreach ($resource->getCollectionOperations() as $operation) {
-                $supportedOperation = [];
+            foreach ($resource->getCollectionOperations() as $collectionOperation) {
+                $operation = [];
 
-                if ('POST' === $operation['hydra:method']) {
-                    $supportedOperation['@type'] = 'hydra:CreateResourceOperation';
-                    $supportedOperation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
-                    $supportedOperation['hydra:expects'] = $shortName;
-                    $supportedOperation['hydra:returns'] = $shortName;
+                if ('POST' === $collectionOperation['hydra:method']) {
+                    $operation['@type'] = 'hydra:CreateResourceOperation';
+                    $operation['rdfs:label'] = sprintf('Creates a %s resource.', $shortName);
+                    $operation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
+                    $operation['expects'] = $prefixedShortName;
+                    $operation['returns'] = $prefixedShortName;
                 } else {
-                    $supportedOperation['@type'] = 'hydra:Operation';
-                    if ('GET' === $operation['hydra:method']) {
-                        $supportedOperation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $shortName);
-                        $supportedOperation['hydra:returns'] = 'hydra:PagedCollection';
+                    $operation['@type'] = 'hydra:Operation';
+                    if ('GET' === $collectionOperation['hydra:method']) {
+                        $operation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $shortName);
+                        $operation['returns'] = 'hydra:PagedCollection';
                     }
                 }
 
-                $collectionOperations[] = $this->getSupportedOperation($supportedOperation, $operation);
+                $operation['rdfs:label'] = $operation['hydra:title'];
+
+                $collectionOperations[] = $this->getSupportedOperation($operation, $collectionOperation);
             }
 
             $entrypointProperties[] = [
                 '@type' => 'hydra:SupportedProperty',
                 'hydra:property' => [
-                    '@id' => lcfirst($resource->getBeautifiedName()),
+                    '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
                     '@type' => 'hydra:Link',
                     'rdfs:label' => sprintf('The collection of %s resources', $shortName),
-                    'domain' => 'Entrypoint',
-                    'range' => $resource->getBeautifiedName(),
+                    'domain' => '#Entrypoint',
+                    'range' => 'hydra:PagedCollection',
+                    'hydra:supportedOperation' => $collectionOperations,
                 ],
                 'hydra:title' => sprintf('The collection of %s resources', $shortName),
                 'hydra:readable' => true,
                 'hydra:writable' => false,
-                'hydra:supportedOperation' => $collectionOperations,
             ];
 
             $classMetadata = $this->classMetadataFactory->getMetadataFor(
@@ -118,10 +122,9 @@ class ApiDocumentationBuilder
                 $resource->getDenormalizationGroups(),
                 $resource->getValidationGroups()
             );
-            $shortName = $resource->getShortName();
 
             $class = [
-                '@id' => $shortName,
+                '@id' => $prefixedShortName,
                 '@type' => 'hydra:Class',
                 'rdfs:label' => $resource->getShortName(),
                 'hydra:title' => $resource->getShortName(),
@@ -134,11 +137,7 @@ class ApiDocumentationBuilder
 
             $properties = [];
             foreach ($classMetadata->getAttributes() as $attributeName => $attribute) {
-                if (
-                    isset($attribute->getTypes()[0]) &&
-                    ($className = $attribute->getTypes()[0]->getClass()) &&
-                    $this->resources->getResourceForEntity($className)
-                ) {
+                if ($attribute->isLink()) {
                     $type = 'Hydra:Link';
                 } else {
                     $type = 'rdf:Property';
@@ -147,10 +146,10 @@ class ApiDocumentationBuilder
                 $property = [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => sprintf('%s/%s', $shortName, $attributeName),
+                        '@id' => sprintf('#%s/%s', $shortName, $attributeName),
                         '@type' => $type,
                         'rdfs:label' => $attributeName,
-                        'domain' => $shortName,
+                        'domain' => $prefixedShortName,
                     ],
                     'hydra:title' => $attributeName,
                     'hydra:required' => $attribute->isRequired(),
@@ -177,17 +176,16 @@ class ApiDocumentationBuilder
                 if ('PUT' === $itemOperation['hydra:method']) {
                     $operation['@type'] = 'hydra:ReplaceResourceOperation';
                     $operation['hydra:title'] = sprintf('Replaces the %s resource.', $shortName);
-                    $operation['hydra:expects'] = $shortName;
-                    $operation['hydra:returns'] = $shortName;
+                    $operation['expects'] = $prefixedShortName;
+                    $operation['returns'] = $prefixedShortName;
                 } elseif ('DELETE' === $itemOperation['hydra:method']) {
                     $operation['@type'] = 'hydra:Operation';
                     $operation['hydra:title'] = sprintf('Deletes the %s resource.', $shortName);
-                    $operation['hydra:expects'] = $shortName;
-                    $operation['hydra:returns'] = 'owl:Nothing';
+                    $operation['returns'] = 'owl:Nothing';
                 } elseif ('GET' === $itemOperation['hydra:method']) {
                     $operation['@type'] = 'hydra:Operation';
                     $operation['hydra:title'] = sprintf('Retrieves %s resource.', $shortName);
-                    $operation['hydra:returns'] = $shortName;
+                    $operation['returns'] = $prefixedShortName;
                 }
 
                 $operation['rdfs:label'] = $operation['hydra:title'];
@@ -204,26 +202,32 @@ class ApiDocumentationBuilder
 
         // Entrypoint
         $classes[] = [
-            '@id' => 'Entrypoint',
+            '@id' => '#Entrypoint',
             '@type' => 'hydra:Class',
             'hydra:title' => 'The API entrypoint',
             'hydra:supportedProperty' => $entrypointProperties,
+            'hydra:supportedOperation' => [
+                '@type' => 'hydra:Operation',
+                'method' => 'GET',
+                'rdfs:label' => 'The API entrypoint.',
+                'returns' => '#EntryPoint',
+            ],
         ];
 
         // Constraint violation
         $classes[] = [
-            '@id' => 'ConstraintViolation',
+            '@id' => '#ConstraintViolation',
             '@type' => 'hydra:Class',
             'hydra:title' => 'A constraint violation',
             'hydra:supportedProperty' => [
                 [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => 'ConstraintViolation/propertyPath',
+                        '@id' => '#ConstraintViolation/propertyPath',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'propertyPath',
-                        'domain' => 'ConstraintViolation',
-                        'range' => 'rdf:string',
+                        'domain' => '#ConstraintViolation',
+                        'range' => 'xmls:string',
                     ],
                     'hydra:title' => 'propertyPath',
                     'hydra:description' => 'The property path of the violation',
@@ -233,11 +237,11 @@ class ApiDocumentationBuilder
                 [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => 'ConstraintViolation/message',
+                        '@id' => '#ConstraintViolation/message',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'message',
-                        'domain' => 'ConstraintViolation',
-                        'range' => 'rdf:string',
+                        'domain' => '#ConstraintViolation',
+                        'range' => 'xmls:string',
                     ],
                     'hydra:title' => 'message',
                     'hydra:description' => 'The message associated with the violation',
@@ -249,7 +253,7 @@ class ApiDocumentationBuilder
 
         // Constraint violation list
         $classes[] = [
-            '@id' => 'ConstraintViolationList',
+            '@id' => '#ConstraintViolationList',
             '@type' => 'hydra:Class',
             'subClassOf' => 'hydra:Error',
             'hydra:title' => 'A constraint violation list',
@@ -257,11 +261,11 @@ class ApiDocumentationBuilder
                 [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => 'ConstraintViolationList/violation',
+                        '@id' => '#ConstraintViolationList/violation',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'violation',
-                        'domain' => 'ConstraintViolationList',
-                        'range' => 'ConstraintViolation',
+                        'domain' => '#ConstraintViolationList',
+                        'range' => '#ConstraintViolation',
                     ],
                     'hydra:title' => 'violation',
                     'hydra:description' => 'The violations',
@@ -314,27 +318,27 @@ class ApiDocumentationBuilder
 
             switch ($type->getType()) {
                 case 'string':
-                    return ContextBuilder::XML_NS.'string';
+                    return 'xmls:string';
 
                 case 'int':
-                    return ContextBuilder::XML_NS.'integer';
+                    return 'xmls:integer';
 
                 case 'float':
-                    return ContextBuilder::XML_NS.'double';
+                    return 'xmls:double';
 
                 case 'bool':
-                    return ContextBuilder::XML_NS.'boolean';
+                    return 'xmls:boolean';
 
                 case 'object':
                     $class = $type->getClass();
 
                     if ($class) {
                         if ('DateTime' === $class) {
-                            return ContextBuilder::XML_NS.'dateTime';
+                            return 'xmls:dateTime';
                         }
 
                         if ($resource = $this->resources->getResourceForEntity($type->getClass())) {
-                            return $resource->getShortName();
+                            return sprintf('#%s', $resource->getShortName());
                         }
                     }
                 break;

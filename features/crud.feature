@@ -63,7 +63,7 @@ Feature: Create-Retrieve-Update-Delete
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "member": [
+      "hydra:member": [
         {
           "@id":"/dummies/1",
           "@type":"Dummy",

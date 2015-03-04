@@ -15,7 +15,6 @@ use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**

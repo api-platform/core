@@ -22,7 +22,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class DocumentationController extends Controller
 {
     private static $reservedShortNames = [
-        'Entrypoint' => true,
         'ConstraintViolationList' => true,
         'ApiDocumentation' => true,
         'Error' => true,
@@ -49,6 +48,30 @@ class DocumentationController extends Controller
     }
 
     /**
+     * JSON-LD context for the entrypoint.
+     *
+     * @return JsonLdResponse
+     */
+    public function entrypointContextAction()
+    {
+        return new JsonLdResponse(
+            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->getEntrypointContext()]
+        );
+    }
+
+    /**
+     * JSON-LD context for the API documentation.
+     *
+     * @return JsonLdResponse
+     */
+    public function apiDocumentationContextAction()
+    {
+        return new JsonLdResponse(
+            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->getApiDocumentationContext()]
+        );
+    }
+
+    /**
      * JSON-LD context for a given type.
      *
      * @param string $shortName
@@ -67,7 +90,7 @@ class DocumentationController extends Controller
         }
 
         return new JsonLdResponse(
-            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->buildContext($resource)]
+            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->getContext($resource)]
         );
     }
 }

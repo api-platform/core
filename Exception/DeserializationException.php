@@ -14,7 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Exception;
 use Symfony\Component\Serializer\Exception\Exception;
 
 /**
- * Deserialization exception
+ * Deserialization exception.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */

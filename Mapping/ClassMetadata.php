@@ -11,7 +11,6 @@
 
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
-
 /**
  * ClassMetadata.
  *

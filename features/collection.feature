@@ -19,7 +19,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "member": []
+      "hydra:member": []
     }
     """
 
@@ -40,7 +40,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies?page=10",
-      "member": [
+      "hydra:member": [
         {
           "@id": "/dummies/1",
           "@type": "Dummy",
@@ -89,7 +89,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies?page=10",
-      "member": [
+      "hydra:member": [
         {
           "@id": "/dummies/19",
           "@type": "Dummy",
@@ -137,7 +137,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies?page=10",
-      "member": [
+      "hydra:member": [
           {
             "@id": "/dummies/28",
             "@type": "Dummy",
@@ -184,7 +184,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "member": [
+      "hydra:member": [
           {
             "@id": "/dummies/8",
             "@type": "Dummy",
@@ -214,7 +214,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "member": [
+      "hydra:member": [
           {
             "@id": "/dummies/8",
             "@type": "Dummy",

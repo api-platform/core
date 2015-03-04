@@ -67,7 +67,7 @@ Feature: Relations support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "member": [
+      "hydra:member": [
         {
           "@id": "/dummies/1",
           "@type": "Dummy",

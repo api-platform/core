@@ -48,26 +48,61 @@ class ContextBuilder
     }
 
     /**
+     * Builds the JSON-LD context for the entrypoint.
+     *
+     * @return array
+     */
+    public function getEntrypointContext()
+    {
+        $context = $this->getBaseContext();
+
+        foreach ($this->resources as $resource) {
+            $context[$resource->getBeautifiedName()] = [
+                '@id' => sprintf('Entrypoint/%s', lcfirst($resource->getShortName())),
+                '@type' => '@id',
+            ];
+        }
+
+        return $context;
+    }
+
+    /**
+     * Builds the JSON-LD context for the API documentation.
+     *
+     * @return array
+     */
+    public function getApiDocumentationContext()
+    {
+        return array_merge(
+            $this->getBaseContext(),
+            [
+                'rdf' => self::RDF_NS,
+                'rdfs' => self::RDFS_NS,
+                'xmls' => self::XML_NS,
+                'owl' => self::OWL_NS,
+                'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
+                'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
+                'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
+                'expects' => ['@id' => 'hydra:expects', '@type' => '@id'],
+                'returns' => ['@id' => 'hydra:returns', '@type' => '@id'],
+            ]
+        );
+    }
+
+    /**
      * Builds the JSON-LD context for the given resource.
      *
      * @param Resource|null $resource
      *
      * @return array
      */
-    public function buildContext(Resource $resource = null)
+    public function getContext(Resource $resource = null)
     {
-        $context = [
-            '@vocab' => $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#',
-            'hydra' => self::HYDRA_NS,
-            'rdf' => self::RDF_NS,
-            'rdfs' => self::RDFS_NS,
-            'owl' => self::OWL_NS,
-            'domain' => ['@id' => 'rdfs:domain', '@type' => '@id' ],
-            'range' => ['@id' => 'rdfs:range', '@type' => '@id' ],
-            'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id' ],
-        ];
+        $context = $this->getBaseContext();
 
         if ($resource) {
+            $prefixedShortName = sprintf('#%s', $resource->getShortName());
+
             $attributes = $this->classMetadataFactory->getMetadataFor(
                 $resource->getEntityClass(),
                 $resource->getNormalizationGroups(),
@@ -76,16 +111,15 @@ class ContextBuilder
             )->getAttributes();
 
             foreach ($attributes as $attributeName => $attribute) {
-                if (isset($attribute->getTypes()[0]) && 'object' === $attribute->getTypes()[0]->getType()) {
-                    $typeClass = $attribute->getTypes()[0]->getClass();
-                    if (null === $this->resources->getResourceForEntity($typeClass) &&
-                        null !== ($guessedType = $this->guessNativeType($typeClass))) {
-                        $type = $guessedType;
-                    } else {
-                        $type = '@id';
-                    }
+                $id = sprintf('%s/%s', $prefixedShortName, $attributeName);
 
-                    $context[$attributeName] = ['@type' => $type];
+                if ($attribute->isLink()) {
+                    $context[$attributeName] = [
+                        '@id' => $id,
+                        '@type' => '@id',
+                    ];
+                } else {
+                    $context[$attributeName] = $id;
                 }
             }
         }
@@ -94,16 +128,15 @@ class ContextBuilder
     }
 
     /**
-     * Guess native class type.
+     * Gets the base context.
      *
-     * @param string $class
-     *
-     * @return string|null
+     * @return array
      */
-    private function guessNativeType($class)
+    private function getBaseContext()
     {
-        if ('DateTime' === $class) {
-            return self::XML_NS.'dateTime';
-        }
+        return [
+            '@vocab' => $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#',
+            'hydra' => self::HYDRA_NS,
+        ];
     }
 }

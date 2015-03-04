@@ -12,6 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
+use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use phpDocumentor\Reflection\FileReflector;
 use PropertyInfo\PropertyInfoInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
@@ -44,6 +45,10 @@ class ClassMetadataFactory
      */
     private static $classReflectors = [];
     /**
+     * @var Resources
+     */
+    private $resources;
+    /**
      * @var PropertyInfoInterface
      */
     private $propertyInfo;
@@ -65,11 +70,13 @@ class ClassMetadataFactory
     private $loadedClasses = [];
 
     public function __construct(
+        Resources $resources,
         PropertyInfoInterface $propertyInfo,
         ValidatorMetadataFactory $validatorMetadataFactory = null,
         SerializerClassMetadataFactory $serializerClassMetadataFactory = null,
         Cache $cache = null
     ) {
+        $this->resources = $resources;
         $this->propertyInfo = $propertyInfo;
         $this->validatorMetadataFactory = $validatorMetadataFactory;
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
@@ -263,7 +270,23 @@ class ClassMetadataFactory
             $reflectionProperty = $reflectionClass->getProperty($attributeName);
 
             $attribute->setDescription($this->propertyInfo->getShortDescription($reflectionProperty));
-            $attribute->setTypes($this->propertyInfo->getTypes($reflectionProperty));
+
+            $types = $this->propertyInfo->getTypes($reflectionProperty);
+            $attribute->setTypes($types);
+
+            $type = isset($types[0]) ? $types[0] : null;
+            $attribute->setLink(
+                $type &&
+                (
+                    (($class = $type->getClass()) && $this->resources->getResourceForEntity($class)) ||
+                    (
+                        $type->isCollection() &&
+                        $type->getCollectionType() &&
+                        ($class = $type->getCollectionType()->getClass()) &&
+                        $this->resources->getResourceForEntity($class)
+                    )
+                )
+            );
         }
 
         if ($this->validatorMetadataFactory) {

@@ -66,6 +66,14 @@ class AttributeMetadata
      *           {@link isRequired()} instead.
      */
     public $required = false;
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getLink()} instead.
+     */
+    public $link = false;
 
     /**
      * @param string $name
@@ -186,6 +194,26 @@ class AttributeMetadata
     }
 
     /**
+     * Set link?
+     *
+     * @param bool $link
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
+    }
+
+    /**
+     * Is link?
+     *
+     * @return bool
+     */
+    public function isLink()
+    {
+        return $this->link;
+    }
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -199,6 +227,7 @@ class AttributeMetadata
             'readable',
             'writable',
             'required',
+            'link',
         ];
     }
 }

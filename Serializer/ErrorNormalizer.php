@@ -13,7 +13,6 @@ namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Converts {@see \Exception} to a Hydra error representation.
