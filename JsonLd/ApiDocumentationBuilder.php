@@ -27,6 +27,10 @@ class ApiDocumentationBuilder
      */
     private $resources;
     /**
+     * @var ContextBuilder
+     */
+    private $contextBuilder;
+    /**
      * @var RouterInterface
      */
     private $router;
@@ -45,6 +49,7 @@ class ApiDocumentationBuilder
 
     /**
      * @param Resources            $resources
+     * @param ContextBuilder       $contextBuilder
      * @param RouterInterface      $router
      * @param ClassMetadataFactory $classMetadataFactory
      * @param string               $title
@@ -52,12 +57,14 @@ class ApiDocumentationBuilder
      */
     public function __construct(
         Resources $resources,
+        ContextBuilder $contextBuilder,
         RouterInterface $router,
         ClassMetadataFactory $classMetadataFactory,
         $title,
         $description
     ) {
         $this->resources = $resources;
+        $this->contextBuilder = $contextBuilder;
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
         $this->title = $title;
@@ -276,7 +283,7 @@ class ApiDocumentationBuilder
         ];
 
         return [
-            '@context' => $this->router->generate('json_ld_api_context', ['shortName' => 'ApiDocumentation']),
+            '@context' => $this->contextBuilder->getApiDocumentationContext(),
             '@id' => $this->router->generate('json_ld_api_vocab'),
             'hydra:title' => $this->title,
             'hydra:description' => $this->description,

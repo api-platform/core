@@ -17,10 +17,6 @@
         <default key="_controller">DunglasJsonLdApiBundle:Documentation:entrypointContext</default>
     </route>
 
-    <route id="json_ld_api_documentation_context" path="/contexts/ApiDocumentation">
-        <default key="_controller">DunglasJsonLdApiBundle:Documentation:apiDocumentationContext</default>
-    </route>
-
     <route id="json_ld_api_context" path="/contexts/{shortName}">
         <default key="_controller">DunglasJsonLdApiBundle:Documentation:context</default>
     </route>

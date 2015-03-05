@@ -23,7 +23,6 @@ class DocumentationController extends Controller
 {
     private static $reservedShortNames = [
         'ConstraintViolationList' => true,
-        'ApiDocumentation' => true,
         'Error' => true,
     ];
 
@@ -56,18 +55,6 @@ class DocumentationController extends Controller
     {
         return new JsonLdResponse(
             ['@context' => $this->get('dunglas_json_ld_api.context_builder')->getEntrypointContext()]
-        );
-    }
-
-    /**
-     * JSON-LD context for the API documentation.
-     *
-     * @return JsonLdResponse
-     */
-    public function apiDocumentationContextAction()
-    {
-        return new JsonLdResponse(
-            ['@context' => $this->get('dunglas_json_ld_api.context_builder')->getApiDocumentationContext()]
         );
     }
 

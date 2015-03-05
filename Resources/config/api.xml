@@ -24,10 +24,17 @@
 
         <service id="dunglas_json_ld_api.api_documentation_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ApiDocumentationBuilder">
             <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.context_builder" />
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
             <argument>%dunglas_json_ld_api.title%</argument>
             <argument>%dunglas_json_ld_api.description%</argument>
+        </service>
+
+        <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
+            <argument type="service" id="dunglas_json_ld_api.router" />
+            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+            <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
         <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
@@ -60,12 +67,6 @@
             <argument type="service" id="property_info" />
             <argument type="service" id="validator" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
-        </service>
-
-        <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
-            <argument type="service" id="dunglas_json_ld_api.router" />
-            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
-            <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
         <service id="dunglas_json_ld_api.link_header_response_listener" class="Dunglas\JsonLdApiBundle\EventListener\LinkHeaderResponseListener">
