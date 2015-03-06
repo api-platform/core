@@ -180,7 +180,9 @@ class ResourceController extends Controller
      * Adds an element to the collection.
      *
      * @param Request $request
+     *
      * @return JsonLdResponse
+     *
      * @throws DeserializationException
      */
     public function postAction(Request $request)

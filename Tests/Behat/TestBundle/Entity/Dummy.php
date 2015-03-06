@@ -25,30 +25,42 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Dummy
 {
     /**
+     * @var int The id.
+     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
     /**
+     * @var string The dummy name.
+     *
      * @ORM\Column
      * @Assert\NotBlank
      */
     private $name;
     /**
+     * @var string A dummy.
+     *
      * @ORM\Column(nullable=true)
      */
     public $dummy;
     /**
+     * @var \DateTime A dummy date.
+     *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
      */
     public $dummyDate;
     /**
+     * @var RelatedDummy A related dummy.
+     *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */
     public $relatedDummy;
     /**
+     * @var RelatedDummy[] Several dummies.
+     *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
     public $relatedDummies;

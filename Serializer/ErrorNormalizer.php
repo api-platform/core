@@ -40,6 +40,7 @@ class ErrorNormalizer implements NormalizerInterface
         $this->router = $router;
         $this->debug = $debug;
     }
+
     /**
      * {@inheritdoc}
      */

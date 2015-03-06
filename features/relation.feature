@@ -17,7 +17,8 @@ Feature: Relations support
     {
       "@context": "/contexts/RelatedDummy",
       "@id": "/related_dummies/1",
-      "@type": "RelatedDummy"
+      "@type": "RelatedDummy",
+      "age": null
     }
     """
 

@@ -14,23 +14,23 @@ namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Related Dummy.
+ * Parent Dummy.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ORM\Entity
+ * @ORM\MappedSuperclass
  */
-class RelatedDummy extends ParentDummy
+class ParentDummy
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int The age.
+     *
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $id;
+    private $age;
 
-    public function getId()
+    public function getAge()
     {
-        return $this->id;
+        return $this->age;
     }
 }

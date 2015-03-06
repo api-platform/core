@@ -264,11 +264,9 @@ class ClassMetadataFactory
         }
 
         $attribute = new AttributeMetadata($attributeName);
-        $reflectionClass = $classMetadata->getReflectionClass();
+        $reflectionProperty = $this->getRelfectionProperty($classMetadata->getReflectionClass(), $attributeName);
 
-        if ($reflectionClass->hasProperty($attributeName)) {
-            $reflectionProperty = $reflectionClass->getProperty($attributeName);
-
+        if ($reflectionProperty) {
             $attribute->setDescription($this->propertyInfo->getShortDescription($reflectionProperty));
 
             $types = $this->propertyInfo->getTypes($reflectionProperty);
@@ -390,5 +388,24 @@ class ClassMetadataFactory
         }
 
         return ltrim(is_object($value) ? get_class($value) : $value, '\\');
+    }
+
+    /**
+     * Gets the {@see |ReflectionProperty} from the class or its parent.
+     *
+     * @param \ReflectionClass $reflectionClass
+     * @param string           $attributeName
+     *
+     * @return \ReflectionProperty
+     */
+    private function getRelfectionProperty(\ReflectionClass $reflectionClass, $attributeName)
+    {
+        if ($reflectionClass->hasProperty($attributeName)) {
+            return $reflectionClass->getProperty($attributeName);
+        }
+
+        if ($parent = $reflectionClass->getParentClass()) {
+            return $this->getRelfectionProperty($parent, $attributeName);
+        }
     }
 }
