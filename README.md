@@ -2,7 +2,7 @@
 **JSON-LD + Hydra REST API generator for Symfony**
 
 This a work in progress under active development.
-This bundle rely on Symfony 2.7 and *is not usable in production yet*.
+This bundle rely heavily on the Serializer of Symfony 2.7 and *is not usable in production yet*.
 
 [![Build Status](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle.svg)](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552/mini.png)](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552)
@@ -28,8 +28,6 @@ Everything is fully customizable trough a powerful event system and strong OOP.
 This bundle is documented and tested with Behat (take a look at [the `features/` directory](features/)).
  
 ## Installation
-
-**This bundle relies heavily on features that will be introduced in Symfony 2.7.**
 
 Use [Composer](http://getcomposer.org) to install the bundle:
 
