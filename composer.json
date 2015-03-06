@@ -13,7 +13,9 @@
   ],
   "require": {
     "php": ">=5.5",
-    "symfony/symfony": "2.7.x-dev",
+    "symfony/serializer": "2.7.x-dev",
+    "symfony/validator": "~2.3|~3.0",
+    "symfony/framework-bundle": "~2.3|~3.0",
     "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/doctrine-bundle": "~1.2",
     "dunglas/php-property-info": "~0.2",
