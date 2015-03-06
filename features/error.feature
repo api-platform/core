@@ -40,15 +40,11 @@ Feature: Error handling
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Error",
-      "@type": "Error",
-      "hydra:title": "An error occurred",
-      "hydra:description": "Type not supported (found \"array\" in attribute \"relatedDummy\")"
-    }
-    """
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'Type not supported (found "array" in attribute "relatedDummy")'
+    And the JSON node "trace" should exist
 
   Scenario: Get an error during deserialization of collection
     Given I send a "POST" request to "/dummies" with body:
@@ -63,15 +59,11 @@ Feature: Error handling
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Error",
-      "@type": "Error",
-      "hydra:title": "An error occurred",
-      "hydra:description": "Nested objects are not supported (found in attribute \"relatedDummies\")"
-    }
-    """
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'Nested objects are not supported (found in attribute "relatedDummies")'
+    And the JSON node "trace" should exist
 
     Scenario: Get an error because of an invalid JSON
     Given I send a "POST" request to "/dummies" with body:
@@ -83,12 +75,8 @@ Feature: Error handling
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Error",
-      "@type": "Error",
-      "hydra:title": "An error occurred",
-      "hydra:description": "Syntax error"
-    }
-    """
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'Syntax error'
+    And the JSON node "trace" should exist

@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * Converts {@see \Exception} to a Hydra error representation.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ErrorNormalizer implements NormalizerInterface
 {
@@ -25,10 +26,19 @@ class ErrorNormalizer implements NormalizerInterface
      * @var RouterInterface
      */
     private $router;
+    /**
+     * @var bool
+     */
+    private $debug;
 
-    public function __construct(RouterInterface $router)
+    /**
+     * @param RouterInterface $router
+     * @param bool            $debug
+     */
+    public function __construct(RouterInterface $router, $debug)
     {
         $this->router = $router;
+        $this->debug = $debug;
     }
     /**
      * {@inheritdoc}
@@ -37,14 +47,24 @@ class ErrorNormalizer implements NormalizerInterface
     {
         if ($object instanceof \Exception) {
             $message = $object->getMessage();
+
+            if ($this->debug) {
+                $trace = $object->getTrace();
+            }
         }
 
-        return [
+        $data = [
             '@context' => $this->router->generate('json_ld_api_context', ['shortName' => 'Error']),
             '@type' => 'Error',
             'hydra:title' => isset($context['title']) ? $context['title'] : 'An error occurred',
             'hydra:description' => isset($message) ? $message : (string) $object,
         ];
+
+        if (isset($trace)) {
+            $data['trace'] = $trace;
+        }
+
+        return $data;
     }
 
     /**
