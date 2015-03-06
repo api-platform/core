@@ -188,12 +188,12 @@ class ClassMetadataFactory
                 }
 
                 if (count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, $normalizationAttribute->getName(), $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
                     $attribute->setReadable(true);
                 }
 
                 if (count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, $normalizationAttribute->getName(), $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
                     $attribute->setWritable(true);
                 }
             }
