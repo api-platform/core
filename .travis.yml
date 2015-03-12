@@ -21,5 +21,5 @@ before_script:
     - composer self-update
 
 script:
-    - if [ "$deps" = "no" ]; composer update; vendor/bin/behat; fi;
-    - if [ "$deps" = "low" ]; composer update --prefer-lowest; vendor/bin/behat; fi;
+    - if [ "$deps" = "no" ]; then composer update; vendor/bin/behat; fi;
+    - if [ "$deps" = "low" ]; then composer update --prefer-lowest; vendor/bin/behat; fi;
