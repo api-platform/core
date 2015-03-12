@@ -1,11 +1,25 @@
 language: php
 
-php:
-  - 5.5
-  - 5.6
-  - hhvm
+matrix:
+    include:
+        - php: 5.5
+        - php: 5.6
+        - php: 5.5
+          env: deps=low
+        - php: nightly
+        - php: hhvm-nightly
+    allow_failures:
+        - php: nightly
+        - php: hhvm-nightly
+    fast_finish: true
+
+env:
+    global:
+        - deps=no
 
 before_script:
-  - composer update
+    - composer self-update
 
-script: vendor/bin/behat
+script:
+    - if [ "$deps" = "no" ]; composer update; vendor/bin/behat; fi;
+    - if [ "$deps" = "low" ]; composer update --prefer-lowest; vendor/bin/behat; fi;
