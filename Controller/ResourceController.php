@@ -151,7 +151,7 @@ class ResourceController extends Controller
 
         $filters = [];
         foreach ($resource->getFilters() as $resourceFilter) {
-            if ($value = $request->get($resourceFilter['name'])) {
+            if (null !== $value = $request->get($resourceFilter['name'])) {
                 $resourceFilter['value'] = $value;
                 $filters[] = $resourceFilter;
             }
