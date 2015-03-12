@@ -4,8 +4,6 @@ matrix:
     include:
         - php: 5.5
         - php: 5.6
-        - php: 5.5
-          env: deps=low
         - php: nightly
         - php: hhvm-nightly
     allow_failures:
@@ -19,7 +17,6 @@ env:
 
 before_script:
     - composer self-update
+    - composer update
 
-script:
-    - if [ "$deps" = "no" ]; then composer update; vendor/bin/behat; fi;
-    - if [ "$deps" = "low" ]; then composer update --prefer-lowest; vendor/bin/behat; fi;
+script: vendor/bin/behat
