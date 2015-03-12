@@ -183,7 +183,7 @@ class ResourceController extends Controller
      *
      * @return JsonLdResponse
      *
-     * @throws \InvalidArgumentException
+     * @throws DeserializationException
      */
     public function postAction(Request $request)
     {

@@ -54,6 +54,7 @@
 
         <service id="dunglas_json_ld_api.error_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\ErrorNormalizer" public="false">
             <argument type="service" id="dunglas_json_ld_api.router" />
+            <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" />
         </service>
