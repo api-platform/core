@@ -198,6 +198,35 @@ Feature: Collections support
     }
     """
 
+  Scenario: Filter with a raw URL
+    Given I send a "GET" request to "/dummies?id=%2fdummies%2f8"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies",
+      "@type": "hydra:PagedCollection",
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies",
+      "hydra:lastPage": "/dummies",
+      "hydra:member": [
+          {
+            "@id": "/dummies/8",
+            "@type": "Dummy",
+            "name": "Dummy #8",
+            "dummy": null,
+            "dummyDate": null,
+            "relatedDummy": null,
+            "relatedDummies": []
+          }
+      ]
+    }
+    """
+
   @dropSchema
   Scenario: Filter with non-exact match
     Given I send a "GET" request to "/dummies?name=Dummy%20%238"

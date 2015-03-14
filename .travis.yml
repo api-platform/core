@@ -1,5 +1,7 @@
 language: php
 
+sudo: false
+
 matrix:
     include:
         - php: 5.5
@@ -11,12 +13,6 @@ matrix:
         - php: hhvm-nightly
     fast_finish: true
 
-env:
-    global:
-        - deps=no
-
-before_script:
-    - composer self-update
-    - composer update
-
+before_script: composer self-update
+install: composer install
 script: vendor/bin/behat
