@@ -14,12 +14,13 @@
   "require": {
     "php": ">=5.5",
     "symfony/serializer": "2.7.x-dev",
-    "symfony/validator": "~2.3|~3.0",
-    "symfony/framework-bundle": "~2.3|~3.0",
+    "symfony/validator": "~2.5|~3.0",
+    "symfony/framework-bundle": "~2.5|~3.0",
     "doctrine/orm": "~2.2,>=2.2.3",
+    "doctrine/inflector": "~1.0",
     "doctrine/doctrine-bundle": "~1.2",
     "dunglas/php-property-info": "~0.2",
-    "phpdocumentor/reflection": "~1.0"
+    "phpdocumentor/reflection": "^1.0.7"
   },
   "require-dev": {
     "phpspec/phpspec": "~2.0",

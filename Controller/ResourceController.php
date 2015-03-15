@@ -95,7 +95,7 @@ class ResourceController extends Controller
      * @param int          $status
      * @param array        $headers
      *
-     * @return array
+     * @return JsonLdResponse
      */
     protected function getSuccessResponse(Resource $resource, $data, $status = 200, array $headers = [])
     {
@@ -151,7 +151,7 @@ class ResourceController extends Controller
 
         $filters = [];
         foreach ($resource->getFilters() as $resourceFilter) {
-            if ($value = $request->get($resourceFilter['name'])) {
+            if (null !== $value = $request->get($resourceFilter['name'])) {
                 $resourceFilter['value'] = $value;
                 $filters[] = $resourceFilter;
             }
@@ -237,8 +237,7 @@ class ResourceController extends Controller
      *
      * @return JsonLdResponse
      *
-     * @throws NotFoundHttpException
-     * @throws \InvalidArgumentException
+     * @throws DeserializationException
      */
     public function putAction(Request $request, $id)
     {

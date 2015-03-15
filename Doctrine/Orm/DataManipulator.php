@@ -16,6 +16,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -98,14 +99,20 @@ class DataManipulator implements DataManipulatorInterface
 
         foreach ($filters as $filter) {
             if (isset($fieldNames[$filter['name']])) {
+                if ('id' === $filter['name']) {
+                    $filter['value'] = $this->getFilterValueFromUrl($filter['value']);
+                }
+
                 $queryBuilder
                     ->andWhere(sprintf('o.%1$s LIKE :%1$s', $filter['name']))
                     ->setParameter($filter['name'], $filter['exact'] ? $filter['value'] : sprintf('%%%s%%', $filter['value']))
                 ;
             } elseif ($metadata->isSingleValuedAssociation($filter['name']) || $metadata->isCollectionValuedAssociation($filter['name'])) {
+                $value = $this->getFilterValueFromUrl($filter['value']);
+
                 $queryBuilder
                     ->andWhere(sprintf('o.%1$s = :%1$s', $filter['name']))
-                    ->setParameter($filter['name'], $this->getObjectFromUri($filter['value']))
+                    ->setParameter($filter['name'], $filter['exact'] ? $value : sprintf('%%%s%%', $value))
                 ;
             }
         }
@@ -147,5 +154,25 @@ class DataManipulator implements DataManipulatorInterface
         $entityClass = $resource->getEntityClass();
 
         return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
+    }
+
+    /**
+     * Gets the ID from an URI or a raw ID.
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private function getFilterValueFromUrl($value)
+    {
+        try {
+            if ($object = $this->getObjectFromUri($value)) {
+                return $object->getId();
+            }
+        } catch (ExceptionInterface $e) {
+            // Do nothing, return the raw value
+        }
+
+        return $value;
     }
 }
