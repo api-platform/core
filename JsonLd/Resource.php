@@ -277,7 +277,7 @@ class Resource
         $method = isset($operation['hydra:method']) ? $operation['hydra:method'] : $operation['hydra:method'] = 'GET';
         $action = $method === 'GET' && $isCollection ? 'cget' : strtolower($method);
 
-        // Use ! as ignore character because @ and are _ reserver JSON-LD characters
+        // Use ! as ignore character because @ and are _ reserved JSON-LD characters
         if (isset($operation['!controller'])) {
             $controller = $operation['!controller'];
         } else {
