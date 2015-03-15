@@ -59,7 +59,7 @@ class Resource
     /**
      * @var array
      */
-    protected $filters;
+    protected $filters = [];
     /**
      * @var array
      */
@@ -81,6 +81,10 @@ class Resource
      */
     protected $shortName;
     /**
+     * @var string
+     */
+    protected $beautifiedName;
+    /**
      * @var array
      */
     protected $collectionOperations;
@@ -95,15 +99,15 @@ class Resource
     /**
      * @var RouteCollection|null
      */
-    protected $routeCollection = null;
+    protected $routeCollection;
     /**
      * @var string|null
      */
-    protected $elementRoute = null;
+    protected $elementRoute;
     /**
      * @var string|null
      */
-    protected $collectionRoute = null;
+    protected $collectionRoute;
 
     /**
      * @param string      $entityClass
@@ -136,14 +140,23 @@ class Resource
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
         $this->validationGroups = $validationGroups;
-        $this->collectionOperations = null === $collectionOperations ? self::$defaultCollectionOperations : $collectionOperations;
-        $this->itemOperations = null === $itemOperations ? self::$defaultItemOperations : $itemOperations;
         $this->controllerName = $controllerName;
 
-        foreach ($filters as &$filter) {
-            $filter = array_merge(self::$defaultFilter, $filter);
+        $this->beautifiedName = Inflector::pluralize(Inflector::tableize($this->shortName));
+
+        $this->collectionOperations = null === $collectionOperations ? self::$defaultCollectionOperations : $collectionOperations;
+        foreach ($this->collectionOperations as $key => $operation) {
+            $this->collectionOperations[$key] = $this->populateOperation($operation, true);
         }
-        $this->filters = $filters;
+
+        $this->itemOperations = null === $itemOperations ? self::$defaultItemOperations : $itemOperations;
+        foreach ($this->itemOperations as $key => $operation) {
+            $this->itemOperations[$key] = $this->populateOperation($operation, false);
+        }
+
+        foreach ($filters as $filters => $filter) {
+            $this->filters[$filters] = array_merge(self::$defaultFilter, $filter);
+        }
 
         $this->normalizationContext['resource'] = $this;
         $this->denormalizationContext['resource'] = $this;
@@ -251,61 +264,63 @@ class Resource
         }
 
         $this->routeCollection = new RouteCollection();
-        $beautified = $this->getBeautifiedName();
-
         foreach ($this->collectionOperations as $collectionOperation) {
-            $this->addRoute($beautified, $this->routeCollection, $collectionOperation, true);
+            $this->addRoute($collectionOperation, true);
         }
 
         foreach ($this->itemOperations as $itemOperation) {
-            $this->addRoute($beautified, $this->routeCollection, $itemOperation, false);
+            $this->addRoute($itemOperation, false);
         }
 
         return $this->routeCollection;
     }
 
     /**
+     * Populates default operation values.
+     *
+     * @param array  $operation
+     * @param bool   $isCollection
+     *
+     * @return array
+     */
+    private function populateOperation(array $operation, $isCollection)
+    {
+        if (!isset($operation['hydra:method'])) {
+            $operation['hydra:method'] = 'GET';
+        }
+
+        $action = $operation['hydra:method'] === 'GET' && $isCollection ? 'cget' : strtolower($operation['hydra:method']);
+
+        // Use ! as ignore character because @ and are _ reserved JSON-LD characters
+        if (!isset($operation['!controller'])) {
+            $operation['!controller'] = sprintf('%s:%s', $this->controllerName, $action);
+        }
+
+        if (!isset($operation['!route_name'])) {
+            $operation['!route_name'] = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $this->beautifiedName, $action);
+        }
+
+        if (!isset($operation['!route_path'])) {
+            $operation['!route_path'] = self::ROUTE_PATH_PREFIX.$this->beautifiedName.($isCollection ? '' : '/{id}');
+        }
+
+        return $operation;
+    }
+
+    /**
      * Adds a route to the collection.
      *
-     * @param string          $beautified
-     * @param RouteCollection $routeCollection
      * @param array           $operation
      * @param boolean         $isCollection
      */
-    private function addRoute($beautified, RouteCollection $routeCollection, array $operation, $isCollection)
+    private function addRoute(array $operation, $isCollection)
     {
-        $method = isset($operation['hydra:method']) ? $operation['hydra:method'] : $operation['hydra:method'] = 'GET';
-        $action = $method === 'GET' && $isCollection ? 'cget' : strtolower($method);
+        $methods = 'GET' === $operation['hydra:method'] ? ['GET', 'HEAD'] : [$operation['hydra:method']];
 
-        // Use ! as ignore character because @ and are _ reserved JSON-LD characters
-        if (isset($operation['!controller'])) {
-            $controller = $operation['!controller'];
-        } else {
-            $controller = sprintf('%s:%s', $this->controllerName, $action);
-        }
-
-        if (isset($operation['!route_name'])) {
-            $routeName = $operation['!route_name'];
-        } else {
-            $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $beautified, $action);
-        }
-
-        if (isset($operation['!route_path'])) {
-            $routePath = $operation['!route_path'];
-        } else {
-            $routePath = self::ROUTE_PATH_PREFIX.$beautified;
-
-            if (!$isCollection) {
-                $routePath .= '/{id}';
-            }
-        }
-
-        $methods = 'GET' === $method ? ['GET', 'HEAD'] : [$method];
-
-        $routeCollection->add($routeName, new Route(
-            $routePath,
+        $this->routeCollection->add($operation['!route_name'], new Route(
+            $operation['!route_path'],
             [
-                '_controller' => $controller,
+                '_controller' => $operation['!controller'],
                 '_json_ld_resource' => $this->shortName,
             ],
             [],
@@ -316,13 +331,13 @@ class Resource
         ));
 
         // Set routes
-        if ('GET' === $method) {
+        if ('GET' === $operation['hydra:method']) {
             if (!$this->collectionRoute && $isCollection) {
-                $this->collectionRoute = $routeName;
+                $this->collectionRoute = $operation['!route_name'];
             }
 
             if (!$this->elementRoute && !$isCollection) {
-                $this->elementRoute = $routeName;
+                $this->elementRoute = $operation['!route_name'];
             }
         }
     }
@@ -384,6 +399,6 @@ class Resource
      */
     public function getBeautifiedName()
     {
-        return Inflector::pluralize(Inflector::tableize($this->shortName));
+        return $this->beautifiedName;
     }
 }

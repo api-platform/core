@@ -227,7 +227,7 @@ in the Serializer component. Specifying to the API system the groups to use is d
 services:
     "resource.product":
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Product", ~, [ "serialization_group1", "serialization_group2" ], [ "deserialization_group1", "deserialization_group2" ] ]
+        arguments: [ "AppBundle\Entity\Product", [], [ "serialization_group1", "serialization_group2" ], [ "deserialization_group1", "deserialization_group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -244,7 +244,7 @@ No problem. Edit your service declaration and add groups you want to use when th
 services:
     "resource.product":
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Product", ~, ~, ~, [ "group1", "group2" ] ]
+        arguments: [ "AppBundle\Entity\Product", [], [], [], [ "group1", "group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
