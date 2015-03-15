@@ -87,25 +87,7 @@ class ApiDocumentationBuilder
 
             $collectionOperations = [];
             foreach ($resource->getCollectionOperations() as $collectionOperation) {
-                $operation = [];
-
-                if ('POST' === $collectionOperation['hydra:method']) {
-                    $operation['@type'] = 'hydra:CreateResourceOperation';
-                    $operation['rdfs:label'] = sprintf('Creates a %s resource.', $shortName);
-                    $operation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
-                    $operation['expects'] = $prefixedShortName;
-                    $operation['returns'] = $prefixedShortName;
-                } else {
-                    $operation['@type'] = 'hydra:Operation';
-                    if ('GET' === $collectionOperation['hydra:method']) {
-                        $operation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $shortName);
-                        $operation['returns'] = 'hydra:PagedCollection';
-                    }
-                }
-
-                $operation['rdfs:label'] = $operation['hydra:title'];
-
-                $collectionOperations[] = $this->getSupportedOperation($operation, $collectionOperation);
+                $collectionOperations[] = $this->getOperation($collectionOperation);
             }
 
             $entrypointProperties[] = [
@@ -178,29 +160,7 @@ class ApiDocumentationBuilder
 
             $operations = [];
             foreach ($resource->getItemOperations() as $itemOperation) {
-                $operation = [];
-
-                if ('PUT' === $itemOperation['hydra:method']) {
-                    $operation['@type'] = 'hydra:ReplaceResourceOperation';
-                    $operation['hydra:title'] = sprintf('Replaces the %s resource.', $shortName);
-                    $operation['expects'] = $prefixedShortName;
-                    $operation['returns'] = $prefixedShortName;
-                } elseif ('DELETE' === $itemOperation['hydra:method']) {
-                    $operation['@type'] = 'hydra:Operation';
-                    $operation['hydra:title'] = sprintf('Deletes the %s resource.', $shortName);
-                    $operation['returns'] = 'owl:Nothing';
-                } elseif ('GET' === $itemOperation['hydra:method']) {
-                    $operation['@type'] = 'hydra:Operation';
-                    $operation['hydra:title'] = sprintf('Retrieves %s resource.', $shortName);
-                    $operation['returns'] = $prefixedShortName;
-                }
-
-                $operation['rdfs:label'] = $operation['hydra:title'];
-
-                $operations[] = $this->getSupportedOperation(
-                    $operation,
-                    $itemOperation
-                );
+                $operations[] = $this->getOperation($itemOperation);
             }
 
             $class['hydra:supportedOperation'] = $operations;
@@ -215,7 +175,7 @@ class ApiDocumentationBuilder
             'hydra:supportedProperty' => $entrypointProperties,
             'hydra:supportedOperation' => [
                 '@type' => 'hydra:Operation',
-                'method' => 'GET',
+                'hydra:method' => 'GET',
                 'rdfs:label' => 'The API entrypoint.',
                 'returns' => '#EntryPoint',
             ],
@@ -293,15 +253,15 @@ class ApiDocumentationBuilder
     }
 
     /**
-     * Copies data from $operation to $supportedOperation except when the key start with "!".
+     * Returns data from $operation except when the key start with "!".
      *
-     * @param array $supportedOperation
      * @param array $operation
      *
      * @return array
      */
-    private function getSupportedOperation(array $supportedOperation, array $operation)
+    private function getOperation(array $operation)
     {
+        $supportedOperation = [];
         foreach ($operation as $key => $value) {
             if (isset($key[0]) && '!' !== $key[0]) {
                 $supportedOperation[$key] = $value;

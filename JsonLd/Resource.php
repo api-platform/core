@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class representing a JSON-LD / Hydra resource.
+ * Class representing a JSON-LD/Hydra resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -26,10 +26,6 @@ class Resource
      * @var string
      */
     const ROUTE_NAME_PREFIX = 'json_ld_api_';
-    /**
-     * @var string
-     */
-    const ROUTE_PATH_PREFIX = '/';
 
     /**
      * @var array
@@ -264,11 +260,11 @@ class Resource
         }
 
         $this->routeCollection = new RouteCollection();
-        foreach ($this->collectionOperations as $collectionOperation) {
+        foreach ($this->collectionOperations as &$collectionOperation) {
             $this->addRoute($collectionOperation, true);
         }
 
-        foreach ($this->itemOperations as $itemOperation) {
+        foreach ($this->itemOperations as &$itemOperation) {
             $this->addRoute($itemOperation, false);
         }
 
@@ -285,8 +281,90 @@ class Resource
      */
     private function populateOperation(array $operation, $isCollection)
     {
+        $prefixedShortName = sprintf('#%s', $this->shortName);
+
         if (!isset($operation['hydra:method'])) {
             $operation['hydra:method'] = 'GET';
+        }
+
+        if ($isCollection) {
+            if ('POST' === $operation['hydra:method']) {
+                if (!isset($operation['@type'])) {
+                    $operation['@type'] = 'hydra:CreateResourceOperation';
+                }
+
+                if (!isset($operation['hydra:title'])) {
+                    $operation['hydra:title'] = sprintf('Creates a %s resource.', $this->shortName);
+                }
+
+                if (!isset($operation['expects'])) {
+                    $operation['expects'] = $prefixedShortName;
+                }
+
+                if (!isset($operation['returns'])) {
+                    $operation['returns'] = $prefixedShortName;
+                }
+            } else {
+                if (!isset($operation['@type'])) {
+                    $operation['@type'] = 'hydra:Operation';
+                }
+
+                if ('GET' === $operation['hydra:method']) {
+                    if (!isset($operation['hydra:title'])) {
+                        $operation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $this->shortName);
+                    }
+
+                    if (!isset($operation['returns'])) {
+                        $operation['returns'] = 'hydra:PagedCollection';
+                    }
+                }
+            }
+        } else {
+            if ('PUT' === $operation['hydra:method']) {
+                if (!isset($operation['@type'])) {
+                    $operation['@type'] = 'hydra:ReplaceResourceOperation';
+                }
+
+                if (!isset($operation['hydra:title'])) {
+                    $operation['hydra:title'] = sprintf('Replaces the %s resource.', $this->shortName);
+                }
+
+                if (!isset($operation['returns'])) {
+                    $operation['returns'] = $prefixedShortName;
+                }
+
+                if (!isset($operation['expects'])) {
+                    $operation['expects'] = $prefixedShortName;
+                }
+            } elseif ('DELETE' === $operation['hydra:method']) {
+                if (!isset($operation['@type'])) {
+                    $operation['@type'] = 'hydra:Operation';
+                }
+
+                if (!isset($operation['hydra:title'])) {
+                    $operation['hydra:title'] = sprintf('Deletes the %s resource.', $this->shortName);
+                }
+
+                if (!isset($operation['expects'])) {
+                    $operation['returns'] = 'owl:Nothing';
+                }
+            } elseif ('GET' === $operation['hydra:method']) {
+                if (!isset($operation['@type'])) {
+                    $operation['@type'] = 'hydra:Operation';
+                }
+
+                if (!isset($operation['hydra:title'])) {
+                    $operation['hydra:title'] = sprintf('Retrieves %s resource.', $this->shortName);
+                }
+
+                if (!isset($operation['returns'])) {
+                    $operation['returns'] = $prefixedShortName;
+                }
+            }
+        }
+
+        if (!isset($operation['rdfs:label'])) {
+            $operation['rdfs:label'] = $operation['hydra:title'];
         }
 
         $action = $operation['hydra:method'] === 'GET' && $isCollection ? 'cget' : strtolower($operation['hydra:method']);
@@ -301,7 +379,7 @@ class Resource
         }
 
         if (!isset($operation['!route_path'])) {
-            $operation['!route_path'] = self::ROUTE_PATH_PREFIX.$this->beautifiedName.($isCollection ? '' : '/{id}');
+            $operation['!route_path'] = '/'.$this->beautifiedName.($isCollection ? '' : '/{id}');
         }
 
         return $operation;
@@ -310,14 +388,13 @@ class Resource
     /**
      * Adds a route to the collection.
      *
-     * @param array           $operation
-     * @param boolean         $isCollection
+     * @param array   $operation
+     * @param boolean $isCollection
      */
-    private function addRoute(array $operation, $isCollection)
+    private function addRoute(array &$operation, $isCollection)
     {
         $methods = 'GET' === $operation['hydra:method'] ? ['GET', 'HEAD'] : [$operation['hydra:method']];
-
-        $this->routeCollection->add($operation['!route_name'], new Route(
+        $route = new Route(
             $operation['!route_path'],
             [
                 '_controller' => $operation['!controller'],
@@ -328,7 +405,10 @@ class Resource
             '',
             [],
             $methods
-        ));
+        );
+
+        $this->routeCollection->add($operation['!route_name'], $route);
+        $operation['!route'] = $route;
 
         // Set routes
         if ('GET' === $operation['hydra:method']) {
@@ -345,7 +425,7 @@ class Resource
     /**
      * Gets the route associated with the collection.
      *
-     * @return null|string
+     * @return string
      */
     public function getCollectionRoute()
     {

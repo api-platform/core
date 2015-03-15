@@ -132,26 +132,26 @@ Feature: Documentation support
                 ],
                 "hydra:supportedOperation": [
                     {
+                        "hydra:method": "GET",
                         "@type": "hydra:Operation",
                         "hydra:title": "Retrieves Dummy resource.",
                         "returns": "#Dummy",
-                        "rdfs:label": "Retrieves Dummy resource.",
-                        "hydra:method": "GET"
+                        "rdfs:label": "Retrieves Dummy resource."
                     },
                     {
+                        "hydra:method": "PUT",
                         "@type": "hydra:ReplaceResourceOperation",
                         "hydra:title": "Replaces the Dummy resource.",
-                        "expects": "#Dummy",
                         "returns": "#Dummy",
-                        "rdfs:label": "Replaces the Dummy resource.",
-                        "hydra:method": "PUT"
+                        "expects": "#Dummy",
+                        "rdfs:label": "Replaces the Dummy resource."
                     },
                     {
+                        "hydra:method": "DELETE",
                         "@type": "hydra:Operation",
                         "hydra:title": "Deletes the Dummy resource.",
                         "returns": "owl:Nothing",
-                        "rdfs:label": "Deletes the Dummy resource.",
-                        "hydra:method": "DELETE"
+                        "rdfs:label": "Deletes the Dummy resource."
                     }
                 ]
             },
@@ -180,26 +180,26 @@ Feature: Documentation support
                 ],
                 "hydra:supportedOperation": [
                     {
+                        "hydra:method": "GET",
                         "@type": "hydra:Operation",
                         "hydra:title": "Retrieves RelatedDummy resource.",
                         "returns": "#RelatedDummy",
-                        "rdfs:label": "Retrieves RelatedDummy resource.",
-                        "hydra:method": "GET"
+                        "rdfs:label": "Retrieves RelatedDummy resource."
                     },
                     {
+                        "hydra:method": "PUT",
                         "@type": "hydra:ReplaceResourceOperation",
                         "hydra:title": "Replaces the RelatedDummy resource.",
-                        "expects": "#RelatedDummy",
                         "returns": "#RelatedDummy",
-                        "rdfs:label": "Replaces the RelatedDummy resource.",
-                        "hydra:method": "PUT"
+                        "expects": "#RelatedDummy",
+                        "rdfs:label": "Replaces the RelatedDummy resource."
                     },
                     {
+                        "hydra:method": "DELETE",
                         "@type": "hydra:Operation",
                         "hydra:title": "Deletes the RelatedDummy resource.",
                         "returns": "owl:Nothing",
-                        "rdfs:label": "Deletes the RelatedDummy resource.",
-                        "hydra:method": "DELETE"
+                        "rdfs:label": "Deletes the RelatedDummy resource."
                     }
                 ]
             },
@@ -218,19 +218,19 @@ Feature: Documentation support
                             "range": "hydra:PagedCollection",
                             "hydra:supportedOperation": [
                                 {
+                                    "hydra:method": "GET",
                                     "@type": "hydra:Operation",
                                     "hydra:title": "Retrieves the collection of Dummy resources.",
                                     "returns": "hydra:PagedCollection",
-                                    "rdfs:label": "Retrieves the collection of Dummy resources.",
-                                    "hydra:method": "GET"
+                                    "rdfs:label": "Retrieves the collection of Dummy resources."
                                 },
                                 {
+                                    "hydra:method": "POST",
                                     "@type": "hydra:CreateResourceOperation",
-                                    "rdfs:label": "Creates a Dummy resource.",
                                     "hydra:title": "Creates a Dummy resource.",
                                     "expects": "#Dummy",
                                     "returns": "#Dummy",
-                                    "hydra:method": "POST"
+                                    "rdfs:label": "Creates a Dummy resource."
                                 }
                             ]
                         },
@@ -248,19 +248,19 @@ Feature: Documentation support
                             "range": "hydra:PagedCollection",
                             "hydra:supportedOperation": [
                                 {
+                                    "hydra:method": "GET",
                                     "@type": "hydra:Operation",
                                     "hydra:title": "Retrieves the collection of RelatedDummy resources.",
                                     "returns": "hydra:PagedCollection",
-                                    "rdfs:label": "Retrieves the collection of RelatedDummy resources.",
-                                    "hydra:method": "GET"
+                                    "rdfs:label": "Retrieves the collection of RelatedDummy resources."
                                 },
                                 {
+                                    "hydra:method": "POST",
                                     "@type": "hydra:CreateResourceOperation",
-                                    "rdfs:label": "Creates a RelatedDummy resource.",
                                     "hydra:title": "Creates a RelatedDummy resource.",
                                     "expects": "#RelatedDummy",
                                     "returns": "#RelatedDummy",
-                                    "hydra:method": "POST"
+                                    "rdfs:label": "Creates a RelatedDummy resource."
                                 }
                             ]
                         },
@@ -271,7 +271,7 @@ Feature: Documentation support
                 ],
                 "hydra:supportedOperation": {
                     "@type": "hydra:Operation",
-                    "method": "GET",
+                    "hydra:method": "GET",
                     "rdfs:label": "The API entrypoint.",
                     "returns": "#EntryPoint"
                 }
