@@ -274,8 +274,8 @@ class Resource
     /**
      * Populates default operation values.
      *
-     * @param array  $operation
-     * @param bool   $isCollection
+     * @param array $operation
+     * @param bool  $isCollection
      *
      * @return array
      */
