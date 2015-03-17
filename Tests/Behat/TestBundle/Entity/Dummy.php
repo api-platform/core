@@ -40,6 +40,10 @@ class Dummy
      */
     private $name;
     /**
+     * @var array foo
+     */
+    private $foo;
+    /**
      * @var string A dummy.
      *
      * @ORM\Column(nullable=true)
@@ -86,6 +90,10 @@ class Dummy
     }
 
     public function hasRole($role)
+    {
+    }
+
+    public function setFoo(array $foo = null)
     {
     }
 }

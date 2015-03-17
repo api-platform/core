@@ -209,7 +209,7 @@ class ClassMetadataFactory
                 $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
 
                 // setters
-                if (1 === $numberOfRequiredParameters && strpos($reflectionMethod->name, 'set') === 0) {
+                if ($numberOfRequiredParameters <= 1 && strpos($reflectionMethod->name, 'set') === 0) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
                     $attribute->setWritable(true);
 

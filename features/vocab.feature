@@ -73,6 +73,20 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
+                            "@id": "#Dummy/foo",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "foo",
+                            "domain": "#Dummy"
+                        },
+                        "hydra:title": "foo",
+                        "hydra:required": false,
+                        "hydra:readable": false,
+                        "hydra:writable": true,
+                        "hydra:description": "foo"
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
                             "@id": "#Dummy/dummy",
                             "@type": "rdf:Property",
                             "rdfs:label": "dummy",
@@ -83,7 +97,7 @@ Feature: Documentation support
                         "hydra:required": false,
                         "hydra:readable": true,
                         "hydra:writable": true,
-                        "hydra:description": "A dummy."
+                        "hydra:description": "foo"
                     },
                     {
                         "@type": "hydra:SupportedProperty",

@@ -15,6 +15,7 @@ Feature: JSON-LD contexts generation
             "@vocab": "http://example.com/vocab#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "name": "#Dummy/name",
+            "foo": "#Dummy/foo",
             "dummy": "#Dummy/dummy",
             "dummyDate": "#Dummy/dummyDate",
             "relatedDummy": {
