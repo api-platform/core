@@ -121,7 +121,7 @@ class DataManipulator implements DataManipulatorInterface
             $queryBuilder->addOrderBy('o.id', $order);
         }
 
-        return new Paginator($queryBuilder);
+        return new Paginator($queryBuilder, false);
     }
 
     /**
