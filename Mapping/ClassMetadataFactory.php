@@ -187,12 +187,12 @@ class ClassMetadataFactory
                     continue;
                 }
 
-                if (null != $normalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
+                if (null !== $normalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
                     $attribute->setReadable(true);
                 }
 
-                if (null != $denormalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
+                if (null !== $denormalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
                     $attribute->setWritable(true);
                 }
@@ -228,7 +228,7 @@ class ClassMetadataFactory
 
                 // getters and hassers
                 if (
-                    null == $normalizationGroups &&
+                    null === $normalizationGroups &&
                     (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0)
                 ) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
@@ -238,7 +238,7 @@ class ClassMetadataFactory
                 }
 
                 // issers
-                if (null == $normalizationGroups && strpos($reflectionMethod->name, 'is') === 0) {
+                if (null === $normalizationGroups && strpos($reflectionMethod->name, 'is') === 0) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 2)), $validationGroups);
                     $attribute->setReadable(true);
                 }
@@ -255,7 +255,7 @@ class ClassMetadataFactory
                     $attribute->setReadable(true);
                 }
 
-                if (null == $denormalizationGroups) {
+                if (null === $denormalizationGroups) {
                     $attribute->setWritable(true);
                 }
             }
