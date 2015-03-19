@@ -181,23 +181,25 @@ class ClassMetadataFactory
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
-        if ($serializerClassMetadata && null !== $normalizationGroups && null !== $denormalizationGroups) {
+        if (null !== $normalizationGroups || null !== $denormalizationGroups) {
             foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
                 if ('id' === $name = $normalizationAttribute->getName()) {
                     continue;
                 }
 
-                if (count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
+                if (null != $normalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
                     $attribute->setReadable(true);
                 }
 
-                if (count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
+                if (null != $denormalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
                     $attribute->setWritable(true);
                 }
             }
-        } else {
+        }
+
+        if (null === $normalizationGroups || null === $denormalizationGroups) {
             $reflectionClass = $classMetadata->getReflectionClass();
 
             // methods
@@ -209,7 +211,11 @@ class ClassMetadataFactory
                 $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
 
                 // setters
-                if ($numberOfRequiredParameters <= 1 && strpos($reflectionMethod->name, 'set') === 0) {
+                if (
+                    null === $denormalizationGroups &&
+                    $numberOfRequiredParameters <= 1 &&
+                    strpos($reflectionMethod->name, 'set') === 0
+                ) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
                     $attribute->setWritable(true);
 
@@ -221,7 +227,10 @@ class ClassMetadataFactory
                 }
 
                 // getters and hassers
-                if (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0) {
+                if (
+                    null == $normalizationGroups &&
+                    (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0)
+                ) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
                     $attribute->setReadable(true);
 
@@ -229,7 +238,7 @@ class ClassMetadataFactory
                 }
 
                 // issers
-                if (strpos($reflectionMethod->name, 'is') === 0) {
+                if (null == $normalizationGroups && strpos($reflectionMethod->name, 'is') === 0) {
                     $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 2)), $validationGroups);
                     $attribute->setReadable(true);
                 }
@@ -242,8 +251,13 @@ class ClassMetadataFactory
                 }
 
                 $attribute = $this->getOrCreateAttribute($classMetadata, $reflectionProperty->name, $validationGroups);
-                $attribute->setReadable(true);
-                $attribute->setWritable(true);
+                if (null === $normalizationGroups) {
+                    $attribute->setReadable(true);
+                }
+
+                if (null == $denormalizationGroups) {
+                    $attribute->setWritable(true);
+                }
             }
         }
     }
