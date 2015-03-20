@@ -11,9 +11,9 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
+use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -53,12 +53,17 @@ class JsonLdNormalizer extends AbstractNormalizer
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
+    /**
+     * @var ContextBuilder
+     */
+    private $contextBuilder;
 
     public function __construct(
         ResourceResolver $resourceResolver,
         RouterInterface $router,
         DataManipulatorInterface $dataManipulator,
         ClassMetadataFactory $jsonLdClassMetadataFactory,
+        ContextBuilder $contextBuilder,
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null
     ) {
@@ -68,6 +73,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         $this->router = $router;
         $this->dataManipulator = $dataManipulator;
         $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
+        $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
@@ -92,15 +98,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         }
 
         $resource = $this->resourceResolver->guessResource($object, $context);
-
-        $data = [];
-        if (!isset($context['json_ld_has_context'])) {
-            $data['@context'] = $this->router->generate(
-                'json_ld_api_context',
-                ['shortName' => $resource->getShortName()]
-            );
-            $context['json_ld_has_context'] = true;
-        }
+        list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         // Don't use hydra:Collection in sub levels
         $context['json_ld_sub_level'] = true;

@@ -128,6 +128,27 @@ class ContextBuilder
     }
 
     /**
+     * Bootstrap a serialization context with the given resource.
+     *
+     * @param Resource $resource
+     * @param array $context
+     * @return array [array, array]
+     */
+    public function bootstrap(Resource $resource, array $context = [])
+    {
+        $data = [];
+        if (!isset($context['has_json_ld_context'])) {
+            $data['@context'] = $this->router->generate(
+                'json_ld_api_context',
+                ['shortName' => $resource->getShortName()]
+            );
+            $context['has_json_ld_context'] = true;
+        }
+
+        return [$context, $data];
+    }
+
+    /**
      * Gets the base context.
      *
      * @return array

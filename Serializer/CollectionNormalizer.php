@@ -12,6 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
@@ -38,13 +39,20 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     private $router;
 
     /**
+     * @var ContextBuilder
+     */
+    private $contextBuilder;
+
+    /**
      * @param ResourceResolver $resourceResolver
      * @param RouterInterface $router
+     * @param ContextBuilder $contextBuilder
      */
-    public function __construct(ResourceResolver $resourceResolver, RouterInterface $router)
+    public function __construct(ResourceResolver $resourceResolver, RouterInterface $router, ContextBuilder $contextBuilder)
     {
         $this->resourceResolver = $resourceResolver;
         $this->router = $router;
+        $this->contextBuilder = $contextBuilder;
     }
 
     /**
@@ -61,15 +69,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     public function normalize($object, $format = null, array $context = array())
     {
         $resource = $this->resourceResolver->guessResource($object, $context);
-
-        $data = [];
-        if (!isset($context['has_json_ld_context'])) {
-            $data['@context'] = $this->router->generate(
-                'json_ld_api_context',
-                ['shortName' => $resource->getShortName()]
-            );
-            $context['has_json_ld_context'] = true;
-        }
+        list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         if (isset($context['sub_level'])) {
             $data = [];
