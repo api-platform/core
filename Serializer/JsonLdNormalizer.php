@@ -15,9 +15,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
-use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -35,8 +32,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class JsonLdNormalizer extends AbstractNormalizer
 {
     const FORMAT = 'json-ld';
-    const HYDRA_COLLECTION = 'hydra:Collection';
-    const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
      * @var ResourceResolver
@@ -105,56 +100,6 @@ class JsonLdNormalizer extends AbstractNormalizer
                 ['shortName' => $resource->getShortName()]
             );
             $context['json_ld_has_context'] = true;
-        }
-
-        // Collection
-        if (is_array($object) || $object instanceof \Traversable) {
-            if (isset($context['json_ld_sub_level'])) {
-                $data = [];
-                foreach ($object as $obj) {
-                    $data[] = $this->serializer->normalize($obj, $format, $context);
-                }
-            } else {
-                $data['@id'] = $this->router->generate($resource->getCollectionRoute());
-
-                if ($object instanceof Paginator) {
-                    $data['@type'] = self::HYDRA_PAGED_COLLECTION;
-
-                    $query = $object->getQuery();
-                    $firstResult = $query->getFirstResult();
-                    $maxResults = $query->getMaxResults();
-                    $currentPage = floor($firstResult / $maxResults) + 1.;
-                    $totalItems = count($object);
-                    $lastPage = ceil($totalItems / $maxResults) ?: 1.;
-
-                    $baseUrl = $data['@id'];
-                    $paginatedUrl = $baseUrl.'?page=';
-
-                    if (1. !== $currentPage) {
-                        $previousPage = $currentPage - 1.;
-                        $data['@id'] .= $paginatedUrl.$currentPage;
-                        $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl.$previousPage;
-                    }
-
-                    if ($currentPage !== $lastPage) {
-                        $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
-                    }
-
-                    $data['hydra:totalItems'] = $totalItems;
-                    $data['hydra:itemsPerPage'] = $maxResults;
-                    $data['hydra:firstPage'] = $baseUrl;
-                    $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
-                } else {
-                    $data['@type'] = self::HYDRA_COLLECTION;
-                }
-
-                $data['hydra:member'] = [];
-                foreach ($object as $obj) {
-                    $data['hydra:member'][] = $this->normalize($obj, $format, $context);
-                }
-            }
-
-            return $data;
         }
 
         // Don't use hydra:Collection in sub levels

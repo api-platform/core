@@ -67,6 +67,13 @@
             <tag name="serializer.normalizer" priority="50" />
         </service>
 
+        <service id="dunglas_json_ld_api.collection_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.resource_resolver" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
+
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
         <service id="dunglas_json_ld_api.json_ld_encoder" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdEncoder" public="false">
             <tag name="serializer.encoder" />
         </service>
