@@ -1,4 +1,14 @@
 <?php
+
+/*
+ * This file is part of the DunglasJsonLdApiBundle package.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -6,6 +16,12 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
+/**
+ * This normalizer handle collections and paginated collections.
+ *
+ * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @author Kevin Dunglas <dunglas@gmail.com>
+ */
 class CollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
 {
     const HYDRA_COLLECTION = 'hydra:Collection';
