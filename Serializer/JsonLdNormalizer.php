@@ -112,7 +112,7 @@ class JsonLdNormalizer extends AbstractNormalizer
             if (isset($context['json_ld_sub_level'])) {
                 $data = [];
                 foreach ($object as $obj) {
-                    $data[] = $this->normalize($obj, $format, $context);
+                    $data[] = $this->serializer->normalize($obj, $format, $context);
                 }
             } else {
                 $data['@id'] = $this->router->generate($resource->getCollectionRoute());
@@ -197,11 +197,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                     }
                 }
 
-                if ($attributeValue instanceof \DateTime) {
-                    $attributeValue = $attributeValue->format(\DateTime::ATOM);
-                }
-
-                $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json', $context);
+                $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json-ld', $context);
             }
         }
 
