@@ -65,7 +65,7 @@ api:
 
 ### Configure
 
-The first step if to name your API. Add the following lines in `app/config/config.yml`:
+The first step is to name your API. Add the following lines in `app/config/config.yml`:
 
 ```yaml
 dunglas_json_ld_api:
@@ -170,7 +170,7 @@ You now have a fully featured API exposing your Doctrine entities
 Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhost:8000/api`.
 
 Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
-and take a look at the usage examples in the [the `features` directory](features/).
+and take a look at the usage examples in [the `features` directory](features/).
 
 ## Advanced usage
 
