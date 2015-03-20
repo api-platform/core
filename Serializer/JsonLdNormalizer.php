@@ -39,9 +39,9 @@ class JsonLdNormalizer extends AbstractNormalizer
     const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
-     * @var Resources
+     * @var ResourceResolver
      */
-    private $resources;
+    private $resourceResolver;
     /**
      * @var RouterInterface
      */
@@ -60,7 +60,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     private $propertyAccessor;
 
     public function __construct(
-        Resources $resources,
+        ResourceResolver $resourceResolver,
         RouterInterface $router,
         DataManipulatorInterface $dataManipulator,
         ClassMetadataFactory $jsonLdClassMetadataFactory,
@@ -69,7 +69,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     ) {
         parent::__construct(null, $nameConverter);
 
-        $this->resources = $resources;
+        $this->resourceResolver = $resourceResolver;
         $this->router = $router;
         $this->dataManipulator = $dataManipulator;
         $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
@@ -96,7 +96,7 @@ class JsonLdNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $resource = $this->guessResource($object, $context);
+        $resource = $this->resourceResolver->guessResource($object, $context);
 
         $data = [];
         if (!isset($context['json_ld_has_context'])) {
@@ -184,7 +184,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         $attributeValue &&
                         $type->isCollection() &&
                         ($collectionType = $type->getCollectionType()) &&
-                        $class = $this->getClassHavingResource($collectionType)
+                        $class = $this->resourceResolver->getClassHavingResource($collectionType)
                     ) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
@@ -192,7 +192,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         }
 
                         $attributeValue = $uris;
-                    } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
+                    } elseif ($attributeValue && $class = $this->resourceResolver->getClassHavingResource($type)) {
                         $attributeValue = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
                     }
                 }
@@ -219,7 +219,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $resource = $this->guessResource($data, $context);
+        $resource = $this->resourceResolver->guessResource($data, $context);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
@@ -272,7 +272,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                     }
 
                     $value = $collection;
-                } elseif (!$this->resources->getResourceForEntity($types[0]->getClass())) {
+                } elseif (!$this->resourceResolver->getClassHavingResource($types[0])) {
                     $typeClass = $types[0]->getClass();
                     if ('DateTime' === $typeClass) {
                         $value = new \DateTime($value);
@@ -302,57 +302,6 @@ class JsonLdNormalizer extends AbstractNormalizer
         }
 
         return $object;
-    }
-
-    /**
-     * Guesses the associated resource.
-     *
-     * @param mixed      $type
-     * @param array|null $context
-     *
-     * @return Resource
-     *
-     * @throws InvalidArgumentException
-     */
-    private function guessResource($type, array $context = null)
-    {
-        if (isset($context['resource'])) {
-            return $context['resource'];
-        }
-
-        if (is_object($type)) {
-            $type = get_class($type);
-        }
-
-        if (!is_string($type)) {
-            $type = gettype($type);
-        }
-
-        if ($resource = $this->resources->getResourceForEntity($type)) {
-            return $resource;
-        }
-
-        throw new InvalidArgumentException(
-            sprintf('Cannot find a resource object for type "%s".', $type)
-        );
-    }
-
-    /**
-     * Returns the class if a resource is associated with it.
-     *
-     * @param Type $type
-     *
-     * @return string|null
-     */
-    private function getClassHavingResource(Type $type)
-    {
-        if (
-            'object' === $type->getType() &&
-            ($class = $type->getClass()) &&
-            $this->resources->getResourceForEntity($class)
-        ) {
-            return $class;
-        }
     }
 
     /**

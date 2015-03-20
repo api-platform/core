@@ -37,8 +37,12 @@
             <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
-        <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
+        <service id="dunglas_json_ld_api.resource_resolver" class="Dunglas\JsonLdApiBundle\Serializer\ResourceResolver">
             <argument type="service" id="dunglas_json_ld_api.resources" />
+        </service>
+
+        <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.resource_resolver" />
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.data_manipulator" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
