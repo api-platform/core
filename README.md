@@ -65,7 +65,7 @@ api:
 
 ### Configure
 
-The first step if to name your API. Add the following lines in `app/config/config.yml`:
+The first step is to name your API. Add the following lines in `app/config/config.yml`:
 
 ```yaml
 dunglas_json_ld_api:
@@ -151,12 +151,12 @@ Register the following services (for example in `app/config/services.yml`):
 
 ```yaml
 services:
-    "resource.product":
+    resource.product:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product" ]
         tags:      [ { name: "json-ld.resource" } ]
 
-    "resource.offer":
+    resource.offer:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Offer" ]
         tags:      [ { name: "json-ld.resource" } ]
@@ -168,7 +168,7 @@ You now have a fully featured API exposing your Doctrine entities
 Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhost:8000/api`.
 
 Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
-and take a look at the usage examples in the [the `features` directory](features/).
+and take a look at the usage examples in [the `features` directory](features/).
 
 ## Advanced usage
 
@@ -182,7 +182,7 @@ To allow filtering the list of offers:
 
 ```yaml
 services:
-    "resource.offer":
+    resource.offer:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments:
             - "AppBundle\Entity\Offer"
@@ -201,7 +201,7 @@ It also possible to filter by relations:
 
 ```yaml
 services:
-    "resource.offer":
+    resource.offer:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments:
             - "AppBundle\Entity\Offer"
@@ -223,7 +223,7 @@ in the Serializer component. Specifying to the API system the groups to use is d
 
 ```yaml
 services:
-    "resource.product":
+    resource.product:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product", [], [ "serialization_group1", "serialization_group2" ], [ "deserialization_group1", "deserialization_group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
@@ -342,7 +342,7 @@ No problem. Edit your service declaration and add groups you want to use when th
 
 ```yaml
 services:
-    "resource.product":
+    resource.product:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Product", [], [], [], [ "group1", "group2" ] ]
         tags:      [ { name: "json-ld.resource" } ]
