@@ -12,6 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Related Dummy.
@@ -28,6 +29,11 @@ class RelatedDummy extends ParentDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+    /**
+     * @ORM\Column
+     * @Groups({"barcelona"})
+     */
+    public $symfony = 'symfony';
 
     public function getId()
     {

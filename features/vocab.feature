@@ -190,6 +190,20 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": false,
                         "hydra:description": "The age."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#RelatedDummy/symfony",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "symfony",
+                            "domain": "#RelatedDummy",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "symfony",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
                     }
                 ],
                 "hydra:supportedOperation": [
@@ -214,6 +228,81 @@ Feature: Documentation support
                         "hydra:title": "Deletes the RelatedDummy resource.",
                         "returns": "owl:Nothing",
                         "rdfs:label": "Deletes the RelatedDummy resource."
+                    }
+                ]
+            },
+            {
+                "@id": "#RelationEmbedder",
+                "@type": "hydra:Class",
+                "rdfs:label": "RelationEmbedder",
+                "hydra:title": "RelationEmbedder",
+                "hydra:description": "Relation Embedder.",
+                "hydra:supportedProperty": [
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#RelationEmbedder/krondstadt",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "krondstadt",
+                            "domain": "#RelationEmbedder",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "krondstadt",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#RelationEmbedder/related",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "related",
+                            "domain": "#RelationEmbedder",
+                            "range": "#RelatedDummy"
+                        },
+                        "hydra:title": "related",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#RelationEmbedder/paris",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "paris",
+                            "domain": "#RelationEmbedder",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "paris",
+                        "hydra:required": false,
+                        "hydra:readable": false,
+                        "hydra:writable": true
+                    }
+                ],
+                "hydra:supportedOperation": [
+                    {
+                        "hydra:method": "GET",
+                        "@type": "hydra:Operation",
+                        "hydra:title": "Retrieves RelationEmbedder resource.",
+                        "returns": "#RelationEmbedder",
+                        "rdfs:label": "Retrieves RelationEmbedder resource."
+                    },
+                    {
+                        "hydra:method": "PUT",
+                        "@type": "hydra:ReplaceResourceOperation",
+                        "hydra:title": "Replaces the RelationEmbedder resource.",
+                        "returns": "#RelationEmbedder",
+                        "expects": "#RelationEmbedder",
+                        "rdfs:label": "Replaces the RelationEmbedder resource."
+                    },
+                    {
+                        "hydra:method": "DELETE",
+                        "@type": "hydra:Operation",
+                        "hydra:title": "Deletes the RelationEmbedder resource.",
+                        "returns": "owl:Nothing",
+                        "rdfs:label": "Deletes the RelationEmbedder resource."
                     }
                 ]
             },
@@ -279,6 +368,36 @@ Feature: Documentation support
                             ]
                         },
                         "hydra:title": "The collection of RelatedDummy resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/relationEmbedder",
+                            "@type": "hydra:Link",
+                            "rdfs:label": "The collection of RelationEmbedder resources",
+                            "domain": "#Entrypoint",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "hydra:method": "GET",
+                                    "@type": "hydra:Operation",
+                                    "hydra:title": "Retrieves the collection of RelationEmbedder resources.",
+                                    "returns": "hydra:PagedCollection",
+                                    "rdfs:label": "Retrieves the collection of RelationEmbedder resources."
+                                },
+                                {
+                                    "hydra:method": "POST",
+                                    "@type": "hydra:CreateResourceOperation",
+                                    "hydra:title": "Creates a RelationEmbedder resource.",
+                                    "expects": "#RelationEmbedder",
+                                    "returns": "#RelationEmbedder",
+                                    "rdfs:label": "Creates a RelationEmbedder resource."
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of RelationEmbedder resources",
                         "hydra:readable": true,
                         "hydra:writable": false
                     }

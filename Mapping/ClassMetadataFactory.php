@@ -181,19 +181,19 @@ class ClassMetadataFactory
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
-        if (null !== $normalizationGroups || null !== $denormalizationGroups) {
+        if ($serializerClassMetadata && (null !== $normalizationGroups || null !== $denormalizationGroups)) {
             foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
                 if ('id' === $name = $normalizationAttribute->getName()) {
                     continue;
                 }
 
                 if (null !== $normalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $normalizationGroups, $validationGroups);
                     $attribute->setReadable(true);
                 }
 
                 if (null !== $denormalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $normalizationGroups, $validationGroups);
                     $attribute->setWritable(true);
                 }
             }
@@ -216,7 +216,7 @@ class ClassMetadataFactory
                     $numberOfRequiredParameters <= 1 &&
                     strpos($reflectionMethod->name, 'set') === 0
                 ) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $normalizationGroups, $validationGroups);
                     $attribute->setWritable(true);
 
                     continue;
@@ -231,7 +231,7 @@ class ClassMetadataFactory
                     null === $normalizationGroups &&
                     (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0)
                 ) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $normalizationGroups, $validationGroups);
                     $attribute->setReadable(true);
 
                     continue;
@@ -239,7 +239,7 @@ class ClassMetadataFactory
 
                 // issers
                 if (null === $normalizationGroups && strpos($reflectionMethod->name, 'is') === 0) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 2)), $validationGroups);
+                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 2)), $normalizationGroups, $validationGroups);
                     $attribute->setReadable(true);
                 }
             }
@@ -250,7 +250,7 @@ class ClassMetadataFactory
                     continue;
                 }
 
-                $attribute = $this->getOrCreateAttribute($classMetadata, $reflectionProperty->name, $validationGroups);
+                $attribute = $this->getOrCreateAttribute($classMetadata, $reflectionProperty->name, $normalizationGroups, $validationGroups);
                 if (null === $normalizationGroups) {
                     $attribute->setReadable(true);
                 }
@@ -267,11 +267,12 @@ class ClassMetadataFactory
      *
      * @param ClassMetadata $classMetadata
      * @param string        $attributeName
+     * @param string[]|null $normalizationGroups
      * @param string[]|null $validationGroups
      *
      * @return AttributeMetadata
      */
-    private function getOrCreateAttribute(ClassMetadata $classMetadata, $attributeName, array $validationGroups = null)
+    private function getOrCreateAttribute(ClassMetadata $classMetadata, $attributeName, array $normalizationGroups = null, array $validationGroups = null)
     {
         if (isset($classMetadata->getAttributes()[$attributeName])) {
             return $classMetadata->getAttributes()[$attributeName];
@@ -286,9 +287,8 @@ class ClassMetadataFactory
             $types = $this->propertyInfo->getTypes($reflectionProperty);
             $attribute->setTypes($types);
 
-            $type = isset($types[0]) ? $types[0] : null;
-            $attribute->setLink(
-                $type &&
+            if (
+                ($type = isset($types[0]) ? $types[0] : null) &&
                 (
                     (($class = $type->getClass()) && $this->resources->getResourceForEntity($class)) ||
                     (
@@ -298,7 +298,26 @@ class ClassMetadataFactory
                         $this->resources->getResourceForEntity($class)
                     )
                 )
-            );
+            ) {
+                if (null === $normalizationGroups) {
+                    $attribute->setLink(true);
+                } else {
+                    if (
+                        $this->serializerClassMetadataFactory &&
+                        ($relationSerializerMetadata = $this->serializerClassMetadataFactory->getMetadataFor($class))
+                    ) {
+                        $link = true;
+                        foreach ($relationSerializerMetadata->getAttributesMetadata() as $attributeMetadata) {
+                            if (1 >= count(array_intersect($normalizationGroups, $attributeMetadata->getGroups()))) {
+                                $link = false;
+                                break;
+                            }
+                        }
+
+                        $attribute->setLink($link);
+                    }
+                }
+            }
         }
 
         if ($this->validatorMetadataFactory) {

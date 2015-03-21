@@ -86,7 +86,6 @@ Imagine you have the following Doctrine entity classes:
 
 namespace AppBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -116,7 +115,6 @@ class Product
 
 namespace AppBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -233,6 +231,108 @@ services:
 
 The Hydra documentation will leverage specified serialization and deserialization to list exposed properties, if they are
 readable or/and writable.
+
+### Embedding relations
+
+By default, the serializer provided with the bundle will represent relations between objects by a dereferenceable URI allowing
+to retrieve details of the related object by issuing another HTTP request.
+
+In the following JSON document, the relation from an offer to a product is represented by an URI:
+
+```json
+{
+  "@context": "/contexts/Offer",
+  "@id": "/offer/62",
+  "@type": "Offer",
+  "price": 31.2,
+  "product": "/products/59"
+}
+```
+
+From a performance point of view, it's sometimes necessary to embed the related object (of a part of it) directly in the
+the parent response.
+
+The bundle allows that trough serialization groups. Using the following serizalization groups annotations (`@Groups`) and
+this updated service definition, a JSON representation of the product will be embedded in the offer response.
+
+```php
+<?php
+
+# src/AppBundle/Entity/Offer.php
+
+namespace AppBundle\Entity;
+
+use Symfony\Component\Serializer\Annotation\Groups;
+
+// ...
+
+class Offer
+{
+    // ...
+    
+    /**
+     * ...
+     * @Groups({"offer"})
+     */
+    public $price;
+    /**
+     * ...
+     * @Groups({"offer"})
+     */
+    public $product;
+}
+```
+
+```php
+<?php
+
+# src/AppBundle/Entity/Product.php
+
+namespace AppBundle\Entity;
+
+use Symfony\Component\Serializer\Annotation\Groups;
+
+// ...
+
+class Product
+{
+    // ...
+
+    /**
+     * ...
+     * @Groups({"offer"})
+     */
+    public $name;
+}
+```
+
+Register the following services (for example in `app/config/services.yml`):
+
+```yaml
+services:
+    # ...
+
+    "resource.offer":
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
+        arguments: [ "AppBundle\Entity\Offer", [], { groups: [ "offer" ] } ]
+        tags:      [ { name: "json-ld.resource" } ]
+```
+
+The generated JSON with previous settings will be like the following:
+
+```json
+{
+  "@context": "/contexts/Offer",
+  "@id": "/offer/62",
+  "@type": "Offer",
+  "price": 31.2,
+  "product": {
+    "@id": "/products/59",
+    "@type": "Product",
+    "name": "Lyle and Scott polo skirt"
+  }
+}
+```
 
 ### Validation groups
 

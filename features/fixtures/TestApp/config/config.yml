@@ -6,6 +6,8 @@ framework:
     validation:
         api:                         2.5
         enable_annotations:          true
+    serializer:
+        enable_annotations:          true
     trusted_proxies: ~
     test: ~
     session:
@@ -41,5 +43,14 @@ services:
         class:     Dunglas\JsonLdApiBundle\JsonLd\Resource
         arguments:
           - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy
+        tags:
+          - { name: json-ld.resource }
+
+    my_relation_embedder_resource:
+        class:     Dunglas\JsonLdApiBundle\JsonLd\Resource
+        arguments:
+          - Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder
+          - []
+          - { groups: [ "barcelona" ] }
         tags:
           - { name: json-ld.resource }

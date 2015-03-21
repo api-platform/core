@@ -12,6 +12,8 @@
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
@@ -22,7 +24,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -98,17 +99,17 @@ class JsonLdNormalizer extends AbstractNormalizer
         $resource = $this->guessResource($object, $context);
 
         $data = [];
-        if (!isset($context['has_json_ld_context'])) {
+        if (!isset($context['json_ld_has_context'])) {
             $data['@context'] = $this->router->generate(
                 'json_ld_api_context',
                 ['shortName' => $resource->getShortName()]
             );
-            $context['has_json_ld_context'] = true;
+            $context['json_ld_has_context'] = true;
         }
 
         // Collection
         if (is_array($object) || $object instanceof \Traversable) {
-            if (isset($context['sub_level'])) {
+            if (isset($context['json_ld_sub_level'])) {
                 $data = [];
                 foreach ($object as $obj) {
                     $data[] = $this->normalize($obj, $format, $context);
@@ -157,7 +158,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         }
 
         // Don't use hydra:Collection in sub levels
-        $context['sub_level'] = true;
+        $context['json_ld_sub_level'] = true;
 
         $data['@id'] = $this->router->generate(
             $resource->getElementRoute(),
@@ -167,9 +168,9 @@ class JsonLdNormalizer extends AbstractNormalizer
 
         $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
-            $resource->getNormalizationGroups(),
-            $resource->getDenormalizationGroups(),
-            $resource->getValidationGroups()
+            isset($context['json_ld_normalization_groups']) ? $context['json_ld_normalization_groups'] : $resource->getNormalizationGroups(),
+            isset($context['json_ld_denormalization_groups']) ? $context['json_ld_denormalization_groups'] : $resource->getDenormalizationGroups(),
+            isset($context['json_ld_validation_groups']) ? $context['json_ld_validation_groups'] : $resource->getValidationGroups()
         )->getAttributes();
 
         foreach ($attributes as $attributeName => $attribute) {
@@ -187,12 +188,12 @@ class JsonLdNormalizer extends AbstractNormalizer
                     ) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
-                            $uris[] = $this->dataManipulator->getUriFromObject($obj, $class);
+                            $uris[] = $this->normalizeRelation($resource, $attribute, $obj, $class);
                         }
 
                         $attributeValue = $uris;
                     } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
-                        $attributeValue = $this->dataManipulator->getUriFromObject($attributeValue, $class);
+                        $attributeValue = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
                     }
                 }
 
@@ -313,7 +314,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      * @param mixed      $type
      * @param array|null $context
      *
-     * @return \Dunglas\JsonLdApiBundle\JsonLd\Resource
+     * @return Resource
      *
      * @throws InvalidArgumentException
      */
@@ -355,6 +356,33 @@ class JsonLdNormalizer extends AbstractNormalizer
             $this->resources->getResourceForEntity($class)
         ) {
             return $class;
+        }
+    }
+
+    /**
+     * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
+     *
+     * @param Resource          $currentResource
+     * @param AttributeMetadata $attribute
+     * @param mixed             $relatedObject
+     * @param string            $class
+     *
+     * @return string|array
+     */
+    private function normalizeRelation(Resource $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
+    {
+        if ($attribute->isLink()) {
+            return $this->dataManipulator->getUriFromObject($relatedObject, $class);
+        } else {
+            $context = [
+                'resource' => $this->resources->getResourceForEntity($class),
+                'json_ld_has_context' => true,
+                'json_ld_normalization_groups' => $currentResource->getNormalizationGroups(),
+                'json_ld_denormalization_groups' => $currentResource->getDenormalizationGroups(),
+                'json_ld_validation_groups' => $currentResource->getValidationGroups(),
+            ];
+
+            return $this->serializer->normalize($relatedObject, 'json-ld', $context);
         }
     }
 }

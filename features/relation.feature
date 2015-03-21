@@ -18,7 +18,8 @@ Feature: Relations support
       "@context": "/contexts/RelatedDummy",
       "@id": "/related_dummies/1",
       "@type": "RelatedDummy",
-      "age": null
+      "age": null,
+      "symfony": "symfony"
     }
     """
 
@@ -52,7 +53,6 @@ Feature: Relations support
     }
     """
 
-  @dropSchema
   Scenario: Filter on a relation
     Given I send a "GET" request to "/dummies?relatedDummy=%2Frelated_dummies%2F1"
     Then the response status code should be 200
@@ -83,3 +83,30 @@ Feature: Relations support
       ]
     }
     """
+
+  @dropSchema
+  Scenario: Embed a relation in the parent object
+      Given I send a "POST" request to "/relation_embedders" with body:
+      """
+      {
+        "related": "/related_dummies/1"
+      }
+      """
+      Then the response status code should be 201
+      And the response should be in JSON
+      And the header "Content-Type" should be equal to "application/ld+json"
+      And print last JSON response
+      And the JSON should be equal to:
+      """
+      {
+        "@context": "/contexts/RelationEmbedder",
+        "@id": "/relation_embedders/1",
+        "@type": "RelationEmbedder",
+        "krondstadt": "Krondstadt",
+        "related": {
+            "@id": "/related_dummies/1",
+            "@type": "RelatedDummy",
+            "symfony": "symfony"
+        }
+      }
+      """

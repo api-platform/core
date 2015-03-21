@@ -29,3 +29,21 @@ Feature: JSON-LD contexts generation
         }
     }
     """
+
+    Scenario: Retrieve context of an object with an embed relation
+      Given I send a "GET" request to "/contexts/RelationEmbedder"
+      Then the response status code should be 200
+      And the response should be in JSON
+      And the header "Content-Type" should be equal to "application/ld+json"
+      And the JSON should be equal to:
+      """
+      {
+        "@context": {
+          "@vocab": "http://example.com/vocab#",
+          "hydra": "http://www.w3.org/ns/hydra/core#",
+          "krondstadt": "#RelationEmbedder/krondstadt",
+          "related": "#RelationEmbedder/related",
+          "paris": "#RelationEmbedder/paris"
+        }
+      }
+      """
