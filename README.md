@@ -373,9 +373,7 @@ TODO
 
 * [API-first et Linked Data avec Symfony](http://les-tilleuls.coop/slides/dunglas/slides-sfPot-2015-01-15/#/) (in french)
 
-## TODO
+## Credits
 
-* [x] Filters (hydra:search)
-* [ ] Externals IRIs support
-* [ ] Spec classes with PHPSpec
-* [ ] Extended documentation
+This project has been created by [Kévin Dunglas](http://dunglas.fr).
+Sponsored by [Les-Tilleuls.coop](http://les-tilleuls.coop).
