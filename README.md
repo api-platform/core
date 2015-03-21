@@ -312,7 +312,7 @@ Register the following services (for example in `app/config/services.yml`):
 services:
     # ...
 
-    "resource.offer":
+    resource.offer:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
         arguments: [ "AppBundle\Entity\Offer", [], { groups: [ "offer" ] } ]
         tags:      [ { name: "json-ld.resource" } ]
