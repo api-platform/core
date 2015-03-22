@@ -18,7 +18,7 @@ before_script:
     - composer self-update
 
 install:
-    - composer install
+    - composer update --prefer-source --dev
 
 script:
     - vendor/bin/behat
