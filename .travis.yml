@@ -14,11 +14,11 @@ matrix:
         - php: hhvm-nightly
     fast_finish: true
 
-before_script:
+before_install:
     - composer self-update
 
 install:
     - composer update --prefer-source --dev
 
 script:
-    - vendor/bin/behat
+    - vendor/bin/behat -vvv
