@@ -36,8 +36,8 @@ class ConstraintViolationListNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        $violations = [];
         if ($object instanceof ConstraintViolationListInterface) {
-            $violations = [];
             $message = '';
 
             foreach ($object as $violation) {

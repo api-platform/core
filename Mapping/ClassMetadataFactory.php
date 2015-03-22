@@ -279,7 +279,7 @@ class ClassMetadataFactory
         }
 
         $attribute = new AttributeMetadata($attributeName);
-        $reflectionProperty = $this->getRelfectionProperty($classMetadata->getReflectionClass(), $attributeName);
+        $reflectionProperty = $this->getReflectionProperty($classMetadata->getReflectionClass(), $attributeName);
 
         if ($reflectionProperty) {
             $attribute->setDescription($this->propertyInfo->getShortDescription($reflectionProperty));
@@ -431,14 +431,14 @@ class ClassMetadataFactory
      *
      * @return \ReflectionProperty
      */
-    private function getRelfectionProperty(\ReflectionClass $reflectionClass, $attributeName)
+    private function getReflectionProperty(\ReflectionClass $reflectionClass, $attributeName)
     {
         if ($reflectionClass->hasProperty($attributeName)) {
             return $reflectionClass->getProperty($attributeName);
         }
 
         if ($parent = $reflectionClass->getParentClass()) {
-            return $this->getRelfectionProperty($parent, $attributeName);
+            return $this->getReflectionProperty($parent, $attributeName);
         }
     }
 }
