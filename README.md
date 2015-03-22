@@ -29,7 +29,11 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
  
 ## Installation
 
-Use [Composer](http://getcomposer.org) to install the bundle:
+If you are starting a new project, the easiest way to get this bundle working and well integrated with other useful tools
+such as PHP Schema, NelmioApiDocBundle, NelmioCorsBundle or Behat is to install [Dunglas's API Platform](https://github.com/dunglas/api-platform).
+It's a Symfony edition packaged with the best tools to develop a REST API and with sensitive settings.
+
+Alternatively, you can use [Composer](http://getcomposer.org) to install the standalone bundle in your project:
 
 `composer require dunglas/json-ld-api-bundle`
 
@@ -53,12 +57,12 @@ Register the routes of our API by adding the following lines to `app/config/rout
 ```yaml
 api_doc:
     resource: "@DunglasJsonLdApiBundle/Resources/config/routing.xml"
-    prefix: "/api" # Optional
+    prefix:   "/api" # Optional
 
 api:
     resource: "."
     type:     "json-ld"
-    prefix: "/api" # Optional
+    prefix:   "/api" # Optional
 ```
 
 ## Usage
@@ -69,8 +73,8 @@ The first step is to name your API. Add the following lines in `app/config/confi
 
 ```yaml
 dunglas_json_ld_api:
-    title: Your API name
-    description: The full description of your API
+    title:       "Your API name"
+    description: "The full description of your API"
 ```
 
 The name and the description you give will be accessible trough the auto-generated Hydra documentation.
@@ -170,6 +174,9 @@ Run the Symfony app (`app/console server:run`) and browse the API entrypoint at 
 Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
 and take a look at the usage examples in [the `features` directory](features/).
 
+Note : [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) (dev-master) as built-in support for this bundle.
+Installing it will give you access to a human-readable documentation and a nice sandbox.
+
 ## Advanced usage
 
 ### Filters
@@ -229,8 +236,8 @@ services:
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
-The Hydra documentation will leverage specified serialization and deserialization to list exposed properties, if they are
-readable or/and writable.
+The built-in controller and the Hydra documentation generator will leverage specified serialization and deserialization
+to give access only to exposed properties and to guess if they are readable or/and writable.
 
 ### Embedding relations
 
@@ -250,7 +257,7 @@ In the following JSON document, the relation from an offer to a product is repre
 ```
 
 From a performance point of view, it's sometimes necessary to embed the related object (of a part of it) directly in the
-the parent response.
+parent response.
 
 The bundle allows that trough serialization groups. Using the following serizalization groups annotations (`@Groups`) and
 this updated service definition, a JSON representation of the product will be embedded in the offer response.
@@ -336,9 +343,9 @@ The generated JSON with previous settings will be like the following:
 
 ### Validation groups
 
-You want to leverage Symfony's [validation groups](http://symfony.com/doc/current/book/validation.html#validation-groups)?
+The built-in controller is able to leverage Symfony's [validation groups](http://symfony.com/doc/current/book/validation.html#validation-groups)?
 
-No problem. Edit your service declaration and add groups you want to use when the validation occurs:
+To take care of them, edit your service declaration and add groups you want to use when the validation occurs:
 
 ```yaml
 services:
