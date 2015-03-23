@@ -71,7 +71,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
         $resource = $this->resourceResolver->guessResource($object, $context);
         list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
-        if (isset($context['sub_level'])) {
+        if (isset($context['json_ld_sub_level'])) {
             $data = [];
             foreach ($object as $obj) {
                 $data[] = $this->serializer->normalize($obj, $format, $context);

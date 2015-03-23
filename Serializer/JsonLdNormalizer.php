@@ -11,6 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
@@ -134,13 +135,15 @@ class JsonLdNormalizer extends AbstractNormalizer
                             $uris[] = $this->normalizeRelation($resource, $attribute, $obj, $class);
                         }
 
-                        $attributeValue = $uris;
+                        $data[$attributeName] = $uris;
                     } elseif ($attributeValue && $class = $this->resourceResolver->getClassHavingResource($type)) {
-                        $attributeValue = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
+                        $data[$attributeName] = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
                     }
                 }
 
-                $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json-ld', $context);
+                if (!isset($data[$attributeName])) {
+                    $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json-ld', $context);
+                }
             }
         }
 
@@ -262,13 +265,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         if ($attribute->isLink()) {
             return $this->dataManipulator->getUriFromObject($relatedObject, $class);
         } else {
-            $context = [
-                'resource' => $this->resources->getResourceForEntity($class),
-                'json_ld_has_context' => true,
-                'json_ld_normalization_groups' => $currentResource->getNormalizationGroups(),
-                'json_ld_denormalization_groups' => $currentResource->getDenormalizationGroups(),
-                'json_ld_validation_groups' => $currentResource->getValidationGroups(),
-            ];
+            $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
 
             return $this->serializer->normalize($relatedObject, 'json-ld', $context);
         }
