@@ -131,7 +131,8 @@ class ContextBuilder
      * Bootstrap a serialization context with the given resource.
      *
      * @param Resource $resource
-     * @param array $context
+     * @param array    $context
+     *
      * @return array [array, array]
      */
     public function bootstrap(Resource $resource, array $context = [])
@@ -153,6 +154,7 @@ class ContextBuilder
      *
      * @param Resource $resource
      * @param $class
+     *
      * @return array
      */
     public function bootstrapRelation(Resource $resource, $class)

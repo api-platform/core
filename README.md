@@ -383,6 +383,8 @@ DunglasJsonLdApiBundle leverages [Doctrine Cache](https://github.com/doctrine/ca
 you want to use a custom cache backend such as Redis, Memcache or MongoDB, register a Doctrine Cache provider as a service
 and set the `cache` config key to the id of the custom service you created.
 
+A built-in cache warmer will be automatically executed every time you clear or warmup the cache if a cache service is configured.
+
 ### Using a custom `Resource` class
 
 TODO

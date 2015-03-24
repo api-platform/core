@@ -45,8 +45,8 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
 
     /**
      * @param ResourceResolver $resourceResolver
-     * @param RouterInterface $router
-     * @param ContextBuilder $contextBuilder
+     * @param RouterInterface  $router
+     * @param ContextBuilder   $contextBuilder
      */
     public function __construct(ResourceResolver $resourceResolver, RouterInterface $router, ContextBuilder $contextBuilder)
     {

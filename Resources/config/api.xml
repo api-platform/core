@@ -92,6 +92,13 @@
             <argument>null</argument>
         </service>
 
+        <service id="dunglas_json_ld_api.cache_warmer.metadata" class="Dunglas\JsonLdApiBundle\CacheWarmer\MetadataCacheWarmer">
+            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+
+            <tag name="kernel.cache_warmer" priority="0" />
+        </service>
+
         <service id="dunglas_json_ld_api.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
             <call method="setNamespace">
                 <argument>%dunglas_json_ld_api.mapping.cache.prefix%</argument>

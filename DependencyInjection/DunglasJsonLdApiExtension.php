@@ -83,6 +83,8 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
             $container->getDefinition('dunglas_json_ld_api.mapping.class_metadata_factory')->replaceArgument(
                 4, new Reference($config['cache'])
             );
+        } else {
+            $container->removeDefinition('dunglas_json_ld_api.cache_warmer.metadata');
         }
     }
 }
