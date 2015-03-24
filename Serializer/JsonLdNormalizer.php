@@ -11,13 +11,11 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
+use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
-use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -35,13 +33,11 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class JsonLdNormalizer extends AbstractNormalizer
 {
     const FORMAT = 'json-ld';
-    const HYDRA_COLLECTION = 'hydra:Collection';
-    const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
-     * @var Resources
+     * @var ResourceResolver
      */
-    private $resources;
+    private $resourceResolver;
     /**
      * @var RouterInterface
      */
@@ -58,21 +54,27 @@ class JsonLdNormalizer extends AbstractNormalizer
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
+    /**
+     * @var ContextBuilder
+     */
+    private $contextBuilder;
 
     public function __construct(
-        Resources $resources,
+        ResourceResolver $resourceResolver,
         RouterInterface $router,
         DataManipulatorInterface $dataManipulator,
         ClassMetadataFactory $jsonLdClassMetadataFactory,
+        ContextBuilder $contextBuilder,
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null
     ) {
         parent::__construct(null, $nameConverter);
 
-        $this->resources = $resources;
+        $this->resourceResolver = $resourceResolver;
         $this->router = $router;
         $this->dataManipulator = $dataManipulator;
         $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
+        $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
@@ -96,66 +98,8 @@ class JsonLdNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $resource = $this->guessResource($object, $context);
-
-        $data = [];
-        if (!isset($context['json_ld_has_context'])) {
-            $data['@context'] = $this->router->generate(
-                'json_ld_api_context',
-                ['shortName' => $resource->getShortName()]
-            );
-            $context['json_ld_has_context'] = true;
-        }
-
-        // Collection
-        if (is_array($object) || $object instanceof \Traversable) {
-            if (isset($context['json_ld_sub_level'])) {
-                $data = [];
-                foreach ($object as $obj) {
-                    $data[] = $this->normalize($obj, $format, $context);
-                }
-            } else {
-                $data['@id'] = $this->router->generate($resource->getCollectionRoute());
-
-                if ($object instanceof Paginator) {
-                    $data['@type'] = self::HYDRA_PAGED_COLLECTION;
-
-                    $query = $object->getQuery();
-                    $firstResult = $query->getFirstResult();
-                    $maxResults = $query->getMaxResults();
-                    $currentPage = floor($firstResult / $maxResults) + 1.;
-                    $totalItems = count($object);
-                    $lastPage = ceil($totalItems / $maxResults) ?: 1.;
-
-                    $baseUrl = $data['@id'];
-                    $paginatedUrl = $baseUrl.'?page=';
-
-                    if (1. !== $currentPage) {
-                        $previousPage = $currentPage - 1.;
-                        $data['@id'] .= $paginatedUrl.$currentPage;
-                        $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl.$previousPage;
-                    }
-
-                    if ($currentPage !== $lastPage) {
-                        $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
-                    }
-
-                    $data['hydra:totalItems'] = $totalItems;
-                    $data['hydra:itemsPerPage'] = $maxResults;
-                    $data['hydra:firstPage'] = $baseUrl;
-                    $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
-                } else {
-                    $data['@type'] = self::HYDRA_COLLECTION;
-                }
-
-                $data['hydra:member'] = [];
-                foreach ($object as $obj) {
-                    $data['hydra:member'][] = $this->normalize($obj, $format, $context);
-                }
-            }
-
-            return $data;
-        }
+        $resource = $this->resourceResolver->guessResource($object, $context);
+        list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         // Don't use hydra:Collection in sub levels
         $context['json_ld_sub_level'] = true;
@@ -184,24 +128,22 @@ class JsonLdNormalizer extends AbstractNormalizer
                         $attributeValue &&
                         $type->isCollection() &&
                         ($collectionType = $type->getCollectionType()) &&
-                        $class = $this->getClassHavingResource($collectionType)
+                        $class = $this->resourceResolver->getClassHavingResource($collectionType)
                     ) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
                             $uris[] = $this->normalizeRelation($resource, $attribute, $obj, $class);
                         }
 
-                        $attributeValue = $uris;
-                    } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
-                        $attributeValue = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
+                        $data[$attributeName] = $uris;
+                    } elseif ($attributeValue && $class = $this->resourceResolver->getClassHavingResource($type)) {
+                        $data[$attributeName] = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
                     }
                 }
 
-                if ($attributeValue instanceof \DateTime) {
-                    $attributeValue = $attributeValue->format(\DateTime::ATOM);
+                if (!isset($data[$attributeName])) {
+                    $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json-ld', $context);
                 }
-
-                $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json', $context);
             }
         }
 
@@ -223,7 +165,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $resource = $this->guessResource($data, $context);
+        $resource = $this->resourceResolver->guessResource($data, $context);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
@@ -276,7 +218,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                     }
 
                     $value = $collection;
-                } elseif (!$this->resources->getResourceForEntity($types[0]->getClass())) {
+                } elseif (!$this->resourceResolver->getClassHavingResource($types[0])) {
                     $typeClass = $types[0]->getClass();
                     if ('DateTime' === $typeClass) {
                         $value = new \DateTime($value);
@@ -309,57 +251,6 @@ class JsonLdNormalizer extends AbstractNormalizer
     }
 
     /**
-     * Guesses the associated resource.
-     *
-     * @param mixed      $type
-     * @param array|null $context
-     *
-     * @return Resource
-     *
-     * @throws InvalidArgumentException
-     */
-    private function guessResource($type, array $context = null)
-    {
-        if (isset($context['resource'])) {
-            return $context['resource'];
-        }
-
-        if (is_object($type)) {
-            $type = get_class($type);
-        }
-
-        if (!is_string($type)) {
-            $type = gettype($type);
-        }
-
-        if ($resource = $this->resources->getResourceForEntity($type)) {
-            return $resource;
-        }
-
-        throw new InvalidArgumentException(
-            sprintf('Cannot find a resource object for type "%s".', $type)
-        );
-    }
-
-    /**
-     * Returns the class if a resource is associated with it.
-     *
-     * @param Type $type
-     *
-     * @return string|null
-     */
-    private function getClassHavingResource(Type $type)
-    {
-        if (
-            'object' === $type->getType() &&
-            ($class = $type->getClass()) &&
-            $this->resources->getResourceForEntity($class)
-        ) {
-            return $class;
-        }
-    }
-
-    /**
      * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
      *
      * @param Resource          $currentResource
@@ -374,13 +265,7 @@ class JsonLdNormalizer extends AbstractNormalizer
         if ($attribute->isLink()) {
             return $this->dataManipulator->getUriFromObject($relatedObject, $class);
         } else {
-            $context = [
-                'resource' => $this->resources->getResourceForEntity($class),
-                'json_ld_has_context' => true,
-                'json_ld_normalization_groups' => $currentResource->getNormalizationGroups(),
-                'json_ld_denormalization_groups' => $currentResource->getDenormalizationGroups(),
-                'json_ld_validation_groups' => $currentResource->getValidationGroups(),
-            ];
+            $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
 
             return $this->serializer->normalize($relatedObject, 'json-ld', $context);
         }

@@ -41,11 +41,16 @@
             <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
-        <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
+        <service id="dunglas_json_ld_api.resource_resolver" class="Dunglas\JsonLdApiBundle\Serializer\ResourceResolver">
             <argument type="service" id="dunglas_json_ld_api.resources" />
+        </service>
+
+        <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.resource_resolver" />
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.data_manipulator" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+            <argument type="service" id="dunglas_json_ld_api.context_builder" />
 
             <tag name="serializer.normalizer" />
         </service>
@@ -61,6 +66,18 @@
             <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="dunglas_json_ld_api.datetime_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\DateTimeNormalizer" public="false">
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
+        <service id="dunglas_json_ld_api.collection_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.resource_resolver" />
+            <argument type="service" id="dunglas_json_ld_api.router" />
+            <argument type="service" id="dunglas_json_ld_api.context_builder" />
+
+            <tag name="serializer.normalizer" priority="50" />
         </service>
 
         <service id="dunglas_json_ld_api.json_ld_encoder" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdEncoder" public="false">
