@@ -174,7 +174,7 @@ Run the Symfony app (`app/console server:run`) and browse the API entrypoint at 
 Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
 and take a look at the usage examples in [the `features` directory](features/).
 
-Note : [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) (dev-master) as built-in support for this bundle.
+Note: [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) (dev-master) has built-in support for this bundle.
 Installing it will give you access to a human-readable documentation and a nice sandbox.
 
 ## Advanced usage
@@ -199,7 +199,7 @@ services:
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
-`http://localhost:8000/api/offers?price=10` will return all offers with a price being exactly of `10`.
+`http://localhost:8000/api/offers?price=10` will return all offers with a price being exactly `10`.
 `http://localhost:8000/api/offers?name=shirt` will returns all offer with a description containing the word "shirt".
 
 #### Relations
@@ -241,8 +241,8 @@ to give access only to exposed properties and to guess if they are readable or/a
 
 ### Embedding relations
 
-By default, the serializer provided with the bundle will represent relations between objects by a dereferenceable URI allowing
-to retrieve details of the related object by issuing another HTTP request.
+By default, the serializer provided with DunglasJsonLdApiBundle will represent relations between objects by a dereferenceables
+URIs. They allow to retrieve details of related objects by issuing an extra HTTP request.
 
 In the following JSON document, the relation from an offer to a product is represented by an URI:
 
@@ -256,11 +256,10 @@ In the following JSON document, the relation from an offer to a product is repre
 }
 ```
 
-From a performance point of view, it's sometimes necessary to embed the related object (of a part of it) directly in the
-parent response.
-
-The bundle allows that trough serialization groups. Using the following serizalization groups annotations (`@Groups`) and
-this updated service definition, a JSON representation of the product will be embedded in the offer response.
+From a performance point of view, it's sometimes necessary to avoid extra HTTP requests. It is possible to embed related
+objects (or only some of their properties) directly in the parent response trough serialization groups.
+By using the following serizalization groups annotations (`@Groups`) and this updated service definition, a JSON representation
+of the product is embedded in the offer response:
 
 ```php
 <?php
