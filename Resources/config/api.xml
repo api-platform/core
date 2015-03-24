@@ -4,6 +4,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
+    <parameters>
+        <parameter key="dunglas_json_ld_api.mapping.cache.prefix" />
+    </parameters>
+
     <services>
         <service id="dunglas_json_ld_api.resources" class="Dunglas\JsonLdApiBundle\JsonLd\Resources" />
 
@@ -68,6 +72,13 @@
             <argument type="service" id="property_info" />
             <argument type="service" id="validator" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+            <argument>null</argument>
+        </service>
+
+        <service id="dunglas_json_ld_api.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
+            <call method="setNamespace">
+                <argument>%dunglas_json_ld_api.mapping.cache.prefix%</argument>
+            </call>
         </service>
 
         <service id="dunglas_json_ld_api.link_header_response_listener" class="Dunglas\JsonLdApiBundle\EventListener\LinkHeaderResponseListener">

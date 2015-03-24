@@ -168,7 +168,7 @@ services:
 
 **You're done!**
 
-You now have a fully featured API exposing your Doctrine entities 
+You now have a fully featured API exposing your Doctrine entities.
 Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhost:8000/api`.
 
 Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
@@ -367,6 +367,21 @@ The bundle provides a powerful event system triggered in the object lifecycle. H
 - `dunglas_json_ld_api.post_create` (`Dunglas\JsonLdApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
 - `dunglas_json_ld_api.pre_delete` (`Dunglas\JsonLdApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
 - `dunglas_json_ld_api.pre_create` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
+
+### Cache
+
+Computing metadata used by the bundle is a costly operation. Fortunately, metadata can be computed once then cached. The
+bundle provides a built-in cache service using [APCu](https://github.com/krakjoe/apcu).
+To enable it in the prod environment (requires APCu to be installed), add the following lines to `app/config/config_prod.yml`:
+
+```yaml
+dunglas_json_ld_api:
+    cache: dunglas_json_ld_api.mapping.cache.apc
+```
+
+DunglasJsonLdApiBundle leverages [Doctrine Cache](https://github.com/doctrine/cache) to abstract the cache backend. If
+you want to use a custom cache backend such as Redis, Memcache or MongoDB, register a Doctrine Cache provider as a service
+and set the `cache` config key to the id of the custom service you created.
 
 ### Using a custom `Resource` class
 

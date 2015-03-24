@@ -33,6 +33,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('title')->cannotBeEmpty()->isRequired()->info('API\'s title.')->end()
                 ->scalarNode('description')->cannotBeEmpty()->isRequired()->info('API\'s description.')->end()
+                ->scalarNode('cache')->defaultFalse()->info('Cache service to use, for instance "dunglas_json_ld_api.mapping.cache.apc".')->end()
                 ->booleanNode('enable_fos_user_event_subscriber')->defaultFalse()->end()
                 ->arrayNode('default')
                     ->addDefaultsIfNotSet()
