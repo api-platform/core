@@ -5,7 +5,7 @@ Feature: Collections support
 
   @createSchema
   Scenario: Retrieve an empty collection
-    Given I send a "GET" request to "/dummies"
+    When I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -73,7 +73,7 @@ Feature: Collections support
     """
 
   Scenario: Retrieve a page of a collection
-    Given I send a "GET" request to "/dummies?page=7"
+    When I send a "GET" request to "/dummies?page=7"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -122,7 +122,7 @@ Feature: Collections support
     """
 
   Scenario: Retrieve the last page of a collection
-    Given I send a "GET" request to "/dummies?page=10"
+    When I send a "GET" request to "/dummies?page=10"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -170,7 +170,7 @@ Feature: Collections support
     """
 
   Scenario: Filter with exact match
-    Given I send a "GET" request to "/dummies?id=8"
+    When I send a "GET" request to "/dummies?id=8"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -199,7 +199,7 @@ Feature: Collections support
     """
 
   Scenario: Filter with a raw URL
-    Given I send a "GET" request to "/dummies?id=%2fdummies%2f8"
+    When I send a "GET" request to "/dummies?id=%2fdummies%2f8"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -229,7 +229,7 @@ Feature: Collections support
 
   @dropSchema
   Scenario: Filter with non-exact match
-    Given I send a "GET" request to "/dummies?name=Dummy%20%238"
+    When I send a "GET" request to "/dummies?name=Dummy%20%238"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"

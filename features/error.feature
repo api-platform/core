@@ -4,7 +4,7 @@ Feature: Error handling
   I need to retrieve an Hydra serialization of errors
 
   Scenario: Get an error
-    Given I send a "POST" request to "/dummies" with body:
+    When I send a "POST" request to "/dummies" with body:
     """
     {}
     """
@@ -28,7 +28,7 @@ Feature: Error handling
     """
 
   Scenario: Get an error during deserialization of simple relation
-    Given I send a "POST" request to "/dummies" with body:
+    When I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",
@@ -47,7 +47,7 @@ Feature: Error handling
     And the JSON node "trace" should exist
 
   Scenario: Get an error during deserialization of collection
-    Given I send a "POST" request to "/dummies" with body:
+    When I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",
@@ -66,7 +66,7 @@ Feature: Error handling
     And the JSON node "trace" should exist
 
     Scenario: Get an error because of an invalid JSON
-    Given I send a "POST" request to "/dummies" with body:
+    When I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",

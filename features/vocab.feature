@@ -298,11 +298,11 @@ Feature: Documentation support
                         "rdfs:label": "Replaces the RelationEmbedder resource."
                     },
                     {
-                        "hydra:method": "DELETE",
+                        "hydra:method": "GET",
                         "@type": "hydra:Operation",
-                        "hydra:title": "Deletes the RelationEmbedder resource.",
-                        "returns": "owl:Nothing",
-                        "rdfs:label": "Deletes the RelationEmbedder resource."
+                        "hydra:title": "A custom operation",
+                        "returns": "xmls:string",
+                        "rdfs:label": "A custom operation"
                     }
                 ]
             },

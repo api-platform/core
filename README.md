@@ -368,7 +368,7 @@ The bundle provides a powerful event system triggered in the object lifecycle. H
 - `dunglas_json_ld_api.pre_delete` (`Dunglas\JsonLdApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
 - `dunglas_json_ld_api.pre_create` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
 
-### Cache
+### Metadata cache
 
 Computing metadata used by the bundle is a costly operation. Fortunately, metadata can be computed once then cached. The
 bundle provides a built-in cache service using [APCu](https://github.com/krakjoe/apcu).
@@ -385,13 +385,137 @@ and set the `cache` config key to the id of the custom service you created.
 
 A built-in cache warmer will be automatically executed every time you clear or warmup the cache if a cache service is configured.
 
+### Disabling operations
+
+By default, the following operations are automatically enabled:
+
+*Collection*
+| Method | Meaning                                   |
+|--------|-------------------------------------------|
+| `GET`  | Retrieve the (paginated) list of elements |
+| `POST` | Create a new element                      |
+
+*Item*
+| Method   | Meaning                                   |
+|----------|-------------------------------------------|
+| `GET`    | Retrieve element (mandatory operation)    |
+| `PUT`    | Update an element                         |
+| `DELETE` | Delete an element                         |
+
+Sometimes, you want to disable some operations (e.g. the `DELETE` operation). The 6th and 7th arguments of the `Resource`
+class allows to customize operations of the given resource.
+
+The following `Resource` definition exposes `GET` and `PUT` operations but not the `DELETE` one:
+
+```yaml
+services:
+    resource.product:
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
+        arguments: [ "AppBundle\Entity\Product", [], [], {}, ~, [ { "hydra:method": "GET" }, { "hydra:method": "PUT" } ] ]
+        tags:      [ { name: "json-ld.resource" } ]
+```
+
+### Defining custom operations
+
+Sometimes, it can be useful to create custom controller actions. DunglasJsonLdApiBundle allows to register custom operations
+for both collections and items. It will register them automatically in the Symfony routing system and will expose them in
+the Hydra vocab.
+
+```yaml
+    my_relation_embedder_resource:
+        class:                      "Dunglas\JsonLdApiBundle\JsonLd\Resource"
+        arguments:
+          -                         "AppBundle\Entity\Product"
+          -                         []
+          -                         []
+          -                         {}
+          -                         ~
+          -                         ~
+          -                         ~ # Collection operations, not customized here
+          -                           # Items operations
+            -                       { "hydra:method": "GET" }
+            -                       { "hydra:method": "PUT" }
+            -                       { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "AppBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/my_entities/{id}/custom", "returns": "xmls:string" }
+```
+
+Additionnaly to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
+the `/my_entities/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
+
 ### Using a custom `Resource` class
 
-TODO
+When the size of your services definition start to grow, or when you want to customize the behavior of the `Resource` class
+it can be useful to extend the default one.
+
+```php
+<?php
+
+namespace AppBundle\JsonLd;
+
+use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+
+class MyCustomResource extends Resource
+{
+    public function __construct(
+        $entityClass = 'AppBundle\Entity\Offer',
+        array $filters = ['name' => 'price', 'exact' => true],
+        array $normalizationContext = ['groups' => ['offers']],
+        array $denormalizationContext = ['groups' => ['offers']],,
+        array $validationGroups = null,
+        $shortName = null,
+        array $collectionOperations = ['hydra:method' => 'GET'],
+        array $itemOperations = ['hydra:method' => 'GET', 'hydra:method' => 'PUT'],
+        $controllerName = 'AppBundle:Controller:Custom'
+    ) {
+        parent::__construct($entityClass, $filters, $normalizationContext, $denormalizationContext, $validationGroups, $shortName, $collectionOperations, $itemOperations, $controllerName);
+    }
+}
+```
+
+The service definition can now be simplified:
+
+```yaml
+services:
+    resource.product:
+        class:     "AppBundle\JsonLd\MyCustomResource"
+        tags:      [ { name: "json-ld.resource" } ]
+```
 
 ### Using a custom controller
 
-TODO
+If you want to customize the controller used for a `Resource` pass the controller name as its last constructor parameter:
+
+```
+services:
+    resource.product:
+        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
+        arguments: [ "AppBundle\Entity\Product", [], [], {}, ~, ~, ~, ~, 'AppBundle:Custom' ]
+        tags:      [ { name: "json-ld.resource" } ]
+```
+
+Your custom controller should extend the `ResourceController` provided by this bundle. It provides convenient methods to
+retrieve the `Resource` class associated with the current request and to serialize entities in JSON-LD.
+
+Example of custom controller:
+
+```php
+<?php
+
+namespace AppBundle\Controller;
+
+use Dunglas\JsonLdApiBundle\Controller\ResourceController;
+use Symfony\Component\HttpFoundation\Request;
+
+class CustomController extends ResourceController
+{
+    # Customize the AppBundle:Custom:get
+    public function getAction(Request $request, $id)
+    {
+        $this->get('logger')->info('This is my custom controller.');
+        
+        return parent::getAction($request, $id);
+    }
+}
+```
 
 ## Resources
 

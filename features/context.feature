@@ -4,7 +4,7 @@ Feature: JSON-LD contexts generation
   I need to access to a JSON-LD context describing data types
 
   Scenario: Retrieve Dummy context
-    Given I send a "GET" request to "/contexts/Dummy"
+    When I send a "GET" request to "/contexts/Dummy"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -31,7 +31,7 @@ Feature: JSON-LD contexts generation
     """
 
     Scenario: Retrieve context of an object with an embed relation
-      Given I send a "GET" request to "/contexts/RelationEmbedder"
+      When I send a "GET" request to "/contexts/RelationEmbedder"
       Then the response status code should be 200
       And the response should be in JSON
       And the header "Content-Type" should be equal to "application/ld+json"

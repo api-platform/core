@@ -5,7 +5,7 @@ Feature: Create-Retrieve-Update-Delete
 
   @createSchema
   Scenario: Create a resource
-    Given I send a "POST" request to "/dummies" with body:
+    When I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "My Dummy",
@@ -30,7 +30,7 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Get a resource
-    Given I send a "GET" request to "/dummies/1"
+    When I send a "GET" request to "/dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -49,7 +49,7 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Get a collection
-    Given I send a "GET" request to "/dummies"
+    When I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -78,7 +78,7 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Update a resource
-      Given I send a "PUT" request to "/dummies/1" with body:
+      When I send a "PUT" request to "/dummies/1" with body:
       """
       {
         "@id": "/dummies/1",
@@ -104,6 +104,6 @@ Feature: Create-Retrieve-Update-Delete
 
   @dropSchema
   Scenario: Delete a resource
-    Given I send a "DELETE" request to "/dummies/1"
+    When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204
     And the response should be empty

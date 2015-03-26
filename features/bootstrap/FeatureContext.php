@@ -5,6 +5,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 use Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
+use Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 
 /**
  * Defines application features from the specific context.
@@ -63,6 +64,17 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $this->manager->persist($dummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelationEmbedder object
+     */
+    public function thereIsARelationEmbedderObject()
+    {
+        $relationEmbedder = new RelationEmbedder();
+
+        $this->manager->persist($relationEmbedder);
         $this->manager->flush();
     }
 }
