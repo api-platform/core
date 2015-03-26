@@ -390,12 +390,14 @@ A built-in cache warmer will be automatically executed every time you clear or w
 By default, the following operations are automatically enabled:
 
 *Collection*
+
 | Method | Meaning                                   |
 |--------|-------------------------------------------|
 | `GET`  | Retrieve the (paginated) list of elements |
 | `POST` | Create a new element                      |
 
 *Item*
+
 | Method   | Meaning                                   |
 |----------|-------------------------------------------|
 | `GET`    | Retrieve element (mandatory operation)    |
