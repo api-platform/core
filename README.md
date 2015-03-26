@@ -4,9 +4,9 @@
 This a work in progress under active development.
 This bundle relies heavily on the Serializer of Symfony 2.7 and *is not usable in production yet*.
 
+[![JSON-LD enabled](http://json-ld.org/images/json-ld-button-88.png)](http://json-ld.org)
 [![Build Status](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle.svg)](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552/mini.png)](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552)
-[![JSON-LD enabled](http://json-ld.org/images/json-ld-button-88.png)](http://json-ld.org)
 
 ## Features
 
@@ -343,7 +343,7 @@ The generated JSON with previous settings will be like the following:
 
 ### Validation groups
 
-The built-in controller is able to leverage Symfony's [validation groups](http://symfony.com/doc/current/book/validation.html#validation-groups)?
+The built-in controller is able to leverage Symfony's [validation groups](http://symfony.com/doc/current/book/validation.html#validation-groups).
 
 To take care of them, edit your service declaration and add groups you want to use when the validation occurs:
 
