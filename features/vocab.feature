@@ -264,7 +264,8 @@ Feature: Documentation support
                         "hydra:title": "related",
                         "hydra:required": false,
                         "hydra:readable": true,
-                        "hydra:writable": true
+                        "hydra:writable": true,
+                        "hydra:description": "The dummy name."
                     },
                     {
                         "@type": "hydra:SupportedProperty",
