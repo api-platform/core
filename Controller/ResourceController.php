@@ -172,8 +172,11 @@ class ResourceController extends Controller
     public function cgetAction(Request $request)
     {
         $resource = $this->getResource($request);
+        $data = $this->getCollectionData($resource, $request);
 
-        return $this->getSuccessResponse($resource, $this->getCollectionData($resource, $request));
+        $this->get('event_dispatcher')->dispatch(Events::RETRIEVE_LIST, new ObjectEvent($resource, $data));
+
+        return $this->getSuccessResponse($resource, $data);
     }
 
     /**
@@ -198,6 +201,8 @@ class ResourceController extends Controller
         } catch (Exception $e) {
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }
+
+        $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE_VALIDATION, new ObjectEvent($resource, $object));
 
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
@@ -225,6 +230,8 @@ class ResourceController extends Controller
     {
         $resource = $this->getResource($request);
         $object = $this->findOrThrowNotFound($resource, $id);
+
+        $this->get('event_dispatcher')->dispatch(Events::RETRIEVE, new ObjectEvent($resource, $object));
 
         return $this->getSuccessResponse($resource, $object);
     }
@@ -257,6 +264,8 @@ class ResourceController extends Controller
         } catch (Exception $e) {
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }
+
+        $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE_VALIDATION, new ObjectEvent($resource, $object));
 
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {

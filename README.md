@@ -361,12 +361,30 @@ With the previous definition, the validations groups `group1` and `group2` will 
 
 The bundle provides a powerful event system triggered in the object lifecycle. Here is the list:
 
+#### Retrieve lists
+
+- `dunglas_json_ld_api.retrieve_list` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
+
+#### Retrieve item
+
+- `dunglas_json_ld_api.retrieve` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
+
+#### Create item
+
+- `dunglas_json_ld_api.pre_create_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
 - `dunglas_json_ld_api.pre_create` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
 - `dunglas_json_ld_api.post_create` (`Dunglas\JsonLdApiBundle\Event::POST_CREATE`): event occurs after the object persistence during `POST` request
+
+#### Update item
+
+- `dunglas_json_ld_api.pre_update_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
 - `dunglas_json_ld_api.pre_update` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
-- `dunglas_json_ld_api.post_create` (`Dunglas\JsonLdApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
+- `dunglas_json_ld_api.post_update` (`Dunglas\JsonLdApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
+
+#### Delete item
+
 - `dunglas_json_ld_api.pre_delete` (`Dunglas\JsonLdApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
-- `dunglas_json_ld_api.pre_create` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
+- `dunglas_json_ld_api.post_delete` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
 
 ### Metadata cache
 
