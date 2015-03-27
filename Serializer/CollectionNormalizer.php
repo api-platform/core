@@ -11,7 +11,6 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
 use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
 use Symfony\Component\Routing\RouterInterface;
