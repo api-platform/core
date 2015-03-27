@@ -486,7 +486,7 @@ services:
 
 If you want to customize the controller used for a `Resource` pass the controller name as its last constructor parameter:
 
-```
+```yaml
 services:
     resource.product:
         class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"

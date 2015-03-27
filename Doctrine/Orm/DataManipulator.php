@@ -111,7 +111,8 @@ class DataManipulator implements DataManipulatorInterface
                 $value = $this->getFilterValueFromUrl($filter['value']);
 
                 $queryBuilder
-                    ->andWhere(sprintf('o.%1$s = :%1$s', $filter['name']))
+                    ->join(sprintf('o.%s', $filter['name']), $filter['name'])
+                    ->andWhere(sprintf('%1$s.id = :%1$s', $filter['name']))
                     ->setParameter($filter['name'], $filter['exact'] ? $value : sprintf('%%%s%%', $value))
                 ;
             }
