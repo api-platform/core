@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;;
 use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
@@ -122,7 +122,7 @@ class DataManipulator implements DataManipulatorInterface
             $queryBuilder->addOrderBy('o.id', $order);
         }
 
-        return new Paginator($queryBuilder);
+        return new Paginator(new DoctrineOrmPaginator($queryBuilder));
     }
 
     /**

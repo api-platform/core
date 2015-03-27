@@ -29,7 +29,7 @@ interface DataManipulatorInterface
      * @param int|null    $byPage
      * @param string|null $order
      *
-     * @return mixed
+     * @return PaginatorInterface
      */
     public function getCollection(Resource $resource, $page, array $filters, $byPage = null, $order = null);
 

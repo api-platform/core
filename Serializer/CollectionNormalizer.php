@@ -13,15 +13,16 @@ namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
+use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
 /**
- * This normalizer handle collections and paginated collections.
+ * This normalizer handles collections and paginated collections.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kevin Dunglas <dunglas@gmail.com>
+ * @author Samuel ROZE <samuel.roze@gmail.com>
  */
 class CollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
 {
@@ -32,12 +33,10 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      * @var ResourceResolver
      */
     private $resourceResolver;
-
     /**
      * @var RouterInterface
      */
     private $router;
-
     /**
      * @var ContextBuilder
      */
@@ -79,15 +78,11 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
         } else {
             $data['@id'] = $this->router->generate($resource->getCollectionRoute());
 
-            if ($object instanceof Paginator) {
+            if ($object instanceof PaginatorInterface) {
                 $data['@type'] = self::HYDRA_PAGED_COLLECTION;
 
-                $query = $object->getQuery();
-                $firstResult = $query->getFirstResult();
-                $maxResults = $query->getMaxResults();
-                $currentPage = floor($firstResult / $maxResults) + 1.;
-                $totalItems = count($object);
-                $lastPage = ceil($totalItems / $maxResults) ?: 1.;
+                $currentPage = $object->getCurrentPage();
+                $lastPage = $object->getLastPage();
 
                 $baseUrl = $data['@id'];
                 $paginatedUrl = $baseUrl.'?page=';
@@ -102,8 +97,8 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                     $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
                 }
 
-                $data['hydra:totalItems'] = $totalItems;
-                $data['hydra:itemsPerPage'] = $maxResults;
+                $data['hydra:totalItems'] = $object->getTotalItems();
+                $data['hydra:itemsPerPage'] = $object->getItemsPerPage();
                 $data['hydra:firstPage'] = $baseUrl;
                 $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
             } else {
