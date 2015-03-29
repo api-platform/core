@@ -14,11 +14,11 @@ namespace Dunglas\JsonLdApiBundle\Model;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 
 /**
- * Manipulates data.
+ * Data provider interface.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface ManagerInterface
+interface DataProviderInterface
 {
     /**
      * Sets resource.

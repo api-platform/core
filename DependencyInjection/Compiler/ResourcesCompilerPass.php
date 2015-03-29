@@ -37,7 +37,7 @@ class ResourcesCompilerPass implements CompilerPassInterface
             if (!isset($resourceDefinition->getArguments()[1])) {
                 $managerServiceId = sprintf('%s.manager', $serviceId);
 
-                $container->setDefinition($managerServiceId, new DefinitionDecorator('dunglas_json_ld_api.doctrine.orm.manager'));
+                $container->setDefinition($managerServiceId, new DefinitionDecorator('dunglas_json_ld_api.data_provider.doctrine.orm'));
                 $resourceDefinition->addArgument(new Reference($managerServiceId));
             }
 

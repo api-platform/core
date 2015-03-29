@@ -13,18 +13,18 @@ namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use Dunglas\JsonLdApiBundle\Model\ManagerInterface;
+use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Manipulates data through Doctrine ORM.
+ * Data provider for the Doctrine ORM.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Manager implements ManagerInterface
+class DataProvider implements DataProviderInterface
 {
     /**
      * @var Resource

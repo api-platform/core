@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use Doctrine\Common\Inflector\Inflector;
-use Dunglas\JsonLdApiBundle\Model\ManagerInterface;
+use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -33,9 +33,9 @@ class Resource
      */
     private $entityClass;
     /**
-     * @var ManagerInterface
+     * @var DataProviderInterface
      */
-    private $manager;
+    private $dataProvider;
     /**
      * @var Resources
      */
@@ -110,11 +110,11 @@ class Resource
 
     /**
      * @param string           $entityClass
-     * @param ManagerInterface $manager
+     * @param DataProviderInterface $manager
      */
     public function __construct(
         $entityClass,
-        ManagerInterface $manager
+        DataProviderInterface $dataProvider
     ) {
         if (!class_exists($entityClass)) {
             throw new \InvalidArgumentException(sprintf('The class %s does not exist.', $entityClass));
@@ -122,8 +122,8 @@ class Resource
 
         $this->entityClass = $entityClass;
         $this->shortName = substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
-        $this->manager = $manager;
-        $this->manager->setResource($this);
+        $this->dataProvider = $dataProvider;
+        $this->dataProvider->setResource($this);
     }
 
     /**
@@ -137,13 +137,13 @@ class Resource
     }
 
     /**
-     * Gets the data manipulator to use.
+     * Gets the related data provider.
      *
-     * @return ManagerInterface
+     * @return DataProviderInterface
      */
-    public function getManager()
+    public function getDataProvider()
     {
-        return $this->manager;
+        return $this->dataProvider;
     }
 
     /**

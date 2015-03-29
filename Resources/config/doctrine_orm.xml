@@ -16,7 +16,7 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="dunglas_json_ld_api.doctrine.orm.manager" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\Manager" public="false" abstract="true">
+        <service id="dunglas_json_ld_api.data_provider.doctrine.orm" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataProvider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
         </service>
     </services>

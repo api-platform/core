@@ -150,6 +150,6 @@ class Resources extends \ArrayObject
             throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s".', $uri));
         }
 
-        return $resource->getManager()->getItem($parameters['id']);
+        return $resource->getDataProvider()->getItem($parameters['id']);
     }
 }

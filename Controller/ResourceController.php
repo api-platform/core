@@ -159,7 +159,7 @@ class ResourceController extends Controller
         $itemsPerPage = $this->container->getParameter('dunglas_json_ld_api.default.items_per_page');
         $order = $this->container->getParameter('dunglas_json_ld_api.default.order');
 
-        return $resource->getManager()->getCollection($page, $filters, $itemsPerPage, $order);
+        return $resource->getDataProvider()->getCollection($page, $filters, $itemsPerPage, $order);
     }
 
     /**
