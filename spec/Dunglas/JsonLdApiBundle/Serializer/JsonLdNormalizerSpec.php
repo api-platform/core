@@ -13,7 +13,7 @@ namespace spec\Dunglas\JsonLdApiBundle\Serializer;
 
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadata;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
-use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
+use Dunglas\JsonLdApiBundle\Model\ManagerInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use PhpSpec\ObjectBehavior;
@@ -27,7 +27,7 @@ class JsonLdNormalizerSpec extends ObjectBehavior
     public function let(
         Resources $resources,
         RouterInterface $router,
-        DataManipulatorInterface $dataManipulator,
+        ManagerInterface $dataManipulator,
         ClassMetadataFactory $classMetadataFactory,
         ClassMetadata $classMetadata)
     {

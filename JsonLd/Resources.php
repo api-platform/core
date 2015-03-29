@@ -12,6 +12,9 @@
 namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use ArrayObject;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * A collection of {@see Resource} classes.
@@ -21,6 +24,10 @@ use ArrayObject;
 class Resources extends \ArrayObject
 {
     /**
+     * @var RouterInterface
+     */
+    private $router;
+    /**
      * @var array<string, Resource>
      */
     private $entityClassIndex = [];
@@ -28,6 +35,12 @@ class Resources extends \ArrayObject
      * @var array<string, Resource>
      */
     private $shortNameIndex = [];
+
+    public function __construct(RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null)
+    {
+        $this->router = $router;
+        $this->propertyAccessor = $propertyAccessor ? $propertyAccessor : PropertyAccess::createPropertyAccessor();
+    }
 
     /**
      * {@inheritdoc}
@@ -51,6 +64,7 @@ class Resources extends \ArrayObject
         }
 
         parent::append($value);
+        $value->setResources($this);
 
         $this->entityClassIndex[$entityClass] = $value;
         $this->shortNameIndex[$shortName] = $value;
@@ -78,5 +92,64 @@ class Resources extends \ArrayObject
     public function getResourceForShortName($shortName)
     {
         return isset($this->shortNameIndex[$shortName]) ? $this->shortNameIndex[$shortName] : null;
+    }
+
+    /**
+     * Gets the URI of a collection.
+     *
+     * @param Resource $resource
+     *
+     * @return string
+     */
+    public function getCollectionUri(Resource $resource)
+    {
+        return $this->router->generate($resource->getCollectionRoute());
+    }
+
+    /**
+     * Gets the URI of an item.
+     *
+     * @param object $object
+     * @param string|null $entityClass
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getItemUri($object, $entityClass = null)
+    {
+        if (!$entityClass) {
+            $entityClass = get_class($object);
+        }
+
+        $resource = $this->getResourceForEntity($entityClass);
+        if (!$resource) {
+            throw new \InvalidArgumentException(sprintf('No resource associated with the type "%s".', $entityClass));
+        }
+
+        return $this->router->generate($resource->getItemRoute(), ['id' => $this->propertyAccessor->getValue($object, 'id')]);
+    }
+
+    /**
+     * Gets an item from an URI.
+     *
+     * @param string $uri
+     *
+     * @return object
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getItemFromUri($uri)
+    {
+        $parameters = $this->router->match($uri);
+        if (
+            !isset($parameters['_json_ld_resource']) ||
+            !isset($parameters['id']) ||
+            !($resource = $this->getResourceForShortName($parameters['_json_ld_resource']))
+        ) {
+            throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s".', $uri));
+        }
+
+        return $resource->getManager()->getItem($parameters['id']);
     }
 }

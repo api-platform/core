@@ -4,12 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="dunglas_json_ld_api.mapping.cache.prefix" />
-    </parameters>
-
     <services>
-        <service id="dunglas_json_ld_api.resources" class="Dunglas\JsonLdApiBundle\JsonLd\Resources" />
+        <service id="dunglas_json_ld_api.resource" class="Dunglas\JsonLdApiBundle\JsonLd\Resource" public="false" abstract="true" />
+
+        <service id="dunglas_json_ld_api.resources" class="Dunglas\JsonLdApiBundle\JsonLd\Resources">
+            <argument type="service" id="dunglas_json_ld_api.router" />
+        </service>
 
         <service id="dunglas_json_ld_api.routing.resources_loader" class="Dunglas\JsonLdApiBundle\Routing\ResourcesLoader">
             <argument type="service" id="dunglas_json_ld_api.resources" />
@@ -17,7 +17,7 @@
             <tag name="routing.loader" />
         </service>
 
-        <service id="dunglas_json_ld_api.router" public="false" class="Dunglas\JsonLdApiBundle\Routing\Router">
+        <service id="dunglas_json_ld_api.router" class="Dunglas\JsonLdApiBundle\Routing\Router" public="false">
             <argument type="service" id="router" />
         </service>
 
@@ -41,70 +41,6 @@
             <argument type="service" id="dunglas_json_ld_api.resources" />
         </service>
 
-        <service id="dunglas_json_ld_api.resource_resolver" class="Dunglas\JsonLdApiBundle\Serializer\ResourceResolver">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
-        </service>
-
-        <service id="dunglas_json_ld_api.json_ld_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdNormalizer" public="false">
-            <argument type="service" id="dunglas_json_ld_api.resource_resolver" />
-            <argument type="service" id="dunglas_json_ld_api.router" />
-            <argument type="service" id="dunglas_json_ld_api.data_manipulator" />
-            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
-            <argument type="service" id="dunglas_json_ld_api.context_builder" />
-
-            <tag name="serializer.normalizer" />
-        </service>
-
-        <service id="dunglas_json_ld_api.constraint_violation_list_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument type="service" id="dunglas_json_ld_api.router" />
-
-            <tag name="serializer.normalizer" />
-        </service>
-
-        <service id="dunglas_json_ld_api.error_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\ErrorNormalizer" public="false">
-            <argument type="service" id="dunglas_json_ld_api.router" />
-            <argument>%kernel.debug%</argument>
-
-            <tag name="serializer.normalizer" />
-        </service>
-
-        <service id="dunglas_json_ld_api.datetime_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\DateTimeNormalizer" public="false">
-            <tag name="serializer.normalizer" priority="50" />
-        </service>
-
-        <service id="dunglas_json_ld_api.collection_normalizer" class="Dunglas\JsonLdApiBundle\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="dunglas_json_ld_api.resource_resolver" />
-            <argument type="service" id="dunglas_json_ld_api.router" />
-            <argument type="service" id="dunglas_json_ld_api.context_builder" />
-
-            <tag name="serializer.normalizer" priority="50" />
-        </service>
-
-        <service id="dunglas_json_ld_api.json_ld_encoder" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdEncoder" public="false">
-            <tag name="serializer.encoder" />
-        </service>
-
-        <service id="dunglas_json_ld_api.mapping.class_metadata_factory" class="Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
-            <argument type="service" id="property_info" />
-            <argument type="service" id="validator" on-invalid="ignore" />
-            <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
-            <argument>null</argument>
-        </service>
-
-        <service id="dunglas_json_ld_api.cache_warmer.metadata" class="Dunglas\JsonLdApiBundle\CacheWarmer\MetadataCacheWarmer">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
-            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
-
-            <tag name="kernel.cache_warmer" priority="0" />
-        </service>
-
-        <service id="dunglas_json_ld_api.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
-            <call method="setNamespace">
-                <argument>%dunglas_json_ld_api.mapping.cache.prefix%</argument>
-            </call>
-        </service>
-
         <service id="dunglas_json_ld_api.link_header_response_listener" class="Dunglas\JsonLdApiBundle\EventListener\LinkHeaderResponseListener">
             <argument type="service" id="router" />
 
@@ -112,7 +48,7 @@
         </service>
 
         <service id="dunglas_json_ld_api.request_exception_listener" class="Dunglas\JsonLdApiBundle\EventListener\RequestExceptionListener">
-            <argument type="service" id="dunglas_json_ld_api.error_normalizer" />
+            <argument type="service" id="dunglas_json_ld_api.normalizer.error" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>

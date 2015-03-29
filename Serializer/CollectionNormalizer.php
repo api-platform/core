@@ -12,8 +12,8 @@
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
+use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
@@ -25,31 +25,19 @@ use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
  */
 class CollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
 {
+    use ResourceResolver;
+
     const HYDRA_COLLECTION = 'hydra:Collection';
     const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
-    /**
-     * @var ResourceResolver
-     */
-    private $resourceResolver;
-    /**
-     * @var RouterInterface
-     */
-    private $router;
     /**
      * @var ContextBuilder
      */
     private $contextBuilder;
 
-    /**
-     * @param ResourceResolver $resourceResolver
-     * @param RouterInterface  $router
-     * @param ContextBuilder   $contextBuilder
-     */
-    public function __construct(ResourceResolver $resourceResolver, RouterInterface $router, ContextBuilder $contextBuilder)
+    public function __construct(Resources $resources, ContextBuilder $contextBuilder)
     {
-        $this->resourceResolver = $resourceResolver;
-        $this->router = $router;
+        $this->resources = $resources;
         $this->contextBuilder = $contextBuilder;
     }
 
@@ -66,7 +54,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        $resource = $this->resourceResolver->guessResource($object, $context);
+        $resource = $this->guessResource($object, $context);
         list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         if (isset($context['json_ld_sub_level'])) {
@@ -75,7 +63,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                 $data[] = $this->serializer->normalize($obj, $format, $context);
             }
         } else {
-            $data['@id'] = $this->router->generate($resource->getCollectionRoute());
+            $data['@id'] = $this->resources->getCollectionUri($resource);
 
             if ($object instanceof PaginatorInterface) {
                 $data['@type'] = self::HYDRA_PAGED_COLLECTION;

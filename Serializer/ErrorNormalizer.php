@@ -17,8 +17,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Converts {@see \Exception} to a Hydra error representation.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Samuel ROZE <samuel.roze@gmail.com>
  */
 class ErrorNormalizer implements NormalizerInterface
 {

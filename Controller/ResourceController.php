@@ -147,7 +147,6 @@ class ResourceController extends Controller
     protected function getCollectionData(Resource $resource, Request $request)
     {
         $page = (int) $request->get('page', 1);
-        $dataManipulator = $this->get('dunglas_json_ld_api.data_manipulator');
 
         $filters = [];
         foreach ($resource->getFilters() as $resourceFilter) {
@@ -157,7 +156,10 @@ class ResourceController extends Controller
             }
         }
 
-        return $dataManipulator->getCollection($resource, $page, $filters);
+        $itemsPerPage = $this->container->getParameter('dunglas_json_ld_api.default.items_per_page');
+        $order = $this->container->getParameter('dunglas_json_ld_api.default.order');
+
+        return $resource->getManager()->getCollection($page, $filters, $itemsPerPage, $order);
     }
 
     /**

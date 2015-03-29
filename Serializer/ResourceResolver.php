@@ -18,22 +18,15 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 /**
  * This class helps to guess which resource is associated with a given object.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class ResourceResolver
+trait ResourceResolver
 {
     /**
      * @var Resources
      */
     private $resources;
-
-    /**
-     * @param Resources $resources
-     */
-    public function __construct(Resources $resources)
-    {
-        $this->resources = $resources;
-    }
 
     /**
      * Guesses the associated resource.

@@ -13,7 +13,7 @@ namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
+use Dunglas\JsonLdApiBundle\Model\ManagerInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
@@ -24,67 +24,50 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DataManipulator implements DataManipulatorInterface
+class Manager implements ManagerInterface
 {
     /**
-     * @var RouterInterface
+     * @var Resource
      */
-    private $router;
+    private $resource;
     /**
      * @var ManagerRegistry
      */
     private $managerRegistry;
-    /**
-     * @var Resources
-     */
-    private $resources;
-    /**
-     * @var int
-     */
-    private $defaultByPage;
-    /**
-     * @var string
-     */
-    private $defaultOrder;
 
     /**
-     * @param RouterInterface $router
      * @param ManagerRegistry $managerRegistry
-     * @param Resources       $resources
-     * @param int             $defaultByPage
-     * @param string|null     $defaultOrder
      */
-    public function __construct(
-        RouterInterface $router,
-        ManagerRegistry $managerRegistry,
-        Resources $resources,
-        $defaultByPage,
-        $defaultOrder
-    ) {
-        $this->router = $router;
+    public function __construct(ManagerRegistry $managerRegistry) {
         $this->managerRegistry = $managerRegistry;
-        $this->resources = $resources;
-        $this->defaultByPage = $defaultByPage;
-        $this->defaultOrder = $defaultOrder;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCollection(Resource $resource, $page, array $filters, $byPage = null, $order = null)
+    public function setResource(Resource $resource)
     {
-        if (!$byPage) {
-            $byPage = $this->defaultByPage;
-        }
+        $this->resource = $resource;
+    }
 
-        if (!$order) {
-            $order = $this->defaultOrder;
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function getItem($id)
+    {
+        $entityClass = $this->resource->getEntityClass();
+        return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $id);
+    }
 
-        $manager = $this->managerRegistry->getManagerForClass($resource->getEntityClass());
-        $repository = $manager->getRepository($resource->getEntityClass());
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollection($page, array $filters, $itemsPerPage = 30, $order = null)
+    {
+        $manager = $this->managerRegistry->getManagerForClass($this->resource->getEntityClass());
+        $repository = $manager->getRepository($this->resource->getEntityClass());
         if (count($filters)) {
-            $metadata = $manager->getClassMetadata($resource->getEntityClass());
+            $metadata = $manager->getClassMetadata($this->resource->getEntityClass());
             $fieldNames = array_flip($metadata->getFieldNames());
         }
 
@@ -93,8 +76,8 @@ class DataManipulator implements DataManipulatorInterface
          */
         $queryBuilder = $repository
             ->createQueryBuilder('o')
-            ->setFirstResult(($page - 1) * $byPage)
-            ->setMaxResults($byPage)
+            ->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage)
         ;
 
         foreach ($filters as $filter) {
@@ -126,49 +109,17 @@ class DataManipulator implements DataManipulatorInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getUriFromObject($object, $type)
-    {
-        $resource = $this->resources->getResourceForEntity($type);
-        if (!$resource) {
-            throw new \InvalidArgumentException(sprintf('No resource associated with the type "%s"', $type));
-        }
-
-        return $this->router->generate($resource->getElementRoute(), ['id' => $object->getId()]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getObjectFromUri($uri)
-    {
-        $parameters = $this->router->match($uri);
-        if (
-            !isset($parameters['_json_ld_resource']) ||
-            !isset($parameters['id']) ||
-            !($resource = $this->resources->getResourceForShortName($parameters['_json_ld_resource']))
-        ) {
-            throw new \InvalidArgumentException(sprintf('No resource associated with the URI "%s"', $uri));
-        }
-
-        $entityClass = $resource->getEntityClass();
-
-        return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $parameters['id']);
-    }
-
-    /**
      * Gets the ID from an URI or a raw ID.
      *
-     * @param mixed $value
+     * @param mixed     $value
      *
      * @return string
      */
     private function getFilterValueFromUrl($value)
     {
         try {
-            if ($object = $this->getObjectFromUri($value)) {
-                return $object->getId();
+            if ($item = $this->resource->getResources()->getItemFromUri($value)) {
+                return $item->getId();
             }
         } catch (ExceptionInterface $e) {
             // Do nothing, return the raw value

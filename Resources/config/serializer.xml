@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="dunglas_json_ld_api.normalizer.item" class="Dunglas\JsonLdApiBundle\Serializer\ItemNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
+            <argument type="service" id="dunglas_json_ld_api.context_builder" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="dunglas_json_ld_api.normalizer.collection" class="Dunglas\JsonLdApiBundle\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.context_builder" />
+
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
+
+        <service id="dunglas_json_ld_api.normalizer.constraint_violation_list" class="Dunglas\JsonLdApiBundle\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.router" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="dunglas_json_ld_api.normalizer.error" class="Dunglas\JsonLdApiBundle\Serializer\ErrorNormalizer" public="false">
+            <argument type="service" id="dunglas_json_ld_api.router" />
+            <argument>%kernel.debug%</argument>
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="dunglas_json_ld_api.normalizer.datetime" class="Dunglas\JsonLdApiBundle\Serializer\DateTimeNormalizer" public="false">
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
+        <service id="dunglas_json_ld_api.json_ld_encoder" class="Dunglas\JsonLdApiBundle\Serializer\JsonLdEncoder" public="false">
+            <tag name="serializer.encoder" />
+        </service>
+    </services>
+
+</container>
