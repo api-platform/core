@@ -156,7 +156,7 @@ class AttributeMetadata
     /**
      * Is writable?
      *
-     * @return boolean
+     * @return bool
      */
     public function isWritable()
     {
@@ -166,7 +166,7 @@ class AttributeMetadata
     /**
      * Sets writable.
      *
-     * @param boolean $writable
+     * @param bool $writable
      */
     public function setWritable($writable)
     {
@@ -176,7 +176,7 @@ class AttributeMetadata
     /**
      * Is required?
      *
-     * @return boolean
+     * @return bool
      */
     public function isRequired()
     {
@@ -186,7 +186,7 @@ class AttributeMetadata
     /**
      * Sets required.
      *
-     * @param boolean $required
+     * @param bool $required
      */
     public function setRequired($required)
     {

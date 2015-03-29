@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\CacheWarmer;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
@@ -23,17 +23,17 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 class MetadataCacheWarmer implements CacheWarmerInterface
 {
     /**
-     * @var Resources
+     * @var ResourceCollectionInterface
      */
-    private $resources;
+    private $resourceCollection;
     /**
      * @var ClassMetadataFactory
      */
     private $classMetadataFactory;
 
-    public function __construct(Resources $resources, ClassMetadataFactory $classMetadataFactory)
+    public function __construct(ResourceCollectionInterface $resourceCollection, ClassMetadataFactory $classMetadataFactory)
     {
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
         $this->classMetadataFactory = $classMetadataFactory;
     }
 
@@ -42,7 +42,7 @@ class MetadataCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        foreach ($this->resources as $resource) {
+        foreach ($this->resourceCollection as $resource) {
             $this->classMetadataFactory->getMetadataFor(
                 $resource->getEntityClass(),
                 $resource->getNormalizationGroups(),

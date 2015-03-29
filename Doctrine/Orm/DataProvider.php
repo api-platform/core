@@ -14,10 +14,8 @@ namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Data provider for the Doctrine ORM.
@@ -27,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 class DataProvider implements DataProviderInterface
 {
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     private $resource;
     /**
@@ -38,14 +36,15 @@ class DataProvider implements DataProviderInterface
     /**
      * @param ManagerRegistry $managerRegistry
      */
-    public function __construct(ManagerRegistry $managerRegistry) {
+    public function __construct(ManagerRegistry $managerRegistry)
+    {
         $this->managerRegistry = $managerRegistry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setResource(Resource $resource)
+    public function setResource(ResourceInterface $resource)
     {
         $this->resource = $resource;
     }
@@ -53,9 +52,13 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem($id)
+    public function getItem($id, $fetchData = false)
     {
         $entityClass = $this->resource->getEntityClass();
+        if ($fetchData) {
+            return $this->managerRegistry->getManagerForClass($entityClass)->find($entityClass, $id);
+        }
+
         return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $id);
     }
 
@@ -111,14 +114,14 @@ class DataProvider implements DataProviderInterface
     /**
      * Gets the ID from an URI or a raw ID.
      *
-     * @param mixed     $value
+     * @param mixed $value
      *
      * @return string
      */
     private function getFilterValueFromUrl($value)
     {
         try {
-            if ($item = $this->resource->getResources()->getItemFromUri($value)) {
+            if ($item = $this->resource->getResourceCollection()->getItemFromUri($value)) {
                 return $item->getId();
             }
         } catch (ExceptionInterface $e) {

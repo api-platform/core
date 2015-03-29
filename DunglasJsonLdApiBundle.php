@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle;
 
-use Dunglas\JsonLdApiBundle\DependencyInjection\Compiler\ResourcesCompilerPass;
+use Dunglas\JsonLdApiBundle\DependencyInjection\Compiler\ResourceCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -29,6 +29,6 @@ class DunglasJsonLdApiBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new ResourcesCompilerPass());
+        $container->addCompilerPass(new ResourceCompilerPass());
     }
 }

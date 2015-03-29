@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Resource
+class Resource implements ResourceInterface
 {
     /**
      * @var string
@@ -37,9 +37,9 @@ class Resource
      */
     private $dataProvider;
     /**
-     * @var Resources
+     * @var ResourceCollection
      */
-    private $resources;
+    private $resourceCollection;
     /**
      * @var array
      */
@@ -109,8 +109,8 @@ class Resource
     private $populatedItemOperations = false;
 
     /**
-     * @param string           $entityClass
-     * @param DataProviderInterface $manager
+     * @param string                $entityClass
+     * @param DataProviderInterface $dataProvider
      */
     public function __construct(
         $entityClass,
@@ -147,23 +147,23 @@ class Resource
     }
 
     /**
-     * Sets the resources.
+     * Sets the resource collection.
      *
-     * @param Resources $resources
+     * @param ResourceCollectionInterface $resourceCollection
      */
-    public function setResources(Resources $resources)
+    public function setResourceCollection(ResourceCollectionInterface $resourceCollection)
     {
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
     }
 
     /**
-     * Gets resources.
+     * Gets the resource collection.
      *
-     * @return Resources
+     * @return ResourceCollectionInterface
      */
-    public function getResources()
+    public function getResourceCollection()
     {
-        return $this->resources;
+        return $this->resourceCollection;
     }
 
     /**
@@ -565,8 +565,8 @@ class Resource
     /**
      * Adds a route to the collection.
      *
-     * @param array   $operation
-     * @param boolean $isCollection
+     * @param array $operation
+     * @param bool  $isCollection
      */
     private function addRoute(array &$operation, $isCollection)
     {

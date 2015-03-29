@@ -70,7 +70,7 @@ class DocumentationController extends Controller
         if (isset(self::$reservedShortNames[$shortName])) {
             $resource = null;
         } else {
-            $resource = $this->get('dunglas_json_ld_api.resources')->getResourceForShortName($shortName);
+            $resource = $this->get('dunglas_json_ld_api.resource_collection')->getResourceForShortName($shortName);
             if (!$resource) {
                 throw $this->createNotFoundException();
             }

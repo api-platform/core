@@ -14,7 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Serializer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * The {@link \DateTime} object normalizer.
+ * The {@see \DateTime} object normalizer.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */

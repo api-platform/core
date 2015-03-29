@@ -11,7 +11,6 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -24,9 +23,9 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 trait ResourceResolver
 {
     /**
-     * @var Resources
+     * @var \Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface
      */
-    private $resources;
+    private $resourceCollection;
 
     /**
      * Guesses the associated resource.
@@ -34,7 +33,7 @@ trait ResourceResolver
      * @param mixed      $type
      * @param array|null $context
      *
-     * @return \Dunglas\JsonLdApiBundle\JsonLd\Resource
+     * @return \Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface
      *
      * @throws InvalidArgumentException
      */
@@ -52,7 +51,7 @@ trait ResourceResolver
             $type = gettype($type);
         }
 
-        if ($resource = $this->resources->getResourceForEntity($type)) {
+        if ($resource = $this->resourceCollection->getResourceForEntity($type)) {
             return $resource;
         }
 
@@ -73,7 +72,7 @@ trait ResourceResolver
         if (
             'object' === $type->getType() &&
             ($class = $type->getClass()) &&
-            $this->resources->getResourceForEntity($class)
+            $this->resourceCollection->getResourceForEntity($class)
         ) {
             return $class;
         }

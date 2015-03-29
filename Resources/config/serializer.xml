@@ -6,7 +6,7 @@
 
     <services>
         <service id="dunglas_json_ld_api.normalizer.item" class="Dunglas\JsonLdApiBundle\Serializer\ItemNormalizer" public="false">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
             <argument type="service" id="dunglas_json_ld_api.context_builder" />
 
@@ -14,7 +14,7 @@
         </service>
 
         <service id="dunglas_json_ld_api.normalizer.collection" class="Dunglas\JsonLdApiBundle\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
             <argument type="service" id="dunglas_json_ld_api.context_builder" />
 
             <tag name="serializer.normalizer" priority="50" />

@@ -7,12 +7,12 @@
     <services>
         <service id="dunglas_json_ld_api.resource" class="Dunglas\JsonLdApiBundle\JsonLd\Resource" public="false" abstract="true" />
 
-        <service id="dunglas_json_ld_api.resources" class="Dunglas\JsonLdApiBundle\JsonLd\Resources">
+        <service id="dunglas_json_ld_api.resource_collection" class="Dunglas\JsonLdApiBundle\JsonLd\ResourceCollection">
             <argument type="service" id="dunglas_json_ld_api.router" />
         </service>
 
         <service id="dunglas_json_ld_api.routing.resources_loader" class="Dunglas\JsonLdApiBundle\Routing\ResourcesLoader">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
 
             <tag name="routing.loader" />
         </service>
@@ -22,12 +22,12 @@
         </service>
 
         <service id="dunglas_json_ld_api.entrypoint_builder" class="Dunglas\JsonLdApiBundle\JsonLd\EntrypointBuilder">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
             <argument type="service" id="dunglas_json_ld_api.router" />
         </service>
 
         <service id="dunglas_json_ld_api.api_documentation_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ApiDocumentationBuilder">
-            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
             <argument type="service" id="dunglas_json_ld_api.context_builder" />
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
@@ -38,7 +38,7 @@
         <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
             <argument type="service" id="dunglas_json_ld_api.router" />
             <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
-            <argument type="service" id="dunglas_json_ld_api.resources" />
+            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
         </service>
 
         <service id="dunglas_json_ld_api.link_header_response_listener" class="Dunglas\JsonLdApiBundle\EventListener\LinkHeaderResponseListener">

@@ -15,7 +15,7 @@ use Dunglas\JsonLdApiBundle\Mapping\ClassMetadata;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\Resource;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollection;
 use PhpSpec\ObjectBehavior;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 class JsonLdNormalizerSpec extends ObjectBehavior
 {
     public function let(
-        Resources $resources,
+        ResourceCollection $resources,
         RouterInterface $router,
         DataProviderInterface $dataManipulator,
         ClassMetadataFactory $classMetadataFactory,

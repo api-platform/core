@@ -11,8 +11,8 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
@@ -52,7 +52,7 @@ class ItemNormalizer extends AbstractNormalizer
     private $contextBuilder;
 
     public function __construct(
-        Resources $resources,
+        ResourceCollectionInterface $resourceCollection,
         ClassMetadataFactory $jsonLdClassMetadataFactory,
         ContextBuilder $contextBuilder,
         NameConverterInterface $nameConverter = null,
@@ -60,7 +60,7 @@ class ItemNormalizer extends AbstractNormalizer
     ) {
         parent::__construct(null, $nameConverter);
 
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
         $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -92,7 +92,7 @@ class ItemNormalizer extends AbstractNormalizer
         // Don't use hydra:Collection in sub levels
         $context['json_ld_sub_level'] = true;
 
-        $data['@id'] = $this->resources->getItemUri($object, $resource->getEntityClass());
+        $data['@id'] = $this->resourceCollection->getItemUri($object, $resource->getEntityClass());
         $data['@type'] = $resource->getShortName();
 
         $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
@@ -199,7 +199,7 @@ class ItemNormalizer extends AbstractNormalizer
                             ));
                         }
 
-                        $collection[] = $this->resources->getItemFromUri($uri);
+                        $collection[] = $this->resourceCollection->getItemFromUri($uri);
                     }
 
                     $value = $collection;
@@ -215,7 +215,7 @@ class ItemNormalizer extends AbstractNormalizer
                         ));
                     }
                 } elseif (is_string($value)) {
-                    $value = $this->resources->getItemFromUri($value);
+                    $value = $this->resourceCollection->getItemFromUri($value);
                 } else {
                     throw new InvalidArgumentException(sprintf(
                         'Type not supported (found "%s" in attribute "%s")',
@@ -238,17 +238,17 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
      *
-     * @param Resource          $currentResource
+     * @param ResourceInterface $currentResource
      * @param AttributeMetadata $attribute
      * @param mixed             $relatedObject
      * @param string            $class
      *
      * @return string|array
      */
-    private function normalizeRelation(Resource $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
+    private function normalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
     {
         if ($attribute->isLink()) {
-            return $this->resources->getItemUri($relatedObject, $class);
+            return $this->resourceCollection->getItemUri($relatedObject, $class);
         } else {
             $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
 

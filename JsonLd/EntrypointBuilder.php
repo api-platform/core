@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 class EntrypointBuilder
 {
     /**
-     * @var Resources
+     * @var ResourceCollection
      */
     private $resources;
     /**
@@ -30,7 +30,7 @@ class EntrypointBuilder
     private $router;
 
     public function __construct(
-        Resources $resources,
+        ResourceCollection $resources,
         RouterInterface $router
     ) {
         $this->resources = $resources;

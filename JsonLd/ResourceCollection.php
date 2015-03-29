@@ -17,11 +17,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * A collection of {@see Resource} classes.
+ * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Resources extends \ArrayObject
+class ResourceCollection extends \ArrayObject implements ResourceCollectionInterface
 {
     /**
      * @var RouterInterface
@@ -44,38 +44,28 @@ class Resources extends \ArrayObject
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \InvalidArgumentException
      */
-    public function append($value)
+    public function add(ResourceInterface $resource)
     {
-        if (!($value instanceof Resource)) {
-            throw new \InvalidArgumentException('Only instances of Dunglas\JsonLdApiBundle\Resource can be appended.');
-        }
-
-        $entityClass = $value->getEntityClass();
+        $entityClass = $resource->getEntityClass();
         if (isset($this->entityClassIndex[$entityClass])) {
             throw new \InvalidArgumentException(sprintf('A Resource class already exists for "%s".', $entityClass));
         }
 
-        $shortName = $value->getShortName();
+        $shortName = $resource->getShortName();
         if (isset($this->shortNameIndex[$shortName])) {
             throw new \InvalidArgumentException(sprintf('A Resource class with the short name "%s" already exists.', $shortName));
         }
 
-        parent::append($value);
-        $value->setResources($this);
+        $this->append($resource);
+        $resource->setResourceCollection($this);
 
-        $this->entityClassIndex[$entityClass] = $value;
-        $this->shortNameIndex[$shortName] = $value;
+        $this->entityClassIndex[$entityClass] = $resource;
+        $this->shortNameIndex[$shortName] = $resource;
     }
 
     /**
-     * Gets the Resource instance associated with the given entity class or null if not found.
-     *
-     * @param string $entityClass
-     *
-     * @return Resource|null
+     * {@inheritdoc}
      */
     public function getResourceForEntity($entityClass)
     {
@@ -83,11 +73,7 @@ class Resources extends \ArrayObject
     }
 
     /**
-     * Gets the Resource instance associated with the given short name or null if not found.
-     *
-     * @param string $shortName
-     *
-     * @return Resource|null
+     * {@inheritdoc}
      */
     public function getResourceForShortName($shortName)
     {
@@ -95,26 +81,15 @@ class Resources extends \ArrayObject
     }
 
     /**
-     * Gets the URI of a collection.
-     *
-     * @param Resource $resource
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getCollectionUri(Resource $resource)
+    public function getCollectionUri(ResourceInterface $resource)
     {
         return $this->router->generate($resource->getCollectionRoute());
     }
 
     /**
-     * Gets the URI of an item.
-     *
-     * @param object $object
-     * @param string|null $entityClass
-     *
-     * @return string
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getItemUri($object, $entityClass = null)
     {
@@ -131,13 +106,7 @@ class Resources extends \ArrayObject
     }
 
     /**
-     * Gets an item from an URI.
-     *
-     * @param string $uri
-     *
-     * @return object
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getItemFromUri($uri)
     {

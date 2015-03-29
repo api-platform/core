@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Model;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 
 /**
  * Data provider interface.
@@ -23,25 +23,26 @@ interface DataProviderInterface
     /**
      * Sets resource.
      *
-     * @param Resource $resource
+     * @param ResourceInterface $resource
      */
-    public function setResource(Resource $resource);
+    public function setResource(ResourceInterface $resource);
 
     /**
      * Retrieves an item.
      *
-     * @param int $id
+     * @param int  $id
+     * @param bool $fetchData
      *
      * @return object
      */
-    public function getItem($id);
+    public function getItem($id, $fetchData = false);
 
     /**
      * Retrieves a collection.
      *
      * @param int         $page
      * @param array       $filters
-     * @param int|null    $byPage
+     * @param int|null    $itemsPerPage
      * @param string|null $order
      *
      * @return PaginatorInterface

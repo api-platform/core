@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Routing;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -23,11 +23,11 @@ use Symfony\Component\Routing\RouteCollection;
 class ResourcesLoader extends Loader
 {
     /**
-     * @var Resources
+     * @var ResourceCollectionInterface
      */
     private $resources;
 
-    public function __construct(Resources $resources)
+    public function __construct(ResourceCollectionInterface $resources)
     {
         $this->resources = $resources;
     }

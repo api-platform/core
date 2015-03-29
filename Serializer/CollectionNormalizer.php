@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
 use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
@@ -35,9 +35,9 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      */
     private $contextBuilder;
 
-    public function __construct(Resources $resources, ContextBuilder $contextBuilder)
+    public function __construct(ResourceCollectionInterface $resourceCollection, ContextBuilder $contextBuilder)
     {
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
         $this->contextBuilder = $contextBuilder;
     }
 
@@ -63,7 +63,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                 $data[] = $this->serializer->normalize($obj, $format, $context);
             }
         } else {
-            $data['@id'] = $this->resources->getCollectionUri($resource);
+            $data['@id'] = $this->resourceCollection->getCollectionUri($resource);
 
             if ($object instanceof PaginatorInterface) {
                 $data['@type'] = self::HYDRA_PAGED_COLLECTION;

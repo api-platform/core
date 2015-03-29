@@ -13,7 +13,6 @@ namespace Dunglas\JsonLdApiBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -22,14 +21,14 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResourcesCompilerPass implements CompilerPassInterface
+class ResourceCompilerPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $resourcesDefinition = $container->getDefinition('dunglas_json_ld_api.resources');
+        $resourceCollectionDefinition = $container->getDefinition('dunglas_json_ld_api.resource_collection');
 
         foreach ($container->findTaggedServiceIds('json-ld.resource') as $serviceId => $tags) {
             $resourceDefinition = $container->getDefinition($serviceId);
@@ -41,8 +40,8 @@ class ResourcesCompilerPass implements CompilerPassInterface
                 $resourceDefinition->addArgument(new Reference($managerServiceId));
             }
 
-            $resourcesDefinition->addMethodCall(
-                'append',
+            $resourceCollectionDefinition->addMethodCall(
+                'add',
                 [new Reference($serviceId)]
             );
         }

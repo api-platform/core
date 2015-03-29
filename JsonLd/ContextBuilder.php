@@ -36,11 +36,11 @@ class ContextBuilder
      */
     private $classMetadataFactory;
     /**
-     * @var Resources
+     * @var ResourceCollection
      */
     private $resources;
 
-    public function __construct(RouterInterface $router, ClassMetadataFactory $classMetadataFactory, Resources $resources)
+    public function __construct(RouterInterface $router, ClassMetadataFactory $classMetadataFactory, ResourceCollection $resources)
     {
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
