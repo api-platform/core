@@ -157,12 +157,12 @@ Register the following services (for example in `app/config/services.yml`):
 ```yaml
 services:
     resource.product:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
+        parent:    "dunglas_json_ld_api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
         tags:      [ { name: "json-ld.resource" } ]
 
     resource.offer:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
+        parent:    "dunglas_json_ld_api.resource"
         arguments: [ "AppBundle\Entity\Offer" ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
@@ -191,12 +191,9 @@ To allow filtering the list of offers:
 ```yaml
 services:
     resource.offer:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments:
-            - "AppBundle\Entity\Offer"
-            -
-                - { "name": "price" }
-                - { "name": "name", "exact": false }
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Offer" ]
+        calls:     [ [ "initFilters", [ [ { "name": "price" }, { "name": "name", "exact": false } ] ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -210,11 +207,9 @@ It also possible to filter by relations:
 ```yaml
 services:
     resource.offer:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments:
-            - "AppBundle\Entity\Offer"
-            -
-                - { "name": "product" }
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Offer"] 
+        calls:     [ [ "initFilters", [ [ { "name": "product" } ] ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -232,8 +227,11 @@ in the Serializer component. Specifying to the API system the groups to use is d
 ```yaml
 services:
     resource.product:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Product", [], [ "serialization_group1", "serialization_group2" ], [ "deserialization_group1", "deserialization_group2" ] ]
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+        calls:
+            -      [ "initSerializationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
+            -      [ "initDeserializationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -320,8 +318,9 @@ services:
     # ...
 
     resource.offer:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Offer", [], { groups: [ "offer" ] } ]
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Offer" ]
+        calls:     [ [ "initSerializationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -350,8 +349,9 @@ To take care of them, edit your service declaration and add groups you want to u
 ```yaml
 services:
     resource.product:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Product", [], [], [], [ "group1", "group2" ] ]
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+        calls:     [ [ "initValidationGroups", [ [ "group1", "group2" ] ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -422,16 +422,18 @@ By default, the following operations are automatically enabled:
 | `PUT`    | Update an element                         |
 | `DELETE` | Delete an element                         |
 
-Sometimes, you want to disable some operations (e.g. the `DELETE` operation). The 6th and 7th arguments of the `Resource`
-class allows to customize operations of the given resource.
+Sometimes, you want to disable some operations (e.g. the `DELETE` operation). `initCollectionOperations` and `initItemOperations`
+of the `Resource` class respectively allow to customize operations available for the collection and for items of the given
+resource.
 
-The following `Resource` definition exposes `GET` and `PUT` operations but not the `DELETE` one:
+The following `Resource` definition exposes a `GET` operation for it's collection but not the `POST` one:
 
 ```yaml
 services:
     resource.product:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Product", [], [], {}, ~, [ { "hydra:method": "GET" }, { "hydra:method": "PUT" } ] ]
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+        calls:     [ [ "initCollectionOperations", [ [ { "hydra:method": "GET" } ] ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -443,19 +445,13 @@ the Hydra vocab.
 
 ```yaml
     my_relation_embedder_resource:
-        class:                      "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments:
-          -                         "AppBundle\Entity\Product"
-          -                         []
-          -                         []
-          -                         {}
-          -                         ~
-          -                         ~
-          -                         ~ # Collection operations, not customized here
-          -                           # Items operations
-            -                       { "hydra:method": "GET" }
-            -                       { "hydra:method": "PUT" }
-            -                       { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "AppBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/my_entities/{id}/custom", "returns": "xmls:string" }
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+        calls:     [ [ "initItemOperations", [ [
+                       { "hydra:method": "GET" },
+                       { "hydra:method": "PUT" }
+                       { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "AppBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/my_entities/{id}/custom", "returns": "xmls:string" }
+                   ] ] ] ]
 ```
 
 Additionnaly to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
@@ -496,6 +492,7 @@ The service definition can now be simplified:
 ```yaml
 services:
     resource.product:
+        parent:    "dunglas_json_ld_api.resource"
         class:     "AppBundle\JsonLd\MyCustomResource"
         tags:      [ { name: "json-ld.resource" } ]
 ```
@@ -507,8 +504,9 @@ If you want to customize the controller used for a `Resource` pass the controlle
 ```yaml
 services:
     resource.product:
-        class:     "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments: [ "AppBundle\Entity\Product", [], [], {}, ~, ~, ~, ~, 'AppBundle:Custom' ]
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+        calls:     [ [ "initControllerName", [ "AppBundle:Custom" ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
