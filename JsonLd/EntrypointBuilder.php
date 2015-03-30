@@ -21,19 +21,19 @@ use Symfony\Component\Routing\RouterInterface;
 class EntrypointBuilder
 {
     /**
-     * @var ResourceCollection
+     * @var ResourceCollectionInterface
      */
-    private $resources;
+    private $resourceCollection;
     /**
      * @var RouterInterface
      */
     private $router;
 
     public function __construct(
-        ResourceCollection $resources,
+        ResourceCollectionInterface $resourceCollection,
         RouterInterface $router
     ) {
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
         $this->router = $router;
     }
 
@@ -50,8 +50,8 @@ class EntrypointBuilder
             '@type' => 'Entrypoint',
         ];
 
-        foreach ($this->resources as $resource) {
-            $entrypoint[$resource->getBeautifiedName()] = $this->router->generate($resource->getCollectionRoute());
+        foreach ($this->resourceCollection as $resource) {
+            $entrypoint[$resource->getBeautifiedName()] = $this->router->generate($resource->getCollectionRouteName());
         }
 
         return $entrypoint;

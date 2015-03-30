@@ -90,11 +90,11 @@ class Resource implements ResourceInterface
     /**
      * @var string|null
      */
-    private $itemRoute;
+    private $itemRouteName;
     /**
      * @var string|null
      */
-    private $collectionRoute;
+    private $collectionRouteName;
     /**
      * @var bool
      */
@@ -314,25 +314,25 @@ class Resource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollectionRoute()
+    public function getCollectionRouteName()
     {
-        if (!$this->collectionRoute) {
+        if (!$this->collectionRouteName) {
             $this->getRouteCollection();
         }
 
-        return $this->collectionRoute;
+        return $this->collectionRouteName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getItemRoute()
+    public function getItemRouteName()
     {
-        if (!$this->itemRoute) {
+        if (!$this->itemRouteName) {
             $this->getRouteCollection();
         }
 
-        return $this->itemRoute;
+        return $this->itemRouteName;
     }
 
     /**
@@ -537,12 +537,12 @@ class Resource implements ResourceInterface
 
         // Set routes
         if ('GET' === $operation['hydra:method']) {
-            if (!$this->collectionRoute && $isCollection) {
-                $this->collectionRoute = $operation['!route_name'];
+            if (!$this->collectionRouteName && $isCollection) {
+                $this->collectionRouteName = $operation['!route_name'];
             }
 
-            if (!$this->itemRoute && !$isCollection) {
-                $this->itemRoute = $operation['!route_name'];
+            if (!$this->itemRouteName && !$isCollection) {
+                $this->itemRouteName = $operation['!route_name'];
             }
         }
     }
