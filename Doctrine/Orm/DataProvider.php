@@ -44,7 +44,7 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setResource(ResourceInterface $resource)
+    public function initResource(ResourceInterface $resource)
     {
         $this->resource = $resource;
     }

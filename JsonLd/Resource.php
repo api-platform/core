@@ -123,13 +123,11 @@ class Resource implements ResourceInterface
         $this->entityClass = $entityClass;
         $this->shortName = substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
         $this->dataProvider = $dataProvider;
-        $this->dataProvider->setResource($this);
+        $this->dataProvider->initResource($this);
     }
 
     /**
-     * Gets the associated entity class.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getEntityClass()
     {
@@ -137,9 +135,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets the related data provider.
-     *
-     * @return DataProviderInterface
+     * {@inheritdoc}
      */
     public function getDataProvider()
     {
@@ -147,19 +143,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets the resource collection.
-     *
-     * @param ResourceCollectionInterface $resourceCollection
+     * {@inheritdoc}
      */
-    public function setResourceCollection(ResourceCollectionInterface $resourceCollection)
+    public function initResourceCollection(ResourceCollectionInterface $resourceCollection)
     {
         $this->resourceCollection = $resourceCollection;
     }
 
     /**
-     * Gets the resource collection.
-     *
-     * @return ResourceCollectionInterface
+     * {@inheritdoc}
      */
     public function getResourceCollection()
     {
@@ -167,19 +159,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets filters.
-     *
-     * @param array $filters
+     * {@inheritdoc}
      */
-    public function setFilters(array $filters)
+    public function initFilters(array $filters)
     {
         $this->filters = $filters;
     }
 
     /**
-     * Gets filters available for this resource.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getFilters()
     {
@@ -197,19 +185,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets normalization context.
-     *
-     * @param array $normalizationContext
+     * {@inheritdoc}
      */
-    public function setNormalizationContext(array $normalizationContext)
+    public function initNormalizationContext(array $normalizationContext)
     {
         $this->normalizationContext = $normalizationContext;
     }
 
     /**
-     * Gets the normalization context.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getNormalizationContext()
     {
@@ -221,9 +205,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets normalization groups.
-     *
-     * @return string[]|null
+     * {@inheritdoc}
      */
     public function getNormalizationGroups()
     {
@@ -231,19 +213,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets denormalization context.
-     *
-     * @param array $denormalizationContext
+     * {@inheritdoc}
      */
-    public function setDenormalizationContext(array $denormalizationContext)
+    public function initDenormalizationContext(array $denormalizationContext)
     {
         $this->denormalizationContext = $denormalizationContext;
     }
 
     /**
-     * Gets the denormalization context.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getDenormalizationContext()
     {
@@ -255,9 +233,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets denormalization groups.
-     *
-     * @return string[]|null
+     * {@inheritdoc}
      */
     public function getDenormalizationGroups()
     {
@@ -265,19 +241,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets validation groups.
-     *
-     * @param array $validationGroups
+     * {@inheritdoc}
      */
-    public function setValidationGroups(array $validationGroups)
+    public function initValidationGroups(array $validationGroups)
     {
         $this->validationGroups = $validationGroups;
     }
 
     /**
-     * Gets validation groups to use.
-     *
-     * @return string[]|null
+     * {@inheritdoc}
      */
     public function getValidationGroups()
     {
@@ -285,19 +257,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets short name.
-     *
-     * @param string $shortName
+     * {@inheritdoc}
      */
-    public function setShortName($shortName)
+    public function initShortName($shortName)
     {
         $this->shortName = $shortName;
     }
 
     /**
-     * Gets the short name (display name) of the resource.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getShortName()
     {
@@ -305,19 +273,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets controller name.
-     *
-     * @param string $controllerName
+     * {@inheritdoc}
      */
-    public function setControllerName($controllerName)
+    public function initControllerName($controllerName)
     {
         $this->controllerName = $controllerName;
     }
 
     /**
-     * Gets the controller name.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getControllerName()
     {
@@ -325,9 +289,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets the route collection for this resource.
-     *
-     * @return RouteCollection
+     * {@inheritdoc}
      */
     public function getRouteCollection()
     {
@@ -350,9 +312,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets the route associated with the collection.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getCollectionRoute()
     {
@@ -364,9 +324,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets route associated with an item.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getItemRoute()
     {
@@ -378,19 +336,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets item operations.
-     *
-     * @param array $itemOperations
+     * {@inheritdoc}
      */
-    public function setItemOperations(array $itemOperations)
+    public function initItemOperations(array $itemOperations)
     {
         $this->itemOperations = $itemOperations;
     }
 
     /**
-     * Gets item operations.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getItemOperations()
     {
@@ -406,19 +360,15 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Sets collection operations.
-     *
-     * @param array $collectionOperations
+     * {@inheritdoc}
      */
-    public function setCollectionOperations(array $collectionOperations)
+    public function initCollectionOperations(array $collectionOperations)
     {
         $this->collectionOperations = $collectionOperations;
     }
 
     /**
-     * Get collection operations.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getCollectionOperations()
     {
@@ -434,9 +384,7 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Gets the short name of the resource pluralized and camel cased.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getBeautifiedName()
     {

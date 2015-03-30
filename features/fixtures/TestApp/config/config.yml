@@ -34,7 +34,7 @@ services:
         parent:                      "dunglas_json_ld_api.resource"
         arguments:                   [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
         calls:
-            -                        [ "setFilters", [ [ { name: "id" }, { name: "name", "exact": false } ] ] ]
+            -                        [ "initFilters", [ [ { name: "id" }, { name: "name", "exact": false } ] ] ]
         tags:
             -                        { name: "json-ld.resource" }
 
@@ -48,8 +48,8 @@ services:
         parent:                     "dunglas_json_ld_api.resource"
         arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
         calls:
-            -                       [ "setNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
-            -                       [ "setItemOperations", [ [ { "hydra:method": "GET" }, { "hydra:method": "PUT" }, { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "TestBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/relation_embedders/{id}/custom", "returns": "xmls:string" } ] ] ]
-            -                       [ "setControllerName", [ "TestBundle:Custom" ] ]
+            -                       [ "initNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
+            -                       [ "initItemOperations", [ [ { "hydra:method": "GET" }, { "hydra:method": "PUT" }, { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "TestBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/relation_embedders/{id}/custom", "returns": "xmls:string" } ] ] ]
+            -                       [ "initControllerName", [ "TestBundle:Custom" ] ]
         tags:
           -                         { name: "json-ld.resource" }

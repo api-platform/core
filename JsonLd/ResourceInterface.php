@@ -36,11 +36,11 @@ interface ResourceInterface
     public function getDataProvider();
 
     /**
-     * Sets the resource collection.
+     * Initializes the resource collection.
      *
      * @param ResourceCollectionInterface $resourceCollection
      */
-    public function setResourceCollection(ResourceCollectionInterface $resourceCollection);
+    public function initResourceCollection(ResourceCollectionInterface $resourceCollection);
 
     /**
      * Gets resource collection.
@@ -50,11 +50,11 @@ interface ResourceInterface
     public function getResourceCollection();
 
     /**
-     * Sets filters.
+     * Initializes filters.
      *
      * @param array $filters
      */
-    public function setFilters(array $filters);
+    public function initFilters(array $filters);
 
     /**
      * Gets filters available for this resource.
@@ -64,11 +64,11 @@ interface ResourceInterface
     public function getFilters();
 
     /**
-     * Sets normalization context.
+     * Initializes normalization context.
      *
      * @param array $normalizationContext
      */
-    public function setNormalizationContext(array $normalizationContext);
+    public function initNormalizationContext(array $normalizationContext);
 
     /**
      * Gets the normalization context.
@@ -85,11 +85,11 @@ interface ResourceInterface
     public function getNormalizationGroups();
 
     /**
-     * Sets denormalization context.
+     * Initializes denormalization context.
      *
      * @param array $denormalizationContext
      */
-    public function setDenormalizationContext(array $denormalizationContext);
+    public function initDenormalizationContext(array $denormalizationContext);
 
     /**
      * Gets the denormalization context.
@@ -106,11 +106,11 @@ interface ResourceInterface
     public function getDenormalizationGroups();
 
     /**
-     * Sets validation groups.
+     * Initializes validation groups.
      *
      * @param array $validationGroups
      */
-    public function setValidationGroups(array $validationGroups);
+    public function initValidationGroups(array $validationGroups);
 
     /**
      * Gets validation groups to use.
@@ -120,11 +120,11 @@ interface ResourceInterface
     public function getValidationGroups();
 
     /**
-     * Sets short name.
+     * Initializes short name.
      *
      * @param string $shortName
      */
-    public function setShortName($shortName);
+    public function initShortName($shortName);
 
     /**
      * Gets the short name (display name) of the resource.
@@ -134,11 +134,11 @@ interface ResourceInterface
     public function getShortName();
 
     /**
-     * Sets controller name.
+     * Initializes controller name.
      *
      * @param string $controllerName
      */
-    public function setControllerName($controllerName);
+    public function initControllerName($controllerName);
 
     /**
      * Gets the controller name.
@@ -169,11 +169,11 @@ interface ResourceInterface
     public function getItemRoute();
 
     /**
-     * Sets item operations.
+     * Initializes item operations.
      *
      * @param array $itemOperations
      */
-    public function setItemOperations(array $itemOperations);
+    public function initItemOperations(array $itemOperations);
 
     /**
      * Gets item operations.
@@ -183,11 +183,11 @@ interface ResourceInterface
     public function getItemOperations();
 
     /**
-     * Sets collection operations.
+     * Initializes collection operations.
      *
      * @param array $collectionOperations
      */
-    public function setCollectionOperations(array $collectionOperations);
+    public function initCollectionOperations(array $collectionOperations);
 
     /**
      * Get collection operations.

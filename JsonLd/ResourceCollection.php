@@ -58,7 +58,7 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
         }
 
         $this->append($resource);
-        $resource->setResourceCollection($this);
+        $resource->initResourceCollection($this);
 
         $this->entityClassIndex[$entityClass] = $resource;
         $this->shortNameIndex[$shortName] = $resource;

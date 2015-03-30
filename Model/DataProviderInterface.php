@@ -21,11 +21,11 @@ use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 interface DataProviderInterface
 {
     /**
-     * Sets resource.
+     * Initializes resource.
      *
      * @param ResourceInterface $resource
      */
-    public function setResource(ResourceInterface $resource);
+    public function initResource(ResourceInterface $resource);
 
     /**
      * Retrieves an item.
