@@ -63,7 +63,7 @@ class Dummy
      */
     public $relatedDummy;
     /**
-     * @var RelatedDummy[] Several dummies.
+     * @var ArrayCollection Several dummies.
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */

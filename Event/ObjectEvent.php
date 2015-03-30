@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\Event;
 class ObjectEvent extends Event
 {
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     private $resource;
     /**
@@ -43,7 +43,7 @@ class ObjectEvent extends Event
     /**
      * Gets related resource.
      *
-     * @return Resource
+     * @return ResourceInterface
      */
     public function getResource()
     {
