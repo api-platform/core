@@ -11,29 +11,21 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
 use PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 /**
  * This class helps to guess which resource is associated with a given object.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class ResourceResolver
+trait ResourceResolver
 {
     /**
-     * @var Resources
+     * @var \Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface
      */
-    private $resources;
-
-    /**
-     * @param Resources $resources
-     */
-    public function __construct(Resources $resources)
-    {
-        $this->resources = $resources;
-    }
+    private $resourceCollection;
 
     /**
      * Guesses the associated resource.
@@ -41,7 +33,7 @@ class ResourceResolver
      * @param mixed      $type
      * @param array|null $context
      *
-     * @return \Dunglas\JsonLdApiBundle\JsonLd\Resource
+     * @return \Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface
      *
      * @throws InvalidArgumentException
      */
@@ -59,7 +51,7 @@ class ResourceResolver
             $type = gettype($type);
         }
 
-        if ($resource = $this->resources->getResourceForEntity($type)) {
+        if ($resource = $this->resourceCollection->getResourceForEntity($type)) {
             return $resource;
         }
 
@@ -80,7 +72,7 @@ class ResourceResolver
         if (
             'object' === $type->getType() &&
             ($class = $type->getClass()) &&
-            $this->resources->getResourceForEntity($class)
+            $this->resourceCollection->getResourceForEntity($class)
         ) {
             return $class;
         }

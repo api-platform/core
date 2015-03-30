@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="dunglas_json_ld_api.doctrine_metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
+        <service id="dunglas_json_ld_api.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
@@ -16,15 +16,9 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="dunglas_json_ld_api.doctrine_orm.data_manipulator" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataManipulator">
-            <argument type="service" id="dunglas_json_ld_api.router" />
+        <service id="dunglas_json_ld_api.data_provider.doctrine.orm" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataProvider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="dunglas_json_ld_api.resources" />
-            <argument>%dunglas_json_ld_api.default.elements_by_page%</argument>
-            <argument>%dunglas_json_ld_api.default.order%</argument>
         </service>
-
-        <service id="dunglas_json_ld_api.data_manipulator" alias="dunglas_json_ld_api.doctrine_orm.data_manipulator" />
     </services>
 
 </container>

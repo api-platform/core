@@ -23,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 class ApiDocumentationBuilder
 {
     /**
-     * @var Resources
+     * @var ResourceCollection
      */
     private $resources;
     /**
@@ -48,7 +48,7 @@ class ApiDocumentationBuilder
     private $description;
 
     /**
-     * @param Resources            $resources
+     * @param ResourceCollection   $resources
      * @param ContextBuilder       $contextBuilder
      * @param RouterInterface      $router
      * @param ClassMetadataFactory $classMetadataFactory
@@ -56,7 +56,7 @@ class ApiDocumentationBuilder
      * @param string               $description
      */
     public function __construct(
-        Resources $resources,
+        ResourceCollection $resources,
         ContextBuilder $contextBuilder,
         RouterInterface $router,
         ClassMetadataFactory $classMetadataFactory,

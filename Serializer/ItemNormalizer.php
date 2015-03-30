@@ -11,15 +11,14 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
-use Dunglas\JsonLdApiBundle\Model\DataManipulatorInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -30,22 +29,15 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class JsonLdNormalizer extends AbstractNormalizer
+class ItemNormalizer extends AbstractNormalizer
 {
-    const FORMAT = 'json-ld';
+    use ResourceResolver;
 
     /**
-     * @var ResourceResolver
+     * @var string
      */
-    private $resourceResolver;
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-    /**
-     * @var DataManipulatorInterface
-     */
-    private $dataManipulator;
+    const FORMAT = 'json-ld';
+
     /**
      * @var ClassMetadataFactory
      */
@@ -60,9 +52,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     private $contextBuilder;
 
     public function __construct(
-        ResourceResolver $resourceResolver,
-        RouterInterface $router,
-        DataManipulatorInterface $dataManipulator,
+        ResourceCollectionInterface $resourceCollection,
         ClassMetadataFactory $jsonLdClassMetadataFactory,
         ContextBuilder $contextBuilder,
         NameConverterInterface $nameConverter = null,
@@ -70,9 +60,7 @@ class JsonLdNormalizer extends AbstractNormalizer
     ) {
         parent::__construct(null, $nameConverter);
 
-        $this->resourceResolver = $resourceResolver;
-        $this->router = $router;
-        $this->dataManipulator = $dataManipulator;
+        $this->resourceCollection = $resourceCollection;
         $this->jsonLdClassMetadataFactory = $jsonLdClassMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -98,16 +86,13 @@ class JsonLdNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $resource = $this->resourceResolver->guessResource($object, $context);
+        $resource = $this->guessResource($object, $context);
         list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         // Don't use hydra:Collection in sub levels
         $context['json_ld_sub_level'] = true;
 
-        $data['@id'] = $this->router->generate(
-            $resource->getElementRoute(),
-            ['id' => $this->propertyAccessor->getValue($object, 'id')]
-        );
+        $data['@id'] = $this->resourceCollection->getItemUri($object, $resource->getEntityClass());
         $data['@type'] = $resource->getShortName();
 
         $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
@@ -128,7 +113,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         $attributeValue &&
                         $type->isCollection() &&
                         ($collectionType = $type->getCollectionType()) &&
-                        $class = $this->resourceResolver->getClassHavingResource($collectionType)
+                        $class = $this->getClassHavingResource($collectionType)
                     ) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
@@ -136,7 +121,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         }
 
                         $data[$attributeName] = $uris;
-                    } elseif ($attributeValue && $class = $this->resourceResolver->getClassHavingResource($type)) {
+                    } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
                         $data[$attributeName] = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
                     }
                 }
@@ -165,7 +150,7 @@ class JsonLdNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $resource = $this->resourceResolver->guessResource($data, $context);
+        $resource = $this->guessResource($data, $context);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
@@ -214,11 +199,11 @@ class JsonLdNormalizer extends AbstractNormalizer
                             ));
                         }
 
-                        $collection[] = $this->dataManipulator->getObjectFromUri($uri);
+                        $collection[] = $this->resourceCollection->getItemFromUri($uri);
                     }
 
                     $value = $collection;
-                } elseif (!$this->resourceResolver->getClassHavingResource($types[0])) {
+                } elseif (!$this->getClassHavingResource($types[0])) {
                     $typeClass = $types[0]->getClass();
                     if ('DateTime' === $typeClass) {
                         $value = new \DateTime($value);
@@ -230,7 +215,7 @@ class JsonLdNormalizer extends AbstractNormalizer
                         ));
                     }
                 } elseif (is_string($value)) {
-                    $value = $this->dataManipulator->getObjectFromUri($value);
+                    $value = $this->resourceCollection->getItemFromUri($value);
                 } else {
                     throw new InvalidArgumentException(sprintf(
                         'Type not supported (found "%s" in attribute "%s")',
@@ -253,17 +238,17 @@ class JsonLdNormalizer extends AbstractNormalizer
     /**
      * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
      *
-     * @param Resource          $currentResource
+     * @param ResourceInterface $currentResource
      * @param AttributeMetadata $attribute
      * @param mixed             $relatedObject
      * @param string            $class
      *
      * @return string|array
      */
-    private function normalizeRelation(Resource $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
+    private function normalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
     {
         if ($attribute->isLink()) {
-            return $this->dataManipulator->getUriFromObject($relatedObject, $class);
+            return $this->resourceCollection->getItemUri($relatedObject, $class);
         } else {
             $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
 

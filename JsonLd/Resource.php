@@ -12,6 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\JsonLd;
 
 use Doctrine\Common\Inflector\Inflector;
+use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -20,7 +21,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Resource
+class Resource implements ResourceInterface
 {
     /**
      * @var string
@@ -28,140 +29,105 @@ class Resource
     const ROUTE_NAME_PREFIX = 'json_ld_api_';
 
     /**
+     * @var string
+     */
+    private $entityClass;
+    /**
+     * @var DataProviderInterface
+     */
+    private $dataProvider;
+    /**
+     * @var ResourceCollection
+     */
+    private $resourceCollection;
+    /**
      * @var array
      */
-    protected static $defaultCollectionOperations = [
+    private $filters = [];
+    /**
+     * @var array
+     */
+    private $normalizationContext = [];
+    /**
+     * @var array
+     */
+    private $denormalizationContext = [];
+    /**
+     * @var array|null
+     */
+    private $validationGroups;
+    /**
+     * @var string|null
+     */
+    private $shortName;
+    /**
+     * @var string|null
+     */
+    private $beautifiedName;
+    /**
+     * @var array
+     */
+    private $collectionOperations = [
         ['hydra:method' => 'GET'],
         ['hydra:method' => 'POST'],
     ];
     /**
      * @var array
      */
-    protected static $defaultItemOperations = [
+    private $itemOperations = [
         ['hydra:method' => 'GET'],
         ['hydra:method' => 'PUT'],
         ['hydra:method' => 'DELETE'],
     ];
     /**
-     * @var array
-     */
-    protected static $defaultFilter = [
-        'exact' => true,
-    ];
-    /**
      * @var string
      */
-    protected $entityClass;
-    /**
-     * @var array
-     */
-    protected $filters = [];
-    /**
-     * @var array
-     */
-    protected $normalizationContext;
-    /**
-     * @var array
-     */
-    protected $denormalizationContext;
-    /**
-     * @var array|null
-     */
-    protected $validationGroups;
-    /**
-     * @var array
-     */
-    protected $serializerContext;
-    /**
-     * @var string
-     */
-    protected $shortName;
-    /**
-     * @var string
-     */
-    protected $beautifiedName;
-    /**
-     * @var array
-     */
-    protected $collectionOperations;
-    /**
-     * @var array
-     */
-    protected $itemOperations;
-    /**
-     * @var string
-     */
-    protected $controllerName;
+    private $controllerName = 'DunglasJsonLdApiBundle:Resource';
     /**
      * @var RouteCollection|null
      */
-    protected $routeCollection;
+    private $routeCollection;
     /**
      * @var string|null
      */
-    protected $elementRoute;
+    private $itemRoute;
     /**
      * @var string|null
      */
-    protected $collectionRoute;
+    private $collectionRoute;
+    /**
+     * @var bool
+     */
+    private $populatedFilters = false;
+    /**
+     * @var bool
+     */
+    private $populatedCollectionOperations = false;
+    /**
+     * @var bool
+     */
+    private $populatedItemOperations = false;
 
     /**
-     * @param string      $entityClass
-     * @param array       $filters
-     * @param array       $normalizationContext
-     * @param array       $denormalizationContext
-     * @param array|null  $validationGroups
-     * @param string|null $shortName
-     * @param array|null  $collectionOperations
-     * @param array|null  $itemOperations
-     * @param string      $controllerName
+     * @param string                $entityClass
+     * @param DataProviderInterface $dataProvider
      */
     public function __construct(
         $entityClass,
-        array $filters = [],
-        array $normalizationContext = [],
-        array $denormalizationContext = [],
-        array $validationGroups = null,
-        $shortName = null,
-        array $collectionOperations = null,
-        array $itemOperations = null,
-        $controllerName = 'DunglasJsonLdApiBundle:Resource'
+        DataProviderInterface $dataProvider
     ) {
         if (!class_exists($entityClass)) {
             throw new \InvalidArgumentException(sprintf('The class %s does not exist.', $entityClass));
         }
 
         $this->entityClass = $entityClass;
-        $this->shortName = $shortName ?: substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
-        $this->normalizationContext = $normalizationContext;
-        $this->denormalizationContext = $denormalizationContext;
-        $this->validationGroups = $validationGroups;
-        $this->controllerName = $controllerName;
-
-        $this->beautifiedName = Inflector::pluralize(Inflector::tableize($this->shortName));
-
-        $this->collectionOperations = null === $collectionOperations ? self::$defaultCollectionOperations : $collectionOperations;
-        foreach ($this->collectionOperations as $key => $operation) {
-            $this->collectionOperations[$key] = $this->populateOperation($operation, true);
-        }
-
-        $this->itemOperations = null === $itemOperations ? self::$defaultItemOperations : $itemOperations;
-        foreach ($this->itemOperations as $key => $operation) {
-            $this->itemOperations[$key] = $this->populateOperation($operation, false);
-        }
-
-        foreach ($filters as $filters => $filter) {
-            $this->filters[$filters] = array_merge(self::$defaultFilter, $filter);
-        }
-
-        $this->normalizationContext['resource'] = $this;
-        $this->denormalizationContext['resource'] = $this;
+        $this->shortName = substr($this->entityClass, strrpos($this->entityClass, '\\') + 1);
+        $this->dataProvider = $dataProvider;
+        $this->dataProvider->initResource($this);
     }
 
     /**
-     * Gets the associated entity class.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getEntityClass()
     {
@@ -169,29 +135,77 @@ class Resource
     }
 
     /**
-     * Gets filters available for this resource.
-     *
-     * @return array
+     * {@inheritdoc}
+     */
+    public function getDataProvider()
+    {
+        return $this->dataProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initResourceCollection(ResourceCollectionInterface $resourceCollection)
+    {
+        $this->resourceCollection = $resourceCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceCollection()
+    {
+        return $this->resourceCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initFilters(array $filters)
+    {
+        $this->filters = $filters;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFilters()
     {
+        if (!$this->populatedFilters) {
+            foreach ($this->filters as $key => $filter) {
+                if (!isset($this->filters[$key]['exact'])) {
+                    $this->filters[$key]['exact'] = true;
+                }
+            }
+
+            $this->populatedFilters = true;
+        }
+
         return $this->filters;
     }
 
     /**
-     * Gets the normalization context.
-     *
-     * @return array
+     * {@inheritdoc}
+     */
+    public function initNormalizationContext(array $normalizationContext)
+    {
+        $this->normalizationContext = $normalizationContext;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getNormalizationContext()
     {
+        if (!isset($this->normalizationContext['resource'])) {
+            $this->normalizationContext['resource'] = $this;
+        }
+
         return $this->normalizationContext;
     }
 
     /**
-     * Gets normalization groups.
-     *
-     * @return string[]|null
+     * {@inheritdoc}
      */
     public function getNormalizationGroups()
     {
@@ -199,19 +213,27 @@ class Resource
     }
 
     /**
-     * Gets the denormalization context.
-     *
-     * @return array
+     * {@inheritdoc}
+     */
+    public function initDenormalizationContext(array $denormalizationContext)
+    {
+        $this->denormalizationContext = $denormalizationContext;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getDenormalizationContext()
     {
+        if (!isset($this->denormalizationContext['resource'])) {
+            $this->denormalizationContext['resource'] = $this;
+        }
+
         return $this->denormalizationContext;
     }
 
     /**
-     * Gets denormalization groups.
-     *
-     * @return string[]|null
+     * {@inheritdoc}
      */
     public function getDenormalizationGroups()
     {
@@ -219,9 +241,15 @@ class Resource
     }
 
     /**
-     * Gets validation groups to use.
-     *
-     * @return string[]|null
+     * {@inheritdoc}
+     */
+    public function initValidationGroups(array $validationGroups)
+    {
+        $this->validationGroups = $validationGroups;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getValidationGroups()
     {
@@ -229,9 +257,15 @@ class Resource
     }
 
     /**
-     * Gets the short name (display name) of the resource.
-     *
-     * @return string
+     * {@inheritdoc}
+     */
+    public function initShortName($shortName)
+    {
+        $this->shortName = $shortName;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getShortName()
     {
@@ -239,9 +273,15 @@ class Resource
     }
 
     /**
-     * Gets the controller name.
-     *
-     * @return string
+     * {@inheritdoc}
+     */
+    public function initControllerName($controllerName)
+    {
+        $this->controllerName = $controllerName;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getControllerName()
     {
@@ -249,9 +289,7 @@ class Resource
     }
 
     /**
-     * Gets the route collection for this resource.
-     *
-     * @return RouteCollection
+     * {@inheritdoc}
      */
     public function getRouteCollection()
     {
@@ -260,15 +298,101 @@ class Resource
         }
 
         $this->routeCollection = new RouteCollection();
-        foreach ($this->collectionOperations as &$collectionOperation) {
+        $collectionOperations = $this->getCollectionOperations();
+        foreach ($collectionOperations as &$collectionOperation) {
             $this->addRoute($collectionOperation, true);
         }
 
-        foreach ($this->itemOperations as &$itemOperation) {
+        $itemOperations = $this->getItemOperations();
+        foreach ($itemOperations as &$itemOperation) {
             $this->addRoute($itemOperation, false);
         }
 
         return $this->routeCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollectionRoute()
+    {
+        if (!$this->collectionRoute) {
+            $this->getRouteCollection();
+        }
+
+        return $this->collectionRoute;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemRoute()
+    {
+        if (!$this->itemRoute) {
+            $this->getRouteCollection();
+        }
+
+        return $this->itemRoute;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initItemOperations(array $itemOperations)
+    {
+        $this->itemOperations = $itemOperations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemOperations()
+    {
+        if (!$this->populatedItemOperations) {
+            foreach ($this->itemOperations as $key => $operation) {
+                $this->itemOperations[$key] = $this->populateOperation($operation, false);
+            }
+
+            $this->populatedItemOperations = true;
+        }
+
+        return $this->itemOperations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initCollectionOperations(array $collectionOperations)
+    {
+        $this->collectionOperations = $collectionOperations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollectionOperations()
+    {
+        if (!$this->populatedCollectionOperations) {
+            foreach ($this->collectionOperations as $key => $operation) {
+                $this->collectionOperations[$key] = $this->populateOperation($operation, true);
+            }
+
+            $this->populatedCollectionOperations = true;
+        }
+
+        return $this->collectionOperations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBeautifiedName()
+    {
+        if (!$this->beautifiedName) {
+            $this->beautifiedName = Inflector::pluralize(Inflector::tableize($this->shortName));
+        }
+
+        return $this->beautifiedName;
     }
 
     /**
@@ -282,6 +406,7 @@ class Resource
     private function populateOperation(array $operation, $isCollection)
     {
         $prefixedShortName = sprintf('#%s', $this->shortName);
+        $beautifiedName = $this->getBeautifiedName();
 
         if (!isset($operation['hydra:method'])) {
             $operation['hydra:method'] = 'GET';
@@ -375,11 +500,11 @@ class Resource
         }
 
         if (!isset($operation['!route_name'])) {
-            $operation['!route_name'] = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $this->beautifiedName, $action);
+            $operation['!route_name'] = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $beautifiedName, $action);
         }
 
         if (!isset($operation['!route_path'])) {
-            $operation['!route_path'] = '/'.$this->beautifiedName.($isCollection ? '' : '/{id}');
+            $operation['!route_path'] = '/'.$beautifiedName.($isCollection ? '' : '/{id}');
         }
 
         return $operation;
@@ -388,8 +513,8 @@ class Resource
     /**
      * Adds a route to the collection.
      *
-     * @param array   $operation
-     * @param boolean $isCollection
+     * @param array $operation
+     * @param bool  $isCollection
      */
     private function addRoute(array &$operation, $isCollection)
     {
@@ -416,69 +541,9 @@ class Resource
                 $this->collectionRoute = $operation['!route_name'];
             }
 
-            if (!$this->elementRoute && !$isCollection) {
-                $this->elementRoute = $operation['!route_name'];
+            if (!$this->itemRoute && !$isCollection) {
+                $this->itemRoute = $operation['!route_name'];
             }
         }
-    }
-
-    /**
-     * Gets the route associated with the collection.
-     *
-     * @return string
-     */
-    public function getCollectionRoute()
-    {
-        if (!$this->collectionRoute) {
-            // Can be optimized
-            $this->getRouteCollection();
-        }
-
-        return $this->collectionRoute;
-    }
-
-    /**
-     * Gets route associated with an element.
-     *
-     * @return string
-     */
-    public function getElementRoute()
-    {
-        if (!$this->elementRoute) {
-            // Can be optimized
-            $this->getRouteCollection();
-        }
-
-        return $this->elementRoute;
-    }
-
-    /**
-     * Gets item operations.
-     *
-     * @return array
-     */
-    public function getItemOperations()
-    {
-        return $this->itemOperations;
-    }
-
-    /**
-     * Get collection operations.
-     *
-     * @return array
-     */
-    public function getCollectionOperations()
-    {
-        return $this->collectionOperations;
-    }
-
-    /**
-     * Gets the short name of the resource pluralized and camel cased.
-     *
-     * @return string
-     */
-    public function getBeautifiedName()
-    {
-        return $this->beautifiedName;
     }
 }

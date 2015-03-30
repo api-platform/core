@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
-use Dunglas\JsonLdApiBundle\JsonLd\Resources;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollection;
 use phpDocumentor\Reflection\FileReflector;
 use PropertyInfo\PropertyInfoInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
@@ -45,7 +45,7 @@ class ClassMetadataFactory
      */
     private static $classReflectors = [];
     /**
-     * @var Resources
+     * @var ResourceCollection
      */
     private $resources;
     /**
@@ -70,7 +70,7 @@ class ClassMetadataFactory
     private $loadedClasses = [];
 
     public function __construct(
-        Resources $resources,
+        ResourceCollection $resources,
         PropertyInfoInterface $propertyInfo,
         ValidatorMetadataFactory $validatorMetadataFactory = null,
         SerializerClassMetadataFactory $serializerClassMetadataFactory = null,

@@ -23,42 +23,33 @@ doctrine:
         auto_mapping:                true
 
 dunglas_json_ld_api:
-    title:                          "My Dummy API"
-    description:                    "This is a test API."
+    title:                           "My Dummy API"
+    description:                     "This is a test API."
     default:
-        elements_by_page:           3
-        order:                      "ASC"
+        items_per_page:              3
+        order:                       "ASC"
 
 services:
     my_dummy_resource:
-        class:                      "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments:
-          -                         "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy"
-          -                         [ { name: "id" }, { name: "name", "exact": false } ]
+        parent:                      "dunglas_json_ld_api.resource"
+        arguments:                   [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
+        calls:
+            -                        [ "initFilters", [ [ { name: "id" }, { name: "name", "exact": false } ] ] ]
         tags:
-          -                         { name: "json-ld.resource" }
+            -                        { name: "json-ld.resource" }
 
     my_related_dummy_resource:
-        class:                      "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments:
-          -                         "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy"
+        parent:                     "dunglas_json_ld_api.resource"
+        arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy" ]
         tags:
-          -                         { name: "json-ld.resource" }
+            -                       { name: "json-ld.resource" }
 
     my_relation_embedder_resource:
-        class:                      "Dunglas\JsonLdApiBundle\JsonLd\Resource"
-        arguments:
-          -                         "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder"
-          -                         []
-          -                         { groups: [ "barcelona" ] }
-          -                         {}
-          -                         ~
-          -                         ~
-          -                         ~
-          -
-            -                       { "hydra:method": "GET" }
-            -                       { "hydra:method": "PUT" }
-            -                       { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "TestBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/relation_embedders/{id}/custom", "returns": "xmls:string" }
-          -                         "TestBundle:Custom"
+        parent:                     "dunglas_json_ld_api.resource"
+        arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
+        calls:
+            -                       [ "initNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
+            -                       [ "initItemOperations", [ [ { "hydra:method": "GET" }, { "hydra:method": "PUT" }, { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "TestBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/relation_embedders/{id}/custom", "returns": "xmls:string" } ] ] ]
+            -                       [ "initControllerName", [ "TestBundle:Custom" ] ]
         tags:
-          -         { name: "json-ld.resource" }
+          -                         { name: "json-ld.resource" }

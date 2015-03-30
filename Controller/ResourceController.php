@@ -11,11 +11,11 @@
 
 namespace Dunglas\JsonLdApiBundle\Controller;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
 use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
+use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
 use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Exception\Exception;
 class ResourceController extends Controller
 {
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     private $resource;
 
@@ -41,7 +41,7 @@ class ResourceController extends Controller
      *
      * @param Request $request
      *
-     * @return Resource
+     * @return ResourceInterface
      *
      * @throws \InvalidArgumentException
      */
@@ -56,7 +56,7 @@ class ResourceController extends Controller
         }
 
         $shortName = $request->attributes->get('_json_ld_resource');
-        if (!($this->resource = $this->get('dunglas_json_ld_api.resources')->getResourceForShortName($shortName))) {
+        if (!($this->resource = $this->get('dunglas_json_ld_api.resource_collection')->getResourceForShortName($shortName))) {
             throw new \InvalidArgumentException(sprintf('The resource "%s" cannot be found.', $shortName));
         }
 
@@ -64,40 +64,16 @@ class ResourceController extends Controller
     }
 
     /**
-     * Gets the Doctrine manager for this entity class.
-     *
-     * @param Resource $resource
-     *
-     * @return \Doctrine\Common\Persistence\ObjectManager|null
-     */
-    protected function getManager(Resource $resource)
-    {
-        return $this->getDoctrine()->getManagerForClass($resource->getEntityClass());
-    }
-
-    /**
-     * Gets the Doctrine repositories for this entity class.
-     *
-     * @param Resource $resource
-     *
-     * @return \Doctrine\ORM\EntityRepository
-     */
-    protected function getRepository(Resource $resource)
-    {
-        return $this->getManager($resource)->getRepository($resource->getEntityClass());
-    }
-
-    /**
      * Normalizes data using the Symfony Serializer.
      *
-     * @param Resource     $resource
-     * @param array|object $data
-     * @param int          $status
-     * @param array        $headers
+     * @param ResourceInterface $resource
+     * @param array|object      $data
+     * @param int               $status
+     * @param array             $headers
      *
      * @return JsonLdResponse
      */
-    protected function getSuccessResponse(Resource $resource, $data, $status = 200, array $headers = [])
+    protected function getSuccessResponse(ResourceInterface $resource, $data, $status = 200, array $headers = [])
     {
         return new JsonLdResponse(
             $this->get('serializer')->normalize($data, 'json-ld', $resource->getNormalizationContext()),
@@ -119,35 +95,34 @@ class ResourceController extends Controller
     /**
      * Finds an object of throws a 404 error.
      *
-     * @param Resource   $resource
-     * @param string|int $id
+     * @param ResourceInterface $resource
+     * @param string|int        $id
      *
      * @return object
      *
      * @throws NotFoundHttpException
      */
-    protected function findOrThrowNotFound(Resource $resource, $id)
+    protected function findOrThrowNotFound(ResourceInterface $resource, $id)
     {
-        $object = $this->getRepository($resource)->find($id);
-        if (!$object) {
+        $item = $resource->getDataProvider()->getItem($id, true);
+        if (!$item) {
             throw $this->createNotFoundException();
         }
 
-        return $object;
+        return $item;
     }
 
     /**
      * Gets collection data.
      *
-     * @param Resource $resource
-     * @param Request  $request
+     * @param ResourceInterface $resource
+     * @param Request           $request
      *
-     * @return Paginator
+     * @return PaginatorInterface
      */
-    protected function getCollectionData(Resource $resource, Request $request)
+    protected function getCollectionData(ResourceInterface $resource, Request $request)
     {
         $page = (int) $request->get('page', 1);
-        $dataManipulator = $this->get('dunglas_json_ld_api.data_manipulator');
 
         $filters = [];
         foreach ($resource->getFilters() as $resourceFilter) {
@@ -157,7 +132,10 @@ class ResourceController extends Controller
             }
         }
 
-        return $dataManipulator->getCollection($resource, $page, $filters);
+        $itemsPerPage = $this->container->getParameter('dunglas_json_ld_api.default.items_per_page');
+        $order = $this->container->getParameter('dunglas_json_ld_api.default.order');
+
+        return $resource->getDataProvider()->getCollection($page, $filters, $itemsPerPage, $order);
     }
 
     /**

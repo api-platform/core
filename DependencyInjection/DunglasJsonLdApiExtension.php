@@ -56,18 +56,20 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
 
         $container->setParameter('dunglas_json_ld_api.title', $config['title']);
         $container->setParameter('dunglas_json_ld_api.description', $config['description']);
-        $container->setParameter('dunglas_json_ld_api.default.elements_by_page', $config['default']['elements_by_page']);
+        $container->setParameter('dunglas_json_ld_api.default.items_per_page', $config['default']['items_per_page']);
         $container->setParameter('dunglas_json_ld_api.default.order', $config['default']['order']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('doctrine_orm.xml');
         $loader->load('property_info.xml');
+        $loader->load('serializer.xml');
+        $loader->load('metadata.xml');
         $loader->load('api.xml');
 
         if ($config['enable_fos_user_event_subscriber']) {
             $definition = new Definition(
                 'Dunglas\JsonLdApiBundle\FosUser\EventSubscriber',
-                [ new Reference('event_dispatcher'), new Reference('fos_user.user_manager') ]
+                [new Reference('event_dispatcher'), new Reference('fos_user.user_manager')]
             );
             $definition->setTags(['kernel.event_subscriber' => []]);
 
