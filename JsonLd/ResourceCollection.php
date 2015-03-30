@@ -34,6 +34,10 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
      * @var array<string, Resource>
      */
     private $shortNameIndex = [];
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
 
     public function __construct(RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null)
     {

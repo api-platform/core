@@ -48,7 +48,7 @@ class ApiDocumentationBuilder
     private $description;
 
     /**
-     * @param ResourceCollectionInterface $resources
+     * @param ResourceCollectionInterface $resourceCollection
      * @param ContextBuilder              $contextBuilder
      * @param RouterInterface             $router
      * @param ClassMetadataFactory        $classMetadataFactory

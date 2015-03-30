@@ -24,6 +24,7 @@
   },
   "require-dev": {
     "symfony/symfony": "~2.7@dev",
+    "friendsofsymfony/user-bundle": "dev-master",
     "phpspec/phpspec": "~2.0",
     "behat/behat": "~3.0",
     "behat/symfony2-extension": "~2.0",

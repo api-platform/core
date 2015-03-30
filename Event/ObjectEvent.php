@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Event;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -31,9 +31,10 @@ class ObjectEvent extends Event
     private $object;
 
     /**
-     * @param object $object
+     * @param ResourceInterface $resource
+     * @param object            $object
      */
-    public function __construct(Resource $resource, $object)
+    public function __construct(ResourceInterface $resource, $object)
     {
         $this->resource = $resource;
         $this->object = $object;

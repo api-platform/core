@@ -12,6 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
@@ -55,11 +56,13 @@ class DataProvider implements DataProviderInterface
     public function getItem($id, $fetchData = false)
     {
         $entityClass = $this->resource->getEntityClass();
-        if ($fetchData) {
-            return $this->managerRegistry->getManagerForClass($entityClass)->find($entityClass, $id);
+        $manager = $this->managerRegistry->getManagerForClass($entityClass);
+
+        if ($fetchData || !method_exists($manager, 'getReference')) {
+            return $manager->find($entityClass, $id);
         }
 
-        return $this->managerRegistry->getManagerForClass($entityClass)->getReference($entityClass, $id);
+        return $manager->getReference($entityClass, $id);
     }
 
     /**

@@ -170,9 +170,11 @@ class ClassMetadataFactory
     /**
      * Gets relevant properties for the given groups.
      *
-     * @param string[] $normalizationGroups
-     * @param string[] $denormalizationGroups
-     * @param string[] $validationGroups
+     * @param ClassMetadata $classMetadata
+     * @param ClassMetadataInterface|null $serializerClassMetadata
+     * @param string[]|null $normalizationGroups
+     * @param string[]|null $denormalizationGroups
+     * @param string[]|null $validationGroups
      */
     private function loadAttributes(
         ClassMetadata $classMetadata,
@@ -285,7 +287,9 @@ class ClassMetadataFactory
             $attribute->setDescription($this->propertyInfo->getShortDescription($reflectionProperty));
 
             $types = $this->propertyInfo->getTypes($reflectionProperty);
-            $attribute->setTypes($types);
+            if (null !== $types) {
+                $attribute->setTypes($types);
+            }
 
             if (
                 ($type = isset($types[0]) ? $types[0] : null) &&
@@ -378,7 +382,7 @@ class ClassMetadataFactory
      */
     private function getClassReflector(\ReflectionClass $reflectionClass)
     {
-        $className = $reflectionClass->getName();
+        $className = $reflectionClass->name;
 
         if (isset(self::$classReflectors[$className])) {
             return self::$classReflectors[$className];
@@ -401,7 +405,7 @@ class ClassMetadataFactory
                 $className = substr($className, 1);
             }
 
-            if ($className === $reflectionClass->getName()) {
+            if ($className === $reflectionClass->name) {
                 return self::$classReflectors[$className] = $classReflector;
             }
         }
@@ -412,7 +416,7 @@ class ClassMetadataFactory
      *
      * @param mixed $value
      *
-     * @return string|bool
+     * @return string|false
      */
     private function getClass($value)
     {
@@ -424,7 +428,7 @@ class ClassMetadataFactory
     }
 
     /**
-     * Gets the {@see |ReflectionProperty} from the class or its parent.
+     * Gets the {@see \ReflectionProperty} from the class or its parent.
      *
      * @param \ReflectionClass $reflectionClass
      * @param string           $attributeName
