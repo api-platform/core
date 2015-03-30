@@ -12,7 +12,6 @@
 namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
