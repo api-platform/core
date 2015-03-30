@@ -11,7 +11,6 @@
 
 namespace Dunglas\JsonLdApiBundle\JsonLd;
 
-use ArrayObject;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -85,7 +84,7 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
      */
     public function getCollectionUri(ResourceInterface $resource)
     {
-        return $this->router->generate($resource->getCollectionRoute());
+        return $this->router->generate($resource->getCollectionRouteName());
     }
 
     /**
@@ -102,7 +101,7 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
             throw new \InvalidArgumentException(sprintf('No resource associated with the type "%s".', $entityClass));
         }
 
-        return $this->router->generate($resource->getItemRoute(), ['id' => $this->propertyAccessor->getValue($object, 'id')]);
+        return $this->router->generate($resource->getItemRouteName(), ['id' => $this->propertyAccessor->getValue($object, 'id')]);
     }
 
     /**

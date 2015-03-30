@@ -159,14 +159,14 @@ interface ResourceInterface
      *
      * @return string
      */
-    public function getCollectionRoute();
+    public function getCollectionRouteName();
 
     /**
      * Gets route associated with an item.
      *
      * @return string
      */
-    public function getItemRoute();
+    public function getItemRouteName();
 
     /**
      * Initializes item operations.

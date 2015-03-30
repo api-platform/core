@@ -23,9 +23,9 @@ use Symfony\Component\Routing\RouterInterface;
 class ApiDocumentationBuilder
 {
     /**
-     * @var ResourceCollection
+     * @var ResourceCollectionInterface
      */
-    private $resources;
+    private $resourceCollection;
     /**
      * @var ContextBuilder
      */
@@ -48,22 +48,22 @@ class ApiDocumentationBuilder
     private $description;
 
     /**
-     * @param ResourceCollection   $resources
-     * @param ContextBuilder       $contextBuilder
-     * @param RouterInterface      $router
-     * @param ClassMetadataFactory $classMetadataFactory
-     * @param string               $title
-     * @param string               $description
+     * @param ResourceCollectionInterface $resources
+     * @param ContextBuilder              $contextBuilder
+     * @param RouterInterface             $router
+     * @param ClassMetadataFactory        $classMetadataFactory
+     * @param string                      $title
+     * @param string                      $description
      */
     public function __construct(
-        ResourceCollection $resources,
+        ResourceCollectionInterface $resourceCollection,
         ContextBuilder $contextBuilder,
         RouterInterface $router,
         ClassMetadataFactory $classMetadataFactory,
         $title,
         $description
     ) {
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
         $this->contextBuilder = $contextBuilder;
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
@@ -81,7 +81,7 @@ class ApiDocumentationBuilder
         $classes = [];
         $entrypointProperties = [];
 
-        foreach ($this->resources as $resource) {
+        foreach ($this->resourceCollection as $resource) {
             $shortName = $resource->getShortName();
             $prefixedShortName = sprintf('#%s', $shortName);
 
@@ -304,7 +304,7 @@ class ApiDocumentationBuilder
                             return 'xmls:dateTime';
                         }
 
-                        if ($resource = $this->resources->getResourceForEntity($type->getClass())) {
+                        if ($resource = $this->resourceCollection->getResourceForEntity($type->getClass())) {
                             return sprintf('#%s', $resource->getShortName());
                         }
                     }

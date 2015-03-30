@@ -36,15 +36,15 @@ class ContextBuilder
      */
     private $classMetadataFactory;
     /**
-     * @var ResourceCollection
+     * @var ResourceCollectionInterface
      */
-    private $resources;
+    private $resourceCollection;
 
-    public function __construct(RouterInterface $router, ClassMetadataFactory $classMetadataFactory, ResourceCollection $resources)
+    public function __construct(RouterInterface $router, ClassMetadataFactory $classMetadataFactory, ResourceCollectionInterface $resourceCollection)
     {
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
-        $this->resources = $resources;
+        $this->resourceCollection = $resourceCollection;
     }
 
     /**
@@ -56,7 +56,7 @@ class ContextBuilder
     {
         $context = $this->getBaseContext();
 
-        foreach ($this->resources as $resource) {
+        foreach ($this->resourceCollection as $resource) {
             $context[$resource->getBeautifiedName()] = [
                 '@id' => sprintf('Entrypoint/%s', lcfirst($resource->getShortName())),
                 '@type' => '@id',
@@ -92,11 +92,11 @@ class ContextBuilder
     /**
      * Builds the JSON-LD context for the given resource.
      *
-     * @param Resource|null $resource
+     * @param ResourceInterface|null $resource
      *
      * @return array
      */
-    public function getContext(Resource $resource = null)
+    public function getContext(ResourceInterface $resource = null)
     {
         $context = $this->getBaseContext();
 
@@ -130,12 +130,12 @@ class ContextBuilder
     /**
      * Bootstrap a serialization context with the given resource.
      *
-     * @param Resource $resource
-     * @param array    $context
+     * @param ResourceInterface $resource
+     * @param array             $context
      *
      * @return array [array, array]
      */
-    public function bootstrap(Resource $resource, array $context = [])
+    public function bootstrap(ResourceInterface $resource, array $context = [])
     {
         $data = [];
         if (!isset($context['json_ld_has_context'])) {
@@ -152,15 +152,15 @@ class ContextBuilder
     /**
      * Bootstrap relation context.
      *
-     * @param Resource $resource
-     * @param $class
+     * @param ResourceInterface $resource
+     * @param string            $class
      *
      * @return array
      */
-    public function bootstrapRelation(Resource $resource, $class)
+    public function bootstrapRelation(ResourceInterface $resource, $class)
     {
         return [
-            'resource' => $this->resources->getResourceForEntity($class),
+            'resource' => $this->resourceCollection->getResourceForEntity($class),
             'json_ld_has_context' => true,
             'json_ld_normalization_groups' => $resource->getNormalizationGroups(),
             'json_ld_denormalization_groups' => $resource->getDenormalizationGroups(),
