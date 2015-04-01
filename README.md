@@ -230,8 +230,8 @@ services:
         parent:    "dunglas_json_ld_api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -      [ "initSerializationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
-            -      [ "initDeserializationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
+            -      [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
+            -      [ "initDeormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
@@ -320,7 +320,7 @@ services:
     resource.offer:
         parent:    "dunglas_json_ld_api.resource"
         arguments: [ "AppBundle\Entity\Offer" ]
-        calls:     [ [ "initSerializationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
+        calls:     [ [ "initNormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
