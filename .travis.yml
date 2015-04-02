@@ -27,4 +27,4 @@ install:
     - composer install
 
 script:
-    - vendor/bin/behat
+    - composer test
