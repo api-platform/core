@@ -231,7 +231,7 @@ services:
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
             -      [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
-            -      [ "initDeormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
+            -      [ "initDenormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
         tags:      [ { name: "json-ld.resource" } ]
 ```
 
