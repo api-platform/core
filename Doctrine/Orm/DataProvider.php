@@ -67,7 +67,7 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollection($page, array $filters, $itemsPerPage = 30, $order = null)
+    public function getCollection($page, array $filters, $itemsPerPage = 30, array $order = null)
     {
         $manager = $this->managerRegistry->getManagerForClass($this->resource->getEntityClass());
         $repository = $manager->getRepository($this->resource->getEntityClass());
@@ -107,7 +107,9 @@ class DataProvider implements DataProviderInterface
         }
 
         if ($order) {
-            $queryBuilder->addOrderBy('o.id', $order);
+            foreach ($order as $propName => $value) {
+                $queryBuilder->addOrderBy(sprintf('o.%1$s', $propName), $value);
+            }
         }
 
         return new Paginator(new DoctrineOrmPaginator($queryBuilder));

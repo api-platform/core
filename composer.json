@@ -11,9 +11,6 @@
       "email": "dunglas@gmail.com"
     }
   ],
-  "scripts": {
-      "test": "vendor/bin/behat"
-  },
   "require": {
     "php": ">=5.5",
     "symfony/serializer": "~3.0|~2.7@dev",

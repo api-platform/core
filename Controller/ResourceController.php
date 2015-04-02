@@ -123,17 +123,39 @@ class ResourceController extends Controller
     protected function getCollectionData(ResourceInterface $resource, Request $request)
     {
         $page = (int) $request->get('page', 1);
-
+        $order = [];
         $filters = [];
-        foreach ($resource->getFilters() as $resourceFilter) {
+        $resourceFilters = $resource->getFilters();
+        $resourceOrders = $resource->getOrder();
+
+        foreach ($resourceFilters as $resourceFilter) {
             if (null !== $value = $request->get($resourceFilter['name'])) {
                 $resourceFilter['value'] = $value;
                 $filters[] = $resourceFilter;
             }
         }
 
+        // Add order filters
+        $requestOrderFilters = $request->get('order');
+        foreach ($requestOrderFilters as $key => $value) {
+            // @TODO change of whitelist, currently is the one of the where filter
+            foreach ($resourceOrders as $resourceOrder) {
+                if ($resourceOrder['name'] === $key
+                    && ('asc' === strtolower($value) || 'desc' === strtolower($value))) {
+                    $order[$key] = $value;
+                }
+            }
+        }
+
+        // If no order found take the default
+        if (0 === count($order)) {
+            $order[] = [
+                'name'  => 'id',
+                'value' => $this->container->getParameter('dunglas_json_ld_api.default.order')
+            ];
+        }
+
         $itemsPerPage = $this->container->getParameter('dunglas_json_ld_api.default.items_per_page');
-        $order = $this->container->getParameter('dunglas_json_ld_api.default.order');
 
         return $resource->getDataProvider()->getCollection($page, $filters, $itemsPerPage, $order);
     }
