@@ -312,7 +312,7 @@ class ClassMetadataFactory
                     ) {
                         $link = true;
                         foreach ($relationSerializerMetadata->getAttributesMetadata() as $attributeMetadata) {
-                            if (1 >= count(array_intersect($normalizationGroups, $attributeMetadata->getGroups()))) {
+                            if (1 <= count(array_intersect($normalizationGroups, $attributeMetadata->getGroups()))) {
                                 $link = false;
                                 break;
                             }
