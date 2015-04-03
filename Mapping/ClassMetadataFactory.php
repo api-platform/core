@@ -135,7 +135,9 @@ class ClassMetadataFactory
         }
 
         if ($classReflector = $this->getClassReflector($classMetadata->getReflectionClass())) {
-            $classMetadata->setDescription($classReflector->getDocBlock()->getShortDescription());
+            if (null !== ($docBlock = $classReflector->getDocBlock())) {
+                $classMetadata->setDescription($docBlock->getShortDescription());
+            }
         }
 
         $this->loadAttributes(
