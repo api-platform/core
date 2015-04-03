@@ -200,6 +200,22 @@ services:
 `http://localhost:8000/api/offers?price=10` will return all offers with a price being exactly `10`.
 `http://localhost:8000/api/offers?name=shirt` will returns all offer with a description containing the word "shirt".
 
+#### Order
+
+To allow order filtering the list of offers:
+
+```yaml
+services:
+    resource.offer:
+        parent:    "dunglas_json_ld_api.resource"
+        arguments: [ "AppBundle\Entity\Offer" ]
+        calls:     [ [ "initOrder", [ [ { "name": "price" }, { "name": "name" } ] ] ] ]
+        tags:      [ { name: "json-ld.resource" } ]
+```
+
+`http://localhost:8000/api/offers?order[price]=asc` will return all offers with prices in ascending order.<br/>
+`http://localhost:8000/api/offers?order[price]=asc&order[name]=asc` will returns all offer with prices in ascending order and when they have the same price, with the name in ascending order.
+
 #### Relations
 
 It also possible to filter by relations:
