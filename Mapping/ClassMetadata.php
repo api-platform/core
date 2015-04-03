@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
 /**
- * ClassMetadata.
+ * Class metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -34,6 +34,14 @@ class ClassMetadata
      *           {@link getDescription()} instead.
      */
     public $description;
+    /**
+     * @var string|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getIri()} instead.
+     */
+    public $iri;
     /**
      * @var AttributeMetadata[]
      *
@@ -88,6 +96,26 @@ class ClassMetadata
     }
 
     /**
+     * Sets IRI of this attribute.
+     *
+     * @param string $iri
+     */
+    public function setIri($iri)
+    {
+        $this->iri = $iri;
+    }
+
+    /**
+     * Gets IRI of this attribute.
+     *
+     * @return string|null
+     */
+    public function getIri()
+    {
+        return $this->iri;
+    }
+
+    /**
      * Adds an {@link AttributeMetadata}.
      *
      * @param AttributeMetadata $attributeMetadata
@@ -105,16 +133,6 @@ class ClassMetadata
     public function getAttributes()
     {
         return $this->attributes;
-    }
-
-    /**
-     * Sets {@see \ReflectionClass}.
-     *
-     * @param \ReflectionClass $reflectionClass
-     */
-    public function setReflectionClass(\ReflectionClass $reflectionClass)
-    {
-        $this->reflectionClass = $reflectionClass;
     }
 
     /**
@@ -141,6 +159,7 @@ class ClassMetadata
         return [
             'name',
             'description',
+            'iri',
             'attributes',
         ];
     }

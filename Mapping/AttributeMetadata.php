@@ -12,7 +12,7 @@
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
 /**
- * AttributeMetadata.
+ * Attribute metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -74,6 +74,14 @@ class AttributeMetadata
      *           {@link getLink()} instead.
      */
     public $link = false;
+    /**
+     * @var string|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getIri()} instead.
+     */
+    public $iri;
 
     /**
      * @param string $name
@@ -214,6 +222,26 @@ class AttributeMetadata
     }
 
     /**
+     * Sets IRI of this attribute.
+     *
+     * @param string $iri
+     */
+    public function setIri($iri)
+    {
+        $this->iri = $iri;
+    }
+
+    /**
+     * Gets IRI of this attribute.
+     *
+     * @return string|null
+     */
+    public function getIri()
+    {
+        return $this->iri;
+    }
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -228,6 +256,7 @@ class AttributeMetadata
             'writable',
             'required',
             'link',
+            'iri',
         ];
     }
 }

@@ -12,16 +12,10 @@
 namespace Dunglas\JsonLdApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollection;
-use phpDocumentor\Reflection\FileReflector;
-use PropertyInfo\PropertyInfoInterface;
-use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactory;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactory;
+use Dunglas\JsonLdApiBundle\Mapping\Loader\LoaderInterface;
 
 /**
- * ClassMetadata Factory for the JSON-LD normalizer.
+ * Class metadata factory for the JSON-LD normalizer.
  *
  * Reuse data available through Serializer, Validator and ORM mappings when possible.
  *
@@ -30,36 +24,9 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as Vali
 class ClassMetadataFactory
 {
     /**
-     * @var string[] A list of constraint classes making the entity required.
+     * @var LoaderInterface
      */
-    public static $requiredConstraints = [
-        'Symfony\Component\Validator\Constraints\NotBlank',
-        'Symfony\Component\Validator\Constraints\NotNull',
-    ];
-    /**
-     * @var FileReflector[]
-     */
-    private static $fileReflectors = [];
-    /**
-     * @var ClassReflector[]
-     */
-    private static $classReflectors = [];
-    /**
-     * @var ResourceCollection
-     */
-    private $resources;
-    /**
-     * @var PropertyInfoInterface
-     */
-    private $propertyInfo;
-    /**
-     * @var ValidatorMetadataFactory|null
-     */
-    private $validatorMetadataFactory;
-    /**
-     * @var SerializerClassMetadataFactory|null
-     */
-    private $serializerClassMetadataFactory;
+    private $loader;
     /**
      * @var Cache|null
      */
@@ -69,17 +36,9 @@ class ClassMetadataFactory
      */
     private $loadedClasses = [];
 
-    public function __construct(
-        ResourceCollection $resources,
-        PropertyInfoInterface $propertyInfo,
-        ValidatorMetadataFactory $validatorMetadataFactory = null,
-        SerializerClassMetadataFactory $serializerClassMetadataFactory = null,
-        Cache $cache = null
-    ) {
-        $this->resources = $resources;
-        $this->propertyInfo = $propertyInfo;
-        $this->validatorMetadataFactory = $validatorMetadataFactory;
-        $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
+    public function __construct(LoaderInterface $loader, Cache $cache = null)
+    {
+        $this->loader = $loader;
         $this->cache = $cache;
     }
 
@@ -128,22 +87,11 @@ class ClassMetadataFactory
         }
 
         $classMetadata = new ClassMetadata($class);
-
-        $serializerClassMetadata = $this->serializerClassMetadataFactory ? $this->serializerClassMetadataFactory->getMetadataFor($class) : null;
-        if ($serializerClassMetadata) {
-            $classMetadata->setReflectionClass($serializerClassMetadata->getReflectionClass());
-        }
-
-        if ($classReflector = $this->getClassReflector($classMetadata->getReflectionClass())) {
-            $classMetadata->setDescription($classReflector->getDocBlock()->getShortDescription());
-        }
-
-        $this->loadAttributes(
+        $this->loader->loadClassMetadata(
             $classMetadata,
-            $serializerClassMetadata,
             $normalizationGroups,
             $denormalizationGroups,
-            $validationGroups
+            $denormalizationGroups
         );
 
         if ($this->cache) {
@@ -168,250 +116,6 @@ class ClassMetadataFactory
     }
 
     /**
-     * Gets relevant properties for the given groups.
-     *
-     * @param ClassMetadata $classMetadata
-     * @param ClassMetadataInterface|null $serializerClassMetadata
-     * @param string[]|null $normalizationGroups
-     * @param string[]|null $denormalizationGroups
-     * @param string[]|null $validationGroups
-     */
-    private function loadAttributes(
-        ClassMetadata $classMetadata,
-        ClassMetadataInterface $serializerClassMetadata = null,
-        array $normalizationGroups = null,
-        array $denormalizationGroups = null,
-        array $validationGroups = null
-    ) {
-        if ($serializerClassMetadata && (null !== $normalizationGroups || null !== $denormalizationGroups)) {
-            foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
-                if ('id' === $name = $normalizationAttribute->getName()) {
-                    continue;
-                }
-
-                if (null !== $normalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $normalizationGroups, $validationGroups);
-                    $attribute->setReadable(true);
-                }
-
-                if (null !== $denormalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, $name, $normalizationGroups, $validationGroups);
-                    $attribute->setWritable(true);
-                }
-            }
-        }
-
-        if (null === $normalizationGroups || null === $denormalizationGroups) {
-            $reflectionClass = $classMetadata->getReflectionClass();
-
-            // methods
-            foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-                if ('getId' === $reflectionMethod->name || 'setId' === $reflectionMethod->name) {
-                    continue;
-                }
-
-                $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
-
-                // setters
-                if (
-                    null === $denormalizationGroups &&
-                    $numberOfRequiredParameters <= 1 &&
-                    strpos($reflectionMethod->name, 'set') === 0
-                ) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $normalizationGroups, $validationGroups);
-                    $attribute->setWritable(true);
-
-                    continue;
-                }
-
-                if (0 !== $numberOfRequiredParameters) {
-                    continue;
-                }
-
-                // getters and hassers
-                if (
-                    null === $normalizationGroups &&
-                    (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0)
-                ) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 3)), $normalizationGroups, $validationGroups);
-                    $attribute->setReadable(true);
-
-                    continue;
-                }
-
-                // issers
-                if (null === $normalizationGroups && strpos($reflectionMethod->name, 'is') === 0) {
-                    $attribute = $this->getOrCreateAttribute($classMetadata, lcfirst(substr($reflectionMethod->name, 2)), $normalizationGroups, $validationGroups);
-                    $attribute->setReadable(true);
-                }
-            }
-
-            // properties
-            foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
-                if ('id' === $reflectionProperty->name) {
-                    continue;
-                }
-
-                $attribute = $this->getOrCreateAttribute($classMetadata, $reflectionProperty->name, $normalizationGroups, $validationGroups);
-                if (null === $normalizationGroups) {
-                    $attribute->setReadable(true);
-                }
-
-                if (null === $denormalizationGroups) {
-                    $attribute->setWritable(true);
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets or creates the {@see AttributeMetadata} of the given name.
-     *
-     * @param ClassMetadata $classMetadata
-     * @param string        $attributeName
-     * @param string[]|null $normalizationGroups
-     * @param string[]|null $validationGroups
-     *
-     * @return AttributeMetadata
-     */
-    private function getOrCreateAttribute(ClassMetadata $classMetadata, $attributeName, array $normalizationGroups = null, array $validationGroups = null)
-    {
-        if (isset($classMetadata->getAttributes()[$attributeName])) {
-            return $classMetadata->getAttributes()[$attributeName];
-        }
-
-        $attribute = new AttributeMetadata($attributeName);
-        $reflectionProperty = $this->getReflectionProperty($classMetadata->getReflectionClass(), $attributeName);
-
-        if ($reflectionProperty) {
-            $attribute->setDescription($this->propertyInfo->getShortDescription($reflectionProperty));
-
-            $types = $this->propertyInfo->getTypes($reflectionProperty);
-            if (null !== $types) {
-                $attribute->setTypes($types);
-            }
-
-            if (
-                ($type = isset($types[0]) ? $types[0] : null) &&
-                (
-                    (($class = $type->getClass()) && $this->resources->getResourceForEntity($class)) ||
-                    (
-                        $type->isCollection() &&
-                        $type->getCollectionType() &&
-                        ($class = $type->getCollectionType()->getClass()) &&
-                        $this->resources->getResourceForEntity($class)
-                    )
-                )
-            ) {
-                if (null === $normalizationGroups) {
-                    $attribute->setLink(true);
-                } else {
-                    if (
-                        $this->serializerClassMetadataFactory &&
-                        ($relationSerializerMetadata = $this->serializerClassMetadataFactory->getMetadataFor($class))
-                    ) {
-                        $link = true;
-                        foreach ($relationSerializerMetadata->getAttributesMetadata() as $attributeMetadata) {
-                            if (1 <= count(array_intersect($normalizationGroups, $attributeMetadata->getGroups()))) {
-                                $link = false;
-                                break;
-                            }
-                        }
-
-                        $attribute->setLink($link);
-                    }
-                }
-            }
-        }
-
-        if ($this->validatorMetadataFactory) {
-            $validatorClassMetadata = $this->validatorMetadataFactory->getMetadataFor($classMetadata->getName());
-
-            foreach ($validatorClassMetadata->getPropertyMetadata($attributeName) as $propertyMetadata) {
-                if (null === $validationGroups) {
-                    foreach ($propertyMetadata->findConstraints($validatorClassMetadata->getDefaultGroup()) as $constraint) {
-                        if ($this->isRequired($constraint)) {
-                            $attribute->setRequired(true);
-
-                            break 2;
-                        }
-                    }
-                } else {
-                    foreach ($validationGroups as $validationGroup) {
-                        foreach ($propertyMetadata->findConstraints($validationGroup) as $constraint) {
-                            if ($this->isRequired($constraint)) {
-                                $attribute->setRequired(true);
-
-                                break 3;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        $classMetadata->addAttribute($attribute);
-
-        return $attribute;
-    }
-
-    /**
-     * Is this constraint making the related property required?
-     *
-     * @param Constraint $constraint
-     *
-     * @return bool
-     */
-    private function isRequired(Constraint $constraint)
-    {
-        foreach (self::$requiredConstraints as $requiredConstraint) {
-            if ($constraint instanceof $requiredConstraint) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets the ClassReflector associated with this class.
-     *
-     * @param \ReflectionClass $reflectionClass
-     *
-     * @return \phpDocumentor\Reflection\ClassReflector|null
-     */
-    private function getClassReflector(\ReflectionClass $reflectionClass)
-    {
-        $className = $reflectionClass->name;
-
-        if (isset(self::$classReflectors[$className])) {
-            return self::$classReflectors[$className];
-        }
-
-        if (!($fileName = $reflectionClass->getFileName())) {
-            return;
-        }
-
-        if (isset(self::$fileReflectors[$fileName])) {
-            $fileReflector = self::$fileReflectors[$fileName];
-        } else {
-            $fileReflector = self::$fileReflectors[$fileName] = new FileReflector($fileName);
-            $fileReflector->process();
-        }
-
-        foreach ($fileReflector->getClasses() as $classReflector) {
-            $className = $classReflector->getName();
-            if ('\\' === $className[0]) {
-                $className = substr($className, 1);
-            }
-
-            if ($className === $reflectionClass->name) {
-                return self::$classReflectors[$className] = $classReflector;
-            }
-        }
-    }
-
-    /**
      * Gets a class name for a given class or instance.
      *
      * @param mixed $value
@@ -425,24 +129,5 @@ class ClassMetadataFactory
         }
 
         return ltrim(is_object($value) ? get_class($value) : $value, '\\');
-    }
-
-    /**
-     * Gets the {@see \ReflectionProperty} from the class or its parent.
-     *
-     * @param \ReflectionClass $reflectionClass
-     * @param string           $attributeName
-     *
-     * @return \ReflectionProperty
-     */
-    private function getReflectionProperty(\ReflectionClass $reflectionClass, $attributeName)
-    {
-        if ($reflectionClass->hasProperty($attributeName)) {
-            return $reflectionClass->getProperty($attributeName);
-        }
-
-        if ($parent = $reflectionClass->getParentClass()) {
-            return $this->getReflectionProperty($parent, $attributeName);
-        }
     }
 }
