@@ -83,14 +83,6 @@ class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getMembers()
-    {
-        return $this->paginator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getIterator()
     {
         return $this->paginator->getIterator();

@@ -45,11 +45,4 @@ interface PaginatorInterface extends \Traversable
      * @return float
      */
     public function getTotalItems();
-
-    /**
-     * Gets members of this page.
-     *
-     * @return array|\Traversable
-     */
-    public function getMembers();
 }
