@@ -19,5 +19,6 @@
 
     <route id="json_ld_api_context" path="/contexts/{shortName}">
         <default key="_controller">DunglasJsonLdApiBundle:Documentation:context</default>
+        <requirement key="shortName">.+</requirement>
     </route>
 </routes>
