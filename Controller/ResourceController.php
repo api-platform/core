@@ -138,7 +138,6 @@ class ResourceController extends Controller
         // Add order filters
         $requestOrderFilters = $request->get('order');
         foreach ($requestOrderFilters as $key => $value) {
-            // @TODO change of whitelist, currently is the one of the where filter
             foreach ($resourceOrders as $resourceOrder) {
                 if ($resourceOrder['name'] === $key
                     && ('asc' === strtolower($value) || 'desc' === strtolower($value))) {
@@ -149,9 +148,8 @@ class ResourceController extends Controller
 
         // If no order found take the default
         if (0 === count($order)) {
-            $order[] = [
-                'name'  => 'id',
-                'value' => $this->container->getParameter('dunglas_json_ld_api.default.order')
+            $order = [
+                'id' => $this->container->getParameter('dunglas_json_ld_api.default.order')
             ];
         }
 

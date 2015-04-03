@@ -66,7 +66,7 @@ interface ResourceInterface
     /**
      * Initializes order filters.
      *
-     * @param array $filters
+     * @param array $orders
      */
     public function initOrder(array $orders);
 
