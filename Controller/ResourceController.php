@@ -136,7 +136,9 @@ class ResourceController extends Controller
         }
 
         // Add order filters
-        $requestOrderFilters = $request->get('order');
+        $requestOrderFilters = (null !== $request->get('order'))?
+            $request->get('order'):
+            [];
         foreach ($requestOrderFilters as $key => $value) {
             foreach ($resourceOrders as $resourceOrder) {
                 if ($resourceOrder['name'] === $key
