@@ -14,7 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Annotation;
 /**
  * Iri annotation.
  *
- * @author Kévin Dunglas <http://dunglas.fr>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @Annotation
  */

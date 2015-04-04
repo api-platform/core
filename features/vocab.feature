@@ -97,7 +97,7 @@ Feature: Documentation support
                         "hydra:required": false,
                         "hydra:readable": true,
                         "hydra:writable": true,
-                        "hydra:description": "foo"
+                        "hydra:description": "A dummy."
                     },
                     {
                         "@type": "hydra:SupportedProperty",

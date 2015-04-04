@@ -3,12 +3,13 @@
   "type": "symfony-bundle",
   "description": "JSON-LD / Hydra REST API for Symfony",
   "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
-  "homepage": "http://dunglas.fr",
+  "homepage": "http://api-platform.com",
   "license": "MIT",
   "authors": [
     {
       "name": "Kévin Dunglas",
-      "email": "dunglas@gmail.com"
+      "email": "dunglas@gmail.com",
+      "homepage": "http://dunglas.fr"
     }
   ],
   "require": {
