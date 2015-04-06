@@ -58,7 +58,7 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
-                            "@id": "#Dummy/name",
+                            "@id": "http://schema.org/name",
                             "@type": "rdf:Property",
                             "rdfs:label": "name",
                             "domain": "#Dummy",
@@ -150,16 +150,16 @@ Feature: Documentation support
                         "hydra:method": "GET",
                         "@type": "hydra:Operation",
                         "hydra:title": "Retrieves Dummy resource.",
-                        "returns": "#Dummy",
-                        "rdfs:label": "Retrieves Dummy resource."
+                        "rdfs:label": "Retrieves Dummy resource.",
+                        "returns": "#Dummy"
                     },
                     {
                         "hydra:method": "PUT",
                         "@type": "hydra:ReplaceResourceOperation",
                         "hydra:title": "Replaces the Dummy resource.",
+                        "rdfs:label": "Replaces the Dummy resource.",
                         "returns": "#Dummy",
-                        "expects": "#Dummy",
-                        "rdfs:label": "Replaces the Dummy resource."
+                        "expects": "#Dummy"
                     },
                     {
                         "hydra:method": "DELETE",
@@ -171,7 +171,7 @@ Feature: Documentation support
                 ]
             },
             {
-                "@id": "#RelatedDummy",
+                "@id": "https://schema.org/Product",
                 "@type": "hydra:Class",
                 "rdfs:label": "RelatedDummy",
                 "hydra:title": "RelatedDummy",
@@ -183,7 +183,7 @@ Feature: Documentation support
                             "@id": "#RelatedDummy/age",
                             "@type": "rdf:Property",
                             "rdfs:label": "age",
-                            "domain": "#RelatedDummy",
+                            "domain": "https://schema.org/Product",
                             "range": "xmls:integer"
                         },
                         "hydra:title": "age",
@@ -198,7 +198,7 @@ Feature: Documentation support
                             "@id": "#RelatedDummy/symfony",
                             "@type": "rdf:Property",
                             "rdfs:label": "symfony",
-                            "domain": "#RelatedDummy",
+                            "domain": "https://schema.org/Product",
                             "range": "xmls:string"
                         },
                         "hydra:title": "symfony",
@@ -212,16 +212,16 @@ Feature: Documentation support
                         "hydra:method": "GET",
                         "@type": "hydra:Operation",
                         "hydra:title": "Retrieves RelatedDummy resource.",
-                        "returns": "#RelatedDummy",
-                        "rdfs:label": "Retrieves RelatedDummy resource."
+                        "rdfs:label": "Retrieves RelatedDummy resource.",
+                        "returns": "https://schema.org/Product"
                     },
                     {
                         "hydra:method": "PUT",
                         "@type": "hydra:ReplaceResourceOperation",
                         "hydra:title": "Replaces the RelatedDummy resource.",
-                        "returns": "#RelatedDummy",
-                        "expects": "#RelatedDummy",
-                        "rdfs:label": "Replaces the RelatedDummy resource."
+                        "rdfs:label": "Replaces the RelatedDummy resource.",
+                        "returns": "https://schema.org/Product",
+                        "expects": "https://schema.org/Product"
                     },
                     {
                         "hydra:method": "DELETE",
@@ -287,16 +287,16 @@ Feature: Documentation support
                         "hydra:method": "GET",
                         "@type": "hydra:Operation",
                         "hydra:title": "Retrieves RelationEmbedder resource.",
-                        "returns": "#RelationEmbedder",
-                        "rdfs:label": "Retrieves RelationEmbedder resource."
+                        "rdfs:label": "Retrieves RelationEmbedder resource.",
+                        "returns": "#RelationEmbedder"
                     },
                     {
                         "hydra:method": "PUT",
                         "@type": "hydra:ReplaceResourceOperation",
                         "hydra:title": "Replaces the RelationEmbedder resource.",
+                        "rdfs:label": "Replaces the RelationEmbedder resource.",
                         "returns": "#RelationEmbedder",
-                        "expects": "#RelationEmbedder",
-                        "rdfs:label": "Replaces the RelationEmbedder resource."
+                        "expects": "#RelationEmbedder"
                     },
                     {
                         "hydra:method": "GET",
@@ -332,9 +332,9 @@ Feature: Documentation support
                                     "hydra:method": "POST",
                                     "@type": "hydra:CreateResourceOperation",
                                     "hydra:title": "Creates a Dummy resource.",
+                                    "rdfs:label": "Creates a Dummy resource.",
                                     "expects": "#Dummy",
-                                    "returns": "#Dummy",
-                                    "rdfs:label": "Creates a Dummy resource."
+                                    "returns": "#Dummy"
                                 }
                             ]
                         },
@@ -362,9 +362,9 @@ Feature: Documentation support
                                     "hydra:method": "POST",
                                     "@type": "hydra:CreateResourceOperation",
                                     "hydra:title": "Creates a RelatedDummy resource.",
-                                    "expects": "#RelatedDummy",
-                                    "returns": "#RelatedDummy",
-                                    "rdfs:label": "Creates a RelatedDummy resource."
+                                    "rdfs:label": "Creates a RelatedDummy resource.",
+                                    "expects": "https://schema.org/Product",
+                                    "returns": "https://schema.org/Product"
                                 }
                             ]
                         },
@@ -392,9 +392,9 @@ Feature: Documentation support
                                     "hydra:method": "POST",
                                     "@type": "hydra:CreateResourceOperation",
                                     "hydra:title": "Creates a RelationEmbedder resource.",
+                                    "rdfs:label": "Creates a RelationEmbedder resource.",
                                     "expects": "#RelationEmbedder",
-                                    "returns": "#RelationEmbedder",
-                                    "rdfs:label": "Creates a RelationEmbedder resource."
+                                    "returns": "#RelationEmbedder"
                                 }
                             ]
                         },
