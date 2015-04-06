@@ -405,7 +405,6 @@ class Resource implements ResourceInterface
      */
     private function populateOperation(array $operation, $isCollection)
     {
-        $prefixedShortName = sprintf('#%s', $this->shortName);
         $beautifiedName = $this->getBeautifiedName();
 
         if (!isset($operation['hydra:method'])) {
@@ -420,14 +419,6 @@ class Resource implements ResourceInterface
 
                 if (!isset($operation['hydra:title'])) {
                     $operation['hydra:title'] = sprintf('Creates a %s resource.', $this->shortName);
-                }
-
-                if (!isset($operation['expects'])) {
-                    $operation['expects'] = $prefixedShortName;
-                }
-
-                if (!isset($operation['returns'])) {
-                    $operation['returns'] = $prefixedShortName;
                 }
             } else {
                 if (!isset($operation['@type'])) {
@@ -453,14 +444,6 @@ class Resource implements ResourceInterface
                 if (!isset($operation['hydra:title'])) {
                     $operation['hydra:title'] = sprintf('Replaces the %s resource.', $this->shortName);
                 }
-
-                if (!isset($operation['returns'])) {
-                    $operation['returns'] = $prefixedShortName;
-                }
-
-                if (!isset($operation['expects'])) {
-                    $operation['expects'] = $prefixedShortName;
-                }
             } elseif ('DELETE' === $operation['hydra:method']) {
                 if (!isset($operation['@type'])) {
                     $operation['@type'] = 'hydra:Operation';
@@ -480,10 +463,6 @@ class Resource implements ResourceInterface
 
                 if (!isset($operation['hydra:title'])) {
                     $operation['hydra:title'] = sprintf('Retrieves %s resource.', $this->shortName);
-                }
-
-                if (!isset($operation['returns'])) {
-                    $operation['returns'] = $prefixedShortName;
                 }
             }
         }

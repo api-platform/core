@@ -82,12 +82,19 @@ class ApiDocumentationBuilder
         $entrypointProperties = [];
 
         foreach ($this->resourceCollection as $resource) {
+            $classMetadata = $this->classMetadataFactory->getMetadataFor(
+                $resource->getEntityClass(),
+                $resource->getNormalizationGroups(),
+                $resource->getDenormalizationGroups(),
+                $resource->getValidationGroups()
+            );
+
             $shortName = $resource->getShortName();
-            $prefixedShortName = sprintf('#%s', $shortName);
+            $prefixedShortName = ($iri = $classMetadata->getIri()) ? $iri : sprintf('#%s', $shortName);
 
             $collectionOperations = [];
             foreach ($resource->getCollectionOperations() as $collectionOperation) {
-                $collectionOperations[] = $this->getOperation($collectionOperation);
+                $collectionOperations[] = $this->getOperation($collectionOperation, $prefixedShortName, true);
             }
 
             $entrypointProperties[] = [
@@ -104,13 +111,6 @@ class ApiDocumentationBuilder
                 'hydra:readable' => true,
                 'hydra:writable' => false,
             ];
-
-            $classMetadata = $this->classMetadataFactory->getMetadataFor(
-                $resource->getEntityClass(),
-                $resource->getNormalizationGroups(),
-                $resource->getDenormalizationGroups(),
-                $resource->getValidationGroups()
-            );
 
             $class = [
                 '@id' => $prefixedShortName,
@@ -135,7 +135,7 @@ class ApiDocumentationBuilder
                 $property = [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => sprintf('#%s/%s', $shortName, $attributeName),
+                        '@id' => ($iri = $attribute->getIri()) ? $iri : sprintf('#%s/%s', $shortName, $attributeName),
                         '@type' => $type,
                         'rdfs:label' => $attributeName,
                         'domain' => $prefixedShortName,
@@ -160,7 +160,7 @@ class ApiDocumentationBuilder
 
             $operations = [];
             foreach ($resource->getItemOperations() as $itemOperation) {
-                $operations[] = $this->getOperation($itemOperation);
+                $operations[] = $this->getOperation($itemOperation, $prefixedShortName, false);
             }
 
             $class['hydra:supportedOperation'] = $operations;
@@ -253,18 +253,46 @@ class ApiDocumentationBuilder
     }
 
     /**
-     * Returns data from $operation except when the key start with "!".
+     * Returns data from $operation except when the key start with "!" and populates expects and returns if applicable.
      *
-     * @param array $operation
+     * @param array  $operation
+     * @param string $prefixedShortName
+     * @param bool   $isCollection
      *
      * @return array
      */
-    private function getOperation(array $operation)
+    private function getOperation(array $operation, $prefixedShortName, $isCollection)
     {
         $supportedOperation = [];
         foreach ($operation as $key => $value) {
             if (isset($key[0]) && '!' !== $key[0]) {
                 $supportedOperation[$key] = $value;
+            }
+        }
+
+        if ($isCollection) {
+            if ('POST' === $supportedOperation['hydra:method']) {
+                if (!isset($supportedOperation['expects'])) {
+                    $supportedOperation['expects'] = $prefixedShortName;
+                }
+
+                if (!isset($supportedOperation['returns'])) {
+                    $supportedOperation['returns'] = $prefixedShortName;
+                }
+            }
+        } else {
+            if ('PUT' === $supportedOperation['hydra:method']) {
+                if (!isset($supportedOperation['returns'])) {
+                    $supportedOperation['returns'] = $prefixedShortName;
+                }
+
+                if (!isset($supportedOperation['expects'])) {
+                    $supportedOperation['expects'] = $prefixedShortName;
+                }
+            } elseif ('GET' === $supportedOperation['hydra:method']) {
+                if (!isset($supportedOperation['returns'])) {
+                    $supportedOperation['returns'] = $prefixedShortName;
+                }
             }
         }
 
