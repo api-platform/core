@@ -17,6 +17,7 @@ namespace Dunglas\JsonLdApiBundle\Annotation;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @Annotation
+ * @Target({"CLASS","PROPERTY"})
  */
 class Iri
 {

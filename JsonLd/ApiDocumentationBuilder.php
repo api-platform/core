@@ -283,6 +283,10 @@ class ApiDocumentationBuilder
         if (isset($attributeMetadata->getTypes()[0])) {
             $type = $attributeMetadata->getTypes()[0];
 
+            if ($type->isCollection() && $collectionType = $type->getCollectionType()) {
+                $type = $collectionType;
+            }
+
             switch ($type->getType()) {
                 case 'string':
                     return 'xmls:string';

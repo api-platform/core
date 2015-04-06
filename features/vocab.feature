@@ -135,7 +135,8 @@ Feature: Documentation support
                             "@id": "#Dummy/relatedDummies",
                             "@type": "Hydra:Link",
                             "rdfs:label": "relatedDummies",
-                            "domain": "#Dummy"
+                            "domain": "#Dummy",
+                            "range": "#RelatedDummy"
                         },
                         "hydra:title": "relatedDummies",
                         "hydra:required": false,
