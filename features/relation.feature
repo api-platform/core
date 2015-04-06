@@ -17,7 +17,7 @@ Feature: Relations support
     {
       "@context": "/contexts/RelatedDummy",
       "@id": "/related_dummies/1",
-      "@type": "RelatedDummy",
+      "@type": "https://schema.org/Product",
       "age": null,
       "symfony": "symfony"
     }
@@ -104,7 +104,7 @@ Feature: Relations support
         "krondstadt": "Krondstadt",
         "related": {
             "@id": "/related_dummies/1",
-            "@type": "RelatedDummy",
+            "@type": "https://schema.org/Product",
             "symfony": "symfony"
         }
       }

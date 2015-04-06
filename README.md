@@ -403,6 +403,71 @@ and set the `cache` config key to the id of the custom service you created.
 
 A built-in cache warmer will be automatically executed every time you clear or warmup the cache if a cache service is configured.
 
+### Using external JSON-LD vocabularies
+
+JSON-LD allows to define classes and properties of your API with open vocabularies such as [Schema.org](https://schema.org)
+and [Good Relations](http://www.heppnetz.de/projects/goodrelations/).
+
+DunglasJsonLdApiBundle provides annotations usable on PHP classes and properties to specify a related external [IRI](http://en.wikipedia.org/wiki/Internationalized_resource_identifier).
+
+
+```php
+<?php
+
+# src/AppBundle/Entity/Product.php
+
+namespace AppBundle\Entity;
+
+use Dunglas\JsonLdApiBundle\Annotation\Iri
+
+// ...
+
+/**
+ * ...
+ * @Iri("https://schema.org/Product")
+ */
+class Product
+{
+    // ...
+
+    /**
+     * ...
+     * @Iri("https://schema.org/name")
+     */
+    public $name;
+}
+```
+
+The generated JSON for products and the related context document will now use external IRIs according to the specified annotations:
+
+`GET /products/22`
+
+```json
+{
+  "@context": "/contexts/Product",
+  "@id": "/product/22",
+  "@type": "https://schema.org/Product",
+  "name": "My awesome product",
+  // other properties
+}
+```
+
+`GET /contexts/Product`
+
+```json
+{
+    "@context": {
+        "@vocab": "http://example.com/vocab#",
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "name": "https://schema.org/name",
+        // Other properties
+    }
+}
+```
+
+An extended list of existing open vocabularies is available on [the Linked Open Vocabularies (LOV) database](http://lov.okfn.org/dataset/lov/).
+
+
 ### Disabling operations
 
 By default, the following operations are automatically enabled:

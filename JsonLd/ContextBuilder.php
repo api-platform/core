@@ -111,7 +111,9 @@ class ContextBuilder
             )->getAttributes();
 
             foreach ($attributes as $attributeName => $attribute) {
-                $id = sprintf('%s/%s', $prefixedShortName, $attributeName);
+                if (!$id = $attribute->getIri()) {
+                    $id = sprintf('%s/%s', $prefixedShortName, $attributeName);
+                }
 
                 if ($attribute->isLink()) {
                     $context[$attributeName] = [

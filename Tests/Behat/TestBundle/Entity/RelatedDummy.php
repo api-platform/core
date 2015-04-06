@@ -11,6 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity;
 
+use Dunglas\JsonLdApiBundle\Annotation\Iri;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -20,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ORM\Entity
+ * @Iri("https://schema.org/Product")
  */
 class RelatedDummy extends ParentDummy
 {

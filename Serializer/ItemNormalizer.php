@@ -92,22 +92,23 @@ class ItemNormalizer extends AbstractNormalizer
         // Don't use hydra:Collection in sub levels
         $context['json_ld_sub_level'] = true;
 
-        $data['@id'] = $this->resourceCollection->getItemUri($object, $resource->getEntityClass());
-        $data['@type'] = $resource->getShortName();
-
-        $attributes = $this->jsonLdClassMetadataFactory->getMetadataFor(
+        $classMetadata = $this->jsonLdClassMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
             isset($context['json_ld_normalization_groups']) ? $context['json_ld_normalization_groups'] : $resource->getNormalizationGroups(),
             isset($context['json_ld_denormalization_groups']) ? $context['json_ld_denormalization_groups'] : $resource->getDenormalizationGroups(),
             isset($context['json_ld_validation_groups']) ? $context['json_ld_validation_groups'] : $resource->getValidationGroups()
-        )->getAttributes();
+        );
+        $attributesMetadata = $classMetadata->getAttributes();
 
-        foreach ($attributes as $attributeName => $attribute) {
-            if ($attribute->isReadable() && 'id' !== $attributeName) {
+        $data['@id'] = $this->resourceCollection->getItemUri($object, $resource->getEntityClass());
+        $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
+
+        foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
+            if ($attributeMetadata->isReadable() && 'id' !== $attributeName) {
                 $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
-                if (isset($attribute->getTypes()[0])) {
-                    $type = $attribute->getTypes()[0];
+                if (isset($attributeMetadata->getTypes()[0])) {
+                    $type = $attributeMetadata->getTypes()[0];
 
                     if (
                         $attributeValue &&
@@ -117,12 +118,12 @@ class ItemNormalizer extends AbstractNormalizer
                     ) {
                         $uris = [];
                         foreach ($attributeValue as $obj) {
-                            $uris[] = $this->normalizeRelation($resource, $attribute, $obj, $class);
+                            $uris[] = $this->normalizeRelation($resource, $attributeMetadata, $obj, $class);
                         }
 
                         $data[$attributeName] = $uris;
                     } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
-                        $data[$attributeName] = $this->normalizeRelation($resource, $attribute, $attributeValue, $class);
+                        $data[$attributeName] = $this->normalizeRelation($resource, $attributeMetadata, $attributeValue, $class);
                     }
                 }
 
