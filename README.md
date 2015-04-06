@@ -418,7 +418,7 @@ DunglasJsonLdApiBundle provides annotations usable on PHP classes and properties
 
 namespace AppBundle\Entity;
 
-use Dunglas\JsonLdApiBundle\Annotation\Iri
+use Dunglas\JsonLdApiBundle\Annotation\Iri;
 
 // ...
 
