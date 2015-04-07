@@ -74,8 +74,11 @@ The first step is to name your API. Add the following lines in `app/config/confi
 
 ```yaml
 dunglas_json_ld_api:
-    title:       "Your API name"
-    description: "The full description of your API"
+    title:          "Your API name"
+    description:    "The full description of your API"
+default:                                               # optional
+    items_per_page: 30                                 # Number of items per page in paginated collections (optional)
+    order:          ~                                  # Default order: null for natural order, ASC or DESC (optional)
 ```
 
 The name and the description you give will be accessible trough the auto-generated Hydra documentation.
