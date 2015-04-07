@@ -47,6 +47,10 @@ class Resource implements ResourceInterface
     /**
      * @var array
      */
+    private $order = [];
+    /**
+     * @var array
+     */
     private $normalizationContext = [];
     /**
      * @var array
@@ -182,6 +186,22 @@ class Resource implements ResourceInterface
         }
 
         return $this->filters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initOrder(array $order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**

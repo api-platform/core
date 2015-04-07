@@ -43,9 +43,9 @@ interface DataProviderInterface
      * @param int         $page
      * @param array       $filters
      * @param int|null    $itemsPerPage
-     * @param string|null $order
+     * @param array|null  $order
      *
      * @return PaginatorInterface
      */
-    public function getCollection($page, array $filters, $itemsPerPage = null, $order = null);
+    public function getCollection($page, array $filters, $itemsPerPage = null, array $order = null);
 }

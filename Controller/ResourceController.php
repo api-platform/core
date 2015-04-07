@@ -123,17 +123,39 @@ class ResourceController extends Controller
     protected function getCollectionData(ResourceInterface $resource, Request $request)
     {
         $page = (int) $request->get('page', 1);
-
+        $order = [];
         $filters = [];
-        foreach ($resource->getFilters() as $resourceFilter) {
+        $resourceFilters = $resource->getFilters();
+        $resourceOrder = $resource->getOrder();
+
+        foreach ($resourceFilters as $resourceFilter) {
             if (null !== $value = $request->get($resourceFilter['name'])) {
                 $resourceFilter['value'] = $value;
                 $filters[] = $resourceFilter;
             }
         }
 
+        // Add order filters
+        $requestOrderFilters = (null !== $request->get('order'))?
+            $request->get('order'):
+            [];
+        foreach ($requestOrderFilters as $key => $value) {
+            foreach ($resourceOrder as $resourceElm) {
+                if ($resourceElm['name'] === $key
+                    && ('asc' === strtolower($value) || 'desc' === strtolower($value))) {
+                    $order[$key] = $value;
+                }
+            }
+        }
+
+        // If no order found take the default
+        if (0 === count($order)) {
+            $order = [
+                'id' => $this->container->getParameter('dunglas_json_ld_api.default.order')
+            ];
+        }
+
         $itemsPerPage = $this->container->getParameter('dunglas_json_ld_api.default.items_per_page');
-        $order = $this->container->getParameter('dunglas_json_ld_api.default.order');
 
         return $resource->getDataProvider()->getCollection($page, $filters, $itemsPerPage, $order);
     }

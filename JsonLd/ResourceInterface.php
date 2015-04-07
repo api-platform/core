@@ -64,6 +64,20 @@ interface ResourceInterface
     public function getFilters();
 
     /**
+     * Initializes order filters.
+     *
+     * @param array $orders
+     */
+    public function initOrder(array $orders);
+
+    /**
+     * Gets order filters available for this resource.
+     *
+     * @return array
+     */
+    public function getOrder();
+
+    /**
      * Initializes normalization context.
      *
      * @param array $normalizationContext
