@@ -126,7 +126,7 @@ class ResourceController extends Controller
         $order = [];
         $filters = [];
         $resourceFilters = $resource->getFilters();
-        $resourceOrders = $resource->getOrder();
+        $resourceOrder = $resource->getOrder();
 
         foreach ($resourceFilters as $resourceFilter) {
             if (null !== $value = $request->get($resourceFilter['name'])) {
@@ -140,8 +140,8 @@ class ResourceController extends Controller
             $request->get('order'):
             [];
         foreach ($requestOrderFilters as $key => $value) {
-            foreach ($resourceOrders as $resourceOrder) {
-                if ($resourceOrder['name'] === $key
+            foreach ($resourceOrder as $resourceElm) {
+                if ($resourceElm['name'] === $key
                     && ('asc' === strtolower($value) || 'desc' === strtolower($value))) {
                     $order[$key] = $value;
                 }
