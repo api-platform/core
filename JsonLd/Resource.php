@@ -298,15 +298,9 @@ class Resource implements ResourceInterface
         }
 
         $this->routeCollection = new RouteCollection();
-        $collectionOperations = $this->getCollectionOperations();
-        foreach ($collectionOperations as &$collectionOperation) {
-            $this->addRoute($collectionOperation, true);
-        }
 
-        $itemOperations = $this->getItemOperations();
-        foreach ($itemOperations as &$itemOperation) {
-            $this->addRoute($itemOperation, false);
-        }
+        $this->addRoutes(true);
+        $this->addRoutes(false);
 
         return $this->routeCollection;
     }
@@ -490,38 +484,45 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Adds a route to the collection.
+     * Adds a routes to the collection.
      *
-     * @param array $operation
-     * @param bool  $isCollection
+     * @param bool $collection
      */
-    private function addRoute(array &$operation, $isCollection)
+    private function addRoutes($collection)
     {
-        $methods = 'GET' === $operation['hydra:method'] ? ['GET', 'HEAD'] : [$operation['hydra:method']];
-        $route = new Route(
-            $operation['!route_path'],
-            [
-                '_controller' => $operation['!controller'],
-                '_json_ld_resource' => $this->shortName,
-            ],
-            [],
-            [],
-            '',
-            [],
-            $methods
-        );
+        if ($collection) {
+            $this->getCollectionOperations();
 
-        $this->routeCollection->add($operation['!route_name'], $route);
-        $operation['!route'] = $route;
+            $operations = &$this->collectionOperations;
+            $routeName = &$this->collectionRouteName;
+        } else {
+            $this->getItemOperations();
 
-        // Set routes
-        if ('GET' === $operation['hydra:method']) {
-            if (!$this->collectionRouteName && $isCollection) {
-                $this->collectionRouteName = $operation['!route_name'];
-            }
+            $operations = &$this->itemOperations;
+            $routeName = &$this->itemRouteName;
+        }
 
-            if (!$this->itemRouteName && !$isCollection) {
-                $this->itemRouteName = $operation['!route_name'];
+        foreach ($operations as $key => $operation) {
+            $methods = 'GET' === $operation['hydra:method'] ? ['GET', 'HEAD'] : [$operation['hydra:method']];
+            $route = new Route(
+                $operation['!route_path'],
+                [
+                    '_controller' => $operation['!controller'],
+                    '_json_ld_resource' => $this->shortName,
+                ],
+                [],
+                [],
+                '',
+                [],
+                $methods
+            );
+
+            $this->routeCollection->add($operation['!route_name'], $route);
+            $operations[$key]['!route'] = $route;
+
+            // Set routes
+            if ('GET' === $operation['hydra:method'] && !$routeName) {
+                $routeName = $operation['!route_name'];
             }
         }
     }
