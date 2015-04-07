@@ -55,8 +55,11 @@ class PhpDocLoader implements LoaderInterface
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
-        if ($classReflector = $this->getClassReflector($classMetadata->getReflectionClass())) {
-            $classMetadata->setDescription($classReflector->getDocBlock()->getShortDescription());
+        if (
+            ($classReflector = $this->getClassReflector($classMetadata->getReflectionClass())) &&
+            $docBlock = $classReflector->getDocBlock()
+        ) {
+            $classMetadata->setDescription($docBlock->getShortDescription());
         }
 
         foreach ($classMetadata->getAttributes() as $attributeMetadata) {
