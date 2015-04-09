@@ -86,7 +86,7 @@ class ItemNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $resource = $this->guessResource($object, $context);
+        $resource = $this->guessResource($object, $context, true);
         list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         // Don't use hydra:Collection in sub levels
