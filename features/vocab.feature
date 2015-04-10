@@ -175,12 +175,12 @@ Feature: Documentation support
                 "@type": "hydra:Class",
                 "rdfs:label": "RelatedDummy",
                 "hydra:title": "RelatedDummy",
-                "hydra:description": "Related Dummy.",
+                "hydra:description": "Related dummy.",
                 "hydra:supportedProperty": [
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
-                            "@id": "#RelatedDummy\/unknown",
+                            "@id": "#RelatedDummy/unknown",
                             "@type": "rdf:Property",
                             "rdfs:label": "unknown",
                             "domain": "https://schema.org/Product"
@@ -250,7 +250,7 @@ Feature: Documentation support
                 "@type": "hydra:Class",
                 "rdfs:label": "RelationEmbedder",
                 "hydra:title": "RelationEmbedder",
-                "hydra:description": "Relation Embedder.",
+                "hydra:description": "Relation embedder.",
                 "hydra:supportedProperty": [
                     {
                         "@type": "hydra:SupportedProperty",
