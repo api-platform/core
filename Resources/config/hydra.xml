@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api.hydra.documentation_builder" class="Dunglas\JsonLdApiBundle\Hydra\ApiDocumentationBuilder">
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.router" />
+            <argument type="service" id="api.mapping.class_metadata_factory" />
+            <argument>%api.title%</argument>
+            <argument>%api.description%</argument>
+        </service>
+
+        <!-- Event listeners -->
+
+        <service id="api.hydra.listener.link_header_response" class="Dunglas\JsonLdApiBundle\Hydra\EventListener\LinkHeaderResponseListener">
+            <argument type="service" id="router" />
+
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+        </service>
+
+        <service id="api.hydra.listener.request_exception" class="Dunglas\JsonLdApiBundle\Hydra\EventListener\RequestExceptionListener">
+            <argument type="service" id="api.hydra.normalizer.error" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+
+        <!-- Serializer -->
+
+        <service id="api.hydra.normalizer.collection" class="Dunglas\JsonLdApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.router" />
+            <argument type="service" id="api.json_ld.context_builder" />
+
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
+        <service id="api.hydra.normalizer.constraint_violation_list" class="Dunglas\JsonLdApiBundle\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument type="service" id="api.router" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api.hydra.normalizer.error" class="Dunglas\JsonLdApiBundle\Hydra\Serializer\ErrorNormalizer" public="false">
+            <argument type="service" id="api.router" />
+            <argument>%kernel.debug%</argument>
+
+            <tag name="serializer.normalizer" />
+        </service>
+    </services>
+
+</container>

@@ -14,9 +14,9 @@ namespace Dunglas\JsonLdApiBundle\Controller;
 use Dunglas\JsonLdApiBundle\Event\Events;
 use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
 use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
+use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
 use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
-use Dunglas\JsonLdApiBundle\Response\JsonLdResponse;
+use Dunglas\JsonLdApiBundle\JsonLd\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -51,12 +51,12 @@ class ResourceController extends Controller
             return $this->resource;
         }
 
-        if (!$request->attributes->has('_json_ld_resource')) {
+        if (!$request->attributes->has('_resource')) {
             throw new \InvalidArgumentException('The current request doesn\'t have an associated resource.');
         }
 
-        $shortName = $request->attributes->get('_json_ld_resource');
-        if (!($this->resource = $this->get('dunglas_json_ld_api.resource_collection')->getResourceForShortName($shortName))) {
+        $shortName = $request->attributes->get('_resource');
+        if (!($this->resource = $this->get('api.resource_collection')->getResourceForShortName($shortName))) {
             throw new \InvalidArgumentException(sprintf('The resource "%s" cannot be found.', $shortName));
         }
 
@@ -71,11 +71,11 @@ class ResourceController extends Controller
      * @param int               $status
      * @param array             $headers
      *
-     * @return JsonLdResponse
+     * @return Response
      */
     protected function getSuccessResponse(ResourceInterface $resource, $data, $status = 200, array $headers = [])
     {
-        return new JsonLdResponse(
+        return new Response(
             $this->get('serializer')->normalize($data, 'json-ld', $resource->getNormalizationContext()),
             $status,
             $headers
@@ -85,11 +85,11 @@ class ResourceController extends Controller
     /**
      * @param ConstraintViolationListInterface $violations
      *
-     * @return JsonLdResponse
+     * @return Response
      */
     protected function getErrorResponse(ConstraintViolationListInterface $violations)
     {
-        return new JsonLdResponse($this->get('serializer')->normalize($violations, 'hydra-error'), 400);
+        return new Response($this->get('serializer')->normalize($violations, 'hydra-error'), 400);
     }
 
     /**
@@ -104,7 +104,7 @@ class ResourceController extends Controller
      */
     protected function findOrThrowNotFound(ResourceInterface $resource, $id)
     {
-        $item = $resource->getDataProvider()->getItem($id, true);
+        $item = $this->get('api.data_provider')->getItem($resource, $id, true);
         if (!$item) {
             throw $this->createNotFoundException();
         }
@@ -124,18 +124,21 @@ class ResourceController extends Controller
     {
         $page = (int) $request->get('page', 1);
 
-        $filters = [];
-        foreach ($resource->getFilters() as $resourceFilter) {
-            if (null !== $value = $request->get($resourceFilter['name'])) {
-                $resourceFilter['value'] = $value;
-                $filters[] = $resourceFilter;
-            }
+        $itemsPerPage = $this->container->getParameter('api.default.items_per_page');
+        $order = $this->container->getParameter('api.default.order');
+        if ($order) {
+            $order = ['id' => $order];
+        } else {
+            $order = [];
         }
 
-        $itemsPerPage = $this->container->getParameter('dunglas_json_ld_api.default.items_per_page');
-        $order = $this->container->getParameter('dunglas_json_ld_api.default.order');
-
-        return $resource->getDataProvider()->getCollection($page, $filters, $itemsPerPage, $order);
+        return $this->get('api.data_provider')->getCollection(
+            $resource,
+            $request->query->getIterator()->getArrayCopy(),
+            $order,
+            $page,
+            $itemsPerPage
+        );
     }
 
     /**
@@ -143,7 +146,7 @@ class ResourceController extends Controller
      *
      * @param Request $request
      *
-     * @return JsonLdResponse
+     * @return Response
      *
      * @throws \InvalidArgumentException
      */
@@ -162,11 +165,11 @@ class ResourceController extends Controller
      *
      * @param Request $request
      *
-     * @return JsonLdResponse
+     * @return Response
      *
      * @throws DeserializationException
      */
-    public function postAction(Request $request)
+    public function cpostAction(Request $request)
     {
         $resource = $this->getResource($request);
         try {
@@ -199,7 +202,7 @@ class ResourceController extends Controller
      * @param Request $request
      * @param int     $id
      *
-     * @return JsonLdResponse
+     * @return Response
      *
      * @throws NotFoundHttpException
      * @throws \InvalidArgumentException
@@ -220,7 +223,7 @@ class ResourceController extends Controller
      * @param Request $request
      * @param string  $id
      *
-     * @return JsonLdResponse
+     * @return Response
      *
      * @throws DeserializationException
      */
@@ -262,7 +265,7 @@ class ResourceController extends Controller
      * @param Request $request
      * @param string  $id
      *
-     * @return JsonLdResponse
+     * @return Response
      *
      * @throws NotFoundHttpException
      * @throws \InvalidArgumentException
@@ -274,6 +277,6 @@ class ResourceController extends Controller
 
         $this->get('event_dispatcher')->dispatch(Events::PRE_DELETE, new ObjectEvent($resource, $object));
 
-        return new JsonLdResponse(null, 204);
+        return new Response(null, 204);
     }
 }

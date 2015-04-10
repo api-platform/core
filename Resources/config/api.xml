@@ -5,52 +5,27 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="dunglas_json_ld_api.resource" class="Dunglas\JsonLdApiBundle\JsonLd\Resource" public="false" abstract="true" />
+        <service id="api.resource" class="Dunglas\JsonLdApiBundle\Api\Resource" public="false" abstract="true" />
 
-        <service id="dunglas_json_ld_api.resource_collection" class="Dunglas\JsonLdApiBundle\JsonLd\ResourceCollection">
-            <argument type="service" id="dunglas_json_ld_api.router" />
+        <service id="api.resource_collection" class="Dunglas\JsonLdApiBundle\Api\ResourceCollection" />
+
+        <service id="api.data_provider" class="Dunglas\JsonLdApiBundle\Model\DataProviderChain">
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.router" />
         </service>
 
-        <service id="dunglas_json_ld_api.routing.resources_loader" class="Dunglas\JsonLdApiBundle\Routing\ResourcesLoader">
-            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
+        <service id="api.operation_factory" class="Dunglas\JsonLdApiBundle\Api\Operation\OperationFactory" public="false" />
+
+        <service id="api.route_loader" class="Dunglas\JsonLdApiBundle\Routing\ApiLoader" public="false">
+            <argument type="service" id="api.resource_collection" />
 
             <tag name="routing.loader" />
         </service>
 
-        <service id="dunglas_json_ld_api.router" class="Dunglas\JsonLdApiBundle\Routing\Router" public="false">
+        <service id="api.router" class="Dunglas\JsonLdApiBundle\Routing\Router" public="false">
             <argument type="service" id="router" />
-        </service>
-
-        <service id="dunglas_json_ld_api.entrypoint_builder" class="Dunglas\JsonLdApiBundle\JsonLd\EntrypointBuilder">
-            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
-            <argument type="service" id="dunglas_json_ld_api.router" />
-        </service>
-
-        <service id="dunglas_json_ld_api.api_documentation_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ApiDocumentationBuilder">
-            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
-            <argument type="service" id="dunglas_json_ld_api.context_builder" />
-            <argument type="service" id="dunglas_json_ld_api.router" />
-            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
-            <argument>%dunglas_json_ld_api.title%</argument>
-            <argument>%dunglas_json_ld_api.description%</argument>
-        </service>
-
-        <service id="dunglas_json_ld_api.context_builder" class="Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder">
-            <argument type="service" id="dunglas_json_ld_api.router" />
-            <argument type="service" id="dunglas_json_ld_api.mapping.class_metadata_factory" />
-            <argument type="service" id="dunglas_json_ld_api.resource_collection" />
-        </service>
-
-        <service id="dunglas_json_ld_api.link_header_response_listener" class="Dunglas\JsonLdApiBundle\EventListener\LinkHeaderResponseListener">
-            <argument type="service" id="router" />
-
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
-        </service>
-
-        <service id="dunglas_json_ld_api.request_exception_listener" class="Dunglas\JsonLdApiBundle\EventListener\RequestExceptionListener">
-            <argument type="service" id="dunglas_json_ld_api.normalizer.error" />
-
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="property_accessor" />
         </service>
     </services>
 

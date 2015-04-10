@@ -11,6 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\JsonLd;
 
+use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -45,13 +46,13 @@ class EntrypointBuilder
     public function getEntrypoint()
     {
         $entrypoint = [
-            '@context' => $this->router->generate('json_ld_api_entrypoint_context'),
-            '@id' => $this->router->generate('json_ld_api_entrypoint'),
+            '@context' => $this->router->generate('api_json_ld_entrypoint_context'),
+            '@id' => $this->router->generate('api_json_ld_entrypoint'),
             '@type' => 'Entrypoint',
         ];
 
         foreach ($this->resourceCollection as $resource) {
-            $entrypoint[$resource->getBeautifiedName()] = $this->router->generate($resource->getCollectionRouteName());
+            $entrypoint[lcfirst($resource->getShortName())] = $this->router->generate($resource);
         }
 
         return $entrypoint;

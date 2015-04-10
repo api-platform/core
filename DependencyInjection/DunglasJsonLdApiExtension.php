@@ -13,7 +13,6 @@ namespace Dunglas\JsonLdApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -54,39 +53,38 @@ class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInt
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('dunglas_json_ld_api.title', $config['title']);
-        $container->setParameter('dunglas_json_ld_api.description', $config['description']);
-        $container->setParameter('dunglas_json_ld_api.default.items_per_page', $config['default']['items_per_page']);
-        $container->setParameter('dunglas_json_ld_api.default.order', $config['default']['order']);
+        $container->setParameter('api.title', $config['title']);
+        $container->setParameter('api.description', $config['description']);
+        $container->setParameter('api.default.items_per_page', $config['default']['items_per_page']);
+        $container->setParameter('api.default.order', $config['default']['order']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('doctrine_orm.xml');
-        $loader->load('property_info.xml');
-        $loader->load('serializer.xml');
-        $loader->load('metadata.xml');
         $loader->load('api.xml');
+        $loader->load('property_info.xml');
+        $loader->load('mapping.xml');
+        $loader->load('doctrine_orm.xml');
 
+        // JSON-LD and Hydra support
+        $loader->load('json_ld.xml');
+        $loader->load('hydra.xml');
+
+        // FOSUser support
         if ($config['enable_fos_user_event_subscriber']) {
-            $definition = new Definition(
-                'Dunglas\JsonLdApiBundle\FosUser\EventSubscriber',
-                [new Reference('event_dispatcher'), new Reference('fos_user.user_manager')]
-            );
-            $definition->setTags(['kernel.event_subscriber' => []]);
-
-            $container->setDefinition('dunglas_json_ld_api.event_subscriber.fos_user', $definition);
+            $loader->load('fos_user.xml');
         }
 
+        // Cache
         if (isset($config['cache']) && $config['cache']) {
             $container->setParameter(
-                'dunglas_json_ld_api.mapping.cache.prefix',
-                'dunglas_json_ld_api_'.hash('sha256', $container->getParameter('kernel.root_dir'))
+                'api.mapping.cache.prefix',
+                'api_'.hash('sha256', $container->getParameter('kernel.root_dir'))
             );
 
-            $container->getDefinition('dunglas_json_ld_api.mapping.class_metadata_factory')->addArgument(
+            $container->getDefinition('api.mapping.class_metadata_factory')->addArgument(
                 new Reference($config['cache'])
             );
         } else {
-            $container->removeDefinition('dunglas_json_ld_api.cache_warmer.metadata');
+            $container->removeDefinition('api.cache_warmer.metadata');
         }
     }
 }

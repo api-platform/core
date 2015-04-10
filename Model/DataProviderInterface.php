@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Model;
 
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
+use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
 
 /**
  * Data provider interface.
@@ -21,31 +21,44 @@ use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 interface DataProviderInterface
 {
     /**
-     * Initializes resource.
-     *
-     * @param ResourceInterface $resource
-     */
-    public function initResource(ResourceInterface $resource);
-
-    /**
      * Retrieves an item.
      *
-     * @param int  $id
-     * @param bool $fetchData
+     * @param ResourceInterface $resource
+     * @param int|string        $id
+     * @param bool              $fetchData
      *
-     * @return object
+     * @return object|null
      */
-    public function getItem($id, $fetchData = false);
+    public function getItem(ResourceInterface $resource, $id, $fetchData = false);
+
+    /**
+     * Retrieves an item from its IRI.
+     *
+     * @param string $iri
+     * @param bool   $fetchData
+     *
+     * @return object|null
+     */
+    public function getItemFromIri($iri, $fetchData = false);
 
     /**
      * Retrieves a collection.
      *
-     * @param int         $page
-     * @param array       $filters
-     * @param int|null    $itemsPerPage
-     * @param string|null $order
+     * @param array    $filters
+     * @param int|null $page
+     * @param int|null $itemsPerPage
+     * @param array    $order
      *
-     * @return PaginatorInterface
+     * @return PaginatorInterface|array|\Traversable
      */
-    public function getCollection($page, array $filters, $itemsPerPage = null, $order = null);
+    public function getCollection(ResourceInterface $resource, array $filters = [], array $order = [], $page = null, $itemsPerPage = null);
+
+    /**
+     * Does this DataProvider supports the given resource.
+     *
+     * @param ResourceInterface $resource
+     *
+     * @return bool
+     */
+    public function supports(ResourceInterface $resource);
 }
