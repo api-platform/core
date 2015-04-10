@@ -11,6 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
+use Doctrine\Common\Util\ClassUtils;
 use PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -30,34 +31,41 @@ trait ResourceResolver
     /**
      * Guesses the associated resource.
      *
-     * @param mixed      $type
+     * @param mixed      $object
      * @param array|null $context
+     * @param bool       $strict
      *
      * @return \Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface
      *
      * @throws InvalidArgumentException
      */
-    public function guessResource($type, array $context = null)
+    public function guessResource($object, array $context = null, $strict = false)
     {
-        if (isset($context['resource'])) {
-            return $context['resource'];
-        }
-
+        $type = $object;
         if (is_object($type)) {
-            $type = get_class($type);
+            $type = $this->getObjectClass($type);
         }
-
         if (!is_string($type)) {
             $type = gettype($type);
         }
 
-        if ($resource = $this->resourceCollection->getResourceForEntity($type)) {
-            return $resource;
+        if (isset($context['resource'])) {
+            $resource = $context['resource'];
+        } else {
+            $resource = $this->resourceCollection->getResourceForEntity($type);
         }
 
-        throw new InvalidArgumentException(
-            sprintf('Cannot find a resource object for type "%s".', $type)
-        );
+        if (null === $resource) {
+            throw new InvalidArgumentException(
+                sprintf('Cannot find a resource object for type "%s".', $type)
+            );
+        } else if ($strict && is_object($object) && $resource->getEntityClass() !== $type) {
+            throw new InvalidArgumentException(
+                sprintf('No resource found for object of type "%s"', $type)
+            );
+        }
+
+        return $resource;
     }
 
     /**
@@ -76,5 +84,17 @@ trait ResourceResolver
         ) {
             return $class;
         }
+    }
+
+    /**
+     * Get class name of the given object.
+     *
+     * @param object $object
+     *
+     * @return string
+     */
+    private function getObjectClass($object)
+    {
+        return class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);
     }
 }

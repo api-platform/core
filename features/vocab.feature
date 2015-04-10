@@ -180,6 +180,19 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
+                            "@id": "#RelatedDummy\/unknown",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "unknown",
+                            "domain": "https://schema.org/Product"
+                        },
+                        "hydra:title": "unknown",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
                             "@id": "#RelatedDummy/age",
                             "@type": "rdf:Property",
                             "rdfs:label": "age",

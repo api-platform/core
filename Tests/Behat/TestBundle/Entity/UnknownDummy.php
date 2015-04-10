@@ -11,40 +11,26 @@
 
 namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity;
 
-use Dunglas\JsonLdApiBundle\Annotation\Iri;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Dunglas\JsonLdApiBundle\Annotation\Iri;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Related Dummy.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * UnknownDummy.
  *
  * @ORM\Entity
- * @Iri("https://schema.org/Product")
  */
-class RelatedDummy extends ParentDummy
+class UnknownDummy
 {
     /**
+     * @var int The id.
+     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-    /**
-     * @ORM\Column
-     * @Groups({"barcelona"})
-     */
-    public $symfony = 'symfony';
-    /**
-     * @ORM\ManyToOne(targetEntity="UnknownDummy", cascade={"persist"})
-     */
-    public $unknown;
-
-    public function setUnknown()
-    {
-        $this->unknown = new UnknownDummy();
-    }
 
     public function getId()
     {
