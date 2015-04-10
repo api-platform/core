@@ -143,7 +143,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes the resource collection.
+     *
+     * @param ResourceCollectionInterface $resourceCollection
      */
     public function initResourceCollection(ResourceCollectionInterface $resourceCollection)
     {
@@ -159,7 +161,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes filters.
+     *
+     * @param array $filters
      */
     public function initFilters(array $filters)
     {
@@ -185,7 +189,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes normalization context.
+     *
+     * @param array $normalizationContext
      */
     public function initNormalizationContext(array $normalizationContext)
     {
@@ -213,7 +219,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes denormalization context.
+     *
+     * @param array $denormalizationContext
      */
     public function initDenormalizationContext(array $denormalizationContext)
     {
@@ -241,7 +249,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes validation groups.
+     *
+     * @param array $validationGroups
      */
     public function initValidationGroups(array $validationGroups)
     {
@@ -257,7 +267,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes short name.
+     *
+     * @param string $shortName
      */
     public function initShortName($shortName)
     {
@@ -273,7 +285,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes controller name.
+     *
+     * @param string $controllerName
      */
     public function initControllerName($controllerName)
     {
@@ -330,7 +344,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes item operations.
+     *
+     * @param array $itemOperations
      */
     public function initItemOperations(array $itemOperations)
     {
@@ -354,7 +370,9 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes collection operations.
+     *
+     * @param array $collectionOperations
      */
     public function initCollectionOperations(array $collectionOperations)
     {

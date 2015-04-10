@@ -36,13 +36,6 @@ interface ResourceInterface
     public function getDataProvider();
 
     /**
-     * Initializes the resource collection.
-     *
-     * @param ResourceCollectionInterface $resourceCollection
-     */
-    public function initResourceCollection(ResourceCollectionInterface $resourceCollection);
-
-    /**
      * Gets resource collection.
      *
      * @return ResourceCollectionInterface
@@ -50,25 +43,11 @@ interface ResourceInterface
     public function getResourceCollection();
 
     /**
-     * Initializes filters.
-     *
-     * @param array $filters
-     */
-    public function initFilters(array $filters);
-
-    /**
      * Gets filters available for this resource.
      *
      * @return array
      */
     public function getFilters();
-
-    /**
-     * Initializes normalization context.
-     *
-     * @param array $normalizationContext
-     */
-    public function initNormalizationContext(array $normalizationContext);
 
     /**
      * Gets the normalization context.
@@ -85,13 +64,6 @@ interface ResourceInterface
     public function getNormalizationGroups();
 
     /**
-     * Initializes denormalization context.
-     *
-     * @param array $denormalizationContext
-     */
-    public function initDenormalizationContext(array $denormalizationContext);
-
-    /**
      * Gets the denormalization context.
      *
      * @return array
@@ -106,13 +78,6 @@ interface ResourceInterface
     public function getDenormalizationGroups();
 
     /**
-     * Initializes validation groups.
-     *
-     * @param array $validationGroups
-     */
-    public function initValidationGroups(array $validationGroups);
-
-    /**
      * Gets validation groups to use.
      *
      * @return string[]|null
@@ -120,25 +85,11 @@ interface ResourceInterface
     public function getValidationGroups();
 
     /**
-     * Initializes short name.
-     *
-     * @param string $shortName
-     */
-    public function initShortName($shortName);
-
-    /**
      * Gets the short name (display name) of the resource.
      *
      * @return string
      */
     public function getShortName();
-
-    /**
-     * Initializes controller name.
-     *
-     * @param string $controllerName
-     */
-    public function initControllerName($controllerName);
 
     /**
      * Gets the controller name.
@@ -169,25 +120,11 @@ interface ResourceInterface
     public function getItemRouteName();
 
     /**
-     * Initializes item operations.
-     *
-     * @param array $itemOperations
-     */
-    public function initItemOperations(array $itemOperations);
-
-    /**
      * Gets item operations.
      *
      * @return array
      */
     public function getItemOperations();
-
-    /**
-     * Initializes collection operations.
-     *
-     * @param array $collectionOperations
-     */
-    public function initCollectionOperations(array $collectionOperations);
 
     /**
      * Get collection operations.
