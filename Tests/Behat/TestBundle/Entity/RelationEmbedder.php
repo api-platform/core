@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Relation Embedder.
+ * Relation embedder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *

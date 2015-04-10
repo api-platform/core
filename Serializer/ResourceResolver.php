@@ -11,6 +11,8 @@
 
 namespace Dunglas\JsonLdApiBundle\Serializer;
 
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
+use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
 use Doctrine\Common\Util\ClassUtils;
 use PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -24,7 +26,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 trait ResourceResolver
 {
     /**
-     * @var \Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface
+     * @var ResourceCollectionInterface
      */
     private $resourceCollection;
 
@@ -35,16 +37,19 @@ trait ResourceResolver
      * @param array|null $context
      * @param bool       $strict
      *
-     * @return \Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface
+     * @return ResourceInterface
      *
      * @throws InvalidArgumentException
      */
     public function guessResource($object, array $context = null, $strict = false)
     {
         $type = $object;
+
         if (is_object($type)) {
             $type = $this->getObjectClass($type);
+            $isObject = true;
         }
+
         if (!is_string($type)) {
             $type = gettype($type);
         }
@@ -59,7 +64,9 @@ trait ResourceResolver
             throw new InvalidArgumentException(
                 sprintf('Cannot find a resource object for type "%s".', $type)
             );
-        } else if ($strict && is_object($object) && $resource->getEntityClass() !== $type) {
+        }
+
+        if ($strict && isset($isObject) && $resource->getEntityClass() !== $type) {
             throw new InvalidArgumentException(
                 sprintf('No resource found for object of type "%s"', $type)
             );

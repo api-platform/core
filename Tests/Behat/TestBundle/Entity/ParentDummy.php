@@ -14,7 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Parent Dummy.
+ * Parent dummy.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
