@@ -5,8 +5,8 @@ This a work in progress under active development.
 This bundle relies heavily on the Serializer of Symfony 2.7 and *is not usable in production yet*.
 
 [![JSON-LD enabled](http://json-ld.org/images/json-ld-button-88.png)](http://json-ld.org)
-[![Build Status](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle.svg)](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552/mini.png)](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552)
+[![Build Status](https://img.shields.io/travis/dunglas/DunglasJsonLdApiBundle.svg)](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle)
+[![SensioLabsInsight](https://img.shields.io/sensiolabs/i/a93f5a40-483f-4c46-ba09-3e1033b62552.svg)](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552)
 
 ## Features
 
