@@ -13,12 +13,8 @@ namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use Dunglas\JsonLdApiBundle\Api\Filter\FilterInterface;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
 use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\Exception\ExceptionInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Data provider for the Doctrine ORM.
@@ -28,40 +24,13 @@ use Symfony\Component\Routing\RouterInterface;
 class DataProvider implements DataProviderInterface
 {
     /**
-     * @var RouterInterface
-     */
-    private $router;
-    /**
      * @var ManagerRegistry
      */
     private $managerRegistry;
-    /**
-     * @var PropertyAccessorInterface
-     */
-    private $propertyAccessor;
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
 
-    public function __construct(
-        RouterInterface $router,
-        ManagerRegistry $managerRegistry,
-        PropertyAccessorInterface $propertyAccessor
-    ) {
-        $this->router = $router;
-        $this->managerRegistry = $managerRegistry;
-        $this->propertyAccessor = $propertyAccessor;
-    }
-
-    /**
-     * Initializes the root data provider.
-     *
-     * @param DataProviderInterface $dataProvider
-     */
-    public function initDataProvider(DataProviderInterface $dataProvider)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        $this->dataProvider = $dataProvider;
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -89,11 +58,6 @@ class DataProvider implements DataProviderInterface
         $manager = $this->managerRegistry->getManagerForClass($resource->getEntityClass());
         $repository = $manager->getRepository($entityClass);
 
-        if (count($filters)) {
-            $metadata = $manager->getClassMetadata($entityClass);
-            $fieldNames = array_flip($metadata->getFieldNames());
-        }
-
         $queryBuilder = $repository
             ->createQueryBuilder('o')
             ->setFirstResult(($page - 1) * $itemsPerPage)
@@ -102,32 +66,12 @@ class DataProvider implements DataProviderInterface
 
         foreach ($resource->getFilters() as $enabledFilter) {
             $filterName = $enabledFilter->getName();
-            $exact = FilterInterface::STRATEGY_EXACT === $enabledFilter->getStrategy();
 
-            if (!isset($filters[$filterName])) {
+            if (!isset($filters[$filterName]) && $enabledFilter instanceof FilterInterface) {
                 continue;
             }
 
-            $value = $filters[$filterName];
-
-            if (isset($fieldNames[$filterName])) {
-                if ('id' === $filterName) {
-                    $value = $this->getFilterValueFromUrl($value);
-                }
-
-                $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $filterName))
-                    ->setParameter($filterName, $exact ? $value : sprintf('%%%s%%', $value))
-                ;
-            } elseif ($metadata->isSingleValuedAssociation($filterName) || $metadata->isCollectionValuedAssociation($filterName)) {
-                $value = $this->getFilterValueFromUrl($value);
-
-                $queryBuilder
-                    ->join(sprintf('o.%s', $filterName), $filterName)
-                    ->andWhere(sprintf('%1$s.id = :%1$s', $filterName))
-                    ->setParameter($filterName, $exact ? $value : sprintf('%%%s%%', $value))
-                ;
-            }
+            $enabledFilter->apply($resource, $queryBuilder, $filters[$filterName]);
         }
 
         foreach ($order as $key => $value) {
@@ -151,25 +95,5 @@ class DataProvider implements DataProviderInterface
     public function supports(ResourceInterface $resource)
     {
         return null !== $this->managerRegistry->getManagerForClass($resource->getEntityClass());
-    }
-
-    /**
-     * Gets the ID from an URI or a raw ID.
-     *
-     * @param mixed $value
-     *
-     * @return string
-     */
-    private function getFilterValueFromUrl($value)
-    {
-        try {
-            if ($item = $this->dataProvider->getItemFromIri($value)) {
-                return $this->propertyAccessor->getValue($item, 'id');
-            }
-        } catch (ExceptionInterface $e) {
-            // Do nothing, return the raw value
-        }
-
-        return $value;
     }
 }

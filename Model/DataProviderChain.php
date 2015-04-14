@@ -13,6 +13,7 @@ namespace Dunglas\JsonLdApiBundle\Model;
 
 use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -64,7 +65,12 @@ class DataProviderChain implements DataProviderInterface
      */
     public function getItemFromIri($iri, $fetchData = false)
     {
-        $parameters = $this->router->match($iri);
+        try {
+            $parameters = $this->router->match($iri);
+        } catch (ResourceNotFoundException $e) {
+            return;
+        }
+
         if (
             !isset($parameters['_resource']) ||
             !isset($parameters['id']) ||

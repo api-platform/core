@@ -125,12 +125,8 @@ class ResourceController extends Controller
         $page = (int) $request->get('page', 1);
 
         $itemsPerPage = $this->container->getParameter('api.default.items_per_page');
-        $order = $this->container->getParameter('api.default.order');
-        if ($order) {
-            $order = ['id' => $order];
-        } else {
-            $order = [];
-        }
+        $defaultOrder = $this->container->getParameter('api.default.order');
+        $order = $defaultOrder ? ['id' => $defaultOrder] : [];
 
         return $this->get('api.data_provider')->getCollection(
             $resource,

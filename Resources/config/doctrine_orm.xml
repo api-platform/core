@@ -17,15 +17,14 @@
         </service>
 
         <service id="api.doctrine.orm.data_provider" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataProvider" public="false">
-            <argument type="service" id="api.router" />
             <argument type="service" id="doctrine" />
-            <argument type="service" id="property_accessor" />
-
-            <call method="initDataProvider">
-                <argument type="service" id="api.data_provider" />
-            </call>
 
             <tag name="api.data_provider" />
+        </service>
+
+        <service id="api.doctrine.orm.filter" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\Filter" public="false" abstract="true">
+            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="property_accessor" />
         </service>
     </services>
 

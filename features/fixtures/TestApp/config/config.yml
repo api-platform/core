@@ -31,13 +31,11 @@ dunglas_json_ld_api:
 
 services:
     my_dummy_resource.filter.id:
-        class:                      "Dunglas\JsonLdApiBundle\Api\Filter\Filter"
-        public:                     false
+        parent:                     "api.doctrine.orm.filter"
         arguments:                  [ "id" ]
 
     my_dummy_resource.filter.name:
-        class:                      "Dunglas\JsonLdApiBundle\Api\Filter\Filter"
-        public:                     false
+        parent:                     "api.doctrine.orm.filter"
         arguments:                  [ "name", "partial" ]
 
     my_dummy_resource:

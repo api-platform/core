@@ -18,19 +18,10 @@ namespace Dunglas\JsonLdApiBundle\Api\Filter;
  */
 interface FilterInterface
 {
-    const STRATEGY_EXACT = 'exact';
-
     /**
-     * Gets name.
+     * Gets filter name.
      *
      * @return string
      */
     public function getName();
-
-    /**
-     * Gets comparison strategy.
-     *
-     * @return string
-     */
-    public function getStrategy();
 }
