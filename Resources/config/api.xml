@@ -18,6 +18,7 @@
 
         <service id="api.route_loader" class="Dunglas\JsonLdApiBundle\Routing\ApiLoader" public="false">
             <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="kernel" />
 
             <tag name="routing.loader" />
         </service>

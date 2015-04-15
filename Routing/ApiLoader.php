@@ -14,6 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Routing;
 use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -35,10 +36,10 @@ class ApiLoader extends Loader
      */
     private $fileLoader;
 
-    public function __construct(ResourceCollectionInterface $resourceCollection)
+    public function __construct(ResourceCollectionInterface $resourceCollection, KernelInterface $kernel)
     {
         $this->resourceCollection = $resourceCollection;
-        $this->fileLoader = new XmlFileLoader(new FileLocator(__DIR__.'/../Resources/config/routing'));
+        $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@DunglasJsonLdApiBundle/Resources/config/routing')));
     }
 
     /**
