@@ -1,5 +1,5 @@
 # DunglasJsonLdApiBundle
-**JSON-LD + Hydra REST API generator for Symfony**
+**JSON-LD + Hydra REST API system for Symfony**
 
 This a work in progress under active development.
 This bundle relies heavily on the Serializer of Symfony 2.7 and *is not usable in production yet*.
@@ -43,11 +43,11 @@ Then, update your `app/config/AppKernel.php` file:
 ```php
     public function registerBundles()
     {
-        $bundles = array(
+        $bundles = [
             // ...
             new Dunglas\JsonLdApiBundle\DunglasJsonLdApiBundle(),
             // ...
-        );
+        ];
 
         return $bundles;
     }
@@ -56,13 +56,9 @@ Then, update your `app/config/AppKernel.php` file:
 Register the routes of our API by adding the following lines to `app/config/routing.yml`:
 
 ```yaml
-api_doc:
-    resource: "@DunglasJsonLdApiBundle/Resources/config/routing.xml"
-    prefix:   "/api" # Optional
-
 api:
     resource: "."
-    type:     "json-ld"
+    type:     "api"
     prefix:   "/api" # Optional
 ```
 
@@ -160,14 +156,14 @@ Register the following services (for example in `app/config/services.yml`):
 ```yaml
 services:
     resource.product:
-        parent:    "dunglas_json_ld_api.resource"
+        parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
-        tags:      [ { name: "json-ld.resource" } ]
+        tags:      [ { name: "api.resource" } ]
 
     resource.offer:
-        parent:    "dunglas_json_ld_api.resource"
+        parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer" ]
-        tags:      [ { name: "json-ld.resource" } ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 **You're done!**
@@ -185,42 +181,77 @@ Installing it will give you access to a human-readable documentation and a nice 
 
 ### Filters
 
-#### Fields
+The bundle provides a generic system to apply filters on collections. It is shipped with built-in Doctrine ORM supports
+and can be extended to fit your specific needs.
 
-How to expose filters on collections? Just register them in your services definition.
+By default all filters are disabled. They must be enabled manually.
+
+#### Doctrine ORM filters
+
+If the Doctrine ORM support is enabled, adding filters is as easy as adding an entry in your `app/config/services.yml` file.
+It supports exact and partial matching strategies. If the partial strategy is specified, a SQL query with a `LIKE %text to search%`
+query will be automatically issued.
 
 To allow filtering the list of offers:
 
 ```yaml
 services:
+    resource.offer.filter.id:
+        parent:                  "api.doctrine.orm.filter"
+        arguments:               [ "id" ] # Filters on the id property, allow both numeric values and IRIs
+
+    resource.offer.filter.price:
+        parent:                  "api.doctrine.orm.filter"
+        arguments:               [ "price" ] # Extracts all collection elements with the exact given price
+
+    resource.offer.filter.name:
+        parent:                  "api.doctrine.orm.filter"
+        arguments:               [ "name", "partial" ] # Elements with given text in their name
+
     resource.offer:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Offer" ]
-        calls:     [ [ "initFilters", [ [ { "name": "price" }, { "name": "name", "exact": false } ] ] ] ]
-        tags:      [ { name: "json-ld.resource" } ]
+        parent:                 "api.resource"
+        arguments:              [ "AppBundle\Entity\Offer" ]
+        calls:
+                                 - [ "addFilter", [ "@resource.offer.filter.id" ] ]
+                                 - [ "addFilter", [ "@resource.offer.filter.price" ] ]
+                                 - [ "addFilter", [ "@resource.offer.filter.name" ] ]
+        tags:                    [ { name: "api.resource" } ]
 ```
 
 `http://localhost:8000/api/offers?price=10` will return all offers with a price being exactly `10`.
 `http://localhost:8000/api/offers?name=shirt` will returns all offer with a description containing the word "shirt".
 
-#### Relations
+Filters can be combined together: `http://localhost:8000/api/offers?price=10&name=shirt`
 
 It also possible to filter by relations:
 
 ```yaml
 services:
+    resource.offer.filter.product:
+        parent:                    "api.doctrine.orm.filter"
+        arguments:                 [ "product" ]
+
     resource.offer:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Offer"] 
-        calls:     [ [ "initFilters", [ [ { "name": "product" } ] ] ] ]
-        tags:      [ { name: "json-ld.resource" } ]
+        parent:                    "api.resource"
+        arguments:                 [ "AppBundle\Entity\Offer"] 
+        calls:
+                                   - [ "addFilter", [ "@resource.offer.filter.product" ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 With this service definition, it is possible to find all offers for the given product.
-Try the following: `http://localhost:8000/api/offers?product=/api/products/1`
+Try the following: `http://localhost:8000/api/offers?product=/api/products/12`
+Using a numeric ID will also work: `http://localhost:8000/api/offers?product=12`
 
-It will return all offers for the product having the JSON-LD identifier (`@id`) `http://localhost:8000/api/products/1`.
+It will return all offers for the product having the JSON-LD identifier (`@id`) `http://localhost:8000/api/products/12`.
 
+#### Creating custom filters
+
+Custom filters can be written by implementing the `Dunglas\JsonLdApiBundle\Api\Filter\FilterInterface` interface
+Doctrine ORM filters must implement the `Dunglas\JsonLdApiBundle\Doctrine\Orm\FilterInterface`. They can interact directly
+with the Doctrine `QueryBuilder`.
+
+Don't forget to register your custom filters with the `Dunglas\JsonLdApiBundle\Api\Resource::addFilter()` method.
 
 ### Serialization groups
 
@@ -230,12 +261,12 @@ in the Serializer component. Specifying to the API system the groups to use is d
 ```yaml
 services:
     resource.product:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
+        parent:       "api.resource"
+        arguments:    [ "AppBundle\Entity\Product" ]
         calls:
-            -      [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
-            -      [ "initDenormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
-        tags:      [ { name: "json-ld.resource" } ]
+            -         [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
+            -         [ "initDenormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
+        tags:         [ { name: "api.resource" } ]
 ```
 
 The built-in controller and the Hydra documentation generator will leverage specified serialization and deserialization
@@ -321,10 +352,10 @@ services:
     # ...
 
     resource.offer:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Offer" ]
-        calls:     [ [ "initNormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
-        tags:      [ { name: "json-ld.resource" } ]
+        parent:     "api.resource"
+        arguments:  [ "AppBundle\Entity\Offer" ]
+        calls:      [ [ "initNormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
+        tags:       [ { name: "api.resource" } ]
 ```
 
 The generated JSON with previous settings will be like the following:
@@ -352,10 +383,10 @@ To take care of them, edit your service declaration and add groups you want to u
 ```yaml
 services:
     resource.product:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:     [ [ "initValidationGroups", [ [ "group1", "group2" ] ] ] ]
-        tags:      [ { name: "json-ld.resource" } ]
+        parent:       "api.resource"
+        arguments:    [ "AppBundle\Entity\Product" ]
+        calls:        [ [ "initValidationGroups", [ [ "group1", "group2" ] ] ] ]
+        tags:         [ { name: "api.resource" } ]
 ```
 
 With the previous definition, the validations groups `group1` and `group2` will be used when the validation occurs.
@@ -366,28 +397,28 @@ The bundle provides a powerful event system triggered in the object lifecycle. H
 
 #### Retrieve lists
 
-- `dunglas_json_ld_api.retrieve_list` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
+- `api.retrieve_list` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
 
 #### Retrieve item
 
-- `dunglas_json_ld_api.retrieve` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
+- `api.retrieve` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
 
 #### Create item
 
-- `dunglas_json_ld_api.pre_create_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
-- `dunglas_json_ld_api.pre_create` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
-- `dunglas_json_ld_api.post_create` (`Dunglas\JsonLdApiBundle\Event::POST_CREATE`): event occurs after the object persistence during `POST` request
+- `api.pre_create_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
+- `api.pre_create` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
+- `api.post_create` (`Dunglas\JsonLdApiBundle\Event::POST_CREATE`): event occurs after the object persistence during `POST` request
 
 #### Update item
 
-- `dunglas_json_ld_api.pre_update_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
-- `dunglas_json_ld_api.pre_update` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
-- `dunglas_json_ld_api.post_update` (`Dunglas\JsonLdApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
+- `api.pre_update_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
+- `api.pre_update` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
+- `api.post_update` (`Dunglas\JsonLdApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
 
 #### Delete item
 
-- `dunglas_json_ld_api.pre_delete` (`Dunglas\JsonLdApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
-- `dunglas_json_ld_api.post_delete` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
+- `api.pre_delete` (`Dunglas\JsonLdApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
+- `api.post_delete` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
 
 ### Metadata cache
 
@@ -397,7 +428,7 @@ To enable it in the prod environment (requires APCu to be installed), add the fo
 
 ```yaml
 dunglas_json_ld_api:
-    cache: dunglas_json_ld_api.mapping.cache.apc
+    cache: api.mapping.cache.apc
 ```
 
 DunglasJsonLdApiBundle leverages [Doctrine Cache](https://github.com/doctrine/cache) to abstract the cache backend. If
@@ -471,7 +502,7 @@ The generated JSON for products and the related context document will now use ex
 An extended list of existing open vocabularies is available on [the Linked Open Vocabularies (LOV) database](http://lov.okfn.org/dataset/lov/).
 
 
-### Disabling operations
+### Operations
 
 By default, the following operations are automatically enabled:
 
@@ -490,67 +521,141 @@ By default, the following operations are automatically enabled:
 | `PUT`    | Update an element                         |
 | `DELETE` | Delete an element                         |
 
-Sometimes, you want to disable some operations (e.g. the `DELETE` operation). `initCollectionOperations` and `initItemOperations`
-of the `Resource` class respectively allow to customize operations available for the collection and for items of the given
-resource.
+
+#### Disabling operations
+
+If you want to disable some operations (e.g. the `DELETE` operation), you must register manually applicable operations using
+the operation factory class, `Dunglas\JsonLdApiBundle\Resource::addCollectionOperation()` and `Dunglas\JsonLdApiBundle\Resource::addCollectionOperation()`
+methods.
 
 The following `Resource` definition exposes a `GET` operation for it's collection but not the `POST` one:
 
 ```yaml
 services:
-    resource.product:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:     [ [ "initCollectionOperations", [ [ { "hydra:method": "GET" } ] ] ] ]
-        tags:      [ { name: "json-ld.resource" } ]
-```
+    resource.product.collection_operation.get:
+        class:                                 "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                                false
+        factory:                               [ "@api.operation_factory", "createItemOperation" ]
+        arguments:                             [ "@resource.product", "GET" ]
 
-### Defining custom operations
+    resource.product:
+        parent:                                "api.resource"
+        arguments:                             [ "AppBundle\Entity\Product" ]
+            -                                  [ "addCollectionOperation", [ "@resource.product.collection_operation.get" ] ]
+        tags:                                  [ { name: "api.resource" } ]
+```
 
 Sometimes, it can be useful to create custom controller actions. DunglasJsonLdApiBundle allows to register custom operations
 for both collections and items. It will register them automatically in the Symfony routing system and will expose them in
-the Hydra vocab.
+the Hydra vocab (if enabled).
 
 ```yaml
-    my_relation_embedder_resource:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:     [ [ "initItemOperations", [ [
-                       { "hydra:method": "GET" },
-                       { "hydra:method": "PUT" }
-                       { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "AppBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/my_entities/{id}/custom", "returns": "xmls:string" }
-                   ] ] ] ]
+    resource.product.item_operation.get:
+        class:                                  "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                                 false
+        factory:                                [ "@api.operation_factory", "createItemOperation" ]
+        arguments:                              [ "@resource.product", "GET" ]
+
+    resource.product.item_operation.put:
+        class:                                  "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                                 false
+        factory:                                [ "@api.operation_factory", "createItemOperation" ]
+        arguments:                              [ "@resource.product", "PUT" ]
+
+
+    resource.product.item_operation.custom_get:
+        class:                                  "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                                 false
+        factory:                                [ "@api.operation_factory", "createItemOperation" ]
+        arguments:
+            -                                   "@resource.product"               # Resource
+            -                                   [ "GET", "HEAD" ]                 # Methods
+            -                                   "/products/{id}/custom" # Path
+            -                                   "AppBundle:Custom:custom"        # Controller
+            -                                   "my_custom_route"                 # Route name
+            -                                   # Context (will be present in Hydra documentation)
+                "@type":                        "hydra:Operation"
+                "hydra:title":                  "A custom operation"
+                "returns":                      "xmls:string"
+
+    resource.product:
+        parent:                                 "api.resource"
+        arguments:                              [ "AppBundle\Entity\Product" ]
+        calls:
+            -                                   [ "addItemOperation", [ "@resource.product.item_operation.get" ] ]
+            -                                   [ "addItemOperation", [ "@resource.product.item_operation.put" ] ]
+            -                                   [ "addItemOperation", [ "@resource.product.item_operation.custom_get" ] ]
+        tags:                                   [ { name: "api.resource" } ]
 ```
 
 Additionnaly to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
-the `/my_entities/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
+the `/products/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
 
 ### Using a custom `Resource` class
 
-When the size of your services definition start to grow, or when you want to customize the behavior of the `Resource` class
-it can be useful to extend the default one.
+When the size of your services definition start to grow, it is useful to create custom resources instead of using the default
+one. To do so, the `Dunglas\JsonLdApiBundle\Api\ResourceInterface` interface must be implemented.
 
 ```php
 <?php
 
-namespace AppBundle\JsonLd;
+namespace AppBundle\Api;
 
-use Dunglas\JsonLdApiBundle\JsonLd\Resource;
+use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
 
-class MyCustomResource extends Resource
+class MyCustomResource implements ResourceInterface
 {
-    public function __construct(
-        $entityClass = 'AppBundle\Entity\Offer',
-        array $filters = ['name' => 'price', 'exact' => true],
-        array $normalizationContext = ['groups' => ['offers']],
-        array $denormalizationContext = ['groups' => ['offers']],,
-        array $validationGroups = null,
-        $shortName = null,
-        array $collectionOperations = ['hydra:method' => 'GET'],
-        array $itemOperations = ['hydra:method' => 'GET', 'hydra:method' => 'PUT'],
-        $controllerName = 'AppBundle:Controller:Custom'
-    ) {
-        parent::__construct($entityClass, $filters, $normalizationContext, $denormalizationContext, $validationGroups, $shortName, $collectionOperations, $itemOperations, $controllerName);
+    public function getEntityClass()
+    {
+        return 'AppBundle\Entity\MyCustomOne';
+    }
+    
+    public function getItemOperations() {
+        return [
+            new MyItemOperation();
+        ];
+    }
+    
+    public function getCollectionOperations()
+    {
+        return [
+            new MyCollectionOperation();
+        ];
+    }
+
+    public function getFilters()
+    {
+        return [];
+    }
+    
+    public function getNormalizationContext()
+    {
+        return [];
+    }
+
+    public function getNormalizationGroups()
+    {
+        return null;
+    }
+    
+    public function getDenormalizationContext()
+    {
+        return [];
+    }
+
+    public function getDenormalizationGroups()
+    {
+        return null;
+    }
+
+    public function getValidationGroups()
+    {
+        return null;
+    }
+
+    public function getShortName()
+    {
+        return 'MyCustomOne';
     }
 }
 ```
@@ -560,23 +665,14 @@ The service definition can now be simplified:
 ```yaml
 services:
     resource.product:
-        parent:    "dunglas_json_ld_api.resource"
-        class:     "AppBundle\JsonLd\MyCustomResource"
-        tags:      [ { name: "json-ld.resource" } ]
+        parent:    "api.resource"
+        class:     "AppBundle\Api\MyCustomResource"
+        tags:      [ { name: "api.resource" } ]
 ```
 
 ### Using a custom controller
 
-If you want to customize the controller used for a `Resource` pass the controller name as its last constructor parameter:
-
-```yaml
-services:
-    resource.product:
-        parent:    "dunglas_json_ld_api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:     [ [ "initControllerName", [ "AppBundle:Custom" ] ] ]
-        tags:      [ { name: "json-ld.resource" } ]
-```
+A seen in the Operations section, it's possible to use custom controllers.
 
 Your custom controller should extend the `ResourceController` provided by this bundle. It provides convenient methods to
 retrieve the `Resource` class associated with the current request and to serialize entities in JSON-LD.
@@ -593,7 +689,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CustomController extends ResourceController
 {
-    # Customize the AppBundle:Custom:get
+    # Customize the AppBundle:Custom:custom
     public function getAction(Request $request, $id)
     {
         $this->get('logger')->info('This is my custom controller.');
@@ -664,7 +760,8 @@ angular.module('myAngularjsApp')
 
 ## Resources
 
-* [API-first et Linked Data avec Symfony](http://les-tilleuls.coop/slides/dunglas/slides-sfPot-2015-01-15/#/) (in french)
+* [A la découverte de API Platform (Symfony Paris Live 2015)](http://dunglas.fr/2015/04/mes-slides-du-symfony-live-2015-a-la-decouverte-de-api-platform/) (in french)
+* [API-first et Linked Data avec Symfony (sfPot Lille 2015)](http://les-tilleuls.coop/slides/dunglas/slides-sfPot-2015-01-15/#/) (in french)
 
 ## Credits
 
