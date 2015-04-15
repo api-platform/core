@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -10,8 +10,8 @@
  */
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Dunglas\JsonLdApiBundle\DunglasJsonLdApiBundle;
-use Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\TestBundle;
+use Dunglas\ApiBundle\DunglasApiBundle;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\TestBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -31,7 +31,7 @@ class AppKernel extends Kernel
         return [
             new FrameworkBundle(),
             new DoctrineBundle(),
-            new DunglasJsonLdApiBundle(),
+            new DunglasApiBundle(),
             new TestBundle(),
         ];
     }

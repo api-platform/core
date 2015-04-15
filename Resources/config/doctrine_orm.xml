@@ -9,20 +9,20 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="api.doctrine.event_subscriber" class="Dunglas\JsonLdApiBundle\Doctrine\EventSubscriber">
+        <service id="api.doctrine.event_subscriber" class="Dunglas\ApiBundle\Doctrine\EventSubscriber">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="doctrine" />
 
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="api.doctrine.orm.data_provider" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\DataProvider" public="false">
+        <service id="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider" public="false">
             <argument type="service" id="doctrine" />
 
             <tag name="api.data_provider" />
         </service>
 
-        <service id="api.doctrine.orm.filter" class="Dunglas\JsonLdApiBundle\Doctrine\Orm\Filter" public="false" abstract="true">
+        <service id="api.doctrine.orm.filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter" public="false" abstract="true">
             <argument type="service" id="api.data_provider" />
             <argument type="service" id="property_accessor" />
         </service>

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Doctrine;
+namespace Dunglas\ApiBundle\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\JsonLdApiBundle\Event\Events;
-use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
+use Dunglas\ApiBundle\Event\Events;
+use Dunglas\ApiBundle\Event\ObjectEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Bridges between Doctrine and DunglasJsonLdApiBundle.
+ * Bridges between Doctrine and DunglasApiBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

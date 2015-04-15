@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Mapping\Loader;
+namespace Dunglas\ApiBundle\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
-use Dunglas\JsonLdApiBundle\Mapping\ClassMetadata;
-use Dunglas\JsonLdApiBundle\Util\Reflection;
+use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Util\Reflection;
 
 /**
  * Annotation loader.
@@ -29,7 +29,7 @@ class AnnotationLoader implements LoaderInterface
     /**
      * @var string
      */
-    const IRI_ANNOTATION_NAME = 'Dunglas\JsonLdApiBundle\Annotation\Iri';
+    const IRI_ANNOTATION_NAME = 'Dunglas\ApiBundle\Annotation\Iri';
 
     /**
      * @var Reader

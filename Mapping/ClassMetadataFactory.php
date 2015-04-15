@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Mapping;
+namespace Dunglas\ApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
-use Dunglas\JsonLdApiBundle\Mapping\Loader\LoaderInterface;
+use Dunglas\ApiBundle\Mapping\Loader\LoaderInterface;
 
 /**
  * Class metadata factory for the JSON-LD normalizer.

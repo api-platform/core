@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Mapping\Loader;
+namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
-use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
-use Dunglas\JsonLdApiBundle\Mapping\ClassMetadata;
-use Dunglas\JsonLdApiBundle\Util\Reflection;
+use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Mapping\AttributeMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Util\Reflection;
 use PropertyInfo\PropertyInfoInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Hydra\Serializer;
+namespace Dunglas\ApiBundle\Hydra\Serializer;
 
-use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
-use Dunglas\JsonLdApiBundle\Api\ResourceResolver;
-use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
-use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
+use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceResolver;
+use Dunglas\ApiBundle\JsonLd\ContextBuilder;
+use Dunglas\ApiBundle\Model\PaginatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;

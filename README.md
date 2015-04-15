@@ -1,11 +1,11 @@
-# DunglasJsonLdApiBundle
+# DunglasApiBundle
 **JSON-LD + Hydra REST API system for Symfony**
 
 This a work in progress under active development.
 This bundle relies heavily on the Serializer of Symfony 2.7 and *is not usable in production yet*.
 
 [![JSON-LD enabled](http://json-ld.org/images/json-ld-button-88.png)](http://json-ld.org)
-[![Build Status](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle.svg)](https://travis-ci.org/dunglas/DunglasJsonLdApiBundle)
+[![Build Status](https://travis-ci.org/dunglas/DunglasApiBundle.svg)](https://travis-ci.org/dunglas/DunglasApiBundle)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552/mini.png)](https://insight.sensiolabs.com/projects/a93f5a40-483f-4c46-ba09-3e1033b62552)
 
 ## Features
@@ -36,7 +36,7 @@ It's a Symfony edition packaged with the best tools to develop a REST API and wi
 
 Alternatively, you can use [Composer](http://getcomposer.org) to install the standalone bundle in your project:
 
-`composer require dunglas/json-ld-api-bundle`
+`composer require dunglas/api-bundle`
 
 Then, update your `app/config/AppKernel.php` file:
 
@@ -45,7 +45,7 @@ Then, update your `app/config/AppKernel.php` file:
     {
         $bundles = [
             // ...
-            new Dunglas\JsonLdApiBundle\DunglasJsonLdApiBundle(),
+            new Dunglas\ApiBundle\DunglasApiBundle(),
             // ...
         ];
 
@@ -69,12 +69,12 @@ api:
 The first step is to name your API. Add the following lines in `app/config/config.yml`:
 
 ```yaml
-dunglas_json_ld_api:
-    title:       "Your API name"
-    description: "The full description of your API"
-default:                                               # optional
-    items_per_page: 30                                 # Number of items per page in paginated collections (optional)
-    order:          ~                                  # Default order: null for natural order, ASC or DESC (optional)
+dunglas_api:
+    title:              "Your API name"
+    description:        "The full description of your API"
+    default:                                               # optional
+        items_per_page: 30                                 # Number of items per page in paginated collections (optional)
+        order:          ~                                  # Default order: null for natural order, ASC or DESC (optional)
 ```
 
 The name and the description you give will be accessible trough the auto-generated Hydra documentation.
@@ -247,11 +247,11 @@ It will return all offers for the product having the JSON-LD identifier (`@id`) 
 
 #### Creating custom filters
 
-Custom filters can be written by implementing the `Dunglas\JsonLdApiBundle\Api\Filter\FilterInterface` interface
-Doctrine ORM filters must implement the `Dunglas\JsonLdApiBundle\Doctrine\Orm\FilterInterface`. They can interact directly
+Custom filters can be written by implementing the `Dunglas\ApiBundle\Api\Filter\FilterInterface` interface
+Doctrine ORM filters must implement the `Dunglas\ApiBundle\Doctrine\Orm\FilterInterface`. They can interact directly
 with the Doctrine `QueryBuilder`.
 
-Don't forget to register your custom filters with the `Dunglas\JsonLdApiBundle\Api\Resource::addFilter()` method.
+Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Resource::addFilter()` method.
 
 ### Serialization groups
 
@@ -274,7 +274,7 @@ to give access only to exposed properties and to guess if they are readable or/a
 
 ### Embedding relations
 
-By default, the serializer provided with DunglasJsonLdApiBundle will represent relations between objects by a dereferenceables
+By default, the serializer provided with DunglasApiBundle will represent relations between objects by a dereferenceables
 URIs. They allow to retrieve details of related objects by issuing an extra HTTP request.
 
 In the following JSON document, the relation from an offer to a product is represented by an URI:
@@ -422,28 +422,28 @@ The bundle provides a powerful event system triggered in the object lifecycle. H
 
 #### Retrieve lists
 
-- `api.retrieve_list` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
+- `api.retrieve_list` (`Dunglas\ApiBundle\Event::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
 
 #### Retrieve item
 
-- `api.retrieve` (`Dunglas\JsonLdApiBundle\Event::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
+- `api.retrieve` (`Dunglas\ApiBundle\Event::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
 
 #### Create item
 
-- `api.pre_create_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
-- `api.pre_create` (`Dunglas\JsonLdApiBundle\Event::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
-- `api.post_create` (`Dunglas\JsonLdApiBundle\Event::POST_CREATE`): event occurs after the object persistence during `POST` request
+- `api.pre_create_validation` (`Dunglas\ApiBundle\Event::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
+- `api.pre_create` (`Dunglas\ApiBundle\Event::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
+- `api.post_create` (`Dunglas\ApiBundle\Event::POST_CREATE`): event occurs after the object persistence during `POST` request
 
 #### Update item
 
-- `api.pre_update_validation` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
-- `api.pre_update` (`Dunglas\JsonLdApiBundle\Event::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
-- `api.post_update` (`Dunglas\JsonLdApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
+- `api.pre_update_validation` (`Dunglas\ApiBundle\Event::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
+- `api.pre_update` (`Dunglas\ApiBundle\Event::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
+- `api.post_update` (`Dunglas\ApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
 
 #### Delete item
 
-- `api.pre_delete` (`Dunglas\JsonLdApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
-- `api.post_delete` (`Dunglas\JsonLdApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
+- `api.pre_delete` (`Dunglas\ApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
+- `api.post_delete` (`Dunglas\ApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
 
 ### Metadata cache
 
@@ -456,7 +456,7 @@ dunglas_json_ld_api:
     cache: api.mapping.cache.apc
 ```
 
-DunglasJsonLdApiBundle leverages [Doctrine Cache](https://github.com/doctrine/cache) to abstract the cache backend. If
+DunglasApiBundle leverages [Doctrine Cache](https://github.com/doctrine/cache) to abstract the cache backend. If
 you want to use a custom cache backend such as Redis, Memcache or MongoDB, register a Doctrine Cache provider as a service
 and set the `cache` config key to the id of the custom service you created.
 
@@ -467,7 +467,7 @@ A built-in cache warmer will be automatically executed every time you clear or w
 JSON-LD allows to define classes and properties of your API with open vocabularies such as [Schema.org](https://schema.org)
 and [Good Relations](http://www.heppnetz.de/projects/goodrelations/).
 
-DunglasJsonLdApiBundle provides annotations usable on PHP classes and properties to specify a related external [IRI](http://en.wikipedia.org/wiki/Internationalized_resource_identifier).
+DunglasApiBundle provides annotations usable on PHP classes and properties to specify a related external [IRI](http://en.wikipedia.org/wiki/Internationalized_resource_identifier).
 
 
 ```php
@@ -477,7 +477,7 @@ DunglasJsonLdApiBundle provides annotations usable on PHP classes and properties
 
 namespace AppBundle\Entity;
 
-use Dunglas\JsonLdApiBundle\Annotation\Iri;
+use Dunglas\ApiBundle\Annotation\Iri;
 
 // ...
 
@@ -550,7 +550,7 @@ By default, the following operations are automatically enabled:
 #### Disabling operations
 
 If you want to disable some operations (e.g. the `DELETE` operation), you must register manually applicable operations using
-the operation factory class, `Dunglas\JsonLdApiBundle\Resource::addCollectionOperation()` and `Dunglas\JsonLdApiBundle\Resource::addCollectionOperation()`
+the operation factory class, `Dunglas\ApiBundle\Resource::addCollectionOperation()` and `Dunglas\ApiBundle\Resource::addCollectionOperation()`
 methods.
 
 The following `Resource` definition exposes a `GET` operation for it's collection but not the `POST` one:
@@ -558,7 +558,7 @@ The following `Resource` definition exposes a `GET` operation for it's collectio
 ```yaml
 services:
     resource.product.collection_operation.get:
-        class:     "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
         public:    false
         factory:   [ "@api.operation_factory", "createItemOperation" ]
         arguments: [ "@resource.product", "GET" ]
@@ -570,26 +570,26 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
-Sometimes, it can be useful to create custom controller actions. DunglasJsonLdApiBundle allows to register custom operations
+Sometimes, it can be useful to create custom controller actions. DunglasApiBundle allows to register custom operations
 for both collections and items. It will register them automatically in the Symfony routing system and will expose them in
 the Hydra vocab (if enabled).
 
 ```yaml
     resource.product.item_operation.get:
-        class:     "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
         public:    false
         factory:   [ "@api.operation_factory", "createItemOperation" ]
         arguments: [ "@resource.product", "GET" ]
 
     resource.product.item_operation.put:
-        class:     "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
         public:    false
         factory:   [ "@api.operation_factory", "createItemOperation" ]
         arguments: [ "@resource.product", "PUT" ]
 
 
     resource.product.item_operation.custom_get:
-        class:   "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:   "Dunglas\ApiBundle\Api\Operation\Operation"
         public:  false
         factory: [ "@api.operation_factory", "createItemOperation" ]
         arguments:
@@ -619,14 +619,14 @@ the `/products/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:
 ### Using a custom `Resource` class
 
 When the size of your services definition start to grow, it is useful to create custom resources instead of using the default
-one. To do so, the `Dunglas\JsonLdApiBundle\Api\ResourceInterface` interface must be implemented.
+one. To do so, the `Dunglas\ApiBundle\Api\ResourceInterface` interface must be implemented.
 
 ```php
 <?php
 
 namespace AppBundle\Api;
 
-use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 
 class MyCustomResource implements ResourceInterface
 {
@@ -709,7 +709,7 @@ Example of custom controller:
 
 namespace AppBundle\Controller;
 
-use Dunglas\JsonLdApiBundle\Controller\ResourceController;
+use Dunglas\ApiBundle\Controller\ResourceController;
 use Symfony\Component\HttpFoundation\Request;
 
 class CustomController extends ResourceController
@@ -726,7 +726,7 @@ class CustomController extends ResourceController
 
 ### AngularJS integration
 
-DunglasJsonLdApiBundle works fine with [AngularJS](http://angularjs.org). The popular [Restangular](https://github.com/mgonto/restangular)
+DunglasApiBundle works fine with [AngularJS](http://angularjs.org). The popular [Restangular](https://github.com/mgonto/restangular)
 REST client library for Angular can easily be configured to handle the API format.
 
 Here is a working Restangular config:

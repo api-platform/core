@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,15 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\JsonLd\Serializer;
+namespace Dunglas\ApiBundle\JsonLd\Serializer;
 
-use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
-use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
-use Dunglas\JsonLdApiBundle\Api\ResourceResolver;
-use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
-use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
-use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
-use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
+use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Api\ResourceResolver;
+use Dunglas\ApiBundle\JsonLd\ContextBuilder;
+use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\Mapping\AttributeMetadata;
+use Dunglas\ApiBundle\Model\DataProviderInterface;
 use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -348,7 +349,7 @@ class ItemNormalizer extends AbstractNormalizer
      * @param ResourceInterface $resource
      * @param array             $context
      *
-     * @return \Dunglas\JsonLdApiBundle\Mapping\ClassMetadataInterface
+     * @return ClassMetadata
      */
     private function getMetadata(ResourceInterface $resource, array $context)
     {

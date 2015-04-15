@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Api;
+namespace Dunglas\ApiBundle\Api;
 
-use Dunglas\JsonLdApiBundle\Api\Filter\FilterInterface;
-use Dunglas\JsonLdApiBundle\Api\Operation\OperationInterface;
+use Dunglas\ApiBundle\Api\Filter\FilterInterface;
+use Dunglas\ApiBundle\Api\Operation\OperationInterface;
 
 /**
  * Class representing an API resource.

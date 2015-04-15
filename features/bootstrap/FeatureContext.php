@@ -4,8 +4,8 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
-use Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 
 /**
  * Defines application features from the specific context.

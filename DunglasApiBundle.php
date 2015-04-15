@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle;
+namespace Dunglas\ApiBundle;
 
-use Dunglas\JsonLdApiBundle\DependencyInjection\Compiler\DataProviderPass;
-use Dunglas\JsonLdApiBundle\DependencyInjection\Compiler\ResourcePass;
+use Dunglas\ApiBundle\DependencyInjection\Compiler\DataProviderPass;
+use Dunglas\ApiBundle\DependencyInjection\Compiler\ResourcePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * DunglasJsonLdApiBundle.
+ * DunglasApiBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DunglasJsonLdApiBundle extends Bundle
+class DunglasApiBundle extends Bundle
 {
     /**
      * {@inheritDoc}

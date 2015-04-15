@@ -6,6 +6,6 @@
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="api_hydra_vocab" path="/vocab">
-        <default key="_controller">DunglasJsonLdApiBundle:Hydra:vocab</default>
+        <default key="_controller">DunglasApiBundle:Hydra:vocab</default>
     </route>
 </routes>
