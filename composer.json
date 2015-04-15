@@ -14,7 +14,7 @@
   ],
   "require": {
     "php": ">=5.5",
-    "symfony/serializer": "~3.0|~2.7@dev",
+    "symfony/serializer": "~3.0|~2.7@beta",
     "symfony/validator": "~2.5|~3.0",
     "symfony/framework-bundle": "~2.6|~3.0",
     "doctrine/orm": "~2.2,>=2.2.3",
@@ -24,7 +24,7 @@
     "phpdocumentor/reflection": "^1.0.7"
   },
   "require-dev": {
-    "symfony/symfony": "~2.7@dev",
+    "symfony/symfony": "~2.7@beta",
     "friendsofsymfony/user-bundle": "dev-master",
     "phpspec/phpspec": "~2.0",
     "behat/behat": "~3.0",

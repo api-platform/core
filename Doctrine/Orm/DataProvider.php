@@ -14,8 +14,7 @@ namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
-use Symfony\Component\Routing\Exception\ExceptionInterface;
+use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
 
 /**
  * Data provider for the Doctrine ORM.
@@ -25,17 +24,10 @@ use Symfony\Component\Routing\Exception\ExceptionInterface;
 class DataProvider implements DataProviderInterface
 {
     /**
-     * @var ResourceInterface
-     */
-    private $resource;
-    /**
      * @var ManagerRegistry
      */
     private $managerRegistry;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;
@@ -44,17 +36,9 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function initResource(ResourceInterface $resource)
+    public function getItem(ResourceInterface $resource, $id, $fetchData = false)
     {
-        $this->resource = $resource;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem($id, $fetchData = false)
-    {
-        $entityClass = $this->resource->getEntityClass();
+        $entityClass = $resource->getEntityClass();
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
 
         if ($fetchData || !method_exists($manager, 'getReference')) {
@@ -67,69 +51,49 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollection($page, array $filters, $itemsPerPage = 30, $order = null)
+    public function getCollection(ResourceInterface $resource, array $filters = [], array $order = [], $page = null, $itemsPerPage = null)
     {
-        $manager = $this->managerRegistry->getManagerForClass($this->resource->getEntityClass());
-        $repository = $manager->getRepository($this->resource->getEntityClass());
-        if (count($filters)) {
-            $metadata = $manager->getClassMetadata($this->resource->getEntityClass());
-            $fieldNames = array_flip($metadata->getFieldNames());
-        }
+        $entityClass = $resource->getEntityClass();
 
-        /*
-         * @var \Doctrine\ORM\QueryBuilder
-         */
+        $manager = $this->managerRegistry->getManagerForClass($resource->getEntityClass());
+        $repository = $manager->getRepository($entityClass);
+
         $queryBuilder = $repository
             ->createQueryBuilder('o')
             ->setFirstResult(($page - 1) * $itemsPerPage)
             ->setMaxResults($itemsPerPage)
         ;
 
-        foreach ($filters as $filter) {
-            if (isset($fieldNames[$filter['name']])) {
-                if ('id' === $filter['name']) {
-                    $filter['value'] = $this->getFilterValueFromUrl($filter['value']);
-                }
+        foreach ($resource->getFilters() as $enabledFilter) {
+            $filterName = $enabledFilter->getName();
 
-                $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $filter['name']))
-                    ->setParameter($filter['name'], $filter['exact'] ? $filter['value'] : sprintf('%%%s%%', $filter['value']))
-                ;
-            } elseif ($metadata->isSingleValuedAssociation($filter['name']) || $metadata->isCollectionValuedAssociation($filter['name'])) {
-                $value = $this->getFilterValueFromUrl($filter['value']);
-
-                $queryBuilder
-                    ->join(sprintf('o.%s', $filter['name']), $filter['name'])
-                    ->andWhere(sprintf('%1$s.id = :%1$s', $filter['name']))
-                    ->setParameter($filter['name'], $filter['exact'] ? $value : sprintf('%%%s%%', $value))
-                ;
+            if (!isset($filters[$filterName]) && $enabledFilter instanceof FilterInterface) {
+                continue;
             }
+
+            $enabledFilter->apply($resource, $queryBuilder, $filters[$filterName]);
         }
 
-        if ($order) {
-            $queryBuilder->addOrderBy('o.id', $order);
+        foreach ($order as $key => $value) {
+            $queryBuilder->addOrderBy('o.'.$key, $value);
         }
 
         return new Paginator(new DoctrineOrmPaginator($queryBuilder));
     }
 
     /**
-     * Gets the ID from an URI or a raw ID.
-     *
-     * @param mixed $value
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    private function getFilterValueFromUrl($value)
+    public function getItemFromIri($iri, $fetchData = false)
     {
-        try {
-            if ($item = $this->resource->getResourceCollection()->getItemFromUri($value)) {
-                return $item->getId();
-            }
-        } catch (ExceptionInterface $e) {
-            // Do nothing, return the raw value
-        }
+        return;
+    }
 
-        return $value;
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(ResourceInterface $resource)
+    {
+        return null !== $this->managerRegistry->getManagerForClass($resource->getEntityClass());
     }
 }

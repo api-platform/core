@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="api.mapping.cache.prefix" />
+    </parameters>
+
+    <services>
+        <service id="api.mapping.class_metadata_factory" class="Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory">
+            <argument type="service" id="api.mapping.loaders.chain" />
+            <argument>null</argument>
+        </service>
+
+        <!-- Cache -->
+
+        <service id="api.cache_warmer.metadata" class="Dunglas\JsonLdApiBundle\CacheWarmer\MetadataCacheWarmer">
+            <tag name="kernel.cache_warmer" priority="0" />
+        </service>
+
+        <service id="api.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
+            <call method="setNamespace">
+                <argument>%api.mapping.cache.prefix%</argument>
+            </call>
+        </service>
+
+        <!-- Loaders -->
+
+        <service id="api.mapping.loaders.chain" class="Dunglas\JsonLdApiBundle\Mapping\Loader\LoaderChain" public="false">
+            <argument type="collection">
+                <argument type="service" id="api.mapping.loaders.attributes" />
+                <argument type="service" id="api.mapping.loaders.validator_metadata" />
+                <argument type="service" id="api.mapping.loaders.phpdoc" />
+                <argument type="service" id="api.mapping.loaders.annotation" />
+            </argument>
+        </service>
+
+        <service id="api.mapping.loaders.attributes" class="Dunglas\JsonLdApiBundle\Mapping\Loader\AttributesLoader" public="false">
+            <argument type="service" id="api.property_info" />
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+        </service>
+
+        <service id="api.mapping.loaders.validator_metadata" class="Dunglas\JsonLdApiBundle\Mapping\Loader\ValidatorMetadataLoader" public="false">
+            <argument type="service" id="validator" />
+        </service>
+
+        <service id="api.mapping.loaders.phpdoc" class="Dunglas\JsonLdApiBundle\Mapping\Loader\PhpDocLoader" public="false">
+            <argument type="service" id="api.property_info" />
+        </service>
+
+        <service id="api.mapping.loaders.annotation" class="Dunglas\JsonLdApiBundle\Mapping\Loader\AnnotationLoader" public="false">
+            <argument type="service" id="annotations.reader" />
+        </service>
+    </services>
+
+</container>

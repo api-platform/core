@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Event;
 
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceInterface;
+use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**

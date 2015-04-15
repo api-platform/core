@@ -11,7 +11,7 @@
 
 namespace Dunglas\JsonLdApiBundle\Mapping\Loader;
 
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
+use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadata;
 use Dunglas\JsonLdApiBundle\Util\Reflection;

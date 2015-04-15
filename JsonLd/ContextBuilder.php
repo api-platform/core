@@ -11,6 +11,8 @@
 
 namespace Dunglas\JsonLdApiBundle\JsonLd;
 
+use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -40,8 +42,11 @@ class ContextBuilder
      */
     private $resourceCollection;
 
-    public function __construct(RouterInterface $router, ClassMetadataFactory $classMetadataFactory, ResourceCollectionInterface $resourceCollection)
-    {
+    public function __construct(
+        RouterInterface $router,
+        ClassMetadataFactory $classMetadataFactory,
+        ResourceCollectionInterface $resourceCollection
+    ) {
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
         $this->resourceCollection = $resourceCollection;
@@ -64,29 +69,6 @@ class ContextBuilder
         }
 
         return $context;
-    }
-
-    /**
-     * Builds the JSON-LD context for the API documentation.
-     *
-     * @return array
-     */
-    public function getApiDocumentationContext()
-    {
-        return array_merge(
-            $this->getBaseContext(),
-            [
-                'rdf' => self::RDF_NS,
-                'rdfs' => self::RDFS_NS,
-                'xmls' => self::XML_NS,
-                'owl' => self::OWL_NS,
-                'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
-                'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
-                'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
-                'expects' => ['@id' => 'hydra:expects', '@type' => '@id'],
-                'returns' => ['@id' => 'hydra:returns', '@type' => '@id'],
-            ]
-        );
     }
 
     /**
@@ -142,7 +124,7 @@ class ContextBuilder
         $data = [];
         if (!isset($context['json_ld_has_context'])) {
             $data['@context'] = $this->router->generate(
-                'json_ld_api_context',
+                'api_json_ld_context',
                 ['shortName' => $resource->getShortName()]
             );
             $context['json_ld_has_context'] = true;
@@ -178,7 +160,7 @@ class ContextBuilder
     private function getBaseContext()
     {
         return [
-            '@vocab' => $this->router->generate('json_ld_api_vocab', [], RouterInterface::ABSOLUTE_URL).'#',
+            '@vocab' => $this->router->generate('api_hydra_vocab', [], RouterInterface::ABSOLUTE_URL).'#',
             'hydra' => self::HYDRA_NS,
         ];
     }

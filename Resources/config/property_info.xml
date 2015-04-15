@@ -5,24 +5,24 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="property_info" class="PropertyInfo\PropertyInfo">
+        <service id="api.property_info" class="PropertyInfo\PropertyInfo" public="false">
             <argument type="collection">
-                <argument type="service" id="property_info.doctrine_extractor" />
-                <argument type="service" id="property_info.setter_extractor" />
-                <argument type="service" id="property_info.php_doc_extractor" />
+                <argument type="service" id="api.property_info.doctrine_extractor" />
+                <argument type="service" id="api.property_info.setter_extractor" />
+                <argument type="service" id="api.property_info.php_doc_extractor" />
             </argument>
             <argument type="collection">
-                <argument type="service" id="property_info.php_doc_extractor" />
+                <argument type="service" id="api.property_info.php_doc_extractor" />
             </argument>
         </service>
 
-        <service id="property_info.doctrine_extractor" class="PropertyInfo\Extractors\DoctrineExtractor">
-            <argument type="service" id="dunglas_json_ld_api.doctrine.metadata_factory" />
+        <service id="api.property_info.doctrine_extractor" class="PropertyInfo\Extractors\DoctrineExtractor" public="false">
+            <argument type="service" id="api.doctrine.metadata_factory" />
         </service>
 
-        <service id="property_info.php_doc_extractor" class="PropertyInfo\Extractors\PhpDocExtractor" />
+        <service id="api.property_info.php_doc_extractor" class="PropertyInfo\Extractors\PhpDocExtractor" public="false" />
 
-        <service id="property_info.setter_extractor" class="PropertyInfo\Extractors\SetterExtractor" />
+        <service id="api.property_info.setter_extractor" class="PropertyInfo\Extractors\SetterExtractor" public="false" />
     </services>
 
 </container>

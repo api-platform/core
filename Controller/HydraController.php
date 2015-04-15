@@ -9,23 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Controller;
+namespace Dunglas\JsonLdApiBundle\Controller;
 
-use Dunglas\JsonLdApiBundle\Controller\ResourceController;
 use Dunglas\JsonLdApiBundle\JsonLd\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
- * Custom Controller.
+ * Generates a Hydra API documentation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CustomController extends ResourceController
+class HydraController extends Controller
 {
     /**
+     * Namespace of types specific to the current API.
+     *
      * @return Response
      */
-    public function customAction($id)
+    public function vocabAction()
     {
-        return new Response(sprintf('This is a custom action for %d.', $id));
+        return new Response($this->get('api.hydra.documentation_builder')->getApiDocumentation());
     }
 }

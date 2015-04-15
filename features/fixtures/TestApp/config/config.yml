@@ -30,22 +30,60 @@ dunglas_json_ld_api:
         order:                       "ASC"
 
 services:
+    my_dummy_resource.filter.id:
+        parent:                     "api.doctrine.orm.filter"
+        arguments:                  [ "id" ]
+
+    my_dummy_resource.filter.name:
+        parent:                     "api.doctrine.orm.filter"
+        arguments:                  [ "name", "partial" ]
+
     my_dummy_resource:
-        parent:                      "dunglas_json_ld_api.resource"
+        parent:                      "api.resource"
         arguments:                   [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
-        calls:                       [ [ "initFilters", [ [ { name: "id" }, { name: "name", "exact": false } ] ] ] ]
-        tags:                        [ { name: "json-ld.resource" } ]
+        calls:
+                                     - [ "addFilter", [ "@my_dummy_resource.filter.id" ] ]
+                                     - [ "addFilter", [ "@my_dummy_resource.filter.name" ] ]
+        tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:
-        parent:                     "dunglas_json_ld_api.resource"
+        parent:                     "api.resource"
         arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy" ]
-        tags:                       [ { name: "json-ld.resource" } ]
+        tags:                       [ { name: "api.resource" } ]
+
+    my_relation_embedder_resource.item_operation.get:
+        class:                      "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                     false
+        factory:                    [ "@api.operation_factory", "createItemOperation" ]
+        arguments:                  [ "@my_relation_embedder_resource", "GET" ]
+
+    my_relation_embedder_resource.item_operation.put:
+        class:                      "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                     false
+        factory:                    [ "@api.operation_factory", "createItemOperation" ]
+        arguments:                  [ "@my_relation_embedder_resource", "PUT" ]
+
+    my_relation_embedder_resource.item_operation.custom_get:
+        class:                      "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:                     false
+        factory:                    [ "@api.operation_factory", "createItemOperation" ]
+        arguments:
+                                    - "@my_relation_embedder_resource"
+                                    - [ "GET", "HEAD" ]
+                                    - "/relation_embedders/{id}/custom"
+                                    - "TestBundle:Custom:custom"
+                                    - "my_custom_route"
+                                    -
+                                        "@type":       "hydra:Operation"
+                                        "hydra:title": "A custom operation"
+                                        "returns":     "xmls:string"
 
     my_relation_embedder_resource:
-        parent:                     "dunglas_json_ld_api.resource"
+        parent:                     "api.resource"
         arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
         calls:
             -                       [ "initNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
-            -                       [ "initItemOperations", [ [ { "hydra:method": "GET" }, { "hydra:method": "PUT" }, { "hydra:method": "GET", "@type": "hydra:Operation", "hydra:title": "A custom operation", "!controller": "TestBundle:Custom:custom", "!route_name": "my_custom_route", "!route_path": "/relation_embedders/{id}/custom", "returns": "xmls:string" } ] ] ]
-            -                       [ "initControllerName", [ "TestBundle:Custom" ] ]
-        tags:                       [ { name: "json-ld.resource" } ]
+            -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.get" ] ]
+            -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.put" ] ]
+            -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.custom_get" ] ]
+        tags:                       [ { name: "api.resource" } ]
