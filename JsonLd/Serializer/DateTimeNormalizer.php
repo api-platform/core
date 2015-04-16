@@ -11,28 +11,48 @@
 
 namespace Dunglas\JsonLdApiBundle\JsonLd\Serializer;
 
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * The {@see \DateTime} object normalizer.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class DateTimeNormalizer implements NormalizerInterface
+class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    const FORMAT = 'json-ld';
+
     /**
      * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {
-        return 'json-ld' === $format && $data instanceof \DateTime;
+        return self::FORMAT === $format && $data instanceof \DateTime;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return self::FORMAT === $format && 'DateTime' === $type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize($object, $format = null, array $context = [])
     {
         return $object->format(\DateTime::ATOM);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = null, array $context = [])
+    {
+        return new \DateTime($data);
     }
 }

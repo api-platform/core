@@ -83,6 +83,7 @@ services:
         arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
         calls:
             -                       [ "initNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
+            -                       [ "initDenormalizationContext", [ { groups: [ "chicago" ] } ] ]
             -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.get" ] ]
             -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.put" ] ]
             -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.custom_get" ] ]

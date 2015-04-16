@@ -41,9 +41,10 @@ Feature: JSON-LD contexts generation
         "@context": {
           "@vocab": "http://example.com/vocab#",
           "hydra": "http://www.w3.org/ns/hydra/core#",
+          "paris": "#RelationEmbedder/paris",
           "krondstadt": "#RelationEmbedder/krondstadt",
-          "related": "#RelationEmbedder/related",
-          "paris": "#RelationEmbedder/paris"
+          "anotherRelated": "#RelationEmbedder/anotherRelated",
+          "related": "#RelationEmbedder/related"
         }
       }
       """

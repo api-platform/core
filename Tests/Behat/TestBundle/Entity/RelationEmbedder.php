@@ -31,16 +31,22 @@ class RelationEmbedder
     public $id;
     /**
      * @ORM\Column
+     * @Groups({"chicago"})
      */
     public $paris = 'Paris';
     /**
      * @ORM\Column
-     * @Groups({"barcelona"})
+     * @Groups({"barcelona", "chicago"})
      */
     public $krondstadt = 'Krondstadt';
     /**
+     * @ORM\ManyToOne(targetEntity="RelatedDummy", cascade={"persist"})
+     * @Groups({"chicago", "barcelona"})
+     */
+    public $anotherRelated;
+    /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
-     * @Groups({"barcelona"})
+     * @Groups({"barcelona", "chicago"})
      */
     protected $related;
 
