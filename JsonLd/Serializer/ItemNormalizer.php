@@ -274,8 +274,8 @@ class ItemNormalizer extends AbstractNormalizer
      *
      * @param ResourceInterface $currentResource
      * @param AttributeMetadata $attributeMetadata
-     * @param string $class
-     * @param mixed $value
+     * @param string            $class
+     * @param mixed             $value
      *
      * @return object|null
      */
@@ -329,7 +329,7 @@ class ItemNormalizer extends AbstractNormalizer
      *
      * @param object $object
      * @param string $attributeName
-     * @param mixed $value
+     * @param mixed  $value
      */
     private function setValue($object, $attributeName, $value)
     {
@@ -346,7 +346,7 @@ class ItemNormalizer extends AbstractNormalizer
      * Fallback to the resource own groups if no context is provided.
      *
      * @param ResourceInterface $resource
-     * @param array $context
+     * @param array             $context
      *
      * @return \Dunglas\JsonLdApiBundle\Mapping\ClassMetadataInterface
      */
