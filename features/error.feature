@@ -43,7 +43,7 @@ Feature: Error handling
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Type not supported (found "array" in attribute "relatedDummy")'
+    And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummy" of "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
     And the JSON node "trace" should exist
 
   Scenario: Get an error during deserialization of collection
@@ -62,7 +62,7 @@ Feature: Error handling
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Nested objects are not supported (found in attribute "relatedDummies")'
+    And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummies" of "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
     And the JSON node "trace" should exist
 
     Scenario: Get an error because of an invalid JSON
@@ -92,4 +92,4 @@ Feature: Error handling
     And the response should be in JSON
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
-    And the JSON node "hydra:description" should contain "Property type not supported"
+    And the JSON node "hydra:description" should be equal to 'IRI  not supported (found "foo" in "unknown" of "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy")'

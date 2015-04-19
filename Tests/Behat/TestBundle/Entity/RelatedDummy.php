@@ -33,7 +33,7 @@ class RelatedDummy extends ParentDummy
     private $id;
     /**
      * @ORM\Column
-     * @Groups({"barcelona"})
+     * @Groups({"barcelona", "chicago"})
      */
     public $symfony = 'symfony';
     /**

@@ -18,6 +18,7 @@ use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
 use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
 use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
+use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -106,45 +107,45 @@ class ItemNormalizer extends AbstractNormalizer
         // Don't use hydra:Collection in sub levels
         $context['json_ld_sub_level'] = true;
 
-        $classMetadata = $this->apiClassMetadataFactory->getMetadataFor(
-            $resource->getEntityClass(),
-            isset($context['json_ld_normalization_groups']) ? $context['json_ld_normalization_groups'] : $resource->getNormalizationGroups(),
-            isset($context['json_ld_denormalization_groups']) ? $context['json_ld_denormalization_groups'] : $resource->getDenormalizationGroups(),
-            isset($context['json_ld_validation_groups']) ? $context['json_ld_validation_groups'] : $resource->getValidationGroups()
-        );
+        $classMetadata = $this->getMetadata($resource, $context);
         $attributesMetadata = $classMetadata->getAttributes();
 
         $data['@id'] = $this->router->generate($object);
         $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
 
         foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
-            if ($attributeMetadata->isReadable() && 'id' !== $attributeName) {
-                $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
+            if ('id' === $attributeName || !$attributeMetadata->isReadable()) {
+                continue;
+            }
+            $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
-                if (isset($attributeMetadata->getTypes()[0])) {
-                    $type = $attributeMetadata->getTypes()[0];
+            if (isset($attributeMetadata->getTypes()[0])) {
+                $type = $attributeMetadata->getTypes()[0];
 
-                    if (
-                        $attributeValue &&
-                        $type->isCollection() &&
-                        ($collectionType = $type->getCollectionType()) &&
-                        $class = $this->getClassHavingResource($collectionType)
-                    ) {
-                        $uris = [];
-                        foreach ($attributeValue as $obj) {
-                            $uris[] = $this->normalizeRelation($resource, $attributeMetadata, $obj, $class);
-                        }
-
-                        $data[$attributeName] = $uris;
-                    } elseif ($attributeValue && $class = $this->getClassHavingResource($type)) {
-                        $data[$attributeName] = $this->normalizeRelation($resource, $attributeMetadata, $attributeValue, $class);
+                if (
+                    $attributeValue &&
+                    $type->isCollection() &&
+                    ($collectionType = $type->getCollectionType()) &&
+                    $class = $this->getClassHavingResource($collectionType)
+                ) {
+                    $values = [];
+                    foreach ($attributeValue as $obj) {
+                        $values[] = $this->normalizeRelation($resource, $attributeMetadata, $obj, $class);
                     }
+
+                    $data[$attributeName] = $values;
+
+                    continue;
                 }
 
-                if (!isset($data[$attributeName])) {
-                    $data[$attributeName] = $this->serializer->normalize($attributeValue, 'json-ld', $context);
+                if ($attributeValue && $class = $this->getClassHavingResource($type)) {
+                    $data[$attributeName] = $this->normalizeRelation($resource, $attributeMetadata, $attributeValue, $class);
+
+                    continue;
                 }
             }
+
+            $data[$attributeName] = $this->serializer->normalize($attributeValue, self::FORMAT, $context);
         }
 
         return $data;
@@ -165,86 +166,83 @@ class ItemNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $resource = $this->guessResource($data, $context);
+        $resource = $this->guessResource($data, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
-        $attributes = $this->apiClassMetadataFactory->getMetadataFor(
-            $class,
-            $resource->getNormalizationGroups(),
-            $resource->getDenormalizationGroups(),
-            $resource->getValidationGroups()
-        )->getAttributes();
+        $attributesMetadata = $this->getMetadata($resource, $context)->getAttributes();
 
         $allowedAttributes = [];
-        foreach ($attributes as $attributeName => $attribute) {
-            if ($attribute->isReadable()) {
+        foreach ($attributesMetadata as $attributeName => $attributeMetatdata) {
+            if ($attributeMetatdata->isReadable()) {
                 $allowedAttributes[] = $attributeName;
             }
         }
 
         $reflectionClass = new \ReflectionClass($class);
-        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
 
-        foreach ($normalizedData as $attribute => $value) {
+        if (isset($data['@id']) && !isset($context['object_to_populate'])) {
+            $context['object_to_populate'] = $this->dataProvider->getItemFromIri($data['@id']);
+
+            // Avoid issues with proxies if we populated the object
+            $overrideClass = true;
+        } else {
+            $overrideClass = false;
+        }
+
+        $object = $this->instantiateObject(
+            $normalizedData,
+            $overrideClass ? get_class($context['object_to_populate']) : $class,
+            $context,
+            $reflectionClass,
+            $allowedAttributes
+        );
+
+        foreach ($normalizedData as $attributeName => $attributeValue) {
             // Ignore JSON-LD special attributes
-            if ('@' === $attribute[0]) {
-                continue;
-            }
-
-            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
-
-            if (!$allowed || $ignored) {
+            if ('@' === $attributeName[0]) {
                 continue;
             }
 
             if ($this->nameConverter) {
-                $attribute = $this->nameConverter->denormalize($attribute);
+                $attributeName = $this->nameConverter->denormalize($attributeName);
             }
 
-            $types = $attributes[$attribute]->getTypes();
-            if (isset($types[0]) && !is_null($value) && 'object' === $types[0]->getType()) {
-                if ($attributes[$attribute]->getTypes()[0]->isCollection()) {
-                    $collection = [];
-                    foreach ($value as $iri) {
-                        if (!is_string($iri)) {
-                            throw new InvalidArgumentException(sprintf(
-                                'Nested objects are not supported (found in attribute "%s")',
-                                $attribute
-                            ));
-                        }
+            if (!in_array($attributeName, $allowedAttributes) || in_array($attributeName, $this->ignoredAttributes)) {
+                continue;
+            }
 
-                        $collection[] = $this->dataProvider->getItemFromIri($iri);
+            $types = $attributesMetadata[$attributeName]->getTypes();
+            if (isset($types[0])) {
+                $type = $types[0];
+
+                if (
+                    $attributeValue &&
+                    $type->isCollection() &&
+                    ($collectionType = $type->getCollectionType()) &&
+                    ($class = $collectionType->getClass())
+                ) {
+                    $values = [];
+                    foreach ($attributeValue as $obj) {
+                        $values[] = $this->denormalizeRelation($resource, $attributesMetadata[$attributeName], $class, $obj);
                     }
 
-                    $value = $collection;
-                } elseif (!$this->getClassHavingResource($types[0])) {
-                    $typeClass = $types[0]->getClass();
-                    if ('DateTime' === $typeClass) {
-                        $value = new \DateTime($value);
-                    } else {
-                        throw new InvalidArgumentException(sprintf(
-                            'Property type not supported ("%s" in attribute "%s")',
-                            $typeClass,
-                            $attribute
-                        ));
-                    }
-                } elseif (is_string($value)) {
-                    $value = $this->dataProvider->getItemFromIri($value);
-                } else {
-                    throw new InvalidArgumentException(sprintf(
-                        'Type not supported (found "%s" in attribute "%s")',
-                        gettype($value),
-                        $attribute
-                    ));
+                    $this->setValue($object, $attributeName, $values);
+
+                    continue;
+                }
+
+                if ($attributeValue && ($class = $type->getClass())) {
+                    $this->setValue(
+                        $object,
+                        $attributeName,
+                        $this->denormalizeRelation($resource, $attributesMetadata[$attributeName], $class, $attributeValue)
+                    );
+
+                    continue;
                 }
             }
 
-            try {
-                $this->propertyAccessor->setValue($object, $attribute, $value);
-            } catch (NoSuchPropertyException $exception) {
-                // Properties not found are ignored
-            }
+            $this->setValue($object, $attributeName, $attributeValue);
         }
 
         return $object;
@@ -262,12 +260,103 @@ class ItemNormalizer extends AbstractNormalizer
      */
     private function normalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
     {
-        if ($attribute->isLink()) {
+        if ($attribute->isNormalizationLink()) {
             return $this->router->generate($relatedObject);
         } else {
             $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
 
             return $this->serializer->normalize($relatedObject, 'json-ld', $context);
         }
+    }
+
+    /**
+     * Denormalizes a relation.
+     *
+     * @param ResourceInterface $currentResource
+     * @param AttributeMetadata $attributeMetadata
+     * @param string            $class
+     * @param mixed             $value
+     *
+     * @return object|null
+     */
+    private function denormalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attributeMetadata, $class, $value)
+    {
+        if ('DateTime' === $class) {
+            return $this->serializer->denormalize($value, $class ?: null, self::FORMAT);
+        }
+
+        $attributeName = $attributeMetadata->getName();
+
+        // Always allow IRI to be compliant with the Hydra spec
+        if (is_string($value)) {
+            $item = $this->dataProvider->getItemFromIri($value);
+
+            if (null === $item) {
+                throw new InvalidArgumentException(sprintf(
+                    'IRI  not supported (found "%s" in "%s" of "%s")',
+                    $value,
+                    $attributeName,
+                    $currentResource->getEntityClass()
+                ));
+            }
+
+            return $item;
+        }
+
+        if (!$resource = $this->resourceCollection->getResourceForEntity($class)) {
+            throw new InvalidArgumentException(sprintf(
+                'Type not supported (found "%s" in attribute "%s" of "%s")',
+                $class,
+                $attributeName,
+                $currentResource->getEntityClass()
+            ));
+        }
+
+        $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
+        if (!$attributeMetadata->isDenormalizationLink()) {
+            return $this->serializer->denormalize($value, $class, self::FORMAT, $context);
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Nested objects for attribute "%s" of "%s" are not enabled. Use serialization groups to change that behavior.',
+            $attributeName,
+            $currentResource->getEntityClass()
+        ));
+    }
+
+    /**
+     * Sets a value of the object using the PropertyAccess component.
+     *
+     * @param object $object
+     * @param string $attributeName
+     * @param mixed  $value
+     */
+    private function setValue($object, $attributeName, $value)
+    {
+        try {
+            $this->propertyAccessor->setValue($object, $attributeName, $value);
+        } catch (NoSuchPropertyException $exception) {
+            // Properties not found are ignored
+        }
+    }
+
+    /**
+     * Gets metadata for the given resource with the current context.
+     *
+     * Fallback to the resource own groups if no context is provided.
+     *
+     * @param ResourceInterface $resource
+     * @param array             $context
+     *
+     * @return \Dunglas\JsonLdApiBundle\Mapping\ClassMetadataInterface
+     */
+    private function getMetadata(ResourceInterface $resource, array $context)
+    {
+        return $this->apiClassMetadataFactory->getMetadataFor(
+            $resource->getEntityClass(),
+            isset($context['json_ld_normalization_groups']) ? $context['json_ld_normalization_groups'] : $resource->getNormalizationGroups(),
+            isset($context['json_ld_denormalization_groups']) ? $context['json_ld_denormalization_groups'] : $resource->getDenormalizationGroups(),
+            isset($context['json_ld_validation_groups']) ? $context['json_ld_validation_groups'] : $resource->getValidationGroups()
+        );
     }
 }

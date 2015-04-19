@@ -130,7 +130,7 @@ class ApiDocumentationBuilder
 
             $properties = [];
             foreach ($classMetadata->getAttributes() as $attributeName => $attribute) {
-                if ($attribute->isLink()) {
+                if ($attribute->isNormalizationLink()) {
                     $type = 'Hydra:Link';
                 } else {
                     $type = 'rdf:Property';

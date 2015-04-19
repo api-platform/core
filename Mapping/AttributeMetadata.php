@@ -71,9 +71,17 @@ class AttributeMetadata
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getLink()} instead.
+     *           {@link isNormalizationLink()} instead.
      */
-    public $link = false;
+    public $normalizationLink = false;
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isDenormalizationLink()} instead.
+     */
+    public $denormalizationLink = false;
     /**
      * @var string|null
      *
@@ -202,23 +210,43 @@ class AttributeMetadata
     }
 
     /**
-     * Set link?
+     * Sets normalization link?
      *
-     * @param bool $link
+     * @param bool normalizationLink
      */
-    public function setLink($link)
+    public function setNormalizationLink($normalizationLink)
     {
-        $this->link = $link;
+        $this->normalizationLink = $normalizationLink;
     }
 
     /**
-     * Is link?
+     * Is normalization link?
      *
      * @return bool
      */
-    public function isLink()
+    public function isNormalizationLink()
     {
-        return $this->link;
+        return $this->normalizationLink;
+    }
+
+    /**
+     * Sets denormalization link?
+     *
+     * @param bool normalizationLink
+     */
+    public function setDenormalizationLink($denormalizationLink)
+    {
+        $this->denormalizationLink = $denormalizationLink;
+    }
+
+    /**
+     * Is denormalization link?
+     *
+     * @return bool
+     */
+    public function isDenormalizationLink()
+    {
+        return $this->denormalizationLink;
     }
 
     /**

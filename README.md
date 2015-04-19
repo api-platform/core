@@ -289,6 +289,8 @@ In the following JSON document, the relation from an offer to a product is repre
 }
 ```
 
+#### Normalization
+
 From a performance point of view, it's sometimes necessary to avoid extra HTTP requests. It is possible to embed related
 objects (or only some of their properties) directly in the parent response trough serialization groups.
 By using the following serizalization groups annotations (`@Groups`) and this updated service definition, a JSON representation
@@ -373,6 +375,29 @@ The generated JSON with previous settings will be like the following:
   }
 }
 ```
+
+#### Denormalization
+
+It is also possible to embed relation in `PUT` and `POST` request. To enable that feature, serialization groups must be
+set the same way than for normalization and the service definition must be like the following:
+
+```yaml
+services:
+    # ...
+
+    resource.offer:
+        parent:     "api.resource"
+        arguments:  [ "AppBundle\Entity\Offer" ]
+        calls:      [ [ "initDenormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
+        tags:       [ { name: "api.resource" } ]
+```
+
+The following rules apply when denormalizating embedded relations:
+* if a `@id` key is present in the embedded resource, the object corresponding to the given URI will be retrieved trough
+the data provider and any changes in the embedded relation will be applied to that object.
+* if no `@id` key exists, a new object will be created containing data provided in the embedded JSON document.
+
+You can create as relation embedding levels as you want.
 
 ### Validation groups
 

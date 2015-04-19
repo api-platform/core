@@ -97,7 +97,7 @@ class ContextBuilder
                     $id = sprintf('%s/%s', $prefixedShortName, $attributeName);
                 }
 
-                if ($attribute->isLink()) {
+                if ($attribute->isNormalizationLink()) {
                     $context[$attributeName] = [
                         '@id' => $id,
                         '@type' => '@id',
