@@ -303,7 +303,7 @@ class ItemNormalizer extends AbstractNormalizer
             return $item;
         }
 
-        if (!$resource = $this->resourceCollection->getResourceForEntity($class)) {
+        if (!$this->resourceCollection->getResourceForEntity($class)) {
             throw new InvalidArgumentException(sprintf(
                 'Type not supported (found "%s" in attribute "%s" of "%s")',
                 $class,
