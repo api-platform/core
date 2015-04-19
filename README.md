@@ -70,8 +70,8 @@ The first step is to name your API. Add the following lines in `app/config/confi
 
 ```yaml
 dunglas_json_ld_api:
-    title:          "Your API name"
-    description:    "The full description of your API"
+    title:       "Your API name"
+    description: "The full description of your API"
 default:                                               # optional
     items_per_page: 30                                 # Number of items per page in paginated collections (optional)
     order:          ~                                  # Default order: null for natural order, ASC or DESC (optional)
@@ -197,25 +197,25 @@ To allow filtering the list of offers:
 ```yaml
 services:
     resource.offer.filter.id:
-        parent:                  "api.doctrine.orm.filter"
-        arguments:               [ "id" ] # Filters on the id property, allow both numeric values and IRIs
+        parent:    "api.doctrine.orm.filter"
+        arguments: [ "id" ] # Filters on the id property, allow both numeric values and IRIs
 
     resource.offer.filter.price:
-        parent:                  "api.doctrine.orm.filter"
-        arguments:               [ "price" ] # Extracts all collection elements with the exact given price
+        parent:    "api.doctrine.orm.filter"
+        arguments: [ "price" ] # Extracts all collection elements with the exact given price
 
     resource.offer.filter.name:
-        parent:                  "api.doctrine.orm.filter"
-        arguments:               [ "name", "partial" ] # Elements with given text in their name
+        parent:    "api.doctrine.orm.filter"
+        arguments: "name", "partial" ] # Elements with given text in their name
 
     resource.offer:
-        parent:                 "api.resource"
-        arguments:              [ "AppBundle\Entity\Offer" ]
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer" ]
         calls:
-                                 - [ "addFilter", [ "@resource.offer.filter.id" ] ]
-                                 - [ "addFilter", [ "@resource.offer.filter.price" ] ]
-                                 - [ "addFilter", [ "@resource.offer.filter.name" ] ]
-        tags:                    [ { name: "api.resource" } ]
+            -      [ "addFilter", [ "@resource.offer.filter.id" ] ]
+            -      [ "addFilter", [ "@resource.offer.filter.price" ] ]
+            -      [ "addFilter", [ "@resource.offer.filter.name" ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 `http://localhost:8000/api/offers?price=10` will return all offers with a price being exactly `10`.
@@ -228,14 +228,14 @@ It also possible to filter by relations:
 ```yaml
 services:
     resource.offer.filter.product:
-        parent:                    "api.doctrine.orm.filter"
-        arguments:                 [ "product" ]
+        parent:    "api.doctrine.orm.filter"
+        arguments: [ "product" ]
 
     resource.offer:
-        parent:                    "api.resource"
-        arguments:                 [ "AppBundle\Entity\Offer"] 
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer"] 
         calls:
-                                   - [ "addFilter", [ "@resource.offer.filter.product" ] ]
+            -      [ "addFilter", [ "@resource.offer.filter.product" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -261,12 +261,12 @@ in the Serializer component. Specifying to the API system the groups to use is d
 ```yaml
 services:
     resource.product:
-        parent:       "api.resource"
-        arguments:    [ "AppBundle\Entity\Product" ]
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -         [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
-            -         [ "initDenormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
-        tags:         [ { name: "api.resource" } ]
+            -      [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
+            -      [ "initDenormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 The built-in controller and the Hydra documentation generator will leverage specified serialization and deserialization
@@ -352,10 +352,10 @@ services:
     # ...
 
     resource.offer:
-        parent:     "api.resource"
-        arguments:  [ "AppBundle\Entity\Offer" ]
-        calls:      [ [ "initNormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
-        tags:       [ { name: "api.resource" } ]
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer" ]
+        calls:     [ [ "initNormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 The generated JSON with previous settings will be like the following:
@@ -383,10 +383,10 @@ To take care of them, edit your service declaration and add groups you want to u
 ```yaml
 services:
     resource.product:
-        parent:       "api.resource"
-        arguments:    [ "AppBundle\Entity\Product" ]
-        calls:        [ [ "initValidationGroups", [ [ "group1", "group2" ] ] ] ]
-        tags:         [ { name: "api.resource" } ]
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+        calls:     [ [ "initValidationGroups", [ [ "group1", "group2" ] ] ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 With the previous definition, the validations groups `group1` and `group2` will be used when the validation occurs.
@@ -508,14 +508,14 @@ By default, the following operations are automatically enabled:
 
 *Collection*
 
-| Method | Meaning                                   |
+| Method | Description                               |
 |--------|-------------------------------------------|
 | `GET`  | Retrieve the (paginated) list of elements |
 | `POST` | Create a new element                      |
 
 *Item*
 
-| Method   | Meaning                                   |
+| Method   | Description                               |
 |----------|-------------------------------------------|
 | `GET`    | Retrieve element (mandatory operation)    |
 | `PUT`    | Update an element                         |
@@ -533,16 +533,16 @@ The following `Resource` definition exposes a `GET` operation for it's collectio
 ```yaml
 services:
     resource.product.collection_operation.get:
-        class:                                 "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
-        public:                                false
-        factory:                               [ "@api.operation_factory", "createItemOperation" ]
-        arguments:                             [ "@resource.product", "GET" ]
+        class:     "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:    false
+        factory:   [ "@api.operation_factory", "createItemOperation" ]
+        arguments: [ "@resource.product", "GET" ]
 
     resource.product:
-        parent:                                "api.resource"
-        arguments:                             [ "AppBundle\Entity\Product" ]
-            -                                  [ "addCollectionOperation", [ "@resource.product.collection_operation.get" ] ]
-        tags:                                  [ { name: "api.resource" } ]
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+            -      [ "addCollectionOperation", [ "@resource.product.collection_operation.get" ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 Sometimes, it can be useful to create custom controller actions. DunglasJsonLdApiBundle allows to register custom operations
@@ -551,41 +551,41 @@ the Hydra vocab (if enabled).
 
 ```yaml
     resource.product.item_operation.get:
-        class:                                  "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
-        public:                                 false
-        factory:                                [ "@api.operation_factory", "createItemOperation" ]
-        arguments:                              [ "@resource.product", "GET" ]
+        class:     "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:    false
+        factory:   [ "@api.operation_factory", "createItemOperation" ]
+        arguments: [ "@resource.product", "GET" ]
 
     resource.product.item_operation.put:
-        class:                                  "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
-        public:                                 false
-        factory:                                [ "@api.operation_factory", "createItemOperation" ]
-        arguments:                              [ "@resource.product", "PUT" ]
+        class:     "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:    false
+        factory:   [ "@api.operation_factory", "createItemOperation" ]
+        arguments: [ "@resource.product", "PUT" ]
 
 
     resource.product.item_operation.custom_get:
-        class:                                  "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
-        public:                                 false
-        factory:                                [ "@api.operation_factory", "createItemOperation" ]
+        class:   "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        public:  false
+        factory: [ "@api.operation_factory", "createItemOperation" ]
         arguments:
-            -                                   "@resource.product"               # Resource
-            -                                   [ "GET", "HEAD" ]                 # Methods
-            -                                   "/products/{id}/custom" # Path
-            -                                   "AppBundle:Custom:custom"        # Controller
-            -                                   "my_custom_route"                 # Route name
-            -                                   # Context (will be present in Hydra documentation)
-                "@type":                        "hydra:Operation"
-                "hydra:title":                  "A custom operation"
-                "returns":                      "xmls:string"
+            -    "@resource.product"               # Resource
+            -    [ "GET", "HEAD" ]                 # Methods
+            -    "/products/{id}/custom" # Path
+            -    "AppBundle:Custom:custom"         # Controller
+            -    "my_custom_route"                 # Route name
+            -    # Context (will be present in Hydra documentation)
+                 "@type":       "hydra:Operation"
+                 "hydra:title": "A custom operation"
+                 "returns":     "xmls:string"
 
     resource.product:
-        parent:                                 "api.resource"
-        arguments:                              [ "AppBundle\Entity\Product" ]
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -                                   [ "addItemOperation", [ "@resource.product.item_operation.get" ] ]
-            -                                   [ "addItemOperation", [ "@resource.product.item_operation.put" ] ]
-            -                                   [ "addItemOperation", [ "@resource.product.item_operation.custom_get" ] ]
-        tags:                                   [ { name: "api.resource" } ]
+            -      [ "addItemOperation", [ "@resource.product.item_operation.get" ] ]
+            -      [ "addItemOperation", [ "@resource.product.item_operation.put" ] ]
+            -      [ "addItemOperation", [ "@resource.product.item_operation.custom_get" ] ]
+        tags:      [ { name: "api.resource" } ]
 ```
 
 Additionnaly to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
@@ -665,9 +665,9 @@ The service definition can now be simplified:
 ```yaml
 services:
     resource.product:
-        parent:    "api.resource"
-        class:     "AppBundle\Api\MyCustomResource"
-        tags:      [ { name: "api.resource" } ]
+        parent: "api.resource"
+        class:  "AppBundle\Api\MyCustomResource"
+        tags:   [ { name: "api.resource" } ]
 ```
 
 ### Using a custom controller
