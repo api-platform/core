@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Hydra\EventListener;
+namespace Dunglas\ApiBundle\Hydra\EventListener;
 
-use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
-use Dunglas\JsonLdApiBundle\JsonLd\Response;
+use Dunglas\ApiBundle\Exception\DeserializationException;
+use Dunglas\ApiBundle\JsonLd\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

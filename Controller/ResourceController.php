@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Controller;
+namespace Dunglas\ApiBundle\Controller;
 
-use Dunglas\JsonLdApiBundle\Event\Events;
-use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
-use Dunglas\JsonLdApiBundle\Exception\DeserializationException;
-use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
-use Dunglas\JsonLdApiBundle\Model\PaginatorInterface;
-use Dunglas\JsonLdApiBundle\JsonLd\Response;
+use Dunglas\ApiBundle\Event\Events;
+use Dunglas\ApiBundle\Event\ObjectEvent;
+use Dunglas\ApiBundle\Exception\DeserializationException;
+use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Model\PaginatorInterface;
+use Dunglas\ApiBundle\JsonLd\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

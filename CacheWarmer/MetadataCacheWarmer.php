@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\CacheWarmer;
+namespace Dunglas\ApiBundle\CacheWarmer;
 
-use Dunglas\JsonLdApiBundle\JsonLd\ResourceCollectionInterface;
-use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\JsonLd\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**

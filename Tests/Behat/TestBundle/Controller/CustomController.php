@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Controller;
+namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Controller;
 
-use Dunglas\JsonLdApiBundle\Controller\ResourceController;
-use Dunglas\JsonLdApiBundle\JsonLd\Response;
+use Dunglas\ApiBundle\Controller\ResourceController;
+use Dunglas\ApiBundle\JsonLd\Response;
 
 /**
  * Custom Controller.

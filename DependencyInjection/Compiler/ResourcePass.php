@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\DependencyInjection\Compiler;
+namespace Dunglas\ApiBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -73,7 +73,7 @@ class ResourcePass implements CompilerPassInterface
         }
 
         $operation = new Definition(
-            'Dunglas\JsonLdApiBundle\Api\Operation\Operation',
+            'Dunglas\ApiBundle\Api\Operation\Operation',
             [new Reference($serviceId), $method]
         );
         $operation->setFactory([new Reference('api.operation_factory'), $factoryMethodName]);

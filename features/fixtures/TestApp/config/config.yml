@@ -22,7 +22,7 @@ doctrine:
         auto_generate_proxy_classes: "%kernel.debug%"
         auto_mapping:                true
 
-dunglas_json_ld_api:
+dunglas_api:
     title:                           "My Dummy API"
     description:                     "This is a test API."
     default:
@@ -40,7 +40,7 @@ services:
 
     my_dummy_resource:
         parent:                      "api.resource"
-        arguments:                   [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
+        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
         calls:
                                      - [ "addFilter", [ "@my_dummy_resource.filter.id" ] ]
                                      - [ "addFilter", [ "@my_dummy_resource.filter.name" ] ]
@@ -48,23 +48,23 @@ services:
 
     my_related_dummy_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy" ]
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy" ]
         tags:                       [ { name: "api.resource" } ]
 
     my_relation_embedder_resource.item_operation.get:
-        class:                      "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
         public:                     false
         factory:                    [ "@api.operation_factory", "createItemOperation" ]
         arguments:                  [ "@my_relation_embedder_resource", "GET" ]
 
     my_relation_embedder_resource.item_operation.put:
-        class:                      "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
         public:                     false
         factory:                    [ "@api.operation_factory", "createItemOperation" ]
         arguments:                  [ "@my_relation_embedder_resource", "PUT" ]
 
     my_relation_embedder_resource.item_operation.custom_get:
-        class:                      "Dunglas\JsonLdApiBundle\Api\Operation\Operation"
+        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
         public:                     false
         factory:                    [ "@api.operation_factory", "createItemOperation" ]
         arguments:
@@ -80,7 +80,7 @@ services:
 
     my_relation_embedder_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\JsonLdApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
         calls:
             -                       [ "initNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
             -                       [ "initDenormalizationContext", [ { groups: [ "chicago" ] } ] ]

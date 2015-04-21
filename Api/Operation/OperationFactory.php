@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Api\Operation;
+namespace Dunglas\ApiBundle\Api\Operation;
 
 use Doctrine\Common\Inflector\Inflector;
-use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Route;
 class OperationFactory
 {
     const ROUTE_NAME_PREFIX = 'api_';
-    const DEFAULT_CONTROLLER = 'DunglasJsonLdApiBundle:Resource';
+    const DEFAULT_CONTROLLER = 'DunglasApiBundle:Resource';
 
     /**
      * @var array

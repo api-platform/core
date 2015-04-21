@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\ORM\QueryBuilder;
-use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
-use Dunglas\JsonLdApiBundle\Model\DataProviderInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**

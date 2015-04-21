@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\DependencyInjection;
+namespace Dunglas\ApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DunglasJsonLdApiExtension extends Extension implements PrependExtensionInterface
+class DunglasApiExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}

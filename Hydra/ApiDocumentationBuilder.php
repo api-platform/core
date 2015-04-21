@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\Hydra;
+namespace Dunglas\ApiBundle\Hydra;
 
-use Dunglas\JsonLdApiBundle\Api\Operation\OperationInterface;
-use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
-use Dunglas\JsonLdApiBundle\Api\ResourceInterface;
-use Dunglas\JsonLdApiBundle\JsonLd\ContextBuilder;
-use Dunglas\JsonLdApiBundle\Mapping\AttributeMetadata;
-use Dunglas\JsonLdApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\Api\Operation\OperationInterface;
+use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\JsonLd\ContextBuilder;
+use Dunglas\ApiBundle\Mapping\AttributeMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
 use Symfony\Component\Routing\RouterInterface;
 
 /**

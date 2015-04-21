@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\FosUser;
+namespace Dunglas\ApiBundle\FosUser;
 
-use Dunglas\JsonLdApiBundle\Event\Events;
-use Dunglas\JsonLdApiBundle\Event\ObjectEvent;
+use Dunglas\ApiBundle\Event\Events;
+use Dunglas\ApiBundle\Event\ObjectEvent;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Bridges between FOSUserBundle and DunglasJsonLdApiBundle.
+ * Bridges between FOSUserBundle and DunglasApiBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

@@ -1,5 +1,5 @@
 {
-  "name": "dunglas/json-ld-api-bundle",
+  "name": "dunglas/api-bundle",
   "type": "symfony-bundle",
   "description": "JSON-LD / Hydra REST API for Symfony",
   "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
@@ -38,7 +38,7 @@
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
   },
   "autoload": {
-    "psr-4": { "Dunglas\\JsonLdApiBundle\\": "" }
+    "psr-4": { "Dunglas\\ApiBundle\\": "" }
   },
   "extra": {
     "branch-alias": {

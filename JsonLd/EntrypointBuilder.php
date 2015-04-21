@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasJsonLdApiBundle package.
+ * This file is part of the DunglasApiBundle package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\JsonLdApiBundle\JsonLd;
+namespace Dunglas\ApiBundle\JsonLd;
 
-use Dunglas\JsonLdApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**

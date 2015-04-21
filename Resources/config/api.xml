@@ -5,25 +5,25 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api.resource" class="Dunglas\JsonLdApiBundle\Api\Resource" public="false" abstract="true" />
+        <service id="api.resource" class="Dunglas\ApiBundle\Api\Resource" public="false" abstract="true" />
 
-        <service id="api.resource_collection" class="Dunglas\JsonLdApiBundle\Api\ResourceCollection" />
+        <service id="api.resource_collection" class="Dunglas\ApiBundle\Api\ResourceCollection" />
 
-        <service id="api.data_provider" class="Dunglas\JsonLdApiBundle\Model\DataProviderChain">
+        <service id="api.data_provider" class="Dunglas\ApiBundle\Model\DataProviderChain">
             <argument type="service" id="api.resource_collection" />
             <argument type="service" id="api.router" />
         </service>
 
-        <service id="api.operation_factory" class="Dunglas\JsonLdApiBundle\Api\Operation\OperationFactory" public="false" />
+        <service id="api.operation_factory" class="Dunglas\ApiBundle\Api\Operation\OperationFactory" public="false" />
 
-        <service id="api.route_loader" class="Dunglas\JsonLdApiBundle\Routing\ApiLoader" public="false">
+        <service id="api.route_loader" class="Dunglas\ApiBundle\Routing\ApiLoader" public="false">
             <argument type="service" id="api.resource_collection" />
             <argument type="service" id="kernel" />
 
             <tag name="routing.loader" />
         </service>
 
-        <service id="api.router" class="Dunglas\JsonLdApiBundle\Routing\Router" public="false">
+        <service id="api.router" class="Dunglas\ApiBundle\Routing\Router" public="false">
             <argument type="service" id="router" />
             <argument type="service" id="api.resource_collection" />
             <argument type="service" id="property_accessor" />
