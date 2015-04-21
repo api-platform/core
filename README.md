@@ -206,7 +206,7 @@ services:
 
     resource.offer.filter.name:
         parent:    "api.doctrine.orm.filter"
-        arguments: "name", "partial" ] # Elements with given text in their name
+        arguments: [ "name", "partial" ] # Elements with given text in their name
 
     resource.offer:
         parent:    "api.resource"
