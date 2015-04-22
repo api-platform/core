@@ -25,7 +25,7 @@ Here is the fully-featured REST API you'll get in minutes, I promise:
 * `\DateTime` serialization and deserialization
 * [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) integration
 
-Everything is fully customizable trough a powerful event system and strong OOP.
+Everything is fully customizable through a powerful event system and strong OOP.
 This bundle is documented and tested with Behat (take a look at [the `features/` directory](features/)).
  
 ## Installation
@@ -181,14 +181,14 @@ Installing it will give you access to a human-readable documentation and a nice 
 
 ### Filters
 
-The bundle provides a generic system to apply filters on collections. It is shipped with built-in Doctrine ORM supports
+The bundle provides a generic system to apply filters on collections. It ships with built-in Doctrine ORM support
 and can be extended to fit your specific needs.
 
-By default all filters are disabled. They must be enabled manually.
+By default, all filters are disabled. They must be enabled manually.
 
 #### Doctrine ORM filters
 
-If the Doctrine ORM support is enabled, adding filters is as easy as adding an entry in your `app/config/services.yml` file.
+If Doctrine ORM support is enabled, adding filters is as easy as adding an entry in your `app/config/services.yml` file.
 It supports exact and partial matching strategies. If the partial strategy is specified, a SQL query with a `LIKE %text to search%`
 query will be automatically issued.
 
@@ -247,7 +247,7 @@ It will return all offers for the product having the JSON-LD identifier (`@id`) 
 
 #### Creating custom filters
 
-Custom filters can be written by implementing the `Dunglas\ApiBundle\Api\Filter\FilterInterface` interface
+Custom filters can be written by implementing the `Dunglas\ApiBundle\Api\Filter\FilterInterface` interface.
 Doctrine ORM filters must implement the `Dunglas\ApiBundle\Doctrine\Orm\FilterInterface`. They can interact directly
 with the Doctrine `QueryBuilder`.
 
@@ -274,7 +274,7 @@ to give access only to exposed properties and to guess if they are readable or/a
 
 ### Embedding relations
 
-By default, the serializer provided with DunglasApiBundle will represent relations between objects by a dereferenceables
+By default, the serializer provided with DunglasApiBundle will represent relations between objects by dereferenceables
 URIs. They allow to retrieve details of related objects by issuing an extra HTTP request.
 
 In the following JSON document, the relation from an offer to a product is represented by an URI:
@@ -378,8 +378,8 @@ The generated JSON with previous settings will be like the following:
 
 #### Denormalization
 
-It is also possible to embed relation in `PUT` and `POST` request. To enable that feature, serialization groups must be
-set the same way than for normalization and the service definition must be like the following:
+It is also possible to embed a relation in `PUT` and `POST` requests. To enable that feature, serialization groups must be
+set the same way as normalization and the service definition must be like the following:
 
 ```yaml
 services:
