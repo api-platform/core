@@ -12,8 +12,8 @@
 namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\ORM\QueryBuilder;
+use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -33,9 +33,9 @@ class Filter implements FilterInterface
     const STRATEGY_PARTIAL = 'partial';
 
     /**
-     * @var DataProviderInterface
+     * @var IriConverterInterface
      */
-    private $dataProvider;
+    private $iriConverter;
     /**
      * @var PropertyAccessorInterface
      */
@@ -54,12 +54,12 @@ class Filter implements FilterInterface
      * @param string $strategy
      */
     public function __construct(
-        DataProviderInterface $dataProvider,
+        IriConverterInterface $iriConverter,
         PropertyAccessorInterface $propertyAccessor,
         $name,
         $strategy = self::STRATEGY_EXACT
     ) {
-        $this->dataProvider = $dataProvider;
+        $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
         $this->name = $name;
         $this->strategy = $strategy;
@@ -113,7 +113,7 @@ class Filter implements FilterInterface
     private function getFilterValueFromUrl($value)
     {
         try {
-            if ($item = $this->dataProvider->getItemFromIri($value)) {
+            if ($item = $this->iriConverter->getItemFromIri($value)) {
                 return $this->propertyAccessor->getValue($item, 'id');
             }
         } catch (\InvalidArgumentException $e) {

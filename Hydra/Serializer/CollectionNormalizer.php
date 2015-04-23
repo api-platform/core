@@ -11,11 +11,11 @@
 
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
+use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceResolver;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
@@ -39,9 +39,9 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
-     * @var RouterInterface
+     * @var IriConverter
      */
-    private $router;
+    private $iriConverter;
     /**
      * @var ContextBuilder
      */
@@ -49,11 +49,11 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
-        RouterInterface $router,
+        IriConverterInterface $iriConverter,
         ContextBuilder $contextBuilder
     ) {
         $this->resourceCollection = $resourceCollection;
-        $this->router = $router;
+        $this->iriConverter = $iriConverter;
         $this->contextBuilder = $contextBuilder;
     }
 
@@ -79,7 +79,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                 $data[] = $this->serializer->normalize($obj, $format, $context);
             }
         } else {
-            $data['@id'] = $this->router->generate($resource);
+            $data['@id'] = $this->iriConverter->getIriFromResource($resource);
 
             if ($object instanceof PaginatorInterface) {
                 $data['@type'] = self::HYDRA_PAGED_COLLECTION;

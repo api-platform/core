@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\JsonLd\Serializer;
 
+use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Api\ResourceResolver;
@@ -18,11 +19,9 @@ use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\ApiBundle\Mapping\AttributeMetadata;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
 use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -43,13 +42,9 @@ class ItemNormalizer extends AbstractNormalizer
     const FORMAT = 'json-ld';
 
     /**
-     * @var DataProviderInterface
+     * @var IriConverterInterface
      */
-    private $dataProvider;
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private $iriConverter;
     /**
      * @var ClassMetadataFactory
      */
@@ -65,8 +60,7 @@ class ItemNormalizer extends AbstractNormalizer
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
-        DataProviderInterface $dataProvider,
-        RouterInterface $router,
+        IriConverterInterface $iriConverter,
         ClassMetadataFactory $apiClassMetadataFactory,
         ContextBuilder $contextBuilder,
         PropertyAccessorInterface $propertyAccessor,
@@ -75,8 +69,7 @@ class ItemNormalizer extends AbstractNormalizer
         parent::__construct(null, $nameConverter);
 
         $this->resourceCollection = $resourceCollection;
-        $this->dataProvider = $dataProvider;
-        $this->router = $router;
+        $this->iriConverter = $iriConverter;
         $this->apiClassMetadataFactory = $apiClassMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor;
@@ -111,7 +104,7 @@ class ItemNormalizer extends AbstractNormalizer
         $classMetadata = $this->getMetadata($resource, $context);
         $attributesMetadata = $classMetadata->getAttributes();
 
-        $data['@id'] = $this->router->generate($object);
+        $data['@id'] = $this->iriConverter->getIriFromItem($object);
         $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
 
         foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
@@ -182,7 +175,7 @@ class ItemNormalizer extends AbstractNormalizer
         $reflectionClass = new \ReflectionClass($class);
 
         if (isset($data['@id']) && !isset($context['object_to_populate'])) {
-            $context['object_to_populate'] = $this->dataProvider->getItemFromIri($data['@id']);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id']);
 
             // Avoid issues with proxies if we populated the object
             $overrideClass = true;
@@ -262,7 +255,7 @@ class ItemNormalizer extends AbstractNormalizer
     private function normalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
     {
         if ($attribute->isNormalizationLink()) {
-            return $this->router->generate($relatedObject);
+            return $this->iriConverter->getIriFromItem($relatedObject);
         } else {
             $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
 
@@ -290,7 +283,7 @@ class ItemNormalizer extends AbstractNormalizer
 
         // Always allow IRI to be compliant with the Hydra spec
         if (is_string($value)) {
-            $item = $this->dataProvider->getItemFromIri($value);
+            $item = $this->iriConverter->getItemFromIri($value);
 
             if (null === $item) {
                 throw new InvalidArgumentException(sprintf(

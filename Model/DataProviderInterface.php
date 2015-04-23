@@ -32,16 +32,6 @@ interface DataProviderInterface
     public function getItem(ResourceInterface $resource, $id, $fetchData = false);
 
     /**
-     * Retrieves an item from its IRI.
-     *
-     * @param string $iri
-     * @param bool   $fetchData
-     *
-     * @return object|null
-     */
-    public function getItemFromIri($iri, $fetchData = false);
-
-    /**
      * Retrieves a collection.
      *
      * @param array    $filters
