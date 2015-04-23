@@ -62,8 +62,10 @@ class ContextBuilder
         $context = $this->getBaseContext();
 
         foreach ($this->resourceCollection as $resource) {
-            $context[$resource->getBeautifiedName()] = [
-                '@id' => sprintf('Entrypoint/%s', lcfirst($resource->getShortName())),
+            $resourceName = lcfirst($resource->getShortName());
+
+            $context[$resourceName] = [
+                '@id' => 'Entrypoint/'.$resourceName,
                 '@type' => '@id',
             ];
         }
