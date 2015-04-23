@@ -12,8 +12,6 @@
 namespace Dunglas\ApiBundle\Model;
 
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * A chain of data providers.
@@ -28,7 +26,7 @@ class DataProviderChain implements DataProviderInterface
     private $dataProviders;
 
     /**
-     * @param DataProviderInterface[]     $dataProviders
+     * @param DataProviderInterface[] $dataProviders
      */
     public function __construct(array $dataProviders)
     {

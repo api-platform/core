@@ -49,8 +49,7 @@ class IriConverter implements IriConverterInterface
         DataProviderInterface $dataProvider,
         RouterInterface $router,
         PropertyAccessorInterface $propertyAccessor
-    )
-    {
+    ) {
         $this->resourceCollection = $resourceCollection;
         $this->dataProvider = $dataProvider;
         $this->router = $router;
