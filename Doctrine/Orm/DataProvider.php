@@ -84,14 +84,6 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemFromIri($iri, $fetchData = false)
-    {
-        return;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supports(ResourceInterface $resource)
     {
         return null !== $this->managerRegistry->getManagerForClass($resource->getEntityClass());

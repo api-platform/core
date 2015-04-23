@@ -5,8 +5,9 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api.json_ld.entrypoint_builder" class="Dunglas\ApiBundle\JsonLd\EntrypointBuilder">
+        <service id="api.json_ld.entrypoint_builder" class="Dunglas\ApiBundle\JsonLd\EntrypointBuilder" lazy="true">
             <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.iri_converter" />
             <argument type="service" id="api.router" />
         </service>
 
@@ -20,8 +21,7 @@
 
         <service id="api.json_ld.normalizer.item" class="Dunglas\ApiBundle\JsonLd\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.data_provider" />
-            <argument type="service" id="api.router" />
+            <argument type="service" id="api.iri_converter" />
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument type="service" id="api.json_ld.context_builder" />
             <argument type="service" id="property_accessor" />

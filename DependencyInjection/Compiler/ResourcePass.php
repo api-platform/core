@@ -77,6 +77,7 @@ class ResourcePass implements CompilerPassInterface
             [new Reference($serviceId), $method]
         );
         $operation->setFactory([new Reference('api.operation_factory'), $factoryMethodName]);
+        $operation->setLazy(true);
 
         $operationId = $serviceId.$operationId.$method;
         $container->setDefinition($operationId, $operation);

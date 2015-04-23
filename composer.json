@@ -17,6 +17,8 @@
     "symfony/serializer": "~3.0|~2.7@beta",
     "symfony/validator": "~2.5|~3.0",
     "symfony/framework-bundle": "~2.6|~3.0",
+    "symfony/proxy-manager-bridge": "~2.3",
+    "ocramius/proxy-manager": "~1.0",
     "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/inflector": "~1.0",
     "doctrine/doctrine-bundle": "~1.2",

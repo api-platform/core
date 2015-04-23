@@ -32,19 +32,19 @@
 
         <service id="api.hydra.normalizer.collection" class="Dunglas\ApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.router" />
+            <argument type="service" id="api.iri_converter" />
             <argument type="service" id="api.json_ld.context_builder" />
 
             <tag name="serializer.normalizer" priority="50" />
         </service>
 
-        <service id="api.hydra.normalizer.constraint_violation_list" class="Dunglas\ApiBundle\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
+        <service id="api.hydra.normalizer.constraint_violation_list" class="Dunglas\ApiBundle\Hydra\Serializer\ConstraintViolationListNormalizer" public="false" lazy="true">
             <argument type="service" id="api.router" />
 
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api.hydra.normalizer.error" class="Dunglas\ApiBundle\Hydra\Serializer\ErrorNormalizer" public="false">
+        <service id="api.hydra.normalizer.error" class="Dunglas\ApiBundle\Hydra\Serializer\ErrorNormalizer" public="false" lazy="true">
             <argument type="service" id="api.router" />
             <argument>%kernel.debug%</argument>
 

@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\JsonLd;
 
+use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -26,15 +27,21 @@ class EntrypointBuilder
      */
     private $resourceCollection;
     /**
+     * @var IriConverterInterface
+     */
+    private $iriConverter;
+    /**
      * @var RouterInterface
      */
     private $router;
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
+        IriConverterInterface $iriConverter,
         RouterInterface $router
     ) {
         $this->resourceCollection = $resourceCollection;
+        $this->iriConverter = $iriConverter;
         $this->router = $router;
     }
 
@@ -52,7 +59,7 @@ class EntrypointBuilder
         ];
 
         foreach ($this->resourceCollection as $resource) {
-            $entrypoint[lcfirst($resource->getShortName())] = $this->router->generate($resource);
+            $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
         }
 
         return $entrypoint;

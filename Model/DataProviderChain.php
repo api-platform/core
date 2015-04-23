@@ -11,10 +11,7 @@
 
 namespace Dunglas\ApiBundle\Model;
 
-use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * A chain of data providers.
@@ -24,27 +21,15 @@ use Symfony\Component\Routing\RouterInterface;
 class DataProviderChain implements DataProviderInterface
 {
     /**
-     * @var ResourceCollectionInterface
-     */
-    private $resourceCollection;
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-    /**
      * @var DataProviderInterface[]
      */
     private $dataProviders;
 
     /**
-     * @param ResourceCollectionInterface $resourceCollection
-     * @param RouterInterface             $router
-     * @param DataProviderInterface[]     $dataProviders
+     * @param DataProviderInterface[] $dataProviders
      */
-    public function __construct(ResourceCollectionInterface $resourceCollection, RouterInterface $router, array $dataProviders)
+    public function __construct(array $dataProviders)
     {
-        $this->resourceCollection = $resourceCollection;
-        $this->router = $router;
         $this->dataProviders = $dataProviders;
     }
 
@@ -58,28 +43,6 @@ class DataProviderChain implements DataProviderInterface
                 return $result;
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getItemFromIri($iri, $fetchData = false)
-    {
-        try {
-            $parameters = $this->router->match($iri);
-        } catch (ResourceNotFoundException $e) {
-            return;
-        }
-
-        if (
-            !isset($parameters['_resource']) ||
-            !isset($parameters['id']) ||
-            !($resource = $this->resourceCollection->getResourceForShortName($parameters['_resource']))
-        ) {
-            throw new \InvalidArgumentException(sprintf('No resource associated with the IRI "%s".', $iri));
-        }
-
-        return $this->getItem($resource, $parameters['id'], $fetchData);
     }
 
     /**
