@@ -94,7 +94,7 @@ class ApiDocumentationBuilder
             );
 
             $shortName = $resource->getShortName();
-            $prefixedShortName = ($iri = $classMetadata->getIri()) ? $iri : sprintf('#%s', $shortName);
+            $prefixedShortName = ($iri = $classMetadata->getIri()) ? $iri : '#'.$shortName;
 
             $collectionOperations = [];
             foreach ($resource->getCollectionOperations() as $collectionOperation) {
@@ -317,7 +317,7 @@ class ApiDocumentationBuilder
                     $hydraOperation['hydra:title'] = sprintf('Deletes the %s resource.', $resource->getShortName());
                 }
 
-                if (!isset($hydraOperation['expects'])) {
+                if (!isset($hydraOperation['returns'])) {
                     $hydraOperation['returns'] = 'owl:Nothing';
                 }
             break;
@@ -334,9 +334,7 @@ class ApiDocumentationBuilder
         }
 
         if (!isset($hydraOperation['expects']) &&
-            (($collection && 'GET' === $method) ||
-                'POST' === $method ||
-                'PUT' === $method)) {
+            ('POST' === $method || 'PUT' === $method)) {
             $hydraOperation['expects'] = $prefixedShortName;
         }
 
