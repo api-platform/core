@@ -350,7 +350,6 @@ Feature: Documentation support
                             "hydra:supportedOperation": [
                                 {
                                     "@type": "hydra:Operation",
-                                    "expects": "#Dummy",
                                     "hydra:method": "GET",
                                     "hydra:title": "Retrieves the collection of Dummy resources.",
                                     "rdfs:label": "Retrieves the collection of Dummy resources.",
@@ -381,7 +380,6 @@ Feature: Documentation support
                             "hydra:supportedOperation": [
                                 {
                                     "@type": "hydra:Operation",
-                                    "expects": "https://schema.org/Product",
                                     "hydra:method": "GET",
                                     "hydra:title": "Retrieves the collection of RelatedDummy resources.",
                                     "rdfs:label": "Retrieves the collection of RelatedDummy resources.",
@@ -412,7 +410,6 @@ Feature: Documentation support
                             "hydra:supportedOperation": [
                                 {
                                     "@type": "hydra:Operation",
-                                    "expects": "#RelationEmbedder",
                                     "hydra:method": "GET",
                                     "hydra:title": "Retrieves the collection of RelationEmbedder resources.",
                                     "rdfs:label": "Retrieves the collection of RelationEmbedder resources.",
