@@ -15,16 +15,11 @@ use Dunglas\ApiBundle\Api\Operation\OperationInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
-use Dunglas\ApiBundle\Mapping\AttributeMetadata;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Hydra's ApiDocumentation builder.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class ApiDocumentationBuilder
+class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 {
     /**
      * @var ResourceCollectionInterface
@@ -39,7 +34,7 @@ class ApiDocumentationBuilder
      */
     private $router;
     /**
-     * @var ClassMetadataFactory
+     * @var ClassMetadataFactoryInterface
      */
     private $classMetadataFactory;
     /**
@@ -52,18 +47,18 @@ class ApiDocumentationBuilder
     private $description;
 
     /**
-     * @param ResourceCollectionInterface $resourceCollection
-     * @param ContextBuilder              $contextBuilder
-     * @param RouterInterface             $router
-     * @param ClassMetadataFactory        $classMetadataFactory
-     * @param string                      $title
-     * @param string                      $description
+     * @param ResourceCollectionInterface   $resourceCollection
+     * @param ContextBuilder                $contextBuilder
+     * @param RouterInterface               $router
+     * @param ClassMetadataFactoryInterface $classMetadataFactory
+     * @param string                        $title
+     * @param string                        $description
      */
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         ContextBuilder $contextBuilder,
         RouterInterface $router,
-        ClassMetadataFactory $classMetadataFactory,
+        ClassMetadataFactoryInterface $classMetadataFactory,
         $title,
         $description
     ) {
@@ -76,9 +71,7 @@ class ApiDocumentationBuilder
     }
 
     /**
-     * Gets the Hydra API documentation.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getApiDocumentation()
     {
@@ -129,8 +122,8 @@ class ApiDocumentationBuilder
             }
 
             $properties = [];
-            foreach ($classMetadata->getAttributes() as $attributeName => $attribute) {
-                if ($attribute->isNormalizationLink()) {
+            foreach ($classMetadata->getAttributes() as $attributeName => $attributeMetadata) {
+                if ($attributeMetadata->isNormalizationLink()) {
                     $type = 'Hydra:Link';
                 } else {
                     $type = 'rdf:Property';
@@ -139,22 +132,22 @@ class ApiDocumentationBuilder
                 $property = [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => ($iri = $attribute->getIri()) ? $iri : sprintf('#%s/%s', $shortName, $attributeName),
+                        '@id' => ($iri = $attributeMetadata->getIri()) ? $iri : sprintf('#%s/%s', $shortName, $attributeName),
                         '@type' => $type,
                         'rdfs:label' => $attributeName,
                         'domain' => $prefixedShortName,
                     ],
                     'hydra:title' => $attributeName,
-                    'hydra:required' => $attribute->isRequired(),
-                    'hydra:readable' => $attribute->isReadable(),
-                    'hydra:writable' => $attribute->isWritable(),
+                    'hydra:required' => $attributeMetadata->isRequired(),
+                    'hydra:readable' => $attributeMetadata->isReadable(),
+                    'hydra:writable' => $attributeMetadata->isWritable(),
                 ];
 
-                if ($range = $this->getRange($attribute)) {
+                if ($range = $this->getRange($attributeMetadata)) {
                     $property['hydra:property']['range'] = $range;
                 }
 
-                if ($description = $attribute->getDescription()) {
+                if ($description = $attributeMetadata->getDescription()) {
                     $property['hydra:description'] = $description;
                 }
 
@@ -358,11 +351,11 @@ class ApiDocumentationBuilder
     /**
      * Gets the range of the property.
      *
-     * @param AttributeMetadata $attributeMetadata
+     * @param AttributeMetadataInterface $attributeMetadata
      *
      * @return string|null
      */
-    private function getRange(AttributeMetadata $attributeMetadata)
+    private function getRange(AttributeMetadataInterface $attributeMetadata)
     {
         if (isset($attributeMetadata->getTypes()[0])) {
             $type = $attributeMetadata->getTypes()[0];

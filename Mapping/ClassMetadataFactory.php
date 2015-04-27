@@ -13,16 +13,17 @@ namespace Dunglas\ApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
 use Dunglas\ApiBundle\Mapping\Loader\LoaderInterface;
+use Dunglas\ApiBundle\Util\Reflection;
 
 /**
- * Class metadata factory for the JSON-LD normalizer.
- *
- * Reuse data available through Serializer, Validator and ORM mappings when possible.
+ * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ClassMetadataFactory
+class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
+    use Reflection;
+
     /**
      * @var LoaderInterface
      */
@@ -43,23 +44,7 @@ class ClassMetadataFactory
     }
 
     /**
-     * If the method was called with the same class name (or an object of that
-     * class) before, the same metadata instance is returned.
-     *
-     * If the factory was configured with a cache, this method will first look
-     * for an existing metadata instance in the cache. If an existing instance
-     * is found, it will be returned without further ado.
-     *
-     * Otherwise, a new metadata instance is created. If the factory was
-     * configured with a loader, the metadata is passed to the
-     * {@link LoaderInterface::loadClassMetadata()} method for further
-     * configuration. At last, the new object is returned.
-     *
-     * @param string|object $value
-     *
-     * @return ClassMetadata
-     *
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     public function getMetadataFor(
         $value,
@@ -102,11 +87,7 @@ class ClassMetadataFactory
     }
 
     /**
-     * Checks if class has metadata.
-     *
-     * @param mixed $value
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasMetadataFor($value)
     {
@@ -128,6 +109,6 @@ class ClassMetadataFactory
             return false;
         }
 
-        return ltrim(is_object($value) ? get_class($value) : $value, '\\');
+        return ltrim(is_object($value) ? $this->getObjectClass($value) : $value, '\\');
     }
 }

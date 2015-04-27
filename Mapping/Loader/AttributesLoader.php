@@ -28,25 +28,25 @@ class AttributesLoader implements LoaderInterface
     use Reflection;
 
     /**
-     * @var PropertyInfoInterface
-     */
-    private $propertyInfo;
-    /**
      * @var ResourceCollectionInterface
      */
     private $resourceCollection;
+    /**
+     * @var PropertyInfoInterface
+     */
+    private $propertyInfo;
     /**
      * @var ClassMetadataFactoryInterface|null
      */
     private $serializerClassMetadataFactory;
 
     public function __construct(
-        PropertyInfoInterface $propertyInfo,
         ResourceCollectionInterface $resourceCollection,
+        PropertyInfoInterface $propertyInfo,
         ClassMetadataFactoryInterface $serializerClassMetadataFactory = null
     ) {
-        $this->propertyInfo = $propertyInfo;
         $this->resourceCollection = $resourceCollection;
+        $this->propertyInfo = $propertyInfo;
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
     }
 
@@ -106,11 +106,11 @@ class AttributesLoader implements LoaderInterface
                 if (
                     null === $denormalizationGroups &&
                     $numberOfRequiredParameters <= 1 &&
-                    strpos($reflectionMethod->name, 'set') === 0
+                    preg_match('/^(set|add|remove)(.+)$/i', $reflectionMethod->name, $matches)
                 ) {
                     $attribute = $this->getOrCreateAttribute(
                         $classMetadata,
-                        lcfirst(substr($reflectionMethod->name, 3)),
+                        lcfirst($matches[2]),
                         $normalizationGroups,
                         $denormalizationGroups
                     );

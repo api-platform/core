@@ -12,11 +12,11 @@
 namespace Dunglas\ApiBundle\Mapping;
 
 /**
- * Class metadata.
+ * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ClassMetadata
+class ClassMetadata implements ClassMetadataInterface
 {
     /**
      * @var string
@@ -66,9 +66,7 @@ class ClassMetadata
     }
 
     /**
-     * Gets the class name.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -76,9 +74,7 @@ class ClassMetadata
     }
 
     /**
-     * Sets description.
-     *
-     * @param string $description
+     * {@inheritdoc}
      */
     public function setDescription($description)
     {
@@ -86,9 +82,7 @@ class ClassMetadata
     }
 
     /**
-     * Gets the description.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -96,9 +90,7 @@ class ClassMetadata
     }
 
     /**
-     * Sets IRI of this attribute.
-     *
-     * @param string $iri
+     * {@inheritdoc}
      */
     public function setIri($iri)
     {
@@ -106,9 +98,7 @@ class ClassMetadata
     }
 
     /**
-     * Gets IRI of this attribute.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getIri()
     {
@@ -116,9 +106,7 @@ class ClassMetadata
     }
 
     /**
-     * Adds an {@link AttributeMetadata}.
-     *
-     * @param AttributeMetadata $attributeMetadata
+     * {@inheritdoc}
      */
     public function addAttribute(AttributeMetadata $attributeMetadata)
     {
@@ -126,9 +114,7 @@ class ClassMetadata
     }
 
     /**
-     * Gets attributes.
-     *
-     * @return AttributeMetadata[]
+     * {@inheritdoc}
      */
     public function getAttributes()
     {
@@ -136,9 +122,7 @@ class ClassMetadata
     }
 
     /**
-     * Returns a {@see \ReflectionClass} instance for this class.
-     *
-     * @return \ReflectionClass
+     * {@inheritdoc}
      */
     public function getReflectionClass()
     {

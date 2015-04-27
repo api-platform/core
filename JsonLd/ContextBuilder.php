@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\JsonLd;
 
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -34,7 +34,7 @@ class ContextBuilder
      */
     private $router;
     /**
-     * @var ClassMetadataFactory
+     * @var ClassMetadataFactoryInterface
      */
     private $classMetadataFactory;
     /**
@@ -44,7 +44,7 @@ class ContextBuilder
 
     public function __construct(
         RouterInterface $router,
-        ClassMetadataFactory $classMetadataFactory,
+        ClassMetadataFactoryInterface $classMetadataFactory,
         ResourceCollectionInterface $resourceCollection
     ) {
         $this->router = $router;

@@ -12,11 +12,11 @@
 namespace Dunglas\ApiBundle\Mapping;
 
 /**
- * Attribute metadata.
+ * {@inheritdoc}
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AttributeMetadata
+class AttributeMetadata implements AttributeMetadataInterface
 {
     /**
      * @var string
@@ -100,9 +100,7 @@ class AttributeMetadata
     }
 
     /**
-     * Gets name.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -110,9 +108,7 @@ class AttributeMetadata
     }
 
     /**
-     * Set types.
-     *
-     * @param \PropertyInfo\Type[] $types
+     * {@inheritdoc}
      */
     public function setTypes(array $types)
     {
@@ -120,9 +116,7 @@ class AttributeMetadata
     }
 
     /**
-     * Gets types.
-     *
-     * @return \PropertyInfo\Type[]
+     * {@inheritdoc}
      */
     public function getTypes()
     {
@@ -130,9 +124,7 @@ class AttributeMetadata
     }
 
     /**
-     * Gets description.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -140,9 +132,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets description.
-     *
-     * @param string $description
+     * {@inheritdoc}
      */
     public function setDescription($description)
     {
@@ -150,9 +140,7 @@ class AttributeMetadata
     }
 
     /**
-     * Is readable?
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isReadable()
     {
@@ -160,9 +148,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets readable.
-     *
-     * @param bool $readable
+     * {@inheritdoc}
      */
     public function setReadable($readable)
     {
@@ -170,9 +156,7 @@ class AttributeMetadata
     }
 
     /**
-     * Is writable?
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isWritable()
     {
@@ -180,9 +164,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets writable.
-     *
-     * @param bool $writable
+     * {@inheritdoc}
      */
     public function setWritable($writable)
     {
@@ -190,9 +172,7 @@ class AttributeMetadata
     }
 
     /**
-     * Is required?
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isRequired()
     {
@@ -200,9 +180,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets required.
-     *
-     * @param bool $required
+     * {@inheritdoc}
      */
     public function setRequired($required)
     {
@@ -210,9 +188,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets normalization link?
-     *
-     * @param bool normalizationLink
+     * {@inheritdoc}
      */
     public function setNormalizationLink($normalizationLink)
     {
@@ -220,9 +196,7 @@ class AttributeMetadata
     }
 
     /**
-     * Is normalization link?
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isNormalizationLink()
     {
@@ -230,9 +204,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets denormalization link?
-     *
-     * @param bool normalizationLink
+     * {@inheritdoc}
      */
     public function setDenormalizationLink($denormalizationLink)
     {
@@ -240,9 +212,7 @@ class AttributeMetadata
     }
 
     /**
-     * Is denormalization link?
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isDenormalizationLink()
     {
@@ -250,9 +220,7 @@ class AttributeMetadata
     }
 
     /**
-     * Sets IRI of this attribute.
-     *
-     * @param string $iri
+     * {@inheritdoc}
      */
     public function setIri($iri)
     {
@@ -260,9 +228,7 @@ class AttributeMetadata
     }
 
     /**
-     * Gets IRI of this attribute.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getIri()
     {

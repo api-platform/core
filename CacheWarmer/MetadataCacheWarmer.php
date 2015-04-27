@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\CacheWarmer;
 
 use Dunglas\ApiBundle\JsonLd\ResourceCollectionInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
@@ -27,12 +27,14 @@ class MetadataCacheWarmer implements CacheWarmerInterface
      */
     private $resourceCollection;
     /**
-     * @var ClassMetadataFactory
+     * @var ClassMetadataFactoryInterface
      */
     private $classMetadataFactory;
 
-    public function __construct(ResourceCollectionInterface $resourceCollection, ClassMetadataFactory $classMetadataFactory)
-    {
+    public function __construct(
+        ResourceCollectionInterface $resourceCollection,
+        ClassMetadataFactoryInterface $classMetadataFactory
+    ) {
         $this->resourceCollection = $resourceCollection;
         $this->classMetadataFactory = $classMetadataFactory;
     }

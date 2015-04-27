@@ -16,9 +16,9 @@ use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Api\ResourceResolver;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
-use Dunglas\ApiBundle\Mapping\ClassMetadata;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
-use Dunglas\ApiBundle\Mapping\AttributeMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
 use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -46,7 +46,7 @@ class ItemNormalizer extends AbstractNormalizer
      */
     private $iriConverter;
     /**
-     * @var ClassMetadataFactory
+     * @var ClassMetadataFactoryInterface
      */
     private $apiClassMetadataFactory;
     /**
@@ -61,7 +61,7 @@ class ItemNormalizer extends AbstractNormalizer
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         IriConverterInterface $iriConverter,
-        ClassMetadataFactory $apiClassMetadataFactory,
+        ClassMetadataFactoryInterface $apiClassMetadataFactory,
         ContextBuilder $contextBuilder,
         PropertyAccessorInterface $propertyAccessor,
         NameConverterInterface $nameConverter = null
@@ -245,15 +245,19 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
      *
-     * @param ResourceInterface $currentResource
-     * @param AttributeMetadata $attribute
-     * @param mixed             $relatedObject
-     * @param string            $class
+     * @param ResourceInterface          $currentResource
+     * @param AttributeMetadataInterface $attribute
+     * @param mixed                      $relatedObject
+     * @param string                     $class
      *
      * @return string|array
      */
-    private function normalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attribute, $relatedObject, $class)
-    {
+    private function normalizeRelation(
+        ResourceInterface $currentResource,
+        AttributeMetadataInterface $attribute,
+        $relatedObject,
+        $class
+    ) {
         if ($attribute->isNormalizationLink()) {
             return $this->iriConverter->getIriFromItem($relatedObject);
         } else {
@@ -266,15 +270,19 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * Denormalizes a relation.
      *
-     * @param ResourceInterface $currentResource
-     * @param AttributeMetadata $attributeMetadata
-     * @param string            $class
-     * @param mixed             $value
+     * @param ResourceInterface          $currentResource
+     * @param AttributeMetadataInterface $attributeMetadata
+     * @param string                     $class
+     * @param mixed                      $value
      *
      * @return object|null
      */
-    private function denormalizeRelation(ResourceInterface $currentResource, AttributeMetadata $attributeMetadata, $class, $value)
-    {
+    private function denormalizeRelation(
+        ResourceInterface $currentResource,
+        AttributeMetadataInterface $attributeMetadata,
+        $class,
+        $value
+    ) {
         if ('DateTime' === $class) {
             return $this->serializer->denormalize($value, $class ?: null, self::FORMAT);
         }
@@ -342,7 +350,7 @@ class ItemNormalizer extends AbstractNormalizer
      * @param ResourceInterface $resource
      * @param array             $context
      *
-     * @return ClassMetadata
+     * @return ClassMetadataInterface
      */
     private function getMetadata(ResourceInterface $resource, array $context)
     {
