@@ -248,11 +248,11 @@ class AttributesLoader implements LoaderInterface
         foreach ($relationSerializerMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
             $serializerAttributeGroups = $serializerAttributeMetadata->getGroups();
 
-            if (null !== $normalizationGroups && 1 >= count(array_intersect($normalizationGroups, $serializerAttributeGroups))) {
+            if (null !== $normalizationGroups && 1 <= count(array_intersect($normalizationGroups, $serializerAttributeGroups))) {
                 $normalizationLink = false;
             }
 
-            if (null !== $denormalizationGroups && 1 >= count(array_intersect($denormalizationGroups, $serializerAttributeGroups))) {
+            if (null !== $denormalizationGroups && 1 <= count(array_intersect($denormalizationGroups, $serializerAttributeGroups))) {
                 $denormalizationLink = false;
             }
 
