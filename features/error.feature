@@ -65,7 +65,7 @@ Feature: Error handling
     And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummies" of "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
     And the JSON node "trace" should exist
 
-    Scenario: Get an error because of an invalid JSON
+  Scenario: Get an error because of an invalid JSON
     When I send a "POST" request to "/dummies" with body:
     """
     {

@@ -23,7 +23,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SearchFilter implements FilterInterface
+class SearchFilter extends AbstractFilter
 {
     /**
      * @var string Exact matching.
@@ -34,10 +34,6 @@ class SearchFilter implements FilterInterface
      */
     const STRATEGY_PARTIAL = 'partial';
 
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
     /**
      * @var IriConverterInterface
      */
@@ -126,8 +122,8 @@ class SearchFilter implements FilterInterface
                         ->andWhere(sprintf('o.%1$s LIKE :%1$s', $filter))
                         ->setParameter($filter, $partial ? sprintf('%%%s%%', $value) : $value)
                     ;
-                } elseif (
-                    $metadata->isSingleValuedAssociation($filter) || $metadata->isCollectionValuedAssociation($filter)
+                } elseif ($metadata->isSingleValuedAssociation($filter)
+                    || $metadata->isCollectionValuedAssociation($filter)
                 ) {
                     $value = $this->getFilterValueFromUrl($value);
 
@@ -159,23 +155,5 @@ class SearchFilter implements FilterInterface
         }
 
         return $value;
-    }
-
-    /**
-     * Gets class metadata for the given resource.
-     *
-     * @param ResourceInterface $resource
-     *
-     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
-     */
-    private function getClassMetadata(ResourceInterface $resource)
-    {
-        $entityClass = $resource->getEntityClass();
-
-        return $this
-            ->managerRegistry
-            ->getManagerForClass($entityClass)
-            ->getClassMetadata($entityClass)
-        ;
     }
 }

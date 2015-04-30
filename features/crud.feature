@@ -22,6 +22,7 @@ Feature: Create-Retrieve-Update-Delete
       "@id": "/dummies/1",
       "@type": "Dummy",
       "name": "My Dummy",
+      "alias": null,
       "dummy": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
       "relatedDummy": null,
@@ -41,6 +42,7 @@ Feature: Create-Retrieve-Update-Delete
       "@id": "/dummies/1",
       "@type": "Dummy",
       "name": "My Dummy",
+      "alias": null,
       "dummy": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
       "relatedDummy": null,
@@ -68,6 +70,7 @@ Feature: Create-Retrieve-Update-Delete
           "@id":"/dummies/1",
           "@type":"Dummy",
           "name":"My Dummy",
+          "alias": null,
           "dummy": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
           "relatedDummy": null,
@@ -76,7 +79,7 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -102,9 +105,21 @@ Feature: Create-Retrieve-Update-Delete
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -126,6 +141,7 @@ Feature: Create-Retrieve-Update-Delete
         "@id": "/dummies/1",
         "@type": "Dummy",
         "name": "A nice dummy",
+        "alias": null,
         "dummy": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
         "relatedDummy": null,

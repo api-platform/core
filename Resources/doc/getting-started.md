@@ -62,6 +62,8 @@ dunglas_api:
     cache:           false                              # The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.
     enable_fos_user: false                              # Enable the FOSUserBundle integration.
     collection:
+        filter_name:
+            order:   "order"                            # Keyword used for the order filter
         order:       null                               # The default order of results. (supported by Doctrine: ASC and DESC)
         pagination:
             page_parameter_name:       page             # The name of the parameter handling the page number.
