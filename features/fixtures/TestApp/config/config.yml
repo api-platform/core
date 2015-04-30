@@ -42,8 +42,12 @@ services:
         parent:                      "api.resource"
         arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
         calls:
-                                     - [ "addFilter", [ "@my_dummy_resource.filter.id" ] ]
-                                     - [ "addFilter", [ "@my_dummy_resource.filter.name" ] ]
+                                     - method:    "addFilter"
+                                       arguments:
+                                           -      "@my_dummy_resource.filter.id"
+                                     - method:    "addFilter"
+                                       arguments:
+                                           -      "@my_dummy_resource.filter.name"
         tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:
@@ -82,9 +86,19 @@ services:
         parent:                     "api.resource"
         arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
         calls:
-            -                       [ "initNormalizationContext", [ { groups: [ "barcelona" ] } ] ]
-            -                       [ "initDenormalizationContext", [ { groups: [ "chicago" ] } ] ]
-            -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.get" ] ]
-            -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.put" ] ]
-            -                       [ "addItemOperation", [ "@my_relation_embedder_resource.item_operation.custom_get" ] ]
+                                    - method:    "initNormalizationContext"
+                                      arguments:
+                                          -      { groups: [ "barcelona" ] }
+                                    - method:    "initDenormalizationContext"
+                                      arguments:
+                                          -      { groups: [ "chicago" ] }
+                                    - method:    "addItemOperation"
+                                      arguments:
+                                          -      "@my_relation_embedder_resource.item_operation.get"
+                                    - method:    "addItemOperation"
+                                      arguments:
+                                          -      "@my_relation_embedder_resource.item_operation.put"
+                                    - method:    "addItemOperation"
+                                      arguments:
+                                          -      "@my_relation_embedder_resource.item_operation.custom_get"
         tags:                       [ { name: "api.resource" } ]

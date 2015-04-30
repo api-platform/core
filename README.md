@@ -213,9 +213,15 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer" ]
         calls:
-            -      [ "addFilter", [ "@resource.offer.filter.id" ] ]
-            -      [ "addFilter", [ "@resource.offer.filter.price" ] ]
-            -      [ "addFilter", [ "@resource.offer.filter.name" ] ]
+            -      method:    "addFilter"
+                   arguments:
+                       -      "@resource.offer.filter.id"
+            -      method:    "addFilter"
+                   arguments:
+                       -      "@resource.offer.filter.price"
+            -      method:    "addFilter"
+                   arguments:
+                       -      "@resource.offer.filter.name"
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -236,7 +242,9 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
-            -      [ "addFilter", [ "@resource.offer.filter.product" ] ]
+            -      method:    "addFilter"
+                   arguments:
+                       -      "@resource.offer.filter.product"
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -265,8 +273,12 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -      [ "initNormalizationContext", [ { groups: [ "serialization_group1", "serialization_group2" ] } ] ]
-            -      [ "initDenormalizationContext", [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ] ]
+            -      method:    "initNormalizationContext"
+                   arguments:
+                       -      { groups: [ "serialization_group1", "serialization_group2" ] }
+            -      method:    "initDenormalizationContext"
+                   arguments:
+                       -      { groups: [ "deserialization_group1", "deserialization_group2" ] }
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -357,7 +369,10 @@ services:
     resource.offer:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer" ]
-        calls:     [ [ "initNormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
+        calls:
+            -      method:    "initNormalizationContext"
+                   arguments:
+                       -      { groups: [ "offer" ] }
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -389,7 +404,10 @@ services:
     resource.offer:
         parent:     "api.resource"
         arguments:  [ "AppBundle\Entity\Offer" ]
-        calls:      [ [ "initDenormalizationContext", [ [ { groups: [ "offer" ] } ] ] ] ]
+        calls:
+            -       method:    "initDenormalizationContext"
+                    arguments:
+                        -      { groups: [ "offer" ] }
         tags:       [ { name: "api.resource" } ]
 ```
 
@@ -411,7 +429,10 @@ services:
     resource.product:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
-        calls:     [ [ "initValidationGroups", [ [ "group1", "group2" ] ] ] ]
+        calls:
+            -      method:    "initValidationGroups"
+                   arguments:
+                       -      [ "group1", "group2" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -608,9 +629,15 @@ the Hydra vocab (if enabled).
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -      [ "addItemOperation", [ "@resource.product.item_operation.get" ] ]
-            -      [ "addItemOperation", [ "@resource.product.item_operation.put" ] ]
-            -      [ "addItemOperation", [ "@resource.product.item_operation.custom_get" ] ]
+            -      method:    "addItemOperation"
+                   arguments:
+                       -      "@resource.product.item_operation.get"
+            -      method:    "addItemOperation"
+                   arguments:
+                       -      "@resource.product.item_operation.put"
+            -      method:    "addItemOperation"
+                   arguments:
+                       -      "@resource.product.item_operation.custom_get"
         tags:      [ { name: "api.resource" } ]
 ```
 
