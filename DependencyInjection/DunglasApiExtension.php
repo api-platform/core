@@ -57,6 +57,8 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('api.description', $config['description']);
         $container->setParameter('api.default.items_per_page', $config['default']['items_per_page']);
         $container->setParameter('api.default.order', $config['default']['order']);
+        $container->setParameter('api.request_items_per_page.enabled', $config['request_items_per_page']['enabled']);
+        $container->setParameter('api.request_items_per_page.parameterName', $config['request_items_per_page']['parameter_name']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');

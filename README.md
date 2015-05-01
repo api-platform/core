@@ -76,6 +76,9 @@ dunglas_api:
     default:                                               # optional
         items_per_page: 30                                 # Number of items per page in paginated collections (optional)
         order:          ~                                  # Default order: null for natural order, ASC or DESC (optional)
+    request_items_per_page:                                # Allow configuration of itemsPerPage from request
+        enabled: false                                     # Enable the feature
+        parameter_name: itemsPerPage                       # Name of the request parameter
 ```
 
 The name and the description you give will be accessible trough the auto-generated Hydra documentation.
