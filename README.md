@@ -592,6 +592,8 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
+#### Create custom operations
+
 Sometimes, it can be useful to create custom controller actions. DunglasApiBundle allows to register custom operations
 for both collections and items. It will register them automatically in the Symfony routing system and will expose them in
 the Hydra vocab (if enabled).
