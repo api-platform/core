@@ -474,7 +474,7 @@ bundle provides a built-in cache service using [APCu](https://github.com/krakjoe
 To enable it in the prod environment (requires APCu to be installed), add the following lines to `app/config/config_prod.yml`:
 
 ```yaml
-dunglas_json_ld_api:
+dunglas_api:
     cache: api.mapping.cache.apc
 ```
 
