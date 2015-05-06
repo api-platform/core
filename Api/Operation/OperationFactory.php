@@ -83,8 +83,8 @@ class OperationFactory
      * @param bool              $collection
      * @param string|array      $methods
      * @param string|null       $path
-     * @param null              $controller
-     * @param null              $routeName
+     * @param string|null       $controller
+     * @param string|null       $routeName
      * @param array             $context
      *
      * @return Operation
@@ -105,7 +105,7 @@ class OperationFactory
         }
 
         // Populate path
-        if (!$path) {
+        if (null === $path) {
             $path = '/'.self::$inflectorCache[$shortName];
 
             if (!$collection) {
@@ -121,7 +121,7 @@ class OperationFactory
         }
 
         // Populate controller
-        if (!$controller) {
+        if (null === $controller) {
             $defaultAction = strtolower($defaultMethod);
 
             if ($collection) {
@@ -131,7 +131,7 @@ class OperationFactory
             $controller = self::DEFAULT_CONTROLLER.':'.$defaultAction;
 
             // Populate route name
-            if (!$routeName) {
+            if (null === $routeName) {
                 $routeName = self::$inflectorCache[$shortName].'_'.$defaultAction;
             }
         }

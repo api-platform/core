@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
 use Dunglas\ApiBundle\Mapping\Loader\LoaderInterface;
+use Dunglas\ApiBundle\Util\ClassInfo;
 use Dunglas\ApiBundle\Util\Reflection;
 
 /**
@@ -22,7 +23,7 @@ use Dunglas\ApiBundle\Util\Reflection;
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
-    use Reflection;
+    use ClassInfo;
 
     /**
      * @var LoaderInterface
@@ -53,7 +54,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         array $validationGroups = null
     ) {
         $class = $this->getClass($value);
-        if (!$class) {
+        if (false === $class) {
             throw new \InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: %s', gettype($value)));
         }
 

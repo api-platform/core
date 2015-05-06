@@ -39,7 +39,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
-     * @var IriConverter
+     * @var IriConverterInterface
      */
     private $iriConverter;
     /**

@@ -46,7 +46,7 @@ class Resource implements ResourceInterface
      */
     private $denormalizationContext = [];
     /**
-     * @var array|null
+     * @var string[]
      */
     private $validationGroups;
     /**

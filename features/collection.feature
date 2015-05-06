@@ -6,7 +6,7 @@ Feature: Collections support
   @createSchema
   Scenario: Retrieve an empty collection
     When I send a "GET" request to "/dummies"
-    Then the response status code should be 200
+    Then print last JSON response
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:

@@ -100,7 +100,7 @@ class IriConverter implements IriConverterInterface
      */
     public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
-        return $this->router->generate($this->getCollectionRouteName($resource, [], $referenceType));
+        return $this->router->generate($this->getCollectionRouteName($resource), [], $referenceType);
     }
 
     /**

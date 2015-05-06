@@ -24,8 +24,11 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Converts between objects and array including JSON-LD and Hydra metadata.
@@ -86,11 +89,16 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      *
+     * @throws RuntimeException
      * @throws CircularReferenceException
      * @throws InvalidArgumentException
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        if (!$this->serializer instanceof NormalizerInterface) {
+            throw new RuntimeException('The serializer must implement the NormalizerInterface.');
+        }
+
         if (is_object($object) && $this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
         }
@@ -107,7 +115,9 @@ class ItemNormalizer extends AbstractNormalizer
         $data['@id'] = $this->iriConverter->getIriFromItem($object);
         $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
 
-        foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
+        foreach ($attributesMetadata as $attributeMetadata) {
+            $attributeName = $attributeMetadata->getName();
+
             if ('id' === $attributeName || !$attributeMetadata->isReadable()) {
                 continue;
             }
@@ -156,10 +166,15 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * {@inheritdoc}
      *
+     * @throws RuntimeException
      * @throws InvalidArgumentException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        if (!$this->serializer instanceof DenormalizerInterface) {
+            throw new RuntimeException('The serializer must implement the DenormalizerInterface to denormalize relations.');
+        }
+
         $resource = $this->guessResource($data, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
@@ -276,6 +291,8 @@ class ItemNormalizer extends AbstractNormalizer
      * @param mixed                      $value
      *
      * @return object|null
+     *
+     * @throws InvalidArgumentException
      */
     private function denormalizeRelation(
         ResourceInterface $currentResource,

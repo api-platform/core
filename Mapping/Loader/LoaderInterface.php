@@ -24,9 +24,9 @@ interface LoaderInterface
      * Loads metadata for the given class.
      *
      * @param ClassMetadata $classMetadata
-     * @param array|null    $normalizationGroups
-     * @param array|null    $denormalizationGroups
-     * @param array|null    $validationGroups
+     * @param string[]|null $normalizationGroups
+     * @param string[]|null $denormalizationGroups
+     * @param string[]|null $validationGroups
      *
      * @return bool
      */
