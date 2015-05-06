@@ -42,6 +42,13 @@ class Configuration implements ConfigurationInterface
                         ->enumNode('order')->values([null, 'ASC', 'DESC'])->defaultNull()->info('The default order of results.')->end()
                     ->end()
                 ->end()
+                ->arrayNode('request_items_per_page')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')->defaultValue(false)->end()
+                        ->scalarNode('parameter_name')->defaultValue('itemsPerPage')->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
