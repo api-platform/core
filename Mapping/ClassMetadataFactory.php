@@ -14,7 +14,6 @@ namespace Dunglas\ApiBundle\Mapping;
 use Doctrine\Common\Cache\Cache;
 use Dunglas\ApiBundle\Mapping\Loader\LoaderInterface;
 use Dunglas\ApiBundle\Util\ClassInfo;
-use Dunglas\ApiBundle\Util\Reflection;
 
 /**
  * {@inheritdoc}
