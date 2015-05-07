@@ -6,6 +6,8 @@
 
     <services>
         <service id="api.fos_user.event_subscriber" class="Dunglas\ApiBundle\FosUser\EventSubscriber">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="fos_user.user_manager" />
             <tag name="kernel.event_subscriber" />
         </service>
     </services>
