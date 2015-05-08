@@ -1,33 +1,36 @@
 framework:
-    secret:                         "dunglas.fr"
+    secret:                           "dunglas.fr"
     router:
-        resource:                   "%kernel.root_dir%/config/routing.yml"
-        strict_requirements:        "%kernel.debug%"
+        resource:                     "%kernel.root_dir%/config/routing.yml"
+        strict_requirements:          "%kernel.debug%"
     validation:
-        enable_annotations:          true
+        enable_annotations:            true
     serializer:
-        enable_annotations:          true
+        enable_annotations:            true
     trusted_proxies: ~
     test: ~
     session:
-        storage_id:                  "session.storage.mock_file"
+        storage_id:                    "session.storage.mock_file"
 
 doctrine:
     dbal:
-        driver:                      "pdo_sqlite"
-        path:                        "%kernel.cache_dir%/db.sqlite"
-        charset:                     "UTF8"
+        driver:                        "pdo_sqlite"
+        path:                          "%kernel.cache_dir%/db.sqlite"
+        charset:                       "UTF8"
 
     orm:
-        auto_generate_proxy_classes: "%kernel.debug%"
-        auto_mapping:                true
+        auto_generate_proxy_classes:   "%kernel.debug%"
+        auto_mapping:                  true
 
 dunglas_api:
-    title:                           "My Dummy API"
-    description:                     "This is a test API."
-    default:
-        items_per_page:              3
-        order:                       "ASC"
+    title:                             "My Dummy API"
+    description:                       "This is a test API."
+    collection:
+        order:                         "ASC"
+        pagination:
+            items_per_page:
+                number:                3
+                enable_client_request: true
 
 services:
     my_dummy_resource.filter.id:

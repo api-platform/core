@@ -169,6 +169,138 @@ Feature: Collections support
     }
     """
 
+  Scenario: Change the number of element by page client side
+    When I send a "GET" request to "/dummies?page=2&itemsPerPage=10"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/dummies?page=2",
+      "@type": "hydra:PagedCollection",
+      "hydra:previousPage": "/dummies",
+      "hydra:nextPage": "/dummies?page=3",
+      "hydra:totalItems": 30,
+      "hydra:itemsPerPage": 10,
+      "hydra:firstPage": "/dummies",
+      "hydra:lastPage": "/dummies?page=3",
+      "hydra:member": [
+        {
+          "@id": "/dummies/11",
+          "@type": "Dummy",
+          "name": "Dummy #11",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/12",
+          "@type": "Dummy",
+          "name": "Dummy #12",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/13",
+          "@type": "Dummy",
+          "name": "Dummy #13",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/14",
+          "@type": "Dummy",
+          "name": "Dummy #14",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/15",
+          "@type": "Dummy",
+          "name": "Dummy #15",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/16",
+          "@type": "Dummy",
+          "name": "Dummy #16",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/17",
+          "@type": "Dummy",
+          "name": "Dummy #17",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/18",
+          "@type": "Dummy",
+          "name": "Dummy #18",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/19",
+          "@type": "Dummy",
+          "name": "Dummy #19",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        },
+        {
+          "@id": "/dummies/20",
+          "@type": "Dummy",
+          "name": "Dummy #20",
+          "dummy": null,
+          "dummyDate": null,
+          "relatedDummy": null,
+          "relatedDummies": [
+            
+          ]
+        }
+      ]
+    }
+    """
+
   Scenario: Filter with exact match
     When I send a "GET" request to "/dummies?id=8"
     Then the response status code should be 200

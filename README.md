@@ -70,15 +70,38 @@ api:
 The first step is to name your API. Add the following lines in `app/config/config.yml`:
 
 ```yaml
+# Default configuration for extension with alias: "dunglas_api"
 dunglas_api:
-    title:              "Your API name"
-    description:        "The full description of your API"
-    default:                                               # optional
-        items_per_page: 30                                 # Number of items per page in paginated collections (optional)
-        order:          ~                                  # Default order: null for natural order, ASC or DESC (optional)
-    request_items_per_page:                                # Allow configuration of itemsPerPage from request
-        enabled: false                                     # Enable the feature
-        parameter_name: itemsPerPage                       # Name of the request parameter
+
+    # The title of the API.
+    title:                "Your API name" # Required
+
+    # The description of the API.
+    description:          "The full description of your API" # Required
+
+    # The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.
+    cache:                false
+
+    # Enable the FOSUserBundle integration.
+    enable_fos_user:      false
+    collection:
+
+        # The default order of results. (supported by Doctrine: ASC and DESC)
+        order:                null
+        pagination:
+
+            # The name of the parameter handling the page number.
+            page_parameter_name:  page
+            items_per_page:
+
+                # The default number of items perm page in collections.
+                number:               30
+
+                # Allow the client to change the number of elements by page.
+                enable_client_request:  false
+
+                # The name of the parameter to change the number of elements by page client side.
+                parameter_name:       itemsPerPage
 ```
 
 The name and the description you give will be accessible trough the auto-generated Hydra documentation.

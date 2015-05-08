@@ -30,10 +30,6 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container)
     {
-        if (isset($container->getParameter('kernel.bundles')['FOSUserBundle'])) {
-            $container->prependExtensionConfig($this->getAlias(), ['enable_fos_user_event_subscriber' => true]);
-        }
-
         if (null !== ($frameworkConfiguration = $container->getExtensionConfig('framework'))) {
             if (!isset($frameworkConfiguration['serializer']) || !isset($frameworkConfiguration['serializer']['enabled'])) {
                 $container->prependExtensionConfig('framework', [
@@ -55,10 +51,11 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('api.title', $config['title']);
         $container->setParameter('api.description', $config['description']);
-        $container->setParameter('api.default.items_per_page', $config['default']['items_per_page']);
-        $container->setParameter('api.default.order', $config['default']['order']);
-        $container->setParameter('api.request_items_per_page.enabled', $config['request_items_per_page']['enabled']);
-        $container->setParameter('api.request_items_per_page.parameterName', $config['request_items_per_page']['parameter_name']);
+        $container->setParameter('api.collection.order', $config['collection']['order']);
+        $container->setParameter('api.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
+        $container->setParameter('api.collection.pagination.items_per_page.number', $config['collection']['pagination']['items_per_page']['number']);
+        $container->setParameter('api.collection.pagination.items_per_page.enable_client_request', $config['collection']['pagination']['items_per_page']['enable_client_request']);
+        $container->setParameter('api.collection.pagination.items_per_page.parameter_name', $config['collection']['pagination']['items_per_page']['parameter_name']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
@@ -71,7 +68,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('hydra.xml');
 
         // FOSUser support
-        if ($config['enable_fos_user_event_subscriber']) {
+        if ($config['enable_fos_user']) {
             $loader->load('fos_user.xml');
         }
 
