@@ -181,8 +181,8 @@ class ItemNormalizer extends AbstractNormalizer
         $attributesMetadata = $this->getMetadata($resource, $context)->getAttributes();
 
         $allowedAttributes = [];
-        foreach ($attributesMetadata as $attributeName => $attributeMetatdata) {
-            if ($attributeMetatdata->isReadable()) {
+        foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
+            if ($attributeMetadata->isReadable()) {
                 $allowedAttributes[] = $attributeName;
             }
         }

@@ -104,7 +104,7 @@ dunglas_api:
                 parameter_name:       itemsPerPage
 ```
 
-The name and the description you give will be accessible trough the auto-generated Hydra documentation.
+The name and the description you give will be accessible through the auto-generated Hydra documentation.
 
 ### Map your entities
 
@@ -669,7 +669,7 @@ the Hydra vocab (if enabled).
         tags:      [ { name: "api.resource" } ]
 ```
 
-Additionnaly to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
+Additionally to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
 the `/products/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
 
 ### Using a custom `Resource` class
