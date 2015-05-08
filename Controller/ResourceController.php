@@ -126,6 +126,8 @@ class ResourceController extends Controller
 
         $defaultItemsPerPage = $this->container->getParameter('api.collection.pagination.items_per_page.number');
 
+        $itemsPerPage = $defaultItemsPerPage;
+
         if ($this->container->getParameter('api.collection.pagination.items_per_page.enable_client_request')) {
             $parameterName = $this->container->getParameter('api.collection.pagination.items_per_page.parameter_name');
             $itemsPerPage = $request->get($parameterName, $defaultItemsPerPage);
