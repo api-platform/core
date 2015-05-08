@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -41,65 +42,62 @@ class Filter implements FilterInterface
      */
     private $propertyAccessor;
     /**
-     * @var string
+     * @var null|array
      */
-    private $name;
-    /**
-     * @var string
-     */
-    private $strategy;
+    private $properties;
 
     /**
-     * @param string $name
-     * @param string $strategy
+     * @param IriConverterInterface     $iriConverter
+     * @param PropertyAccessorInterface $propertyAccessor
+     * @param null|array                $properties       Null to allow filtering on all properties with the exact strategy or a map of property name with strategy.
      */
     public function __construct(
         IriConverterInterface $iriConverter,
         PropertyAccessorInterface $propertyAccessor,
-        $name,
-        $strategy = self::STRATEGY_EXACT
+        array $properties = null
     ) {
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
-        $this->name = $name;
-        $this->strategy = $strategy;
+        $this->properties = $properties;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, $value)
-    {
-        $exact = self::STRATEGY_EXACT === $this->strategy;
-
         $metadata = $queryBuilder->getEntityManager()->getClassMetadata($resource->getEntityClass());
         $fieldNames = array_flip($metadata->getFieldNames());
 
-        if (isset($fieldNames[$this->name])) {
-            if ('id' === $this->name) {
-                $value = $this->getFilterValueFromUrl($value);
+        foreach ($request->query->all() as $filter => $value) {
+            if (!is_string($value)) {
+                continue;
             }
 
-            $queryBuilder
-                ->andWhere(sprintf('o.%1$s LIKE :%1$s', $this->name))
-                ->setParameter($this->name, $exact ? $value : sprintf('%%%s%%', $value))
-            ;
-        } elseif ($metadata->isSingleValuedAssociation($this->name) || $metadata->isCollectionValuedAssociation($this->name)) {
-            $value = $this->getFilterValueFromUrl($value);
+            if (null === $this->properties || isset($this->properties[$filter])) {
+                $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$filter];
 
-            $queryBuilder
-                ->join(sprintf('o.%s', $this->name), $this->name)
-                ->andWhere(sprintf('%1$s.id = :%1$s', $this->name))
-                ->setParameter($this->name, $exact ? $value : sprintf('%%%s%%', $value))
-            ;
+                if (isset($fieldNames[$filter])) {
+                    if ('id' === $filter) {
+                        $value = $this->getFilterValueFromUrl($value);
+                    }
+
+                    $queryBuilder
+                        ->andWhere(sprintf('o.%1$s LIKE :%1$s', $filter))
+                        ->setParameter($filter, $partial ? sprintf('%%%s%%', $value) : $value)
+                    ;
+                } elseif (
+                    $metadata->isSingleValuedAssociation($filter) || $metadata->isCollectionValuedAssociation($filter)
+                ) {
+                    $value = $this->getFilterValueFromUrl($value);
+
+                    $queryBuilder
+                        ->join(sprintf('o.%s', $filter), $filter)
+                        ->andWhere(sprintf('%1$s.id = :%1$s', $filter))
+                        ->setParameter($filter, $partial ? sprintf('%%%s%%', $value) : $value)
+                    ;
+                }
+            }
         }
     }
 

@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Data provider for the Doctrine ORM.
@@ -27,10 +28,49 @@ class DataProvider implements DataProviderInterface
      * @var ManagerRegistry
      */
     private $managerRegistry;
+    /**
+     * @var string|null
+     */
+    private $order;
+    /**
+     * @var string
+     */
+    private $pageParameter;
+    /**
+     * @var int
+     */
+    private $itemsPerPage;
+    /**
+     * @var bool
+     */
+    private $enableClientRequestItemsPerPage;
+    /**
+     * @var string
+     */
+    private $itemsPerPageParameter;
 
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param string|null     $order
+     * @param string          $pageParameter
+     * @param int             $itemsPerPage
+     * @param bool            $enableClientRequestItemsPerPage
+     * @param string          $itemsPerPageParameter
+     */
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        $order,
+        $pageParameter,
+        $itemsPerPage,
+        $enableClientRequestItemsPerPage,
+        $itemsPerPageParameter
+    ) {
         $this->managerRegistry = $managerRegistry;
+        $this->order = $order;
+        $this->pageParameter = $pageParameter;
+        $this->itemsPerPage = $itemsPerPage;
+        $this->enableClientRequestItemsPerPage = $enableClientRequestItemsPerPage;
+        $this->itemsPerPageParameter = $itemsPerPageParameter;
     }
 
     /**
@@ -51,12 +91,19 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollection(ResourceInterface $resource, array $filters = [], array $order = [], $page = null, $itemsPerPage = null)
+    public function getCollection(ResourceInterface $resource, Request $request)
     {
         $entityClass = $resource->getEntityClass();
 
         $manager = $this->managerRegistry->getManagerForClass($resource->getEntityClass());
         $repository = $manager->getRepository($entityClass);
+
+        $page = (int) $request->get($this->pageParameter, 1);
+
+        $itemsPerPage = $this->itemsPerPage;
+        if ($this->enableClientRequestItemsPerPage && $requestedItemsPerPage = $request->get($this->itemsPerPageParameter)) {
+            $itemsPerPage = (int) $requestedItemsPerPage;
+        }
 
         $queryBuilder = $repository
             ->createQueryBuilder('o')
@@ -64,18 +111,14 @@ class DataProvider implements DataProviderInterface
             ->setMaxResults($itemsPerPage)
         ;
 
-        foreach ($resource->getFilters() as $enabledFilter) {
-            $filterName = $enabledFilter->getName();
-
-            if (!isset($filters[$filterName]) && $enabledFilter instanceof FilterInterface) {
-                continue;
+        foreach ($resource->getFilters() as $filter) {
+            if ($filter instanceof FilterInterface) {
+                $filter->apply($resource, $queryBuilder, $request);
             }
-
-            $enabledFilter->apply($resource, $queryBuilder, $filters[$filterName]);
         }
 
-        foreach ($order as $key => $value) {
-            $queryBuilder->addOrderBy('o.'.$key, $value);
+        if ($this->order) {
+            $queryBuilder->addOrderBy('o.id', $this->order);
         }
 
         return new Paginator(new DoctrineOrmPaginator($queryBuilder));
