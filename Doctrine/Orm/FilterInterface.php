@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\Filter\FilterInterface as BaseFilterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Doctrine ORM filter interface.
@@ -27,7 +28,7 @@ interface FilterInterface extends BaseFilterInterface
      *
      * @param ResourceInterface $resource
      * @param QueryBuilder      $queryBuilder
-     * @param string            $value
+     * @param Request           $request
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, $value);
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request);
 }

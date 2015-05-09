@@ -118,31 +118,11 @@ class ResourceController extends Controller
      * @param ResourceInterface $resource
      * @param Request           $request
      *
-     * @return PaginatorInterface
+     * @return PaginatorInterface|array|\Traversable
      */
     protected function getCollectionData(ResourceInterface $resource, Request $request)
     {
-        $page = (int) $request->get($this->container->getParameter('api.collection.pagination.page_parameter_name'), 1);
-
-        $defaultItemsPerPage = $this->container->getParameter('api.collection.pagination.items_per_page.number');
-
-        $itemsPerPage = $defaultItemsPerPage;
-
-        if ($this->container->getParameter('api.collection.pagination.items_per_page.enable_client_request')) {
-            $parameterName = $this->container->getParameter('api.collection.pagination.items_per_page.parameter_name');
-            $itemsPerPage = $request->get($parameterName, $defaultItemsPerPage);
-        }
-
-        $defaultOrder = $this->container->getParameter('api.collection.order');
-        $order = $defaultOrder ? ['id' => $defaultOrder] : [];
-
-        return $this->get('api.data_provider')->getCollection(
-            $resource,
-            $request->query->getIterator()->getArrayCopy(),
-            $order,
-            $page,
-            $itemsPerPage
-        );
+        return $this->get('api.data_provider')->getCollection($resource, $request);
     }
 
     /**

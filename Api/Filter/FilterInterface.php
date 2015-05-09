@@ -18,10 +18,4 @@ namespace Dunglas\ApiBundle\Api\Filter;
  */
 interface FilterInterface
 {
-    /**
-     * Gets filter name.
-     *
-     * @return string
-     */
-    public function getName();
 }

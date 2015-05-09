@@ -33,13 +33,9 @@ dunglas_api:
                 enable_client_request: true
 
 services:
-    my_dummy_resource.filter.id:
+    my_dummy_resource.filter:
         parent:                     "api.doctrine.orm.filter"
-        arguments:                  [ "id" ]
-
-    my_dummy_resource.filter.name:
-        parent:                     "api.doctrine.orm.filter"
-        arguments:                  [ "name", "partial" ]
+        arguments:                  [ { "id": "exact", "name": "partial" } ]
 
     my_dummy_resource:
         parent:                      "api.resource"
@@ -47,10 +43,7 @@ services:
         calls:
                                      - method:    "addFilter"
                                        arguments:
-                                           -      "@my_dummy_resource.filter.id"
-                                     - method:    "addFilter"
-                                       arguments:
-                                           -      "@my_dummy_resource.filter.name"
+                                           -      "@my_dummy_resource.filter"
         tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:

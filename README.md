@@ -223,17 +223,13 @@ To allow filtering the list of offers:
 
 ```yaml
 services:
-    resource.offer.filter.id:
+    resource.offer.filter:
         parent:    "api.doctrine.orm.filter"
-        arguments: [ "id" ] # Filters on the id property, allow both numeric values and IRIs
-
-    resource.offer.filter.price:
-        parent:    "api.doctrine.orm.filter"
-        arguments: [ "price" ] # Extracts all collection elements with the exact given price
-
-    resource.offer.filter.name:
-        parent:    "api.doctrine.orm.filter"
-        arguments: [ "name", "partial" ] # Elements with given text in their name
+        arguments: [ {
+                        "id": "exact",    # Filters on the id property, allow both numeric values and IRIs
+                        "price": "exact", # Extracts all collection elements with the exact given price
+                        "name": "partial" # Elements with given text in their name
+                   } ]
 
     resource.offer:
         parent:    "api.resource"
@@ -241,13 +237,7 @@ services:
         calls:
             -      method:    "addFilter"
                    arguments:
-                       -      "@resource.offer.filter.id"
-            -      method:    "addFilter"
-                   arguments:
-                       -      "@resource.offer.filter.price"
-            -      method:    "addFilter"
-                   arguments:
-                       -      "@resource.offer.filter.name"
+                       -      "@resource.offer.filter"
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -260,9 +250,9 @@ It also possible to filter by relations:
 
 ```yaml
 services:
-    resource.offer.filter.product:
+    resource.offer.filter:
         parent:    "api.doctrine.orm.filter"
-        arguments: [ "product" ]
+        arguments: [ { "product": "exact" } ]
 
     resource.offer:
         parent:    "api.resource"
@@ -270,7 +260,7 @@ services:
         calls:
             -      method:    "addFilter"
                    arguments:
-                       -      "@resource.offer.filter.product"
+                       -      "@resource.offer.filter"
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -279,6 +269,24 @@ Try the following: `http://localhost:8000/api/offers?product=/api/products/12`
 Using a numeric ID will also work: `http://localhost:8000/api/offers?product=12`
 
 It will return all offers for the product having the JSON-LD identifier (`@id`) `http://localhost:8000/api/products/12`.
+
+The last possibility offered by the bundle is to enable filters on all properties exposed by the bundle by omitting the
+first argument of the filter:
+
+```yaml
+services:
+    resource.offer.filter:
+        parent:    "api.doctrine.orm.filter"
+
+    resource.offer:
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer"] 
+        calls:
+            -      method:    "addFilter"
+                   arguments:
+                       -      "@resource.offer.filter"
+        tags:      [ { name: "api.resource" } ]
+```
 
 #### Creating custom filters
 
