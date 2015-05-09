@@ -26,13 +26,13 @@ class ObjectEvent extends Event
      */
     private $resource;
     /**
-     * @var object
+     * @var object|array
      */
     private $object;
 
     /**
      * @param ResourceInterface $resource
-     * @param object            $object
+     * @param object|array      $object
      */
     public function __construct(ResourceInterface $resource, $object)
     {

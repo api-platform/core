@@ -117,7 +117,7 @@ class DataProvider implements DataProviderInterface
             }
         }
 
-        if ($this->order) {
+        if (null !== $this->order) {
             $queryBuilder->addOrderBy('o.id', $this->order);
         }
 
