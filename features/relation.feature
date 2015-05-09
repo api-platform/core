@@ -63,12 +63,12 @@ Feature: Relations support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies",
+      "@id": "/dummies?relatedDummy=%2Frelated_dummies%2F1",
       "@type": "hydra:PagedCollection",
       "hydra:totalItems": 1,
       "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies",
+      "hydra:firstPage": "/dummies?relatedDummy=%2Frelated_dummies%2F1",
+      "hydra:lastPage": "/dummies?relatedDummy=%2Frelated_dummies%2F1",
       "hydra:member": [
         {
           "@id": "/dummies/1",
