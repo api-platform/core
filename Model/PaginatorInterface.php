@@ -16,7 +16,7 @@ namespace Dunglas\ApiBundle\Model;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PaginatorInterface extends \Traversable
+interface PaginatorInterface extends \Traversable, \Countable
 {
     /**
      * Gets the current page number.

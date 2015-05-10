@@ -147,6 +147,13 @@ class ResourceController extends Controller
         $resource = $this->getResource($request);
         $data = $this->getCollectionData($resource, $request);
 
+        if (
+            $request->get($this->container->getParameter('api.collection.pagination.page_parameter_name')) &&
+            0 === count($data)
+        ) {
+            throw $this->createNotFoundException();
+        }
+
         $this->get('event_dispatcher')->dispatch(Events::RETRIEVE_LIST, new DataEvent($resource, $data));
 
         return $this->getSuccessResponse($resource, $data, 200, [], ['request_uri' => $request->getRequestUri()]);
