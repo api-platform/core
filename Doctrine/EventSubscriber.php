@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\Doctrine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Dunglas\ApiBundle\Event\Events;
-use Dunglas\ApiBundle\Event\ObjectEvent;
+use Dunglas\ApiBundle\Event\DataEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -54,12 +54,15 @@ class EventSubscriber implements EventSubscriberInterface
     /**
      * Persists the given object and flushes.
      *
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function persistObject(ObjectEvent $event)
+    public function persistObject(DataEvent $event)
     {
-        $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
-        $objectManager->persist($event->getObject());
+        if (!$objectManager = $this->getManagerIfApplicable($event)) {
+            return;
+        }
+
+        $objectManager->persist($event->getData());
         $objectManager->flush();
 
         $this->eventDispatcher->dispatch(Events::POST_CREATE, $event);
@@ -69,11 +72,14 @@ class EventSubscriber implements EventSubscriberInterface
     /**
      * Updates the given object and flushes.
      *
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function updateObject(ObjectEvent $event)
+    public function updateObject(DataEvent $event)
     {
-        $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
+        if (!$objectManager = $this->getManagerIfApplicable($event)) {
+            return;
+        }
+
         $objectManager->flush();
 
         $this->eventDispatcher->dispatch(Events::POST_UPDATE, $event);
@@ -83,16 +89,37 @@ class EventSubscriber implements EventSubscriberInterface
     /**
      * Removes the given object and flushes.
      *
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function deleteObject(ObjectEvent $event)
+    public function deleteObject(DataEvent $event)
     {
-        $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
+        if (!$objectManager = $this->getManagerIfApplicable($event)) {
+            return;
+        }
 
-        $objectManager->remove($event->getObject());
+        $objectManager->remove($event->getData());
         $objectManager->flush();
 
         $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
         $event->stopPropagation();
+    }
+
+    /**
+     * Gets the manager if applicable.
+     *
+     * @param DataEvent $event
+     *
+     * @return \Doctrine\Common\Persistence\ObjectManager|bool
+     */
+    private function getManagerIfApplicable(DataEvent $event)
+    {
+        $objectManager = $this->managerRegistry->getManagerForClass($event->getResource()->getEntityClass());
+        $object = $event->getData();
+
+        if (null !== $objectManager && is_object($object)) {
+            return $objectManager;
+        }
+
+        return false;
     }
 }

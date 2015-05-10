@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ObjectEvent extends Event
+class DataEvent extends Event
 {
     /**
      * @var ResourceInterface
@@ -28,16 +28,16 @@ class ObjectEvent extends Event
     /**
      * @var object|array
      */
-    private $object;
+    private $data;
 
     /**
      * @param ResourceInterface $resource
-     * @param object|array      $object
+     * @param object|array      $data
      */
-    public function __construct(ResourceInterface $resource, $object)
+    public function __construct(ResourceInterface $resource, $data)
     {
         $this->resource = $resource;
-        $this->object = $object;
+        $this->data = $data;
     }
 
     /**
@@ -51,12 +51,12 @@ class ObjectEvent extends Event
     }
 
     /**
-     * Gets related object.
+     * Gets related data.
      *
-     * @return object
+     * @return object|array
      */
-    public function getObject()
+    public function getData()
     {
-        return $this->object;
+        return $this->data;
     }
 }
