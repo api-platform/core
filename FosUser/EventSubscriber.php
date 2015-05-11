@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\FosUser;
 
 use Dunglas\ApiBundle\Event\Events;
-use Dunglas\ApiBundle\Event\ObjectEvent;
+use Dunglas\ApiBundle\Event\DataEvent;
 use FOS\UserBundle\Model\UserManagerInterface;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -55,11 +55,11 @@ class EventSubscriber implements EventSubscriberInterface
     /**
      * Persists the given user object.
      *
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function persistObject(ObjectEvent $event)
+    public function persistObject(DataEvent $event)
     {
-        $object = $event->getObject();
+        $object = $event->getData();
         if ($object instanceof UserInterface) {
             $this->userManager->updateUser($object);
 
@@ -71,11 +71,11 @@ class EventSubscriber implements EventSubscriberInterface
     /**
      * Updates the given user object.
      *
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function updateObject(ObjectEvent $event)
+    public function updateObject(DataEvent $event)
     {
-        $object = $event->getObject();
+        $object = $event->getData();
         if ($object instanceof UserInterface) {
             $this->userManager->updateUser($object);
 
@@ -87,13 +87,13 @@ class EventSubscriber implements EventSubscriberInterface
     /**
      * Removes the given user object.
      *
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function deleteObject(ObjectEvent $event)
+    public function deleteObject(DataEvent $event)
     {
-        $object = $event->getObject();
+        $object = $event->getData();
         if ($object instanceof UserInterface) {
-            $this->userManager->deleteUser($event->getObject());
+            $this->userManager->deleteUser($object);
 
             $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
             $event->stopPropagation();

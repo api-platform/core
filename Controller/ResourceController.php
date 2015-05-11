@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Controller;
 
 use Dunglas\ApiBundle\Event\Events;
-use Dunglas\ApiBundle\Event\ObjectEvent;
+use Dunglas\ApiBundle\Event\DataEvent;
 use Dunglas\ApiBundle\Exception\DeserializationException;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
@@ -147,7 +147,7 @@ class ResourceController extends Controller
         $resource = $this->getResource($request);
         $data = $this->getCollectionData($resource, $request);
 
-        $this->get('event_dispatcher')->dispatch(Events::RETRIEVE_LIST, new ObjectEvent($resource, $data));
+        $this->get('event_dispatcher')->dispatch(Events::RETRIEVE_LIST, new DataEvent($resource, $data));
 
         return $this->getSuccessResponse($resource, $data, 200, [], ['request_uri' => $request->getRequestUri()]);
     }
@@ -175,12 +175,12 @@ class ResourceController extends Controller
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE_VALIDATION, new ObjectEvent($resource, $object));
+        $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE_VALIDATION, new DataEvent($resource, $object));
 
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
             // Validation succeed
-            $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE, new ObjectEvent($resource, $object));
+            $this->get('event_dispatcher')->dispatch(Events::PRE_CREATE, new DataEvent($resource, $object));
 
             return $this->getSuccessResponse($resource, $object, 201);
         }
@@ -204,7 +204,7 @@ class ResourceController extends Controller
         $resource = $this->getResource($request);
         $object = $this->findOrThrowNotFound($resource, $id);
 
-        $this->get('event_dispatcher')->dispatch(Events::RETRIEVE, new ObjectEvent($resource, $object));
+        $this->get('event_dispatcher')->dispatch(Events::RETRIEVE, new DataEvent($resource, $object));
 
         return $this->getSuccessResponse($resource, $object);
     }
@@ -238,12 +238,12 @@ class ResourceController extends Controller
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE_VALIDATION, new ObjectEvent($resource, $object));
+        $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE_VALIDATION, new DataEvent($resource, $object));
 
         $violations = $this->get('validator')->validate($object, null, $resource->getValidationGroups());
         if (0 === count($violations)) {
             // Validation succeed
-            $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE, new ObjectEvent($resource, $object));
+            $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE, new DataEvent($resource, $object));
 
             return $this->getSuccessResponse($resource, $object, 202);
         }
@@ -267,7 +267,7 @@ class ResourceController extends Controller
         $resource = $this->getResource($request);
         $object = $this->findOrThrowNotFound($resource, $id);
 
-        $this->get('event_dispatcher')->dispatch(Events::PRE_DELETE, new ObjectEvent($resource, $object));
+        $this->get('event_dispatcher')->dispatch(Events::PRE_DELETE, new DataEvent($resource, $object));
 
         return new Response(null, 204);
     }
