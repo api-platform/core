@@ -32,8 +32,8 @@
 
         <service id="api.hydra.normalizer.collection" class="Dunglas\ApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.iri_converter" />
             <argument type="service" id="api.json_ld.context_builder" />
+            <argument>%api.collection.pagination.page_parameter_name%</argument>
 
             <tag name="serializer.normalizer" priority="50" />
         </service>

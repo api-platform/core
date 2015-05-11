@@ -11,7 +11,6 @@
 
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
-use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceResolver;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
@@ -39,22 +38,27 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
     /**
-     * @var IriConverterInterface
-     */
-    private $iriConverter;
-    /**
      * @var ContextBuilder
      */
     private $contextBuilder;
+    /**
+     * @var string
+     */
+    private $pageParameterName;
 
+    /**
+     * @param ResourceCollectionInterface $resourceCollection
+     * @param ContextBuilder              $contextBuilder
+     * @param string                      $pageParameterName
+     */
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
-        IriConverterInterface $iriConverter,
-        ContextBuilder $contextBuilder
+        ContextBuilder $contextBuilder,
+        $pageParameterName
     ) {
         $this->resourceCollection = $resourceCollection;
-        $this->iriConverter = $iriConverter;
         $this->contextBuilder = $contextBuilder;
+        $this->pageParameterName = $pageParameterName;
     }
 
     /**
@@ -79,7 +83,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                 $data[] = $this->serializer->normalize($obj, $format, $context);
             }
         } else {
-            $data['@id'] = $this->iriConverter->getIriFromResource($resource);
+            $data['@id'] = $context['request_uri'];
 
             if ($object instanceof PaginatorInterface) {
                 $data['@type'] = self::HYDRA_PAGED_COLLECTION;
@@ -87,23 +91,19 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                 $currentPage = $object->getCurrentPage();
                 $lastPage = $object->getLastPage();
 
-                $baseUrl = $data['@id'];
-                $paginatedUrl = $baseUrl.'?page=';
-
                 if (1. !== $currentPage) {
                     $previousPage = $currentPage - 1.;
-                    $data['@id'] .= $paginatedUrl.$currentPage;
-                    $data['hydra:previousPage'] = 1. === $previousPage ? $baseUrl : $paginatedUrl.$previousPage;
+                    $data['hydra:previousPage'] = $this->getPageUrl($context['request_uri'], $previousPage);
                 }
 
                 if ($currentPage !== $lastPage) {
-                    $data['hydra:nextPage'] = $paginatedUrl.($currentPage + 1.);
+                    $data['hydra:nextPage'] = $this->getPageUrl($context['request_uri'], $currentPage + 1.);
                 }
 
                 $data['hydra:totalItems'] = $object->getTotalItems();
                 $data['hydra:itemsPerPage'] = $object->getItemsPerPage();
-                $data['hydra:firstPage'] = $baseUrl;
-                $data['hydra:lastPage'] = 1. === $lastPage ? $baseUrl : $paginatedUrl.$lastPage;
+                $data['hydra:firstPage'] = $this->getPageUrl($context['request_uri'], 1.);
+                $data['hydra:lastPage'] = $this->getPageUrl($context['request_uri'], $lastPage);
             } else {
                 $data['@type'] = self::HYDRA_COLLECTION;
             }
@@ -115,5 +115,42 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
         }
 
         return $data;
+    }
+
+    /**
+     * Gets a collection URL for the given page.
+     *
+     * @param string $requestUri
+     * @param float  $page
+     *
+     * @return string
+     */
+    private function getPageUrl($requestUri, $page)
+    {
+        $parts = parse_url($requestUri);
+
+        $parameters = [];
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $parameters);
+
+            // Remove existing page parameter
+            if (isset($parameters[$this->pageParameterName])) {
+                unset($parameters[$this->pageParameterName]);
+            }
+        }
+
+        if (1. !== $page) {
+            $parameters[$this->pageParameterName] = $page;
+        }
+
+        $parts['query'] = http_build_query($parameters);
+
+        $url = $parts['path'];
+
+        if ('' !== $parts['query']) {
+            $url .= '?'.$parts['query'];
+        }
+
+        return $url;
     }
 }

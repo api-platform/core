@@ -81,7 +81,7 @@ Feature: Collections support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies/dummies?page=7",
+      "@id": "/dummies?page=7",
       "@type": "hydra:PagedCollection",
       "hydra:previousPage": "/dummies?page=6",
       "hydra:nextPage": "/dummies?page=8",
@@ -130,7 +130,7 @@ Feature: Collections support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies/dummies?page=10",
+      "@id": "/dummies?page=10",
       "@type": "hydra:PagedCollection",
       "hydra:previousPage": "/dummies?page=9",
       "hydra:totalItems": 30,
@@ -178,14 +178,14 @@ Feature: Collections support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies/dummies?page=2",
+      "@id": "/dummies?page=2&itemsPerPage=10",
       "@type": "hydra:PagedCollection",
-      "hydra:previousPage": "/dummies",
-      "hydra:nextPage": "/dummies?page=3",
+      "hydra:previousPage": "/dummies?itemsPerPage=10",
+      "hydra:nextPage": "/dummies?itemsPerPage=10&page=3",
       "hydra:totalItems": 30,
       "hydra:itemsPerPage": 10,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies?page=3",
+      "hydra:firstPage": "/dummies?itemsPerPage=10",
+      "hydra:lastPage": "/dummies?itemsPerPage=10&page=3",
       "hydra:member": [
         {
           "@id": "/dummies/11",
@@ -310,12 +310,12 @@ Feature: Collections support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies",
+      "@id": "/dummies?id=8",
       "@type": "hydra:PagedCollection",
       "hydra:totalItems": 1,
       "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies",
+      "hydra:firstPage": "/dummies?id=8",
+      "hydra:lastPage": "/dummies?id=8",
       "hydra:member": [
           {
             "@id": "/dummies/8",
@@ -339,12 +339,12 @@ Feature: Collections support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies",
+      "@id": "/dummies?id=%2fdummies%2f8",
       "@type": "hydra:PagedCollection",
       "hydra:totalItems": 1,
       "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies",
+      "hydra:firstPage": "/dummies?id=%2Fdummies%2F8",
+      "hydra:lastPage": "/dummies?id=%2Fdummies%2F8",
       "hydra:member": [
           {
             "@id": "/dummies/8",
@@ -369,12 +369,12 @@ Feature: Collections support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies",
+      "@id": "/dummies?name=Dummy%20%238",
       "@type": "hydra:PagedCollection",
       "hydra:totalItems": 1,
       "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies",
+      "hydra:firstPage": "/dummies?name=Dummy+%238",
+      "hydra:lastPage": "/dummies?name=Dummy+%238",
       "hydra:member": [
           {
             "@id": "/dummies/8",

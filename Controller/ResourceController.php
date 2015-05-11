@@ -70,13 +70,21 @@ class ResourceController extends Controller
      * @param array|object      $data
      * @param int               $status
      * @param array             $headers
+     * @param array             $additionalContext
      *
      * @return Response
      */
-    protected function getSuccessResponse(ResourceInterface $resource, $data, $status = 200, array $headers = [])
-    {
+    protected function getSuccessResponse(
+        ResourceInterface $resource,
+        $data,
+        $status = 200,
+        array $headers = [],
+        array $additionalContext = []
+    ) {
         return new Response(
-            $this->get('serializer')->normalize($data, 'json-ld', $resource->getNormalizationContext()),
+            $this->get('serializer')->normalize(
+                $data, 'json-ld', $resource->getNormalizationContext() + $additionalContext
+            ),
             $status,
             $headers
         );
@@ -141,7 +149,7 @@ class ResourceController extends Controller
 
         $this->get('event_dispatcher')->dispatch(Events::RETRIEVE_LIST, new ObjectEvent($resource, $data));
 
-        return $this->getSuccessResponse($resource, $data);
+        return $this->getSuccessResponse($resource, $data, 200, [], ['request_uri' => $request->getRequestUri()]);
     }
 
     /**
