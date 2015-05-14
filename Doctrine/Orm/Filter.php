@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Doctrine\Orm;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
@@ -34,6 +35,10 @@ class Filter implements FilterInterface
     const STRATEGY_PARTIAL = 'partial';
 
     /**
+     * @var ManagerRegistry
+     */
+    private $managerRegistry;
+    /**
      * @var IriConverterInterface
      */
     private $iriConverter;
@@ -47,15 +52,18 @@ class Filter implements FilterInterface
     private $properties;
 
     /**
+     * @param ManagerRegistry           $managerRegistry
      * @param IriConverterInterface     $iriConverter
      * @param PropertyAccessorInterface $propertyAccessor
      * @param null|array                $properties       Null to allow filtering on all properties with the exact strategy or a map of property name with strategy.
      */
     public function __construct(
+        ManagerRegistry $managerRegistry,
         IriConverterInterface $iriConverter,
         PropertyAccessorInterface $propertyAccessor,
         array $properties = null
     ) {
+        $this->managerRegistry = $managerRegistry;
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
         $this->properties = $properties;
@@ -64,9 +72,36 @@ class Filter implements FilterInterface
     /**
      * {@inheritdoc}
      */
+    public function getDescription(ResourceInterface $resource)
+    {
+        $description = [];
+        $metadata = $this->getClassMetadata($resource);
+
+        foreach ($metadata->getFieldNames() as $fieldName) {
+            if (null === $this->properties || ($found = isset($this->properties[$fieldName]))) {
+                $description[$fieldName] = [
+                    'type' => $metadata->getTypeOfField($fieldName),
+                    'strategy' => $found ? $this->properties[$fieldName] : self::STRATEGY_EXACT,
+                ];
+            }
+        }
+
+        foreach ($metadata->getAssociationNames() as $associationName) {
+            $description[$associationName] = [
+                'type' => 'iri',
+                'strategy' => self::STRATEGY_EXACT,
+            ];
+        }
+
+        return $description;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
-        $metadata = $queryBuilder->getEntityManager()->getClassMetadata($resource->getEntityClass());
+        $metadata = $this->getClassMetadata($resource);
         $fieldNames = array_flip($metadata->getFieldNames());
 
         foreach ($request->query->all() as $filter => $value) {
@@ -119,5 +154,23 @@ class Filter implements FilterInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Gets class metadata for the given resource.
+     *
+     * @param ResourceInterface $resource
+     *
+     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     */
+    private function getClassMetadata(ResourceInterface $resource)
+    {
+        $entityClass = $resource->getEntityClass();
+
+        return $this
+            ->managerRegistry
+            ->getManagerForClass($entityClass)
+            ->getClassMetadata($entityClass)
+        ;
     }
 }
