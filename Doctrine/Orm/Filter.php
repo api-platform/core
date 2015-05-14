@@ -78,7 +78,8 @@ class Filter implements FilterInterface
         $metadata = $this->getClassMetadata($resource);
 
         foreach ($metadata->getFieldNames() as $fieldName) {
-            if (null === $this->properties || ($found = isset($this->properties[$fieldName]))) {
+            $found = isset($this->properties[$fieldName]);
+            if ($found || null === $this->properties) {
                 $description[$fieldName] = [
                     'type' => $metadata->getTypeOfField($fieldName),
                     'strategy' => $found ? $this->properties[$fieldName] : self::STRATEGY_EXACT,
@@ -139,7 +140,7 @@ class Filter implements FilterInterface
     /**
      * Gets the ID from an URI or a raw ID.
      *
-     * @param mixed $value
+     * @param string $value
      *
      * @return string
      */
