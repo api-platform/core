@@ -35,7 +35,7 @@ class RelatedDummy extends ParentDummy
      * @ORM\Column
      * @Groups({"barcelona", "chicago"})
      */
-    public $symfony = 'symfony';
+    protected $symfony = 'symfony';
     /**
      * @ORM\ManyToOne(targetEntity="UnknownDummy", cascade={"persist"})
      */
@@ -49,5 +49,15 @@ class RelatedDummy extends ParentDummy
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getSymfony()
+    {
+        return $this->symfony;
+    }
+
+    public function setSymfony($symfony)
+    {
+        $this->symfony = $symfony;
     }
 }

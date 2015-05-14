@@ -19,8 +19,8 @@ Feature: Relations support
       "@id": "/related_dummies/1",
       "@type": "https://schema.org/Product",
       "unknown": null,
-      "age": null,
-      "symfony": "symfony"
+      "symfony": "symfony",
+      "age": null
     }
     """
 

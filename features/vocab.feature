@@ -193,6 +193,20 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
+                            "@id": "#RelatedDummy/symfony",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "symfony",
+                            "domain": "https://schema.org/Product",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "symfony",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
                             "@id": "#RelatedDummy/age",
                             "@type": "rdf:Property",
                             "rdfs:label": "age",
@@ -204,20 +218,6 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": false,
                         "hydra:description": "The age."
-                    },
-                    {
-                        "@type": "hydra:SupportedProperty",
-                        "hydra:property": {
-                            "@id": "#RelatedDummy/symfony",
-                            "@type": "rdf:Property",
-                            "rdfs:label": "symfony",
-                            "domain": "https://schema.org/Product",
-                            "range": "xmls:string"
-                        },
-                        "hydra:title": "symfony",
-                        "hydra:required": false,
-                        "hydra:readable": true,
-                        "hydra:writable": true
                     }
                 ],
                 "hydra:supportedOperation": [
