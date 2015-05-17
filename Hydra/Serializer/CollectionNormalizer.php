@@ -159,7 +159,6 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      */
     private function getPageUrl(array $parts, array $parameters, $page)
     {
-
         if (1. !== $page) {
             $parameters[$this->pageParameterName] = $page;
         }
@@ -202,7 +201,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
 
         return [
             '@type' => 'hydra:IriTemplate',
-            'hydra:template' => sprintf('%s{?%s}', $parts['path'], join(',', $variables)),
+            'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)),
             'hydra:variableRepresentation' => 'BasicRepresentation',
             'hydra:mapping' => $mapping,
         ];
