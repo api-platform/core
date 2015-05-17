@@ -23,8 +23,10 @@ interface FilterInterface
     /**
      * Gets the description of this filter for the given resource.
      *
-     * Returns an array with the filter names as keys and array with the following data as values:
+     * Returns an array with the filter parameter names as keys and array with the following data as values:
+     *   - property: the property where the filter is applied
      *   - type: the type of the filter
+     *   - required: if this filter is required
      *   - strategy: the used strategy
      * The description can contain additional data specific to a filter.
      *
