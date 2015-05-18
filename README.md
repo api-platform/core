@@ -34,8 +34,40 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
 
 ## Official documentation
 
-An extensive documentation is available in the [`Resources/doc/`](Resources/doc/) directory.
-The [Getting Started] article will let you build your first API in minutes.
+1. [Getting Started](Resources/doc/getting-started.md)
+  1. [Installing DunglasApiBundle](Resources/doc/getting-started.md#installing-dunglasapibundle)
+  2. [Configuring the API](Resources/doc/getting-started.md#configuring-the-api)
+  3. [Mapping the entities](Resources/doc/getting-started.md#mapping-the-entities)
+  4. [Registering the services](Resources/doc/getting-started.md#registering-the-services)
+2. [Operations](Resources/doc/operations.md)
+  1. [Disabling operations](Resources/doc/operations.md#disabling-operations)
+  2. [Creating custom operations](Resources/doc/operations.md#creating-custom-operations)
+3. [Data providers](Resources/doc/data-providers.md)
+4. [Filters](Resources/doc/filters.md)
+  1. [Adding Doctrine ORM filters](Resources/doc/filters.md#adding-doctrine-orm-filters)
+  2. [Creating custom filters](Resources/doc/filters.md#creating-custom-filters)
+5. [Serialization groups and relations](Resources/doc/serialization-groups-and-relations.md)
+  1. [Using serialization groups](Resources/doc/serialization-groups-and-relations.md#using-serialization-groups)
+  2. [Embedding relations](Resources/doc/serialization-groups-and-relations.md#embedding-relations)
+    1. [Normalization](Resources/doc/serialization-groups-and-relations.md#normalization)
+    2. [Denormalization](Resources/doc/serialization-groups-and-relations.md#denormalization)
+6. [Validation](Resources/doc/validation.md)
+  1. [Using validation groups](Resources/doc/validation.md#using-validation-groups)
+7. [The event system](Resources/doc/the-event-system.md)
+  1. [Retrieving list](Resources/doc/the-event-system.md#retrieving-list)
+  2. [Retrieving item](Resources/doc/the-event-system.md#retrieving-item)
+  3. [Creating item](Resources/doc/the-event-system.md#creating-item)
+  4. [Updating item](Resources/doc/the-event-system.md#updating-item)
+  5. [Deleting item](Resources/doc/the-event-system.md#deleting-item)
+  6. [Registering an event listener](Resources/doc/the-event-system.md#registering-an-event-listener)
+8. [Resources](Resources/doc/resources.md)
+  1. [Using a custom `Resource` class](Resources/doc/resources.md#using-a-custom-Resource-class)
+9. [Controllers](Resources/doc/controllers.md)
+  1. [Using a custom controller](Resources/doc/controllers.md#using-a-custom-controller)
+10. [Using external (JSON-LD) vocabularies](Resources/doc/external-vocabularies.md)
+11. [Performances](Resources/doc/performances.md)
+  1. [Enabling the metadata cache](Resources/doc/performances.md#enabling-the-metadata-cache)
+12. [AngularJS Integration](Resources/doc/angular-integration.md)
 
 ## Other resources
 
