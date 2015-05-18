@@ -61,3 +61,6 @@ The generated JSON for products and the related context document will now use ex
 ```
 
 An extended list of existing open vocabularies is available on [the Linked Open Vocabularies (LOV) database](http://lov.okfn.org/dataset/lov/).
+
+Next chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)
+Previous chapter: [Resources](resources.md)

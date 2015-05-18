@@ -32,3 +32,6 @@ class CustomController extends ResourceController
     }
 }
 ```
+
+Next chapter: [Controllers](controllers.md)
+Previous chapter: [Performances](performances.md)

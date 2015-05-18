@@ -56,3 +56,5 @@ angular.module('myAngularjsApp')
     }])
 ;
 ```
+
+Previous chapter: [Performances](performances.md)

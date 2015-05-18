@@ -94,3 +94,6 @@ the Hydra vocab (if enabled).
 
 Additionally to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
 the `/products/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
+
+Next chapter: [Data providers](data-providers.md)
+Previous chapter: [Getting Started](getting-started.md)

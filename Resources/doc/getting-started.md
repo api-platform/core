@@ -174,3 +174,5 @@ and take a look at the usage examples in [the `features` directory](features/).
 
 Note: [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) (dev-master) has built-in support for this bundle.
 Installing it will give you access to a human-readable documentation and a nice sandbox.
+
+Next chapter: [Operations](operations.md)

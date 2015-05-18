@@ -81,3 +81,6 @@ services:
         class:  "AppBundle\Api\MyCustomResource"
         tags:   [ { name: "api.resource" } ]
 ```
+
+Next chapter: [Controllers](controllers.md)
+Previous chapter: [The event system](the-event-system.md)
