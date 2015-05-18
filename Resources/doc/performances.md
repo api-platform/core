@@ -1,4 +1,4 @@
-# Performance
+# Performances
 
 ## Enabling the metadata cache
 
@@ -16,3 +16,6 @@ you want to use a custom cache backend such as Redis, Memcache or MongoDB, regis
 and set the `cache` config key to the id of the custom service you created.
 
 A built-in cache warmer will be automatically executed every time you clear or warmup the cache if a cache service is configured.
+
+Next chapter: [AngularJS Integration](angular-integration.md)
+Previous chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)

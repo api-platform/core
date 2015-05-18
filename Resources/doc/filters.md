@@ -90,3 +90,9 @@ Doctrine ORM filters must implement the `Dunglas\ApiBundle\Doctrine\Orm\FilterIn
 with the Doctrine `QueryBuilder`.
 
 Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Resource::addFilter()` method.
+
+If you use [custom data providers](data-providers.yml), they must support filtering and be aware of actives filters to
+work properly.
+
+Next chapter: [Serialization groups and relations](serialization-groups-and-relations.md)
+Previous chapter: [Data providers](data-providers.md)

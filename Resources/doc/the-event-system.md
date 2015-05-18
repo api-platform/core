@@ -35,7 +35,7 @@ In the following example, we register an event listener that will be called ever
 ```php
 <?php
 
-# src/AppBundle/EventListener/MyEventListener.php
+// src/AppBundle/EventListener/MyEventListener.php
 
 namespace AppBundle\EventListener;
 
@@ -70,3 +70,6 @@ services:
         tags:
             - { name: "kernel.event_listener", event: "api.post_create", method: "onPostCreate"  }
 ```
+
+Next chapter: [Resources](resources.md)
+Previous chapter: [Validation](validation.md)

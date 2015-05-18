@@ -155,3 +155,6 @@ the data provider and any changes in the embedded relation will be applied to th
 * if no `@id` key exists, a new object will be created containing data provided in the embedded JSON document.
 
 You can create as relation embedding levels as you want.
+
+Next chapter: [Validation](validation.md)
+Previous chapter: [Filters](filters.md)
