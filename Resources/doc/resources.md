@@ -84,5 +84,5 @@ services:
         tags:   [ { name: "api.resource" } ]
 ```
 
-Previous chapter: [The event system](the-event-system.md)<br />
+Previous chapter: [The event system](the-event-system.md)<br>
 Next chapter: [Controllers](controllers.md)

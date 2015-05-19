@@ -21,5 +21,5 @@ services:
 
 With the previous definition, the validations groups `group1` and `group2` will be used when the validation occurs.
 
-Previous chapter: [Serialization groups and relations](serialization-groups-and-relations.md)<br />
+Previous chapter: [Serialization groups and relations](serialization-groups-and-relations.md)<br>
 Next chapter: [The event system](the-event-system.md)

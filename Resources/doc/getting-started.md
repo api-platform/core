@@ -23,7 +23,7 @@ public function registerBundles()
         // ...
     ];
 
-    //...
+    // ...
 }
 ```
 
@@ -171,10 +171,8 @@ services:
 You now have a fully featured API exposing your Doctrine entities.
 Run the Symfony app (`app/console server:run`) and browse the API entrypoint at `http://localhost:8000/api`.
 
-Interact with it using a REST client such as [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm)
-and take a look at the usage examples in [the `features` directory](features/).
+Interact with the API using a REST client (I recommend [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm))
+or an Hydra aware application (you should give a try to [Hydra Console](https://github.com/lanthaler/HydraConsole)). Take
+a look at the usage examples in [the `features` directory](features/).
 
-Note: [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle) (dev-master) has built-in support for this bundle.
-Installing it will give you access to a human-readable documentation and a nice sandbox.
-
-Next chapter: [Operations](operations.md)
+Next chapter: [NelmioApiDocBundle integration](nelmio-api-doc.md)

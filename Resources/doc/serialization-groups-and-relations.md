@@ -150,5 +150,5 @@ the data provider and any changes in the embedded relation will be applied to th
 
 You can create as relation embedding levels as you want.
 
-Previous chapter: [Filters](filters.md)<br />
+Previous chapter: [Filters](filters.md)<br>
 Next chapter: [Validation](validation.md)

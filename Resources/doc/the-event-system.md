@@ -74,5 +74,5 @@ services:
         tags:  [ { name: "kernel.event_listener", event: "api.post_create", method: "onPostCreate" } ]
 ```
 
-Previous chapter: [Validation](validation.md)<br />
+Previous chapter: [Validation](validation.md)<br>
 Next chapter: [Resources](resources.md)

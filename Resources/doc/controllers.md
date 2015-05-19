@@ -35,5 +35,5 @@ class CustomController extends ResourceController
 }
 ```
 
-Previous chapter: [Controllers](controllers.md)<br />
+Previous chapter: [Controllers](controllers.md)<br>
 Next chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)
