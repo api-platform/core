@@ -68,7 +68,7 @@ the Hydra vocab (if enabled).
         arguments:
             -    "@resource.product"               # Resource
             -    [ "GET", "HEAD" ]                 # Methods
-            -    "/products/{id}/custom" # Path
+            -    "/products/{id}/custom"           # Path
             -    "AppBundle:Custom:custom"         # Controller
             -    "my_custom_route"                 # Route name
             -    # Context (will be present in Hydra documentation)
@@ -81,19 +81,16 @@ the Hydra vocab (if enabled).
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
             -      method:    "addItemOperation"
-                   arguments:
-                       -      "@resource.product.item_operation.get"
+                   arguments: [ "@resource.product.item_operation.get" ]
             -      method:    "addItemOperation"
-                   arguments:
-                       -      "@resource.product.item_operation.put"
+                   arguments: [ "@resource.product.item_operation.put" ]
             -      method:    "addItemOperation"
-                   arguments:
-                       -      "@resource.product.item_operation.custom_get"
+                   arguments: [ "@resource.product.item_operation.custom_get" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
 Additionally to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
 the `/products/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
 
+Previous chapter: [Getting Started](getting-started.md)<br />
 Next chapter: [Data providers](data-providers.md)
-Previous chapter: [Getting Started](getting-started.md)

@@ -16,6 +16,8 @@ Example of custom controller:
 ```php
 <?php
 
+// src/AppBundle/Controller/CustomController.php
+
 namespace AppBundle\Controller;
 
 use Dunglas\ApiBundle\Controller\ResourceController;
@@ -23,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CustomController extends ResourceController
 {
-    # Customize the AppBundle:Custom:custom
+    # Customize the AppBundle:Custom:custom action
     public function getAction(Request $request, $id)
     {
         $this->get('logger')->info('This is my custom controller.');
@@ -33,5 +35,5 @@ class CustomController extends ResourceController
 }
 ```
 
-Next chapter: [Controllers](controllers.md)
-Previous chapter: [Performances](performances.md)
+Previous chapter: [Controllers](controllers.md)<br />
+Next chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)
