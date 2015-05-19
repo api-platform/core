@@ -2,9 +2,11 @@
 
 ## Installing DunglasApiBundle
 
-If you are starting a new project, the easiest way to get this bundle working and well integrated with other useful tools
-such as PHP Schema, NelmioApiDocBundle, NelmioCorsBundle or Behat is to install [Dunglas's API Platform](https://github.com/dunglas/api-platform).
-It's a Symfony edition packaged with the best tools to develop a REST API and with sensitive settings.
+If you are starting a new project, the easiest way to get DunglasApiBundle up, running and well integrated with other useful
+tools including [PHP Schema](http://php-schema.dunglas.com), [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle),
+[NelmioCorsBundle](https://github.com/nelmio/NelmioCorsBundle) and [Behat](http://behat.org) is to install [Dunglas's API
+Platform](https://github.com/dunglas/api-platform).
+It's a Symfony edition packaged with the best tools to develop a REST API and sensitive default settings.
 
 Alternatively, you can use [Composer](http://getcomposer.org) to install the standalone bundle in your project:
 

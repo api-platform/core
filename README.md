@@ -1,8 +1,11 @@
 # DunglasApiBundle
-**JSON-LD + Hydra REST API system for Symfony**
 
-This a work in progress under active development.
-This bundle relies heavily on the Serializer of Symfony 2.7 and *is not usable in production yet*.
+DunglasApiBundle is an easy to use and powerful system to create [hypermedia-driven REST APIs](http://en.wikipedia.org/wiki/HATEOAS)
+for [the Symfony framework](http://symfony.com) and [API Platform](https://github.com/dunglas/api-platform).
+It embraces [JSON for Linked Data (JSON-LD)](http://json-ld.org) and [Hydra Core Vocabulary](http://www.hydra-cg.com) web standards. 
+
+Build a working and fully-featured CRUD API in minutes. Leverage the awesome features of the tool to develop complex and
+high performance API-first projects.
 
 [![JSON-LD enabled](http://json-ld.org/images/json-ld-button-88.png)](http://json-ld.org)
 [![Build Status](https://travis-ci.org/dunglas/DunglasApiBundle.svg)](https://travis-ci.org/dunglas/DunglasApiBundle)
@@ -16,8 +19,10 @@ Here is the fully-featured REST API you'll get in minutes, I promise:
 
 * CRUD support through the API for Doctrine entities: list, `GET`, `POST`, `PUT` and `DELETE`
 * Hypermedia implementing [JSON-LD](http://json-ld.org)
-* Machine-readable documentation of the API in the [Hydra](http://hydra-cg.com) format, guessed from PHPDoc, Serializer, Validator and Doctrine ORM metadata
-* Human-readable Swagger-like documentation including a sandbox automatically generated thanks to the integration with [NelmioApiDoc](https://github.com/nelmio/NelmioApiDocBundle)
+* Machine-readable documentation of the API in the [Hydra](http://hydra-cg.com) format, guessed from PHPDoc, Serializer,
+Validator and Doctrine ORM metadata
+* Human-readable Swagger-like documentation including a sandbox automatically generated thanks to the integration with
+[NelmioApiDoc](https://github.com/nelmio/NelmioApiDocBundle)
 * Pagination (compliant with Hydra)
 * List filters (compliant with Hydra)
 * Validation using the Symfony Validator Component, with groups support
@@ -79,5 +84,5 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
 
 ## Credits
 
-DunglasApiBundle is part of the API Platform project.
-It is developed by [Kévin Dunglas](http://dunglas.fr), [Les-Tilleuls.coop](http://les-tilleuls.coop) and some awesome contributors.
+DunglasApiBundle is part of the API Platform project. It is developed by [Kévin Dunglas](http://dunglas.fr),
+[Les-Tilleuls.coop](http://les-tilleuls.coop) and [awesome contributors](https://github.com/dunglas/DunglasApiBundle/graphs/contributors).
