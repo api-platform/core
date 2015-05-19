@@ -65,11 +65,10 @@ class MyEventListener
 # app/config/services.yml
 
 services: 
-    "my_event_listener":
-        class:     "AppBundle\EventListener\MyEventListener"
-        tags:
-            - { name: "kernel.event_listener", event: "api.post_create", method: "onPostCreate"  }
+    my_event_listener:
+        class: "AppBundle\EventListener\MyEventListener"
+        tags:  [ { name: "kernel.event_listener", event: "api.post_create", method: "onPostCreate" } ]
 ```
 
+Previous chapter: [Validation](validation.md)<br />
 Next chapter: [Resources](resources.md)
-Previous chapter: [Validation](validation.md)

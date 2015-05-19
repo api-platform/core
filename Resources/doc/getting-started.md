@@ -13,16 +13,16 @@ Alternatively, you can use [Composer](http://getcomposer.org) to install the sta
 Then, update your `app/config/AppKernel.php` file:
 
 ```php
-    public function registerBundles()
-    {
-        $bundles = [
-            // ...
-            new Dunglas\ApiBundle\DunglasApiBundle(),
-            // ...
-        ];
+public function registerBundles()
+{
+    $bundles = [
+        // ...
+        new Dunglas\ApiBundle\DunglasApiBundle(),
+        // ...
+    ];
 
-        return $bundles;
-    }
+    //...
+}
 ```
 
 Register the routes of our API by adding the following lines to `app/config/routing.yml`:
@@ -36,41 +36,37 @@ api:
 
 ## Configuring the API
 
+### Minimal configuration
+
 The first step is to name your API. Add the following lines in `app/config/config.yml`:
+
+```yaml
+dunglas_api:
+    title:       "Your API name"                    # The title of the API.
+    description: "The full description of your API" # The description of the API.
+```
+
+The name and the description you give will be accessible through the auto-generated Hydra documentation.
+
+### Full configuration
+
+Here's the complete configuration with the default:
 
 ```yaml
 # Default configuration for extension with alias: "dunglas_api"
 dunglas_api:
-
-    # The title of the API.
-    title:                "Your API name" # Required
-
-    # The description of the API.
-    description:          "The full description of your API" # Required
-
-    # The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.
-    cache:                false
-
-    # Enable the FOSUserBundle integration.
-    enable_fos_user:      false
+    title:           "Your API name"                    # Required, the title of the API.
+    description:     "The full description of your API" # Required, the description of the API.
+    cache:           false                              # The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.
+    enable_fos_user: false                              # Enable the FOSUserBundle integration.
     collection:
-
-        # The default order of results. (supported by Doctrine: ASC and DESC)
-        order:                null
+        order:       null                               # The default order of results. (supported by Doctrine: ASC and DESC)
         pagination:
-
-            # The name of the parameter handling the page number.
-            page_parameter_name:  page
+            page_parameter_name:       page             # The name of the parameter handling the page number.
             items_per_page:
-
-                # The default number of items perm page in collections.
-                number:               30
-
-                # Allow the client to change the number of elements by page.
-                enable_client_request:  false
-
-                # The name of the parameter to change the number of elements by page client side.
-                parameter_name:       itemsPerPage
+                number:                30               # The default number of items perm page in collections.
+                enable_client_request: false            # Allow the client to change the number of elements by page.
+                parameter_name:        itemsPerPage     # The name of the parameter to change the number of elements by page client side.
 ```
 
 The name and the description you give will be accessible through the auto-generated Hydra documentation.
@@ -82,7 +78,7 @@ Imagine you have the following Doctrine entity classes:
 ```php
 <?php
 
-# src/AppBundle/Entity/Product.php
+// src/AppBundle/Entity/Product.php
 
 namespace AppBundle\Entity;
 
@@ -100,6 +96,7 @@ class Product
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
     /**
      * @ORM\Column
      * @Assert\NotBlank
@@ -111,7 +108,7 @@ class Product
 ```php
 <?php
 
-# src/AppBundle/Entity/Offer.php
+// src/AppBundle/Entity/Offer.php
 
 namespace AppBundle\Entity;
 
@@ -129,10 +126,12 @@ class Offer
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
     /**
      * @ORM\Column(type="text")
      */
     public $description;
+
     /**
      * @ORM\Column(type="float")
      * @Assert\NotBlank
@@ -140,6 +139,7 @@ class Offer
      * @Assert\Type(type="float")
      */
     public $price;
+    
     /**
      * @ORM\ManyToOne(targetEntity="Product")
      */

@@ -12,11 +12,9 @@ services:
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
             -      method:    "initNormalizationContext"
-                   arguments:
-                       -      { groups: [ "serialization_group1", "serialization_group2" ] }
+                   arguments: [ { groups: [ "serialization_group1", "serialization_group2" ] } ]
             -      method:    "initDenormalizationContext"
-                   arguments:
-                       -      { groups: [ "deserialization_group1", "deserialization_group2" ] }
+                   arguments: [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -50,13 +48,11 @@ of the product is embedded in the offer response:
 ```php
 <?php
 
-# src/AppBundle/Entity/Offer.php
+// src/AppBundle/Entity/Offer.php
 
 namespace AppBundle\Entity;
 
 use Symfony\Component\Serializer\Annotation\Groups;
-
-// ...
 
 class Offer
 {
@@ -67,6 +63,7 @@ class Offer
      * @Groups({"offer"})
      */
     public $price;
+    
     /**
      * ...
      * @Groups({"offer"})
@@ -78,13 +75,11 @@ class Offer
 ```php
 <?php
 
-# src/AppBundle/Entity/Product.php
+// src/AppBundle/Entity/Product.php
 
 namespace AppBundle\Entity;
 
 use Symfony\Component\Serializer\Annotation\Groups;
-
-// ...
 
 class Product
 {
@@ -109,8 +104,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer" ]
         calls:
             -      method:    "initNormalizationContext"
-                   arguments:
-                       -      { groups: [ "offer" ] }
+                   arguments: [ { groups: [ "offer" ] } ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -156,5 +150,5 @@ the data provider and any changes in the embedded relation will be applied to th
 
 You can create as relation embedding levels as you want.
 
+Previous chapter: [Filters](filters.md)<br />
 Next chapter: [Validation](validation.md)
-Previous chapter: [Filters](filters.md)

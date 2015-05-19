@@ -1,6 +1,6 @@
 # Resources
 
-THe default `Resource` class provided by the bundle is sufficient for small projects. If your app grows, using custom resources
+The default `Resource` class provided by the bundle is sufficient for small projects. If your app grows, using custom resources
 can become necessary.
 
 ## Using a custom `Resource` class
@@ -10,6 +10,8 @@ one. To do so, the `Dunglas\ApiBundle\Api\ResourceInterface` interface must be i
 
 ```php
 <?php
+
+// src/AppBundle/Api/MyCustomResource.php
 
 namespace AppBundle\Api;
 
@@ -82,5 +84,5 @@ services:
         tags:   [ { name: "api.resource" } ]
 ```
 
+Previous chapter: [The event system](the-event-system.md)<br />
 Next chapter: [Controllers](controllers.md)
-Previous chapter: [The event system](the-event-system.md)

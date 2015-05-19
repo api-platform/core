@@ -64,8 +64,8 @@ Then register that provider with a priority higher than the Doctrine ORM data pr
 
 services:
     my_custom_data_provider:
-        class:     AppBundle\DataProvider\StaticDataProvider
-        tags:      [ { name: "api.data_provider", priority=1 } ]
+        class: AppBundle\DataProvider\StaticDataProvider
+        tags:  [ { name: "api.data_provider", priority=1 } ]
 ```
 
 This data provider is now up and running. It will take precedence over the default Doctrine ORM data provider for each resources
@@ -85,5 +85,5 @@ To create your own paginators, take a look at the Doctrine ORM paginator bridge:
 To be able [to filter collections](filters.md), the Data Provider must be aware of registered filters to the given resource.
 The best way to learn how to create filter aware data provider is too look at the default Doctrine ORM dataprovider: [`Dunglas\ApiBundle\Doctrine\Orm\DataProvider`](src/Doctrine/Orm/DataProvider.php).
 
+Previous chapter: [Operations](operations.md)<br />
 Next chapter: [Filters](filters.md)
-Previous chapter: [Operations](operations.md)

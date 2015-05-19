@@ -31,8 +31,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer" ]
         calls:
             -      method:    "addFilter"
-                   arguments:
-                       -      "@resource.offer.filter"
+                   arguments: [ "@resource.offer.filter" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -54,8 +53,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
             -      method:    "addFilter"
-                   arguments:
-                       -      "@resource.offer.filter"
+                   arguments: [ "@resource.offer.filter" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -78,8 +76,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
             -      method:    "addFilter"
-                   arguments:
-                       -      "@resource.offer.filter"
+                   arguments: [ "@resource.offer.filter" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -94,5 +91,5 @@ Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Res
 If you use [custom data providers](data-providers.yml), they must support filtering and be aware of actives filters to
 work properly.
 
+Previous chapter: [Data providers](data-providers.md)<br />
 Next chapter: [Serialization groups and relations](serialization-groups-and-relations.md)
-Previous chapter: [Data providers](data-providers.md)
