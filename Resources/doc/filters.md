@@ -80,6 +80,24 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
+**Note**: if you wish to register multiple filters, you can use the `addFilters` method instead:
+
+```yaml
+services:
+    #...
+
+    resource.offer:
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer"] 
+        calls:
+            -      method:    "addFilters"
+                   arguments:
+                       -      "@resource.offer.filter1"
+                       -      "@resource.offer.filter2"
+                       -      "@resource.offer.filter3"
+        tags:      [ { name: "api.resource" } ]
+```
+
 ## Creating custom filters
 
 Custom filters can be written by implementing the `Dunglas\ApiBundle\Api\Filter\FilterInterface` interface.

@@ -93,11 +93,23 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Add an operation for this resource.
+     *
+     * @param OperationInterface $operation
      */
     public function addItemOperation(OperationInterface $operation)
     {
         $this->itemOperations[] = $operation;
+    }
+
+    /**
+     * Add operations for this resource.
+     *
+     * @param OperationInterface[] $operations
+     */
+    public function addItemOperations(array $operations)
+    {
+        $this->itemOperations = array_merge($this->itemOperations, $operations);
     }
 
     /**
@@ -109,11 +121,23 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Add a filter to this resource.
+     *
+     * @param FilterInterface $filter
      */
     public function addFilter(FilterInterface $filter)
     {
         $this->filters[] = $filter;
+    }
+
+    /**
+     * Add multiple filters to this resource.
+     *
+     * @param FilterInterface[] $filters
+     */
+    public function addFilters(array $filters)
+    {
+        $this->filters = array_merge($this->filters, $filters);
     }
 
     /**
