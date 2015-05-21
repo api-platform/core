@@ -150,7 +150,7 @@ the data provider and any changes in the embedded relation will be applied to th
 
 You can create as relation embedding levels as you want.
 
-### Name convertion
+### Name conversion
 
 The Serializer Component provides a handy way to translate or map PHP field names to serialized names. See the
 [Symfony documentation](http://symfony.com/doc/master/components/serializer.html#converting-property-names-when-serializing-and-deserializing)
