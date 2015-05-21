@@ -150,5 +150,21 @@ the data provider and any changes in the embedded relation will be applied to th
 
 You can create as relation embedding levels as you want.
 
+### Name convertion
+
+The Serializer Component provides a handy way to translate or map PHP field names to serialized names. See the
+[Symfony documentation](http://symfony.com/doc/master/components/serializer.html#converting-property-names-when-serializing-and-deserializing)
+
+To use this feature, declare a new service with id `api.name_converter`. For example, you can convert `CamelCase` to 
+`snake_case` with the following configuration:
+
+```yaml
+services:
+    # ...
+
+    api.name_converter:
+        class: Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
+```
+
 Previous chapter: [Filters](filters.md)<br>
 Next chapter: [Validation](validation.md)
