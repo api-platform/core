@@ -62,6 +62,7 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   2. [Embedding relations](Resources/doc/serialization-groups-and-relations.md#embedding-relations)
     1. [Normalization](Resources/doc/serialization-groups-and-relations.md#normalization)
     2. [Denormalization](Resources/doc/serialization-groups-and-relations.md#denormalization)
+  3. [Name conversion](Resources/doc/serialization-groups-and-relations.md#name-conversion)
 7. [Validation](Resources/doc/validation.md)
   1. [Using validation groups](Resources/doc/validation.md#using-validation-groups)
 8. [The event system](Resources/doc/the-event-system.md)
