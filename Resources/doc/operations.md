@@ -80,12 +80,11 @@ the Hydra vocab (if enabled).
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -      method:    "addItemOperation"
-                   arguments: [ "@resource.product.item_operation.get" ]
-            -      method:    "addItemOperation"
-                   arguments: [ "@resource.product.item_operation.put" ]
-            -      method:    "addItemOperation"
-                   arguments: [ "@resource.product.item_operation.custom_get" ]
+            -      method:    "addItemOperations"
+                   arguments:
+                       -      "@resource.product.item_operation.get"
+                       -      "@resource.product.item_operation.put"
+                       -      "@resource.product.item_operation.custom_get"
         tags:      [ { name: "api.resource" } ]
 ```
 
