@@ -45,6 +45,7 @@ Feature: Relations support
       "@id": "/dummies/1",
       "@type": "Dummy",
       "name": "Dummy with relations",
+      "alias": null,
       "dummy": null,
       "dummyDate": null,
       "relatedDummy": "/related_dummies/1",
@@ -74,6 +75,7 @@ Feature: Relations support
           "@id": "/dummies/1",
           "@type": "Dummy",
           "name": "Dummy with relations",
+          "alias": null,
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": "/related_dummies/1",
@@ -84,7 +86,7 @@ Feature: Relations support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -110,9 +112,21 @@ Feature: Relations support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 

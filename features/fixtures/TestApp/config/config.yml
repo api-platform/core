@@ -26,6 +26,8 @@ dunglas_api:
     title:                             "My Dummy API"
     description:                       "This is a test API."
     collection:
+        filter_name:
+            order:                     "order"
         order:                         "ASC"
         pagination:
             items_per_page:
@@ -37,13 +39,18 @@ services:
         parent:                     "api.doctrine.orm.search_filter"
         arguments:                  [ { "id": "exact", "name": "partial" } ]
 
+    my_dummy_resource.order_filter:
+        parent:                     "api.doctrine.orm.order_filter"
+        arguments:                  [ ["id", "name"] ]
+
     my_dummy_resource:
         parent:                      "api.resource"
         arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
         calls:
                                      - method:    "addFilter"
-                                       arguments:
-                                           -      "@my_dummy_resource.search_filter"
+                                       arguments: [ "@my_dummy_resource.search_filter" ]
+                                     - method:    "addFilter"
+                                       arguments: [ "@my_dummy_resource.order_filter" ]
         tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:

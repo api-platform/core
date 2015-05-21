@@ -42,6 +42,13 @@ class Dummy
      */
     private $name;
     /**
+     * @var string The dummy name alias.
+     *
+     * @ORM\Column(nullable=true)
+     * @Iri("https://schema.org/alternateName")
+     */
+    private $alias;
+    /**
      * @var array foo
      */
     private $foo;
@@ -89,6 +96,16 @@ class Dummy
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
+    }
+
+    public function getAlias()
+    {
+        return $this->alias;
     }
 
     public function hasRole($role)

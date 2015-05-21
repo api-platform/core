@@ -3,6 +3,9 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
+        <parameter key="api.doctrine.orm.order_filter.class">Dunglas\ApiBundle\Doctrine\Orm\OrderFilter</parameter>
+    </parameters>
 
     <services>
         <service id="api.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
@@ -31,6 +34,11 @@
             <argument type="service" id="doctrine" />
             <argument type="service" id="api.iri_converter" />
             <argument type="service" id="property_accessor" />
+        </service>
+
+        <service id="api.doctrine.orm.order_filter" class="%api.doctrine.orm.order_filter.class%" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument>%api.collection.filter_name.order%</argument>
         </service>
     </services>
 

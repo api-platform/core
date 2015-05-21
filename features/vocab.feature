@@ -73,6 +73,21 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
+                            "@id": "https:\/\/schema.org\/alternateName",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "alias",
+                            "domain": "#Dummy",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "alias",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true,
+                        "hydra:description": "The dummy name alias."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
                             "@id": "#Dummy/foo",
                             "@type": "rdf:Property",
                             "rdfs:label": "foo",

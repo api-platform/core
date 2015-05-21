@@ -11,22 +11,23 @@ Feature: JSON-LD contexts generation
     And the JSON should be equal to:
     """
     {
-      "@context": {
-        "@vocab": "http://example.com/vocab#",
-        "hydra": "http://www.w3.org/ns/hydra/core#",
-        "name": "http://schema.org/name",
-        "foo": "#Dummy/foo",
-        "dummy": "#Dummy/dummy",
-        "dummyDate": "#Dummy/dummyDate",
-        "relatedDummy": {
-          "@id": "#Dummy/relatedDummy",
-          "@type": "@id"
-        },
-        "relatedDummies": {
-          "@id": "#Dummy/relatedDummies",
-          "@type": "@id"
+        "@context": {
+            "@vocab": "http://example.com/vocab#",
+            "hydra": "http://www.w3.org/ns/hydra/core#",
+            "name": "http://schema.org/name",
+            "alias": "https://schema.org/alternateName",
+            "foo": "#Dummy/foo",
+            "dummy": "#Dummy/dummy",
+            "dummyDate": "#Dummy/dummyDate",
+            "relatedDummy": {
+                "@id": "#Dummy/relatedDummy",
+                "@type": "@id"
+            },
+            "relatedDummies": {
+                "@id": "#Dummy/relatedDummies",
+                "@type": "@id"
+            }
         }
-      }
     }
     """
 
@@ -42,6 +43,7 @@ Feature: JSON-LD contexts generation
             "@vocab": "http://example.com/vocab#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "name": "http://schema.org/name",
+            "alias": "https://schema.org/alternateName",
             "foo": "#Dummy/foo",
             "dummy": "#Dummy/dummy",
             "dummyDate": "#Dummy/dummyDate",

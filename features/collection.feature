@@ -6,7 +6,7 @@ Feature: Collections support
   @createSchema
   Scenario: Retrieve an empty collection
     When I send a "GET" request to "/dummies"
-    Then print last JSON response
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:
@@ -22,7 +22,7 @@ Feature: Collections support
       "hydra:member": [],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -48,9 +48,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -76,6 +88,7 @@ Feature: Collections support
           "@id": "/dummies/1",
           "@type": "Dummy",
           "name": "Dummy #1",
+          "alias": "Alias #29",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -85,6 +98,7 @@ Feature: Collections support
           "@id": "/dummies/2",
           "@type": "Dummy",
           "name": "Dummy #2",
+          "alias": "Alias #28",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -94,6 +108,7 @@ Feature: Collections support
           "@id": "/dummies/3",
           "@type": "Dummy",
           "name": "Dummy #3",
+          "alias": "Alias #27",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -102,7 +117,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -128,9 +143,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -156,6 +183,7 @@ Feature: Collections support
           "@id": "/dummies/19",
           "@type": "Dummy",
           "name": "Dummy #19",
+          "alias": "Alias #11",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -165,6 +193,7 @@ Feature: Collections support
           "@id": "/dummies/20",
           "@type": "Dummy",
           "name": "Dummy #20",
+          "alias": "Alias #10",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -174,6 +203,7 @@ Feature: Collections support
           "@id": "/dummies/21",
           "@type": "Dummy",
           "name": "Dummy #21",
+          "alias": "Alias #9",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -182,7 +212,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -208,9 +238,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -235,6 +277,7 @@ Feature: Collections support
             "@id": "/dummies/28",
             "@type": "Dummy",
             "name": "Dummy #28",
+            "alias": "Alias #2",
             "dummy": null,
             "dummyDate": null,
             "relatedDummy": null,
@@ -244,6 +287,7 @@ Feature: Collections support
             "@id": "/dummies/29",
             "@type": "Dummy",
             "name": "Dummy #29",
+            "alias": "Alias #1",
             "dummy": null,
             "dummyDate": null,
             "relatedDummy": null,
@@ -253,6 +297,7 @@ Feature: Collections support
             "@id": "/dummies/30",
             "@type": "Dummy",
             "name": "Dummy #30",
+            "alias": "Alias #0",
             "dummy": null,
             "dummyDate": null,
             "relatedDummy": null,
@@ -261,7 +306,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -287,9 +332,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -319,6 +376,7 @@ Feature: Collections support
           "@id": "/dummies/11",
           "@type": "Dummy",
           "name": "Dummy #11",
+          "alias": "Alias #19",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -330,6 +388,7 @@ Feature: Collections support
           "@id": "/dummies/12",
           "@type": "Dummy",
           "name": "Dummy #12",
+          "alias": "Alias #18",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -341,6 +400,7 @@ Feature: Collections support
           "@id": "/dummies/13",
           "@type": "Dummy",
           "name": "Dummy #13",
+          "alias": "Alias #17",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -352,6 +412,7 @@ Feature: Collections support
           "@id": "/dummies/14",
           "@type": "Dummy",
           "name": "Dummy #14",
+          "alias": "Alias #16",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -363,6 +424,7 @@ Feature: Collections support
           "@id": "/dummies/15",
           "@type": "Dummy",
           "name": "Dummy #15",
+          "alias": "Alias #15",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -374,6 +436,7 @@ Feature: Collections support
           "@id": "/dummies/16",
           "@type": "Dummy",
           "name": "Dummy #16",
+          "alias": "Alias #14",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -385,6 +448,7 @@ Feature: Collections support
           "@id": "/dummies/17",
           "@type": "Dummy",
           "name": "Dummy #17",
+          "alias": "Alias #13",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -396,6 +460,7 @@ Feature: Collections support
           "@id": "/dummies/18",
           "@type": "Dummy",
           "name": "Dummy #18",
+          "alias": "Alias #12",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -407,6 +472,7 @@ Feature: Collections support
           "@id": "/dummies/19",
           "@type": "Dummy",
           "name": "Dummy #19",
+          "alias": "Alias #11",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -418,6 +484,7 @@ Feature: Collections support
           "@id": "/dummies/20",
           "@type": "Dummy",
           "name": "Dummy #20",
+          "alias": "Alias #10",
           "dummy": null,
           "dummyDate": null,
           "relatedDummy": null,
@@ -428,7 +495,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -454,9 +521,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -480,6 +559,7 @@ Feature: Collections support
             "@id": "/dummies/8",
             "@type": "Dummy",
             "name": "Dummy #8",
+            "alias": "Alias #22",
             "dummy": null,
             "dummyDate": null,
             "relatedDummy": null,
@@ -488,7 +568,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -514,9 +594,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -540,6 +632,7 @@ Feature: Collections support
             "@id": "/dummies/8",
             "@type": "Dummy",
             "name": "Dummy #8",
+            "alias": "Alias #22",
             "dummy": null,
             "dummyDate": null,
             "relatedDummy": null,
@@ -548,7 +641,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -574,9 +667,21 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """
 
@@ -601,6 +706,7 @@ Feature: Collections support
             "@id": "/dummies/8",
             "@type": "Dummy",
             "name": "Dummy #8",
+            "alias": "Alias #22",
             "dummy": null,
             "dummyDate": null,
             "relatedDummy": null,
@@ -609,7 +715,7 @@ Feature: Collections support
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -635,8 +741,20 @@ Feature: Collections support
                       "variable": "relatedDummies",
                       "property": "relatedDummies",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
                   }
               ]
-          }
+      }
     }
     """

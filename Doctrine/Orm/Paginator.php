@@ -44,11 +44,11 @@ class Paginator implements \IteratorAggregate, PaginatorInterface
 
     public function __construct(DoctrineOrmPaginator $paginator)
     {
-        $this->paginator = $paginator;
-        $this->query = $paginator->getQuery();
+        $this->paginator   = $paginator;
+        $this->query       = $paginator->getQuery();
         $this->firstResult = $this->query->getFirstResult();
-        $this->maxResults = $this->query->getMaxResults();
-        $this->totalItems = count($paginator);
+        $this->maxResults  = $this->query->getMaxResults();
+        $this->totalItems  = count($paginator);
     }
 
     /**
@@ -59,6 +59,9 @@ class Paginator implements \IteratorAggregate, PaginatorInterface
         return floor($this->firstResult / $this->maxResults) + 1.;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getLastPage()
     {
         return ceil($this->totalItems / $this->maxResults) ?: 1.;

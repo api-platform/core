@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- http://phpunit.de/manual/4.1/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.6/phpunit.xsd"
+         backupGlobals="false"
+         bootstrap="features/fixtures/TestApp/bootstrap.php"
+         colors="true"
+>
+    <php>
+        <server name="KERNEL_DIR" value="features/fixtures/TestApp/" />
+    </php>
+
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>Tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>Tests</directory>
+            <exclude>
+                <directory>Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
