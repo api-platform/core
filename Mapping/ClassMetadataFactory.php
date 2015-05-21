@@ -76,7 +76,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
             $classMetadata,
             $normalizationGroups,
             $denormalizationGroups,
-            $denormalizationGroups
+            $validationGroups
         );
 
         if ($this->cache) {
