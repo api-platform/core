@@ -121,7 +121,12 @@ class ItemNormalizer extends AbstractNormalizer
             if ('id' === $attributeName || !$attributeMetadata->isReadable()) {
                 continue;
             }
+
             $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
+
+            if ($this->nameConverter) {
+                $attributeName = $this->nameConverter->normalize($attributeName);
+            }
 
             if (isset($attributeMetadata->getTypes()[0])) {
                 $type = $attributeMetadata->getTypes()[0];
