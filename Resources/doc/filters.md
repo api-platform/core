@@ -18,8 +18,8 @@ To allow filtering the list of offers:
 
 ```yaml
 services:
-    resource.offer.filter:
-        parent:    "api.doctrine.orm.filter"
+    resource.offer.search_filter:
+        parent:    "api.doctrine.orm.search_filter"
         arguments: [ {
                         "id": "exact",    # Filters on the id property, allow both numeric values and IRIs
                         "price": "exact", # Extracts all collection elements with the exact given price
@@ -31,7 +31,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer" ]
         calls:
             -      method:    "addFilter"
-                   arguments: [ "@resource.offer.filter" ]
+                   arguments: [ "@resource.offer.search_filter" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -44,8 +44,8 @@ It also possible to filter by relations:
 
 ```yaml
 services:
-    resource.offer.filter:
-        parent:    "api.doctrine.orm.filter"
+    resource.offer.search_filter:
+        parent:    "api.doctrine.orm.search_filter"
         arguments: [ { "product": "exact" } ]
 
     resource.offer:
@@ -53,7 +53,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
             -      method:    "addFilter"
-                   arguments: [ "@resource.offer.filter" ]
+                   arguments: [ "@resource.offer.search_filter" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -68,15 +68,15 @@ first argument of the filter:
 
 ```yaml
 services:
-    resource.offer.filter:
-        parent:    "api.doctrine.orm.filter"
+    resource.offer.search_filter:
+        parent:    "api.doctrine.orm.search_filter"
 
     resource.offer:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
             -      method:    "addFilter"
-                   arguments: [ "@resource.offer.filter" ]
+                   arguments: [ "@resource.offer.search_filter" ]
         tags:      [ { name: "api.resource" } ]
 ```
 
