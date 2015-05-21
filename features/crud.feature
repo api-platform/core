@@ -73,7 +73,38 @@ Feature: Create-Retrieve-Update-Delete
           "relatedDummy": null,
           "relatedDummies": []
         }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 

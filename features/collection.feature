@@ -19,7 +19,38 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "hydra:member": []
+      "hydra:member": [],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -68,7 +99,38 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": []
         }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -117,7 +179,38 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": []
         }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -165,7 +258,38 @@ Feature: Collections support
             "relatedDummy": null,
             "relatedDummies": []
           }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -301,7 +425,38 @@ Feature: Collections support
             
           ]
         }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -330,7 +485,38 @@ Feature: Collections support
             "relatedDummy": null,
             "relatedDummies": []
           }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -359,7 +545,38 @@ Feature: Collections support
             "relatedDummy": null,
             "relatedDummies": []
           }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 
@@ -389,6 +606,37 @@ Feature: Collections support
             "relatedDummy": null,
             "relatedDummies": []
           }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """

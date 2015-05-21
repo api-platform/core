@@ -81,7 +81,9 @@ class Filter implements FilterInterface
             $found = isset($this->properties[$fieldName]);
             if ($found || null === $this->properties) {
                 $description[$fieldName] = [
+                    'property' => $fieldName,
                     'type' => $metadata->getTypeOfField($fieldName),
+                    'required' => false,
                     'strategy' => $found ? $this->properties[$fieldName] : self::STRATEGY_EXACT,
                 ];
             }
@@ -89,7 +91,9 @@ class Filter implements FilterInterface
 
         foreach ($metadata->getAssociationNames() as $associationName) {
             $description[$associationName] = [
+                'property' => $associationName,
                 'type' => 'iri',
+                'required' => false,
                 'strategy' => self::STRATEGY_EXACT,
             ];
         }

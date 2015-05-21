@@ -81,7 +81,38 @@ Feature: Relations support
             "/related_dummies/1"
           ]
         }
-      ]
+      ],
+      "hydra:search": {
+              "@type": "hydra:IriTemplate",
+              "hydra:template": "/dummies{?id,name,relatedDummy,relatedDummies}",
+              "hydra:variableRepresentation": "BasicRepresentation",
+              "hydra:mapping": [
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "id",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "name",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy",
+                      "property": "relatedDummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  }
+              ]
+          }
     }
     """
 

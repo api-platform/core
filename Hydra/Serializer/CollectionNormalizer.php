@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Api\ResourceResolver;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
@@ -84,6 +85,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
             }
         } else {
             $data['@id'] = $context['request_uri'];
+            list($parts, $parameters) = $this->parseRequestUri($context['request_uri']);
 
             if ($object instanceof PaginatorInterface) {
                 $data['@type'] = self::HYDRA_PAGED_COLLECTION;
@@ -93,17 +95,17 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
 
                 if (1. !== $currentPage) {
                     $previousPage = $currentPage - 1.;
-                    $data['hydra:previousPage'] = $this->getPageUrl($context['request_uri'], $previousPage);
+                    $data['hydra:previousPage'] = $this->getPageUrl($parts, $parameters, $previousPage);
                 }
 
                 if ($currentPage !== $lastPage) {
-                    $data['hydra:nextPage'] = $this->getPageUrl($context['request_uri'], $currentPage + 1.);
+                    $data['hydra:nextPage'] = $this->getPageUrl($parts, $parameters, $currentPage + 1.);
                 }
 
                 $data['hydra:totalItems'] = $object->getTotalItems();
                 $data['hydra:itemsPerPage'] = $object->getItemsPerPage();
-                $data['hydra:firstPage'] = $this->getPageUrl($context['request_uri'], 1.);
-                $data['hydra:lastPage'] = $this->getPageUrl($context['request_uri'], $lastPage);
+                $data['hydra:firstPage'] = $this->getPageUrl($parts, $parameters, 1.);
+                $data['hydra:lastPage'] = $this->getPageUrl($parts, $parameters, $lastPage);
             } else {
                 $data['@type'] = self::HYDRA_COLLECTION;
             }
@@ -112,20 +114,24 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
             foreach ($object as $obj) {
                 $data['hydra:member'][] = $this->serializer->normalize($obj, $format, $context);
             }
+
+            $filters = $resource->getFilters();
+            if (!empty($filters)) {
+                $data['hydra:search'] = $this->getSearch($resource, $parts, $filters);
+            }
         }
 
         return $data;
     }
 
     /**
-     * Gets a collection URL for the given page.
+     * Parse and standardize the request URI.
      *
      * @param string $requestUri
-     * @param float  $page
      *
-     * @return string
+     * @return array
      */
-    private function getPageUrl($requestUri, $page)
+    private function parseRequestUri($requestUri)
     {
         $parts = parse_url($requestUri);
 
@@ -139,6 +145,20 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
             }
         }
 
+        return [$parts, $parameters];
+    }
+
+    /**
+     * Gets a collection URL for the given page.
+     *
+     * @param array $parts
+     * @param array $parameters
+     * @param float $page
+     *
+     * @return string
+     */
+    private function getPageUrl(array $parts, array $parameters, $page)
+    {
         if (1. !== $page) {
             $parameters[$this->pageParameterName] = $page;
         }
@@ -152,5 +172,38 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
         }
 
         return $url;
+    }
+
+    /**
+     * Returns the content of the Hydra search property.
+     *
+     * @param ResourceInterface $resource
+     * @param array             $parts
+     * @param array             $filters
+     *
+     * @return array
+     */
+    private function getSearch(ResourceInterface $resource, array $parts, array $filters)
+    {
+        $variables = [];
+        $mapping = [];
+        foreach ($filters as $filter) {
+            foreach ($filter->getDescription($resource) as $variable => $data) {
+                $variables[] = $variable;
+                $mapping[] = [
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => $variable,
+                    'property' => $data['property'],
+                    'required' => $data['required'],
+                ];
+            }
+        }
+
+        return [
+            '@type' => 'hydra:IriTemplate',
+            'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)),
+            'hydra:variableRepresentation' => 'BasicRepresentation',
+            'hydra:mapping' => $mapping,
+        ];
     }
 }
