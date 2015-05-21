@@ -35,8 +35,8 @@ class OrderFilter extends AbstractFilter
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param string          $orderParameter Keyword used to retrieve the value.
-     * @param array|null      $properties     List of property names on which the filter will be enabled/disabled.
+     * @param string          $orderParameter  Keyword used to retrieve the value.
+     * @param array|null      $properties      List of property names on which the filter will be enabled.
      */
     public function __construct(ManagerRegistry $managerRegistry, $orderParameter, array $properties = null)
     {
@@ -75,7 +75,7 @@ class OrderFilter extends AbstractFilter
             foreach ($values as $property => $order) {
                 $order = strtoupper($order);
 
-                // Check if property is enabled if filter is not enabled on all properties
+                // Check if property is enabled or if filter is not enabled on all properties
                 if (null !== $this->properties) {
                     if (false === in_array($property, $this->properties)) {
                         continue;   // Skip this property

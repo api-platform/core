@@ -35,6 +35,11 @@ dunglas_api:
                 enable_client_request: true
 
 services:
+    ressource.date_filter:
+        parent:    "api.doctrine.orm.date_filter"
+        arguments: [ ["dummyDate"] ]
+
+
     my_dummy_resource.search_filter:
         parent:                     "api.doctrine.orm.search_filter"
         arguments:                  [ { "id": "exact", "name": "partial" } ]
@@ -42,6 +47,10 @@ services:
     my_dummy_resource.order_filter:
         parent:                     "api.doctrine.orm.order_filter"
         arguments:                  [ ["id", "name"] ]
+
+    my_dummy_resource.date_filter:
+            parent:                 "api.doctrine.orm.date_filter"
+            arguments:              [ ["dummyDate"] ]
 
     my_dummy_resource:
         parent:                      "api.resource"
@@ -51,6 +60,8 @@ services:
                                        arguments: [ "@my_dummy_resource.search_filter" ]
                                      - method:    "addFilter"
                                        arguments: [ "@my_dummy_resource.order_filter" ]
+                                     - method:    "addFilter"
+                                       arguments: [ "@my_dummy_resource.date_filter" ]
         tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:

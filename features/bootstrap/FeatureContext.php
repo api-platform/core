@@ -70,6 +70,25 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is :nb dummy objects with dummyDate
+     */
+    public function thereIsDummyObjectsWithDummyDate($nb)
+    {
+        for ($i = 1; $i <= $nb; $i++) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDummyDate($date);
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a RelationEmbedder object
      */
     public function thereIsARelationEmbedderObject()

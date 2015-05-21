@@ -102,21 +102,6 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
-                            "@id": "#Dummy/dummy",
-                            "@type": "rdf:Property",
-                            "rdfs:label": "dummy",
-                            "domain": "#Dummy",
-                            "range": "xmls:string"
-                        },
-                        "hydra:title": "dummy",
-                        "hydra:required": false,
-                        "hydra:readable": true,
-                        "hydra:writable": true,
-                        "hydra:description": "A dummy."
-                    },
-                    {
-                        "@type": "hydra:SupportedProperty",
-                        "hydra:property": {
                             "@id": "#Dummy/dummyDate",
                             "@type": "rdf:Property",
                             "rdfs:label": "dummyDate",
@@ -128,6 +113,21 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": true,
                         "hydra:description": "A dummy date."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Dummy/dummy",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "dummy",
+                            "domain": "#Dummy",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "dummy",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true,
+                        "hydra:description": "A dummy."
                     },
                     {
                         "@type": "hydra:SupportedProperty",

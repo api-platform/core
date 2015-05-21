@@ -115,4 +115,14 @@ class Dummy
     public function setFoo(array $foo = null)
     {
     }
+
+    public function setDummyDate(\DateTime $dummyDate)
+    {
+        $this->dummyDate = $dummyDate;
+    }
+
+    public function getDummyDate()
+    {
+        return $this->dummyDate;
+    }
 }

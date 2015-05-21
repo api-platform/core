@@ -23,8 +23,8 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "Dummy",
       "name": "My Dummy",
       "alias": null,
-      "dummy": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummy": null,
       "relatedDummy": null,
       "relatedDummies": []
     }
@@ -43,8 +43,8 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "Dummy",
       "name": "My Dummy",
       "alias": null,
-      "dummy": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummy": null,
       "relatedDummy": null,
       "relatedDummies": []
     }
@@ -71,15 +71,15 @@ Feature: Create-Retrieve-Update-Delete
           "@type":"Dummy",
           "name":"My Dummy",
           "alias": null,
-          "dummy": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
+          "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
         }
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name]}",
+              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -117,6 +117,12 @@ Feature: Create-Retrieve-Update-Delete
                       "variable": "order[name]",
                       "property": "name",
                       "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "string",
+                      "property": "dummyDate",
+                      "required": false
                   }
               ]
       }
@@ -142,8 +148,8 @@ Feature: Create-Retrieve-Update-Delete
         "@type": "Dummy",
         "name": "A nice dummy",
         "alias": null,
-        "dummy": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
+        "dummy": null,
         "relatedDummy": null,
         "relatedDummies": []
       }

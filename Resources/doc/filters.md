@@ -86,6 +86,39 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
+## Doctrine ORM date filter
+
+This filter allows you to filter a collection by dates periods.
+
+Syntax: `?property[<after|before>]=value`
+
+The period value (`after` or `before`) is case insensitive. The value can take any date format as long as it is understood by [`\DateTime()`](http://php.net/manual/fr/datetime.construct.php).
+
+To enable this filter on your ressource, just declare the following in your `app/config/services.yml`:
+
+```yaml
+# app/config/services.yml
+
+services:
+    # Enable date filter only for `dateProperty`
+    ressource.date_filter:
+        parent:    "api.doctrine.orm.date_filter"
+        arguments: [ ["dateProperty"] ]
+
+    # Enable date filter for all property
+    ressource.date_filter:
+        parent:    "api.doctrine.orm.date_filter"
+        arguments: [ ["dateProperty"] ]
+        
+    resource.offer:
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer"] 
+        calls:
+            -      method:    "addFilter"
+                   arguments: [ "@resource.offer.date_filter" ]
+        tags:      [ { name: "api.resource" } ]
+```
+
 ## Doctrine ORM order filter
 
 This filter allows you to order a collection.
