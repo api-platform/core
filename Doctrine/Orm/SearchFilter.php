@@ -23,7 +23,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Filter implements FilterInterface
+class SearchFilter implements FilterInterface
 {
     /**
      * @var string Exact matching.
