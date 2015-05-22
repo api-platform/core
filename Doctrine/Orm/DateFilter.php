@@ -29,11 +29,6 @@ class DateFilter extends AbstractFilter
     private $properties;
 
     /**
-     * @var string Keyword used to retrieve the value.
-     */
-    private $dateParameter;
-
-    /**
      * @param ManagerRegistry $managerRegistry
      * @param array|null      $properties      List of property names on which the filter will be enabled.
      */
