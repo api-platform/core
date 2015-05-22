@@ -52,7 +52,7 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   2. [Creating custom operations](Resources/doc/operations.md#creating-custom-operations)
 4. [Data providers](Resources/doc/data-providers.md)
   1. [Creating a custom data provider](Resources/doc/data-providers.md#creating-a-custom-data-provider)
-  2. [Returning a paged collection](Resources/doc/data-providers.md#Returning-a-paged-collection)
+  2. [Returning a paged collection](Resources/doc/data-providers.md#returning-a-paged-collection)
   3. [Supporting filters](Resources/doc/data-providers.md#Supporting-filters)
 5. [Filters](Resources/doc/filters.md)
   1. [Adding Doctrine ORM filters](Resources/doc/filters.md#adding-doctrine-orm-filters)
