@@ -40,11 +40,11 @@ class OrderFilterTest extends KernelTestCase
     protected function setUp()
     {
         self::bootKernel();
-        $class                 = 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy';
-        $manager               = DoctrineTestHelper::createTestEntityManager();
+        $class = 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy';
+        $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->repository      = $manager->getRepository($class);
-        $this->resource        = new Resource($class);
+        $this->repository = $manager->getRepository($class);
+        $this->resource = new Resource($class);
     }
 
     /**
@@ -54,17 +54,17 @@ class OrderFilterTest extends KernelTestCase
      */
     public function testApply(array $filterParameters, array $query, $expected)
     {
-        $request      = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $query);
         $queryBuilder = $this->getQueryBuilder();
-        $parameter      = (array_key_exists('parameter', $filterParameters))? $filterParameters['parameter']: 'order';
-        $filter       = new OrderFilter(
+        $parameter = (array_key_exists('parameter', $filterParameters)) ? $filterParameters['parameter'] : 'order';
+        $filter = new OrderFilter(
             $this->managerRegistry,
             $parameter,
             $filterParameters['properties']
         );
 
         $filter->apply($this->resource, $queryBuilder, $request);
-        $actual   = strtolower($queryBuilder->getQuery()->getDQL());
+        $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
         $this->assertEquals(
@@ -87,7 +87,7 @@ class OrderFilterTest extends KernelTestCase
      *  - filter parameters.
      *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
      *    otherwise not.
-     *  - expected DQL query
+     *  - expected DQL query.
      *
      * @return array
      */
@@ -101,11 +101,11 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 [
                     'order' => [
-                        'id'   => 'asc',
-                        'name' => 'desc'
-                    ]
+                        'id' => 'asc',
+                        'name' => 'desc',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name DESC'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name DESC',
             ],
             // Properties enabled with invalid values
             [
@@ -114,11 +114,11 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 [
                     'order' => [
-                        'id'   => 'asc',
-                        'name' => 'invalid'
-                    ]
+                        'id' => 'asc',
+                        'name' => 'invalid',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC',
             ],
             // Properties disabled with valid values
             [
@@ -127,11 +127,11 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 [
                     'order' => [
-                        'id'    => 'asc',
-                        'alias' => 'asc'
-                    ]
+                        'id' => 'asc',
+                        'alias' => 'asc',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC',
             ],
             // Properties disabled with invalid values
             [
@@ -140,12 +140,12 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 [
                     'order' => [
-                        'id'    => 'invalid',
-                        'name'  => 'asc',
-                        'alias' => 'invalid'
-                    ]
+                        'id' => 'invalid',
+                        'name' => 'asc',
+                        'alias' => 'invalid',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.name ASC'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.name ASC',
             ],
             // Unkown property disabled
             [
@@ -154,10 +154,10 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 [
                     'order' => [
-                        'unknown' => 'asc'
-                    ]
+                        'unknown' => 'asc',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o',
             ],
             // Unkown property enabled
             [
@@ -166,40 +166,40 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 [
                     'order' => [
-                        'unknown' => 'asc'
-                    ]
+                        'unknown' => 'asc',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o',
             ],
             // Test with another keyword
             [
                 [
                     'properties' => ['id', 'name'],
-                    'parameter'  => 'customOrder'
+                    'parameter' => 'customOrder',
                 ],
                 [
                     'order' => [
-                        'id'   => 'asc',
-                        'name' => 'asc'
+                        'id' => 'asc',
+                        'name' => 'asc',
                     ],
                     'customOrder' => [
-                        'name' => 'desc'
-                    ]
+                        'name' => 'desc',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.name DESC'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.name DESC',
             ],
             // Test with no list
             [
                 [
-                    'properties' => null
+                    'properties' => null,
                 ],
                 [
                     'order' => [
-                        'id'   => 'asc',
-                        'name' => 'asc'
-                    ]
+                        'id' => 'asc',
+                        'name' => 'asc',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name ASC'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name ASC',
             ],
         ];
     }

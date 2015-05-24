@@ -27,7 +27,6 @@ class OrderFilter extends AbstractFilter
      * @var array List of properties by witch the collection can or cannot be ordered.
      */
     private $properties;
-
     /**
      * @var string Keyword used to retrieve the value.
      */
@@ -41,8 +40,8 @@ class OrderFilter extends AbstractFilter
     public function __construct(ManagerRegistry $managerRegistry, $orderParameter, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->orderParameter  = $orderParameter;
-        $this->properties      = $properties;
+        $this->orderParameter = $orderParameter;
+        $this->properties = $properties;
     }
 
     /**
@@ -63,7 +62,7 @@ class OrderFilter extends AbstractFilter
      *
      * @param ResourceInterface $resource
      * @param QueryBuilder      $queryBuilder
-     * @param array|null        $values Array of properties as key and order value as value.
+     * @param array|null        $values       Array of properties as key and order value as value.
      *
      * @return QueryBuilder
      */
@@ -75,16 +74,13 @@ class OrderFilter extends AbstractFilter
             foreach ($values as $property => $order) {
                 $order = strtoupper($order);
 
-                // Check if property is enabled or if filter is not enabled on all properties
                 if (null !== $this->properties) {
                     if (false === in_array($property, $this->properties)) {
-                        continue;   // Skip this property
+                        continue;
                     }
                 }
 
-                if (true === in_array($property, $fieldNames)   // Check if the entity has the property
-                    && ('ASC' === $order || 'DESC' === $order)  // Check if order value is valid
-                ) {
+                if (in_array($property, $fieldNames) && ('ASC' === $order || 'DESC' === $order)) {
                     $queryBuilder->addOrderBy(sprintf('o.%s', $property), $order);
                 }
             }
@@ -106,7 +102,7 @@ class OrderFilter extends AbstractFilter
             if ($found || null === $this->properties) {
                 $description[sprintf('%s[%s]', $this->orderParameter, $fieldName)] = [
                     'property' => $fieldName,
-                    'type'     => 'string',
+                    'type' => 'string',
                     'required' => false,
                 ];
             }

@@ -40,11 +40,11 @@ class DateFilterTest extends KernelTestCase
     protected function setUp()
     {
         self::bootKernel();
-        $class                 = 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy';
-        $manager               = DoctrineTestHelper::createTestEntityManager();
+        $class = 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy';
+        $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->repository      = $manager->getRepository($class);
-        $this->resource        = new Resource($class);
+        $this->repository = $manager->getRepository($class);
+        $this->resource = new Resource($class);
     }
 
     /**
@@ -54,15 +54,15 @@ class DateFilterTest extends KernelTestCase
      */
     public function testApply(array $filterParameters, array $query, $expected)
     {
-        $request      = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $query);
         $queryBuilder = $this->getQueryBuilder();
-        $filter       = new DateFilter(
+        $filter = new DateFilter(
             $this->managerRegistry,
             $filterParameters['properties']
         );
 
         $filter->apply($this->resource, $queryBuilder, $request);
-        $actual   = strtolower($queryBuilder->getQuery()->getDQL());
+        $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
         $this->assertEquals(
@@ -85,7 +85,7 @@ class DateFilterTest extends KernelTestCase
      *  - filter parameters.
      *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
      *    otherwise not.
-     *  - expected DQL query
+     *  - expected DQL query.
      *
      * @return array
      */
@@ -99,10 +99,10 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after' => '2015-04-05'
-                    ]
+                        'after' => '2015-04-05',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o where o.dummydate >= :afterdummydate'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o where o.dummydate >= :afterdummydate',
             ],
             [
                 [
@@ -110,11 +110,11 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after'  => '2015-04-05',
-                        'before' => '2015-04-05'
-                    ]
+                        'after' => '2015-04-05',
+                        'before' => '2015-04-05',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o where o.dummydate >= :afterdummydate and o.dummydate <= :beforedummydate'
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o where o.dummydate >= :afterdummydate and o.dummydate <= :beforedummydate',
             ],
             [
                 [
@@ -122,12 +122,12 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after'  => '2015-04-05',
-                        'before' => '2015-04-05'
-                    ]
+                        'after' => '2015-04-05',
+                        'before' => '2015-04-05',
+                    ],
                 ],
-                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o'
-            ]
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o',
+            ],
         ];
     }
 }

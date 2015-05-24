@@ -35,7 +35,7 @@ class DateFilter extends AbstractFilter
     public function __construct(ManagerRegistry $managerRegistry, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->properties      = $properties;
+        $this->properties = $properties;
     }
 
     /**
@@ -50,23 +50,20 @@ class DateFilter extends AbstractFilter
         $fieldNames = $metadata->getFieldNames();
 
         foreach ($request->query->all() as $filter => $values) {
-            // Check if value is an array
             if (!is_array($values)) {
                 continue;
             }
 
-            // Check if property is enabled or if filter is not enabled on all properties
             if (null !== $this->properties) {
                 if (false === in_array($filter, $this->properties)) {
-                    continue;   // Skip this property
+                    continue;
                 }
             }
 
-            // Check if the entity has the property
-            if (true === in_array($filter, $fieldNames)) {
+            if (in_array($filter, $fieldNames)) {
                 foreach ($values as $period => $date) {
                     $period = strtolower($period);
-                    $date   = new \DateTime($date);
+                    $date = new \DateTime($date);
 
                     if ('before' === $period) {
                         $parameter = sprintf('%s%s', $period, $filter);
@@ -98,11 +95,10 @@ class DateFilter extends AbstractFilter
 
         foreach ($metadata->getFieldNames() as $fieldName) {
             $found = in_array($fieldName, $this->properties);
-            //TODO: update description, how to handle the case of the period (`before` and `after`)?
             if ($found || null === $this->properties) {
                 $description['string'] = [
                     'property' => $fieldName,
-                    'type'     => 'string',
+                    'type' => 'string',
                     'required' => false,
                 ];
             }

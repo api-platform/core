@@ -4,7 +4,6 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AnotherDummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 
