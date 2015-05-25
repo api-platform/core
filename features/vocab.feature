@@ -117,6 +117,20 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
+                            "@id": "#Dummy\/jsonData",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "jsonData",
+                            "domain": "#Dummy"
+                        },
+                        "hydra:title": "jsonData",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true,
+                        "hydra:description": "serialize data."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
                             "@id": "#Dummy/dummy",
                             "@type": "rdf:Property",
                             "rdfs:label": "dummy",

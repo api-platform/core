@@ -28,6 +28,7 @@ Feature: Order filter on collections
                   "name": "Dummy #5",
                   "alias": "Alias #25",
                   "dummyDate": "2015-04-05T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -38,6 +39,7 @@ Feature: Order filter on collections
                   "name": "Dummy #6",
                   "alias": "Alias #24",
                   "dummyDate": "2015-04-06T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -48,6 +50,7 @@ Feature: Order filter on collections
                   "name": "Dummy #7",
                   "alias": "Alias #23",
                   "dummyDate": "2015-04-07T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -128,6 +131,7 @@ Feature: Order filter on collections
                   "name": "Dummy #1",
                   "alias": "Alias #29",
                   "dummyDate": "2015-04-01T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -138,6 +142,7 @@ Feature: Order filter on collections
                   "name": "Dummy #2",
                   "alias": "Alias #28",
                   "dummyDate": "2015-04-02T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -148,6 +153,7 @@ Feature: Order filter on collections
                   "name": "Dummy #3",
                   "alias": "Alias #27",
                   "dummyDate": "2015-04-03T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -229,6 +235,7 @@ Feature: Order filter on collections
                   "name": "Dummy #5",
                   "alias": "Alias #25",
                   "dummyDate": "2015-04-05T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
@@ -308,6 +315,7 @@ Feature: Order filter on collections
                   "name": "Dummy #5",
                   "alias": "Alias #25",
                   "dummyDate": "2015-04-05T00:00:00+00:00",
+                  "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []

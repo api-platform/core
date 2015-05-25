@@ -96,6 +96,7 @@ Feature: Collections support
           "name": "Dummy #1",
           "alias": "Alias #29",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -106,6 +107,7 @@ Feature: Collections support
           "name": "Dummy #2",
           "alias": "Alias #28",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -116,6 +118,7 @@ Feature: Collections support
           "name": "Dummy #3",
           "alias": "Alias #27",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -197,6 +200,7 @@ Feature: Collections support
           "name": "Dummy #19",
           "alias": "Alias #11",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -207,6 +211,7 @@ Feature: Collections support
           "name": "Dummy #20",
           "alias": "Alias #10",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -217,6 +222,7 @@ Feature: Collections support
           "name": "Dummy #21",
           "alias": "Alias #9",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -298,6 +304,7 @@ Feature: Collections support
             "name": "Dummy #28",
             "alias": "Alias #2",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []
@@ -308,6 +315,7 @@ Feature: Collections support
             "name": "Dummy #29",
             "alias": "Alias #1",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []
@@ -318,6 +326,7 @@ Feature: Collections support
             "name": "Dummy #30",
             "alias": "Alias #0",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []
@@ -403,10 +412,11 @@ Feature: Collections support
           "name": "Dummy #11",
           "alias": "Alias #19",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -415,10 +425,11 @@ Feature: Collections support
           "name": "Dummy #12",
           "alias": "Alias #18",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -427,10 +438,11 @@ Feature: Collections support
           "name": "Dummy #13",
           "alias": "Alias #17",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -439,10 +451,11 @@ Feature: Collections support
           "name": "Dummy #14",
           "alias": "Alias #16",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -451,10 +464,11 @@ Feature: Collections support
           "name": "Dummy #15",
           "alias": "Alias #15",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -463,10 +477,11 @@ Feature: Collections support
           "name": "Dummy #16",
           "alias": "Alias #14",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -475,10 +490,11 @@ Feature: Collections support
           "name": "Dummy #17",
           "alias": "Alias #13",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -487,10 +503,11 @@ Feature: Collections support
           "name": "Dummy #18",
           "alias": "Alias #12",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -499,10 +516,11 @@ Feature: Collections support
           "name": "Dummy #19",
           "alias": "Alias #11",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         },
         {
@@ -511,10 +529,11 @@ Feature: Collections support
           "name": "Dummy #20",
           "alias": "Alias #10",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": [
-            
+
           ]
         }
       ],
@@ -592,6 +611,7 @@ Feature: Collections support
             "name": "Dummy #8",
             "alias": "Alias #22",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []
@@ -672,6 +692,7 @@ Feature: Collections support
             "name": "Dummy #8",
             "alias": "Alias #22",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []
@@ -752,6 +773,7 @@ Feature: Collections support
             "name": "Dummy #8",
             "alias": "Alias #22",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
             "relatedDummies": []

@@ -47,6 +47,7 @@ Feature: Relations support
       "name": "Dummy with relations",
       "alias": null,
       "dummyDate": null,
+      "jsonData": [],
       "dummy": null,
       "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
@@ -77,6 +78,7 @@ Feature: Relations support
           "name": "Dummy with relations",
           "alias": null,
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": "/related_dummies/1",
           "relatedDummies": [
