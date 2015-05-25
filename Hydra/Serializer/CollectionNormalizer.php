@@ -80,8 +80,8 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
 
         if (isset($context['json_ld_sub_level'])) {
             $data = [];
-            foreach ($object as $obj) {
-                $data[] = $this->serializer->normalize($obj, $format, $context);
+            foreach ($object as $index => $obj) {
+                $data[$index] = $this->serializer->normalize($obj, $format, $context);
             }
         } else {
             $data['@id'] = $context['request_uri'];

@@ -77,10 +77,17 @@ class Dummy
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
     public $relatedDummies;
+    /**
+     * @var Array serialize data.
+     *
+     * @ORM\Column(type="json_array", nullable=true)
+     */
+    public $jsonData;
 
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->jsonData = array();
     }
 
     public function getId()
@@ -124,5 +131,15 @@ class Dummy
     public function getDummyDate()
     {
         return $this->dummyDate;
+    }
+
+    public function setJsonData($jsonData)
+    {
+        $this->jsonData = $jsonData;
+    }
+
+    public function getJsonData()
+    {
+        return $this->jsonData;
     }
 }

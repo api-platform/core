@@ -9,7 +9,13 @@ Feature: Create-Retrieve-Update-Delete
     """
     {
       "name": "My Dummy",
-      "dummyDate": "2015-03-01T10:00:00+00:00"
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "jsonData": {
+        "key": [
+          "value1",
+          "value2"
+        ]
+      }
     }
     """
     Then the response status code should be 201
@@ -24,6 +30,12 @@ Feature: Create-Retrieve-Update-Delete
       "name": "My Dummy",
       "alias": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "jsonData": {
+        "key": [
+          "value1",
+          "value2"
+        ]
+      },
       "dummy": null,
       "relatedDummy": null,
       "relatedDummies": []
@@ -44,6 +56,12 @@ Feature: Create-Retrieve-Update-Delete
       "name": "My Dummy",
       "alias": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "jsonData": {
+        "key": [
+          "value1",
+          "value2"
+        ]
+      },
       "dummy": null,
       "relatedDummy": null,
       "relatedDummies": []
@@ -72,6 +90,12 @@ Feature: Create-Retrieve-Update-Delete
           "name":"My Dummy",
           "alias": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
+          "jsonData": {
+            "key": [
+              "value1",
+              "value2"
+            ]
+          },
           "dummy": null,
           "relatedDummy": null,
           "relatedDummies": []
@@ -134,7 +158,14 @@ Feature: Create-Retrieve-Update-Delete
       """
       {
         "@id": "/dummies/1",
-        "name": "A nice dummy"
+        "name": "A nice dummy",
+        "jsonData": [{
+            "key": "value1"
+          },
+          {
+            "key": "value2"
+          }
+        ]
       }
       """
       Then the response status code should be 202
@@ -149,6 +180,13 @@ Feature: Create-Retrieve-Update-Delete
         "name": "A nice dummy",
         "alias": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
+        "jsonData": [{
+            "key": "value1"
+          },
+          {
+            "key": "value2"
+          }
+        ],
         "dummy": null,
         "relatedDummy": null,
         "relatedDummies": []
