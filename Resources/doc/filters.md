@@ -32,8 +32,8 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer" ]
         calls:
-            -      method:    "addFilter"
-                   arguments: [ "@resource.offer.search_filter" ]
+            -      method:    "initFilters"
+                   arguments: [ [ "@resource.offer.search_filter" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -56,8 +56,8 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
-            -      method:    "addFilter"
-                   arguments: [ "@resource.offer.search_filter" ]
+            -      method:    "initFilters"
+                   arguments: [ [ "@resource.offer.search_filter" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -81,8 +81,8 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
-            -      method:    "addFilter"
-                   arguments: [ "@resource.offer.search_filter" ]
+            -      method:    "initFilters"
+                   arguments: [ [ "@resource.offer.search_filter" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -100,22 +100,17 @@ To enable this filter on your ressource, just declare the following in your `app
 # app/config/services.yml
 
 services:
-    # Enable date filter only for `dateProperty`
-    ressource.date_filter:
+    # Enable date filter only for dateProperty
+    resource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
-        arguments: [ ["dateProperty"] ]
+        arguments: [ [ "dateProperty" ] ]
 
-    # Enable date filter for all property
-    ressource.date_filter:
-        parent:    "api.doctrine.orm.date_filter"
-        arguments: [ ["dateProperty"] ]
-        
     resource.offer:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
-            -      method:    "addFilter"
-                   arguments: [ "@resource.offer.date_filter" ]
+            -      method:    "initFilters"
+                   arguments: [ [ "@resource.offer.date_filter" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -141,8 +136,8 @@ services:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Offer"] 
         calls:
-            -      method:    "addFilter"
-                   arguments: [ "@resource.offer.order_filter" ]
+            -      method:    "initFilters"
+                   arguments: [ [ "@resource.offer.order_filter" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -150,7 +145,7 @@ Given the collection endpoint is `/offers`, you can filter offers by name in asc
 
 `/offers?order[name]=desc&order[id]=asc`.
 
-### Advance usage
+### Advanced usage
 
 #### Modes
 
@@ -160,15 +155,14 @@ The filter can be either enabled on all properties or on specific properties.
 # app/config/services.yml
 
 services:
-    # Filter enbabled on all properties
+    # Filter enabled on all properties
     resource.offer.order_filter:
         parent:    "api.doctrine.orm.order_filter"
 
-    # Filter enbabled on the properties `id` and `name`
+    # Filter enabled on the properties id and name
     resource.offer.order_filter:
         parent:    "api.doctrine.orm.order_filter"
         arguments: [ ["id", "name"] ]
-
 ```
 
 Regardless of the mode, the filter works on a property only if the property does exist and if the order value is valid (`asc` or `desc` case insensitive). When the property does not exist, is not enabled or the value incorrect, the query for this property is silently ignored.
@@ -184,13 +178,13 @@ dunglas_api:
     #...
     collection:
         filter_name:
-            order:   "_order" # now to use the filter, you will have to use the `_order` keyword
+            order:   "_order" # now to use the filter, you will have to use the _order keyword
         #...
 ```
 
 #### Extending filter
 
-The filter is pretty flexible: it has different modes and you can specify the keyword. But what if you want to completly change the syntax to use something like this:
+The filter is pretty flexible: it has different modes and you can specify the keyword. But what if you want to completely change the syntax to use something like this:
 
 `?filter[order][property]`
 
@@ -230,7 +224,7 @@ Custom filters can be written by implementing the `Dunglas\ApiBundle\Api\Filter\
 Doctrine ORM filters must implement the `Dunglas\ApiBundle\Doctrine\Orm\FilterInterface`. They can interact directly
 with the Doctrine `QueryBuilder`.
 
-Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Resource::addFilter()` or `Dunglas\ApiBundle\Api\Resource::addFilters()` method.
+Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Resource::initFilters()` method.
 
 If you use [custom data providers](data-providers.yml), they must support filtering and be aware of actives filters to
 work properly.

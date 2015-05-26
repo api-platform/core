@@ -28,11 +28,11 @@ class Resource implements ResourceInterface
     /**
      * @var OperationInterface[]
      */
-    private $itemOperations = [];
+    private $itemOperations;
     /**
      * @var OperationInterface[]
      */
-    private $collectionOperations = [];
+    private $collectionOperations;
     /**
      * @var FilterInterface[]
      */
@@ -57,9 +57,8 @@ class Resource implements ResourceInterface
     /**
      * @param string $entityClass
      */
-    public function __construct(
-        $entityClass
-    ) {
+    public function __construct($entityClass)
+    {
         if (!class_exists($entityClass)) {
             throw new \InvalidArgumentException(sprintf('The class %s does not exist.', $entityClass));
         }
@@ -77,11 +76,13 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes collection operations.
+     *
+     * @param OperationInterface[] $collectionOperations
      */
-    public function addCollectionOperation(OperationInterface $operation)
+    public function initCollectionOperations(array $collectionOperations)
     {
-        $this->collectionOperations[] = $operation;
+        $this->collectionOperations = $collectionOperations;
     }
 
     /**
@@ -93,11 +94,13 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes item operations.
+     *
+     * @param OperationInterface[] $itemOperations
      */
-    public function addItemOperation(OperationInterface $operation)
+    public function initItemOperations(array $itemOperations)
     {
-        $this->itemOperations[] = $operation;
+        $this->itemOperations = $itemOperations;
     }
 
     /**
@@ -109,11 +112,13 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Initializes filters.
+     *
+     * @param array $filters
      */
-    public function addFilter(FilterInterface $filter)
+    public function initFilters(array $filters)
     {
-        $this->filters[] = $filter;
+        $this->filters = $filters;
     }
 
     /**
