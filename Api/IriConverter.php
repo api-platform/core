@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Api;
 
+use Doctrine\ORM\EntityManager;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -44,17 +45,24 @@ class IriConverter implements IriConverterInterface
      */
     private $routeCache;
 
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         DataProviderInterface $dataProvider,
         RouterInterface $router,
-        PropertyAccessorInterface $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor,
+        EntityManager $entityManager
     ) {
         $this->resourceCollection = $resourceCollection;
         $this->dataProvider = $dataProvider;
         $this->router = $router;
         $this->propertyAccessor = $propertyAccessor;
         $this->routeCache = new \SplObjectStorage();
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -87,12 +95,37 @@ class IriConverter implements IriConverterInterface
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
             return $this->router->generate(
                 $this->getItemRouteName($resource),
-                ['id' => $this->propertyAccessor->getValue($item, 'id')],
+                ['id' => $this->propertyAccessor->getValue(
+                        $item,
+                        $this->getIdentifierFromClassName(get_class($item))
+                    )
+                ],
                 $referenceType
             );
         }
 
         throw new \InvalidArgumentException(sprintf('No resource associated with the type "%s".', get_class($item)));
+    }
+
+    /**
+     * @param string $className
+     *
+     * @throws |Exception
+     *
+     * @return string
+     */
+    private function getIdentifierFromClassName($className)
+    {
+        $classMetaData = $this->entityManager->getClassMetadata($className);
+        $identifierList = $classMetaData->getIdentifier();
+
+        if (count($identifierList) != 1) {
+            throw new \Exception(sprintf(
+                'Entity "%s" have multiple identifier, actually we support only simple identifier', $className
+            ));
+        }
+
+        return array_shift($identifierList);
     }
 
     /**
