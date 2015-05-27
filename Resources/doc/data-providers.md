@@ -51,7 +51,7 @@ class StaticDataProvider implements DataProviderInterface
 
     public function supports(ResourceInterface $resource)
     {
-        return 'AppBundle\Entity\MyEntity` === $resource->getEntityClass();
+        return 'AppBundle\Entity\MyEntity' === $resource->getEntityClass();
     }
 }
 ```
