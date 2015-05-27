@@ -22,11 +22,7 @@ To allow filtering the list of offers:
 services:
     resource.offer.search_filter:
         parent:    "api.doctrine.orm.search_filter"
-        arguments: [ {
-                        "id": "exact",    # Filters on the id property, allow both numeric values and IRIs
-                        "price": "exact", # Extracts all collection elements with the exact given price
-                        "name": "partial" # Elements with given text in their name
-                   } ]
+        arguments: [ { id: "exact", price: "exact", name: "partial"  } ]
 
     resource.offer:
         parent:    "api.resource"
