@@ -139,7 +139,7 @@ class Offer
     /**
      * @ORM\Column(type="float")
      * @Assert\NotBlank
-     * @Assert\Range(min=0, message="The price must be superior to 0.")
+     * @Assert\Range(min=0, minMessage="The price must be superior to 0.")
      * @Assert\Type(type="float")
      */
     public $price;
