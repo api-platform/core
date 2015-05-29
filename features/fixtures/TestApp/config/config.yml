@@ -56,12 +56,8 @@ services:
         parent:                      "api.resource"
         arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
         calls:
-                                     - method:    "addFilter"
-                                       arguments: [ "@my_dummy_resource.search_filter" ]
-                                     - method:    "addFilter"
-                                       arguments: [ "@my_dummy_resource.order_filter" ]
-                                     - method:    "addFilter"
-                                       arguments: [ "@my_dummy_resource.date_filter" ]
+                                     - method:    "initFilters"
+                                       arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.date_filter" ] ]
         tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:
@@ -106,13 +102,10 @@ services:
                                     - method:    "initDenormalizationContext"
                                       arguments:
                                           -      { groups: [ "chicago" ] }
-                                    - method:    "addItemOperation"
+                                    - method:    "initItemOperations"
                                       arguments:
-                                          -      "@my_relation_embedder_resource.item_operation.get"
-                                    - method:    "addItemOperation"
-                                      arguments:
-                                          -      "@my_relation_embedder_resource.item_operation.put"
-                                    - method:    "addItemOperation"
-                                      arguments:
-                                          -      "@my_relation_embedder_resource.item_operation.custom_get"
+                                          -
+                                              -      "@my_relation_embedder_resource.item_operation.get"
+                                              -      "@my_relation_embedder_resource.item_operation.put"
+                                              -      "@my_relation_embedder_resource.item_operation.custom_get"
         tags:                       [ { name: "api.resource" } ]

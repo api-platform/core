@@ -37,7 +37,21 @@ services:
     resource.product:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
-            -      [ "addCollectionOperation", [ "@resource.product.collection_operation.get" ] ]
+            -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
+        tags:      [ { name: "api.resource" } ]
+```
+
+However, in the following example items operations will still be automatically registered. To disable them, call `initItemOperations`
+with an empty array as first parameter:
+
+```yaml
+# ...
+
+    resource.product:
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Product" ]
+            -      [ "initItemOperations", [ [ ] ] ]
+            -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
@@ -60,7 +74,6 @@ the Hydra vocab (if enabled).
         factory:   [ "@api.operation_factory", "createItemOperation" ]
         arguments: [ "@resource.product", "PUT" ]
 
-
     resource.product.item_operation.custom_get:
         class:   "Dunglas\ApiBundle\Api\Operation\Operation"
         public:  false
@@ -80,12 +93,8 @@ the Hydra vocab (if enabled).
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
         calls:
-            -      method:    "addItemOperation"
-                   arguments: [ "@resource.product.item_operation.get" ]
-            -      method:    "addItemOperation"
-                   arguments: [ "@resource.product.item_operation.put" ]
-            -      method:    "addItemOperation"
-                   arguments: [ "@resource.product.item_operation.custom_get" ]
+            -      method:    "initItemOperations"
+                   arguments: [ [ "@resource.product.item_operation.get", "@resource.product.item_operation.put", "@resource.product.item_operation.custom_get" ] ]
         tags:      [ { name: "api.resource" } ]
 ```
 
