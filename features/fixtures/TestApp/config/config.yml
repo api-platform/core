@@ -50,7 +50,7 @@ services:
 
     my_dummy_resource.date_filter:
             parent:                 "api.doctrine.orm.date_filter"
-            arguments:              [ ["dummyDate"] ]
+            arguments:              [ ["dummyDate"], 2 ]
 
     my_dummy_resource:
         parent:                      "api.resource"

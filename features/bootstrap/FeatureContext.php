@@ -79,7 +79,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->setDummyDate($date);
+            // Last Dummy has a null date
+            if ($nb !== $i) {
+                $dummy->setDummyDate($date);
+            }
 
             $this->manager->persist($dummy);
         }

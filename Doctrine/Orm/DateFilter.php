@@ -23,19 +23,35 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DateFilter extends AbstractFilter
 {
+    const PARAMETER_BEFORE = 'before';
+    const PARAMETER_AFTER = 'after';
+
+    const NULL_EXCLUDED = 0;
+    const NULL_FIRST = 1;
+    const NULL_LAST = 2;
+
     /**
-     * @var array List of properties by witch the collection can or cannot be ordered.
+     * @var array List of properties by witch the collection can be ordered.
      */
     private $properties;
 
     /**
+     * @var int Specify the NULL position when sorting dates
+     */
+    private $nullOption = self::NULL_FIRST;
+
+    /**
      * @param ManagerRegistry $managerRegistry
      * @param array|null      $properties      List of property names on which the filter will be enabled.
+     * @param int             $nullOption
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, array $properties = null, $nullOption = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->properties = $properties;
+        if (in_array($nullOption, [self::NULL_EXCLUDED, self::NULL_FIRST, self::NULL_LAST])) {
+            $this->nullOption = $nullOption;
+        }
     }
 
     /**
@@ -47,36 +63,76 @@ class DateFilter extends AbstractFilter
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
         $metadata = $this->getClassMetadata($resource);
-        $fieldNames = $metadata->getFieldNames();
+        $fieldNames = array_flip($metadata->getFieldNames());
 
         foreach ($request->query->all() as $filter => $values) {
+            // Expect $values to be an array having the period as keys and the date value as values
             if (!is_array($values)) {
                 continue;
             }
 
-            if (null !== $this->properties) {
-                if (false === in_array($filter, $this->properties)) {
-                    continue;
-                }
+            // Check if filter is in whitelist mode and if so if the filter is enabled
+            if (null !== $this->properties && !in_array($filter, $this->properties)) {
+                continue;
             }
 
-            if (in_array($filter, $fieldNames)) {
+            // Check if entity has such single association property
+            if (isset($fieldNames[$filter])) {
                 foreach ($values as $period => $date) {
                     $period = strtolower($period);
                     $date = new \DateTime($date);
+                    $parameter = sprintf('date_%s_%s', $period, $filter);
 
-                    if ('before' === $period) {
-                        $parameter = sprintf('%s%s', $period, $filter);
-                        $queryBuilder
-                            ->andWhere(sprintf('o.%s <= :%s', $filter, $parameter))
-                            ->setParameter($parameter, $date)
-                        ;
+                    switch ($this->nullOption) {
+
+                        case self::NULL_EXCLUDED:
+                            switch ($period) {
+
+                                case self::PARAMETER_BEFORE:
+                                    $expr = $queryBuilder->expr()->andX(
+                                        sprintf('o.%s <= :%s', $filter, $parameter),
+                                        $queryBuilder->expr()->isNotNull(sprintf('o.%s', $filter))
+                                    );
+                                    break;
+
+                                case self::PARAMETER_AFTER:
+                                    $queryBuilder->andWhere(sprintf('o.%s >= :%s', $filter, $parameter));
+                            }
+                            break;
+
+                        case self::NULL_FIRST:
+                            switch ($period) {
+
+                                case self::PARAMETER_BEFORE:
+                                    $queryBuilder->andWhere(sprintf('o.%s <= :%s', $filter, $parameter));
+                                    break;
+
+                                case self::PARAMETER_AFTER:
+                                    $queryBuilder->andWhere(sprintf('o.%s >= :%s', $filter, $parameter));
+                            }
+                            break;
+
+                        case self::NULL_LAST:
+                            switch ($period) {
+
+                                case self::PARAMETER_BEFORE:
+                                    $expr = $queryBuilder->expr()->andX(
+                                        sprintf('o.%s <= :%s', $filter, $parameter),
+                                        $queryBuilder->expr()->isNotNull(sprintf('o.%s', $filter))
+                                    );
+                                    break;
+
+                                case self::PARAMETER_AFTER:
+                                    $expr = $queryBuilder->expr()->orX(
+                                        sprintf('o.%s >= :%s', $filter, $parameter),
+                                        $queryBuilder->expr()->isNull(sprintf('o.%s', $filter))
+                                    );
+                            }
                     }
 
-                    if ('after' === $period) {
-                        $parameter = sprintf('%s%s', $period, $filter);
+                    if (isset($expr)) {
                         $queryBuilder
-                            ->andWhere(sprintf('o.%s >= :%s', $filter, $parameter))
+                            ->andWhere($expr)
                             ->setParameter($parameter, $date)
                         ;
                     }
@@ -98,7 +154,7 @@ class DateFilter extends AbstractFilter
             if ($found || null === $this->properties) {
                 $description['string'] = [
                     'property' => $fieldName,
-                    'type' => 'string',
+                    'type'     => 'string',
                     'required' => false,
                 ];
             }
