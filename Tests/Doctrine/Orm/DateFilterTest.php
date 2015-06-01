@@ -176,7 +176,7 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after'  => '2015-04-05',
+                        'after' => '2015-04-05',
                         'before' => '2015-04-05',
                     ],
                 ],
@@ -189,7 +189,7 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after'  => '2015-04-05',
+                        'after' => '2015-04-05',
                         'before' => '2015-04-05',
                     ],
                 ],
@@ -202,7 +202,7 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after'  => '2015-04-05',
+                        'after' => '2015-04-05',
                         'before' => '2015-04-05',
                     ],
                 ],
@@ -216,7 +216,7 @@ class DateFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyDate' => [
-                        'after'  => '2015-04-05',
+                        'after' => '2015-04-05',
                         'before' => '2015-04-05',
                     ],
                 ],

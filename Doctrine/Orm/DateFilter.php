@@ -154,7 +154,7 @@ class DateFilter extends AbstractFilter
             if ($found || null === $this->properties) {
                 $description['string'] = [
                     'property' => $fieldName,
-                    'type'     => 'string',
+                    'type' => 'string',
                     'required' => false,
                 ];
             }
