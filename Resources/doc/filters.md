@@ -1,4 +1,4 @@
-# Filters
+# Doctrine ORM Filters
 
 The bundle provides a generic system to apply filters on collections. It ships with built-in Doctrine ORM support
 and can be extended to fit your specific needs.
@@ -8,7 +8,7 @@ By default, all filters are disabled. They must be enabled manually.
 When a filter is enabled, it is automatically documented as a `hydra:search` property in collection returns. It also automatically
 appears in the NelmioApiDoc documentation if this bundle is installed and enabled.
 
-## Adding Doctrine ORM filters
+## Search filter
 
 If Doctrine ORM support is enabled, adding filters is as easy as adding an entry in your `app/config/services.yml` file.
 It supports exact and partial matching strategies. If the partial strategy is specified, a SQL query with a `LIKE %text to search%`
@@ -82,13 +82,15 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
-## Doctrine ORM date filter
+## Date filter
 
 This filter allows you to filter a collection by dates periods.
 
 Syntax: `?property[<after|before>]=value`
 
 The period value (`after` or `before`) is case insensitive. The value can take any date format as long as it is understood by [`\DateTime()`](http://php.net/manual/fr/datetime.construct.php).
+
+### Basic usage
 
 To enable this filter on your ressource, just declare the following in your `app/config/services.yml`:
 
@@ -110,7 +112,34 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
-## Doctrine ORM order filter
+### Advanced configuration
+
+It is also possible to parametrize how the null value works. You may which the null value to be:
+* before any date (default behavior): [1](../../Doctrine/Orm/DateFilter.php#L30)
+* after any date: [2](../../Doctrine/Orm/DateFilter.php#L31)
+* exclude from comparison: [0](../../Doctrine/Orm/DateFilter.php#L29)
+
+To change the default configuration, just pass the constant as the second argument. If you use XML instead of YAML, you can directly use the [class constants](../../Doctrine/Orm/DateFilter.php#L29):
+
+```yaml
+# app/config/services.yml
+
+services:
+    # Enable date filter only for dateProperty
+    resource.date_filter:
+        parent:    "api.doctrine.orm.date_filter"
+        arguments: [ [ "dateProperty" ] ]
+
+    resource.offer:
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer"] 
+        calls:
+            -      method:    "initFilters"
+                   arguments: [ [ "@resource.offer.date_filter" ], 2 ]
+        tags:      [ { name: "api.resource" } ]
+```
+
+## Order filter
 
 This filter allows you to order a collection.
 
