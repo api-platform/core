@@ -1,3 +1,4 @@
+@dateFilter
 Feature: Order filter on collections
   In order to retrieve ordered large collections of resources
   As a client software developer
@@ -6,7 +7,7 @@ Feature: Order filter on collections
   @createSchema
   Scenario: Get collection filtered by date
     Given there is "30" dummy objects with dummyDate
-    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-05"
+    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -14,42 +15,41 @@ Feature: Order filter on collections
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies?dummyDate[after]=2015-04-05",
+      "@id": "/dummies?dummyDate[after]=2015-04-28",
       "@type": "hydra:PagedCollection",
-      "hydra:nextPage": "/dummies?dummyDate%5Bafter%5D=2015-04-05&page=2",
-      "hydra:totalItems": 26,
+      "hydra:totalItems": 3,
       "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?dummyDate%5Bafter%5D=2015-04-05",
-      "hydra:lastPage": "/dummies?dummyDate%5Bafter%5D=2015-04-05&page=9",
+      "hydra:firstPage": "/dummies?dummyDate%5Bafter%5D=2015-04-28",
+      "hydra:lastPage": "/dummies?dummyDate%5Bafter%5D=2015-04-28",
       "hydra:member": [
               {
-                  "@id": "/dummies/5",
+                  "@id": "/dummies/28",
                   "@type": "Dummy",
-                  "name": "Dummy #5",
-                  "alias": "Alias #25",
-                  "dummyDate": "2015-04-05T00:00:00+00:00",
+                  "name": "Dummy #28",
+                  "alias": "Alias #2",
+                  "dummyDate": "2015-04-28T00:00:00+00:00",
                   "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
               },
               {
-                  "@id": "/dummies/6",
+                  "@id": "/dummies/29",
                   "@type": "Dummy",
-                  "name": "Dummy #6",
-                  "alias": "Alias #24",
-                  "dummyDate": "2015-04-06T00:00:00+00:00",
+                  "name": "Dummy #29",
+                  "alias": "Alias #1",
+                  "dummyDate": "2015-04-29T00:00:00+00:00",
                   "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
                   "relatedDummies": []
               },
               {
-                  "@id": "/dummies/7",
+                  "@id": "/dummies/30",
                   "@type": "Dummy",
-                  "name": "Dummy #7",
-                  "alias": "Alias #23",
-                  "dummyDate": "2015-04-07T00:00:00+00:00",
+                  "name": "Dummy #30",
+                  "alias": "Alias #0",
+                  "dummyDate": null,
                   "jsonData": [],
                   "dummy": null,
                   "relatedDummy": null,
