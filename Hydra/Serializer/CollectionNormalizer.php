@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
+use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Api\ResourceResolver;
@@ -134,6 +135,9 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     private function parseRequestUri($requestUri)
     {
         $parts = parse_url($requestUri);
+        if (false === $parts) {
+            throw new \InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $requestUri));
+        }
 
         $parameters = [];
         if (isset($parts['query'])) {
@@ -179,7 +183,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      *
      * @param ResourceInterface $resource
      * @param array             $parts
-     * @param array             $filters
+     * @param FilterInterface[] $filters
      *
      * @return array
      */
