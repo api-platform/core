@@ -78,7 +78,7 @@ The service definition can now be simplified:
 
 ```yaml
 services:
-    resource.product:
+    custom_resource:
         parent: "api.resource"
         class:  "AppBundle\Api\MyCustomResource"
         tags:   [ { name: "api.resource" } ]

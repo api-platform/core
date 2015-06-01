@@ -73,7 +73,7 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
-                            "@id": "https:\/\/schema.org\/alternateName",
+                            "@id": "https://schema.org/alternateName",
                             "@type": "rdf:Property",
                             "rdfs:label": "alias",
                             "domain": "#Dummy",
@@ -117,7 +117,7 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
-                            "@id": "#Dummy\/jsonData",
+                            "@id": "#Dummy/jsonData",
                             "@type": "rdf:Property",
                             "rdfs:label": "jsonData",
                             "domain": "#Dummy"
@@ -364,6 +364,23 @@ Feature: Documentation support
                 ]
             },
             {
+                "@id": "#Custom",
+                "@type": "hydra:Class",
+                "rdfs:label": "Custom",
+                "hydra:title": "Custom",
+                "hydra:description": "Custom.",
+                "hydra:supportedProperty": [],
+                "hydra:supportedOperation": [
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "GET",
+                        "hydra:title": "Retrieves Custom resource.",
+                        "rdfs:label": "Retrieves Custom resource.",
+                        "returns": "#Custom"
+                    }
+                ]
+            },
+            {
                 "@id": "#Entrypoint",
                 "@type": "hydra:Class",
                 "hydra:title": "The API entrypoint",
@@ -455,6 +472,28 @@ Feature: Documentation support
                             ]
                         },
                         "hydra:title": "The collection of RelationEmbedder resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/custom",
+                            "@type": "hydra:Link",
+                            "domain": "#Entrypoint",
+                            "rdfs:label": "The collection of Custom resources",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "@type": "hydra:Operation",
+                                    "hydra:method": "GET",
+                                    "hydra:title": "Retrieves the collection of Custom resources.",
+                                    "rdfs:label": "Retrieves the collection of Custom resources.",
+                                    "returns": "hydra:PagedCollection"
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of Custom resources",
                         "hydra:readable": true,
                         "hydra:writable": false
                     }

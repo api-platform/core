@@ -263,7 +263,8 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     {
         $method = $operation->getRoute()->getMethods();
         if (is_array($method)) {
-            $method = $method[0];
+            // If all methods are allowed, default to GET
+            $method = isset($method[0]) ? $method[0] : 'GET';
         }
 
         $hydraOperation = $operation->getContext();

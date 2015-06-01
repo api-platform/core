@@ -39,7 +39,6 @@ services:
         parent:    "api.doctrine.orm.date_filter"
         arguments: [ ["dummyDate"] ]
 
-
     my_dummy_resource.search_filter:
         parent:                     "api.doctrine.orm.search_filter"
         arguments:                  [ { "id": "exact", "name": "partial" } ]
@@ -109,3 +108,8 @@ services:
                                               -      "@my_relation_embedder_resource.item_operation.put"
                                               -      "@my_relation_embedder_resource.item_operation.custom_get"
         tags:                       [ { name: "api.resource" } ]
+
+    custom_resource:
+        parent: "api.resource"
+        class:  "Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource"
+        tags:   [ { name: "api.resource" } ]
