@@ -78,10 +78,11 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   1. [Using a custom `Resource` class](Resources/doc/resources.md#using-a-custom-resource-class)
 10. [Controllers](Resources/doc/controllers.md)
   1. [Using a custom controller](Resources/doc/controllers.md#using-a-custom-controller)
-11. [Using external (JSON-LD) vocabularies](Resources/doc/external-vocabularies.md)
-12. [Performances](Resources/doc/performances.md)
+11. [FOSUserBundle integration](Resources/doc/fosuser-bundle.md#fosuser-bundle-integration)
+12. [Using external (JSON-LD) vocabularies](Resources/doc/external-vocabularies.md)
+13. [Performances](Resources/doc/performances.md)
   1. [Enabling the metadata cache](Resources/doc/performances.md#enabling-the-metadata-cache)
-13. [AngularJS integration](Resources/doc/angular-integration.md)
+14. [AngularJS integration](Resources/doc/angular-integration.md)
 
 ## Other resources
 
