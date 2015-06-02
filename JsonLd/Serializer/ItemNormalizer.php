@@ -105,6 +105,8 @@ class ItemNormalizer extends AbstractNormalizer
         }
 
         $resource = $this->guessResource($object, $context, true);
+
+        $data = [];
         if (!isset($context['json_ld_has_context'])) {
             $data['@context'] = $this->contextBuilder->getContextUri($resource);
         }
@@ -281,7 +283,8 @@ class ItemNormalizer extends AbstractNormalizer
      *
      * @param AttributeMetadataInterface $attribute
      * @param mixed                      $relatedObject
-     * @param string                     $class
+     * @param ResourceInterface          $resource
+     * @param array                      $context
      *
      * @return string|array
      */
