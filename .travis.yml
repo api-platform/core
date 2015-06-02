@@ -21,6 +21,7 @@ matrix:
 
 before_script:
     - composer self-update
+    - wget http://get.sensiolabs.org/php-cs-fixer.phar
 
 install:
     - composer install
@@ -28,3 +29,4 @@ install:
 script:
     - vendor/bin/behat
     - vendor/bin/phpunit
+    - php php-cs-fixer.phar fix --no-interaction --dry-run --diff -vvv
