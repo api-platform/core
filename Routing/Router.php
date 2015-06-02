@@ -85,7 +85,7 @@ class Router implements RouterInterface
 
         try {
             $this->router->setContext(new RequestContext(
-                '',
+                $baseContext->getBaseUrl(),
                 'GET',
                 $baseContext->getHost(),
                 $baseContext->getScheme(),
