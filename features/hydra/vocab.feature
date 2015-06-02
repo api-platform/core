@@ -247,6 +247,20 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": false,
                         "hydra:description": "The age."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#RelatedDummy/thirdLevel",
+                            "@type": "Hydra:Link",
+                            "rdfs:label": "thirdLevel",
+                            "domain": "https://schema.org/Product",
+                            "range": "#ThirdLevel"
+                        },
+                        "hydra:title": "thirdLevel",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
                     }
                 ],
                 "hydra:supportedOperation": [
@@ -381,6 +395,67 @@ Feature: Documentation support
                 ]
             },
             {
+                "@id": "#ThirdLevel",
+                "@type": "hydra:Class",
+                "rdfs:label": "ThirdLevel",
+                "hydra:title": "ThirdLevel",
+                "hydra:description": "ThirdLevel.",
+                "hydra:supportedProperty": [
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#ThirdLevel/level",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "level",
+                            "domain": "#ThirdLevel",
+                            "range": "xmls:integer"
+                        },
+                        "hydra:title": "level",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#ThirdLevel/test",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "test",
+                            "domain": "#ThirdLevel",
+                            "range": "xmls:boolean"
+                        },
+                        "hydra:title": "test",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    }
+                ],
+                "hydra:supportedOperation": [
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "GET",
+                        "hydra:title": "Retrieves ThirdLevel resource.",
+                        "rdfs:label": "Retrieves ThirdLevel resource.",
+                        "returns": "#ThirdLevel"
+                    },
+                    {
+                        "@type": "hydra:ReplaceResourceOperation",
+                        "expects": "#ThirdLevel",
+                        "hydra:method": "PUT",
+                        "hydra:title": "Replaces the ThirdLevel resource.",
+                        "rdfs:label": "Replaces the ThirdLevel resource.",
+                        "returns": "#ThirdLevel"
+                    },
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "DELETE",
+                        "hydra:title": "Deletes the ThirdLevel resource.",
+                        "rdfs:label": "Deletes the ThirdLevel resource.",
+                        "returns": "owl:Nothing"
+                    }
+                ]
+            },
+            {
                 "@id": "#Entrypoint",
                 "@type": "hydra:Class",
                 "hydra:title": "The API entrypoint",
@@ -494,6 +569,36 @@ Feature: Documentation support
                             ]
                         },
                         "hydra:title": "The collection of Custom resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/thirdLevel",
+                            "@type": "hydra:Link",
+                            "domain": "#Entrypoint",
+                            "rdfs:label": "The collection of ThirdLevel resources",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "@type": "hydra:Operation",
+                                    "hydra:method": "GET",
+                                    "hydra:title": "Retrieves the collection of ThirdLevel resources.",
+                                    "rdfs:label": "Retrieves the collection of ThirdLevel resources.",
+                                    "returns": "hydra:PagedCollection"
+                                },
+                                {
+                                    "@type": "hydra:CreateResourceOperation",
+                                    "expects": "#ThirdLevel",
+                                    "hydra:method": "POST",
+                                    "hydra:title": "Creates a ThirdLevel resource.",
+                                    "rdfs:label": "Creates a ThirdLevel resource.",
+                                    "returns": "#ThirdLevel"
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of ThirdLevel resources",
                         "hydra:readable": true,
                         "hydra:writable": false
                     }

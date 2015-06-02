@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
-use Dunglas\ApiBundle\Util\Reflection;
+use Dunglas\ApiBundle\Util\ReflectionTrait;
 
 /**
  * Annotation loader.
@@ -24,7 +24,7 @@ use Dunglas\ApiBundle\Util\Reflection;
  */
 class AnnotationLoader implements LoaderInterface
 {
-    use Reflection;
+    use ReflectionTrait;
 
     /**
      * @var string

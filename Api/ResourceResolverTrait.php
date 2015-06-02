@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Api;
 
-use Dunglas\ApiBundle\Util\ClassInfo;
+use Dunglas\ApiBundle\Util\ClassInfoTrait;
 use PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -21,9 +21,9 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-trait ResourceResolver
+trait ResourceResolverTrait
 {
-    use ClassInfo;
+    use ClassInfoTrait;
 
     /**
      * @var ResourceCollectionInterface
@@ -76,20 +76,20 @@ trait ResourceResolver
     }
 
     /**
-     * Returns the class if a resource is associated with it.
+     * Returns the resource associated with the given type or null.
      *
      * @param Type $type
      *
-     * @return string|null
+     * @return ResourceInterface|null
      */
-    public function getClassHavingResource(Type $type)
+    public function getResourceFromType(Type $type)
     {
         if (
             'object' === $type->getType() &&
             ($class = $type->getClass()) &&
-            $this->resourceCollection->getResourceForEntity($class)
+            $resource = $this->resourceCollection->getResourceForEntity($class)
         ) {
-            return $class;
+            return $resource;
         }
     }
 }

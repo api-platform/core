@@ -14,7 +14,7 @@ namespace Dunglas\ApiBundle\JsonLd\Serializer;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Api\ResourceResolver;
+use Dunglas\ApiBundle\Api\ResourceResolverTrait;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
@@ -37,7 +37,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ItemNormalizer extends AbstractNormalizer
 {
-    use ResourceResolver;
+    use ResourceResolverTrait;
+    use ContextTrait;
 
     /**
      * @var string
@@ -104,10 +105,11 @@ class ItemNormalizer extends AbstractNormalizer
         }
 
         $resource = $this->guessResource($object, $context, true);
-        list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
+        if (!isset($context['json_ld_has_context'])) {
+            $data['@context'] = $this->contextBuilder->getContextUri($resource);
+        }
 
-        // Don't use hydra:Collection in sub levels
-        $context['json_ld_sub_level'] = true;
+        $context = $this->createContext($resource, $context);
 
         $classMetadata = $this->getMetadata($resource, $context);
         $attributesMetadata = $classMetadata->getAttributes();
@@ -135,11 +137,11 @@ class ItemNormalizer extends AbstractNormalizer
                     $attributeValue &&
                     $type->isCollection() &&
                     ($collectionType = $type->getCollectionType()) &&
-                    $class = $this->getClassHavingResource($collectionType)
+                    $subResource = $this->getResourceFromType($collectionType)
                 ) {
                     $values = [];
                     foreach ($attributeValue as $obj) {
-                        $values[] = $this->normalizeRelation($resource, $attributeMetadata, $obj, $class);
+                        $values[] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
                     }
 
                     $data[$attributeName] = $values;
@@ -147,8 +149,8 @@ class ItemNormalizer extends AbstractNormalizer
                     continue;
                 }
 
-                if ($attributeValue && $class = $this->getClassHavingResource($type)) {
-                    $data[$attributeName] = $this->normalizeRelation($resource, $attributeMetadata, $attributeValue, $class);
+                if ($attributeValue && $subResource = $this->getResourceFromType($type)) {
+                    $data[$attributeName] = $this->normalizeRelation($attributeMetadata, $attributeValue, $subResource, $context);
 
                     continue;
                 }
@@ -237,7 +239,13 @@ class ItemNormalizer extends AbstractNormalizer
                 ) {
                     $values = [];
                     foreach ($attributeValue as $obj) {
-                        $values[] = $this->denormalizeRelation($resource, $attributesMetadata[$attributeName], $class, $obj);
+                        $values[] = $this->denormalizeRelation(
+                            $resource,
+                            $attributesMetadata[$attributeName],
+                            $class,
+                            $obj,
+                            $context
+                        );
                     }
 
                     $this->setValue($object, $attributeName, $values);
@@ -249,7 +257,13 @@ class ItemNormalizer extends AbstractNormalizer
                     $this->setValue(
                         $object,
                         $attributeName,
-                        $this->denormalizeRelation($resource, $attributesMetadata[$attributeName], $class, $attributeValue)
+                        $this->denormalizeRelation(
+                            $resource,
+                            $attributesMetadata[$attributeName],
+                            $class,
+                            $attributeValue,
+                            $context
+                        )
                     );
 
                     continue;
@@ -265,7 +279,6 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
      *
-     * @param ResourceInterface          $currentResource
      * @param AttributeMetadataInterface $attribute
      * @param mixed                      $relatedObject
      * @param string                     $class
@@ -273,17 +286,19 @@ class ItemNormalizer extends AbstractNormalizer
      * @return string|array
      */
     private function normalizeRelation(
-        ResourceInterface $currentResource,
         AttributeMetadataInterface $attribute,
         $relatedObject,
-        $class
+        ResourceInterface $resource,
+        array $context
     ) {
         if ($attribute->isNormalizationLink()) {
             return $this->iriConverter->getIriFromItem($relatedObject);
         } else {
-            $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
-
-            return $this->serializer->normalize($relatedObject, 'json-ld', $context);
+            return $this->serializer->normalize(
+                $relatedObject,
+                self::FORMAT,
+                $this->createRelationContext($resource, $context)
+            );
         }
     }
 
@@ -294,6 +309,7 @@ class ItemNormalizer extends AbstractNormalizer
      * @param AttributeMetadataInterface $attributeMetadata
      * @param string                     $class
      * @param mixed                      $value
+     * @param array                      $context
      *
      * @return object|null
      *
@@ -303,10 +319,11 @@ class ItemNormalizer extends AbstractNormalizer
         ResourceInterface $currentResource,
         AttributeMetadataInterface $attributeMetadata,
         $class,
-        $value
+        $value,
+        array $context
     ) {
         if ('DateTime' === $class) {
-            return $this->serializer->denormalize($value, $class ?: null, self::FORMAT);
+            return $this->serializer->denormalize($value, $class ?: null, self::FORMAT, $context);
         }
 
         $attributeName = $attributeMetadata->getName();
@@ -327,7 +344,7 @@ class ItemNormalizer extends AbstractNormalizer
             return $item;
         }
 
-        if (!$this->resourceCollection->getResourceForEntity($class)) {
+        if (!$resource = $this->resourceCollection->getResourceForEntity($class)) {
             throw new InvalidArgumentException(sprintf(
                 'Type not supported (found "%s" in attribute "%s" of "%s")',
                 $class,
@@ -336,9 +353,13 @@ class ItemNormalizer extends AbstractNormalizer
             ));
         }
 
-        $context = $this->contextBuilder->bootstrapRelation($currentResource, $class);
         if (!$attributeMetadata->isDenormalizationLink()) {
-            return $this->serializer->denormalize($value, $class, self::FORMAT, $context);
+            return $this->serializer->denormalize(
+                $value,
+                $class,
+                self::FORMAT,
+                $this->createRelationContext($resource, $context)
+            );
         }
 
         throw new InvalidArgumentException(sprintf(

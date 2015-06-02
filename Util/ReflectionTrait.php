@@ -16,7 +16,7 @@ namespace Dunglas\ApiBundle\Util;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-trait Reflection
+trait ReflectionTrait
 {
     /**
      * Gets the {@see \ReflectionProperty} from the class or its parent.

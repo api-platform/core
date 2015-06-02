@@ -14,11 +14,11 @@ namespace Dunglas\ApiBundle\Util;
 use Doctrine\Common\Util\ClassUtils;
 
 /**
- * Retrieves informations about a class.
+ * Retrieves information about a class.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-trait ClassInfo
+trait ClassInfoTrait
 {
     /**
      * Get class name of the given object.

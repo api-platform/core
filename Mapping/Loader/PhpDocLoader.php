@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
-use Dunglas\ApiBundle\Util\Reflection;
+use Dunglas\ApiBundle\Util\ReflectionTrait;
 use phpDocumentor\Reflection\FileReflector;
 use PropertyInfo\PropertyInfoInterface;
 
@@ -25,7 +25,7 @@ use PropertyInfo\PropertyInfoInterface;
  */
 class PhpDocLoader implements LoaderInterface
 {
-    use Reflection;
+    use ReflectionTrait;
 
     /**
      * @var FileReflector[]

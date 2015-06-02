@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Api;
 
-use Dunglas\ApiBundle\Util\ClassInfo;
+use Dunglas\ApiBundle\Util\ClassInfoTrait;
 
 /**
  * {@inheritdoc}
@@ -20,7 +20,7 @@ use Dunglas\ApiBundle\Util\ClassInfo;
  */
 class ResourceCollection extends \ArrayObject implements ResourceCollectionInterface
 {
-    use ClassInfo;
+    use ClassInfoTrait;
 
     /**
      * @var array

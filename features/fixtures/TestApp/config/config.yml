@@ -110,6 +110,11 @@ services:
         tags:                       [ { name: "api.resource" } ]
 
     custom_resource:
-        parent: "api.resource"
-        class:  "Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource"
-        tags:   [ { name: "api.resource" } ]
+        parent:                     "api.resource"
+        class:                      "Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource"
+        tags:                       [ { name: "api.resource" } ]
+
+    third_level_resource:
+        parent:                     "api.resource"
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ThirdLevel" ]
+        tags:                       [ { name: "api.resource" } ]
