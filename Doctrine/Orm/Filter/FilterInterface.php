@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\Filter\FilterInterface as BaseFilterInterface;

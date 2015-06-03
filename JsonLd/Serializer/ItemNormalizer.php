@@ -78,7 +78,7 @@ class ItemNormalizer extends AbstractNormalizer
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor;
 
-        $this->setCircularReferenceHandler(function($object) {
+        $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
         });
     }
