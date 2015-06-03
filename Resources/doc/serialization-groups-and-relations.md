@@ -21,6 +21,15 @@ services:
 The built-in controller and the Hydra documentation generator will leverage specified serialization and deserialization
 to give access only to exposed properties and to guess if they are readable or/and writable.
 
+## Annotations
+
+The Symfony serializer allows to specify the definition of serialization using XML, YAML, or annotations. As annotations are really easy to understand, we'll use them in following examples.  
+However, in order to use annotations, don't forget to enable it in the serializer configuration:
+```yaml
+framework:
+    serializer:      { enable_annotations: true }
+```
+
 ## Embedding relations
 
 By default, the serializer provided with DunglasApiBundle will represent relations between objects by dereferenceables
