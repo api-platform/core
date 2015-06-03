@@ -45,7 +45,7 @@ services:
 
 Filters can be combined together: `http://localhost:8000/api/offers?price=10&name=shirt`
 
-It also possible to filter on relations:
+It is possible to filter on relations too:
 
 ```yaml
 
