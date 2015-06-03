@@ -9,17 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Filter\AbstractFilter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * {@inheritdoc}
+ * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -42,10 +43,6 @@ class SearchFilter extends AbstractFilter
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
-    /**
-     * @var null|array
-     */
-    private $properties;
 
     /**
      * @param ManagerRegistry           $managerRegistry
@@ -59,10 +56,48 @@ class SearchFilter extends AbstractFilter
         PropertyAccessorInterface $propertyAccessor,
         array $properties = null
     ) {
-        $this->managerRegistry = $managerRegistry;
+        parent::__construct($managerRegistry, $properties);
+
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
-        $this->properties = $properties;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
+    {
+        $metadata = $this->getClassMetadata($resource);
+        $fieldNames = array_flip($metadata->getFieldNames());
+
+        foreach ($this->extractProperties($request) as $property => $value) {
+            if (!is_string($value) || !$this->isPropertyEnabled($property)) {
+                continue;
+            }
+
+            $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$property];
+
+            if (isset($fieldNames[$property])) {
+                if ('id' === $property) {
+                    $value = $this->getFilterValueFromUrl($value);
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
+                    ->setParameter($property, $partial ? sprintf('%%%s%%', $value) : $value)
+                ;
+            } elseif ($metadata->isSingleValuedAssociation($property)
+                || $metadata->isCollectionValuedAssociation($property)
+            ) {
+                $value = $this->getFilterValueFromUrl($value);
+
+                $queryBuilder
+                    ->join(sprintf('o.%s', $property), $property)
+                    ->andWhere(sprintf('%1$s.id = :%1$s', $property))
+                    ->setParameter($property, $partial ? sprintf('%%%s%%', $value) : $value)
+                ;
+            }
+        }
     }
 
     /**
@@ -86,55 +121,17 @@ class SearchFilter extends AbstractFilter
         }
 
         foreach ($metadata->getAssociationNames() as $associationName) {
-            $description[$associationName] = [
-                'property' => $associationName,
-                'type' => 'iri',
-                'required' => false,
-                'strategy' => self::STRATEGY_EXACT,
-            ];
+            if ($this->isPropertyEnabled($associationName)) {
+                $description[$associationName] = [
+                    'property' => $associationName,
+                    'type' => 'iri',
+                    'required' => false,
+                    'strategy' => self::STRATEGY_EXACT,
+                ];
+            }
         }
 
         return $description;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
-    {
-        $metadata = $this->getClassMetadata($resource);
-        $fieldNames = array_flip($metadata->getFieldNames());
-
-        foreach ($request->query->all() as $filter => $value) {
-            if (!is_string($value)) {
-                continue;
-            }
-
-            if (null === $this->properties || isset($this->properties[$filter])) {
-                $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$filter];
-
-                if (isset($fieldNames[$filter])) {
-                    if ('id' === $filter) {
-                        $value = $this->getFilterValueFromUrl($value);
-                    }
-
-                    $queryBuilder
-                        ->andWhere(sprintf('o.%1$s LIKE :%1$s', $filter))
-                        ->setParameter($filter, $partial ? sprintf('%%%s%%', $value) : $value)
-                    ;
-                } elseif ($metadata->isSingleValuedAssociation($filter)
-                    || $metadata->isCollectionValuedAssociation($filter)
-                ) {
-                    $value = $this->getFilterValueFromUrl($value);
-
-                    $queryBuilder
-                        ->join(sprintf('o.%s', $filter), $filter)
-                        ->andWhere(sprintf('%1$s.id = :%1$s', $filter))
-                        ->setParameter($filter, $partial ? sprintf('%%%s%%', $value) : $value)
-                    ;
-                }
-            }
-        }
     }
 
     /**

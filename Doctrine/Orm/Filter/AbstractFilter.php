@@ -9,33 +9,37 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * {@inheritdoc}
  *
  * Abstract class with helpers for easing the implementation of a filter.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
 abstract class AbstractFilter implements FilterInterface
 {
     /**
+     * @var array|null
+     */
+    protected $properties;
+
+    /**
      * @var ManagerRegistry
      */
     protected $managerRegistry;
 
-    /**
-     * Default filter constructor.
-     *
-     * @param ManagerRegistry $managerRegistry
-     */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(ManagerRegistry $managerRegistry, array $properties)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->properties = $properties;
     }
 
     /**
@@ -43,7 +47,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @param ResourceInterface $resource
      *
-     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     * @return ClassMetadata
      */
     protected function getClassMetadata(ResourceInterface $resource)
     {
@@ -54,5 +58,29 @@ abstract class AbstractFilter implements FilterInterface
             ->getManagerForClass($entityClass)
             ->getClassMetadata($entityClass)
         ;
+    }
+
+    /**
+     * Is the given property enabled?
+     *
+     * @param string $property
+     *
+     * @return bool
+     */
+    protected function isPropertyEnabled($property)
+    {
+        return null === $this->properties || isset($this->properties[$property]);
+    }
+
+    /**
+     * Extracts properties to filter from the request.
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    protected function extractProperties(Request $request)
+    {
+        return $request->query->all();
     }
 }

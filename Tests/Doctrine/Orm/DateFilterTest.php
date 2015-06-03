@@ -3,7 +3,7 @@
 namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\ApiBundle\Doctrine\Orm\DateFilter;
+use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;

@@ -9,24 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Filter\AbstractFilter;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * {@inheritdoc}
+ * Order the collection by given properties.
  *
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class OrderFilter extends AbstractFilter
 {
-    /**
-     * @var array List of properties by witch the collection can or cannot be ordered.
-     */
-    private $properties;
     /**
      * @var string Keyword used to retrieve the value.
      */
@@ -39,54 +37,31 @@ class OrderFilter extends AbstractFilter
      */
     public function __construct(ManagerRegistry $managerRegistry, $orderParameter, array $properties = null)
     {
-        $this->managerRegistry = $managerRegistry;
+        parent::__construct($managerRegistry, $properties);
+
         $this->orderParameter = $orderParameter;
-        $this->properties = $properties;
     }
 
     /**
      * {@inheritdoc}
      *
-     * Order collection by properties. The order of the ordered properties is the same as the order specified in the
+     * Orders collection by properties. The order of the ordered properties is the same as the order specified in the
      * query.
+     * For each property passed, if the resource does not have such property or if the order value is different from
+     * `asc` or `desc` (case insensitive), the property is ignored.
      */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
-        $this->applyFilter($resource, $queryBuilder, $request->query->get($this->orderParameter));
-    }
+        $properties = $this->extractProperties($request);
+        $fieldNames = array_flip($this->getClassMetadata($resource)->getFieldNames());
 
-    /**
-     * Create query to order the collection by the properties passed.
-     * For each property passed, if the resource does not have such property or if the order value is different from
-     * `asc` or `desc` (case insensitive), the property is ignored.
-     *
-     * @param ResourceInterface $resource
-     * @param QueryBuilder      $queryBuilder
-     * @param array|null        $values       Array of properties as key and order value as value.
-     *
-     * @return QueryBuilder
-     */
-    protected function applyFilter(ResourceInterface $resource, QueryBuilder $queryBuilder, array $values = null)
-    {
-        $fieldNames = $this->getClassMetadata($resource)->getFieldNames();
+        foreach ($properties as $property => $order) {
+            $order = strtoupper($order);
 
-        if (null !== $values) {
-            foreach ($values as $property => $order) {
-                $order = strtoupper($order);
-
-                if (null !== $this->properties) {
-                    if (false === in_array($property, $this->properties)) {
-                        continue;
-                    }
-                }
-
-                if (in_array($property, $fieldNames) && ('ASC' === $order || 'DESC' === $order)) {
-                    $queryBuilder->addOrderBy(sprintf('o.%s', $property), $order);
-                }
+            if ($this->isPropertyEnabled($property) && isset($fieldNames[$property]) && ('ASC' === $order || 'DESC' === $order)) {
+                $queryBuilder->addOrderBy(sprintf('o.%s', $property), $order);
             }
         }
-
-        return $queryBuilder;
     }
 
     /**
@@ -98,8 +73,7 @@ class OrderFilter extends AbstractFilter
         $metadata = $this->getClassMetadata($resource);
 
         foreach ($metadata->getFieldNames() as $fieldName) {
-            $found = in_array($fieldName, $this->properties);
-            if ($found || null === $this->properties) {
+            if ($this->isPropertyEnabled($fieldName)) {
                 $description[sprintf('%s[%s]', $this->orderParameter, $fieldName)] = [
                     'property' => $fieldName,
                     'type' => 'string',
@@ -109,5 +83,13 @@ class OrderFilter extends AbstractFilter
         }
 
         return $description;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function extractProperties(Request $request)
+    {
+        return $request->query->get($this->orderParameter, []);
     }
 }
