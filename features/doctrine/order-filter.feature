@@ -31,7 +31,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/2",
@@ -42,7 +43,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/3",
@@ -53,7 +55,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -128,7 +131,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/29",
@@ -139,7 +143,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/28",
@@ -150,7 +155,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -225,7 +231,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/10",
@@ -236,7 +243,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/11",
@@ -247,7 +255,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -322,7 +331,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/8",
@@ -333,7 +343,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/7",
@@ -344,7 +355,8 @@ Feature: Order filter on collections
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -420,7 +432,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -431,7 +444,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -442,7 +456,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -516,7 +531,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -527,7 +543,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -538,7 +555,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -612,7 +630,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -623,7 +642,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -634,7 +654,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -708,7 +729,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -719,7 +741,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -730,7 +753,8 @@ Feature: Order filter on collections
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {

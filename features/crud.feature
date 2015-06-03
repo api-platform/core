@@ -38,7 +38,8 @@ Feature: Create-Retrieve-Update-Delete
       },
       "dummy": null,
       "relatedDummy": null,
-      "relatedDummies": []
+      "relatedDummies": [],
+      "name_converted": null
     }
     """
 
@@ -64,7 +65,8 @@ Feature: Create-Retrieve-Update-Delete
       },
       "dummy": null,
       "relatedDummy": null,
-      "relatedDummies": []
+      "relatedDummies": [],
+      "name_converted": null
     }
     """
 
@@ -98,7 +100,8 @@ Feature: Create-Retrieve-Update-Delete
           },
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -183,7 +186,8 @@ Feature: Create-Retrieve-Update-Delete
         ],
         "dummy": null,
         "relatedDummy": null,
-        "relatedDummies": []
+        "relatedDummies": [],
+        "name_converted": null
       }
       """
 

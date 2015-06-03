@@ -27,7 +27,8 @@ Feature: JSON-LD contexts generation
             "relatedDummies": {
                 "@id": "#Dummy/relatedDummies",
                 "@type": "@id"
-            }
+            },
+            "name_converted": "#Dummy/name_converted"
         }
     }
     """
@@ -56,7 +57,8 @@ Feature: JSON-LD contexts generation
             "relatedDummies": {
                 "@id": "#Dummy/relatedDummies",
                 "@type": "@id"
-            }
+            },
+            "name_converted": "#Dummy/name_converted"
         }
     }
     """

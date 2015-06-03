@@ -83,6 +83,12 @@ class Dummy
      * @ORM\Column(type="json_array", nullable=true)
      */
     public $jsonData;
+    /**
+     * @var string
+     *
+     * @ORM\Column(nullable=true)
+     */
+    public $nameConverted;
 
     public function __construct()
     {
