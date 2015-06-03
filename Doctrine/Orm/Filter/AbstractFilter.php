@@ -36,7 +36,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected $managerRegistry;
 
-    public function __construct(ManagerRegistry $managerRegistry, array $properties)
+    public function __construct(ManagerRegistry $managerRegistry, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->properties = $properties;
