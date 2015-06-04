@@ -456,6 +456,67 @@ Feature: Documentation support
                 ]
             },
             {
+                "@id": "#CircularReference",
+                "@type": "hydra:Class",
+                "rdfs:label": "CircularReference",
+                "hydra:title": "CircularReference",
+                "hydra:description": "Circular Reference.",
+                "hydra:supportedProperty": [
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#CircularReference/parent",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "parent",
+                            "domain": "#CircularReference",
+                            "range": "#CircularReference"
+                        },
+                        "hydra:title": "parent",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#CircularReference/children",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "children",
+                            "domain": "#CircularReference",
+                            "range": "#CircularReference"
+                        },
+                        "hydra:title": "children",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    }
+                ],
+                "hydra:supportedOperation": [
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "GET",
+                        "hydra:title": "Retrieves CircularReference resource.",
+                        "rdfs:label": "Retrieves CircularReference resource.",
+                        "returns": "#CircularReference"
+                    },
+                    {
+                        "@type": "hydra:ReplaceResourceOperation",
+                        "expects": "#CircularReference",
+                        "hydra:method": "PUT",
+                        "hydra:title": "Replaces the CircularReference resource.",
+                        "rdfs:label": "Replaces the CircularReference resource.",
+                        "returns": "#CircularReference"
+                    },
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "DELETE",
+                        "hydra:title": "Deletes the CircularReference resource.",
+                        "rdfs:label": "Deletes the CircularReference resource.",
+                        "returns": "owl:Nothing"
+                    }
+                ]
+            },
+            {
                 "@id": "#Entrypoint",
                 "@type": "hydra:Class",
                 "hydra:title": "The API entrypoint",
@@ -599,6 +660,36 @@ Feature: Documentation support
                             ]
                         },
                         "hydra:title": "The collection of ThirdLevel resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/circularReference",
+                            "@type": "hydra:Link",
+                            "domain": "#Entrypoint",
+                            "rdfs:label": "The collection of CircularReference resources",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "@type": "hydra:Operation",
+                                    "hydra:method": "GET",
+                                    "hydra:title": "Retrieves the collection of CircularReference resources.",
+                                    "rdfs:label": "Retrieves the collection of CircularReference resources.",
+                                    "returns": "hydra:PagedCollection"
+                                },
+                                {
+                                    "@type": "hydra:CreateResourceOperation",
+                                    "expects": "#CircularReference",
+                                    "hydra:method": "POST",
+                                    "hydra:title": "Creates a CircularReference resource.",
+                                    "rdfs:label": "Creates a CircularReference resource.",
+                                    "returns": "#CircularReference"
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of CircularReference resources",
                         "hydra:readable": true,
                         "hydra:writable": false
                     }
