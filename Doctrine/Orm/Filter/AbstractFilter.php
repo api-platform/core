@@ -69,7 +69,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function isPropertyEnabled($property)
     {
-        return null === $this->properties || isset($this->properties[$property]);
+        return null === $this->properties || array_key_exists($property, $this->properties);
     }
 
     /**

@@ -92,7 +92,7 @@ services:
     # Enable date filter for for the property "dateProperty" of the resource "resource.offer"
     resource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
-        arguments: [ [ "dateProperty": ~ ] ]
+        arguments: [ { "dateProperty": ~ } ]
 
     resource.offer:
         parent:    "api.resource"
@@ -115,7 +115,7 @@ definition like the following:
 services:
     resource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
-        arguments: [ [ "dateProperty": true ] ] # Set the first parameter set to "true" to exclude null values
+        arguments: [ { "dateProperty": true } ] # Set the first parameter set to "true" to exclude null values
 
     resource.offer:
         parent:    "api.resource"
@@ -144,7 +144,7 @@ Enable the filter:
 services:
     resource.offer.order_filter:
         parent:    "api.doctrine.orm.order_filter"
-        arguments: [ [ "id": ~, "name": ~ ] ]
+        arguments: [ { "id": ~, "name": ~ } ]
 
     resource.offer:
         parent:    "api.resource"

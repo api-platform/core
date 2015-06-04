@@ -59,7 +59,7 @@ class DateFilter extends AbstractFilter
                 $this->filterByDate($queryBuilder, $property, $values[self::PARAMETER_AFTER], self::PARAMETER_AFTER);
             }
 
-            if (self::NULL_EXCLUDED === $this->properties) {
+            if (self::EXCLUDE_NULL === $this->properties[$property]) {
                 $queryBuilder->andWhere(sprintf('o.%s IS NOT NULL', $property));
             }
         }
