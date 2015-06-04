@@ -118,3 +118,12 @@ services:
         parent:                     "api.resource"
         arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ThirdLevel" ]
         tags:                       [ { name: "api.resource" } ]
+
+    circular_reference_resource:
+        parent:                     "api.resource"
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CircularReference" ]
+        calls:
+                                    - method:    "initNormalizationContext"
+                                      arguments:
+                                          -      { groups: [ "circular" ] }
+        tags:                       [ { name: "api.resource" } ]

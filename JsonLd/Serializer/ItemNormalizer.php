@@ -77,6 +77,10 @@ class ItemNormalizer extends AbstractNormalizer
         $this->apiClassMetadataFactory = $apiClassMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor;
+
+        $this->setCircularReferenceHandler(function ($object) {
+            return $this->iriConverter->getIriFromItem($object);
+        });
     }
 
     /**
