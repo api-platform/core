@@ -97,7 +97,7 @@ class OrderFilterTest extends KernelTestCase
             // Properties enabled with valid values
             [
                 [
-                    'properties' => ['id', 'name'],
+                    'properties' => ['id' => null, 'name' => null],
                 ],
                 [
                     'order' => [
@@ -110,7 +110,7 @@ class OrderFilterTest extends KernelTestCase
             // Properties enabled with invalid values
             [
                 [
-                    'properties' => ['id', 'name'],
+                    'properties' => ['id' => null, 'name' => null],
                 ],
                 [
                     'order' => [
@@ -123,7 +123,7 @@ class OrderFilterTest extends KernelTestCase
             // Properties disabled with valid values
             [
                 [
-                    'properties' => ['id', 'name'],
+                    'properties' => ['id' => null, 'name' => null],
                 ],
                 [
                     'order' => [
@@ -136,7 +136,7 @@ class OrderFilterTest extends KernelTestCase
             // Properties disabled with invalid values
             [
                 [
-                    'properties' => ['id', 'name'],
+                    'properties' => ['id' => null, 'name' => null],
                 ],
                 [
                     'order' => [
@@ -150,7 +150,7 @@ class OrderFilterTest extends KernelTestCase
             // Unkown property disabled
             [
                 [
-                    'properties' => ['id', 'name'],
+                    'properties' => ['id' => null, 'name' => null],
                 ],
                 [
                     'order' => [
@@ -162,7 +162,7 @@ class OrderFilterTest extends KernelTestCase
             // Unkown property enabled
             [
                 [
-                    'properties' => ['id', 'name', 'unknown'],
+                    'properties' => ['id' => null, 'name' => null, 'unknown' => null],
                 ],
                 [
                     'order' => [
@@ -174,7 +174,7 @@ class OrderFilterTest extends KernelTestCase
             // Test with another keyword
             [
                 [
-                    'properties' => ['id', 'name'],
+                    'properties' => ['id' => null, 'name' => null],
                     'parameter' => 'customOrder',
                 ],
                 [
