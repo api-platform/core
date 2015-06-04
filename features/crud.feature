@@ -103,7 +103,7 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+              "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -120,18 +120,6 @@ Feature: Create-Retrieve-Update-Delete
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy",
-                      "property": "relatedDummy",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
                       "variable": "order[id]",
                       "property": "id",
                       "required": false
@@ -144,7 +132,13 @@ Feature: Create-Retrieve-Update-Delete
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "string",
+                      "variable": "dummyDate[before]",
+                      "property": "dummyDate",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyDate[after]",
                       "property": "dummyDate",
                       "required": false
                   }
