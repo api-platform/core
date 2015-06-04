@@ -49,7 +49,7 @@ class DateFilter extends AbstractFilter
     {
         $this->managerRegistry = $managerRegistry;
         $this->properties = $properties;
-        if (in_array($nullOption, [self::NULL_EXCLUDED, self::NULL_FIRST, self::NULL_LAST])) {
+        if (in_array($nullOption, [self::NULL_EXCLUDED, self::NULL_FIRST, self::NULL_LAST], true)) {
             $this->nullOption = $nullOption;
         }
     }
