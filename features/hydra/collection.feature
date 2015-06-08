@@ -93,7 +93,8 @@ Feature: Collections support
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -104,7 +105,8 @@ Feature: Collections support
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -115,7 +117,8 @@ Feature: Collections support
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -191,7 +194,8 @@ Feature: Collections support
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/20",
@@ -202,7 +206,8 @@ Feature: Collections support
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/21",
@@ -213,7 +218,8 @@ Feature: Collections support
           "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -288,7 +294,8 @@ Feature: Collections support
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/29",
@@ -299,7 +306,8 @@ Feature: Collections support
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/30",
@@ -310,7 +318,8 @@ Feature: Collections support
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -392,7 +401,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/12",
@@ -405,7 +415,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/13",
@@ -418,7 +429,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/14",
@@ -431,7 +443,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/15",
@@ -444,7 +457,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/16",
@@ -457,7 +471,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/17",
@@ -470,7 +485,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/18",
@@ -483,7 +499,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/19",
@@ -496,7 +513,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         },
         {
           "@id": "/dummies/20",
@@ -509,7 +527,8 @@ Feature: Collections support
           "relatedDummy": null,
           "relatedDummies": [
 
-          ]
+          ],
+          "name_converted": null
         }
       ],
       "hydra:search": {
@@ -583,7 +602,8 @@ Feature: Collections support
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -657,7 +677,8 @@ Feature: Collections support
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
@@ -732,7 +753,8 @@ Feature: Collections support
             "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {

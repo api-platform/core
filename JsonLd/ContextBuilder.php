@@ -15,6 +15,7 @@ use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * JSON-LD Context Builder.
@@ -41,15 +42,21 @@ class ContextBuilder
      * @var ResourceCollectionInterface
      */
     private $resourceCollection;
+    /**
+     * @var NameConverterInterface
+     */
+    private $nameConverter;
 
     public function __construct(
         RouterInterface $router,
         ClassMetadataFactoryInterface $classMetadataFactory,
-        ResourceCollectionInterface $resourceCollection
+        ResourceCollectionInterface $resourceCollection,
+        NameConverterInterface $nameConverter = null
     ) {
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
         $this->resourceCollection = $resourceCollection;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -95,17 +102,19 @@ class ContextBuilder
             )->getAttributes();
 
             foreach ($attributes as $attributeName => $attribute) {
+                $convertedName = $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
+
                 if (!$id = $attribute->getIri()) {
-                    $id = sprintf('%s/%s', $prefixedShortName, $attributeName);
+                    $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
                 }
 
                 if ($attribute->isNormalizationLink()) {
-                    $context[$attributeName] = [
+                    $context[$convertedName] = [
                         '@id' => $id,
                         '@type' => '@id',
                     ];
                 } else {
-                    $context[$attributeName] = $id;
+                    $context[$convertedName] = $id;
                 }
             }
         }

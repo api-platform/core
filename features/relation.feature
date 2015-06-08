@@ -54,7 +54,8 @@ Feature: Relations support
       "relatedDummy": "http://example.com/related_dummies/1",
       "relatedDummies": [
         "/related_dummies/1"
-      ]
+      ],
+      "name_converted": null
     }
     """
     Then the response status code should be 201
@@ -74,7 +75,8 @@ Feature: Relations support
       "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
         "/related_dummies/1"
-      ]
+      ],
+      "name_converted": null
     }
     """
 
@@ -105,7 +107,8 @@ Feature: Relations support
           "relatedDummy": "/related_dummies/1",
           "relatedDummies": [
             "/related_dummies/1"
-          ]
+          ],
+          "name_converted": null
         }
       ],
       "hydra:search": {

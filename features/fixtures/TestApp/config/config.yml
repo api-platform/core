@@ -35,6 +35,9 @@ dunglas_api:
                 enable_client_request: true
 
 services:
+    api.name_converter:
+        class: Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\NameConverter\CustomConverter
+
     ressource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
         arguments: [ { "dummyDate": ~ } ]

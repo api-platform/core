@@ -172,6 +172,20 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": true,
                         "hydra:description": "Several dummies."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Dummy/nameConverted",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "nameConverted",
+                            "domain": "#Dummy",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "nameConverted",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
                     }
                 ],
                 "hydra:supportedOperation": [

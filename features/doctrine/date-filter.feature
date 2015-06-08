@@ -31,7 +31,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           },
           {
               "@id": "/dummies/29",
@@ -42,7 +43,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           }
       ],
       "hydra:search": {
@@ -116,7 +118,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           },
           {
               "@id": "/dummies/2",
@@ -127,7 +130,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           },
           {
               "@id": "/dummies/3",
@@ -138,7 +142,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           }
       ],
       "hydra:search": {
@@ -213,7 +218,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           }
       ],
       "hydra:search": {
@@ -286,7 +292,8 @@ Feature: Order filter on collections
               "jsonData": [],
               "dummy": null,
               "relatedDummy": null,
-              "relatedDummies": []
+              "relatedDummies": [],
+              "name_converted": null
           }
       ],
       "hydra:search": {
