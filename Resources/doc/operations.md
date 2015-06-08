@@ -37,6 +37,7 @@ services:
     resource.product:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
+        calls:
             -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
         tags:      [ { name: "api.resource" } ]
 ```
@@ -50,6 +51,7 @@ with an empty array as first parameter:
     resource.product:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
+        calls:
             -      [ "initItemOperations", [ [ ] ] ]
             -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
         tags:      [ { name: "api.resource" } ]
