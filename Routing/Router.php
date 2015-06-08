@@ -62,6 +62,7 @@ class Router implements RouterInterface
     public function match($pathInfo)
     {
         $baseContext = $this->router->getContext();
+        $pathInfo = str_replace($baseContext->getBaseUrl(), '', $pathInfo);
 
         $request = Request::create($pathInfo);
         $context = (new RequestContext())->fromRequest($request);
@@ -81,21 +82,6 @@ class Router implements RouterInterface
      */
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
     {
-        $baseContext = $this->router->getContext();
-
-        try {
-            $this->router->setContext(new RequestContext(
-                $baseContext->getBaseUrl(),
-                'GET',
-                $baseContext->getHost(),
-                $baseContext->getScheme(),
-                $baseContext->getHttpPort(),
-                $baseContext->getHttpsPort()
-            ));
-
-            return $this->router->generate($name, $parameters, $referenceType);
-        } finally {
-            $this->router->setContext($baseContext);
-        }
+        return $this->router->generate($name, $parameters, $referenceType);
     }
 }
