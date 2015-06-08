@@ -62,6 +62,7 @@ class Router implements RouterInterface
     public function match($pathInfo)
     {
         $baseContext = $this->router->getContext();
+        $pathInfo = str_replace($baseContext->getBaseUrl(), '', $pathInfo);
 
         $request = Request::create($pathInfo);
         $context = (new RequestContext())->fromRequest($request);
