@@ -37,7 +37,7 @@ dunglas_api:
 services:
     ressource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
-        arguments: [ ["dummyDate"] ]
+        arguments: [ { "dummyDate": ~ } ]
 
     my_dummy_resource.search_filter:
         parent:                     "api.doctrine.orm.search_filter"
@@ -45,11 +45,11 @@ services:
 
     my_dummy_resource.order_filter:
         parent:                     "api.doctrine.orm.order_filter"
-        arguments:                  [ ["id", "name"] ]
+        arguments:                  [ { "id": ~, "name": ~ } ]
 
     my_dummy_resource.date_filter:
             parent:                 "api.doctrine.orm.date_filter"
-            arguments:              [ ["dummyDate"], 2 ]
+            arguments:              [ { "dummyDate": ~ } ]
 
     my_dummy_resource:
         parent:                      "api.resource"

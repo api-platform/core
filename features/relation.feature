@@ -109,53 +109,47 @@ Feature: Relations support
         }
       ],
       "hydra:search": {
-              "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
-              "hydra:variableRepresentation": "BasicRepresentation",
-              "hydra:mapping": [
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "id",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "name",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy",
-                      "property": "relatedDummy",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[id]",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[name]",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "string",
-                      "property": "dummyDate",
-                      "required": false
-                  }
-              ]
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
+        ]
       }
     }
     """
