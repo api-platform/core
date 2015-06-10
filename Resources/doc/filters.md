@@ -217,7 +217,7 @@ interface.
 
 Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Resource::initFilters()` method.
 
-If you use [custom data providers](data-providers.yml), they must support filtering and be aware of actives filters to
+If you use [custom data providers](data-providers.md), they must support filtering and be aware of actives filters to
 work properly.
 
 ### Creating custom Doctrine ORM filters

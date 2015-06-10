@@ -78,12 +78,12 @@ the data set in one response is often not possible.
 The `getCollection()` method of data providers supporting paged collections must returns an instance of `Dunglas\ApiBundle\Model\PaginatorInterface`
 instead of a standard array.
 
-To create your own paginators, take a look at the Doctrine ORM paginator bridge: [`Dunglas\ApiBundle\Doctrine\Orm\Paginator`](src/Doctrine/Orm/Paginator.php).
+To create your own paginators, take a look at the Doctrine ORM paginator bridge: [`Dunglas\ApiBundle\Doctrine\Orm\Paginator`](/Doctrine/Orm/Paginator.php).
 
 ## Supporting filters
 
 To be able [to filter collections](filters.md), the Data Provider must be aware of registered filters to the given resource.
-The best way to learn how to create filter aware data provider is too look at the default Doctrine ORM dataprovider: [`Dunglas\ApiBundle\Doctrine\Orm\DataProvider`](src/Doctrine/Orm/DataProvider.php).
+The best way to learn how to create filter aware data provider is too look at the default Doctrine ORM dataprovider: [`Dunglas\ApiBundle\Doctrine\Orm\DataProvider`](/Doctrine/Orm/DataProvider.php).
 
 Previous chapter: [Operations](operations.md)<br>
 Next chapter: [Filters](filters.md)

@@ -175,6 +175,6 @@ Run the Symfony app (`app/console server:run`) and browse the API entrypoint at 
 
 Interact with the API using a REST client (I recommend [Postman](https://chrome.google.com/webstore/detail/postman-rest-client/fdmmgilgnpjigdojojpjoooidkmcomcm))
 or an Hydra aware application (you should give a try to [Hydra Console](https://github.com/lanthaler/HydraConsole)). Take
-a look at the usage examples in [the `features` directory](features/).
+a look at the usage examples in [the `features` directory](/features/).
 
 Next chapter: [NelmioApiDocBundle integration](nelmio-api-doc.md)

@@ -7,7 +7,7 @@ and to serialize entities using normalizers provided by the bundle.
 
 ## Using a custom controller
 
-When [the event system](6-the-event-system.md) is not enough, it's possible to use custom controllers.
+When [the event system](the-event-system.md) is not enough, it's possible to use custom controllers.
 
 Your custom controller should extend the `ResourceController` provided by this bundle.
 
