@@ -48,7 +48,7 @@ services:
 
     my_dummy_resource.order_filter:
         parent:                     "api.doctrine.orm.order_filter"
-        arguments:                  [ { "id": ~, "name": ~ } ]
+        arguments:                  [ { "id": ~, "name": "desc" } ]
 
     my_dummy_resource.date_filter:
             parent:                 "api.doctrine.orm.date_filter"
