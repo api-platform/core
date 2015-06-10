@@ -59,9 +59,19 @@ with an empty array as first parameter:
 
 ## Creating custom operations
 
-Sometimes, it can be useful to [create custom controller](8-custom-controllers.md) actions. DunglasApiBundle allows to register custom operations
-for both collections and items. It will register them automatically in the Symfony routing system and will expose them in
-the Hydra vocab (if enabled).
+DunglasApiBundle allows to register custom operations for collections and items.
+Custom operations allow to customize routing information (like the URL and the HTTP method),
+the controller to use (default to the built-in action of the `ResourceController` applicable
+for the given HTTP method) and a context that will be passed to documentation generators.
+
+A convenient factory is provided to build `Dunglas\ApiBundle\Api\Operation\Operation` instances.
+This factory guesses good default values for options such as the route name and its associated URL
+by inspecting the given `Resource` instance. All guessed values can be override.
+
+If you want to use custom controller action, [refer to the dedicated documentation](controllers.md).
+
+DunglasApiBundle is smart enough to automatically register routes in the Symfony routing system and to document
+operations in the Hydra vocab.
 
 ```yaml
     resource.product.item_operation.get:
