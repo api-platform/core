@@ -14,7 +14,7 @@ namespace Dunglas\ApiBundle\Mapping\Loader;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Mapping\AttributeMetadata;
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
-use Dunglas\ApiBundle\Util\Reflection;
+use Dunglas\ApiBundle\Util\ReflectionTrait;
 use PropertyInfo\PropertyInfoInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  */
 class AttributesLoader implements LoaderInterface
 {
-    use Reflection;
+    use ReflectionTrait;
 
     /**
      * @var ResourceCollectionInterface

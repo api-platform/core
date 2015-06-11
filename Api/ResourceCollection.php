@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Api;
 
-use Dunglas\ApiBundle\Util\ClassInfo;
+use Dunglas\ApiBundle\Util\ClassInfoTrait;
 
 /**
  * {@inheritdoc}
@@ -20,7 +20,7 @@ use Dunglas\ApiBundle\Util\ClassInfo;
  */
 class ResourceCollection extends \ArrayObject implements ResourceCollectionInterface
 {
-    use ClassInfo;
+    use ClassInfoTrait;
 
     /**
      * @var array
@@ -34,22 +34,24 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
     /**
      * {@inheritdoc}
      */
-    public function add(ResourceInterface $resource)
+    public function init(array $resources)
     {
-        $entityClass = $resource->getEntityClass();
-        if (isset($this->entityClassIndex[$entityClass])) {
-            throw new \InvalidArgumentException(sprintf('A Resource class already exists for "%s".', $entityClass));
+        foreach ($resources as $resource) {
+            $entityClass = $resource->getEntityClass();
+            if (isset($this->entityClassIndex[$entityClass])) {
+                throw new \InvalidArgumentException(sprintf('A Resource class already exists for "%s".', $entityClass));
+            }
+
+            $shortName = $resource->getShortName();
+            if (isset($this->shortNameIndex[$shortName])) {
+                throw new \InvalidArgumentException(sprintf('A Resource class with the short name "%s" already exists.', $shortName));
+            }
+
+            $this->append($resource);
+
+            $this->entityClassIndex[$entityClass] = $resource;
+            $this->shortNameIndex[$shortName] = $resource;
         }
-
-        $shortName = $resource->getShortName();
-        if (isset($this->shortNameIndex[$shortName])) {
-            throw new \InvalidArgumentException(sprintf('A Resource class with the short name "%s" already exists.', $shortName));
-        }
-
-        $this->append($resource);
-
-        $this->entityClassIndex[$entityClass] = $resource;
-        $this->shortNameIndex[$shortName] = $resource;
     }
 
     /**

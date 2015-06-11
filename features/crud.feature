@@ -9,7 +9,13 @@ Feature: Create-Retrieve-Update-Delete
     """
     {
       "name": "My Dummy",
-      "dummyDate": "2015-03-01T10:00:00+00:00"
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "jsonData": {
+        "key": [
+          "value1",
+          "value2"
+        ]
+      }
     }
     """
     Then the response status code should be 201
@@ -24,9 +30,16 @@ Feature: Create-Retrieve-Update-Delete
       "name": "My Dummy",
       "alias": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "jsonData": {
+        "key": [
+          "value1",
+          "value2"
+        ]
+      },
       "dummy": null,
       "relatedDummy": null,
-      "relatedDummies": []
+      "relatedDummies": [],
+      "name_converted": null
     }
     """
 
@@ -44,9 +57,16 @@ Feature: Create-Retrieve-Update-Delete
       "name": "My Dummy",
       "alias": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "jsonData": {
+        "key": [
+          "value1",
+          "value2"
+        ]
+      },
       "dummy": null,
       "relatedDummy": null,
-      "relatedDummies": []
+      "relatedDummies": [],
+      "name_converted": null
     }
     """
 
@@ -72,14 +92,21 @@ Feature: Create-Retrieve-Update-Delete
           "name":"My Dummy",
           "alias": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
+          "jsonData": {
+            "key": [
+              "value1",
+              "value2"
+            ]
+          },
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+              "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -96,18 +123,6 @@ Feature: Create-Retrieve-Update-Delete
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy",
-                      "property": "relatedDummy",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
                       "variable": "order[id]",
                       "property": "id",
                       "required": false
@@ -120,7 +135,13 @@ Feature: Create-Retrieve-Update-Delete
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "string",
+                      "variable": "dummyDate[before]",
+                      "property": "dummyDate",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyDate[after]",
                       "property": "dummyDate",
                       "required": false
                   }
@@ -134,7 +155,14 @@ Feature: Create-Retrieve-Update-Delete
       """
       {
         "@id": "/dummies/1",
-        "name": "A nice dummy"
+        "name": "A nice dummy",
+        "jsonData": [{
+            "key": "value1"
+          },
+          {
+            "key": "value2"
+          }
+        ]
       }
       """
       Then the response status code should be 202
@@ -149,9 +177,17 @@ Feature: Create-Retrieve-Update-Delete
         "name": "A nice dummy",
         "alias": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
+        "jsonData": [{
+            "key": "value1"
+          },
+          {
+            "key": "value2"
+          }
+        ],
         "dummy": null,
         "relatedDummy": null,
-        "relatedDummies": []
+        "relatedDummies": [],
+        "name_converted": null
       }
       """
 

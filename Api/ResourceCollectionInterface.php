@@ -19,13 +19,13 @@ namespace Dunglas\ApiBundle\Api;
 interface ResourceCollectionInterface extends \Traversable
 {
     /**
-     * Adds a {@see ResourceInterface} to the collection.
+     * Initializes the {@see ResourceInterface} collection.
      *
-     * @param ResourceInterface $resource
+     * @param ResourceInterface[] $resources
      *
      * @throws \InvalidArgumentException
      */
-    public function add(ResourceInterface $resource);
+    public function init(array $resources);
 
     /**
      * Gets the {@see ResourceInterface} instance associated with the given entity class or null if not found.

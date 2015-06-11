@@ -73,7 +73,7 @@ Feature: Documentation support
                     {
                         "@type": "hydra:SupportedProperty",
                         "hydra:property": {
-                            "@id": "https:\/\/schema.org\/alternateName",
+                            "@id": "https://schema.org/alternateName",
                             "@type": "rdf:Property",
                             "rdfs:label": "alias",
                             "domain": "#Dummy",
@@ -113,6 +113,20 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": true,
                         "hydra:description": "A dummy date."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Dummy/jsonData",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "jsonData",
+                            "domain": "#Dummy"
+                        },
+                        "hydra:title": "jsonData",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true,
+                        "hydra:description": "serialize data."
                     },
                     {
                         "@type": "hydra:SupportedProperty",
@@ -158,6 +172,20 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": true,
                         "hydra:description": "Several dummies."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Dummy/nameConverted",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "nameConverted",
+                            "domain": "#Dummy",
+                            "range": "xmls:string"
+                        },
+                        "hydra:title": "nameConverted",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
                     }
                 ],
                 "hydra:supportedOperation": [
@@ -233,6 +261,20 @@ Feature: Documentation support
                         "hydra:readable": true,
                         "hydra:writable": false,
                         "hydra:description": "The age."
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#RelatedDummy/thirdLevel",
+                            "@type": "Hydra:Link",
+                            "rdfs:label": "thirdLevel",
+                            "domain": "https://schema.org/Product",
+                            "range": "#ThirdLevel"
+                        },
+                        "hydra:title": "thirdLevel",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
                     }
                 ],
                 "hydra:supportedOperation": [
@@ -350,6 +392,145 @@ Feature: Documentation support
                 ]
             },
             {
+                "@id": "#Custom",
+                "@type": "hydra:Class",
+                "rdfs:label": "Custom",
+                "hydra:title": "Custom",
+                "hydra:description": "Custom.",
+                "hydra:supportedProperty": [],
+                "hydra:supportedOperation": [
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "GET",
+                        "hydra:title": "Retrieves Custom resource.",
+                        "rdfs:label": "Retrieves Custom resource.",
+                        "returns": "#Custom"
+                    }
+                ]
+            },
+            {
+                "@id": "#ThirdLevel",
+                "@type": "hydra:Class",
+                "rdfs:label": "ThirdLevel",
+                "hydra:title": "ThirdLevel",
+                "hydra:description": "ThirdLevel.",
+                "hydra:supportedProperty": [
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#ThirdLevel/level",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "level",
+                            "domain": "#ThirdLevel",
+                            "range": "xmls:integer"
+                        },
+                        "hydra:title": "level",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#ThirdLevel/test",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "test",
+                            "domain": "#ThirdLevel",
+                            "range": "xmls:boolean"
+                        },
+                        "hydra:title": "test",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    }
+                ],
+                "hydra:supportedOperation": [
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "GET",
+                        "hydra:title": "Retrieves ThirdLevel resource.",
+                        "rdfs:label": "Retrieves ThirdLevel resource.",
+                        "returns": "#ThirdLevel"
+                    },
+                    {
+                        "@type": "hydra:ReplaceResourceOperation",
+                        "expects": "#ThirdLevel",
+                        "hydra:method": "PUT",
+                        "hydra:title": "Replaces the ThirdLevel resource.",
+                        "rdfs:label": "Replaces the ThirdLevel resource.",
+                        "returns": "#ThirdLevel"
+                    },
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "DELETE",
+                        "hydra:title": "Deletes the ThirdLevel resource.",
+                        "rdfs:label": "Deletes the ThirdLevel resource.",
+                        "returns": "owl:Nothing"
+                    }
+                ]
+            },
+            {
+                "@id": "#CircularReference",
+                "@type": "hydra:Class",
+                "rdfs:label": "CircularReference",
+                "hydra:title": "CircularReference",
+                "hydra:description": "Circular Reference.",
+                "hydra:supportedProperty": [
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#CircularReference/parent",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "parent",
+                            "domain": "#CircularReference",
+                            "range": "#CircularReference"
+                        },
+                        "hydra:title": "parent",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#CircularReference/children",
+                            "@type": "rdf:Property",
+                            "rdfs:label": "children",
+                            "domain": "#CircularReference",
+                            "range": "#CircularReference"
+                        },
+                        "hydra:title": "children",
+                        "hydra:required": false,
+                        "hydra:readable": true,
+                        "hydra:writable": true
+                    }
+                ],
+                "hydra:supportedOperation": [
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "GET",
+                        "hydra:title": "Retrieves CircularReference resource.",
+                        "rdfs:label": "Retrieves CircularReference resource.",
+                        "returns": "#CircularReference"
+                    },
+                    {
+                        "@type": "hydra:ReplaceResourceOperation",
+                        "expects": "#CircularReference",
+                        "hydra:method": "PUT",
+                        "hydra:title": "Replaces the CircularReference resource.",
+                        "rdfs:label": "Replaces the CircularReference resource.",
+                        "returns": "#CircularReference"
+                    },
+                    {
+                        "@type": "hydra:Operation",
+                        "hydra:method": "DELETE",
+                        "hydra:title": "Deletes the CircularReference resource.",
+                        "rdfs:label": "Deletes the CircularReference resource.",
+                        "returns": "owl:Nothing"
+                    }
+                ]
+            },
+            {
                 "@id": "#Entrypoint",
                 "@type": "hydra:Class",
                 "hydra:title": "The API entrypoint",
@@ -441,6 +622,88 @@ Feature: Documentation support
                             ]
                         },
                         "hydra:title": "The collection of RelationEmbedder resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/custom",
+                            "@type": "hydra:Link",
+                            "domain": "#Entrypoint",
+                            "rdfs:label": "The collection of Custom resources",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "@type": "hydra:Operation",
+                                    "hydra:method": "GET",
+                                    "hydra:title": "Retrieves the collection of Custom resources.",
+                                    "rdfs:label": "Retrieves the collection of Custom resources.",
+                                    "returns": "hydra:PagedCollection"
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of Custom resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/thirdLevel",
+                            "@type": "hydra:Link",
+                            "domain": "#Entrypoint",
+                            "rdfs:label": "The collection of ThirdLevel resources",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "@type": "hydra:Operation",
+                                    "hydra:method": "GET",
+                                    "hydra:title": "Retrieves the collection of ThirdLevel resources.",
+                                    "rdfs:label": "Retrieves the collection of ThirdLevel resources.",
+                                    "returns": "hydra:PagedCollection"
+                                },
+                                {
+                                    "@type": "hydra:CreateResourceOperation",
+                                    "expects": "#ThirdLevel",
+                                    "hydra:method": "POST",
+                                    "hydra:title": "Creates a ThirdLevel resource.",
+                                    "rdfs:label": "Creates a ThirdLevel resource.",
+                                    "returns": "#ThirdLevel"
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of ThirdLevel resources",
+                        "hydra:readable": true,
+                        "hydra:writable": false
+                    },
+                    {
+                        "@type": "hydra:SupportedProperty",
+                        "hydra:property": {
+                            "@id": "#Entrypoint/circularReference",
+                            "@type": "hydra:Link",
+                            "domain": "#Entrypoint",
+                            "rdfs:label": "The collection of CircularReference resources",
+                            "range": "hydra:PagedCollection",
+                            "hydra:supportedOperation": [
+                                {
+                                    "@type": "hydra:Operation",
+                                    "hydra:method": "GET",
+                                    "hydra:title": "Retrieves the collection of CircularReference resources.",
+                                    "rdfs:label": "Retrieves the collection of CircularReference resources.",
+                                    "returns": "hydra:PagedCollection"
+                                },
+                                {
+                                    "@type": "hydra:CreateResourceOperation",
+                                    "expects": "#CircularReference",
+                                    "hydra:method": "POST",
+                                    "hydra:title": "Creates a CircularReference resource.",
+                                    "rdfs:label": "Creates a CircularReference resource.",
+                                    "returns": "#CircularReference"
+                                }
+                            ]
+                        },
+                        "hydra:title": "The collection of CircularReference resources",
                         "hydra:readable": true,
                         "hydra:writable": false
                     }

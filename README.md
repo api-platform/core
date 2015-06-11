@@ -1,7 +1,9 @@
 # DunglasApiBundle
 
-DunglasApiBundle is an easy to use and powerful system to create [hypermedia-driven REST APIs](http://en.wikipedia.org/wiki/HATEOAS)
-for [the Symfony framework](http://symfony.com) and [API Platform](https://github.com/dunglas/api-platform).
+DunglasApiBundle is an easy to use and powerful system to create [hypermedia-driven REST APIs](http://en.wikipedia.org/wiki/HATEOAS).
+It is a component of the [Dunglas's API Platform framework](https://github.com/dunglas/api-platform) and it can be used
+as a standalone bundle for [the Symfony framework](http://symfony.com).
+
 It embraces [JSON for Linked Data (JSON-LD)](http://json-ld.org) and [Hydra Core Vocabulary](http://www.hydra-cg.com) web standards. 
 
 Build a working and fully-featured CRUD API in minutes. Leverage the awesome features of the tool to develop complex and
@@ -52,17 +54,25 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   2. [Creating custom operations](Resources/doc/operations.md#creating-custom-operations)
 4. [Data providers](Resources/doc/data-providers.md)
   1. [Creating a custom data provider](Resources/doc/data-providers.md#creating-a-custom-data-provider)
-  2. [Returning a paged collection](Resources/doc/data-providers.md#Returning-a-paged-collection)
+  2. [Returning a paged collection](Resources/doc/data-providers.md#returning-a-paged-collection)
   3. [Supporting filters](Resources/doc/data-providers.md#Supporting-filters)
 5. [Filters](Resources/doc/filters.md)
-  1. [Adding Doctrine ORM filters](Resources/doc/filters.md#adding-doctrine-orm-filters)
-  2. [Creating custom filters](Resources/doc/filters.md#creating-custom-filters)
+  1. [Search filter](Resources/doc/filters.md#search-filter)
+  2. [Date filter](Resources/doc/filters.md#date-filter)
+    1. [Managing `null` values](Resources/doc/filters.md#managing-null-values)
+  3. [Order filter](Resources/doc/filters.md#order-filter)
+    1. [Using a custom order query parameter name](Resources/doc/filters.md#using-a-custom-order-query-parameter-name)
+  4. [Enabling a filter for all properties of a resource](Resources/doc/filters.md#enabling-a-filter-for-all-properties-of-a-resource)
+  5. [Creating custom filters](Resources/doc/filters.md#creating-custom-filters)
+    1. [Creating custom Doctrine ORM filters](Resources/doc/filters.md#creating-custom-doctrine-orm-filters)
+    2. [Overriding extraction of properties from the request](Resources/doc/filters.md#overriding-extraction-of-properties-from-the-request)
 6. [Serialization groups and relations](Resources/doc/serialization-groups-and-relations.md)
   1. [Using serialization groups](Resources/doc/serialization-groups-and-relations.md#using-serialization-groups)
-  2. [Embedding relations](Resources/doc/serialization-groups-and-relations.md#embedding-relations)
+  2. [Annotations](Resources/doc/serialization-groups-and-relations.md#annotations)
+  3. [Embedding relations](Resources/doc/serialization-groups-and-relations.md#embedding-relations)
     1. [Normalization](Resources/doc/serialization-groups-and-relations.md#normalization)
     2. [Denormalization](Resources/doc/serialization-groups-and-relations.md#denormalization)
-  3. [Name conversion](Resources/doc/serialization-groups-and-relations.md#name-conversion)
+  4. [Name conversion](Resources/doc/serialization-groups-and-relations.md#name-conversion)
 7. [Validation](Resources/doc/validation.md)
   1. [Using validation groups](Resources/doc/validation.md#using-validation-groups)
 8. [The event system](Resources/doc/the-event-system.md)
@@ -76,10 +86,11 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   1. [Using a custom `Resource` class](Resources/doc/resources.md#using-a-custom-resource-class)
 10. [Controllers](Resources/doc/controllers.md)
   1. [Using a custom controller](Resources/doc/controllers.md#using-a-custom-controller)
-11. [Using external (JSON-LD) vocabularies](Resources/doc/external-vocabularies.md)
-12. [Performances](Resources/doc/performances.md)
+11. [FOSUserBundle integration](Resources/doc/fosuser-bundle.md#fosuser-bundle-integration)
+12. [Using external (JSON-LD) vocabularies](Resources/doc/external-vocabularies.md)
+13. [Performances](Resources/doc/performances.md)
   1. [Enabling the metadata cache](Resources/doc/performances.md#enabling-the-metadata-cache)
-13. [AngularJS integration](Resources/doc/angular-integration.md)
+14. [AngularJS integration](Resources/doc/angular-integration.md)
 
 ## Other resources
 

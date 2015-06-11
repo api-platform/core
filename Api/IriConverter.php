@@ -94,12 +94,8 @@ class IriConverter implements IriConverterInterface
     {
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
             return $this->router->generate(
-                $this->getItemRouteName($resource),
-                ['id' => $this->propertyAccessor->getValue(
-                        $item,
-                        $this->getIdentifierFromClassName(get_class($item))
-                    )
-                ],
+                $this->getRouteName($resource, 'item'),
+                ['id' => $this->propertyAccessor->getValue($item, $this->getIdentifierFromClassName(get_class($item)))],
                 $referenceType
             );
         }
@@ -133,72 +129,38 @@ class IriConverter implements IriConverterInterface
      */
     public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
-        return $this->router->generate($this->getCollectionRouteName($resource), [], $referenceType);
+        return $this->router->generate($this->getRouteName($resource, 'collection'), [], $referenceType);
     }
 
     /**
-     * Gets the collection route name for a resource.
+     * Gets the route name related to a resource.
      *
      * @param ResourceInterface $resource
      *
      * @return string
      */
-    private function getCollectionRouteName(ResourceInterface $resource)
-    {
-        $this->initRouteCache($resource);
-
-        if (isset($this->routeCache[$resource]['collectionRouteName'])) {
-            return $this->routeCache[$resource]['collectionRouteName'];
-        }
-
-        $operations = $resource->getCollectionOperations();
-        foreach ($operations as $operation) {
-            if (in_array('GET', $operation->getRoute()->getMethods())) {
-                $data = $this->routeCache[$resource];
-                $data['collectionRouteName'] = $operation->getRouteName();
-                $this->routeCache[$resource] = $data;
-
-                return $data['collectionRouteName'];
-            }
-        }
-    }
-
-    /**
-     * Gets the item route name for a resource.
-     *
-     * @param ResourceInterface $resource
-     *
-     * @return string
-     */
-    private function getItemRouteName(ResourceInterface $resource)
-    {
-        $this->initRouteCache($resource);
-
-        if (isset($this->routeCache[$resource]['itemRouteName'])) {
-            return $this->routeCache[$resource]['itemRouteName'];
-        }
-
-        $operations = $resource->getitemOperations();
-        foreach ($operations as $operation) {
-            if (in_array('GET', $operation->getRoute()->getMethods())) {
-                $data = $this->routeCache[$resource];
-                $data['itemRouteName'] = $operation->getRouteName();
-                $this->routeCache[$resource] = $data;
-
-                return $data['itemRouteName'];
-            }
-        }
-    }
-
-    /**
-     * Initializes the route cache structure for the given resource.
-     *
-     * @param ResourceInterface $resource
-     */
-    private function initRouteCache(ResourceInterface $resource)
+    private function getRouteName(ResourceInterface $resource, $prefix)
     {
         if (!$this->routeCache->contains($resource)) {
             $this->routeCache[$resource] = [];
+        }
+
+        $key = $prefix.'RouteName';
+
+        if (isset($this->routeCache[$resource][$key])) {
+            return $this->routeCache[$resource][$key];
+        }
+
+        $operations = 'item' === $prefix ? $resource->getItemOperations() : $resource->getCollectionOperations();
+        foreach ($operations as $operation) {
+            $methods = $operation->getRoute()->getMethods();
+            if (empty($methods) || in_array('GET', $methods)) {
+                $data = $this->routeCache[$resource];
+                $data[$key] = $operation->getRouteName();
+                $this->routeCache[$resource] = $data;
+
+                return $data[$key];
+            }
         }
     }
 }

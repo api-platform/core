@@ -11,10 +11,12 @@
 
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
+use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Api\ResourceResolver;
+use Dunglas\ApiBundle\Api\ResourceResolverTrait;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
+use Dunglas\ApiBundle\JsonLd\Serializer\ContextTrait;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
@@ -27,7 +29,8 @@ use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
  */
 class CollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
 {
-    use ResourceResolver;
+    use ResourceResolverTrait;
+    use ContextTrait;
 
     /**
      * @var string
@@ -76,15 +79,19 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     public function normalize($object, $format = null, array $context = array())
     {
         $resource = $this->guessResource($object, $context);
-        list($context, $data) = $this->contextBuilder->bootstrap($resource, $context);
 
         if (isset($context['json_ld_sub_level'])) {
             $data = [];
-            foreach ($object as $obj) {
-                $data[] = $this->serializer->normalize($obj, $format, $context);
+            foreach ($object as $index => $obj) {
+                $data[$index] = $this->serializer->normalize($obj, $format, $context);
             }
         } else {
-            $data['@id'] = $context['request_uri'];
+            $context = $this->createContext($resource, $context);
+
+            $data = [
+                '@context' => $this->contextBuilder->getContextUri($resource),
+                '@id' => $context['request_uri'],
+            ];
             list($parts, $parameters) = $this->parseRequestUri($context['request_uri']);
 
             if ($object instanceof PaginatorInterface) {
@@ -134,6 +141,9 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     private function parseRequestUri($requestUri)
     {
         $parts = parse_url($requestUri);
+        if (false === $parts) {
+            throw new \InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $requestUri));
+        }
 
         $parameters = [];
         if (isset($parts['query'])) {
@@ -179,7 +189,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      *
      * @param ResourceInterface $resource
      * @param array             $parts
-     * @param array             $filters
+     * @param FilterInterface[] $filters
      *
      * @return array
      */

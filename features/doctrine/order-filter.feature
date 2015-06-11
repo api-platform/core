@@ -28,9 +28,11 @@ Feature: Order filter on collections
             "name": "Dummy #1",
             "alias": "Alias #29",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/2",
@@ -38,9 +40,11 @@ Feature: Order filter on collections
             "name": "Dummy #2",
             "alias": "Alias #28",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/3",
@@ -48,59 +52,55 @@ Feature: Order filter on collections
             "name": "Dummy #3",
             "alias": "Alias #27",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
-        ]
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
+          ]
       }
     }
     """
@@ -128,9 +128,11 @@ Feature: Order filter on collections
             "name": "Dummy #30",
             "alias": "Alias #0",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/29",
@@ -138,9 +140,11 @@ Feature: Order filter on collections
             "name": "Dummy #29",
             "alias": "Alias #1",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/28",
@@ -148,58 +152,54 @@ Feature: Order filter on collections
             "name": "Dummy #28",
             "alias": "Alias #2",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }
@@ -228,9 +228,11 @@ Feature: Order filter on collections
             "name": "Dummy #1",
             "alias": "Alias #29",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/10",
@@ -238,9 +240,11 @@ Feature: Order filter on collections
             "name": "Dummy #10",
             "alias": "Alias #20",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/11",
@@ -248,58 +252,54 @@ Feature: Order filter on collections
             "name": "Dummy #11",
             "alias": "Alias #19",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }
@@ -328,9 +328,11 @@ Feature: Order filter on collections
             "name": "Dummy #9",
             "alias": "Alias #21",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/8",
@@ -338,9 +340,11 @@ Feature: Order filter on collections
             "name": "Dummy #8",
             "alias": "Alias #22",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           },
           {
             "@id": "/dummies/7",
@@ -348,58 +352,54 @@ Feature: Order filter on collections
             "name": "Dummy #7",
             "alias": "Alias #23",
             "dummyDate": null,
+            "jsonData": [],
             "dummy": null,
             "relatedDummy": null,
-            "relatedDummies": []
+            "relatedDummies": [],
+            "name_converted": null
           }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }
@@ -429,9 +429,11 @@ Feature: Order filter on collections
           "name": "Dummy #1",
           "alias": "Alias #29",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -439,9 +441,11 @@ Feature: Order filter on collections
           "name": "Dummy #2",
           "alias": "Alias #28",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -449,58 +453,54 @@ Feature: Order filter on collections
           "name": "Dummy #3",
           "alias": "Alias #27",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }
@@ -528,9 +528,11 @@ Feature: Order filter on collections
           "name": "Dummy #1",
           "alias": "Alias #29",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -538,9 +540,11 @@ Feature: Order filter on collections
           "name": "Dummy #2",
           "alias": "Alias #28",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -548,58 +552,54 @@ Feature: Order filter on collections
           "name": "Dummy #3",
           "alias": "Alias #27",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }
@@ -627,9 +627,11 @@ Feature: Order filter on collections
           "name": "Dummy #1",
           "alias": "Alias #29",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -637,9 +639,11 @@ Feature: Order filter on collections
           "name": "Dummy #2",
           "alias": "Alias #28",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -647,58 +651,54 @@ Feature: Order filter on collections
           "name": "Dummy #3",
           "alias": "Alias #27",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }
@@ -726,9 +726,11 @@ Feature: Order filter on collections
           "name": "Dummy #1",
           "alias": "Alias #29",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/2",
@@ -736,9 +738,11 @@ Feature: Order filter on collections
           "name": "Dummy #2",
           "alias": "Alias #28",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         },
         {
           "@id": "/dummies/3",
@@ -746,58 +750,54 @@ Feature: Order filter on collections
           "name": "Dummy #3",
           "alias": "Alias #27",
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": null,
-          "relatedDummies": []
+          "relatedDummies": [],
+          "name_converted": null
         }
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "id",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "name",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummy",
-                "property": "relatedDummy",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "relatedDummies",
-                "property": "relatedDummies",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[id]",
-                "property": "id",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "order[name]",
-                "property": "name",
-                "required": false
-            },
-            {
-                "@type": "IriTemplateMapping",
-                "variable": "string",
-                "property": "dummyDate",
-                "required": false
-            }
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
         ]
       }
     }

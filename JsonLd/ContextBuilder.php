@@ -15,6 +15,7 @@ use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * JSON-LD Context Builder.
@@ -41,15 +42,21 @@ class ContextBuilder
      * @var ResourceCollectionInterface
      */
     private $resourceCollection;
+    /**
+     * @var NameConverterInterface
+     */
+    private $nameConverter;
 
     public function __construct(
         RouterInterface $router,
         ClassMetadataFactoryInterface $classMetadataFactory,
-        ResourceCollectionInterface $resourceCollection
+        ResourceCollectionInterface $resourceCollection,
+        NameConverterInterface $nameConverter = null
     ) {
         $this->router = $router;
         $this->classMetadataFactory = $classMetadataFactory;
         $this->resourceCollection = $resourceCollection;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -95,17 +102,19 @@ class ContextBuilder
             )->getAttributes();
 
             foreach ($attributes as $attributeName => $attribute) {
+                $convertedName = $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
+
                 if (!$id = $attribute->getIri()) {
-                    $id = sprintf('%s/%s', $prefixedShortName, $attributeName);
+                    $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
                 }
 
                 if ($attribute->isNormalizationLink()) {
-                    $context[$attributeName] = [
+                    $context[$convertedName] = [
                         '@id' => $id,
                         '@type' => '@id',
                     ];
                 } else {
-                    $context[$attributeName] = $id;
+                    $context[$convertedName] = $id;
                 }
             }
         }
@@ -114,44 +123,15 @@ class ContextBuilder
     }
 
     /**
-     * Bootstrap a serialization context with the given resource.
+     * Gets the context URI for the given resource.
      *
      * @param ResourceInterface $resource
-     * @param array             $context
      *
-     * @return array [array, array]
+     * @return string
      */
-    public function bootstrap(ResourceInterface $resource, array $context = [])
+    public function getContextUri(ResourceInterface $resource)
     {
-        $data = [];
-        if (!isset($context['json_ld_has_context'])) {
-            $data['@context'] = $this->router->generate(
-                'api_json_ld_context',
-                ['shortName' => $resource->getShortName()]
-            );
-            $context['json_ld_has_context'] = true;
-        }
-
-        return [$context, $data];
-    }
-
-    /**
-     * Bootstrap relation context.
-     *
-     * @param ResourceInterface $resource
-     * @param string            $class
-     *
-     * @return array
-     */
-    public function bootstrapRelation(ResourceInterface $resource, $class)
-    {
-        return [
-            'resource' => $this->resourceCollection->getResourceForEntity($class),
-            'json_ld_has_context' => true,
-            'json_ld_normalization_groups' => $resource->getNormalizationGroups(),
-            'json_ld_denormalization_groups' => $resource->getDenormalizationGroups(),
-            'json_ld_validation_groups' => $resource->getValidationGroups(),
-        ];
+        return $this->router->generate('api_json_ld_context', ['shortName' => $resource->getShortName()]);
     }
 
     /**

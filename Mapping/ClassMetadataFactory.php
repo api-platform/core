@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\Mapping;
 
 use Doctrine\Common\Cache\Cache;
 use Dunglas\ApiBundle\Mapping\Loader\LoaderInterface;
-use Dunglas\ApiBundle\Util\ClassInfo;
+use Dunglas\ApiBundle\Util\ClassInfoTrait;
 
 /**
  * {@inheritdoc}
@@ -22,7 +22,7 @@ use Dunglas\ApiBundle\Util\ClassInfo;
  */
 class ClassMetadataFactory implements ClassMetadataFactoryInterface
 {
-    use ClassInfo;
+    use ClassInfoTrait;
 
     /**
      * @var LoaderInterface

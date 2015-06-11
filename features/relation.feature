@@ -4,10 +4,31 @@ Feature: Relations support
   I need to be able to update relations between resources
 
   @createSchema
+  Scenario: Create a third level
+    When I send a "POST" request to "/third_levels" with body:
+    """
+    {"level": 3}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/ThirdLevel",
+      "@id": "/third_levels/1",
+      "@type": "ThirdLevel",
+      "level": 3,
+      "test": true
+    }
+    """
+
   Scenario: Create a related dummy
     When I send a "POST" request to "/related_dummies" with body:
     """
-    {}
+    {
+      "thirdLevel": "/third_levels/1"
+    }
     """
     Then the response status code should be 201
     And the response should be in JSON
@@ -20,7 +41,8 @@ Feature: Relations support
       "@type": "https://schema.org/Product",
       "unknown": null,
       "symfony": "symfony",
-      "age": null
+      "age": null,
+      "thirdLevel": "/third_levels/1"
     }
     """
 
@@ -32,7 +54,8 @@ Feature: Relations support
       "relatedDummy": "http://example.com/related_dummies/1",
       "relatedDummies": [
         "/related_dummies/1"
-      ]
+      ],
+      "name_converted": null
     }
     """
     Then the response status code should be 201
@@ -47,11 +70,13 @@ Feature: Relations support
       "name": "Dummy with relations",
       "alias": null,
       "dummyDate": null,
+      "jsonData": [],
       "dummy": null,
       "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
         "/related_dummies/1"
-      ]
+      ],
+      "name_converted": null
     }
     """
 
@@ -77,61 +102,57 @@ Feature: Relations support
           "name": "Dummy with relations",
           "alias": null,
           "dummyDate": null,
+          "jsonData": [],
           "dummy": null,
           "relatedDummy": "/related_dummies/1",
           "relatedDummies": [
             "/related_dummies/1"
-          ]
+          ],
+          "name_converted": null
         }
       ],
       "hydra:search": {
-              "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,relatedDummy,relatedDummies,order[id],order[name],string}",
-              "hydra:variableRepresentation": "BasicRepresentation",
-              "hydra:mapping": [
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "id",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "name",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy",
-                      "property": "relatedDummy",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[id]",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[name]",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "string",
-                      "property": "dummyDate",
-                      "required": false
-                  }
-              ]
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
+        ]
       }
     }
     """
@@ -157,7 +178,12 @@ Feature: Relations support
         "related": {
             "@id": "/related_dummies/1",
             "@type": "https://schema.org/Product",
-            "symfony": "symfony"
+            "symfony": "symfony",
+                "thirdLevel": {
+                    "@id": "/third_levels/1",
+                    "@type": "ThirdLevel",
+                    "level": 3
+                }
         }
       }
       """
@@ -184,7 +210,8 @@ Feature: Relations support
       "anotherRelated": {
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
-        "symfony": "laravel"
+        "symfony": "laravel",
+        "thirdLevel": null
       },
       "related": null
     }
@@ -215,7 +242,8 @@ Feature: Relations support
       "anotherRelated": {
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
-        "symfony": "phalcon"
+        "symfony": "phalcon",
+        "thirdLevel": null
       },
       "related": null
     }

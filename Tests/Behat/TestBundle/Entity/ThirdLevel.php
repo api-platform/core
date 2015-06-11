@@ -11,58 +11,77 @@
 
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
-use Dunglas\ApiBundle\Annotation\Iri;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Related dummy.
+ * ThirdLevel.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ORM\Entity
- * @Iri("https://schema.org/Product")
  */
-class RelatedDummy extends ParentDummy
+class ThirdLevel
 {
     /**
+     * @var int The id.
+     *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
     /**
-     * @ORM\Column
+     * @var int
+     *
+     * @ORM\Column(type = "integer")
      * @Groups({"barcelona", "chicago"})
      */
-    protected $symfony = 'symfony';
+    private $level = 3;
     /**
-     * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
-     * @Groups({"barcelona", "chicago"})
+     * @var bool
+     *
+     * @ORM\Column(type = "boolean")
      */
-    public $thirdLevel;
+    private $test = true;
+
     /**
-     * @ORM\ManyToOne(targetEntity="UnknownDummy", cascade={"persist"})
+     * @return int
      */
-    public $unknown;
-
-    public function setUnknown()
-    {
-        $this->unknown = new UnknownDummy();
-    }
-
     public function getId()
     {
         return $this->id;
     }
 
-    public function getSymfony()
+    /**
+     * @return int
+     */
+    public function getLevel()
     {
-        return $this->symfony;
+        return $this->level;
     }
 
-    public function setSymfony($symfony)
+    /**
+     * @param int $level
+     */
+    public function setLevel($level)
     {
-        $this->symfony = $symfony;
+        $this->level = $level;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTest()
+    {
+        return $this->test;
+    }
+
+    /**
+     * @param bool $test
+     */
+    public function setTest($test)
+    {
+        $this->test = $test;
     }
 }

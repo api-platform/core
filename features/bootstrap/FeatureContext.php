@@ -4,7 +4,6 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AnotherDummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 
@@ -80,7 +79,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->setDummyDate($date);
+            // Last Dummy has a null date
+            if ($nb !== $i) {
+                $dummy->setDummyDate($date);
+            }
 
             $this->manager->persist($dummy);
         }

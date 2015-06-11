@@ -7,7 +7,7 @@ and to serialize entities using normalizers provided by the bundle.
 
 ## Using a custom controller
 
-When [the event system](6-the-event-system.md) is not enough, it's possible to use custom controllers.
+When [the event system](the-event-system.md) is not enough, it's possible to use custom controllers.
 
 Your custom controller should extend the `ResourceController` provided by this bundle.
 
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CustomController extends ResourceController
 {
-    # Customize the AppBundle:Custom:custom action
+    // Customize the AppBundle:Custom:custom action
     public function getAction(Request $request, $id)
     {
         $this->get('logger')->info('This is my custom controller.');
@@ -34,6 +34,10 @@ class CustomController extends ResourceController
     }
 }
 ```
+
+Custom controllers are often used with [custom operations](operations.md). If you don't create a custom operation
+for your custom controller, you need to register yourself that controller in the Symfony routing system and it will
+appear in documentations.
 
 Previous chapter: [Controllers](controllers.md)<br>
 Next chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)
