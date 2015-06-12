@@ -1,7 +1,7 @@
 # DunglasApiBundle
 
 DunglasApiBundle is an easy to use and powerful system to create [hypermedia-driven REST APIs](http://en.wikipedia.org/wiki/HATEOAS).
-It is a component of the [Dunglas's API Platform framework](https://github.com/dunglas/api-platform) and it can be used
+It is a component of the [Dunglas's API Platform framework](http://api-platform.com) and it can be used
 as a standalone bundle for [the Symfony framework](http://symfony.com).
 
 It embraces [JSON for Linked Data (JSON-LD)](http://json-ld.org) and [Hydra Core Vocabulary](http://www.hydra-cg.com) web standards. 
