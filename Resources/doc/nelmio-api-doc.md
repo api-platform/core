@@ -9,7 +9,7 @@ Once installed, use the following configuration:
 
 ```yaml
 
-# app/config/services.yml
+# app/config/config.yml
 
 nelmio_api_doc:
     sandbox:
