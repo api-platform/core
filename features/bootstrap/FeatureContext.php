@@ -57,7 +57,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsDummyObjects($nb)
     {
-        for ($i = 1; $i <= $nb; $i++) {
+        for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
@@ -73,7 +73,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsDummyObjectsWithDummyDate($nb)
     {
-        for ($i = 1; $i <= $nb; $i++) {
+        for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = new Dummy();
