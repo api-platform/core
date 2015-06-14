@@ -167,6 +167,20 @@ services:
 Given that the collection endpoint is `/offers`, you can filter offers by name in
 ascending order and then by ID on descending order with the following query: `/offers?order[name]=desc&order[id]=asc`.
 
+By default, whenever the query does not specify explicitly the direction (e.g: `/offers?order[name]&order[id]`), filters will not be applied, unless you configure a default order direction to use:
+
+```yaml
+
+# app/config/services.yml
+
+services:
+    resource.offer.order_filter:
+        parent:    "api.doctrine.orm.order_filter"
+        arguments: [ { "id": ASC, "name": DESC } ]
+
+    [...]
+```
+
 ### Using a custom order query parameter name
 
 A conflict will occur if `order` is also the name of a property with the search filter enabled.

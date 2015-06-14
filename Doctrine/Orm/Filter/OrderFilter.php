@@ -55,9 +55,14 @@ class OrderFilter extends AbstractFilter
         $fieldNames = array_flip($this->getClassMetadata($resource)->getFieldNames());
 
         foreach ($properties as $property => $order) {
-            $order = strtoupper($order);
+            if (!$this->isPropertyEnabled($property) || !isset($fieldNames[$property])) {
+                continue;
+            } elseif ('' === $order && isset($this->properties[$property])) {
+                $order = $this->properties[$property];
+            }
 
-            if ($this->isPropertyEnabled($property) && isset($fieldNames[$property]) && ('ASC' === $order || 'DESC' === $order)) {
+            $order = strtoupper($order);
+            if ('ASC' === $order || 'DESC' === $order) {
                 $queryBuilder->addOrderBy(sprintf('o.%s', $property), $order);
             }
         }

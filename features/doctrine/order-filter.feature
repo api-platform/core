@@ -305,7 +305,7 @@ Feature: Order filter on collections
     }
     """
 
-  Scenario: Get collection ordered in ascending order on a string property and on which order filter has been enabled in whitelist mode
+  Scenario: Get collection ordered in descending order on a string property and on which order filter has been enabled in whitelist mode
     When I send a "GET" request to "/dummies?order[name]=desc"
     Then the response status code should be 200
     And the response should be in JSON
@@ -321,6 +321,106 @@ Feature: Order filter on collections
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies?order%5Bname%5D=desc",
       "hydra:lastPage": "/dummies?order%5Bname%5D=desc&page=10",
+      "hydra:member": [
+          {
+            "@id": "/dummies/9",
+            "@type": "Dummy",
+            "name": "Dummy #9",
+            "alias": "Alias #21",
+            "dummyDate": null,
+            "jsonData": [],
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": [],
+            "name_converted": null
+          },
+          {
+            "@id": "/dummies/8",
+            "@type": "Dummy",
+            "name": "Dummy #8",
+            "alias": "Alias #22",
+            "dummyDate": null,
+            "jsonData": [],
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": [],
+            "name_converted": null
+          },
+          {
+            "@id": "/dummies/7",
+            "@type": "Dummy",
+            "name": "Dummy #7",
+            "alias": "Alias #23",
+            "dummyDate": null,
+            "jsonData": [],
+            "dummy": null,
+            "relatedDummy": null,
+            "relatedDummies": [],
+            "name_converted": null
+          }
+      ],
+      "hydra:search": {
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "id",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "name",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[id]",
+                  "property": "id",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "order[name]",
+                  "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              }
+        ]
+      }
+    }
+    """
+
+  Scenario: Get collection ordered by default configured order on a string property and on which order filter has been enabled in whitelist mode with default descending order
+    When I send a "GET" request to "/dummies?order[name]"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies?order[name]",
+      "@type": "hydra:PagedCollection",
+      "hydra:nextPage": "/dummies?order%5Bname%5D=&page=2",
+      "hydra:totalItems": 30,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies?order%5Bname%5D=",
+      "hydra:lastPage": "/dummies?order%5Bname%5D=&page=10",
       "hydra:member": [
           {
             "@id": "/dummies/9",
