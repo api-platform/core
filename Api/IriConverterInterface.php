@@ -49,4 +49,13 @@ interface IriConverterInterface
      * @return string
      */
     public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH);
+
+    /**
+     * Returns if the given resource collection has an IRI associated.
+     *
+     * @param ResourceInterface $resource
+     *
+     * @return bool
+     */
+    public function hasIriFromResource(ResourceInterface $resource);
 }

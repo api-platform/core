@@ -104,6 +104,14 @@ class IriConverter implements IriConverterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasIriFromResource(ResourceInterface $resource)
+    {
+        return null !== $this->getRouteName($resource, 'collection');
+    }
+
+    /**
      * Gets the route name related to a resource.
      *
      * @param ResourceInterface $resource
@@ -133,5 +141,10 @@ class IriConverter implements IriConverterInterface
                 return $data[$key];
             }
         }
+
+        $data = $this->routeCache[$resource];
+        $data[$key] = null;
+        $this->routeCache[$resource] = $data;
+        return null;
     }
 }
