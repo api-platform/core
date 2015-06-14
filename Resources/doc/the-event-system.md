@@ -50,13 +50,13 @@ use Dunglas\JsonApiBundle\Event\DataEvent;
 class MyEventListener
 {
     /**
-     * @param ObjectEvent $event
+     * @param DataEvent $event
      */
-    public function onPostCreate(ObjectEvent $event)
+    public function onPostCreate(DataEvent $event)
     {
-        $object = $event->getObject();
+        $data = $event->getData();
 
-        if ($object instanceof MyObject) {
+        if ($data instanceof MyObject) {
             $resource = $event->getResource(); // Get the related instance of Dunglas\ApiBundle\Api\ResourceInterface
 
             // Do something awesome here
