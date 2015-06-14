@@ -195,7 +195,7 @@ class ItemNormalizer extends AbstractNormalizer
 
         $allowedAttributes = [];
         foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
-            if ($attributeMetadata->isReadable()) {
+            if ($attributeMetadata->isWritable()) {
                 $allowedAttributes[] = $attributeName;
             }
         }
