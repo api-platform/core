@@ -13,9 +13,15 @@
 
         <service id="api.json_ld.context_builder" class="Dunglas\ApiBundle\JsonLd\ContextBuilder">
             <argument type="service" id="router" />
-            <argument type="service" id="api.mapping.class_metadata_factory" />
+            <argument type="service" id="event_dispatcher" />
             <argument type="service" id="api.resource_collection" />
+        </service>
+
+        <service id="api.json_ld.resource_context_builder_listener" class="Dunglas\ApiBundle\JsonLd\EventListener\ResourceContextBuilderListener">
+            <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument type="service" id="api.name_converter" on-invalid="ignore" />
+
+            <tag name="kernel.event_subscriber" />
         </service>
 
         <!-- Serializer -->

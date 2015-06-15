@@ -13,9 +13,8 @@ namespace Dunglas\ApiBundle\JsonLd;
 
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * JSON-LD Context Builder.
@@ -35,28 +34,22 @@ class ContextBuilder
      */
     private $router;
     /**
-     * @var ClassMetadataFactoryInterface
+     * @var EventDispatcherInterface
      */
-    private $classMetadataFactory;
+    private $eventDispatcher;
     /**
      * @var ResourceCollectionInterface
      */
     private $resourceCollection;
-    /**
-     * @var NameConverterInterface
-     */
-    private $nameConverter;
 
     public function __construct(
         RouterInterface $router,
-        ClassMetadataFactoryInterface $classMetadataFactory,
-        ResourceCollectionInterface $resourceCollection,
-        NameConverterInterface $nameConverter = null
+        EventDispatcherInterface $eventDispatcher,
+        ResourceCollectionInterface $resourceCollection
     ) {
         $this->router = $router;
-        $this->classMetadataFactory = $classMetadataFactory;
+        $this->eventDispatcher = $eventDispatcher;
         $this->resourceCollection = $resourceCollection;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -105,36 +98,10 @@ class ContextBuilder
     public function getContext(ResourceInterface $resource = null)
     {
         $context = $this->getBaseContext();
+        $event = new Event\ContextBuilderEvent($context, $resource);
+        $this->eventDispatcher->dispatch(Event\Events::CONTEXT_BUILDER, $event);
 
-        if ($resource) {
-            $prefixedShortName = sprintf('#%s', $resource->getShortName());
-
-            $attributes = $this->classMetadataFactory->getMetadataFor(
-                $resource->getEntityClass(),
-                $resource->getNormalizationGroups(),
-                $resource->getDenormalizationGroups(),
-                $resource->getValidationGroups()
-            )->getAttributes();
-
-            foreach ($attributes as $attributeName => $attribute) {
-                $convertedName = $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
-
-                if (!$id = $attribute->getIri()) {
-                    $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
-                }
-
-                if ($attribute->isNormalizationLink()) {
-                    $context[$convertedName] = [
-                        '@id' => $id,
-                        '@type' => '@id',
-                    ];
-                } else {
-                    $context[$convertedName] = $id;
-                }
-            }
-        }
-
-        return $context;
+        return $event->getContext();
     }
 
     /**
