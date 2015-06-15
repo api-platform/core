@@ -59,6 +59,10 @@ class EntrypointBuilder
         ];
 
         foreach ($this->resourceCollection as $resource) {
+            if (!$this->iriConverter->hasIriFromResource($resource)) {
+                continue;
+            }
+
             $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
         }
 
