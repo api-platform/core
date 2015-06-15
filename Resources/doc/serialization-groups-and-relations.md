@@ -50,6 +50,41 @@ In the following JSON document, the relation from an offer to a product is repre
 }
 ```
 
+## Embedding the context
+
+By default, the context attribute (`@context`) will be serialized as an URI:
+```json
+{
+  "@context": "/contexts/Offer"
+}
+```
+
+You can also decide to embed it:
+```json
+{
+  "@context": {
+    "@vocab": "http://localhost/vocab#",
+    "hydra": "http://www.w3.org/ns/hydra/core#",
+    "name": "#Offer/name"
+  }
+}
+```
+
+For this, register the following services (for example in `app/config/services.yml`):
+
+```yaml
+services:
+    # ...
+
+    resource.offer:
+        parent:    "api.resource"
+        arguments: [ "AppBundle\Entity\Offer" ]
+        calls:
+            -      method:    "initNormalizationContext"
+                   arguments: [ { json_ld_context_embedded: true } ]
+        tags:      [ { name: "api.resource" } ]
+```
+
 ### Normalization
 
 From a performance point of view, it's sometimes necessary to avoid extra HTTP requests. It is possible to embed related

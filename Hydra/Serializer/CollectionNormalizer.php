@@ -89,7 +89,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
             $context = $this->createContext($resource, $context);
 
             $data = [
-                '@context' => $this->contextBuilder->getContextUri($resource),
+                '@context' => $this->contextBuilder->getResourceContext($resource, $context),
                 '@id' => $context['request_uri'],
             ];
             list($parts, $parameters) = $this->parseRequestUri($context['request_uri']);
