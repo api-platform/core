@@ -244,8 +244,8 @@ class ItemNormalizer extends AbstractNormalizer
                     ($class = $collectionType->getClass())
                 ) {
                     $values = [];
-                    foreach ($attributeValue as $obj) {
-                        $values[] = $this->denormalizeRelation(
+                    foreach ($attributeValue as $index => $obj) {
+                        $values[$index] = $this->denormalizeRelation(
                             $resource,
                             $attributesMetadata[$attributeName],
                             $class,
