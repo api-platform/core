@@ -146,8 +146,8 @@ class ItemNormalizer extends AbstractNormalizer
                     $subResource = $this->getResourceFromType($collectionType)
                 ) {
                     $values = [];
-                    foreach ($attributeValue as $obj) {
-                        $values[] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
+                    foreach ($attributeValue as $index => $obj) {
+                        $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
                     }
 
                     $data[$attributeName] = $values;
