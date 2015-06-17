@@ -6,6 +6,7 @@ Symfony 2.7 introduced [serialization (and deserialization) groups support](http
 in the Serializer component. Specifying to the API system the groups to use is damn easy:
 
 ```yaml
+# app/config/services.yml
 services:
     resource.product:
         parent:    "api.resource"
@@ -26,7 +27,9 @@ to give access only to exposed properties and to guess if they are readable or/a
 The Symfony serializer allows to specify the definition of serialization using XML, YAML, or annotations. As annotations are really easy to understand, we'll use them in following examples.  
 However, in order to use annotations, don't forget to enable it in the serializer configuration:
 ```yaml
+# app/config/config.yml
 framework:
+    # ...
     serializer:      { enable_annotations: true }
 ```
 
@@ -139,6 +142,7 @@ It is also possible to embed a relation in `PUT` and `POST` requests. To enable 
 set the same way as normalization and the service definition must be like the following:
 
 ```yaml
+# app/config/services.yml
 services:
     # ...
 
@@ -168,6 +172,7 @@ To use this feature, declare a new service with id `api.name_converter`. For exa
 `snake_case` with the following configuration:
 
 ```yaml
+# app/config/services.yml
 services:
     # ...
 
