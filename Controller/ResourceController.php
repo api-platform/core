@@ -178,6 +178,7 @@ class ResourceController extends Controller
                 'json-ld',
                 $resource->getDenormalizationContext()
             );
+
         } catch (Exception $e) {
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }

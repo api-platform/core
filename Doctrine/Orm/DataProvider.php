@@ -118,8 +118,12 @@ class DataProvider implements DataProviderInterface
             }
         }
 
-        if (null !== $this->order) {
-            $queryBuilder->addOrderBy('o.id', $this->order);
+        $classMetaData = $manager->getClassMetadata($entityClass);
+        $identifiers = $classMetaData->getIdentifier();
+
+        if (null !== $this->order && 1 === count($identifiers)) {
+            $identifier = $identifiers[0];
+            $queryBuilder->addOrderBy('o.'.$identifier , $this->order);
         }
 
         return new Paginator(new DoctrineOrmPaginator($queryBuilder));

@@ -123,6 +123,10 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
             $properties = [];
             foreach ($classMetadata->getAttributes() as $attributeName => $attributeMetadata) {
+                if ($attributeMetadata->isIdentifier() && !$attributeMetadata->isWritable()) {
+                    continue;
+                }
+
                 if ($attributeMetadata->isNormalizationLink()) {
                     $type = 'Hydra:Link';
                 } else {
@@ -139,7 +143,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     ],
                     'hydra:title' => $attributeName,
                     'hydra:required' => $attributeMetadata->isRequired(),
-                    'hydra:readable' => $attributeMetadata->isReadable(),
+                    'hydra:readable' => $attributeMetadata->isIdentifier() ? false : $attributeMetadata->isReadable(),
                     'hydra:writable' => $attributeMetadata->isWritable(),
                 ];
 

@@ -101,6 +101,7 @@ class ContextBuilder
         $event = new Event\ContextBuilderEvent($context, $resource);
         $this->eventDispatcher->dispatch(Event\Events::CONTEXT_BUILDER, $event);
 
+
         return $event->getContext();
     }
 

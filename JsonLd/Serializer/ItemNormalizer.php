@@ -124,12 +124,10 @@ class ItemNormalizer extends AbstractNormalizer
         $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
 
         foreach ($attributesMetadata as $attributeMetadata) {
-            $attributeName = $attributeMetadata->getName();
-
-            if ('id' === $attributeName || !$attributeMetadata->isReadable()) {
+            if ($attributeMetadata->isIdentifier() || !$attributeMetadata->isReadable()) {
                 continue;
             }
-
+            $attributeName = $attributeMetadata->getName();
             $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
             if ($this->nameConverter) {

@@ -69,6 +69,20 @@ class LoaderChain implements LoaderInterface
             ) || $success;
         }
 
+        $this->checkClassMetaData($metadata);
+
         return $success;
+    }
+
+    /**
+     * @param ClassMetadata $classMetaData
+     *
+     * @throws \Exception
+     */
+    private function checkClassMetaData(ClassMetadata $classMetaData)
+    {
+        if (($identifier = $classMetaData->getIdentifier()) === null) {
+            throw new \Exception(sprintf('Class "%s" have no identifier', $classMetaData->getName()));
+        }
     }
 }

@@ -59,116 +59,103 @@ class AttributesLoader implements LoaderInterface
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
-        $serializerClassMetadata = $this->serializerClassMetadataFactory ? $this->serializerClassMetadataFactory->getMetadataFor($classMetadata->getName()) : null;
+        $reflectionClass = $classMetadata->getReflectionClass();
 
-        // Use Serializer metadata if applicable
-        if ($serializerClassMetadata && (null !== $normalizationGroups || null !== $denormalizationGroups)) {
-            foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
-                if ('id' === $name = $normalizationAttribute->getName()) {
-                    continue;
-                }
+        // Methods
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
 
-                if (null !== $normalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        $name,
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setReadable(true);
-                }
-
-                if (null !== $denormalizationGroups && count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups))) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        $name,
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setWritable(true);
-                }
-            }
-        }
-
-        // Fallback to reflection
-        if (null === $normalizationGroups || null === $denormalizationGroups) {
-            $reflectionClass = $classMetadata->getReflectionClass();
-
-            // Methods
-            foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-                if ('getId' === $reflectionMethod->name || 'setId' === $reflectionMethod->name) {
-                    continue;
-                }
-
-                $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
-
-                // Setters
-                if (
-                    null === $denormalizationGroups &&
-                    $numberOfRequiredParameters <= 1 &&
-                    preg_match('/^(set|add|remove)(.+)$/i', $reflectionMethod->name, $matches)
-                ) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        lcfirst($matches[2]),
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setWritable(true);
-
-                    continue;
-                }
-
-                if (0 !== $numberOfRequiredParameters) {
-                    continue;
-                }
-
-                // Getters and hassers
-                if (
-                    null === $normalizationGroups &&
-                    (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0)
-                ) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        lcfirst(substr($reflectionMethod->name, 3)),
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setReadable(true);
-
-                    continue;
-                }
-
-                // Issers
-                if (null === $normalizationGroups && strpos($reflectionMethod->name, 'is') === 0) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        lcfirst(substr($reflectionMethod->name, 2)),
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setReadable(true);
-                }
-            }
-
-            // Properties
-            foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
-                if ('id' === $reflectionProperty->name) {
-                    continue;
-                }
-
+            // Setters
+            if (
+                $numberOfRequiredParameters <= 1 &&
+                preg_match('/^(set|add|remove)(.+)$/i', $reflectionMethod->name, $matches)
+            ) {
                 $attribute = $this->getOrCreateAttribute(
                     $classMetadata,
-                    $reflectionProperty->name,
+                    lcfirst($matches[2]),
                     $normalizationGroups,
                     $denormalizationGroups
                 );
-                if (null === $normalizationGroups) {
-                    $attribute->setReadable(true);
+                $attribute->setWritable(true);
+
+                continue;
+            }
+
+            if (0 !== $numberOfRequiredParameters) {
+                continue;
+            }
+
+            // Getters and hassers
+            if (
+                (strpos($reflectionMethod->name, 'get') === 0 || strpos($reflectionMethod->name, 'has') === 0)
+            ) {
+                $attribute = $this->getOrCreateAttribute(
+                    $classMetadata,
+                    lcfirst(substr($reflectionMethod->name, 3)),
+                    $normalizationGroups,
+                    $denormalizationGroups
+                );
+                $attribute->setReadable(true);
+
+                continue;
+            }
+
+            // Issers
+            if (strpos($reflectionMethod->name, 'is') === 0) {
+                $attribute = $this->getOrCreateAttribute(
+                    $classMetadata,
+                    lcfirst(substr($reflectionMethod->name, 2)),
+                    $normalizationGroups,
+                    $denormalizationGroups
+                );
+
+                $attribute->setReadable(true);
+            }
+        }
+
+        // Properties
+        foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
+
+            $attribute = $this->getOrCreateAttribute(
+                $classMetadata,
+                $reflectionProperty->name,
+                $normalizationGroups,
+                $denormalizationGroups
+            );
+
+            $attribute->setReadable(true);
+            $attribute->setWritable(true);
+        }
+
+        if (null === $normalizationGroups && null === $denormalizationGroups) {
+            return true;
+        }
+
+        $serializerClassMetadata = $this->serializerClassMetadataFactory ? $this->serializerClassMetadataFactory->getMetadataFor($classMetadata->getName()) : null;
+
+        // Use Serializer metadata if applicable
+        if ($serializerClassMetadata) {
+            foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
+
+                $name = $normalizationAttribute->getName();
+                if (null !== $normalizationGroups) {
+                    $attribute = $this->getOrCreateAttribute(
+                        $classMetadata,
+                        $name,
+                        $normalizationGroups,
+                        $denormalizationGroups
+                    );
+                    $attribute->setReadable(count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups)) > 0);
                 }
 
-                if (null === $denormalizationGroups) {
-                    $attribute->setWritable(true);
+                if (null !== $denormalizationGroups) {
+                    $attribute = $this->getOrCreateAttribute(
+                        $classMetadata,
+                        $name,
+                        $normalizationGroups,
+                        $denormalizationGroups
+                    );
+                    $attribute->setWritable(count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups)) > 0);
                 }
             }
         }

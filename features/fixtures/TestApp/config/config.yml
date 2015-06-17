@@ -130,3 +130,13 @@ services:
                                       arguments:
                                           -      { groups: [ "circular" ] }
         tags:                       [ { name: "api.resource" } ]
+
+    custom_identifier_resource:
+        parent:                     "api.resource"
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomIdentifierDummy" ]
+        tags:                       [ { name: "api.resource" } ]
+
+    custom_writable_identifier_resource:
+        parent:                     "api.resource"
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomWritableIdentifierDummy" ]
+        tags:                       [ { name: "api.resource" } ]
