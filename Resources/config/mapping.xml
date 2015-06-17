@@ -16,7 +16,10 @@
 
         <!-- Cache -->
 
-        <service id="api.cache_warmer.metadata" class="Dunglas\ApiBundle\CacheWarmer\MetadataCacheWarmer">
+        <service id="api.cache_warmer.metadata" class="Dunglas\ApiBundle\CacheWarmer\MetadataCacheWarmer" public="false">
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.mapping.class_metadata_factory" />
+
             <tag name="kernel.cache_warmer" priority="0" />
         </service>
 

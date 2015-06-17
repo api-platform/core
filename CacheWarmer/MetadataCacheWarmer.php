@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\CacheWarmer;
 
-use Dunglas\ApiBundle\JsonLd\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
