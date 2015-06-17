@@ -94,7 +94,7 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
 
 ## Other resources
 
-* (french) [A la découverte de API Platform (Symfony Paris Live 2015)](http://dunglas.fr/2015/04/mes-slides-du-symfony-live-2015-a-la-decouverte-de-api-platform/)
+* (french) [A la découverte de API Platform (Symfony Live Paris 2015)](http://dunglas.fr/2015/04/mes-slides-du-symfony-live-2015-a-la-decouverte-de-api-platform/)
 * (french) [API-first et Linked Data avec Symfony (sfPot Lille 2015)](http://les-tilleuls.coop/slides/dunglas/slides-sfPot-2015-01-15/#/)
 
 ## Credits
