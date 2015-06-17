@@ -22,7 +22,7 @@ nelmio_api_doc:
                 json:       "application/json"
 ```
 
-Please note that NelmioApiDocBundle has sandbox limitations, so you cannot use it to deserialize nested objects.
+Please note that NelmioApiDocBundle has a sandbox limitation where you cannot pass a JSON array as parameter, so you cannot use it to deserialize nested objects.
 
 Previous chapter: [Getting Started](getting-started.md)<br>
 Next chapter: [Operations](operations.md)
