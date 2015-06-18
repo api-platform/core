@@ -1,33 +1,32 @@
+# Resources
+
+The default `Resource` class provided by the bundle is sufficient for small projects. If your app grows, using custom resources
+can become necessary.
+
+## Using a custom `Resource` class
+
+When the size of your services definition start to grow, it is useful to create custom resources instead of using the default
+one. To do so, the `Dunglas\ApiBundle\Api\ResourceInterface` interface must be implemented.
+
+```php
 <?php
 
-/*
- * This file is part of the DunglasApiBundle package.
- *
- * (c) Kévin Dunglas <dunglas@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+// src/AppBundle/Api/MyCustomResource.php
 
-namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Api;
+namespace AppBundle\Api;
 
-use Dunglas\ApiBundle\Api\Operation\Operation;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\Routing\Route;
 
-/**
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class CustomResource implements ResourceInterface
+class MyCustomResource implements ResourceInterface
 {
     public function getEntityClass()
     {
-        return 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Custom';
+        return 'AppBundle\Entity\MyCustomOne';
     }
 
     public function getShortName()
     {
-        return 'Custom';
+        return 'MyCustomOne';
     }
 
     public function getItemOperations()
@@ -105,3 +104,17 @@ class CustomResource implements ResourceInterface
         return '';
     }
 }
+```
+
+The service definition can now be simplified:
+
+```yaml
+services:
+    custom_resource:
+        parent: "api.resource"
+        class:  "AppBundle\Api\MyCustomResource"
+        tags:   [ { name: "api.resource" } ]
+```
+
+Previous chapter: [The event system](the-event-system.md)<br>
+Next chapter: [Controllers](controllers.md)
