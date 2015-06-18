@@ -85,6 +85,22 @@ interface ResourceInterface
     public function getValidationGroups();
 
     /**
+     * Is the pagination enabled for this resource?
+     *
+     * @return bool
+     */
+    public function isPaginationEnabled();
+
+    /**
+     * Returns the number of items by page.
+     *
+     * Only applicable if the pagination is enabled.
+     *
+     * @return float
+     */
+    public function getItemsPerPage();
+
+    /**
      * Gets the short name (display name) of the resource.
      *
      * @return string

@@ -34,6 +34,9 @@ class ResourcePass implements CompilerPassInterface
         $resourceCollectionDefinition = $container->getDefinition('api.resource_collection');
         $resourceReferences = [];
 
+        $defaultPaginationEnabled = $container->getParameter('api.collection.pagination.enabled');
+        $defaultItemsPerPage = $container->getParameter('api.collection.pagination.items_per_page.number');
+
         foreach ($container->findTaggedServiceIds('api.resource') as $serviceId => $tags) {
             $resourceReferences[] = new Reference($serviceId);
             $resourceDefinition = $container->getDefinition($serviceId);
@@ -55,6 +58,14 @@ class ResourcePass implements CompilerPassInterface
                     $this->createOperation($container, $serviceId, 'GET', true),
                     $this->createOperation($container, $serviceId, 'POST', true),
                 ]]);
+            }
+
+            if (!$resourceDefinition->hasMethodCall('initPaginationEnabled')) {
+                $resourceDefinition->addMethodCall('initPaginationEnabled', [$defaultPaginationEnabled]);
+            }
+
+            if (!$resourceDefinition->hasMethodCall('initItemsPerPage')) {
+                $resourceDefinition->addMethodCall('initItemsPerPage', [$defaultItemsPerPage]);
             }
         }
 

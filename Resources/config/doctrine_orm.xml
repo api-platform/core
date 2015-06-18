@@ -20,7 +20,6 @@
             <argument type="service" id="doctrine" />
             <argument>%api.collection.order%</argument>
             <argument>%api.collection.pagination.page_parameter_name%</argument>
-            <argument>%api.collection.pagination.items_per_page.number%</argument>
             <argument>%api.collection.pagination.items_per_page.enable_client_request%</argument>
             <argument>%api.collection.pagination.items_per_page.parameter_name%</argument>
 

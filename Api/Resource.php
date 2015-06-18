@@ -50,6 +50,14 @@ class Resource implements ResourceInterface
      */
     private $validationGroups;
     /**
+     * @var bool
+     */
+    private $paginationEnabled = true;
+    /**
+     * @var float
+     */
+    private $itemsPerPage = 30.;
+    /**
      * @var string|null
      */
     private $shortName;
@@ -205,6 +213,42 @@ class Resource implements ResourceInterface
     public function getValidationGroups()
     {
         return $this->validationGroups;
+    }
+
+    /**
+     * Enables or disables pagination.
+     *
+     * @param bool $paginationEnabled
+     */
+    public function initPaginationEnabled($paginationEnabled)
+    {
+        $this->paginationEnabled = $paginationEnabled;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPaginationEnabled()
+    {
+        return $this->paginationEnabled;
+    }
+
+    /**
+     * Initializes the number of items per page.
+     *
+     * @param float $itemsPerPage
+     */
+    public function initItemsPerPage($itemsPerPage)
+    {
+        $this->itemsPerPage = $itemsPerPage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemsPerPage()
+    {
+        return $this->itemsPerPage;
     }
 
     /**

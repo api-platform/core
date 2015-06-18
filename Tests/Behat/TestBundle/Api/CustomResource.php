@@ -65,6 +65,16 @@ class CustomResource implements ResourceInterface
         return;
     }
 
+    public function isPaginationEnabled()
+    {
+        return false;
+    }
+
+    public function getItemsPerPage()
+    {
+        return 0.;
+    }
+
     public function getShortName()
     {
         return 'Custom';

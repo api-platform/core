@@ -46,6 +46,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('order')->defaultNull()->info('The default order of results.')->end()
                         ->arrayNode('pagination')
+                            ->canBeDisabled()
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The name of the parameter handling the page number.')->end()

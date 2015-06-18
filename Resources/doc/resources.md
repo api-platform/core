@@ -23,13 +23,13 @@ class MyCustomResource implements ResourceInterface
     {
         return 'AppBundle\Entity\MyCustomOne';
     }
-    
+
     public function getItemOperations() {
         return [
             new MyItemOperation();
         ];
     }
-    
+
     public function getCollectionOperations()
     {
         return [
@@ -51,7 +51,7 @@ class MyCustomResource implements ResourceInterface
     {
         return null;
     }
-    
+
     public function getDenormalizationContext()
     {
         return [];
@@ -65,6 +65,16 @@ class MyCustomResource implements ResourceInterface
     public function getValidationGroups()
     {
         return null;
+    }
+
+    public function isPaginationEnabled()
+    {
+        return false;
+    }
+
+    public function getItemsPerPage()
+    {
+        return 0.;
     }
 
     public function getShortName()
