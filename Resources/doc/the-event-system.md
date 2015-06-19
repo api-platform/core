@@ -45,7 +45,7 @@ namespace AppBundle\EventListener;
 
 use AppBundle\Entity\MyObject;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\JsonApiBundle\Event\DataEvent;
+use Dunglas\ApiBundle\Event\DataEvent;
 
 class MyEventListener
 {
@@ -68,7 +68,7 @@ class MyEventListener
 ```yaml
 # app/config/services.yml
 
-services: 
+services:
     my_event_listener:
         class: "AppBundle\EventListener\MyEventListener"
         tags:  [ { name: "kernel.event_listener", event: "api.post_create", method: "onPostCreate" } ]
