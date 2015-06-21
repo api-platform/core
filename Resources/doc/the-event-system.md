@@ -9,28 +9,28 @@ and [by Doctrine ORM](http://doctrine-orm.readthedocs.org/en/latest/reference/ev
 
 ## Retrieving list
 
-- `api.retrieve_list` (`Dunglas\ApiBundle\Event::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
+- `api.retrieve_list` (`Dunglas\ApiBundle\Event\Events::RETRIEVE_LIST`): occurs after the retrieving of an object list during a `GET` request on a collection.
 
 ## Retrieving item
 
-- `api.retrieve` (`Dunglas\ApiBundle\Event::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
+- `api.retrieve` (`Dunglas\ApiBundle\Event\Events::RETRIEVE_LIST`): after the retrieving of an object during a `GET` request on an item.
 
 ## Creating item
 
-- `api.pre_create_validation` (`Dunglas\ApiBundle\Event::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
-- `api.pre_create` (`Dunglas\ApiBundle\Event::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
-- `api.post_create` (`Dunglas\ApiBundle\Event::POST_CREATE`): event occurs after the object persistence during `POST` request
+- `api.pre_create_validation` (`Dunglas\ApiBundle\Event\Events::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
+- `api.pre_create` (`Dunglas\ApiBundle\Event\Events::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
+- `api.post_create` (`Dunglas\ApiBundle\Event\Events::POST_CREATE`): event occurs after the object persistence during `POST` request
 
 ## Updating item
 
-- `api.pre_update_validation` (`Dunglas\ApiBundle\Event::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
-- `api.pre_update` (`Dunglas\ApiBundle\Event::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
-- `api.post_update` (`Dunglas\ApiBundle\Event::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
+- `api.pre_update_validation` (`Dunglas\ApiBundle\Event\Events::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
+- `api.pre_update` (`Dunglas\ApiBundle\Event\Events::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
+- `api.post_update` (`Dunglas\ApiBundle\Event\Events::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
 
 ## Deleting item
 
-- `api.pre_delete` (`Dunglas\ApiBundle\Event::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
-- `api.post_delete` (`Dunglas\ApiBundle\Event::POST_DELETE`): occurs after the object deletion during a `DELETE` request
+- `api.pre_delete` (`Dunglas\ApiBundle\Event\Events::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
+- `api.post_delete` (`Dunglas\ApiBundle\Event\Events::POST_DELETE`): occurs after the object deletion during a `DELETE` request
 
 ## Registering an event listener
 
