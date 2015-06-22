@@ -217,6 +217,36 @@ Feature: Relations support
     }
     """
 
+  Scenario: Update an embedded relation
+    When I send a "PUT" request to "/relation_embedders/2" with body:
+    """
+      {
+        "anotherRelated": {
+          "@id": "/related_dummies/2",
+          "symfony": "API Platform"
+        }
+      }
+      """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelationEmbedder",
+      "@id": "/relation_embedders/2",
+      "@type": "RelationEmbedder",
+      "krondstadt": "Krondstadt",
+      "anotherRelated": {
+        "@id": "/related_dummies/2",
+        "@type": "https://schema.org/Product",
+        "symfony": "API Platform",
+        "thirdLevel": null
+      },
+      "related": null
+    }
+    """
+
   @dropSchema
   Scenario: Update an existing relation
     When I send a "POST" request to "/relation_embedders" with body:
