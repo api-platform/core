@@ -16,7 +16,7 @@ Feature: Circular references handling
       "parent": "/circular_references/1"
     }
     """
-    Then the response status code should be 202
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And print last JSON response
