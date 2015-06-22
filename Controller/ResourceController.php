@@ -252,7 +252,7 @@ class ResourceController extends Controller
             // Validation succeed
             $this->get('event_dispatcher')->dispatch(Events::PRE_UPDATE, new DataEvent($resource, $object));
 
-            return $this->getSuccessResponse($resource, $object, 202);
+            return $this->getSuccessResponse($resource, $object);
         }
 
         return $this->getErrorResponse($violations);
