@@ -34,8 +34,6 @@ class ResourcePass implements CompilerPassInterface
         $resourceCollectionDefinition = $container->getDefinition('api.resource_collection');
         $resourceReferences = [];
 
-        $defaultItemsPerPage = $container->getParameter('api.collection.pagination.items_per_page.default');
-
         foreach ($container->findTaggedServiceIds('api.resource') as $serviceId => $tags) {
             $resourceReferences[] = new Reference($serviceId);
             $resourceDefinition = $container->getDefinition($serviceId);

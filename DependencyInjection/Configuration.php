@@ -70,15 +70,3 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 }
-
-/*
-pagination:
-  enabled: true
-  client_can_enable: false
-  enable_parameter: "enablePagination"
-  page_parameter: "page"
-  items_per_page:
-    default: 30
-    client_can_change: false
-    parameter: itemsPerPage
-*/
