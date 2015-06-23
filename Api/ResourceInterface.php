@@ -15,7 +15,7 @@ use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\Operation\OperationInterface;
 
 /**
- * Class representing an API resource.
+ * An API resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -27,6 +27,13 @@ interface ResourceInterface
      * @return string
      */
     public function getEntityClass();
+
+    /**
+     * Gets the short name (display name) of the resource.
+     *
+     * @return string
+     */
+    public function getShortName();
 
     /**
      * Get item operations.
@@ -89,7 +96,14 @@ interface ResourceInterface
      *
      * @return bool
      */
-    public function isPaginationEnabled();
+    public function isPaginationEnabledByDefault();
+
+    /**
+     * Is the client allowed to enable or disable pagination?
+     *
+     * @return bool
+     */
+    public function isClientAllowedToEnablePagination();
 
     /**
      * Returns the number of items by page.
@@ -98,12 +112,33 @@ interface ResourceInterface
      *
      * @return float
      */
-    public function getItemsPerPage();
+    public function getItemsPerPageByDefault();
 
     /**
-     * Gets the short name (display name) of the resource.
+     * Is the client allowed to set the number of items per page?
+     *
+     * @return bool
+     */
+    public function isClientAllowedToChangeItemsPerPage();
+
+    /**
+     * Gets the query parameter to use client-side to enabled or disable the pagination.
      *
      * @return string
      */
-    public function getShortName();
+    public function getEnablePaginationParameter();
+
+    /**
+     * Gets the query parameter to use client-side to request the page.
+     *
+     * @return string
+     */
+    public function getPageParameter();
+
+    /**
+     * Gets the query parameter to use client-side to change the number of items per page.
+     *
+     * @return string
+     */
+    public function getItemsPerPageParameter();
 }

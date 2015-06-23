@@ -52,11 +52,31 @@ class Resource implements ResourceInterface
     /**
      * @var bool
      */
-    private $paginationEnabled = true;
+    private $paginationEnabledByDefault = false;
+    /**
+     * @var bool
+     */
+    private $clientAllowedToEnablePagination = false;
     /**
      * @var float
      */
-    private $itemsPerPage = 30.;
+    private $itemsPerPageByDefault = 30.;
+    /**
+     * @var bool
+     */
+    private $clientAllowedToChangeItemsPerPage = false;
+    /**
+     * @var string
+     */
+    private $enablePaginationParameter;
+    /**
+     * @var string
+     */
+    private $pageParameter;
+    /**
+     * @var string
+     */
+    private $itemsPerPageParameter;
     /**
      * @var string|null
      */
@@ -216,39 +236,129 @@ class Resource implements ResourceInterface
     }
 
     /**
-     * Enables or disables pagination.
-     *
-     * @param bool $paginationEnabled
+     * {@inheritdoc}
      */
-    public function initPaginationEnabled($paginationEnabled)
+    public function isPaginationEnabledByDefault()
     {
-        $this->paginationEnabled = $paginationEnabled;
+        return $this->paginationEnabledByDefault;
+    }
+
+    /**
+     * Initializes the default pagination status.
+     *
+     * @param bool $paginationEnabledByDefault
+     */
+    public function initPaginationEnabledByDefault($paginationEnabledByDefault)
+    {
+        $this->paginationEnabledByDefault = $paginationEnabledByDefault;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isPaginationEnabled()
+    public function isClientAllowedToEnablePagination()
     {
-        return $this->paginationEnabled;
+        return $this->clientAllowedToEnablePagination;
     }
 
     /**
-     * Initializes the number of items per page.
+     * Initializes if the pagination can be enabled client-side.
      *
-     * @param float $itemsPerPage
+     * @param bool $clientAllowedToEnablePagination
      */
-    public function initItemsPerPage($itemsPerPage)
+    public function initClientAllowedToEnablePagination($clientAllowedToEnablePagination)
     {
-        $this->itemsPerPage = $itemsPerPage;
+        $this->clientAllowedToEnablePagination = $clientAllowedToEnablePagination;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getItemsPerPage()
+    public function getItemsPerPageByDefault()
     {
-        return $this->itemsPerPage;
+        return $this->itemsPerPageByDefault;
+    }
+
+    /**
+     * Initializes the default number of items per page.
+     *
+     * @param float $itemsPerPageByDefault
+     */
+    public function initItemsPerPageByDefault($itemsPerPageByDefault)
+    {
+        $this->itemsPerPageByDefault = $itemsPerPageByDefault;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isClientAllowedToChangeItemsPerPage()
+    {
+        return $this->clientAllowedToChangeItemsPerPage;
+    }
+
+    /**
+     * Initializes if the client is allowed to change the number of items per page.
+     *
+     * @param bool $clientAllowedToChangeItemsPerPage
+     */
+    public function initClientAllowedToChangeItemsPerPage($clientAllowedToChangeItemsPerPage)
+    {
+        $this->clientAllowedToChangeItemsPerPage = $clientAllowedToChangeItemsPerPage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEnablePaginationParameter()
+    {
+        return $this->enablePaginationParameter;
+    }
+
+    /**
+     * Initializes the query parameter to enable or disable the pagination.
+     *
+     * @param string $enablePaginationParameter
+     */
+    public function initEnablePaginationParameter($enablePaginationParameter)
+    {
+        $this->enablePaginationParameter = $enablePaginationParameter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageParameter()
+    {
+        return $this->pageParameter;
+    }
+
+    /**
+     * Initializes the query parameter to request a page.
+     *
+     * @param string $pageParameter
+     */
+    public function initPageParameter($pageParameter)
+    {
+        $this->pageParameter = $pageParameter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemsPerPageParameter()
+    {
+        return $this->itemsPerPageParameter;
+    }
+
+    /**
+     * Initializes the query parameter to set the number of items per page.
+     *
+     * @param string $itemsPerPageParameter
+     */
+    public function initItemsPerPageParameter($itemsPerPageParameter)
+    {
+        $this->itemsPerPageParameter = $itemsPerPageParameter;
     }
 
     /**

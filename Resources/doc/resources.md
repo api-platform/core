@@ -24,24 +24,26 @@ class MyCustomResource implements ResourceInterface
         return 'AppBundle\Entity\MyCustomOne';
     }
 
-    public function getItemOperations() {
-        return [
-            new MyItemOperation();
-        ];
+    public function getShortName()
+    {
+        return 'MyCustomOne';
+    }
+
+    public function getItemOperations()
+    {
+        return [new Operation(new Route('/customs/{id}'), 'custom_item')];
     }
 
     public function getCollectionOperations()
     {
-        return [
-            new MyCollectionOperation();
-        ];
+        return [new Operation(new Route('/customs'), 'custom_collection')];
     }
 
     public function getFilters()
     {
         return [];
     }
-    
+
     public function getNormalizationContext()
     {
         return [];
@@ -49,7 +51,7 @@ class MyCustomResource implements ResourceInterface
 
     public function getNormalizationGroups()
     {
-        return null;
+        return;
     }
 
     public function getDenormalizationContext()
@@ -59,27 +61,47 @@ class MyCustomResource implements ResourceInterface
 
     public function getDenormalizationGroups()
     {
-        return null;
+        return;
     }
 
     public function getValidationGroups()
     {
-        return null;
+        return;
     }
 
-    public function isPaginationEnabled()
+    public function isPaginationEnabledByDefault()
     {
         return false;
     }
 
-    public function getItemsPerPage()
+    public function isClientAllowedToEnablePagination()
+    {
+        return false;
+    }
+
+    public function getItemsPerPageByDefault()
     {
         return 0.;
     }
 
-    public function getShortName()
+    public function isClientAllowedToChangeItemsPerPage()
     {
-        return 'MyCustomOne';
+        return false;
+    }
+
+    public function getEnablePaginationParameter()
+    {
+        return '';
+    }
+
+    public function getPageParameter()
+    {
+        return '';
+    }
+
+    public function getItemsPerPageParameter()
+    {
+        return '';
     }
 }
 ```

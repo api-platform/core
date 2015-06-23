@@ -34,8 +34,7 @@ class ResourcePass implements CompilerPassInterface
         $resourceCollectionDefinition = $container->getDefinition('api.resource_collection');
         $resourceReferences = [];
 
-        $defaultPaginationEnabled = $container->getParameter('api.collection.pagination.enabled');
-        $defaultItemsPerPage = $container->getParameter('api.collection.pagination.items_per_page.number');
+        $defaultItemsPerPage = $container->getParameter('api.collection.pagination.items_per_page.default');
 
         foreach ($container->findTaggedServiceIds('api.resource') as $serviceId => $tags) {
             $resourceReferences[] = new Reference($serviceId);
@@ -45,28 +44,48 @@ class ResourcePass implements CompilerPassInterface
                 continue;
             }
 
-            if (!$resourceDefinition->hasMethodCall('initItemOperations')) {
-                $resourceDefinition->addMethodCall('initItemOperations', [[
-                    $this->createOperation($container, $serviceId, 'GET', false),
-                    $this->createOperation($container, $serviceId, 'PUT', false),
-                    $this->createOperation($container, $serviceId, 'DELETE', false),
-                ]]);
-            }
+            $this->setDefaultValue($resourceDefinition, 'initItemOperations', [[
+                $this->createOperation($container, $serviceId, 'GET', false),
+                $this->createOperation($container, $serviceId, 'PUT', false),
+                $this->createOperation($container, $serviceId, 'DELETE', false),
+            ]]);
 
-            if (!$resourceDefinition->hasMethodCall('initCollectionOperations')) {
-                $resourceDefinition->addMethodCall('initCollectionOperations', [[
-                    $this->createOperation($container, $serviceId, 'GET', true),
-                    $this->createOperation($container, $serviceId, 'POST', true),
-                ]]);
-            }
+            $this->setDefaultValue($resourceDefinition, 'initCollectionOperations', [[
+                $this->createOperation($container, $serviceId, 'GET', true),
+                $this->createOperation($container, $serviceId, 'POST', true),
+            ]]);
 
-            if (!$resourceDefinition->hasMethodCall('initPaginationEnabled')) {
-                $resourceDefinition->addMethodCall('initPaginationEnabled', [$defaultPaginationEnabled]);
-            }
+            $this->setDefaultValue($resourceDefinition, 'initPaginationEnabledByDefault', [
+                $container->getParameter('api.collection.pagination.enabled'),
+            ]);
 
-            if (!$resourceDefinition->hasMethodCall('initItemsPerPage')) {
-                $resourceDefinition->addMethodCall('initItemsPerPage', [$defaultItemsPerPage]);
-            }
+            $this->setDefaultValue($resourceDefinition, 'initPaginationEnabledByDefault', [
+                $container->getParameter('api.collection.pagination.enabled'),
+            ]);
+
+            $this->setDefaultValue($resourceDefinition, 'initClientAllowedToEnablePagination', [
+                $container->getParameter('api.collection.pagination.client_can_enable'),
+            ]);
+
+            $this->setDefaultValue($resourceDefinition, 'initEnablePaginationParameter', [
+                $container->getParameter('api.collection.pagination.enable_parameter'),
+            ]);
+
+            $this->setDefaultValue($resourceDefinition, 'initPageParameter', [
+                $container->getParameter('api.collection.pagination.page_parameter'),
+            ]);
+
+            $this->setDefaultValue($resourceDefinition, 'initItemsPerPageByDefault', [
+                $container->getParameter('api.collection.pagination.items_per_page.default'),
+            ]);
+
+            $this->setDefaultValue($resourceDefinition, 'initClientAllowedToChangeItemsPerPage', [
+                $container->getParameter('api.collection.pagination.items_per_page.client_can_change'),
+            ]);
+
+            $this->setDefaultValue($resourceDefinition, 'initItemsPerPageParameter', [
+                $container->getParameter('api.collection.pagination.items_per_page.parameter'),
+            ]);
         }
 
         $resourceCollectionDefinition->addMethodCall('init', [$resourceReferences]);
@@ -121,6 +140,13 @@ class ResourcePass implements CompilerPassInterface
 
         if ($definition instanceof DefinitionDecorator) {
             return $container->getDefinition($definition->getParent())->getClass();
+        }
+    }
+
+    private function setDefaultValue(Definition $definition, $method, $values)
+    {
+        if (!$definition->hasMethodCall($method)) {
+            $definition->addMethodCall($method, $values);
         }
     }
 }

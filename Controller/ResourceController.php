@@ -148,7 +148,7 @@ class ResourceController extends Controller
         $data = $this->getCollectionData($resource, $request);
 
         if (
-            $request->get($this->container->getParameter('api.collection.pagination.page_parameter_name')) &&
+            $request->get($resource->getPageParameter()) &&
             0 === count($data)
         ) {
             throw $this->createNotFoundException();

@@ -16,6 +16,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Model\PaginationTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -25,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DataProvider implements DataProviderInterface
 {
+    use PaginationTrait;
+
     /**
      * @var ManagerRegistry
      */
@@ -33,38 +36,15 @@ class DataProvider implements DataProviderInterface
      * @var string|null
      */
     private $order;
-    /**
-     * @var string
-     */
-    private $pageParameter;
-    /**
-     * @var bool
-     */
-    private $enableClientRequestItemsPerPage;
-    /**
-     * @var string
-     */
-    private $itemsPerPageParameter;
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param string|null     $order
-     * @param string          $pageParameter
-     * @param bool            $enableClientRequestItemsPerPage
-     * @param string          $itemsPerPageParameter
      */
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        $order,
-        $pageParameter,
-        $enableClientRequestItemsPerPage,
-        $itemsPerPageParameter
-    ) {
+    public function __construct(ManagerRegistry $managerRegistry, $order)
+    {
         $this->managerRegistry = $managerRegistry;
         $this->order = $order;
-        $this->pageParameter = $pageParameter;
-        $this->enableClientRequestItemsPerPage = $enableClientRequestItemsPerPage;
-        $this->itemsPerPageParameter = $itemsPerPageParameter;
     }
 
     /**
@@ -93,18 +73,11 @@ class DataProvider implements DataProviderInterface
         $repository = $manager->getRepository($entityClass);
         $queryBuilder = $repository->createQueryBuilder('o');
 
-        $paginationEnabled = $resource->isPaginationEnabled();
-        if ($paginationEnabled) {
-            $page = (int)$request->get($this->pageParameter, 1);
-
-            if ($this->enableClientRequestItemsPerPage && $requestedItemsPerPage = $request->get($this->itemsPerPageParameter)) {
-                $itemsPerPage = (int)$requestedItemsPerPage;
-            } else {
-                $itemsPerPage = $resource->getItemsPerPage();
-            }
+        if ($paginationEnabled = $this->isPaginationEnabled($resource, $request)) {
+            $itemsPerPage = $this->getItemsPerPage($resource, $request);
 
             $queryBuilder
-                ->setFirstResult(($page - 1) * $itemsPerPage)
+                ->setFirstResult(($this->getPage($resource, $request) - 1) * $itemsPerPage)
                 ->setMaxResults($itemsPerPage)
             ;
         }

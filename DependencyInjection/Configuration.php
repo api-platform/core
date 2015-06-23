@@ -49,13 +49,15 @@ class Configuration implements ConfigurationInterface
                             ->canBeDisabled()
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The name of the parameter handling the page number.')->end()
+                                ->booleanNode('client_can_enable')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
+                                ->scalarNode('enable_parameter')->defaultValue('enablePagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
+                                ->scalarNode('page_parameter')->defaultValue('page')->cannotBeEmpty()->info('The name of the parameter handling the page number.')->end()
                                 ->arrayNode('items_per_page')
                                     ->addDefaultsIfNotSet()
                                     ->children()
-                                        ->integerNode('number')->min(1)->defaultValue(30)->cannotBeEmpty()->info('The default number of items perm page in collections.')->end()
-                                        ->booleanNode('enable_client_request')->defaultValue(false)->info('Allow the client to change the number of elements by page.')->end()
-                                        ->scalarNode('parameter_name')->defaultValue('itemsPerPage')->info('The name of the parameter to change the number of elements by page client side.')->end()
+                                        ->integerNode('default')->min(1)->defaultValue(30)->cannotBeEmpty()->info('The default number of items perm page in collections.')->end()
+                                        ->booleanNode('client_can_change')->defaultValue(false)->info('Allow the client to change the number of elements by page.')->end()
+                                        ->scalarNode('parameter')->defaultValue('itemsPerPage')->info('The name of the parameter to change the number of elements by page client side.')->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -68,3 +70,15 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 }
+
+/*
+pagination:
+  enabled: true
+  client_can_enable: false
+  enable_parameter: "enablePagination"
+  page_parameter: "page"
+  items_per_page:
+    default: 30
+    client_can_change: false
+    parameter: itemsPerPage
+*/
