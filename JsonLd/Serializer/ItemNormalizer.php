@@ -14,14 +14,13 @@ namespace Dunglas\ApiBundle\JsonLd\Serializer;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Api\ResourceResolverTrait;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Exception\RuntimeException;
+use Dunglas\ApiBundle\Api\ResourceResolver;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
-use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
@@ -37,7 +36,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ItemNormalizer extends AbstractNormalizer
 {
-    use ResourceResolverTrait;
     use ContextTrait;
 
     /**
@@ -61,6 +59,10 @@ class ItemNormalizer extends AbstractNormalizer
      * @var ContextBuilder
      */
     private $contextBuilder;
+    /**
+     * @var ResourceResolver
+     */
+    private $resourceResolver;
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
@@ -68,6 +70,7 @@ class ItemNormalizer extends AbstractNormalizer
         ClassMetadataFactoryInterface $apiClassMetadataFactory,
         ContextBuilder $contextBuilder,
         PropertyAccessorInterface $propertyAccessor,
+        ResourceResolver $resourceResolver,
         NameConverterInterface $nameConverter = null
     ) {
         parent::__construct(null, $nameConverter);
@@ -77,6 +80,7 @@ class ItemNormalizer extends AbstractNormalizer
         $this->apiClassMetadataFactory = $apiClassMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor;
+        $this->resourceResolver = $resourceResolver;
 
         $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
@@ -108,7 +112,7 @@ class ItemNormalizer extends AbstractNormalizer
             return $this->handleCircularReference($object);
         }
 
-        $resource = $this->guessResource($object, $context, true);
+        $resource = $this->resourceResolver->guessResource($object, $context, true);
 
         $data = [];
         if (!isset($context['jsonld_has_context'])) {
@@ -141,7 +145,7 @@ class ItemNormalizer extends AbstractNormalizer
                 $type &&
                 $type->isCollection() &&
                 ($collectionType = $type->getCollectionType()) &&
-                $subResource = $this->getResourceFromType($collectionType)
+                $subResource = $this->resourceResolver->getResourceFromType($collectionType)
             ) {
                 $values = [];
                 foreach ($attributeValue as $index => $obj) {
@@ -153,7 +157,7 @@ class ItemNormalizer extends AbstractNormalizer
                 continue;
             }
 
-            if ($attributeValue && $type && $subResource = $this->getResourceFromType($type)) {
+            if ($attributeValue && $type && $subResource = $this->resourceResolver->getResourceFromType($type)) {
                 $data[$attributeName] = $this->normalizeRelation($attributeMetadata, $attributeValue, $subResource, $context);
 
                 continue;
@@ -185,7 +189,7 @@ class ItemNormalizer extends AbstractNormalizer
             throw new RuntimeException('The serializer must implement the DenormalizerInterface to denormalize relations.');
         }
 
-        $resource = $this->guessResource($data, $context, true);
+        $resource = $this->resourceResolver->guessResource($data, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
         $attributesMetadata = $this->getMetadata($resource, $context)->getAttributesMetadata();
