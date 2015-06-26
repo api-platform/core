@@ -31,7 +31,7 @@ services:
     resource.product.collection_operation.get:
         class:     "Dunglas\ApiBundle\Api\Operation\Operation"
         public:    false
-        factory:   [ "@api.operation_factory", "createItemOperation" ]
+        factory:   [ "@api.operation_factory", "createCollectionOperation" ]
         arguments: [ "@resource.product", "GET" ]
 
     resource.product:
