@@ -9,7 +9,6 @@ use Dunglas\ApiBundle\Doctrine\Orm\QueryResultExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 
-
 class PaginationExtension implements QueryResultExtension
 {
     /**
@@ -29,7 +28,8 @@ class PaginationExtension implements QueryResultExtension
 
     /**
      * @param ResourceInterface $resource
-     * @param Request $request
+     * @param Request           $request
+     *
      * @return bool
      */
     public function supportsResult(ResourceInterface $resource, Request $request)

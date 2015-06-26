@@ -37,7 +37,7 @@ class CollectionFiltersEnhancer extends SerializerAwareNormalizer implements Nor
 
     /**
      * @param NormalizerInterface $collectionNormalizer
-     * @param ResourceResolver $resourceResolver
+     * @param ResourceResolver    $resourceResolver
      */
     public function __construct(NormalizerInterface $collectionNormalizer, ResourceResolver $resourceResolver)
     {

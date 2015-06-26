@@ -10,8 +10,8 @@ interface QueryExtension
 {
     /**
      * @param ResourceInterface $resource
-     * @param Request $request
-     * @param QueryBuilder $queryBuilder
+     * @param Request           $request
+     * @param QueryBuilder      $queryBuilder
      */
     public function apply(ResourceInterface $resource, Request $request, QueryBuilder $queryBuilder);
 }

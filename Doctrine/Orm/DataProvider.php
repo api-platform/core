@@ -34,7 +34,7 @@ class DataProvider implements DataProviderInterface
     private $extensions;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry  $managerRegistry
      * @param QueryExtension[] $extensions
      */
     public function __construct(ManagerRegistry $managerRegistry, array $extensions = [])

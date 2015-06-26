@@ -10,7 +10,8 @@ interface QueryResultExtension extends QueryExtension
 {
     /**
      * @param ResourceInterface $resource
-     * @param Request $request
+     * @param Request           $request
+     *
      * @return bool
      */
     public function supportsResult(ResourceInterface $resource, Request $request);

@@ -11,9 +11,6 @@
 
 namespace Dunglas\ApiBundle\Model;
 
-use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 /**
  * Pagination related features for data providers.
  *
@@ -21,5 +18,4 @@ use Symfony\Component\HttpFoundation\Request;
  */
 trait PaginationTrait
 {
-
 }

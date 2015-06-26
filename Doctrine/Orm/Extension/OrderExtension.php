@@ -4,7 +4,6 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Extension;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\QueryExtension;
 use Symfony\Component\HttpFoundation\Request;
 

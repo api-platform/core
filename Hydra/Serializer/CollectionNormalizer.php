@@ -76,7 +76,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
                 '@context' => $this->contextBuilder->getContextUri($resource),
                 '@id' => $context['request_uri'],
                 '@type' => self::HYDRA_COLLECTION,
-                'hydra:member' => []
+                'hydra:member' => [],
             ];
 
             foreach ($object as $obj) {

@@ -41,7 +41,7 @@ class PaginatedCollectionEnhancer extends SerializerAwareNormalizer implements N
 
     /**
      * @param NormalizerInterface $collectionNormalizer
-     * @param ResourceResolver $resourceResolver
+     * @param ResourceResolver    $resourceResolver
      */
     public function __construct(NormalizerInterface $collectionNormalizer, ResourceResolver $resourceResolver)
     {
