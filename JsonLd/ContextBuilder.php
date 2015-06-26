@@ -81,6 +81,21 @@ class ContextBuilder
     }
 
     /**
+     * @param ResourceInterface $resource
+     * @param array             $normalizationContext
+     *
+     * @return array|string
+     */
+    public function getResourceContext(ResourceInterface $resource, array $normalizationContext)
+    {
+        if (isset($normalizationContext['json_ld_context_embedded'])) {
+            return $this->getContext($resource);
+        }
+
+        return $this->getContextUri($resource);
+    }
+
+    /**
      * Builds the JSON-LD context for the given resource.
      *
      * @param ResourceInterface|null $resource
