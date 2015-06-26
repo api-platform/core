@@ -12,11 +12,8 @@
 namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Model\PaginationTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -26,25 +23,32 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DataProvider implements DataProviderInterface
 {
-    use PaginationTrait;
-
     /**
      * @var ManagerRegistry
      */
     private $managerRegistry;
+
     /**
-     * @var string|null
+     * @var QueryExtension[]
      */
-    private $order;
+    private $extensions;
 
     /**
      * @param ManagerRegistry $managerRegistry
-     * @param string|null     $order
+     * @param QueryExtension[] $extensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, $order)
+    public function __construct(ManagerRegistry $managerRegistry, array $extensions = [])
     {
         $this->managerRegistry = $managerRegistry;
-        $this->order = $order;
+        $this->extensions = $extensions;
+    }
+
+    /**
+     * @param QueryExtension $extension
+     */
+    public function addExtension(QueryExtension $extension)
+    {
+        $this->extensions[] = $extension;
     }
 
     /**
@@ -73,27 +77,14 @@ class DataProvider implements DataProviderInterface
         $repository = $manager->getRepository($entityClass);
         $queryBuilder = $repository->createQueryBuilder('o');
 
-        if ($paginationEnabled = $this->isPaginationEnabled($resource, $request)) {
-            $itemsPerPage = $this->getItemsPerPage($resource, $request);
+        foreach ($this->extensions as $extension) {
+            $extension->apply($resource, $request, $queryBuilder);
 
-            $queryBuilder
-                ->setFirstResult(($this->getPage($resource, $request) - 1) * $itemsPerPage)
-                ->setMaxResults($itemsPerPage)
-            ;
-        }
-
-        foreach ($resource->getFilters() as $filter) {
-            if ($filter instanceof FilterInterface) {
-                $filter->apply($resource, $queryBuilder, $request);
+            if ($extension instanceof QueryResultExtension) {
+                if ($extension->supportsResult($resource, $request)) {
+                    return $extension->getResult($queryBuilder);
+                }
             }
-        }
-
-        if (null !== $this->order) {
-            $queryBuilder->addOrderBy('o.id', $this->order);
-        }
-
-        if ($paginationEnabled) {
-            return new Paginator(new DoctrineOrmPaginator($queryBuilder));
         }
 
         return $queryBuilder->getQuery()->getResult();

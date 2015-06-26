@@ -18,7 +18,6 @@
 
         <service id="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider" public="false">
             <argument type="service" id="doctrine" />
-            <argument>%api.collection.order%</argument>
 
             <tag name="api.data_provider" />
         </service>
@@ -36,6 +35,18 @@
 
         <service id="api.doctrine.orm.date_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
+        </service>
+
+        <!-- Doctrine Query extensions -->
+        <service id="api.doctrine.orm.query_extension.filter" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\FilterExtension">
+            <tag name="api.doctrine.orm.query_extension" />
+        </service>
+        <service id="api.doctrine.orm.query_extension.pagination" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\PaginationExtension">
+            <tag name="api.doctrine.orm.query_extension" />
+        </service>
+        <service id="api.doctrine.orm.query_extension.order" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\OrderExtension">
+            <argument>%api.collection.order%</argument>
+            <tag name="api.doctrine.orm.query_extension" />
         </service>
     </services>
 
