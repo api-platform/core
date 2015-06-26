@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Enhance the result of collection by enabling pagination.
+ * Enhance the result of collection by adding the filters applied on collection.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
@@ -37,7 +37,7 @@ class CollectionFiltersEnhancer extends SerializerAwareNormalizer implements Nor
 
     /**
      * @param NormalizerInterface $collectionNormalizer
-     * @param ResourceResolver $resourceResolver
+     * @param ResourceResolver    $resourceResolver
      */
     public function __construct(NormalizerInterface $collectionNormalizer, ResourceResolver $resourceResolver)
     {
@@ -48,7 +48,7 @@ class CollectionFiltersEnhancer extends SerializerAwareNormalizer implements Nor
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
         $resource = $this->resourceResolver->guessResource($object, $context);

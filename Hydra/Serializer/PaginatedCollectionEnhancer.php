@@ -41,7 +41,7 @@ class PaginatedCollectionEnhancer extends SerializerAwareNormalizer implements N
 
     /**
      * @param NormalizerInterface $collectionNormalizer
-     * @param ResourceResolver $resourceResolver
+     * @param ResourceResolver    $resourceResolver
      */
     public function __construct(NormalizerInterface $collectionNormalizer, ResourceResolver $resourceResolver)
     {
@@ -52,7 +52,7 @@ class PaginatedCollectionEnhancer extends SerializerAwareNormalizer implements N
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
         if (isset($context['json_ld_sub_level']) || !$object instanceof PaginatorInterface) {

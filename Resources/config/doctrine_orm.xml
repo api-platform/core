@@ -50,6 +50,18 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
         </service>
 
+        <!-- Doctrine Query extensions -->
+
+        <service id="api.doctrine.orm.query_extension.filter" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\FilterExtension">
+            <tag name="api.doctrine.orm.query_extension" />
+        </service>
+        <service id="api.doctrine.orm.query_extension.pagination" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\PaginationExtension">
+            <tag name="api.doctrine.orm.query_extension" />
+        </service>
+        <service id="api.doctrine.orm.query_extension.order" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\OrderExtension">
+            <argument>%api.collection.order%</argument>
+            <tag name="api.doctrine.orm.query_extension" />
+        </service>
     </services>
 
 </container>
