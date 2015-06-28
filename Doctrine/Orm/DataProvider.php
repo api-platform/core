@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  * Data provider for the Doctrine ORM.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Samuel ROZE <samuel.roze@gmail.com>
  */
 class DataProvider implements DataProviderInterface
 {
@@ -29,13 +30,13 @@ class DataProvider implements DataProviderInterface
     private $managerRegistry;
 
     /**
-     * @var QueryExtension[]
+     * @var QueryExtensionInterface[]
      */
     private $extensions;
 
     /**
-     * @param ManagerRegistry  $managerRegistry
-     * @param QueryExtension[] $extensions
+     * @param ManagerRegistry           $managerRegistry
+     * @param QueryExtensionInterface[] $extensions
      */
     public function __construct(ManagerRegistry $managerRegistry, array $extensions = [])
     {
@@ -44,9 +45,9 @@ class DataProvider implements DataProviderInterface
     }
 
     /**
-     * @param QueryExtension $extension
+     * @param QueryExtensionInterface $extension
      */
-    public function addExtension(QueryExtension $extension)
+    public function addExtension(QueryExtensionInterface $extension)
     {
         $this->extensions[] = $extension;
     }
@@ -80,7 +81,7 @@ class DataProvider implements DataProviderInterface
         foreach ($this->extensions as $extension) {
             $extension->apply($resource, $request, $queryBuilder);
 
-            if ($extension instanceof QueryResultExtension) {
+            if ($extension instanceof QueryResultExtensionInterface) {
                 if ($extension->supportsResult($resource, $request)) {
                     return $extension->getResult($queryBuilder);
                 }

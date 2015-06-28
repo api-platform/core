@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
 /**
- * This normalizer handles collections and paginated collections.
+ * This normalizer handles collections.
  *
  * @author Kevin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
