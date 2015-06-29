@@ -18,19 +18,23 @@ and [by Doctrine ORM](http://doctrine-orm.readthedocs.org/en/latest/reference/ev
 ## Creating item
 
 - `api.pre_create_validation` (`Dunglas\ApiBundle\Event\Events::PRE_CREATE_VALIDATION`): occurs before the object validation during a `POST` request.
-- `api.pre_create` (`Dunglas\ApiBundle\Event\Events::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request
-- `api.post_create` (`Dunglas\ApiBundle\Event\Events::POST_CREATE`): event occurs after the object persistence during `POST` request
+- `api.pre_create` (`Dunglas\ApiBundle\Event\Events::PRE_CREATE`): occurs after the object validation and before its persistence during a `POST` request.
+- `api.post_create` (`Dunglas\ApiBundle\Event\Events::POST_CREATE`): event occurs after the object persistence during `POST` request.
 
 ## Updating item
 
 - `api.pre_update_validation` (`Dunglas\ApiBundle\Event\Events::PRE_UPDATE_VALIDATION`): event occurs before the object validation during a `PUT` request.
-- `api.pre_update` (`Dunglas\ApiBundle\Event\Events::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request
-- `api.post_update` (`Dunglas\ApiBundle\Event\Events::POST_UPDATE`): event occurs after the object persistence during a `PUT` request
+- `api.pre_update` (`Dunglas\ApiBundle\Event\Events::PRE_UPDATE`): occurs after the object validation and before its persistence during a `PUT` request.
+- `api.post_update` (`Dunglas\ApiBundle\Event\Events::POST_UPDATE`): event occurs after the object persistence during a `PUT` request.
 
 ## Deleting item
 
-- `api.pre_delete` (`Dunglas\ApiBundle\Event\Events::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request
-- `api.post_delete` (`Dunglas\ApiBundle\Event\Events::POST_DELETE`): occurs after the object deletion during a `DELETE` request
+- `api.pre_delete` (`Dunglas\ApiBundle\Event\Events::PRE_DELETE`): event occurs before the object deletion during a `DELETE` request.
+- `api.post_delete` (`Dunglas\ApiBundle\Event\Events::POST_DELETE`): occurs after the object deletion during a `DELETE` request.
+
+## JSON-LD context builder
+
+- `api.json_ld.context_builder` (`Dunglas\ApiBundle\JsonLd\Event\Events::CONTEXT_BUILDER`): occurs after the initialization of the context and lets you extend the context. Event object is an instance of Dunglas\ApiBundle\JsonLd\Event\ContextBuilderEvent.
 
 ## Registering an event listener
 
