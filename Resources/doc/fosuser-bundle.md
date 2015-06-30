@@ -4,7 +4,7 @@ This bundle is shipped with a bridge for the [FOSUserBundle](https://github.com/
 
 ## Creating a `User` entity with serialization groups
 
-First register the following service :
+First register the following service:
 
 ```yaml
 # app/config/services.yml
@@ -20,10 +20,21 @@ resource.user:
         tags:      [ { name: "api.resource" } ]
 ```
 
-Then create your User entity with serialization groups :
+Then create your User entity with serialization groups:
 
 ```php
+<?php
+
+namespace AppBundle\Entity;
+
+use FOS\UserBundle\Entity\User as BaseUser;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 /**
+ * @ORM\Entity
+ *
  * @UniqueEntity("email")
  * @UniqueEntity("username")
  */
@@ -51,9 +62,7 @@ class User extends BaseUser
     protected $email;
 
     /**
-     * Plain password. Used for model validation. Must not be persisted.
-     *
-     * @var string
+     * @var string Plain password. Used for model validation. Must not be persisted.
      *
      * @Groups({"user_write"})
      */
