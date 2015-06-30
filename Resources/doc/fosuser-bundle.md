@@ -2,11 +2,11 @@
 
 This bundle is shipped with a bridge for the [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle). If the FOSUserBundle is enabled, this bridges registers to the persist, update and delete events to pass user objects to the UserManager, before redispatching the event. 
 
-### Example to create User with serialization groups :
+## Creating a `User` entity with serialization groups
 
 First register the following service :
 
-```
+```yaml
 # app/config/services.yml
 
 resource.user:
@@ -22,22 +22,8 @@ resource.user:
 
 Then create your User entity with serialization groups :
 
-```
-<?php
-
-namespace AppBundle\Entity;
-
-use FOS\UserBundle\Entity\User as BaseUser;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-
+```php
 /**
- * @ORM\Entity
- * @ORM\Table(name="fos_user")
- *
  * @UniqueEntity("email")
  * @UniqueEntity("username")
  */
@@ -53,7 +39,7 @@ class User extends BaseUser
     /**
      * @var string The username of the author.
      *
-     * @Groups({"user_read", "user_write", "article_read", "category_read"})
+     * @Groups({"user_read", "user_write"})
      */
     protected $username;
 
@@ -88,22 +74,12 @@ class User extends BaseUser
     protected $roles;
 
     /**
-     * @var BlogPosting[] Collection of BlogPosting.
+     * Get id
      *
-     * @ORM\OneToMany(targetEntity="BlogPosting", mappedBy="author")
-     * @Groups({"user_read"})
+     * @return integer
      */
-    private $blog_postings;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function getId()
     {
-        parent::__construct();
-
-        $this->blog_postings = new ArrayCollection();
+        return $this->id;
     }
-
- // getters and setters ...
 ```
