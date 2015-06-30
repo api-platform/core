@@ -83,7 +83,7 @@ class User extends BaseUser
     protected $roles;
 
     /**
-     * Get id
+     * Gets id.
      *
      * @return integer
      */
