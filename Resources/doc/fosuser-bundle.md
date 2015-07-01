@@ -4,6 +4,8 @@ This bundle is shipped with a bridge for the [FOSUserBundle](https://github.com/
 
 ## Creating a `User` entity with serialization groups
 
+Here's an example of declaration of a doctrine ORM User class. As shown you can use serialization groups to hide properties like plainPassword and password (only in read). The properties shown are handled with the normalizationContext, while the properties you can modify are handled with DenormalizationContext.
+
 First register the following service:
 
 ```yaml
@@ -11,7 +13,7 @@ First register the following service:
 
 resource.user:
         parent:    "api.resource"
-        arguments: [ "AppBundle\\Entity\\User" ]
+        arguments: [ "AppBundle\Entity\User" ]
         calls:
             -      method:    "initNormalizationContext"
                    arguments: [ { groups: [ "user_read" ] } ]
@@ -81,14 +83,6 @@ class User extends BaseUser
      * @Groups({"user_read", "user_write"})
      */
     protected $roles;
+}
 
-    /**
-     * Gets id.
-     *
-     * @return integer
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 ```
