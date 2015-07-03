@@ -75,7 +75,7 @@ interface ClassMetadataInterface
     public function getReflectionClass();
 
     /**
-     * Gets the attribute identifier of the class
+     * Gets the attribute identifier of the class.
      *
      * @return AttributeMetadataInterface
      */

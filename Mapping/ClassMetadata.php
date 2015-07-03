@@ -115,7 +115,8 @@ class ClassMetadata implements ClassMetadataInterface
                 return $attribute;
             }
         }
-        return null;
+
+        return;
     }
 
     /**
