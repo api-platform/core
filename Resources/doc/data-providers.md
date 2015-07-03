@@ -65,7 +65,7 @@ Then register that provider with a priority higher than the Doctrine ORM data pr
 services:
     my_custom_data_provider:
         class: AppBundle\DataProvider\StaticDataProvider
-        tags:  [ { name: "api.data_provider", priority=1 } ]
+        tags:  [ { name: "api.data_provider", priority: 1 } ]
 ```
 
 This data provider is now up and running. It will take precedence over the default Doctrine ORM data provider for each resources
