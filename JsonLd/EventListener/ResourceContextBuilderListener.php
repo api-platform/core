@@ -65,6 +65,9 @@ class ResourceContextBuilderListener implements EventSubscriberInterface
         )->getAttributes();
 
         foreach ($attributes as $attributeName => $attribute) {
+            if ($attribute->isIdentifier()) {
+                continue;
+            }
             $convertedName = $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
 
             if (!$id = $attribute->getIri()) {
