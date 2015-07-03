@@ -115,7 +115,6 @@ class AttributesLoader implements LoaderInterface
 
         // Properties
         foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
-
             $attribute = $this->getOrCreateAttribute(
                 $classMetadata,
                 $reflectionProperty->name,
@@ -136,7 +135,6 @@ class AttributesLoader implements LoaderInterface
         // Use Serializer metadata if applicable
         if ($serializerClassMetadata) {
             foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
-
                 $name = $normalizationAttribute->getName();
                 if (null !== $normalizationGroups) {
                     $attribute = $this->getOrCreateAttribute(

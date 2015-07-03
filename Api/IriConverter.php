@@ -93,8 +93,8 @@ class IriConverter implements IriConverterInterface
     public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
-
             $identifier = $this->getIdentifierFromResource($resource);
+
             return $this->router->generate(
                 $this->getRouteName($resource, 'item'),
                 ['id' => $this->propertyAccessor->getValue($item, $identifier->getName())],

@@ -32,11 +32,6 @@ class AnnotationLoader implements LoaderInterface
     const IRI_ANNOTATION_NAME = 'Dunglas\ApiBundle\Annotation\Iri';
 
     /**
-     * @var string
-     */
-    const IDENTIFIER_ANNOTATION_NAME = 'Dunglas\ApiBundle\Annotation\Identifier';
-
-    /**
      * @var Reader
      */
     private $reader;
@@ -60,25 +55,12 @@ class AnnotationLoader implements LoaderInterface
             $classMetadata->setIri($iri->value);
         }
 
-        $haveIdentifier = false;
         foreach ($classMetadata->getAttributes() as $attributeMetadata) {
             $attributeName = $attributeMetadata->getName();
 
             if ($reflectionProperty = $this->getReflectionProperty($reflectionClass, $attributeName)) {
                 if ($iri = $this->reader->getPropertyAnnotation($reflectionProperty, self::IRI_ANNOTATION_NAME)) {
                     $attributeMetadata->setIri($iri->value);
-                }
-
-                if ($this->reader->getPropertyAnnotation($reflectionProperty, self::IDENTIFIER_ANNOTATION_NAME)) {
-                    if ($haveIdentifier) {
-                        throw new \Exception(sprintf(
-                            'Class %s have multiple annotations for Dunglas\ApiBundle\Annotation\Identifier, must be only one of this kind',
-                            $reflectionClass->getName()
-                        ));
-                    } else {
-                        $haveIdentifier = true;
-                        $attributeMetadata->setIdentifier(true);
-                    }
                 }
             }
         }

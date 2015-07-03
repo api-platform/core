@@ -123,7 +123,7 @@ class DataProvider implements DataProviderInterface
 
         if (null !== $this->order && 1 === count($identifiers)) {
             $identifier = $identifiers[0];
-            $queryBuilder->addOrderBy('o.'.$identifier , $this->order);
+            $queryBuilder->addOrderBy('o.'.$identifier, $this->order);
         }
 
         return new Paginator(new DoctrineOrmPaginator($queryBuilder));
