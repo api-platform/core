@@ -30,6 +30,10 @@
             <argument type="service" id="api.router" />
             <argument type="service" id="property_accessor" />
         </service>
+
+        <service id="api.resource_resolver" class="Dunglas\ApiBundle\Api\ResourceResolver">
+            <argument type="service" id="api.resource_collection" />
+        </service>
     </services>
 
 </container>

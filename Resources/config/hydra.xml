@@ -31,8 +31,8 @@
         <!-- Serializer -->
 
         <service id="api.hydra.normalizer.collection" class="Dunglas\ApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="api.resource_collection" />
             <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.resource_resolver" />
 
             <tag name="serializer.normalizer" priority="50" />
         </service>
@@ -48,6 +48,25 @@
             <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" />
+        </service>
+
+        <!-- Serializer enhancers -->
+        <service
+                id="api.hydra.normalizer.paginated_collection_enhancer"
+                class="Dunglas\ApiBundle\Hydra\Serializer\PaginatedCollectionEnhancer"
+                decorates="api.hydra.normalizer.collection"
+                public="false">
+            <argument type="service" id="api.hydra.normalizer.paginated_collection_enhancer.inner" />
+            <argument type="service" id="api.resource_resolver" />
+        </service>
+
+        <service
+                id="api.hydra.normalizer.collection_filters_enhancer"
+                class="Dunglas\ApiBundle\Hydra\Serializer\CollectionFiltersEnhancer"
+                decorates="api.hydra.normalizer.collection"
+                public="false">
+            <argument type="service" id="api.hydra.normalizer.collection_filters_enhancer.inner" />
+            <argument type="service" id="api.resource_resolver" />
         </service>
     </services>
 
