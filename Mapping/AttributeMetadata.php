@@ -18,6 +18,8 @@ namespace Dunglas\ApiBundle\Mapping;
  */
 class AttributeMetadata implements AttributeMetadataInterface
 {
+    const DEFAULT_IDENTIFIER_NAME = 'id';
+
     /**
      * @var string
      *
@@ -90,13 +92,23 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           {@link getIri()} instead.
      */
     public $iri;
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link isIdentifier()} instead.
+     */
+    public $identifier;
 
     /**
-     * @param string $name
+     * @param string    $name
+     * @param bool|null $identifier
      */
-    public function __construct($name)
+    public function __construct($name, $identifier = null)
     {
         $this->name = $name;
+        $this->identifier = ($identifier === null) ? $name === self::DEFAULT_IDENTIFIER_NAME : $identifier;
     }
 
     /**
@@ -236,6 +248,22 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @param bool $identifier
+     */
+    public function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+    }
+
+    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -251,6 +279,7 @@ class AttributeMetadata implements AttributeMetadataInterface
             'required',
             'link',
             'iri',
+            'identifier',
         ];
     }
 }

@@ -29,6 +29,7 @@
             <argument type="service" id="api.data_provider" />
             <argument type="service" id="api.router" />
             <argument type="service" id="property_accessor" />
+            <argument type="service" id="api.mapping.class_metadata_factory" />
         </service>
     </services>
 

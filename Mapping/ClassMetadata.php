@@ -106,6 +106,20 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
+     * @return AttributeMetadataInterface
+     */
+    public function getIdentifier()
+    {
+        foreach ($this->attributes as $attribute) {
+            if ($attribute->isIdentifier()) {
+                return $attribute;
+            }
+        }
+
+        return;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function addAttribute(AttributeMetadata $attributeMetadata)

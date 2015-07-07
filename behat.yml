@@ -3,6 +3,7 @@ default:
     default:
       contexts:
         - FeatureContext: { doctrine: "@doctrine" }
+        - HydraContext
         - Behat\MinkExtension\Context\MinkContext
         - Sanpi\Behatch\Context\RestContext
         - Sanpi\Behatch\Context\JsonContext

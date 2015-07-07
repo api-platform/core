@@ -215,5 +215,22 @@ services:
         class: Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 ```
 
+### Entity identifier case
+
+Actually we identify the entity identifier from Doctrine Identifier.
+We don't support entity resource with multiple identifier.
+
+The entity identifier is never returned like other properties : it's a part of the URI contained in @id field. 
+So in the /vocab endpoint : identifier not appear in the properties list.
+
+#### Entity identifier writable
+
+In some case, you will be able to set from the client the identifier of a resource. (like a slug for example)
+So, in this case the identifier property must become a writable class property in the /vocab endpoint.
+
+To do this you simply have to : 
+* create a a setter for identifier in the entity
+* add the denormalization group to the property if you use a specific denormalization group
+
 Previous chapter: [Filters](filters.md)<br>
 Next chapter: [Validation](validation.md)

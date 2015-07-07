@@ -41,6 +41,10 @@
         <service id="api.doctrine.orm.date_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
         </service>
+
+        <service id="api.mapping.loaders.doctrine_identifier" class="Dunglas\ApiBundle\Mapping\Loader\DoctrineIdentifierLoader" public="false">
+            <argument type="service" id="doctrine.orm.default_entity_manager" />
+        </service>
     </services>
 
 </container>

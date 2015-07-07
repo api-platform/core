@@ -136,4 +136,11 @@ interface AttributeMetadataInterface
      * @return string|null
      */
     public function getIri();
+
+    /**
+     * Is attribute the identifier of the class.
+     *
+     * @return bool
+     */
+    public function isIdentifier();
 }

@@ -11,6 +11,8 @@
 
 namespace Dunglas\ApiBundle\Api;
 
+use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -43,18 +45,24 @@ class IriConverter implements IriConverterInterface
      * @var \SplObjectStorage
      */
     private $routeCache;
+    /**
+     * @var ClassMetadataFactory
+     */
+    private $classMetadataFactory;
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         DataProviderInterface $dataProvider,
         RouterInterface $router,
-        PropertyAccessorInterface $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor,
+        ClassMetadataFactory $classMetadataFactory
     ) {
         $this->resourceCollection = $resourceCollection;
         $this->dataProvider = $dataProvider;
         $this->router = $router;
         $this->propertyAccessor = $propertyAccessor;
         $this->routeCache = new \SplObjectStorage();
+        $this->classMetadataFactory = $classMetadataFactory;
     }
 
     /**
@@ -85,9 +93,11 @@ class IriConverter implements IriConverterInterface
     public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
+            $identifier = $this->getIdentifierFromResource($resource);
+
             return $this->router->generate(
                 $this->getRouteName($resource, 'item'),
-                ['id' => $this->propertyAccessor->getValue($item, 'id')],
+                ['id' => $this->propertyAccessor->getValue($item, $identifier->getName())],
                 $referenceType
             );
         }
@@ -133,5 +143,22 @@ class IriConverter implements IriConverterInterface
                 return $data[$key];
             }
         }
+    }
+
+    /**
+     * @param ResourceInterface $resource
+     *
+     * @return AttributeMetadataInterface
+     */
+    private function getIdentifierFromResource(ResourceInterface $resource)
+    {
+        $classMetadata = $this->classMetadataFactory->getMetadataFor(
+            $resource->getEntityClass(),
+            $resource->getNormalizationGroups(),
+            $resource->getDenormalizationGroups(),
+            $resource->getValidationGroups()
+        );
+
+        return $classMetadata->getIdentifier();
     }
 }
