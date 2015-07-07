@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
+use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
@@ -126,7 +127,23 @@ class DataProvider implements DataProviderInterface
             $queryBuilder->addOrderBy('o.'.$identifier, $this->order);
         }
 
-        return new Paginator(new DoctrineOrmPaginator($queryBuilder));
+        return $this->getPaginator($queryBuilder);
+    }
+
+    /**
+     * Gets the paginator.
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return Paginator
+     */
+    protected function getPaginator(QueryBuilder $queryBuilder)
+    {
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder);
+        // Disable output walkers by default (performance)
+        $doctrineOrmPaginator->setUseOutputWalkers(false);
+
+        return new Paginator($doctrineOrmPaginator);
     }
 
     /**
