@@ -14,9 +14,8 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\ORM\QueryBuilder;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Dunglas\ApiBundle\Model\DataProviderInterface;
 
 /**
  * Data provider for the Doctrine ORM.
@@ -32,26 +31,44 @@ class DataProvider implements DataProviderInterface
     private $managerRegistry;
 
     /**
-     * @var QueryExtensionInterface[]
+     * @var QueryItemExtensionInterface[]
      */
-    private $extensions;
+    private $itemExtensions;
 
     /**
-     * @param ManagerRegistry           $managerRegistry
-     * @param QueryExtensionInterface[] $extensions
+     * @var QueryCollectionExtensionInterface[]
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $extensions = [])
-    {
+    private $collectionExtensions;
+
+    /**
+     * @param ManagerRegistry                     $managerRegistry
+     * @param QueryCollectionExtensionInterface[] $collectionExtensions
+     * @param QueryItemExtensionInterface[]       $itemExtensions
+     */
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        array $collectionExtensions = [],
+        array $itemExtensions = []
+    ) {
         $this->managerRegistry = $managerRegistry;
-        $this->extensions = $extensions;
+        $this->itemExtensions = $itemExtensions;
+        $this->collectionExtensions = $collectionExtensions;
     }
 
     /**
-     * @param QueryExtensionInterface $extension
+     * @param QueryItemExtensionInterface $extension
      */
-    public function addExtension(QueryExtensionInterface $extension)
+    public function addItemExtension(QueryItemExtensionInterface $extension)
     {
-        $this->extensions[] = $extension;
+        $this->itemExtensions[] = $extension;
+    }
+
+    /**
+     * @param QueryCollectionExtensionInterface $extension
+     */
+    public function addCollectionExtension(QueryCollectionExtensionInterface $extension)
+    {
+        $this->collectionExtensions[] = $extension;
     }
 
     /**
@@ -63,7 +80,16 @@ class DataProvider implements DataProviderInterface
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
 
         if ($fetchData || !method_exists($manager, 'getReference')) {
-            return $manager->find($entityClass, $id);
+            $repository = $manager->getRepository($entityClass);
+            $queryBuilder = $repository->createQueryBuilder('o');
+            $identifier = $manager->getClassMetadata($resource->getEntityClass())->getIdentifierFieldNames()[0];
+            $queryBuilder->where($queryBuilder->expr()->eq('o.'.$identifier, ':id'))->setParameter('id', $id);
+
+            foreach ($this->itemExtensions as $extension) {
+                $extension->applyToItem($resource, $queryBuilder, $id);
+            }
+
+            return $queryBuilder->getQuery()->getOneOrNullResult();
         }
 
         return $manager->getReference($entityClass, $id);
@@ -72,7 +98,7 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollection(ResourceInterface $resource, Request $request)
+    public function getCollection(ResourceInterface $resource)
     {
         $entityClass = $resource->getEntityClass();
 
@@ -80,11 +106,11 @@ class DataProvider implements DataProviderInterface
         $repository = $manager->getRepository($entityClass);
         $queryBuilder = $repository->createQueryBuilder('o');
 
-        foreach ($this->extensions as $extension) {
-            $extension->apply($resource, $request, $queryBuilder);
+        foreach ($this->collectionExtensions as $extension) {
+            $extension->applyToCollection($resource, $queryBuilder);
 
             if ($extension instanceof QueryResultExtensionInterface) {
-                if ($extension->supportsResult($resource, $request)) {
+                if ($extension->supportsResult($resource)) {
                     return $extension->getResult($queryBuilder);
                 }
             }
