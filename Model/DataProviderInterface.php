@@ -12,7 +12,6 @@
 namespace Dunglas\ApiBundle\Model;
 
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Data provider interface.
@@ -36,11 +35,10 @@ interface DataProviderInterface
      * Retrieves a collection.
      *
      * @param ResourceInterface $resource
-     * @param Request           $request
      *
-     * @return PaginatorInterface|array|\Traversable
+     * @return array|PaginatorInterface|\Traversable
      */
-    public function getCollection(ResourceInterface $resource, Request $request);
+    public function getCollection(ResourceInterface $resource);
 
     /**
      * Does this DataProvider supports the given resource.

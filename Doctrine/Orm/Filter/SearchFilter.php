@@ -55,15 +55,21 @@ class SearchFilter extends AbstractFilter
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
 
     /**
      * @param ManagerRegistry           $managerRegistry
+     * @param RequestStack              $requestStack
      * @param IriConverterInterface     $iriConverter
      * @param PropertyAccessorInterface $propertyAccessor
      * @param null|array                $properties       Null to allow filtering on all properties with the exact strategy or a map of property name with strategy.
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
+        RequestStack $requestStack,
         IriConverterInterface $iriConverter,
         PropertyAccessorInterface $propertyAccessor,
         array $properties = null
@@ -72,17 +78,19 @@ class SearchFilter extends AbstractFilter
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
+        $this->requestStack = $requestStack;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
         $metadata = $this->getClassMetadata($resource);
         $fieldNames = array_flip($metadata->getFieldNames());
+        $currentRequest = $this->requestStack->getCurrentRequest();
 
-        foreach ($this->extractProperties($request) as $property => $value) {
+        foreach ($this->extractProperties($currentRequest) as $property => $value) {
             if (!is_string($value) || !$this->isPropertyEnabled($property)) {
                 continue;
             }

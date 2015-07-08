@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Order the collection by given properties.
@@ -28,17 +29,27 @@ class OrderFilter extends AbstractFilter
      * @var string Keyword used to retrieve the value.
      */
     private $orderParameter;
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
 
     /**
      * @param ManagerRegistry $managerRegistry
+     * @param RequestStack    $requestStack
      * @param string          $orderParameter  Keyword used to retrieve the value.
      * @param array|null      $properties      List of property names on which the filter will be enabled.
      */
-    public function __construct(ManagerRegistry $managerRegistry, $orderParameter, array $properties = null)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        RequestStack $requestStack,
+        $orderParameter,
+        array $properties = null
+    ) {
         parent::__construct($managerRegistry, $properties);
 
         $this->orderParameter = $orderParameter;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -49,9 +60,9 @@ class OrderFilter extends AbstractFilter
      * For each property passed, if the resource does not have such property or if the order value is different from
      * `asc` or `desc` (case insensitive), the property is ignored.
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
-        $properties = $this->extractProperties($request);
+        $properties = $this->extractProperties($this->requestStack->getCurrentRequest());
         $fieldNames = array_flip($this->getClassMetadata($resource)->getFieldNames());
 
         foreach ($properties as $property => $order) {
