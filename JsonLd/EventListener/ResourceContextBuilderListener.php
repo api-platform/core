@@ -46,14 +46,20 @@ class ResourceContextBuilderListener implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * Builds default context.
+     *
+     * @param ContextBuilderEvent $event
+     */
     public function onContextBuilder(ContextBuilderEvent $event)
     {
         $resource = $event->getResource();
-        $context = $event->getContext();
 
         if (null === $resource) {
             return;
         }
+
+        $context = $event->getContext();
 
         $prefixedShortName = sprintf('#%s', $resource->getShortName());
 

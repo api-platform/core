@@ -26,7 +26,7 @@ class ContextBuilderEvent extends Event
      */
     private $context;
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     private $resource;
 
