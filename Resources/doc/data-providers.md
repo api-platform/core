@@ -1,7 +1,7 @@
 # Data providers
 
 To retrieve data that will be exposed by the API, DunglasApiBundle use classes called data providers. A data provider
-using Doctrine ORM to retrieve data from a database is included with the bundle and enabled by default. This data provider
+using [Doctrine ORM](http://www.doctrine-project.org/projects/orm.html) to retrieve data from a database is included with the bundle and enabled by default. This data provider
 natively supports paged collection and filters. It can be used as is and fits perfectly with common usages.
 
 But sometime, you want to retrieve data from other sources such as a webservice, ElasticSearch, MongoDB or another ORM.
@@ -84,6 +84,57 @@ To create your own paginators, take a look at the Doctrine ORM paginator bridge:
 
 To be able [to filter collections](filters.md), the Data Provider must be aware of registered filters to the given resource.
 The best way to learn how to create filter aware data provider is too look at the default Doctrine ORM dataprovider: [`Dunglas\ApiBundle\Doctrine\Orm\DataProvider`](/Doctrine/Orm/DataProvider.php).
+
+## Extending the Doctrine Data Provider
+
+The bundle is provided with a data provider leveraging the Doctrine ORM. This default data provider can be extended.
+
+For performance reasons, [custom output walkers for the Doctrine ORM Paginator](http://www.doctrine-project.org/jira/browse/DDC-3282)
+are disabled. It drastically improves performance when dealing with large collections. However it prevents advanced [filters](filters.md)
+adding `HAVING` and `GROUP BY` clauses to DQL queries to work properly.
+
+To enable custom output walkers, start by creating a custom data provider supporting the `AppBundle\Entity\MyEntity` class:
+
+```php
+<?php
+
+// src/AppBundle/DataProvider/MyEntityDataProvider.php
+
+namespace AppBundle\DataProvider;
+
+use Dunglas\ApiBundle\Doctrine\Orm\DataProvider;
+use Dunglas\ApiBundle\Model\DataProviderInterface;
+
+class MyEntityDataProvider extends DataProvider
+{
+    protected function getPaginator(QueryBuilder $queryBuilder)
+    {
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder);
+        // Enable output walkers to make queries with HAVING and ORDER BY clauses working
+        $doctrineOrmPaginator->setUseOutputWalkers(true);
+
+        return new Paginator($doctrineOrmPaginator);
+    }
+    
+    public function supports(ResourceInterface $resource)
+    {
+        return 'AppBundle\Entity\MyEntity' === $resource->getEntityClass();
+    }
+}
+```
+
+Then register the data provider:
+
+```yaml
+
+# app/config/services.yml
+
+services:
+    my_entity_data_provider:
+        parent: "api.doctrine.orm.data_provider"
+        class: AppBundle\DataProvider\MyEntityDataProvider
+        tags:  [ { name: "api.data_provider", priority: 1 } ]
+```
 
 Previous chapter: [Operations](operations.md)<br>
 Next chapter: [Filters](filters.md)

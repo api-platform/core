@@ -16,14 +16,16 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider" public="false">
+        <service id="api.doctrine.orm.data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument>%api.collection.order%</argument>
             <argument>%api.collection.pagination.page_parameter_name%</argument>
             <argument>%api.collection.pagination.items_per_page.number%</argument>
             <argument>%api.collection.pagination.items_per_page.enable_client_request%</argument>
             <argument>%api.collection.pagination.items_per_page.parameter_name%</argument>
+        </service>
 
+        <service id="api.doctrine.orm.default_data_provider" parent="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider">
             <tag name="api.data_provider" />
         </service>
 
