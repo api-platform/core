@@ -11,24 +11,25 @@
 
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
 
 /**
  * Doctrine identifier loader.
  *
  * @author Mikaël Labrut <labrut@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class DoctrineIdentifierLoader implements LoaderInterface
 {
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    private $entityManager;
+    private $managerRegistry;
 
-    public function __construct(EntityManager $entityManager)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        $this->entityManager = $entityManager;
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -40,17 +41,29 @@ class DoctrineIdentifierLoader implements LoaderInterface
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
-        $doctrineClassMetaData = $this->entityManager->getClassMetadata($classMetadata->getReflectionClass()->getName());
+        $className = $classMetadata->getReflectionClass()->name;
+
+        $manager = $this->managerRegistry->getManagerForClass($className);
+        if (!$manager) {
+            return true;
+        }
+
+        $doctrineClassMetaData = $manager->getClassMetadata($className);
+        if (!$doctrineClassMetaData) {
+            return true;
+        }
+
         $identifiers = $doctrineClassMetaData->getIdentifier();
+        if (1 !== count($identifiers)) {
+            return true;
+        }
 
-        if (1 === count($identifiers)) {
-            $identifierName = $identifiers[0];
+        $identifierName = $identifiers[0];
+        foreach ($classMetadata->getAttributes() as $attribute) {
+            if ($attribute->getName() === $identifierName) {
+                $attribute->setIdentifier(true);
 
-            foreach ($classMetadata->getAttributes() as $attribute) {
-                if ($attribute->getName() === $identifierName) {
-                    $attribute->setIdentifier(true);
-                    break;
-                }
+                return true;
             }
         }
 

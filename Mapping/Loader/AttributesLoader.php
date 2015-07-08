@@ -166,7 +166,7 @@ class AttributesLoader implements LoaderInterface
      *
      * @param ClassMetadata $classMetadata
      * @param string        $attributeName
-     * @param string[]|null $normalizationGroups
+     * @param array|null    $normalizationGroups
      *
      * @return AttributeMetadata
      */

@@ -45,7 +45,7 @@
         </service>
 
         <service id="api.mapping.loaders.doctrine_identifier" class="Dunglas\ApiBundle\Mapping\Loader\DoctrineIdentifierLoader" public="false">
-            <argument type="service" id="doctrine.orm.default_entity_manager" />
+            <argument type="service" id="doctrine" />
         </service>
     </services>
 
