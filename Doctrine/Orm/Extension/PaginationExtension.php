@@ -17,6 +17,7 @@ use Dunglas\ApiBundle\Doctrine\Orm\Paginator;
 use Dunglas\ApiBundle\Doctrine\Orm\QueryResultExtensionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Apply pagination on the Doctrine query for resource collection when enabled.
@@ -26,10 +27,24 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 class PaginationExtension implements QueryResultExtensionInterface
 {
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function apply(ResourceInterface $resource, Request $request, QueryBuilder $queryBuilder)
+    public function applyToCollection(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
+        $request = $this->requestStack->getCurrentRequest();
         if ($paginationEnabled = $this->isPaginationEnabled($resource, $request)) {
             $itemsPerPage = $this->getItemsPerPage($resource, $request);
 
@@ -42,13 +57,20 @@ class PaginationExtension implements QueryResultExtensionInterface
 
     /**
      * @param ResourceInterface $resource
-     * @param Request           $request
      *
      * @return bool
      */
-    public function supportsResult(ResourceInterface $resource, Request $request)
+    public function supportsResult(ResourceInterface $resource)
     {
-        return $this->isPaginationEnabled($resource, $request);
+        return $this->isPaginationEnabled($resource, $this->requestStack->getCurrentRequest());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResult(QueryBuilder $queryBuilder)
+    {
+        return new Paginator(new DoctrineOrmPaginator($queryBuilder));
     }
 
     /**
@@ -99,13 +121,5 @@ class PaginationExtension implements QueryResultExtensionInterface
         }
 
         return $resource->getItemsPerPageByDefault();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResult(QueryBuilder $queryBuilder)
-    {
-        return new Paginator(new DoctrineOrmPaginator($queryBuilder));
     }
 }

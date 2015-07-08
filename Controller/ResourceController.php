@@ -124,13 +124,12 @@ class ResourceController extends Controller
      * Gets collection data.
      *
      * @param ResourceInterface $resource
-     * @param Request           $request
      *
-     * @return PaginatorInterface|array|\Traversable
+     * @return array|PaginatorInterface|\Traversable
      */
-    protected function getCollectionData(ResourceInterface $resource, Request $request)
+    protected function getCollectionData(ResourceInterface $resource)
     {
-        return $this->get('api.data_provider')->getCollection($resource, $request);
+        return $this->get('api.data_provider')->getCollection($resource);
     }
 
     /**
@@ -145,7 +144,7 @@ class ResourceController extends Controller
     public function cgetAction(Request $request)
     {
         $resource = $this->getResource($request);
-        $data = $this->getCollectionData($resource, $request);
+        $data = $this->getCollectionData($resource);
 
         if (
             $request->get($resource->getPageParameter()) &&

@@ -13,15 +13,14 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Extension;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\QueryExtensionInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Dunglas\ApiBundle\Doctrine\Orm\QueryCollectionExtensionInterface;
 
 /**
  * Apply selected ordering while querying resource collection.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class OrderExtension implements QueryExtensionInterface
+class OrderExtension implements QueryCollectionExtensionInterface
 {
     /**
      * @var string|null
@@ -39,7 +38,7 @@ class OrderExtension implements QueryExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(ResourceInterface $resource, Request $request, QueryBuilder $queryBuilder)
+    public function applyToCollection(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
         if (null !== $this->order) {
             $queryBuilder->addOrderBy('o.id', $this->order);

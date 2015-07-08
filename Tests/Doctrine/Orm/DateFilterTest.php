@@ -3,6 +3,7 @@
 namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
 use Doctrine\ORM\EntityRepository;
@@ -10,6 +11,7 @@ use Dunglas\ApiBundle\Api\Resource;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class DateFilterTest.
@@ -31,7 +33,7 @@ class DateFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     protected $resource;
 
@@ -55,13 +57,16 @@ class DateFilterTest extends KernelTestCase
     public function testApply(array $filterParameters, array $query, $expected)
     {
         $request = Request::create('/api/dummies', 'GET', $query);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $queryBuilder = $this->getQueryBuilder();
         $filter = new DateFilter(
             $this->managerRegistry,
+            $requestStack,
             $filterParameters['properties']
         );
 
-        $filter->apply($this->resource, $queryBuilder, $request);
+        $filter->apply($this->resource, $queryBuilder);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 

@@ -27,20 +27,27 @@ class DoctrineQueryExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $sortedServices = [];
-        foreach ($container->findTaggedServiceIds('api.doctrine.orm.query_extension') as $serviceId => $tags) {
+        $dataProviderDefinition = $container->getDefinition('api.doctrine.orm.data_provider');
+        foreach ($this->findSortedExtensions($container, 'api.doctrine.orm.query_extension.item') as $extension) {
+            $dataProviderDefinition->addMethodCall('addItemExtension', [$extension]);
+        }
+        foreach ($this->findSortedExtensions($container, 'api.doctrine.orm.query_extension.collection') as $extension) {
+            $dataProviderDefinition->addMethodCall('addCollectionExtension', [$extension]);
+        }
+    }
+
+    private function findSortedExtensions(ContainerBuilder $container, $tag)
+    {
+        $extensions = [];
+        foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 $priority = isset($tag['priority']) ? $tag['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
+                $extensions[$priority][] = new Reference($serviceId);
             }
         }
-        krsort($sortedServices);
+        krsort($extensions);
 
         // Flatten the array
-        $extensions = call_user_func_array('array_merge', $sortedServices);
-        $dataProviderDefinition = $container->getDefinition('api.doctrine.orm.data_provider');
-        foreach ($extensions as $extension) {
-            $dataProviderDefinition->addMethodCall('addExtension', [$extension]);
-        }
+        return empty($extensions) ? [] : call_user_func_array('array_merge', $extensions);
     }
 }

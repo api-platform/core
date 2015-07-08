@@ -13,19 +13,17 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Interface of Doctrine ORM query extensions.
+ * Interface of Doctrine ORM query extensions for collection queries.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-interface QueryExtensionInterface
+interface QueryCollectionExtensionInterface
 {
     /**
      * @param ResourceInterface $resource
-     * @param Request           $request
      * @param QueryBuilder      $queryBuilder
      */
-    public function apply(ResourceInterface $resource, Request $request, QueryBuilder $queryBuilder);
+    public function applyToCollection(ResourceInterface $resource, QueryBuilder $queryBuilder);
 }

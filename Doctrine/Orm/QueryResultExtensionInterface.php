@@ -13,7 +13,6 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface of Doctrine ORM query extensions that supports result production
@@ -21,15 +20,14 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-interface QueryResultExtensionInterface extends QueryExtensionInterface
+interface QueryResultExtensionInterface extends QueryCollectionExtensionInterface
 {
     /**
      * @param ResourceInterface $resource
-     * @param Request           $request
      *
      * @return bool
      */
-    public function supportsResult(ResourceInterface $resource, Request $request);
+    public function supportsResult(ResourceInterface $resource);
 
     /**
      * @param QueryBuilder $queryBuilder
