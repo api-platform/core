@@ -132,30 +132,36 @@ class AttributesLoader implements LoaderInterface
 
         $serializerClassMetadata = $this->serializerClassMetadataFactory ? $this->serializerClassMetadataFactory->getMetadataFor($classMetadata->getName()) : null;
 
-        // Use Serializer metadata if applicable
         if ($serializerClassMetadata) {
+            $normalizationAttributes = [];
             foreach ($serializerClassMetadata->getAttributesMetadata() as $normalizationAttribute) {
-                $name = $normalizationAttribute->getName();
+                $normalizationAttributes[$normalizationAttribute->getName()] = $normalizationAttribute;
+            }
+
+            foreach ($classMetadata->getAttributes() as $attribute) {
+                if ($attribute->isIdentifier()) {
+                    continue;
+                }
+                $attributeGroups = isset($normalizationAttributes[$attribute->getName()]) ? $normalizationAttributes[$attribute->getName()]->getGroups() : array();
+                $readable = true;
+                $writable = true;
+
                 if (null !== $normalizationGroups) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        $name,
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setReadable(count(array_intersect($normalizationAttribute->getGroups(), $normalizationGroups)) > 0);
+                    $readable = count(array_intersect($attributeGroups, $normalizationGroups)) > 0;
+                }
+                if (null !== $denormalizationGroups) {
+                    $writable = count(array_intersect($attributeGroups, $denormalizationGroups)) > 0;
                 }
 
-                if (null !== $denormalizationGroups) {
-                    $attribute = $this->getOrCreateAttribute(
-                        $classMetadata,
-                        $name,
-                        $normalizationGroups,
-                        $denormalizationGroups
-                    );
-                    $attribute->setWritable(count(array_intersect($normalizationAttribute->getGroups(), $denormalizationGroups)) > 0);
+                if (!$readable && !$writable) {
+                    $classMetadata->removeAttribute($attribute);
+                } else {
+                    $attribute->setReadable($readable);
+                    $attribute->setWritable($writable);
                 }
             }
+        } else {
+            throw new \Exception('Cannot apply normalization settings, serializer class metadata factory not found');
         }
 
         return true;
