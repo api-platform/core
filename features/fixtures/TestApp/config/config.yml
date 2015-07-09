@@ -140,3 +140,15 @@ services:
         parent:                     "api.resource"
         arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomWritableIdentifierDummy" ]
         tags:                       [ { name: "api.resource" } ]
+
+    custom_normalized_resource:
+        parent:                     "api.resource"
+        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomNormalizedDummy" ]
+        calls:
+                                    - method:    "initNormalizationContext"
+                                      arguments:
+                                          -      { groups: [ "output" ] }
+                                    - method:    "initDenormalizationContext"
+                                      arguments:
+                                          -      { groups: [ "input" ] }
+        tags:                       [ { name: "api.resource" } ]

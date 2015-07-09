@@ -128,6 +128,16 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
+     * @param AttributeMetadata $attributeMetadata
+     */
+    public function removeAttribute(AttributeMetadata $attributeMetadata)
+    {
+        if (isset($this->attributes[$attributeMetadata->getName()])) {
+            unset($this->attributes[$attributeMetadata->getName()]);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAttributes()

@@ -326,6 +326,20 @@ Feature: Documentation support
                   {
                       "@type": "hydra:SupportedProperty",
                       "hydra:property": {
+                          "@id": "#RelationEmbedder\/id",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "id",
+                          "domain": "#RelationEmbedder",
+                          "range": "xmls:integer"
+                      },
+                      "hydra:title": "id",
+                      "hydra:required": false,
+                      "hydra:readable": false,
+                      "hydra:writable": true
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
                           "@id": "#RelationEmbedder\/paris",
                           "@type": "rdf:Property",
                           "rdfs:label": "paris",
@@ -672,6 +686,69 @@ Feature: Documentation support
               ]
           },
           {
+              "@id": "#CustomNormalizedDummy",
+              "@type": "hydra:Class",
+              "rdfs:label": "CustomNormalizedDummy",
+              "hydra:title": "CustomNormalizedDummy",
+              "hydra:description": "Custom normalized dummy.",
+              "hydra:supportedProperty": [
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "http:\/\/schema.org\/name",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "name",
+                          "domain": "#CustomNormalizedDummy",
+                          "range": "xmls:string"
+                      },
+                      "hydra:title": "name",
+                      "hydra:required": true,
+                      "hydra:readable": true,
+                      "hydra:writable": true,
+                      "hydra:description": "The dummy name."
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "https:\/\/schema.org\/alternateName",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "alias",
+                          "domain": "#CustomNormalizedDummy",
+                          "range": "xmls:string"
+                      },
+                      "hydra:title": "alias",
+                      "hydra:required": false,
+                      "hydra:readable": true,
+                      "hydra:writable": true,
+                      "hydra:description": "The dummy name alias."
+                  }
+              ],
+              "hydra:supportedOperation": [
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "GET",
+                      "hydra:title": "Retrieves CustomNormalizedDummy resource.",
+                      "rdfs:label": "Retrieves CustomNormalizedDummy resource.",
+                      "returns": "#CustomNormalizedDummy"
+                  },
+                  {
+                      "@type": "hydra:ReplaceResourceOperation",
+                      "expects": "#CustomNormalizedDummy",
+                      "hydra:method": "PUT",
+                      "hydra:title": "Replaces the CustomNormalizedDummy resource.",
+                      "rdfs:label": "Replaces the CustomNormalizedDummy resource.",
+                      "returns": "#CustomNormalizedDummy"
+                  },
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "DELETE",
+                      "hydra:title": "Deletes the CustomNormalizedDummy resource.",
+                      "rdfs:label": "Deletes the CustomNormalizedDummy resource.",
+                      "returns": "owl:Nothing"
+                  }
+              ]
+          },
+          {
               "@id": "#Entrypoint",
               "@type": "hydra:Class",
               "hydra:title": "The API entrypoint",
@@ -905,6 +982,36 @@ Feature: Documentation support
                           ]
                       },
                       "hydra:title": "The collection of CustomWritableIdentifierDummy resources",
+                      "hydra:readable": true,
+                      "hydra:writable": false
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#Entrypoint\/customNormalizedDummy",
+                          "@type": "hydra:Link",
+                          "domain": "#Entrypoint",
+                          "rdfs:label": "The collection of CustomNormalizedDummy resources",
+                          "range": "hydra:PagedCollection",
+                          "hydra:supportedOperation": [
+                              {
+                                  "@type": "hydra:Operation",
+                                  "hydra:method": "GET",
+                                  "hydra:title": "Retrieves the collection of CustomNormalizedDummy resources.",
+                                  "rdfs:label": "Retrieves the collection of CustomNormalizedDummy resources.",
+                                  "returns": "hydra:PagedCollection"
+                              },
+                              {
+                                  "@type": "hydra:CreateResourceOperation",
+                                  "expects": "#CustomNormalizedDummy",
+                                  "hydra:method": "POST",
+                                  "hydra:title": "Creates a CustomNormalizedDummy resource.",
+                                  "rdfs:label": "Creates a CustomNormalizedDummy resource.",
+                                  "returns": "#CustomNormalizedDummy"
+                              }
+                          ]
+                      },
+                      "hydra:title": "The collection of CustomNormalizedDummy resources",
                       "hydra:readable": true,
                       "hydra:writable": false
                   }
