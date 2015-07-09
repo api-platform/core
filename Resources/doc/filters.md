@@ -287,5 +287,13 @@ services:
         tags:      [ { name: "api.resource" } ]
 ```
 
+Beware: in [some cases](https://github.com/dunglas/DunglasApiBundle/issues/157#issuecomment-119576010) you may have to use double slashes in the class path to make it work:
+
+```
+services:
+    resource.offer.custom_order_filter:
+        class:    "AppBundle\\Filter\\CustomOrderFilter"
+```
+
 Previous chapter: [Data providers](data-providers.md)<br>
 Next chapter: [Serialization groups and relations](serialization-groups-and-relations.md)
