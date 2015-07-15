@@ -11,14 +11,11 @@
 
 namespace Dunglas\ApiBundle\Exception;
 
-use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
-
 /**
- * Deserialization exception.
+ * Base exception interface.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DeserializationException extends \Exception implements ExceptionInterface, SerializerExceptionInterface
+interface ExceptionInterface
 {
 }

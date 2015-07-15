@@ -15,6 +15,8 @@ use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Api\ResourceResolverTrait;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Dunglas\ApiBundle\Exception\RuntimeException;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
@@ -23,8 +25,6 @@ use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -335,18 +335,16 @@ class ItemNormalizer extends AbstractNormalizer
 
         // Always allow IRI to be compliant with the Hydra spec
         if (is_string($value)) {
-            $item = $this->iriConverter->getItemFromIri($value);
-
-            if (null === $item) {
+            try {
+                return $this->iriConverter->getItemFromIri($value);
+            } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException(sprintf(
                     'IRI  not supported (found "%s" in "%s" of "%s")',
                     $value,
                     $attributeName,
                     $currentResource->getEntityClass()
-                ));
+                ), $e->getCode(), $e);
             }
-
-            return $item;
         }
 
         if (!$resource = $this->resourceCollection->getResourceForEntity($class)) {

@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Api;
 
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Util\ClassInfoTrait;
 
 /**
@@ -39,12 +40,12 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
             if (isset($this->entityClassIndex[$entityClass])) {
-                throw new \InvalidArgumentException(sprintf('A Resource class already exists for "%s".', $entityClass));
+                throw new InvalidArgumentException(sprintf('A Resource class already exists for "%s".', $entityClass));
             }
 
             $shortName = $resource->getShortName();
             if (isset($this->shortNameIndex[$shortName])) {
-                throw new \InvalidArgumentException(sprintf('A Resource class with the short name "%s" already exists.', $shortName));
+                throw new InvalidArgumentException(sprintf('A Resource class with the short name "%s" already exists.', $shortName));
             }
 
             $this->append($resource);

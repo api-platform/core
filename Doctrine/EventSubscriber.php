@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Doctrine;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Dunglas\ApiBundle\Event\Events;
 use Dunglas\ApiBundle\Event\DataEvent;
@@ -109,7 +110,7 @@ class EventSubscriber implements EventSubscriberInterface
      *
      * @param DataEvent $event
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager|bool
+     * @return ObjectManager|false
      */
     private function getManagerIfApplicable(DataEvent $event)
     {

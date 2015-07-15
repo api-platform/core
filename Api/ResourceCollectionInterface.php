@@ -11,6 +11,8 @@
 
 namespace Dunglas\ApiBundle\Api;
 
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+
 /**
  * A collection of {@see ResourceInterface} classes.
  *
@@ -23,7 +25,7 @@ interface ResourceCollectionInterface extends \Traversable
      *
      * @param ResourceInterface[] $resources
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function init(array $resources);
 
