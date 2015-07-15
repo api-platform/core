@@ -26,7 +26,7 @@ class HydraController extends Controller
      *
      * @return Response
      */
-    public function vocabAction()
+    public function docAction()
     {
         return new Response($this->get('api.hydra.documentation_builder')->getApiDocumentation());
     }

@@ -84,13 +84,13 @@ Feature: Using custom identifier on resource
       }
       """
 
-  Scenario: Vocab is correctly generated
-    When I send a "GET" request to "/vocab"
+  Scenario: API doc is correctly generated
+    When I send a "GET" request to "/apidoc"
     Then the response status code should be 200
     And the response should be in JSON
     And the hydra class "CustomIdentifierDummy" exist
-    And 3 operations are availables for hydra class "CustomIdentifierDummy"
-    And 1 properties are availables for hydra class "CustomIdentifierDummy"
+    And 3 operations are available for hydra class "CustomIdentifierDummy"
+    And 1 properties are available for hydra class "CustomIdentifierDummy"
     And "name" property is readable for hydra class "CustomIdentifierDummy"
     And "name" property is writable for hydra class "CustomIdentifierDummy"
 

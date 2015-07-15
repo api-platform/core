@@ -27,7 +27,7 @@ class HydraContext implements Context
     }
 
     /**
-     * @Then :nb operations are availables for hydra class ":class"
+     * @Then :nb operations are available for hydra class ":class"
      */
     public function assertNbOperationsExist($nb, $className)
     {
@@ -40,7 +40,7 @@ class HydraContext implements Context
     }
 
     /**
-     * @Then :nb properties are availables for hydra class ":class"
+     * @Then :nb properties are available for hydra class ":class"
      */
     public function assertNbPropertiesExist($nb, $className)
     {

@@ -12,7 +12,7 @@ Feature: JSON-LD contexts generation
     """
     {
         "@context": {
-            "@vocab": "http://example.com/vocab#",
+            "@vocab": "http://example.com/apidoc#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "name": "http://schema.org/name",
             "alias": "https://schema.org/alternateName",
@@ -42,7 +42,7 @@ Feature: JSON-LD contexts generation
     """
     {
         "@context": {
-            "@vocab": "http://example.com/vocab#",
+            "@vocab": "http://example.com/apidoc#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "name": "http://schema.org/name",
             "alias": "https://schema.org/alternateName",
@@ -72,7 +72,7 @@ Feature: JSON-LD contexts generation
       """
       {
         "@context": {
-          "@vocab": "http://example.com/vocab#",
+          "@vocab": "http://example.com/apidoc#",
           "hydra": "http://www.w3.org/ns/hydra/core#",
           "related": "#RelationEmbedder/related",
           "paris": "#RelationEmbedder/paris",

@@ -89,13 +89,13 @@ Feature: Using custom normalized entity
       }
       """
 
-  Scenario: Vocab is correctly generated
-    When I send a "GET" request to "/vocab"
+  Scenario: API doc is correctly generated
+    When I send a "GET" request to "/apidoc"
     Then the response status code should be 200
     And the response should be in JSON
     And the hydra class "CustomNormalizedDummy" exist
-    And 3 operations are availables for hydra class "CustomNormalizedDummy"
-    And 2 properties are availables for hydra class "CustomNormalizedDummy"
+    And 3 operations are available for hydra class "CustomNormalizedDummy"
+    And 2 properties are available for hydra class "CustomNormalizedDummy"
     And "name" property is readable for hydra class "CustomNormalizedDummy"
     And "name" property is writable for hydra class "CustomNormalizedDummy"
     And "alias" property is readable for hydra class "CustomNormalizedDummy"
