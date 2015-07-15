@@ -5,10 +5,10 @@ Feature: Documentation support
 
   Scenario: Checks that the Link pointing to the Hydra documentation is set
     Given I send a "GET" request to "/"
-    Then the header "Link" should be equal to '<http://example.com/vocab>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
+    Then the header "Link" should be equal to '<http://example.com/apidoc>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
 
   Scenario: Retrieve the API vocabulary
-    Given I send a "GET" request to "/vocab"
+    Given I send a "GET" request to "/apidoc"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -16,7 +16,7 @@ Feature: Documentation support
     """
     {
       "@context": {
-          "@vocab": "http:\/\/example.com\/vocab#",
+          "@vocab": "http:\/\/example.com\/apidoc#",
           "hydra": "http:\/\/www.w3.org\/ns\/hydra\/core#",
           "rdf": "http:\/\/www.w3.org\/1999\/02\/22-rdf-syntax-ns#",
           "rdfs": "http:\/\/www.w3.org\/2000\/01\/rdf-schema#",
@@ -43,7 +43,7 @@ Feature: Documentation support
               "@type": "@id"
           }
       },
-      "@id": "\/vocab",
+      "@id": "\/apidoc",
       "hydra:title": "My Dummy API",
       "hydra:description": "This is a test API.",
       "hydra:entrypoint": "\/",
