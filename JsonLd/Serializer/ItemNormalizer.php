@@ -61,6 +61,14 @@ class ItemNormalizer extends AbstractNormalizer
      * @var ContextBuilder
      */
     private $contextBuilder;
+    /**
+     * @var bool
+     */
+    private $ignoreNullValue;
+    /**
+     * @var bool
+     */
+    private $ignoreEmptyCollection;
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
@@ -68,7 +76,9 @@ class ItemNormalizer extends AbstractNormalizer
         ClassMetadataFactoryInterface $apiClassMetadataFactory,
         ContextBuilder $contextBuilder,
         PropertyAccessorInterface $propertyAccessor,
-        NameConverterInterface $nameConverter = null
+        NameConverterInterface $nameConverter = null,
+        $ignoreNullValue = false,
+        $ignoreEmptyCollection = false
     ) {
         parent::__construct(null, $nameConverter);
 
@@ -77,6 +87,8 @@ class ItemNormalizer extends AbstractNormalizer
         $this->apiClassMetadataFactory = $apiClassMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor;
+        $this->ignoreNullValue = $ignoreNullValue;
+        $this->ignoreEmptyCollection = $ignoreEmptyCollection;
 
         $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
@@ -132,6 +144,10 @@ class ItemNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
+            if ($this->ignoreNullValue && $attributeValue === null) {
+                continue;
+            }
+
             if ($this->nameConverter) {
                 $attributeName = $this->nameConverter->normalize($attributeName);
             }
@@ -150,7 +166,9 @@ class ItemNormalizer extends AbstractNormalizer
                         $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
                     }
 
-                    $data[$attributeName] = $values;
+                    if (!empty($values) || !$this->ignoreEmptyCollection) {
+                        $data[$attributeName] = $values;
+                    }
 
                     continue;
                 }

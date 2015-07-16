@@ -68,6 +68,15 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('json_ld.xml');
         $loader->load('hydra.xml');
 
+        // Normalizer configuration
+        $container->getDefinition('api.json_ld.normalizer.item')
+            ->addArgument(
+                $config['item_normalizer']['ignore_null_value']
+            )
+            ->addArgument(
+                $config['item_normalizer']['ignore_empty_collection']
+            );
+
         // FOSUser support
         if ($config['enable_fos_user']) {
             $loader->load('fos_user.xml');
