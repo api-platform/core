@@ -36,6 +36,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache')->defaultFalse()->info('The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->arrayNode('item_normalizer')
+                    ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('ignore_null_value')->defaultValue(false)->end()
                         ->booleanNode('ignore_empty_collection')->defaultValue(false)->end()
