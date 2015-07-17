@@ -20,30 +20,9 @@ By default, the following operations are automatically enabled:
 
 ## Disabling operations
 
-If you want to disable some operations (e.g. the `DELETE` operation), you must register manually applicable operations using
-the operation factory class, `Dunglas\ApiBundle\Resource::addCollectionOperation()` and `Dunglas\ApiBundle\Resource::addCollectionOperation()`
-methods.
+You can specify the list of operation to enable by setting two properties `collectionOperations` and `itemOperations`.
 
-The following `Resource` definition exposes a `GET` operation for it's collection but not the `POST` one:
-
-```yaml
-services:
-    resource.product.collection_operation.get:
-        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
-        public:    false
-        factory:   [ "@api.operation_factory", "createCollectionOperation" ]
-        arguments: [ "@resource.product", "GET" ]
-
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
-        tags:      [ { name: "api.resource" } ]
-```
-
-However, in the following example items operations will still be automatically registered. To disable them, call `initItemOperations`
-with an empty array as first parameter:
+The following example allow only GET on collections and GET / PUT on item calls.
 
 ```yaml
 # ...
@@ -51,9 +30,7 @@ with an empty array as first parameter:
     resource.product:
         parent:    "api.resource"
         arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      [ "initItemOperations", [ [ ] ] ]
-            -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
+        properties: properties: { collectionOperations: ["GET"], itemOperations: ["GET", "PUT"] }
         tags:      [ { name: "api.resource" } ]
 ```
 
