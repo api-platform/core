@@ -37,24 +37,40 @@ class ResourcePass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('api.resource') as $serviceId => $tags) {
             $resourceReferences[] = new Reference($serviceId);
             $resourceDefinition = $container->getDefinition($serviceId);
+            $serviceProperties = $resourceDefinition->getProperties();
 
             if (self::BUILTIN_RESOURCE !== $this->getClass($container, $resourceDefinition)) {
                 continue;
             }
 
+            // get the properties and reset them to avoid property-injection
+            $serviceProperties = $resourceDefinition->getProperties();
+            $resourceDefinition->setProperties([]);
+
             if (!$resourceDefinition->hasMethodCall('initItemOperations')) {
-                $resourceDefinition->addMethodCall('initItemOperations', [[
-                    $this->createOperation($container, $serviceId, 'GET', false),
-                    $this->createOperation($container, $serviceId, 'PUT', false),
-                    $this->createOperation($container, $serviceId, 'DELETE', false),
-                ]]);
+                if (empty($serviceProperties['itemOperations'])) {
+                    $serviceProperties['itemOperations'] = ['GET', 'PUT', 'DELETE'];
+                }
+
+                $operations = [];
+                foreach ($serviceProperties['itemOperations'] as $itemOperation) {
+                    $operations[] = $this->createOperation($container, $serviceId, $itemOperation, false);
+                }
+
+                $resourceDefinition->addMethodCall('initItemOperations', [$operations]);
             }
 
             if (!$resourceDefinition->hasMethodCall('initCollectionOperations')) {
-                $resourceDefinition->addMethodCall('initCollectionOperations', [[
-                    $this->createOperation($container, $serviceId, 'GET', true),
-                    $this->createOperation($container, $serviceId, 'POST', true),
-                ]]);
+                if (empty($serviceProperties['collectionOperations'])) {
+                    $serviceProperties['collectionOperations'] = ['GET', 'POST'];
+                }
+
+                $operations = [];
+                foreach ($serviceProperties['collectionOperations'] as $itemOperation) {
+                    $operations[] = $this->createOperation($container, $serviceId, $itemOperation, true);
+                }
+
+                $resourceDefinition->addMethodCall('initCollectionOperations', [$operations]);
             }
         }
 

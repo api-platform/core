@@ -31,12 +31,15 @@ class ResourcePassTest extends \PHPUnit_Framework_TestCase
 
         $customResourceDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
         $customResourceDefinitionProphecy->getClass()->willReturn('Foo\Bar')->shouldBeCalled();
+        $customResourceDefinitionProphecy->getProperties(Argument::any())->shouldBeCalled();
         $customResourceDefinitionProphecy->hasMethodCall(Argument::any())->shouldNotBeCalled();
         $customResourceDefinitionProphecy->addMethodCall(Argument::any())->shouldNotBeCalled();
         $customResourceDefinition = $customResourceDefinitionProphecy->reveal();
 
         $builtinResourceDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
         $builtinResourceDefinitionProphecy->getClass()->willReturn('Dunglas\ApiBundle\Api\Resource')->shouldBeCalled();
+        $builtinResourceDefinitionProphecy->getProperties(Argument::any())->shouldBeCalled();
+        $builtinResourceDefinitionProphecy->setProperties(Argument::any())->shouldBeCalled();
         $builtinResourceDefinitionProphecy->hasMethodCall('initItemOperations')->willReturn(true)->shouldBeCalled();
         $builtinResourceDefinitionProphecy->addMethodCall('initItemOperations')->shouldNotBeCalled();
         $builtinResourceDefinitionProphecy->hasMethodCall('initCollectionOperations', Argument::any())->willReturn(true)->shouldBeCalled();
@@ -49,6 +52,8 @@ class ResourcePassTest extends \PHPUnit_Framework_TestCase
 
         $decoratedResourceDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\DefinitionDecorator');
         $decoratedResourceDefinitionProphecy->getClass()->willReturn(false)->shouldBeCalled();
+        $decoratedResourceDefinitionProphecy->getProperties(Argument::any())->shouldBeCalled();
+        $decoratedResourceDefinitionProphecy->setProperties(Argument::any())->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->getParent()->willReturn('inner_resource')->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->hasMethodCall('initItemOperations')->willReturn(false)->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->addMethodCall('initItemOperations', Argument::type('array'))->shouldBeCalled();
