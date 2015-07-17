@@ -132,7 +132,7 @@ class OperationFactory
 
             // Populate route name
             if (null === $routeName) {
-                $routeName = self::$inflectorCache[$shortName].'_'.$defaultAction;
+                $routeName = self::ROUTE_NAME_PREFIX.self::$inflectorCache[$shortName].'_'.$defaultAction;
             }
         }
 

@@ -11,11 +11,12 @@
 
 namespace Dunglas\ApiBundle\Api;
 
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactory;
+use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -46,23 +47,23 @@ class IriConverter implements IriConverterInterface
      */
     private $routeCache;
     /**
-     * @var ClassMetadataFactory
+     * @var ClassMetadataFactoryInterface
      */
     private $classMetadataFactory;
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         DataProviderInterface $dataProvider,
+        ClassMetadataFactoryInterface $classMetadataFactory,
         RouterInterface $router,
-        PropertyAccessorInterface $propertyAccessor,
-        ClassMetadataFactory $classMetadataFactory
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->resourceCollection = $resourceCollection;
         $this->dataProvider = $dataProvider;
+        $this->classMetadataFactory = $classMetadataFactory;
         $this->router = $router;
         $this->propertyAccessor = $propertyAccessor;
         $this->routeCache = new \SplObjectStorage();
-        $this->classMetadataFactory = $classMetadataFactory;
     }
 
     /**
@@ -72,8 +73,8 @@ class IriConverter implements IriConverterInterface
     {
         try {
             $parameters = $this->router->match($iri);
-        } catch (ResourceNotFoundException $e) {
-            return;
+        } catch (ExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
         if (
@@ -81,10 +82,14 @@ class IriConverter implements IriConverterInterface
             !isset($parameters['id']) ||
             !($resource = $this->resourceCollection->getResourceForShortName($parameters['_resource']))
         ) {
-            throw new \InvalidArgumentException(sprintf('No resource associated with the IRI "%s".', $iri));
+            throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        return $this->dataProvider->getItem($resource, $parameters['id'], $fetchData);
+        if ($item = $this->dataProvider->getItem($resource, $parameters['id'], $fetchData)) {
+            return $item;
+        }
+
+        throw new InvalidArgumentException(sprintf('Item not found for "%s".', $iri));
     }
 
     /**
@@ -102,7 +107,7 @@ class IriConverter implements IriConverterInterface
             );
         }
 
-        throw new \InvalidArgumentException(sprintf('No resource associated with the type "%s".', get_class($item)));
+        throw new InvalidArgumentException(sprintf('No resource associated with the type "%s".', get_class($item)));
     }
 
     /**
@@ -110,7 +115,11 @@ class IriConverter implements IriConverterInterface
      */
     public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
-        return $this->router->generate($this->getRouteName($resource, 'collection'), [], $referenceType);
+        try {
+            return $this->router->generate($this->getRouteName($resource, 'collection'), [], $referenceType);
+        } catch (ExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resource->getShortName()), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -118,7 +127,7 @@ class IriConverter implements IriConverterInterface
      *
      * @param ResourceInterface $resource
      *
-     * @return string
+     * @return string|null
      */
     private function getRouteName(ResourceInterface $resource, $prefix)
     {

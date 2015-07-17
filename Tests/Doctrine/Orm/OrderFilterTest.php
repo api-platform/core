@@ -20,10 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class OrderFilterTest.
- *
- * @@coversDefaultClass Dunglas\ApiBundle\Doctrine\Orm\OrderFilter
- *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
 class OrderFilterTest extends KernelTestCase
@@ -57,8 +53,6 @@ class OrderFilterTest extends KernelTestCase
     }
 
     /**
-     * @covers ::apply
-     *
      * @dataProvider filterProvider
      */
     public function testApply(array $filterParameters, array $query, $expected)

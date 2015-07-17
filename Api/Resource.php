@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Api;
 
 use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\Operation\OperationInterface;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 
 /**
  * {@inheritdoc}
@@ -56,11 +57,13 @@ class Resource implements ResourceInterface
 
     /**
      * @param string $entityClass
+     *
+     * @throws InvalidArgumentException
      */
     public function __construct($entityClass)
     {
         if (!class_exists($entityClass)) {
-            throw new \InvalidArgumentException(sprintf('The class %s does not exist.', $entityClass));
+            throw new InvalidArgumentException(sprintf('The class "%s" does not exist.', $entityClass));
         }
 
         $this->entityClass = $entityClass;

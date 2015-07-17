@@ -14,14 +14,16 @@ namespace Dunglas\ApiBundle\Controller;
 use Dunglas\ApiBundle\Event\Events;
 use Dunglas\ApiBundle\Event\DataEvent;
 use Dunglas\ApiBundle\Exception\DeserializationException;
+use Dunglas\ApiBundle\Exception\ExceptionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
 use Dunglas\ApiBundle\JsonLd\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
-use Symfony\Component\Serializer\Exception\Exception;
+use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 
 /**
  * CRUD operations for a JSON-LD/Hydra API.
@@ -43,7 +45,7 @@ class ResourceController extends Controller
      *
      * @return ResourceInterface
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function getResource(Request $request)
     {
@@ -52,12 +54,12 @@ class ResourceController extends Controller
         }
 
         if (!$request->attributes->has('_resource')) {
-            throw new \InvalidArgumentException('The current request doesn\'t have an associated resource.');
+            throw new InvalidArgumentException('The current request doesn\'t have an associated resource.');
         }
 
         $shortName = $request->attributes->get('_resource');
         if (!($this->resource = $this->get('api.resource_collection')->getResourceForShortName($shortName))) {
-            throw new \InvalidArgumentException(sprintf('The resource "%s" cannot be found.', $shortName));
+            throw new InvalidArgumentException(sprintf('The resource "%s" cannot be found.', $shortName));
         }
 
         return $this->resource;
@@ -178,7 +180,9 @@ class ResourceController extends Controller
                 'json-ld',
                 $resource->getDenormalizationContext()
             );
-        } catch (Exception $e) {
+        } catch (ExceptionInterface $e) {
+            throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
+        } catch (SerializerExceptionInterface $e) {
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -241,7 +245,9 @@ class ResourceController extends Controller
                 'json-ld',
                 $context
             );
-        } catch (Exception $e) {
+        } catch (ExceptionInterface $e) {
+            throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
+        } catch (SerializerExceptionInterface $e) {
             throw new DeserializationException($e->getMessage(), $e->getCode(), $e);
         }
 

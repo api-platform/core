@@ -19,9 +19,11 @@
 
     <filter>
         <whitelist>
-            <directory>Tests</directory>
+            <directory>.</directory>
             <exclude>
                 <directory>Tests</directory>
+                <directory>features</directory>
+                <directory>vendor</directory>
             </exclude>
         </whitelist>
     </filter>

@@ -21,10 +21,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class DateFilterTest.
- *
- * @@coversDefaultClass Dunglas\ApiBundle\Doctrine\Orm\DateFilter
- *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
 class DateFilterTest extends KernelTestCase
@@ -57,8 +53,6 @@ class DateFilterTest extends KernelTestCase
     }
 
     /**
-     * @covers ::apply
-     *
      * @dataProvider filterProvider
      */
     public function testApply(array $filterParameters, array $query, $expected)
