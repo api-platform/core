@@ -32,6 +32,9 @@ interface ClassMetadataFactoryInterface
      * configuration. At last, the new object is returned.
      *
      * @param string|object $value
+     * @param string[]|null $normalizationGroups
+     * @param string[]|null $denormalizationGroups
+     * @param string[]|null $validationGroups
      *
      * @return ClassMetadataInterface
      *
