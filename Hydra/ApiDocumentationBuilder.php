@@ -16,7 +16,7 @@ use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
@@ -122,8 +122,9 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             }
 
             $properties = [];
-            foreach ($classMetadata->getAttributes() as $attributeName => $attributeMetadata) {
-                if ($attributeMetadata->isIdentifier() && !$attributeMetadata->isWritable()) {
+            $identifierName = $classMetadata->getIdentifierName();
+            foreach ($classMetadata->getAttributesMetadata() as $attributeName => $attributeMetadata) {
+                if ($identifierName === $attributeName && !$attributeMetadata->isWritable()) {
                     continue;
                 }
 
@@ -143,7 +144,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     ],
                     'hydra:title' => $attributeName,
                     'hydra:required' => $attributeMetadata->isRequired(),
-                    'hydra:readable' => $attributeMetadata->isIdentifier() ? false : $attributeMetadata->isReadable(),
+                    'hydra:readable' => $identifierName === $attributeName ? false : $attributeMetadata->isReadable(),
                     'hydra:writable' => $attributeMetadata->isWritable(),
                 ];
 
@@ -362,40 +363,41 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
      */
     private function getRange(AttributeMetadataInterface $attributeMetadata)
     {
-        if (isset($attributeMetadata->getTypes()[0])) {
-            $type = $attributeMetadata->getTypes()[0];
+        $type = $attributeMetadata->getType();
+        if (!$type) {
+            return;
+        }
 
-            if ($type->isCollection() && $collectionType = $type->getCollectionType()) {
-                $type = $collectionType;
-            }
+        if ($type->isCollection() && $collectionType = $type->getCollectionType()) {
+            $type = $collectionType;
+        }
 
-            switch ($type->getType()) {
-                case 'string':
-                    return 'xmls:string';
+        switch ($type->getType()) {
+            case 'string':
+                return 'xmls:string';
 
-                case 'int':
-                    return 'xmls:integer';
+            case 'int':
+                return 'xmls:integer';
 
-                case 'float':
-                    return 'xmls:double';
+            case 'float':
+                return 'xmls:double';
 
-                case 'bool':
-                    return 'xmls:boolean';
+            case 'bool':
+                return 'xmls:boolean';
 
-                case 'object':
-                    $class = $type->getClass();
+            case 'object':
+                $class = $type->getClass();
 
-                    if ($class) {
-                        if ('DateTime' === $class) {
-                            return 'xmls:dateTime';
-                        }
-
-                        if ($resource = $this->resourceCollection->getResourceForEntity($type->getClass())) {
-                            return sprintf('#%s', $resource->getShortName());
-                        }
+                if ($class) {
+                    if ('DateTime' === $class) {
+                        return 'xmls:dateTime';
                     }
-                break;
-            }
+
+                    if ($resource = $this->resourceCollection->getResourceForEntity($type->getClass())) {
+                        return sprintf('#%s', $resource->getShortName());
+                    }
+                }
+            break;
         }
     }
 

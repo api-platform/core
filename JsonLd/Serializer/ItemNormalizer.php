@@ -19,7 +19,7 @@ use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Exception\RuntimeException;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
 use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -118,46 +118,45 @@ class ItemNormalizer extends AbstractNormalizer
         $context = $this->createContext($resource, $context);
 
         $classMetadata = $this->getMetadata($resource, $context);
-        $attributesMetadata = $classMetadata->getAttributes();
+        $attributesMetadata = $classMetadata->getAttributesMetadata();
 
         $data['@id'] = $this->iriConverter->getIriFromItem($object);
         $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
 
-        foreach ($attributesMetadata as $attributeMetadata) {
-            if ($attributeMetadata->isIdentifier() || !$attributeMetadata->isReadable()) {
+        $identifierName = $classMetadata->getIdentifierName();
+        foreach ($attributesMetadata as $attributeName => $attributeMetadata) {
+            if ($identifierName === $attributeName || !$attributeMetadata->isReadable()) {
                 continue;
             }
-            $attributeName = $attributeMetadata->getName();
             $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
             if ($this->nameConverter) {
                 $attributeName = $this->nameConverter->normalize($attributeName);
             }
 
-            if (isset($attributeMetadata->getTypes()[0])) {
-                $type = $attributeMetadata->getTypes()[0];
+            $type = $attributeMetadata->getType();
 
-                if (
-                    $attributeValue &&
-                    $type->isCollection() &&
-                    ($collectionType = $type->getCollectionType()) &&
-                    $subResource = $this->getResourceFromType($collectionType)
-                ) {
-                    $values = [];
-                    foreach ($attributeValue as $index => $obj) {
-                        $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
-                    }
-
-                    $data[$attributeName] = $values;
-
-                    continue;
+            if (
+                $attributeValue &&
+                $type &&
+                $type->isCollection() &&
+                ($collectionType = $type->getCollectionType()) &&
+                $subResource = $this->getResourceFromType($collectionType)
+            ) {
+                $values = [];
+                foreach ($attributeValue as $index => $obj) {
+                    $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
                 }
 
-                if ($attributeValue && $subResource = $this->getResourceFromType($type)) {
-                    $data[$attributeName] = $this->normalizeRelation($attributeMetadata, $attributeValue, $subResource, $context);
+                $data[$attributeName] = $values;
 
-                    continue;
-                }
+                continue;
+            }
+
+            if ($attributeValue && $type && $subResource = $this->getResourceFromType($type)) {
+                $data[$attributeName] = $this->normalizeRelation($attributeMetadata, $attributeValue, $subResource, $context);
+
+                continue;
             }
 
             $data[$attributeName] = $this->serializer->normalize($attributeValue, self::FORMAT, $context);
@@ -262,21 +261,26 @@ class ItemNormalizer extends AbstractNormalizer
                     continue;
                 }
 
-                if ($attributeValue && ($class = $type->getClass())) {
-                    $this->setValue(
-                        $object,
-                        $attributeName,
-                        $this->denormalizeRelation(
-                            $resource,
-                            $attributesMetadata[$attributeName],
-                            $class,
-                            $attributeValue,
-                            $context
-                        )
-                    );
+                $this->setValue($object, $attributeName, $values);
 
-                    continue;
-                }
+                continue;
+            }
+
+            if ($attributeValue && ($class = $type->getClass())) {
+                $this->setValue(
+                    $object,
+                    $attributeName,
+                    $this->denormalizeRelation(
+                        $resource,
+                        $attributeName,
+                        $attributesMetadata[$attributeName],
+                        $class,
+                        $attributeValue,
+                        $context
+                    )
+                );
+
+                continue;
             }
 
             $this->setValue($object, $attributeName, $attributeValue);
@@ -316,6 +320,7 @@ class ItemNormalizer extends AbstractNormalizer
      * Denormalizes a relation.
      *
      * @param ResourceInterface          $currentResource
+     * @param string                     $attributeName
      * @param AttributeMetadataInterface $attributeMetadata
      * @param string                     $class
      * @param mixed                      $value
@@ -327,6 +332,7 @@ class ItemNormalizer extends AbstractNormalizer
      */
     private function denormalizeRelation(
         ResourceInterface $currentResource,
+        $attributeName,
         AttributeMetadataInterface $attributeMetadata,
         $class,
         $value,
@@ -335,8 +341,6 @@ class ItemNormalizer extends AbstractNormalizer
         if ('DateTime' === $class) {
             return $this->serializer->denormalize($value, $class ?: null, self::FORMAT, $context);
         }
-
-        $attributeName = $attributeMetadata->getName();
 
         // Always allow IRI to be compliant with the Hydra spec
         if (is_string($value)) {

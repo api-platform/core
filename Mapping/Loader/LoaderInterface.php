@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 
 /**
  * Loader interface.
@@ -23,15 +23,15 @@ interface LoaderInterface
     /**
      * Loads metadata for the given class.
      *
-     * @param ClassMetadata $classMetadata
-     * @param string[]|null $normalizationGroups
-     * @param string[]|null $denormalizationGroups
-     * @param string[]|null $validationGroups
+     * @param ClassMetadataInterface $classMetadata
+     * @param string[]|null          $normalizationGroups
+     * @param string[]|null          $denormalizationGroups
+     * @param string[]|null          $validationGroups
      *
-     * @return bool
+     * @return ClassMetadataInterface
      */
     public function loadClassMetadata(
-        ClassMetadata $classMetadata,
+        ClassMetadataInterface $classMetadata,
         array $normalizationGroups = null,
         array $denormalizationGroups = null,
         array $validationGroups = null

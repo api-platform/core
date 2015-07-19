@@ -11,6 +11,8 @@
 
 namespace Dunglas\ApiBundle\Mapping;
 
+use PropertyInfo\Type;
+
 /**
  * {@inheritdoc}
  *
@@ -18,24 +20,14 @@ namespace Dunglas\ApiBundle\Mapping;
  */
 class AttributeMetadata implements AttributeMetadataInterface
 {
-    const DEFAULT_IDENTIFIER_NAME = 'id';
-
     /**
-     * @var string
+     * @var Type|null
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getName()} instead.
+     *           {@link getType()} instead.
      */
-    public $name;
-    /**
-     * @var \PropertyInfo\Type[]
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getTypes()} instead.
-     */
-    public $types;
+    public $type;
     /**
      * @var string
      *
@@ -43,7 +35,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           class' serialized representation. Do not access it. Use
      *           {@link getDescription()} instead.
      */
-    public $description;
+    public $description = '';
     /**
      * @var bool
      *
@@ -73,6 +65,22 @@ class AttributeMetadata implements AttributeMetadataInterface
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
+     *           {@link isLink()} instead.
+     */
+    public $link = false;
+    /**
+     * @var string
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getLinkClass()} instead.
+     */
+    public $linkClass = '';
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
      *           {@link isNormalizationLink()} instead.
      */
     public $normalizationLink = false;
@@ -92,47 +100,24 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           {@link getIri()} instead.
      */
     public $iri;
-    /**
-     * @var bool
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link isIdentifier()} instead.
-     */
-    public $identifier;
 
     /**
-     * @param string    $name
-     * @param bool|null $identifier
+     * {@inheritdoc}
      */
-    public function __construct($name, $identifier = null)
+    public function withType(Type $type)
     {
-        $this->name = $name;
-        $this->identifier = ($identifier === null) ? $name === self::DEFAULT_IDENTIFIER_NAME : $identifier;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->type = $type;
+
+        return $attributeMetadata;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getType()
     {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setTypes(array $types)
-    {
-        $this->types = $types;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypes()
-    {
-        return $this->types;
+        return $this->type;
     }
 
     /**
@@ -146,9 +131,12 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setDescription($description)
+    public function withDescription($description)
     {
-        $this->description = $description;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->description = $description;
+
+        return $attributeMetadata;
     }
 
     /**
@@ -162,9 +150,12 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setReadable($readable)
+    public function withReadable($readable)
     {
-        $this->readable = $readable;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->readable = $readable;
+
+        return $attributeMetadata;
     }
 
     /**
@@ -178,9 +169,12 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setWritable($writable)
+    public function withWritable($writable)
     {
-        $this->writable = $writable;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->writable = $writable;
+
+        return $attributeMetadata;
     }
 
     /**
@@ -194,17 +188,61 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setRequired($required)
+    public function withRequired($required)
     {
-        $this->required = $required;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->required = $required;
+
+        return $attributeMetadata;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setNormalizationLink($normalizationLink)
+    public function withLink($link)
     {
-        $this->normalizationLink = $normalizationLink;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->link = $link;
+
+        return $attributeMetadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isLink()
+    {
+        return $this->link;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withLinkClass($linkClass)
+    {
+        $attributeMetadata = clone $this;
+        $attributeMetadata->linkClass = $linkClass;
+
+        return $attributeMetadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLinkClass()
+    {
+        return $this->linkClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withNormalizationLink($normalizationLink)
+    {
+        $attributeMetadata = clone $this;
+        $attributeMetadata->normalizationLink = $normalizationLink;
+
+        return $attributeMetadata;
     }
 
     /**
@@ -218,9 +256,12 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setDenormalizationLink($denormalizationLink)
+    public function withDenormalizationLink($denormalizationLink)
     {
-        $this->denormalizationLink = $denormalizationLink;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->denormalizationLink = $denormalizationLink;
+
+        return $attributeMetadata;
     }
 
     /**
@@ -234,9 +275,12 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setIri($iri)
+    public function withIri($iri)
     {
-        $this->iri = $iri;
+        $attributeMetadata = clone $this;
+        $attributeMetadata->iri = $iri;
+
+        return $attributeMetadata;
     }
 
     /**
@@ -248,22 +292,6 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isIdentifier()
-    {
-        return $this->identifier;
-    }
-
-    /**
-     * @param bool $identifier
-     */
-    public function setIdentifier($identifier)
-    {
-        $this->identifier = $identifier;
-    }
-
-    /**
      * Returns the names of the properties that should be serialized.
      *
      * @return string[]
@@ -271,16 +299,16 @@ class AttributeMetadata implements AttributeMetadataInterface
     public function __sleep()
     {
         return [
-            'name',
-            'types',
+            'type',
             'description',
             'readable',
             'writable',
             'required',
+            'link',
+            'linkClass',
             'normalizationLink',
             'denormalizationLink',
             'iri',
-            'identifier',
         ];
     }
 }
