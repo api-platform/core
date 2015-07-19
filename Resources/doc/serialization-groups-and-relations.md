@@ -217,11 +217,11 @@ services:
 
 ### Entity identifier case
 
-Actually we identify the entity identifier from Doctrine Identifier.
+Actually we identify the entity identifier from [Doctrine Identifier](http://doctrine-orm.readthedocs.org/en/latest/reference/basic-mapping.html#identifiers-primary-keys).
 We don't support entity resource with multiple identifier.
 
-The entity identifier is never returned like other properties : it's a part of the URI contained in @id field. 
-So in the /vocab endpoint : identifier not appear in the properties list.
+The entity identifier is never returned like other properties : it's a part of the URI contained in `@id` field. 
+So in the `/vocab` endpoint : identifier not appear in the properties list.
 
 #### Entity identifier writable
 
