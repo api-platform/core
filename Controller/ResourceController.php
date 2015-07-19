@@ -26,7 +26,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 
 /**
- * CRUD operations for a JSON-LD/Hydra API.
+ * CRUD operations for the API.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
