@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\CacheWarmer;
 
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**

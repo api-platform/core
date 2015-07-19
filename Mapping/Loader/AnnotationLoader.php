@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
-use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Dunglas\ApiBundle\Util\ReflectionTrait;
 
 /**
@@ -45,26 +45,24 @@ class AnnotationLoader implements LoaderInterface
      * {@inheritdoc}
      */
     public function loadClassMetadata(
-        ClassMetadata $classMetadata,
+        ClassMetadataInterface $classMetadata,
         array $normalizationGroups = null,
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
         $reflectionClass = $classMetadata->getReflectionClass();
         if ($iri = $this->reader->getClassAnnotation($reflectionClass, self::IRI_ANNOTATION_NAME)) {
-            $classMetadata->setIri($iri->value);
+            $classMetadata = $classMetadata->withIri($iri->value);
         }
 
-        foreach ($classMetadata->getAttributes() as $attributeMetadata) {
-            $attributeName = $attributeMetadata->getName();
-
+        foreach ($classMetadata->getAttributesMetadata() as $attributeName => $attributeMetadata) {
             if ($reflectionProperty = $this->getReflectionProperty($reflectionClass, $attributeName)) {
                 if ($iri = $this->reader->getPropertyAnnotation($reflectionProperty, self::IRI_ANNOTATION_NAME)) {
-                    $attributeMetadata->setIri($iri->value);
+                    $classMetadata = $classMetadata->withAttributeMetadata($attributeName, $attributeMetadata->withIri($iri->value));
                 }
             }
         }
 
-        return true;
+        return $classMetadata;
     }
 }

@@ -32,7 +32,7 @@ class MetadataCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $resourceCollectionProphecy->getIterator()->willReturn(new \ArrayObject([$resource]))->shouldBeCalled();
         $resourceCollection = $resourceCollectionProphecy->reveal();
 
-        $classMetadataFactoryProphecy = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface');
+        $classMetadataFactoryProphecy = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface');
         $classMetadataFactoryProphecy->getMetadataFor('Foo', null, null, [])->shouldBeCalled();
         $classMetadataFactory = $classMetadataFactoryProphecy->reveal();
 

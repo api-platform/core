@@ -16,7 +16,6 @@ Feature: JSON-LD contexts generation
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "name": "http://schema.org/name",
             "alias": "https://schema.org/alternateName",
-            "foo": "#Dummy/foo",
             "dummyDate": "#Dummy/dummyDate",
             "jsonData": "#Dummy\/jsonData",
             "dummy": "#Dummy/dummy",
@@ -46,7 +45,6 @@ Feature: JSON-LD contexts generation
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "name": "http://schema.org/name",
             "alias": "https://schema.org/alternateName",
-            "foo": "#Dummy/foo",
             "dummyDate": "#Dummy/dummyDate",
             "jsonData": "#Dummy\/jsonData",
             "dummy": "#Dummy/dummy",
@@ -74,10 +72,10 @@ Feature: JSON-LD contexts generation
         "@context": {
           "@vocab": "http://example.com/apidoc#",
           "hydra": "http://www.w3.org/ns/hydra/core#",
-          "related": "#RelationEmbedder/related",
           "paris": "#RelationEmbedder/paris",
           "krondstadt": "#RelationEmbedder/krondstadt",
-          "anotherRelated": "#RelationEmbedder/anotherRelated"
+          "anotherRelated": "#RelationEmbedder/anotherRelated",
+          "related": "#RelationEmbedder/related"
         }
       }
       """
