@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\DependencyInjection\Compiler;
 
+use Dunglas\ApiBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;

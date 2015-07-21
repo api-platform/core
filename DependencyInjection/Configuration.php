@@ -73,6 +73,106 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
+        $this->addResourceSection($rootNode);
+
         return $treeBuilder;
+    }
+
+    /**
+     * addResourceSection
+     *
+     * @param Node $rootNode
+     * @access private
+     * @return void
+     */
+    private function addResourceSection($rootNode)
+    {
+        $rootNode
+            ->fixXmlConfig('resource')
+            ->children()
+                ->arrayNode('resources')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('resource_class')
+                                ->cannotBeEmpty()
+                                ->defaultValue('Dunglas\ApiBundle\Api\Resource')
+                                ->info('The resource class name')
+                            ->end()
+                            ->scalarNode('entry_class')->cannotBeEmpty()->isRequired()->info('The entity class name')->end()
+                            ->scalarNode('short_name')->info('The resource short name')->end()
+
+                            // operations
+                            ->arrayNode('collection_operations')
+                                ->info('The collections operation to allow')
+                                    ->prototype('scalar')->end()
+                                    ->defaultValue(['GET', 'POST'])
+                            ->end()
+                            ->arrayNode('item_operations')
+                                ->info('The items operation to allow')
+                                    ->prototype('scalar')->end()
+                                    ->defaultValue(['GET', 'PUT', 'DELETE'])
+                            ->end()
+
+                            // custom operations
+                            ->arrayNode('collection_custom_operations')
+                                ->info('The custom collections operation to add')
+                                ->prototype('array')
+                                    ->children()
+                                        ->arrayNode('methods')
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                        ->scalarNode('path')->defaultNull()->end()
+                                        ->scalarNode('route')->defaultNull()->end()
+                                        ->scalarNode('controller')->isRequired()->end()
+                                        ->variableNode('context')->defaultValue(['hydra:title' => null])->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
+                            ->arrayNode('item_custom_operations')
+                                ->info('The custom items operation to add')
+                                ->prototype('array')
+                                    ->children()
+                                        ->arrayNode('methods')
+                                            ->prototype('scalar')->end()
+                                        ->end()
+                                        ->scalarNode('path')->defaultNull()->end()
+                                        ->scalarNode('route')->defaultNull()->end()
+                                        ->scalarNode('controller')->isRequired()->end()
+                                        ->variableNode('context')->defaultValue(['hydra:title' => null])->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
+                            // (de)normalization context
+                            ->booleanNode('json_ld_context_embedded')
+                                ->info('Embed the context in the response')
+                                ->defaultFalse()
+                            ->end()
+                            ->arrayNode('normalization_groups')
+                                ->info('The normalization groups')
+                                ->prototype('scalar')->end()
+                            ->end()
+                            ->arrayNode('denormalization_groups')
+                                ->info('The denormalization groups')
+                                ->prototype('scalar')->end()
+                            ->end()
+
+                            // validation groups
+                            ->arrayNode('validation_groups')
+                                ->info('The validation groups')
+                                ->prototype('scalar')->end()
+                            ->end()
+
+                            // filters
+                            ->arrayNode('filters')
+                                ->info('The search filters')
+                                ->prototype('scalar')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
     }
 }

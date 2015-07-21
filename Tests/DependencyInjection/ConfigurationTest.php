@@ -42,6 +42,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'page_parameter' => 'page',
             ],
         ],
+        'resources' => [],
     ];
 
     public function testDefaultConfig()
@@ -54,5 +55,48 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\Config\Definition\ConfigurationInterface', $configuration);
         $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $treeBuilder);
         $this->assertEquals(self::$defaultConfig, $config);
+    }
+
+    public function testResourceConfig()
+    {
+        $userConfig = [
+            'entry_class' => 'Foo\Bar'
+        ];
+
+
+        $configuration = new Configuration();
+        $treeBuilder = $configuration->getConfigTreeBuilder();
+        $processor = new Processor();
+        $config = $processor->processConfiguration(
+            $configuration,
+            [
+                'dunglas_api' => [
+                    'title' => 'title',
+                    'description' => 'description',
+                    'resources' => [
+                        $userConfig,
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\ConfigurationInterface', $configuration);
+        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $treeBuilder);
+
+        $expected = [
+            [
+                'resource_class' => 'Dunglas\ApiBundle\Api\Resource',
+                'entry_class' => 'Foo\Bar',
+                'item_operations' => ['GET', 'PUT', 'DELETE'],
+                'collection_operations' => ['GET', 'POST'],
+                'item_custom_operations' => [],
+                'collection_custom_operations' => [],
+                'normalization_groups' => [],
+                'denormalization_groups' => [],
+                'validation_groups' => [],
+                'filters' => [],
+            ],
+        ];
+        $this->assertEquals($expected, $config['resources']);
     }
 }
