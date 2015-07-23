@@ -95,11 +95,17 @@ class SearchFilter extends AbstractFilter
         $fieldNames = array_flip($metadata->getFieldNames());
 
         foreach ($this->extractProperties($request) as $property => $value) {
-            if (!is_string($value) || !$this->isPropertyEnabled($property)) {
+            if (null === $value || !$this->isPropertyEnabled($property)) {
                 continue;
             }
 
             if (isset($fieldNames[$property])) {
+                if (!is_string($value)) {
+                    continue;
+                }
+
+                $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$property];
+
                 if ('id' === $property) {
                     $value = $this->getFilterValueFromUrl($value);
                 }
@@ -193,7 +199,11 @@ class SearchFilter extends AbstractFilter
 
         foreach ($metadata->getAssociationNames() as $associationName) {
             if ($this->isPropertyEnabled($associationName)) {
-                $description[$associationName] = [
+                $paramName = $associationName;
+                if ($metadata->isCollectionValuedAssociation($associationName)) {
+                    $paramName .= '[]';
+                }
+                $description[$paramName] = [
                     'property' => $associationName,
                     'type' => 'iri',
                     'required' => false,
