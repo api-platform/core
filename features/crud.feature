@@ -106,7 +106,7 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+              "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -119,6 +119,12 @@ Feature: Create-Retrieve-Update-Delete
                       "@type": "IriTemplateMapping",
                       "variable": "name",
                       "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies[]",
+                      "property": "relatedDummies",
                       "required": false
                   },
                   {

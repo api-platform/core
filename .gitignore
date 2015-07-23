@@ -1,7 +1,7 @@
 .php_cs.cache
 composer.phar
 composer.lock
+phpunit.xml
 /vendor/
 /features/fixtures/TestApp/cache/*
 /features/fixtures/TestApp/logs/*
-

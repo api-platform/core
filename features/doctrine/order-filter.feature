@@ -61,7 +61,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -74,6 +74,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -161,7 +167,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -174,6 +180,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -261,7 +273,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -274,6 +286,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -361,7 +379,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -374,6 +392,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -461,7 +485,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -474,6 +498,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -562,7 +592,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -575,6 +605,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -661,7 +697,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -674,6 +710,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -760,7 +802,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -773,6 +815,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
@@ -859,7 +907,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -872,6 +920,12 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies[]",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
