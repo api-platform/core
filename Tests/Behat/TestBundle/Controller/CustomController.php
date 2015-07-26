@@ -11,15 +11,15 @@
 
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Controller;
 
-use Dunglas\ApiBundle\Controller\ResourceController;
 use Dunglas\ApiBundle\JsonLd\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * Custom Controller.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CustomController extends ResourceController
+class CustomController extends Controller
 {
     /**
      * @return Response

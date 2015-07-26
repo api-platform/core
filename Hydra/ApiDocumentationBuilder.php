@@ -248,7 +248,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             '@id' => $this->router->generate('api_hydra_vocab'),
             'hydra:title' => $this->title,
             'hydra:description' => $this->description,
-            'hydra:entrypoint' => $this->router->generate('api_json_ld_entrypoint'),
+            'hydra:entrypoint' => $this->router->generate('api_jsonld_entrypoint'),
             'hydra:supportedClass' => $classes,
         ];
     }

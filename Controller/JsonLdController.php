@@ -36,7 +36,7 @@ class JsonLdController extends Controller
      */
     public function entrypointAction()
     {
-        return new Response($this->get('api.json_ld.entrypoint_builder')->getEntrypoint());
+        return new Response($this->get('api.jsonld.entrypoint_builder')->getEntrypoint());
     }
 
     /**
@@ -47,7 +47,7 @@ class JsonLdController extends Controller
     public function entrypointContextAction()
     {
         return new Response(
-            ['@context' => $this->get('api.json_ld.context_builder')->getEntrypointContext()]
+            ['@context' => $this->get('api.jsonld.context_builder')->getEntrypointContext()]
         );
     }
 
@@ -70,7 +70,7 @@ class JsonLdController extends Controller
         }
 
         return new Response(
-            ['@context' => $this->get('api.json_ld.context_builder')->getContext($resource)]
+            ['@context' => $this->get('api.jsonld.context_builder')->getContext($resource)]
         );
     }
 }

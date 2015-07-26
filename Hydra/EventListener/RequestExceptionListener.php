@@ -11,10 +11,12 @@
 
 namespace Dunglas\ApiBundle\Hydra\EventListener;
 
-use Dunglas\ApiBundle\Exception\DeserializationException;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Dunglas\ApiBundle\Exception\ValidationException;
 use Dunglas\ApiBundle\JsonLd\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -40,31 +42,32 @@ class RequestExceptionListener
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMasterRequest() || !$event->getRequest()->attributes->has('_resource_type')) {
             return;
         }
 
-        $request = $event->getRequest();
         $exception = $event->getException();
+        $headers = [];
 
         if ($exception instanceof HttpException) {
             $status = $exception->getStatusCode();
             $headers = $exception->getHeaders();
-        } elseif ($exception instanceof DeserializationException) {
+            $data = $exception;
+        } elseif ($exception instanceof ValidationException) {
             $status = Response::HTTP_BAD_REQUEST;
-            $headers = [];
+            $data = $exception->getConstraintViolationList();
+        } elseif ($exception instanceof ExceptionInterface || $exception instanceof InvalidArgumentException) {
+            $status = Response::HTTP_BAD_REQUEST;
+            $data = $exception;
         } else {
             $status = Response::HTTP_INTERNAL_SERVER_ERROR;
-            $headers = [];
+            $data = $exception;
         }
 
-        // Normalize exceptions with hydra errors only for resources
-        if ($request->attributes->has('_resource')) {
-            $event->setResponse(new Response(
-                $this->normalizer->normalize($exception, 'hydra-error'),
-                $status,
-                $headers
-            ));
-        }
+        $event->setResponse(new Response(
+            $this->normalizer->normalize($data, 'hydra-error'),
+            $status,
+            $headers
+        ));
     }
 }

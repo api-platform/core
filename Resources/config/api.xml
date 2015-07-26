@@ -31,6 +31,55 @@
             <argument type="service" id="api.router" />
             <argument type="service" id="property_accessor" />
         </service>
+
+        <service id="api.format_negotiator" class="Negotiation\FormatNegotiator" public="false" />
+
+        <!-- Event listeners -->
+
+        <service id="api.listener.request.resource_type" class="Dunglas\ApiBundle\EventListener\ResourceTypeRequestListener">
+            <argument type="service" id="api.resource_collection" />
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+        </service>
+
+        <service id="api.listener.request.format" class="Dunglas\ApiBundle\EventListener\FormatRequestListener">
+            <argument type="service" id="api.format_negotiator" />
+            <argument>%api.supported_formats%</argument>
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+        </service>
+
+        <!-- Default actions -->
+
+        <service id="api.action.get_collection" class="Dunglas\ApiBundle\Action\GetCollectionAction">
+            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="api.action.post_collection" class="Dunglas\ApiBundle\Action\PostItemAction">
+            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="validator" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="api.action.get_item" class="Dunglas\ApiBundle\Action\GetItemAction">
+            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="api.action.put_item" class="Dunglas\ApiBundle\Action\PutItemAction">
+            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="validator" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="api.action.delete_item" class="Dunglas\ApiBundle\Action\DeleteItemAction">
+            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
     </services>
 
 </container>

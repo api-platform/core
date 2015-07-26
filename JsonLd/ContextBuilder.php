@@ -81,7 +81,7 @@ class ContextBuilder
      */
     public function getResourceContext(ResourceInterface $resource, array $normalizationContext)
     {
-        if (isset($normalizationContext['json_ld_context_embedded'])) {
+        if (isset($normalizationContext['jsonld_context_embedded'])) {
             return $this->getContext($resource);
         }
 
@@ -113,7 +113,7 @@ class ContextBuilder
      */
     public function getContextUri(ResourceInterface $resource)
     {
-        return $this->router->generate('api_json_ld_context', ['shortName' => $resource->getShortName()]);
+        return $this->router->generate('api_jsonld_context', ['shortName' => $resource->getShortName()]);
     }
 
     /**

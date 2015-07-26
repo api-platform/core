@@ -38,10 +38,10 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['GET', 'DELETE'], $operation->getRoute()->getMethods());
 
         $defaults = $operation->getRoute()->getDefaults();
-        $this->assertEquals('DunglasApiBundle:Resource:cget', $defaults['_controller']);
+        $this->assertEquals('api.action.get_collection', $defaults['_controller']);
         $this->assertEquals('Foo', $defaults['_resource']);
 
-        $this->assertEquals('api_foos_cget', $operation->getRouteName());
+        $this->assertEquals('api_foos_get_collection', $operation->getRouteName());
         $this->assertEquals([], $operation->getContext());
     }
 
@@ -70,10 +70,10 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['GET', 'DELETE'], $operation->getRoute()->getMethods());
 
         $defaults = $operation->getRoute()->getDefaults();
-        $this->assertEquals('DunglasApiBundle:Resource:get', $defaults['_controller']);
+        $this->assertEquals('api.action.get_item', $defaults['_controller']);
         $this->assertEquals('Foo', $defaults['_resource']);
 
-        $this->assertEquals('api_foos_get', $operation->getRouteName());
+        $this->assertEquals('api_foos_get_item', $operation->getRouteName());
         $this->assertEquals([], $operation->getContext());
     }
 

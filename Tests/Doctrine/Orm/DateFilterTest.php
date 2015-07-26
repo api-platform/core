@@ -12,10 +12,10 @@
 namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
+use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;

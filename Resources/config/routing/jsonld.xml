@@ -5,15 +5,15 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_json_ld_entrypoint" path="/">
+    <route id="api_jsonld_entrypoint" path="/">
         <default key="_controller">DunglasApiBundle:JsonLd:entrypoint</default>
     </route>
 
-    <route id="api_json_ld_entrypoint_context" path="/contexts/Entrypoint">
+    <route id="api_jsonld_entrypoint_context" path="/contexts/Entrypoint">
         <default key="_controller">DunglasApiBundle:JsonLd:entrypointContext</default>
     </route>
 
-    <route id="api_json_ld_context" path="/contexts/{shortName}">
+    <route id="api_jsonld_context" path="/contexts/{shortName}">
         <default key="_controller">DunglasApiBundle:JsonLd:context</default>
         <requirement key="shortName">.+</requirement>
     </route>

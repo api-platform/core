@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Route;
 class OperationFactory
 {
     const ROUTE_NAME_PREFIX = 'api_';
-    const DEFAULT_CONTROLLER = 'DunglasApiBundle:Resource';
+    const DEFAULT_ACTION_PATTERN = 'api.action.';
 
     /**
      * @var array
@@ -122,17 +122,13 @@ class OperationFactory
 
         // Populate controller
         if (null === $controller) {
-            $defaultAction = strtolower($defaultMethod);
+            $actionName = sprintf('%s_%s', strtolower($defaultMethod), $collection ? 'collection' : 'item');
 
-            if ($collection) {
-                $defaultAction = 'c'.$defaultAction;
-            }
-
-            $controller = self::DEFAULT_CONTROLLER.':'.$defaultAction;
+            $controller = self::DEFAULT_ACTION_PATTERN.$actionName;
 
             // Populate route name
             if (null === $routeName) {
-                $routeName = self::ROUTE_NAME_PREFIX.self::$inflectorCache[$shortName].'_'.$defaultAction;
+                $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, self::$inflectorCache[$shortName], $actionName);
             }
         }
 

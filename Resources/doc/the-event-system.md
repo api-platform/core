@@ -34,7 +34,7 @@ and [by Doctrine ORM](http://doctrine-orm.readthedocs.org/en/latest/reference/ev
 
 ## JSON-LD context builder
 
-- `api.json_ld.context_builder` (`Dunglas\ApiBundle\JsonLd\Event\Events::CONTEXT_BUILDER`): occurs after the initialization of the context and lets you extend the context. Event object is an instance of Dunglas\ApiBundle\JsonLd\Event\ContextBuilderEvent.
+- `api.jsonld.context_builder` (`Dunglas\ApiBundle\JsonLd\Event\Events::CONTEXT_BUILDER`): occurs after the initialization of the context and lets you extend the context. Event object is an instance of Dunglas\ApiBundle\JsonLd\Event\ContextBuilderEvent.
 
 ## Registering an event listener
 

@@ -22,6 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     private static $defaultConfig = [
         'title' => 'title',
         'description' => 'description',
+        'supported_formats' => ['jsonld'],
         'cache' => false,
         'enable_fos_user' => false,
         'collection' => [

@@ -21,5 +21,5 @@ final class Events
     /**
      * The CONTEXT_BUILDER event occurs after the creation of the context.
      */
-    const CONTEXT_BUILDER = 'api.json_ld.context_builder';
+    const CONTEXT_BUILDER = 'api.jsonld.context_builder';
 }
