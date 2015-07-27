@@ -31,7 +31,7 @@
     "behat/mink": "~1.5",
     "behat/mink-extension": "~2.0",
     "behat/mink-browserkit-driver": "~1.1",
-    "behatch/contexts": "dev-master#eef7ab39ca896796bf3ba25a0fa5a95f15276eb7",
+    "behatch/contexts": "dev-master",
     "symfony/finder": "~2.3",
     "phpunit/phpunit": "~4.6",
     "doctrine/orm": "~2.2,>=2.2.3",

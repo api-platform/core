@@ -17,13 +17,6 @@
             <argument type="service" id="api.resource_collection" />
         </service>
 
-        <service id="api.jsonld.resource_context_builder_listener" class="Dunglas\ApiBundle\JsonLd\EventListener\ResourceContextBuilderListener">
-            <argument type="service" id="api.mapping.class_metadata_factory" />
-            <argument type="service" id="api.name_converter" on-invalid="ignore" />
-
-            <tag name="kernel.event_subscriber" />
-        </service>
-
         <!-- Serializer -->
 
         <service id="api.jsonld.normalizer.item" class="Dunglas\ApiBundle\JsonLd\Serializer\ItemNormalizer" public="false">
@@ -46,6 +39,13 @@
         </service>
 
         <!-- Event listeners -->
+
+        <service id="api.jsonld.resource_context_builder_listener" class="Dunglas\ApiBundle\JsonLd\EventListener\ResourceContextBuilderListener">
+            <argument type="service" id="api.mapping.class_metadata_factory" />
+            <argument type="service" id="api.name_converter" on-invalid="ignore" />
+
+            <tag name="kernel.event_subscriber" />
+        </service>
 
         <service id="api.jsonld.listener.view.responder" class="Dunglas\ApiBundle\JsonLd\EventListener\ResponderViewListener">
             <argument type="service" id="serializer" />

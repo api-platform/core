@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
  */
 class RequestExceptionListener extends ExceptionListener
 {
+    const FORMAT = 'jsonld';
+
     /**
      * @param GetResponseForExceptionEvent $event
      */
