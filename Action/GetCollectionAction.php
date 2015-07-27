@@ -11,11 +11,8 @@
 
 namespace Dunglas\ApiBundle\Action;
 
-use Dunglas\ApiBundle\Event\DataEvent;
-use Dunglas\ApiBundle\Event\Events;
 use Dunglas\ApiBundle\Exception\RuntimeException;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -31,15 +28,10 @@ class GetCollectionAction
      * @var DataProviderInterface
      */
     private $dataProvider;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
 
-    public function __construct(DataProviderInterface $dataProvider, EventDispatcherInterface $eventDispatcher)
+    public function __construct(DataProviderInterface $dataProvider)
     {
         $this->dataProvider = $dataProvider;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -55,10 +47,6 @@ class GetCollectionAction
     {
         list($resourceType) = $this->extractAttributes($request);
 
-        $data = $this->dataProvider->getCollection($resourceType, $request);
-
-        $this->eventDispatcher->dispatch(Events::RETRIEVE_LIST, new DataEvent($resourceType, $data));
-
-        return $data;
+        return $this->dataProvider->getCollection($resourceType, $request);
     }
 }

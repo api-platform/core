@@ -42,7 +42,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -97,9 +97,5 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
     {
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
-
-        $container->getDefinition('api.format_negotiator')->addMethodCall('registerFormat', [
-            'jsonld', ['application/ld+json'], true,
-        ]);
     }
 }

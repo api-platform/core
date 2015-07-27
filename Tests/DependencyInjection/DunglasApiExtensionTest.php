@@ -128,9 +128,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitionArgument = Argument::type('Symfony\Component\DependencyInjection\Definition');
 
-        $formatNegociatorDefinition = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
-        $formatNegociatorDefinition->addMethodCall('registerFormat', ['jsonld', ['application/ld+json'], true])->shouldBeCalled();
-
         $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
         $containerBuilderProphecy->getParameterBag()->willReturn($parameterBag)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.title', 'title')->shouldBeCalled();
@@ -152,8 +149,8 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.route_loader', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.router', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.iri_converter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.format_negotiator')->willReturn($formatNegociatorDefinition)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.listener.request.resource_type', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.listener.view.validation', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.listener.request.format', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
@@ -173,14 +170,14 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.validator_metadata', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.phpdoc', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.annotation', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.doctrine_identifier', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.doctrine.mapping.loaders.identifier', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.metadata_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.event_subscriber', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.data_provider', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_data_provider', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.search_filter', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.order_filter', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.date_filter', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.doctrine.listener.view.manager', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.jsonld.entrypoint_builder', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.jsonld.context_builder', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.jsonld.resource_context_builder_listener', $definitionArgument)->shouldBeCalled();

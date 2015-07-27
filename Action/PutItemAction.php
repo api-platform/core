@@ -11,16 +11,11 @@
 
 namespace Dunglas\ApiBundle\Action;
 
-use Dunglas\ApiBundle\Event\DataEvent;
-use Dunglas\ApiBundle\Event\Events;
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Exception\ValidationException;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Updates a resource.
@@ -39,21 +34,11 @@ class PutItemAction
      * @var SerializerInterface
      */
     private $serializer;
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
 
-    public function __construct(DataProviderInterface $dataProvider, SerializerInterface $serializer, ValidatorInterface $validator, EventDispatcherInterface $eventDispatcher)
+    public function __construct(DataProviderInterface $dataProvider, SerializerInterface $serializer)
     {
         $this->dataProvider = $dataProvider;
         $this->serializer = $serializer;
-        $this->validator = $validator;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -81,16 +66,6 @@ class PutItemAction
             $format,
             $context
         );
-
-        $this->eventDispatcher->dispatch(Events::PRE_UPDATE_VALIDATION, new DataEvent($resourceType, $data));
-
-        $violations = $this->validator->validate($data, null, $resourceType->getValidationGroups());
-        if (0 !== count($violations)) {
-            throw new ValidationException($violations);
-        }
-
-        // Validation succeed
-        $this->eventDispatcher->dispatch(Events::PRE_CREATE, new DataEvent($resourceType, $data));
 
         return $data;
     }

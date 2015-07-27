@@ -49,35 +49,34 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>
 
-        <!-- Default actions -->
+        <service id="api.listener.view.validation" class="Dunglas\ApiBundle\EventListener\ValidationViewListener">
+            <argument type="service" id="validator" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="20" />
+        </service>
+
+        <!-- Action -->
 
         <service id="api.action.get_collection" class="Dunglas\ApiBundle\Action\GetCollectionAction">
             <argument type="service" id="api.data_provider" />
-            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="api.action.post_collection" class="Dunglas\ApiBundle\Action\PostItemAction">
             <argument type="service" id="api.data_provider" />
             <argument type="service" id="serializer" />
-            <argument type="service" id="validator" />
-            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="api.action.get_item" class="Dunglas\ApiBundle\Action\GetItemAction">
             <argument type="service" id="api.data_provider" />
-            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="api.action.put_item" class="Dunglas\ApiBundle\Action\PutItemAction">
             <argument type="service" id="api.data_provider" />
             <argument type="service" id="serializer" />
-            <argument type="service" id="validator" />
-            <argument type="service" id="event_dispatcher" />
         </service>
 
         <service id="api.action.delete_item" class="Dunglas\ApiBundle\Action\DeleteItemAction">
             <argument type="service" id="api.data_provider" />
-            <argument type="service" id="event_dispatcher" />
         </service>
 
     </services>

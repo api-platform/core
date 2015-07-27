@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class DunglasApiBundle extends Bundle
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function build(ContainerBuilder $container)
     {
