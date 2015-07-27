@@ -6,15 +6,11 @@
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="api_jsonld_entrypoint" path="/">
-        <default key="_controller">DunglasApiBundle:JsonLd:entrypoint</default>
-    </route>
-
-    <route id="api_jsonld_entrypoint_context" path="/contexts/Entrypoint">
-        <default key="_controller">DunglasApiBundle:JsonLd:entrypointContext</default>
+        <default key="_controller">api.jsonld.action.entrypoint</default>
     </route>
 
     <route id="api_jsonld_context" path="/contexts/{shortName}">
-        <default key="_controller">DunglasApiBundle:JsonLd:context</default>
+        <default key="_controller">api.jsonld.action.context</default>
         <requirement key="shortName">.+</requirement>
     </route>
 

@@ -52,6 +52,12 @@
 
             <tag name="serializer.normalizer" />
         </service>
+
+        <!-- Action -->
+
+        <service id="api.hydra.action.documentation" class="Dunglas\ApiBundle\Hydra\Action\DocumentationAction">
+            <argument type="service" id="api.hydra.documentation_builder" />
+        </service>
     </services>
 
 </container>

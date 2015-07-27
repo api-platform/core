@@ -161,6 +161,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.route_loader', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.router', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.iri_converter', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api.format_negotiator')->willReturn($formatNegociatorDefinition)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.listener.request.resource_type', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.listener.request.format', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
@@ -172,8 +173,8 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.property_info', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info.php_doc_extractor', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info.setter_extractor', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.class_metadata_factory', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.cache_warmer.metadata', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.mapping.class_metadata_factory', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.cache.apc', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.chain', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.attributes', $definitionArgument)->shouldBeCalled();
@@ -192,7 +193,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.constraint_violation_list', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.error', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.format_negotiator')->willReturn($formatNegociatorDefinition)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.hydra.action.documentation', $definitionArgument)->shouldBeCalled();
 
         if ($withDoctrine) {
             $definitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
