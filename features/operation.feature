@@ -1,7 +1,7 @@
 Feature: Operation support
-  In order to make the API fist custom need
-  As an APIe developer
-  I need to be able to add custom operations and remove built-in one
+  In order to make the API fitting custom need
+  As an API developer
+  I need to be able to add custom operations and remove built-in ones
 
   Scenario: Access custom operations
     When I send a "GET" request to "/relation_embedders/42/custom"

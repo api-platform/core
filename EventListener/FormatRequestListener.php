@@ -62,12 +62,9 @@ class FormatRequestListener
             if (null !== $accept = $request->headers->get('Accept')) {
                 // Try to guess the best format to use
                 $format = $this->formatNegotiator->getBestFormat($accept, $this->supportedFormats);
-            } else {
-                // Fallback to the fist supported format
-                $format = $this->supportedFormats[0];
             }
         }
 
-        $request->attributes->set('_api_format', $format);
+        $request->attributes->set('_api_format', $format ?: $this->supportedFormats[0]);
     }
 }

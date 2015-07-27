@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class RequestExceptionListener
 {
+    const FORMAT = 'jsonld';
+
     /**
      * @var NormalizerInterface
      */
@@ -42,7 +44,12 @@ class RequestExceptionListener
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if (!$event->isMasterRequest() || !$event->getRequest()->attributes->has('_resource_type')) {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
+        $request = $event->getRequest();
+        if (!$request->attributes->has('_resource_type') || self::FORMAT !== $request->attributes->get('_api_format')) {
             return;
         }
 
