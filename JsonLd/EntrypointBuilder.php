@@ -53,7 +53,7 @@ class EntrypointBuilder
     public function getEntrypoint()
     {
         $entrypoint = [
-            '@context' => $this->router->generate('api_jsonld_entrypoint_context'),
+            '@context' => $this->router->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
             '@id' => $this->router->generate('api_jsonld_entrypoint'),
             '@type' => 'Entrypoint',
         ];

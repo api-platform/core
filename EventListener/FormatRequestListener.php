@@ -56,7 +56,7 @@ class FormatRequestListener
             return;
         }
 
-        // Use the Symfony reques format if available and applicable
+        // Use the Symfony request format if available and applicable
         $format = $request->getRequestFormat(null);
         if (null === $format || !in_array($format, $this->supportedFormats)) {
             if (null !== $accept = $request->headers->get('Accept')) {

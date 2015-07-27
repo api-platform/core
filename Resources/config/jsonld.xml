@@ -52,6 +52,17 @@
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" />
         </service>
+
+        <!-- Action -->
+
+        <service id="api.jsonld.action.context" class="Dunglas\ApiBundle\JsonLd\Action\ContextAction">
+            <argument type="service" id="api.jsonld.context_builder" />
+            <argument type="service" id="api.resource_collection" />
+        </service>
+
+        <service id="api.jsonld.action.entrypoint" class="Dunglas\ApiBundle\JsonLd\Action\EntrypointAction">
+            <argument type="service" id="api.jsonld.entrypoint_builder" />
+        </service>
     </services>
 
 </container>

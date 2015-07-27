@@ -12,12 +12,13 @@
 namespace Dunglas\ApiBundle\Action;
 
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Exception\RuntimeException;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Checks if the request is propertly configured.
+ * Checks if the request is properly configured.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -26,11 +27,13 @@ trait ActionUtilTrait
     /**
      * Gets an item using the data provider. Throws a 404 error if not found.
      *
-     * @param DataProvider      $dataProvider
-     * @param ResourceInterface $resourceType
-     * @param $id
+     * @param DataProviderInterface $dataProvider
+     * @param ResourceInterface     $resourceType
+     * @param string|int            $id
      *
      * @return object
+     *
+     * @throws NotFoundHttpException
      */
     private function getItem(DataProviderInterface $dataProvider, ResourceInterface $resourceType, $id)
     {
