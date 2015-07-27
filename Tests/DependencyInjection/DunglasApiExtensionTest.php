@@ -137,9 +137,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitionArgument = Argument::type('Symfony\Component\DependencyInjection\Definition');
 
-        $formatNegociatorDefinition = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
-        $formatNegociatorDefinition->addMethodCall('registerFormat', ['jsonld', ['application/ld+json'], true])->shouldBeCalled();
-
         $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
         $containerBuilderProphecy->getParameterBag()->willReturn($parameterBag)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.title', 'title')->shouldBeCalled();
@@ -161,8 +158,8 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.route_loader', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.router', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.iri_converter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.format_negotiator')->willReturn($formatNegociatorDefinition)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.listener.request.resource_type', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.listener.view.validation', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.listener.request.format', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();

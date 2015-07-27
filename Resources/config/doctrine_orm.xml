@@ -9,13 +9,6 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="api.doctrine.event_subscriber" class="Dunglas\ApiBundle\Doctrine\EventSubscriber">
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="doctrine" />
-
-            <tag name="kernel.event_subscriber" />
-        </service>
-
         <service id="api.doctrine.orm.data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument>%api.collection.order%</argument>
@@ -28,6 +21,8 @@
         <service id="api.doctrine.orm.default_data_provider" parent="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider">
             <tag name="api.data_provider" />
         </service>
+
+        <!-- Filter -->
 
         <service id="api.doctrine.orm.search_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
@@ -44,8 +39,18 @@
             <argument type="service" id="doctrine" />
         </service>
 
-        <service id="api.mapping.loaders.doctrine_identifier" class="Dunglas\ApiBundle\Mapping\Loader\DoctrineIdentifierLoader" public="false">
+        <!-- Metadata loader -->
+
+        <service id="api.doctrine.mapping.loaders.identifier" class="Dunglas\ApiBundle\Mapping\Loader\DoctrineIdentifierLoader" public="false">
             <argument type="service" id="doctrine" />
+        </service>
+
+        <!-- Event listener -->
+
+        <service id="api.doctrine.listener.view.manager" class="Dunglas\ApiBundle\Doctrine\EventListener\ManagerViewListener">
+            <argument type="service" id="doctrine" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
         </service>
 
         <service id="api.property_info.doctrine_extractor" class="PropertyInfo\Extractors\DoctrineExtractor" public="false">

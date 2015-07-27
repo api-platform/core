@@ -22,7 +22,7 @@
     "doctrine/inflector": "~1.0",
     "dunglas/php-property-info": "~0.2",
     "phpdocumentor/reflection": "^1.0.7",
-    "willdurand/negotiation": "~1.3"
+    "willdurand/negotiation": "~1.4"
   },
   "require-dev": {
     "friendsofsymfony/user-bundle": "~1.3",

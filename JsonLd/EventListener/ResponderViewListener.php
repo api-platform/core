@@ -52,14 +52,14 @@ class ResponderViewListener
         $controllerResult = $event->getControllerResult();
 
         if ($controllerResult instanceof Response) {
-            return $controllerResult;
+            return;
         }
 
         $request = $event->getRequest();
 
         $format = $request->attributes->get('_api_format');
         if (self::FORMAT !== $format) {
-            return $controllerResult;
+            return;
         }
 
         switch ($request->getMethod()) {
