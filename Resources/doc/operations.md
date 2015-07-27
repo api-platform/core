@@ -20,9 +20,8 @@ By default, the following operations are automatically enabled:
 
 ## Disabling operations
 
-If you want to disable some operations (e.g. the `DELETE` operation), you must register manually applicable operations using
-the operation factory class, `Dunglas\ApiBundle\Resource::addCollectionOperation()` and `Dunglas\ApiBundle\Resource::addCollectionOperation()`
-methods.
+If you want to disable some operations (e.g. the `DELETE` operation), you must create manually applicable operations using
+the operation factory class, `Dunglas\ApiBundle\Api\Operation\OperationFactory::createCollectionOperation()` or/and `Dunglas\ApiBundle\Api\Operation\OperationFactory::createItemOperation()` methods and then, register it in the resource with `Dunglas\ApiBundle\Api/Resource::initCollectionOperations` or/and `Dunglas\ApiBundle\Api/Resource::initItemOperations`.
 
 The following `Resource` definition exposes a `GET` operation for it's collection but not the `POST` one:
 
