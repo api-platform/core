@@ -194,7 +194,7 @@ class HydraContext implements Context
      */
     private function getLastJsonResponse()
     {
-        $content = $this->restContext->getMink()->getSession()->getDriver()->getContent();
+        $content = $this->restContext->getSession()->getDriver()->getContent();
         if (null === ($decoded = json_decode($content, true))) {
             throw new \RuntimeException('JSON response seems to be invalid');
         }

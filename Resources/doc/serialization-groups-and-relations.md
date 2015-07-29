@@ -81,7 +81,7 @@ services:
         arguments: [ "AppBundle\Entity\Offer" ]
         calls:
             -      method:    "initNormalizationContext"
-                   arguments: [ { json_ld_context_embedded: true } ]
+                   arguments: [ { jsonld_context_embedded: true } ]
         tags:      [ { name: "api.resource" } ]
 ```
 

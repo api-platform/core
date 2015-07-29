@@ -92,9 +92,14 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
 11. [FOSUserBundle integration](Resources/doc/fosuser-bundle.md#fosuser-bundle-integration)
   1. [Creating a `User` entity with serialization groups](Resources/doc/fosuser-bundle.md#creating-a-user-entity-with-serialization-groups)
 12. [Using external (JSON-LD) vocabularies](Resources/doc/external-vocabularies.md)
-13. [Performances](Resources/doc/performances.md)
+13. [Content negotiation](Resources/doc/content-negotiation.md)
+  1. [Enabling several formats](Resources/doc/content-negotiation.md#enabling-several-formats)
+  2. [Registering a custom format in the Negotiation library](Resources/doc/content-negotiation.md#registering-a-custom-format-in-the-Negotiation-library)
+  3. [Registering a custom serializer](Resources/doc/content-negotiation.md#registering-a-custom-serializer)
+  4. [Creating a responder](Resources/doc/content-negotiation.md#creating-a-responder)
+14. [Performance](Resources/doc/performance.md)
   1. [Enabling the metadata cache](Resources/doc/performances.md#enabling-the-metadata-cache)
-14. [AngularJS integration](Resources/doc/angular-integration.md)
+15. [AngularJS integration](Resources/doc/angular-integration.md)
 
 ## Other resources
 

@@ -15,6 +15,7 @@ use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Api\ResourceResolverTrait;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\JsonLd\Serializer\ContextTrait;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
@@ -29,6 +30,8 @@ use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
  */
 class CollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
 {
+    const FORMAT = 'jsonld';
+
     use ResourceResolverTrait;
     use ContextTrait;
 
@@ -70,7 +73,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      */
     public function supportsNormalization($data, $format = null)
     {
-        return 'json-ld' === $format && (is_array($data) || $data instanceof \Traversable);
+        return self::FORMAT === $format && (is_array($data) || $data instanceof \Traversable);
     }
 
     /**
@@ -80,7 +83,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     {
         $resource = $this->guessResource($object, $context);
 
-        if (isset($context['json_ld_sub_level'])) {
+        if (isset($context['jsonld_sub_level'])) {
             $data = [];
             foreach ($object as $index => $obj) {
                 $data[$index] = $this->serializer->normalize($obj, $format, $context);
@@ -137,12 +140,14 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
      * @param string $requestUri
      *
      * @return array
+     *
+     * @throws InvalidArgumentException
      */
     private function parseRequestUri($requestUri)
     {
         $parts = parse_url($requestUri);
         if (false === $parts) {
-            throw new \InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $requestUri));
+            throw new InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $requestUri));
         }
 
         $parameters = [];

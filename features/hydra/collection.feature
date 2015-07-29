@@ -368,10 +368,6 @@ Feature: Collections support
     }
     """
 
-  Scenario: Retrieve a non-existing page of the collection
-    When I send a "GET" request to "/dummies?page=11"
-    Then the response status code should be 404
-
   Scenario: Change the number of element by page client side
     When I send a "GET" request to "/dummies?page=2&itemsPerPage=10"
     Then the response status code should be 200

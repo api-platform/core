@@ -51,6 +51,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('api.title', $config['title']);
         $container->setParameter('api.description', $config['description']);
+        $container->setParameter('api.supported_formats', $config['supported_formats']);
         $container->setParameter('api.collection.filter_name.order', $config['collection']['filter_name']['order']);
         $container->setParameter('api.collection.order', $config['collection']['order']);
         $container->setParameter('api.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
@@ -64,9 +65,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('mapping.xml');
         $loader->load('doctrine_orm.xml');
 
-        // JSON-LD and Hydra support
-        $loader->load('json_ld.xml');
-        $loader->load('hydra.xml');
+        $this->enableJsonLd($container, $loader);
 
         // FOSUser support
         if ($config['enable_fos_user']) {
@@ -86,5 +85,17 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         } else {
             $container->removeDefinition('api.cache_warmer.metadata');
         }
+    }
+
+    /**
+     * Enables JSON-LD and Hydra support.
+     *
+     * @param ContainerBuilder     $container
+     * @param Loader\XmlFileLoader $loader
+     */
+    private function enableJsonLd(ContainerBuilder $container, Loader\XmlFileLoader $loader)
+    {
+        $loader->load('jsonld.xml');
+        $loader->load('hydra.xml');
     }
 }

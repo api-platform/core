@@ -49,7 +49,7 @@ class ApiLoader extends Loader
     {
         $routeCollection = new RouteCollection();
 
-        $routeCollection->addCollection($this->fileLoader->load('json_ld.xml'));
+        $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));
         $routeCollection->addCollection($this->fileLoader->load('hydra.xml'));
 
         foreach ($this->resourceCollection as $resource) {

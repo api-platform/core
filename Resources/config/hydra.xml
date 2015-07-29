@@ -7,7 +7,7 @@
     <services>
         <service id="api.hydra.documentation_builder" class="Dunglas\ApiBundle\Hydra\ApiDocumentationBuilder">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.jsonld.context_builder" />
             <argument type="service" id="router" />
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument>%api.title%</argument>
@@ -23,7 +23,7 @@
         </service>
 
         <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
-            <argument type="service" id="api.hydra.normalizer.error" />
+            <argument type="service" id="serializer" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
@@ -32,7 +32,7 @@
 
         <service id="api.hydra.normalizer.collection" class="Dunglas\ApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.jsonld.context_builder" />
             <argument>%api.collection.pagination.page_parameter_name%</argument>
 
             <tag name="serializer.normalizer" priority="50" />
@@ -49,6 +49,12 @@
             <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" />
+        </service>
+
+        <!-- Action -->
+
+        <service id="api.hydra.action.documentation" class="Dunglas\ApiBundle\Hydra\Action\DocumentationAction">
+            <argument type="service" id="api.hydra.documentation_builder" />
         </service>
     </services>
 

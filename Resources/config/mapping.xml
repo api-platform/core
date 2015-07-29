@@ -35,7 +35,7 @@
                 <argument type="service" id="api.mapping.loaders.attributes" />
                 <argument type="service" id="api.mapping.loaders.validator_metadata" />
                 <argument type="service" id="api.mapping.loaders.phpdoc" />
-                <argument type="service" id="api.mapping.loaders.doctrine_identifier" on-invalid="ignore" />
+                <argument type="service" id="api.doctrine.mapping.loaders.identifier" on-invalid="ignore" />
                 <argument type="service" id="api.mapping.loaders.annotation" />
             </argument>
         </service>

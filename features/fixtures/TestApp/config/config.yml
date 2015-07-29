@@ -25,6 +25,7 @@ doctrine:
 dunglas_api:
     title:                             "My Dummy API"
     description:                       "This is a test API."
+    supported_formats:                 [ "jsonld", "xml" ]
     collection:
         filter_name:
             order:                     "order"
@@ -36,7 +37,14 @@ dunglas_api:
 
 services:
     api.name_converter:
-        class: Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\NameConverter\CustomConverter
+        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\\NameConverter\CustomConverter"
+
+    xml_responder_view_listener:
+        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\EventListener\XmlResponderViewListener"
+        arguments:
+            - @serializer
+        tags:
+            - { name: "kernel.event_listener", event: "kernel.view", method: "onKernelView" }
 
     ressource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
