@@ -173,3 +173,6 @@ dispatched by Symfony:
         tags:
             - { name: "kernel.event_listener", event: "kernel.view", method: "onKernelView" }
 ```
+
+Previous chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)<br>
+Next chapter: [Security](security.md)

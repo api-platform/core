@@ -17,5 +17,5 @@ and set the `cache` config key to the id of the custom service you created.
 
 A built-in cache warmer will be automatically executed every time you clear or warmup the cache if a cache service is configured.
 
-Previous chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)<br>
+Previous chapter: [Security](security.md)<br>
 Next chapter: [AngularJS Integration](angular-integration.md)
