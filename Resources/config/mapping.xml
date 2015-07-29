@@ -9,8 +9,15 @@
     </parameters>
 
     <services>
-        <service id="api.mapping.class_metadata_factory" class="Dunglas\ApiBundle\Mapping\ClassMetadataFactory">
+        <!-- Factories -->
+
+        <service id="api.mapping.class_metadata_factory" class="Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactory">
             <argument type="service" id="api.mapping.loaders.chain" />
+        </service>
+
+        <service id="api.mapping.attribute_metadata_factory" class="Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactory" public="false">
+            <argument type="service" id="api.property_info" />
+            <argument type="service" id="api.resource_collection" />
         </service>
 
         <!-- Cache -->
@@ -32,7 +39,8 @@
 
         <service id="api.mapping.loaders.chain" class="Dunglas\ApiBundle\Mapping\Loader\LoaderChain" public="false">
             <argument type="collection">
-                <argument type="service" id="api.mapping.loaders.attributes" />
+                <argument type="service" id="api.mapping.loaders.serializer_metadata" />
+                <argument type="service" id="api.mapping.loaders.reflection" />
                 <argument type="service" id="api.mapping.loaders.validator_metadata" />
                 <argument type="service" id="api.mapping.loaders.phpdoc" />
                 <argument type="service" id="api.doctrine.mapping.loaders.identifier" on-invalid="ignore" />
@@ -40,10 +48,13 @@
             </argument>
         </service>
 
-        <service id="api.mapping.loaders.attributes" class="Dunglas\ApiBundle\Mapping\Loader\AttributesLoader" public="false">
-            <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.property_info" />
-            <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+        <service id="api.mapping.loaders.serializer_metadata" class="Dunglas\ApiBundle\Mapping\Loader\SerializerMetadataLoader" public="false">
+            <argument type="service" id="api.mapping.attribute_metadata_factory" />
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+        </service>
+
+        <service id="api.mapping.loaders.reflection" class="Dunglas\ApiBundle\Mapping\Loader\ReflectionLoader" public="false">
+            <argument type="service" id="api.mapping.attribute_metadata_factory" />
         </service>
 
         <service id="api.mapping.loaders.validator_metadata" class="Dunglas\ApiBundle\Mapping\Loader\ValidatorMetadataLoader" public="false">

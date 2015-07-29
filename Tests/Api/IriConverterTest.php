@@ -20,7 +20,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     {
         $item = new \stdClass();
         $resource = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface')->reveal();
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
 
         $resourceCollectionProphecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface');
@@ -47,7 +47,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetItemFromIriRouteNotFound()
     {
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
         $resourceCollection = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
@@ -66,7 +66,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetItemFromIriResourceNotInRouterParameters()
     {
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
         $resourceCollection = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
@@ -85,7 +85,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetItemFromIriIdNotInRouterParameters()
     {
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
         $resourceCollection = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
@@ -104,7 +104,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetItemFromIriResourceIsNull()
     {
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
 
@@ -127,7 +127,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetItemFromIriDataProviderReturnsNull()
     {
         $resource = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface')->reveal();
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
 
         $resourceCollectionProphecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface');
@@ -157,15 +157,11 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $propertyAccessorProphecy->getValue($item, 'myId')->willReturn(69)->shouldBeCalled();
         $propertyAccessor = $propertyAccessorProphecy->reveal();
 
-        $attributeMetadataProphecy = $this->prophesize('Dunglas\ApiBundle\Mapping\AttributeMetadataInterface');
-        $attributeMetadataProphecy->getName()->willReturn('myId')->shouldBeCalled();
-        $attributeMetadata = $attributeMetadataProphecy->reveal();
-
         $classMetadataProphecy = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataInterface');
-        $classMetadataProphecy->getIdentifier()->willReturn($attributeMetadata)->shouldBeCalled();
+        $classMetadataProphecy->getIdentifierName()->willReturn('myId')->shouldBeCalled();
         $classMetadata = $classMetadataProphecy->reveal();
 
-        $classMetadataFactoryProphecy = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface');
+        $classMetadataFactoryProphecy = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface');
         $classMetadataFactoryProphecy->getMetadataFor('MyClass', null, null, null)->willReturn($classMetadata)->shouldBeCalled();
         $classMetadataFactory = $classMetadataFactoryProphecy->reveal();
 
@@ -205,7 +201,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetIriFromItemNoResourceAssociated()
     {
         $item = new \stdClass();
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
         $router = $this->prophesize('Symfony\Component\Routing\RouterInterface')->reveal();
@@ -223,7 +219,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     {
         $resourceCollection = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
 
         $collectionRouteProphecy = $this->prophesize('Symfony\Component\Routing\Route');
@@ -258,7 +254,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetIriFromResourceRouteNotFound()
     {
         $resourceCollection = $this->prophesize('Dunglas\ApiBundle\Api\ResourceCollectionInterface')->reveal();
-        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface')->reveal();
+        $classMetadataFactory = $this->prophesize('Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface')->reveal();
         $propertyAccessor = $this->prophesize('Symfony\Component\PropertyAccess\PropertyAccessorInterface')->reveal();
         $dataProvider = $this->prophesize('Dunglas\ApiBundle\Model\DataProviderInterface')->reveal();
 

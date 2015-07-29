@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Mapping;
+namespace Dunglas\ApiBundle\Mapping\Factory;
 
 use Doctrine\Common\Cache\Cache;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Dunglas\ApiBundle\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Mapping\Loader\LoaderInterface;
 use Dunglas\ApiBundle\Util\ClassInfoTrait;
 
@@ -54,7 +56,7 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
     ) {
         $class = $this->getClass($value);
         if (false === $class) {
-            throw new \InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: %s', gettype($value)));
+            throw new InvalidArgumentException(sprintf('Cannot create metadata for non-objects. Got: %s', gettype($value)));
         }
 
         $classKey = serialize([$class, $normalizationGroups, $denormalizationGroups, $validationGroups]);
@@ -68,11 +70,11 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         }
 
         if (!class_exists($class) && !interface_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
+            throw new InvalidArgumentException(sprintf('The class or interface "%s" does not exist.', $class));
         }
 
         $classMetadata = new ClassMetadata($class);
-        $this->loader->loadClassMetadata(
+        $classMetadata = $this->loader->loadClassMetadata(
             $classMetadata,
             $normalizationGroups,
             $denormalizationGroups,

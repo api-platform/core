@@ -9,7 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Mapping;
+namespace Dunglas\ApiBundle\Mapping\Factory;
+
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 
 /**
  * Class metadata factory. Use loaders to populates structures.
@@ -38,7 +41,7 @@ interface ClassMetadataFactoryInterface
      *
      * @return ClassMetadataInterface
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getMetadataFor($value, array $normalizationGroups = null, array $denormalizationGroups = null, array $validationGroups = null);
 

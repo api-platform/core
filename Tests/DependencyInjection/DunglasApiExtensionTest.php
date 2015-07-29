@@ -164,10 +164,12 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.property_info.setter_extractor', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.cache_warmer.metadata', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.class_metadata_factory', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.mapping.attribute_metadata_factory', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.cache.apc', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.chain', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.attributes', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.mapping.loaders.serializer_metadata', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.validator_metadata', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.mapping.loaders.reflection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.phpdoc', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.annotation', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.mapping.loaders.identifier', $definitionArgument)->shouldBeCalled();

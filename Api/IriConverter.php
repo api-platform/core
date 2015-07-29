@@ -12,8 +12,7 @@
 namespace Dunglas\ApiBundle\Api;
 
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
-use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
@@ -98,11 +97,11 @@ class IriConverter implements IriConverterInterface
     public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
-            $identifier = $this->getIdentifierFromResource($resource);
+            $identifierName = $this->getIdentifierNameFromResource($resource);
 
             return $this->router->generate(
                 $this->getRouteName($resource, 'item'),
-                ['id' => $this->propertyAccessor->getValue($item, $identifier->getName())],
+                ['id' => $this->propertyAccessor->getValue($item, $identifierName)],
                 $referenceType
             );
         }
@@ -155,11 +154,13 @@ class IriConverter implements IriConverterInterface
     }
 
     /**
+     * Gets the identifier name.
+     *
      * @param ResourceInterface $resource
      *
-     * @return AttributeMetadataInterface
+     * @return string
      */
-    private function getIdentifierFromResource(ResourceInterface $resource)
+    private function getIdentifierNameFromResource(ResourceInterface $resource)
     {
         $classMetadata = $this->classMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
@@ -168,6 +169,6 @@ class IriConverter implements IriConverterInterface
             $resource->getValidationGroups()
         );
 
-        return $classMetadata->getIdentifier();
+        return $classMetadata->getIdentifierName();
     }
 }

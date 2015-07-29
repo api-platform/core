@@ -88,20 +88,6 @@ Feature: Documentation support
                   {
                       "@type": "hydra:SupportedProperty",
                       "hydra:property": {
-                          "@id": "#Dummy\/foo",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "foo",
-                          "domain": "#Dummy"
-                      },
-                      "hydra:title": "foo",
-                      "hydra:required": false,
-                      "hydra:readable": false,
-                      "hydra:writable": true,
-                      "hydra:description": "foo"
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
                           "@id": "#Dummy\/dummyDate",
                           "@type": "rdf:Property",
                           "rdfs:label": "dummyDate",
@@ -223,19 +209,6 @@ Feature: Documentation support
                   {
                       "@type": "hydra:SupportedProperty",
                       "hydra:property": {
-                          "@id": "#RelatedDummy\/unknown",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "unknown",
-                          "domain": "https:\/\/schema.org\/Product"
-                      },
-                      "hydra:title": "unknown",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
                           "@id": "#RelatedDummy\/symfony",
                           "@type": "rdf:Property",
                           "rdfs:label": "symfony",
@@ -272,6 +245,19 @@ Feature: Documentation support
                           "range": "#ThirdLevel"
                       },
                       "hydra:title": "thirdLevel",
+                      "hydra:required": false,
+                      "hydra:readable": true,
+                      "hydra:writable": true
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#RelatedDummy\/unknown",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "unknown",
+                          "domain": "https:\/\/schema.org\/Product"
+                      },
+                      "hydra:title": "unknown",
                       "hydra:required": false,
                       "hydra:readable": true,
                       "hydra:writable": true
@@ -312,34 +298,6 @@ Feature: Documentation support
                   {
                       "@type": "hydra:SupportedProperty",
                       "hydra:property": {
-                          "@id": "#RelationEmbedder\/related",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "related",
-                          "domain": "#RelationEmbedder",
-                          "range": "#RelatedDummy"
-                      },
-                      "hydra:title": "related",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#RelationEmbedder\/id",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "id",
-                          "domain": "#RelationEmbedder",
-                          "range": "xmls:integer"
-                      },
-                      "hydra:title": "id",
-                      "hydra:required": false,
-                      "hydra:readable": false,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
                           "@id": "#RelationEmbedder\/paris",
                           "@type": "rdf:Property",
                           "rdfs:label": "paris",
@@ -375,6 +333,20 @@ Feature: Documentation support
                           "range": "#RelatedDummy"
                       },
                       "hydra:title": "anotherRelated",
+                      "hydra:required": false,
+                      "hydra:readable": true,
+                      "hydra:writable": true
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#RelationEmbedder\/related",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "related",
+                          "domain": "#RelationEmbedder",
+                          "range": "#RelatedDummy"
+                      },
+                      "hydra:title": "related",
                       "hydra:required": false,
                       "hydra:readable": true,
                       "hydra:writable": true
@@ -509,20 +481,6 @@ Feature: Documentation support
                   {
                       "@type": "hydra:SupportedProperty",
                       "hydra:property": {
-                          "@id": "#CircularReference\/id",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "id",
-                          "domain": "#CircularReference",
-                          "range": "xmls:integer"
-                      },
-                      "hydra:title": "id",
-                      "hydra:required": false,
-                      "hydra:readable": false,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
                           "@id": "#CircularReference\/parent",
                           "@type": "rdf:Property",
                           "rdfs:label": "parent",
@@ -546,6 +504,20 @@ Feature: Documentation support
                       "hydra:title": "children",
                       "hydra:required": false,
                       "hydra:readable": true,
+                      "hydra:writable": true
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#CircularReference\/id",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "id",
+                          "domain": "#CircularReference",
+                          "range": "xmls:integer"
+                      },
+                      "hydra:title": "id",
+                      "hydra:required": false,
+                      "hydra:readable": false,
                       "hydra:writable": true
                   }
               ],
@@ -1080,6 +1052,6 @@ Feature: Documentation support
                   }
               ]
           }
-        ]
-      }
-      """
+      ]
+    }
+    """

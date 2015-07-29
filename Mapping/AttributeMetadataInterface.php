@@ -11,33 +11,30 @@
 
 namespace Dunglas\ApiBundle\Mapping;
 
+use PropertyInfo\Type;
+
 /**
- * Attribute metadata.
+ * Attribute metadata. Instances are immutable.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface AttributeMetadataInterface
 {
     /**
-     * Gets name.
+     * Returns an instance with the specified type.
      *
-     * @return string
+     * @param Type $type
+     *
+     * @return self
      */
-    public function getName();
+    public function withType(Type $type);
 
     /**
-     * Set types.
+     * Gets type.
      *
-     * @param \PropertyInfo\Type[] $types
+     * @return Type
      */
-    public function setTypes(array $types);
-
-    /**
-     * Gets types.
-     *
-     * @return \PropertyInfo\Type[]
-     */
-    public function getTypes();
+    public function getType();
 
     /**
      * Gets description.
@@ -47,11 +44,13 @@ interface AttributeMetadataInterface
     public function getDescription();
 
     /**
-     * Sets description.
+     * Returns an instance with the specified description.
      *
      * @param string $description
+     *
+     * @return self
      */
-    public function setDescription($description);
+    public function withDescription($description);
 
     /**
      * Is readable?
@@ -61,11 +60,13 @@ interface AttributeMetadataInterface
     public function isReadable();
 
     /**
-     * Sets readable.
+     * Returns an instance with the specified readable flag.
      *
      * @param bool $readable
+     *
+     * @return self
      */
-    public function setReadable($readable);
+    public function withReadable($readable);
 
     /**
      * Is writable?
@@ -75,11 +76,13 @@ interface AttributeMetadataInterface
     public function isWritable();
 
     /**
-     * Sets writable.
+     * Returns an instance with the specified writable flag.
      *
      * @param bool $writable
+     *
+     * @return self
      */
-    public function setWritable($writable);
+    public function withWritable($writable);
 
     /**
      * Is required?
@@ -89,18 +92,54 @@ interface AttributeMetadataInterface
     public function isRequired();
 
     /**
-     * Sets required.
+     * Returns an instance with the specified required flag.
      *
      * @param bool $required
+     *
+     * @return self
      */
-    public function setRequired($required);
+    public function withRequired($required);
 
     /**
-     * Sets normalization link?
+     * Returns an instance with the specified link value.
      *
-     * @param bool normalizationLink
+     * @param bool $link
+     *
+     * @return self
      */
-    public function setNormalizationLink($normalizationLink);
+    public function withLink($link);
+
+    /**
+     * Is this attribute a relation to a resource?
+     *
+     * @return bool
+     */
+    public function isLink();
+
+    /**
+     * Returns an instance with the specified link class.
+     *
+     * @param string $linkClass
+     *
+     * @return self
+     */
+    public function withLinkClass($linkClass);
+
+    /**
+     * Gets the entity class of the related resource.
+     *
+     * @return string
+     */
+    public function getLinkClass();
+
+    /**
+     * Returns an instance with the specified normalization link flag.
+     *
+     * @param bool $normalizationLink
+     *
+     * @return self
+     */
+    public function withNormalizationLink($normalizationLink);
 
     /**
      * Is normalization link?
@@ -110,11 +149,13 @@ interface AttributeMetadataInterface
     public function isNormalizationLink();
 
     /**
-     * Sets denormalization link?
+     * Returns an instance with the specified denormalization link flag.
      *
-     * @param bool normalizationLink
+     * @param bool $denormalizationLink
+     *
+     * @return self
      */
-    public function setDenormalizationLink($denormalizationLink);
+    public function withDenormalizationLink($denormalizationLink);
 
     /**
      * Is denormalization link?
@@ -124,11 +165,13 @@ interface AttributeMetadataInterface
     public function isDenormalizationLink();
 
     /**
-     * Sets IRI of this attribute.
+     * Returns an instance with the specified IRI.
      *
      * @param string $iri
+     *
+     * @return self
      */
-    public function setIri($iri);
+    public function withIri($iri);
 
     /**
      * Gets IRI of this attribute.
@@ -136,11 +179,4 @@ interface AttributeMetadataInterface
      * @return string|null
      */
     public function getIri();
-
-    /**
-     * Is attribute the identifier of the class.
-     *
-     * @return bool
-     */
-    public function isIdentifier();
 }
