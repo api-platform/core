@@ -26,17 +26,12 @@ class PostItemAction
     use ActionUtilTrait;
 
     /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
-    /**
      * @var SerializerInterface
      */
     private $serializer;
 
-    public function __construct(DataProviderInterface $dataProvider, SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer)
     {
-        $this->dataProvider = $dataProvider;
         $this->serializer = $serializer;
     }
 
