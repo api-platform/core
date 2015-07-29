@@ -62,7 +62,6 @@
         </service>
 
         <service id="api.action.post_collection" class="Dunglas\ApiBundle\Action\PostItemAction">
-            <argument type="service" id="api.data_provider" />
             <argument type="service" id="serializer" />
         </service>
 
