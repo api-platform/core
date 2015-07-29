@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Util\Orm\IdExtractorTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -25,6 +26,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SearchFilter extends AbstractFilter
 {
+    use IdExtractorTrait;
+
     /**
      * @var string Exact matching.
      */
@@ -78,7 +81,7 @@ class SearchFilter extends AbstractFilter
 
             if (isset($fieldNames[$property])) {
                 if ('id' === $property) {
-                    $value = $this->getFilterValueFromUrl($value);
+                    $value = $this->getIdValueFromUrl($value);
                 }
 
                 $queryBuilder
@@ -88,7 +91,7 @@ class SearchFilter extends AbstractFilter
             } elseif ($metadata->isSingleValuedAssociation($property)
                 || $metadata->isCollectionValuedAssociation($property)
             ) {
-                $value = $this->getFilterValueFromUrl($value);
+                $value = $this->getIdValueFromUrl($value);
 
                 $queryBuilder
                     ->join(sprintf('o.%s', $property), $property)
@@ -131,25 +134,5 @@ class SearchFilter extends AbstractFilter
         }
 
         return $description;
-    }
-
-    /**
-     * Gets the ID from an URI or a raw ID.
-     *
-     * @param string $value
-     *
-     * @return string
-     */
-    private function getFilterValueFromUrl($value)
-    {
-        try {
-            if ($item = $this->iriConverter->getItemFromIri($value)) {
-                return $this->propertyAccessor->getValue($item, 'id');
-            }
-        } catch (\InvalidArgumentException $e) {
-            // Do nothing, return the raw value
-        }
-
-        return $value;
     }
 }
