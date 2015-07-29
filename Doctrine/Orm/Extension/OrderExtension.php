@@ -41,8 +41,12 @@ class OrderExtension implements QueryCollectionExtensionInterface
      */
     public function applyToCollection(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
-        if (null !== $this->order) {
-            $queryBuilder->addOrderBy('o.id', $this->order);
+        $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resource->getEntityClass());
+        $identifiers = $classMetaData->getIdentifier();
+
+        if (null !== $this->order && 1 === count($identifiers)) {
+            $identifier = $identifiers[0];
+            $queryBuilder->addOrderBy('o.'.$identifier, $this->order);
         }
     }
 }

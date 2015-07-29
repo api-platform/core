@@ -55,7 +55,7 @@ class PaginatedCollectionEnhancer extends SerializerAwareNormalizer implements N
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['json_ld_sub_level']) || !$object instanceof PaginatorInterface) {
+        if (isset($context['jsonld_sub_level']) || !$object instanceof PaginatorInterface) {
             return $data;
         }
 

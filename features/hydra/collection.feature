@@ -368,10 +368,6 @@ Feature: Collections support
     }
     """
 
-  Scenario: Retrieve a non-existing page of the collection
-    When I send a "GET" request to "/dummies?page=11"
-    Then the response status code should be 404
-
   Scenario: Disable the pagination client side
     When I send a "GET" request to "/dummies?enablePagination=0"
     Then the response status code should be 200

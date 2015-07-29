@@ -12,8 +12,6 @@
 namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 
@@ -114,14 +112,6 @@ class DataProvider implements DataProviderInterface
                     return $extension->getResult($queryBuilder);
                 }
             }
-        }
-
-        $classMetaData = $manager->getClassMetadata($entityClass);
-        $identifiers = $classMetaData->getIdentifier();
-
-        if (null !== $this->order && 1 === count($identifiers)) {
-            $identifier = $identifiers[0];
-            $queryBuilder->addOrderBy('o.'.$identifier, $this->order);
         }
 
         return $queryBuilder->getQuery()->getResult();

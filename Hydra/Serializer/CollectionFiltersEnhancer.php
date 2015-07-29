@@ -53,7 +53,7 @@ class CollectionFiltersEnhancer extends SerializerAwareNormalizer implements Nor
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
         $resource = $this->resourceResolver->guessResource($object, $context);
 
-        if (!isset($context['json_ld_sub_level'])) {
+        if (!isset($context['jsonld_sub_level'])) {
             $filters = $resource->getFilters();
             if (!empty($filters)) {
                 $requestParts = parse_url($context['request_uri']);
