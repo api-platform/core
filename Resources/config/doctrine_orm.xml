@@ -11,7 +11,6 @@
 
         <service id="api.doctrine.orm.data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>%api.collection.order%</argument>
         </service>
 
         <service id="api.doctrine.orm.default_data_provider" parent="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider">
