@@ -31,12 +31,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ],
             'order' => null,
             'pagination' => [
-                'page_parameter_name' => 'page',
                 'items_per_page' => [
-                    'number' => 30,
-                    'enable_client_request' => false,
-                    'parameter_name' => 'itemsPerPage',
+                    'default' => 30,
+                    'client_can_change' => false,
+                    'parameter' => 'itemsPerPage',
                 ],
+                'enabled' => true,
+                'client_can_enable' => false,
+                'enable_parameter' => 'enablePagination',
+                'page_parameter' => 'page',
             ],
         ],
     ];

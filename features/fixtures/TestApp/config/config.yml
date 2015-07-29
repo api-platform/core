@@ -31,9 +31,10 @@ dunglas_api:
             order:                     "order"
         order:                         "ASC"
         pagination:
+            client_can_enable:         true
             items_per_page:
-                number:                3
-                enable_client_request: true
+                default:               3
+                client_can_change:     true
 
 services:
     api.name_converter:

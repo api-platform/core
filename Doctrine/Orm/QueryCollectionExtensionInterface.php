@@ -9,24 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
+namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\ORM\QueryBuilder;
-use Dunglas\ApiBundle\Api\Filter\FilterInterface as BaseFilterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 
 /**
- * Doctrine ORM filter interface.
+ * Interface of Doctrine ORM query extensions for collection queries.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-interface FilterInterface extends BaseFilterInterface
+interface QueryCollectionExtensionInterface
 {
     /**
-     * Applies the filter.
-     *
      * @param ResourceInterface $resource
      * @param QueryBuilder      $queryBuilder
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder);
+    public function applyToCollection(ResourceInterface $resource, QueryBuilder $queryBuilder);
 }

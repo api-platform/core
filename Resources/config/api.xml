@@ -78,6 +78,10 @@
             <argument type="service" id="api.data_provider" />
         </service>
 
+        <service id="api.resource_resolver" class="Dunglas\ApiBundle\Api\ResourceResolver">
+            <argument type="service" id="api.resource_collection" />
+        </service>
+
     </services>
 
 </container>

@@ -21,6 +21,8 @@ class ResourcePassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
+        $this->markTestSkipped('To be refactored');
+
         $resourcePass = new ResourcePass();
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $resourcePass);

@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-trait ResourceResolverTrait
+class ResourceResolver
 {
     use ClassInfoTrait;
 
@@ -29,6 +29,14 @@ trait ResourceResolverTrait
      * @var ResourceCollectionInterface
      */
     private $resourceCollection;
+
+    /**
+     * @param ResourceCollectionInterface $resourceCollection
+     */
+    public function __construct(ResourceCollectionInterface $resourceCollection)
+    {
+        $this->resourceCollection = $resourceCollection;
+    }
 
     /**
      * Guesses the associated resource.

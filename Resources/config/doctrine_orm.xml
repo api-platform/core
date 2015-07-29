@@ -11,11 +11,6 @@
 
         <service id="api.doctrine.orm.data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>%api.collection.order%</argument>
-            <argument>%api.collection.pagination.page_parameter_name%</argument>
-            <argument>%api.collection.pagination.items_per_page.number%</argument>
-            <argument>%api.collection.pagination.items_per_page.enable_client_request%</argument>
-            <argument>%api.collection.pagination.items_per_page.parameter_name%</argument>
         </service>
 
         <service id="api.doctrine.orm.default_data_provider" parent="api.doctrine.orm.data_provider" class="Dunglas\ApiBundle\Doctrine\Orm\DataProvider">
@@ -26,17 +21,20 @@
 
         <service id="api.doctrine.orm.search_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
+            <argument type="service" id="request_stack" />
             <argument type="service" id="api.iri_converter" />
             <argument type="service" id="property_accessor" />
         </service>
 
         <service id="api.doctrine.orm.order_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
+            <argument type="service" id="request_stack" />
             <argument>%api.collection.filter_name.order%</argument>
         </service>
 
         <service id="api.doctrine.orm.date_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <!-- Metadata loader -->
@@ -54,6 +52,21 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
         </service>
 
+        <!-- Doctrine Query extensions -->
+
+        <service id="api.doctrine.orm.query_extension.filter" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\FilterExtension">
+            <tag name="api.doctrine.orm.query_extension.collection" />
+        </service>
+
+        <service id="api.doctrine.orm.query_extension.pagination" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\PaginationExtension">
+            <argument type="service" id="request_stack" />
+            <tag name="api.doctrine.orm.query_extension.collection" />
+        </service>
+
+        <service id="api.doctrine.orm.query_extension.order" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\OrderExtension">
+            <argument>%api.collection.order%</argument>
+            <tag name="api.doctrine.orm.query_extension.collection" />
+        </service>
     </services>
 
 </container>
