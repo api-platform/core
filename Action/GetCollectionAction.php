@@ -47,6 +47,6 @@ class GetCollectionAction
     {
         list($resourceType) = $this->extractAttributes($request);
 
-        return $this->dataProvider->getCollection($resourceType, $request);
+        return $this->dataProvider->getCollection($resourceType);
     }
 }

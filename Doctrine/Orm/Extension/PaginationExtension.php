@@ -46,14 +46,16 @@ class PaginationExtension implements QueryResultExtensionInterface
     public function applyToCollection(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($paginationEnabled = $this->isPaginationEnabled($resource, $request)) {
-            $itemsPerPage = $this->getItemsPerPage($resource, $request);
-
-            $queryBuilder
-                ->setFirstResult(($this->getPage($resource, $request) - 1) * $itemsPerPage)
-                ->setMaxResults($itemsPerPage)
-            ;
+        if (null === $request || !$this->isPaginationEnabled($resource, $request)) {
+            return;
         }
+
+        $itemsPerPage = $this->getItemsPerPage($resource, $request);
+
+        $queryBuilder
+            ->setFirstResult(($this->getPage($resource, $request) - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage)
+        ;
     }
 
     /**

@@ -64,7 +64,12 @@ class DateFilter extends AbstractFilter
     {
         $fieldNames = $this->getDateFieldNames($resource);
 
-        foreach ($this->extractProperties($this->requestStack->getCurrentRequest()) as $property => $values) {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
+        foreach ($this->extractProperties($request) as $property => $values) {
             // Expect $values to be an array having the period as keys and the date value as values
             if (!isset($fieldNames[$property]) || !is_array($values) || !$this->isPropertyEnabled($property)) {
                 continue;
