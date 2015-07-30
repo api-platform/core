@@ -5,6 +5,8 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api.property_accessor" alias="property_accessor" />
+
         <service id="api.resource" class="Dunglas\ApiBundle\Api\Resource" public="false" abstract="true" lazy="true" />
 
         <service id="api.resource_collection" class="Dunglas\ApiBundle\Api\ResourceCollection" lazy="true" />
@@ -29,7 +31,7 @@
             <argument type="service" id="api.data_provider" />
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument type="service" id="api.router" />
-            <argument type="service" id="property_accessor" />
+            <argument type="service" id="api.property_accessor" />
         </service>
 
         <service id="api.format_negotiator" class="Negotiation\FormatNegotiator" public="false" />
