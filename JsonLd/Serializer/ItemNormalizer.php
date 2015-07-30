@@ -44,6 +44,10 @@ class ItemNormalizer extends AbstractNormalizer
     const FORMAT = 'jsonld';
 
     /**
+     * @var ResourceCollectionInterface
+     */
+    private $resourceCollection;
+    /**
      * @var IriConverterInterface
      */
     private $iriConverter;

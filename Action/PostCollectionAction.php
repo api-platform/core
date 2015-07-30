@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PostItemAction
+class PostCollectionAction
 {
     use ActionUtilTrait;
 

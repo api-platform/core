@@ -57,7 +57,9 @@ class CollectionFiltersEnhancer extends SerializerAwareNormalizer implements Nor
             $filters = $resource->getFilters();
             if (!empty($filters)) {
                 $requestParts = parse_url($context['request_uri']);
-                $data['hydra:search'] = $this->getSearch($resource, $requestParts, $filters);
+                if (is_array($requestParts)) {
+                    $data['hydra:search'] = $this->getSearch($resource, $requestParts, $filters);
+                }
             }
         }
 

@@ -62,7 +62,12 @@ class OrderFilter extends AbstractFilter
      */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
-        $properties = $this->extractProperties($this->requestStack->getCurrentRequest());
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
+        $properties = $this->extractProperties($request);
         $fieldNames = array_flip($this->getClassMetadata($resource)->getFieldNames());
 
         foreach ($properties as $property => $order) {

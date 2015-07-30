@@ -86,11 +86,15 @@ class SearchFilter extends AbstractFilter
      */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
         $metadata = $this->getClassMetadata($resource);
         $fieldNames = array_flip($metadata->getFieldNames());
-        $currentRequest = $this->requestStack->getCurrentRequest();
 
-        foreach ($this->extractProperties($currentRequest) as $property => $value) {
+        foreach ($this->extractProperties($request) as $property => $value) {
             if (!is_string($value) || !$this->isPropertyEnabled($property)) {
                 continue;
             }
