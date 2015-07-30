@@ -23,7 +23,7 @@
             <argument type="service" id="doctrine" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="api.iri_converter" />
-            <argument type="service" id="property_accessor" />
+            <argument type="service" id="api.property_accessor" />
         </service>
 
         <service id="api.doctrine.orm.order_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">
