@@ -73,6 +73,8 @@ Using a numeric ID is also supported: `http://localhost:8000/api/offers?product=
 Previous URLs will return all offers for the product having the following IRI as
 JSON-LD identifier (`@id`): `http://localhost:8000/api/products/12`.
 
+For to-many relations, just use the array syntax: `http://localhost:8000/api/offers?products[]=/api/products/13&products[]=/api/products/14`. This is translated into DQL as `products.id IN (13,14)`.
+
 ## Date filter
 
 The date filter allows to filter a collection by date intervals.

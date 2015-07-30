@@ -133,7 +133,8 @@ class PaginatedCollectionEnhancer extends SerializerAwareNormalizer implements N
             $parameters[$resource->getPageParameter()] = $page;
         }
 
-        $parts['query'] = http_build_query($parameters);
+        $query = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
+        $parts['query'] = preg_replace('/%5B[0-9]+%5D/', '%5B%5D', $query);
 
         $url = $parts['path'];
 

@@ -82,13 +82,17 @@ class SearchFilter extends AbstractFilter
         $fieldNames = array_flip($metadata->getFieldNames());
 
         foreach ($this->extractProperties($request) as $property => $value) {
-            if (!is_string($value) || !$this->isPropertyEnabled($property)) {
+            if (null === $value || !$this->isPropertyEnabled($property)) {
                 continue;
             }
 
-            $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$property];
-
             if (isset($fieldNames[$property])) {
+                if (!is_string($value)) {
+                    continue;
+                }
+
+                $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$property];
+
                 if ('id' === $property) {
                     $value = $this->getFilterValueFromUrl($value);
                 }
@@ -97,15 +101,39 @@ class SearchFilter extends AbstractFilter
                     ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
                     ->setParameter($property, $partial ? sprintf('%%%s%%', $value) : $value)
                 ;
-            } elseif ($metadata->isSingleValuedAssociation($property)
-                || $metadata->isCollectionValuedAssociation($property)
-            ) {
+            } elseif ($metadata->isSingleValuedAssociation($property)) {
+                if (!is_string($value)) {
+                    continue;
+                }
+
                 $value = $this->getFilterValueFromUrl($value);
 
                 $queryBuilder
                     ->join(sprintf('o.%s', $property), $property)
                     ->andWhere(sprintf('%1$s.id = :%1$s', $property))
-                    ->setParameter($property, $partial ? sprintf('%%%s%%', $value) : $value)
+                    ->setParameter($property, $value)
+                ;
+            } elseif ($metadata->isCollectionValuedAssociation($property)) {
+                $values = $value;
+                if (!is_array($values)) {
+                    $values = [$value];
+                }
+                foreach ($values as $k => $v) {
+                    if (!is_int($k) || !is_string($v)) {
+                        unset($values[$k]);
+                    }
+                }
+
+                if (empty($values)) {
+                    continue;
+                }
+
+                $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+
+                $queryBuilder
+                    ->join(sprintf('o.%s', $property), $property)
+                    ->andWhere(sprintf('%1$s.id IN (:%1$s)', $property))
+                    ->setParameter($property, $values)
                 ;
             }
         }
@@ -133,7 +161,11 @@ class SearchFilter extends AbstractFilter
 
         foreach ($metadata->getAssociationNames() as $associationName) {
             if ($this->isPropertyEnabled($associationName)) {
-                $description[$associationName] = [
+                $paramName = $associationName;
+                if ($metadata->isCollectionValuedAssociation($associationName)) {
+                    $paramName .= '[]';
+                }
+                $description[$paramName] = [
                     'property' => $associationName,
                     'type' => 'iri',
                     'required' => false,
