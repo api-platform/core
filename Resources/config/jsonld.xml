@@ -49,7 +49,7 @@
         </service>
 
         <service id="api.jsonld.listener.view.responder" class="Dunglas\ApiBundle\JsonLd\EventListener\ResponderViewListener">
-            <argument type="service" id="serializer" />
+            <argument type="service" id="api.serializer" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" />
         </service>

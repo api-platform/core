@@ -24,7 +24,7 @@
         </service>
 
         <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
-            <argument type="service" id="serializer" />
+            <argument type="service" id="api.serializer" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
