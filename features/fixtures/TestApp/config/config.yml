@@ -43,7 +43,7 @@ services:
     xml_responder_view_listener:
         class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\EventListener\XmlResponderViewListener"
         arguments:
-            - @serializer
+            - @api.serializer
         tags:
             - { name: "kernel.event_listener", event: "kernel.view", method: "onKernelView" }
 
