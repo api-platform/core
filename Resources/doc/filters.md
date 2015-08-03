@@ -30,14 +30,15 @@ services:
     resource.offer.search_filter:
         parent:    "api.doctrine.orm.search_filter"
         arguments: [ { id: "exact", price: "exact", name: "partial"  } ]
+```
 
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer" ]
-        calls:
-            -      method:    "initFilters"
-                   arguments: [ [ "@resource.offer.search_filter" ] ]
-        tags:      [ { name: "api.resource" } ]
+```yaml
+
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            filters: [ 'resource.offer.search_filter' ]
 ```
 
 `http://localhost:8000/api/offers?price=10` will return all offers with a price being exactly `10`.
@@ -55,14 +56,15 @@ services:
     resource.offer.search_filter:
         parent:    "api.doctrine.orm.search_filter"
         arguments: [ { "product": "exact" } ]
+```
 
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer"] 
-        calls:
-            -      method:    "initFilters"
-                   arguments: [ [ "@resource.offer.search_filter" ] ]
-        tags:      [ { name: "api.resource" } ]
+```yaml
+
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            filters: [ 'resource.offer.search_filter' ]
 ```
 
 With this service definition, it is possible to find all offers belonging to the
@@ -95,14 +97,15 @@ services:
     resource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
         arguments: [ { "dateProperty": ~ } ]
+```
 
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer"] 
-        calls:
-            -      method:    "initFilters"
-                   arguments: [ [ "@resource.offer.date_filter" ] ]
-        tags:      [ { name: "api.resource" } ]
+```yaml
+
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            filters: [ 'resource.offer.date_filter' ]
 ```
 
 ### Managing `null` values
@@ -128,13 +131,13 @@ services:
         parent:    "api.doctrine.orm.date_filter"
         arguments: [ { "dateProperty": exclude_null } ]
 
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer"] 
-        calls:
-            -      method:    "initFilters"
-                   arguments: [ [ "@resource.offer.date_filter" ] ]
-        tags:      [ { name: "api.resource" } ]
+```yaml
+
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            filters: [ 'resource.offer.date_filter' ]
 ```
 
 If you use another service definition format than YAML, you can use the
@@ -156,14 +159,15 @@ services:
     resource.offer.order_filter:
         parent:    "api.doctrine.orm.order_filter"
         arguments: [ { "id": ~, "name": ~ } ]
+```
 
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer"] 
-        calls:
-            -      method:    "initFilters"
-                   arguments: [ [ "@resource.offer.order_filter" ] ]
-        tags:      [ { name: "api.resource" } ]
+```yaml
+
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            filters: [ 'resource.offer.order_filter' ]
 ```
 
 Given that the collection endpoint is `/offers`, you can filter offers by name in
@@ -231,7 +235,7 @@ It means that the filter will be **silently** ignored if the property:
 Custom filters can be written by implementing the `Dunglas\ApiBundle\Api\Filter\FilterInterface`
 interface.
 
-Don't forget to register your custom filters with the `Dunglas\ApiBundle\Api\Resource::initFilters()` method.
+Don't forget to register your custom filters in the `filters` configuration.
 
 If you use [custom data providers](data-providers.md), they must support filtering and be aware of actives filters to
 work properly.

@@ -6,17 +6,13 @@ Symfony 2.7 introduced [serialization (and deserialization) groups support](http
 in the Serializer component. Specifying to the API system the groups to use is damn easy:
 
 ```yaml
-# app/config/services.yml
-services:
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      method:    "initNormalizationContext"
-                   arguments: [ { groups: [ "serialization_group1", "serialization_group2" ] } ]
-            -      method:    "initDenormalizationContext"
-                   arguments: [ { groups: [ "deserialization_group1", "deserialization_group2" ] } ]
-        tags:      [ { name: "api.resource" } ]
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            normalization_groups: [ "serialization_group1", "serialization_group2" ]
+            denormalization_groups: [ "deserialization_group1", "deserialization_group2" ]
 ```
 
 The built-in controller and the Hydra documentation generator will leverage specified serialization and deserialization
@@ -73,16 +69,11 @@ You can also decide to embed it:
 For this, register the following services (for example in `app/config/services.yml`):
 
 ```yaml
-services:
-    # ...
-
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer" ]
-        calls:
-            -      method:    "initNormalizationContext"
-                   arguments: [ { jsonld_context_embedded: true } ]
-        tags:      [ { name: "api.resource" } ]
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            json_ld_context_embedded: true
 ```
 
 ### Normalization
@@ -143,16 +134,11 @@ class Product
 Register the following services (for example in `app/config/services.yml`):
 
 ```yaml
-services:
-    # ...
-
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer" ]
-        calls:
-            -      method:    "initNormalizationContext"
-                   arguments: [ { groups: [ "offer" ] } ]
-        tags:      [ { name: "api.resource" } ]
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            normalization_groups: ["offer"]
 ```
 
 The generated JSON with previous settings will be like the following:
@@ -177,18 +163,12 @@ It is also possible to embed a relation in `PUT` and `POST` requests. To enable 
 set the same way as normalization and the service definition must be like the following:
 
 ```yaml
-# app/config/services.yml
-services:
-    # ...
-
-    resource.offer:
-        parent:     "api.resource"
-        arguments:  [ "AppBundle\Entity\Offer" ]
-        calls:
-            -       method:    "initDenormalizationContext"
-                    arguments:
-                        -      { groups: [ "offer" ] }
-        tags:       [ { name: "api.resource" } ]
+# app/config/config.yml
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            denormalization_groups: ["offer"]
 ```
 
 The following rules apply when denormalizating embedded relations:
