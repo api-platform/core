@@ -20,40 +20,15 @@ By default, the following operations are automatically enabled:
 
 ## Disabling operations
 
-If you want to disable some operations (e.g. the `DELETE` operation), you must create manually applicable operations using
-the operation factory class, `Dunglas\ApiBundle\Api\Operation\OperationFactory::createCollectionOperation()` or/and `Dunglas\ApiBundle\Api\Operation\OperationFactory::createItemOperation()` methods and then, register it in the resource with `Dunglas\ApiBundle\Api/Resource::initCollectionOperations` or/and `Dunglas\ApiBundle\Api/Resource::initItemOperations`.
-
-The following `Resource` definition exposes a `GET` operation for it's collection but not the `POST` one:
+If you want to disable some operations (e.g. the `DELETE` operation), can update it in your configuration.
 
 ```yaml
-services:
-    resource.product.collection_operation.get:
-        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
-        public:    false
-        factory:   [ "@api.operation_factory", "createCollectionOperation" ]
-        arguments: [ "@resource.product", "GET" ]
-
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
-        tags:      [ { name: "api.resource" } ]
-```
-
-However, in the following example items operations will still be automatically registered. To disable them, call `initItemOperations`
-with an empty array as first parameter:
-
-```yaml
-# ...
-
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      [ "initItemOperations", [ [ ] ] ]
-            -      [ "initCollectionOperations", [ [ "@resource.product.collection_operation.get" ] ] ]
-        tags:      [ { name: "api.resource" } ]
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            item_operations: ["GET", "PUT" ]
+            collection_operations: ["GET" ]
 ```
 
 ## Creating custom operations
@@ -63,54 +38,33 @@ Custom operations allow to customize routing information (like the URL and the H
 the controller to use (default to the built-in action of the `ResourceController` applicable
 for the given HTTP method) and a context that will be passed to documentation generators.
 
-A convenient factory is provided to build `Dunglas\ApiBundle\Api\Operation\Operation` instances.
-This factory guesses good default values for options such as the route name and its associated URL
-by inspecting the given `Resource` instance. All guessed values can be override.
-
-If you want to use custom controller action, [refer to the dedicated documentation](controllers.md).
-
-DunglasApiBundle is smart enough to automatically register routes in the Symfony routing system and to document
-operations in the Hydra vocab.
-
+You just need to add some configuration options:
 ```yaml
-    resource.product.item_operation.get:
-        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
-        public:    false
-        factory:   [ "@api.operation_factory", "createItemOperation" ]
-        arguments: [ "@resource.product", "GET" ]
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            item_operations: ["GET", "PUT" ]
+            collection_operations: ["GET" ]
+            item_custom_operations: 
+                some_action:
+                    methods: ["POST"]
+                    path: "/product/{id}/_some_action" # optional
+                    route: "some_action_route" # optional
+                    controller: "AppBundle:Foo:bar"
+                    context:
+                         "@type": "hydra:Operation"
+                         "hydra:title": "Do something"
+                         "returns": "xmls:string"
+            collection_custom_operations: 
+                another_custom_action: 
+                    methods: ["HEAD"]
+                    controller: "AppBundle:Foo:baz"
 
-    resource.product.item_operation.put:
-        class:     "Dunglas\ApiBundle\Api\Operation\Operation"
-        public:    false
-        factory:   [ "@api.operation_factory", "createItemOperation" ]
-        arguments: [ "@resource.product", "PUT" ]
-
-    resource.product.item_operation.custom_get:
-        class:   "Dunglas\ApiBundle\Api\Operation\Operation"
-        public:  false
-        factory: [ "@api.operation_factory", "createItemOperation" ]
-        arguments:
-            -    "@resource.product"               # Resource
-            -    [ "GET", "HEAD" ]                 # Methods
-            -    "/products/{id}/custom"           # Path
-            -    "AppBundle:Custom:custom"         # Controller
-            -    "my_custom_route"                 # Route name
-            -    # Context (will be present in Hydra documentation)
-                 "@type":       "hydra:Operation"
-                 "hydra:title": "A custom operation"
-                 "returns":     "xmls:string"
-
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      method:    "initItemOperations"
-                   arguments: [ [ "@resource.product.item_operation.get", "@resource.product.item_operation.put", "@resource.product.item_operation.custom_get" ] ]
-        tags:      [ { name: "api.resource" } ]
 ```
 
-Additionally to the default generated `GET` and `PUT` operations, this definition will expose a new `GET` operation for
-the `/products/{id}/custom` URL. When this URL is opened, the `AppBundle:Custom:custom` controller is called.
+Additionally to the default generated operations, this definition will expose a new `POST` operation for the `/products/{id}/_some_action` URL. When this URL is opened, the `AppBundle:Foo:bar` controller is called.
+It will also add a new `HEAD` operation for `/products/`.
 
 Previous chapter: [NelmioApiDocBundle integration](nelmio-api-doc.md)<br>
 Next chapter: [Data providers](data-providers.md)
