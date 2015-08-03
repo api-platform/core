@@ -73,7 +73,7 @@ dunglas_api:
     resources:
         product:
             entry_class: "AppBundle\Entity\Product"
-            json_ld_context_embedded: true
+            jsonld_context_embedded: true
 ```
 
 ### Normalization
