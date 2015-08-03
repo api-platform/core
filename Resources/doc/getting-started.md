@@ -79,7 +79,7 @@ dunglas_api:
             item_operations: [ "GET", "PUT", "DELETE" ] # Default to GET, PUT, DELETE
             collection_operations: [ "GET", "POST" ] # Default to GET, POST
             filters: [ my_filter_service_name ] # Optional
-            json_ld_context_embedded: false # Optional, default to false
+            jsonld_context_embedded: false # Optional, default to false
             normalization_groups: [ a, b ] # Optional, default to null
             denormalization_groups: [ a, b ] # Optional, default to null
             validation_groups: [ a, b] # Optional, default to null

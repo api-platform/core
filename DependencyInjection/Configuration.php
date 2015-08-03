@@ -145,7 +145,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
 
                             // (de)normalization context
-                            ->booleanNode('json_ld_context_embedded')
+                            ->booleanNode('jsonld_context_embedded')
                                 ->info('Embed the context in the response')
                                 ->defaultFalse()
                             ->end()

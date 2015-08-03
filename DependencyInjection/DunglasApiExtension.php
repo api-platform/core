@@ -133,13 +133,13 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
             );
 
             // (de)normalization contexts
-            if (!empty($config['normalization_groups']) || !empty($config['json_ld_context_embedded'])) {
+            if (!empty($config['normalization_groups']) || !empty($config['jsonld_context_embedded'])) {
                 $context = [];
                 if (!empty($config['normalization_groups'])) {
                     $context['groups'] = $config['normalization_groups'];
                 }
-                if (!empty($config['json_ld_context_embedded'])) {
-                    $context['json_ld_context_embedded'] = $config['json_ld_context_embedded'];
+                if (!empty($config['jsonld_context_embedded'])) {
+                    $context['jsonld_context_embedded'] = $config['jsonld_context_embedded'];
                 }
                 $resourceDefinition->addMethodCall('initNormalizationContext', [$context]);
             }
