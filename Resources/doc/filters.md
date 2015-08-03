@@ -91,7 +91,7 @@ As others filters, the date filter must be explicitly enabled:
 # app/config/services.yml
 
 services:
-    # Enable date filter for for the property "dateProperty" of the resource "resource.offer"
+    # Enable date filter for the property "dateProperty" of the resource "resource.offer"
     resource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
         arguments: [ { "dateProperty": ~ } ]
@@ -110,12 +110,12 @@ services:
 The date filter is able to deal with date properties having `null` values.
 Four behaviors are available at the property level of the filter:
 
-| Description                          | Strategy to set                                                               |
-|--------------------------------------|-------------------------------------------------------------------------------|
-| Use the default behavior of the DBMS | `null`                                                                        |
-| Exclude items                        | `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter::EXCLUDE_NULL` (`0`)        |
-| Consider items as oldest             | `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter::INCLUDE_NULL_BEFORE` (`1`) |
-| Consider items as youngest           | `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter::INCLUDE_NULL_AFTER` (`2`)  |
+| Description                          | Strategy to set                                                                                 |
+|--------------------------------------|-------------------------------------------------------------------------------------------------|
+| Use the default behavior of the DBMS | `null`                                                                                          |
+| Exclude items                        | `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter::EXCLUDE_NULL` (`exclude_null`)               |
+| Consider items as oldest             | `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter::INCLUDE_NULL_BEFORE` (`include_null_before`) |
+| Consider items as youngest           | `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter::INCLUDE_NULL_AFTER` (`include_null_after`)   |
 
 For instance, exclude entries with a property value of `null`, with the following service definition:
 
@@ -126,7 +126,7 @@ For instance, exclude entries with a property value of `null`, with the followin
 services:
     resource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
-        arguments: [ { "dateProperty": ~ } ]
+        arguments: [ { "dateProperty": exclude_null } ]
 
     resource.offer:
         parent:    "api.resource"
