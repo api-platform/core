@@ -47,10 +47,6 @@ class FormatRequestListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $request = $event->getRequest();
         if (!$request->attributes->get('_resource_type')) {
             return;

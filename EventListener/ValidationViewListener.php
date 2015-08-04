@@ -44,10 +44,6 @@ class ValidationViewListener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $resourceType = $event->getRequest()->attributes->get('_resource_type');
         if (!$resourceType || !in_array($event->getRequest()->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT])) {
             return;
