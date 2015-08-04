@@ -188,7 +188,6 @@ Feature: Documentation support
                           "hydra:writable": true,
                           "hydra:description": "Several dummies."
                       },
-<<<<<<< HEAD
                       {
                           "@type": "hydra:SupportedProperty",
                           "hydra:property": {
@@ -219,54 +218,6 @@ Feature: Documentation support
                           "hydra:title": "Replaces the Dummy resource.",
                           "rdfs:label": "Replaces the Dummy resource.",
                           "returns": "#Dummy"
-=======
-                      "hydra:title": "nameConverted",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  }
-              ],
-              "hydra:supportedOperation": [
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "GET",
-                      "hydra:title": "Retrieves Dummy resource.",
-                      "rdfs:label": "Retrieves Dummy resource.",
-                      "returns": "#Dummy"
-                  },
-                  {
-                      "@type": "hydra:ReplaceResourceOperation",
-                      "expects": "#Dummy",
-                      "hydra:method": "PUT",
-                      "hydra:title": "Replaces the Dummy resource.",
-                      "rdfs:label": "Replaces the Dummy resource.",
-                      "returns": "#Dummy"
-                  },
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "DELETE",
-                      "hydra:title": "Deletes the Dummy resource.",
-                      "rdfs:label": "Deletes the Dummy resource.",
-                      "returns": "owl:Nothing"
-                  }
-              ]
-          },
-          {
-              "@id": "https:\/\/schema.org\/Product",
-              "@type": "hydra:Class",
-              "rdfs:label": "RelatedDummy",
-              "hydra:title": "RelatedDummy",
-              "hydra:description": "Related dummy.",
-              "hydra:supportedProperty": [
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#RelatedDummy\/symfony",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "symfony",
-                          "domain": "https:\/\/schema.org\/Product",
-                          "range": "xmls:string"
->>>>>>> ed3635a... Refactor the metadata system: better SRP, immutability
                       },
                       {
                           "@type": "hydra:Operation",
@@ -311,7 +262,6 @@ Feature: Documentation support
                           "hydra:readable": true,
                           "hydra:writable": true
                       },
-<<<<<<< HEAD
                       {
                           "@type": "hydra:SupportedProperty",
                           "hydra:property": {
@@ -357,67 +307,6 @@ Feature: Documentation support
                           "hydra:title": "Replaces the RelatedDummy resource.",
                           "rdfs:label": "Replaces the RelatedDummy resource.",
                           "returns": "https://schema.org/Product"
-=======
-                      "hydra:title": "thirdLevel",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#RelatedDummy\/unknown",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "unknown",
-                          "domain": "https:\/\/schema.org\/Product"
-                      },
-                      "hydra:title": "unknown",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  }
-              ],
-              "hydra:supportedOperation": [
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "GET",
-                      "hydra:title": "Retrieves RelatedDummy resource.",
-                      "rdfs:label": "Retrieves RelatedDummy resource.",
-                      "returns": "https:\/\/schema.org\/Product"
-                  },
-                  {
-                      "@type": "hydra:ReplaceResourceOperation",
-                      "expects": "https:\/\/schema.org\/Product",
-                      "hydra:method": "PUT",
-                      "hydra:title": "Replaces the RelatedDummy resource.",
-                      "rdfs:label": "Replaces the RelatedDummy resource.",
-                      "returns": "https:\/\/schema.org\/Product"
-                  },
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "DELETE",
-                      "hydra:title": "Deletes the RelatedDummy resource.",
-                      "rdfs:label": "Deletes the RelatedDummy resource.",
-                      "returns": "owl:Nothing"
-                  }
-              ]
-          },
-          {
-              "@id": "#RelationEmbedder",
-              "@type": "hydra:Class",
-              "rdfs:label": "RelationEmbedder",
-              "hydra:title": "RelationEmbedder",
-              "hydra:description": "Relation embedder.",
-              "hydra:supportedProperty": [
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#RelationEmbedder\/paris",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "paris",
-                          "domain": "#RelationEmbedder",
-                          "range": "xmls:string"
->>>>>>> ed3635a... Refactor the metadata system: better SRP, immutability
                       },
                       {
                           "@type": "hydra:Operation",
@@ -463,7 +352,6 @@ Feature: Documentation support
                           "hydra:readable": false,
                           "hydra:writable": true
                       },
-<<<<<<< HEAD
                       {
                           "@type": "hydra:SupportedProperty",
                           "hydra:property": {
@@ -477,68 +365,6 @@ Feature: Documentation support
                           "hydra:required": false,
                           "hydra:readable": false,
                           "hydra:writable": true
-=======
-                      "hydra:title": "anotherRelated",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#RelationEmbedder\/related",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "related",
-                          "domain": "#RelationEmbedder",
-                          "range": "#RelatedDummy"
-                      },
-                      "hydra:title": "related",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  }
-              ],
-              "hydra:supportedOperation": [
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "GET",
-                      "hydra:title": "Retrieves RelationEmbedder resource.",
-                      "rdfs:label": "Retrieves RelationEmbedder resource.",
-                      "returns": "#RelationEmbedder"
-                  },
-                  {
-                      "@type": "hydra:ReplaceResourceOperation",
-                      "expects": "#RelationEmbedder",
-                      "hydra:method": "PUT",
-                      "hydra:title": "Replaces the RelationEmbedder resource.",
-                      "rdfs:label": "Replaces the RelationEmbedder resource.",
-                      "returns": "#RelationEmbedder"
-                  },
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "GET",
-                      "hydra:title": "A custom operation",
-                      "rdfs:label": "A custom operation",
-                      "returns": "xmls:string"
-                  }
-              ]
-          },
-          {
-              "@id": "#Custom",
-              "@type": "hydra:Class",
-              "rdfs:label": "Custom",
-              "hydra:title": "Custom",
-              "hydra:description": "Custom.",
-              "hydra:supportedProperty": [
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#Custom\/id",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "id",
-                          "domain": "#Custom",
-                          "range": "xmls:integer"
->>>>>>> ed3635a... Refactor the metadata system: better SRP, immutability
                       },
                       {
                           "@type": "hydra:SupportedProperty",
@@ -577,7 +403,6 @@ Feature: Documentation support
                           "rdfs:label": "Retrieves RelationEmbedder resource.",
                           "returns": "#RelationEmbedder"
                       },
-<<<<<<< HEAD
                       {
                           "@type": "hydra:ReplaceResourceOperation",
                           "expects": "#RelationEmbedder",
@@ -679,129 +504,6 @@ Feature: Documentation support
                           "hydra:title": "Replaces the ThirdLevel resource.",
                           "rdfs:label": "Replaces the ThirdLevel resource.",
                           "returns": "#ThirdLevel"
-=======
-                      "hydra:title": "test",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  }
-              ],
-              "hydra:supportedOperation": [
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "GET",
-                      "hydra:title": "Retrieves ThirdLevel resource.",
-                      "rdfs:label": "Retrieves ThirdLevel resource.",
-                      "returns": "#ThirdLevel"
-                  },
-                  {
-                      "@type": "hydra:ReplaceResourceOperation",
-                      "expects": "#ThirdLevel",
-                      "hydra:method": "PUT",
-                      "hydra:title": "Replaces the ThirdLevel resource.",
-                      "rdfs:label": "Replaces the ThirdLevel resource.",
-                      "returns": "#ThirdLevel"
-                  },
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "DELETE",
-                      "hydra:title": "Deletes the ThirdLevel resource.",
-                      "rdfs:label": "Deletes the ThirdLevel resource.",
-                      "returns": "owl:Nothing"
-                  }
-              ]
-          },
-          {
-              "@id": "#CircularReference",
-              "@type": "hydra:Class",
-              "rdfs:label": "CircularReference",
-              "hydra:title": "CircularReference",
-              "hydra:description": "Circular Reference.",
-              "hydra:supportedProperty": [
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#CircularReference\/parent",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "parent",
-                          "domain": "#CircularReference",
-                          "range": "#CircularReference"
-                      },
-                      "hydra:title": "parent",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#CircularReference\/children",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "children",
-                          "domain": "#CircularReference",
-                          "range": "#CircularReference"
-                      },
-                      "hydra:title": "children",
-                      "hydra:required": false,
-                      "hydra:readable": true,
-                      "hydra:writable": true
-                  },
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#CircularReference\/id",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "id",
-                          "domain": "#CircularReference",
-                          "range": "xmls:integer"
-                      },
-                      "hydra:title": "id",
-                      "hydra:required": false,
-                      "hydra:readable": false,
-                      "hydra:writable": true
-                  }
-              ],
-              "hydra:supportedOperation": [
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "GET",
-                      "hydra:title": "Retrieves CircularReference resource.",
-                      "rdfs:label": "Retrieves CircularReference resource.",
-                      "returns": "#CircularReference"
-                  },
-                  {
-                      "@type": "hydra:ReplaceResourceOperation",
-                      "expects": "#CircularReference",
-                      "hydra:method": "PUT",
-                      "hydra:title": "Replaces the CircularReference resource.",
-                      "rdfs:label": "Replaces the CircularReference resource.",
-                      "returns": "#CircularReference"
-                  },
-                  {
-                      "@type": "hydra:Operation",
-                      "hydra:method": "DELETE",
-                      "hydra:title": "Deletes the CircularReference resource.",
-                      "rdfs:label": "Deletes the CircularReference resource.",
-                      "returns": "owl:Nothing"
-                  }
-              ]
-          },
-          {
-              "@id": "#CustomIdentifierDummy",
-              "@type": "hydra:Class",
-              "rdfs:label": "CustomIdentifierDummy",
-              "hydra:title": "CustomIdentifierDummy",
-              "hydra:description": "Custom identifier dummy.",
-              "hydra:supportedProperty": [
-                  {
-                      "@type": "hydra:SupportedProperty",
-                      "hydra:property": {
-                          "@id": "#CustomIdentifierDummy\/name",
-                          "@type": "rdf:Property",
-                          "rdfs:label": "name",
-                          "domain": "#CustomIdentifierDummy",
-                          "range": "xmls:string"
->>>>>>> ed3635a... Refactor the metadata system: better SRP, immutability
                       },
                       {
                           "@type": "hydra:Operation",
@@ -1335,7 +1037,6 @@ Feature: Documentation support
                       "rdfs:label": "The API entrypoint.",
                       "returns": "#EntryPoint"
                   }
-<<<<<<< HEAD
               },
               {
                   "@id": "#ConstraintViolation",
@@ -1397,10 +1098,3 @@ Feature: Documentation support
           ]
       }
       """
-=======
-              ]
-          }
-      ]
-    }
-    """
->>>>>>> ed3635a... Refactor the metadata system: better SRP, immutability

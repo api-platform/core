@@ -161,3 +161,12 @@ services:
                                       arguments:
                                           -      { groups: [ "input" ] }
         tags:                       [ { name: "api.resource" } ]
+
+    no_collection_resource:
+        parent:                     "api.resource"
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\NoCollectionDummy' ]
+        tags:                       [ { name: "api.resource" } ]
+        calls:
+                                    - method:    "initCollectionOperations"
+                                      arguments:
+                                            - []

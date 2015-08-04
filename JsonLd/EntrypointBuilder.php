@@ -59,7 +59,9 @@ class EntrypointBuilder
         ];
 
         foreach ($this->resourceCollection as $resource) {
-            $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+            if (!empty($resource->getCollectionOperations())) {
+                $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+            }
         }
 
         return $entrypoint;

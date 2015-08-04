@@ -94,20 +94,22 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 $collectionOperations[] = $this->getHydraOperation($resource, $collectionOperation, $prefixedShortName, true);
             }
 
-            $entrypointProperties[] = [
-                '@type' => 'hydra:SupportedProperty',
-                'hydra:property' => [
-                    '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
-                    '@type' => 'hydra:Link',
-                    'domain' => '#Entrypoint',
-                    'rdfs:label' => sprintf('The collection of %s resources', $shortName),
-                    'range' => 'hydra:PagedCollection',
-                    'hydra:supportedOperation' => $collectionOperations,
-                ],
-                'hydra:title' => sprintf('The collection of %s resources', $shortName),
-                'hydra:readable' => true,
-                'hydra:writable' => false,
-            ];
+            if (!empty($collectionOperations)) {
+                $entrypointProperties[] = [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
+                        '@type' => 'hydra:Link',
+                        'domain' => '#Entrypoint',
+                        'rdfs:label' => sprintf('The collection of %s resources', $shortName),
+                        'range' => 'hydra:PagedCollection',
+                        'hydra:supportedOperation' => $collectionOperations,
+                    ],
+                    'hydra:title' => sprintf('The collection of %s resources', $shortName),
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ];
+            }
 
             $class = [
                 '@id' => $prefixedShortName,
