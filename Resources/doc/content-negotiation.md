@@ -29,7 +29,6 @@ If the format you want to use is not supported by default in the Negotiation lib
 extension:
 
 ```php
-
 // src/AppBundle/DependencyInjection/AppBundleExtension.php
 
 namespace AppBundle\DependencyInjection;
@@ -52,6 +51,7 @@ class AppBundleExtension extends Extension
         ]);		
     }
 }
+```
 
 ## Registering a custom serializer
 
