@@ -721,6 +721,38 @@ Feature: Documentation support
               ]
           },
           {
+              "@id": "#NoCollectionDummy",
+              "@type": "hydra:Class",
+              "rdfs:label": "NoCollectionDummy",
+              "hydra:title": "NoCollectionDummy",
+              "hydra:description": "No collection dummy.",
+              "hydra:supportedProperty": [],
+              "hydra:supportedOperation": [
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "GET",
+                      "hydra:title": "Retrieves NoCollectionDummy resource.",
+                      "rdfs:label": "Retrieves NoCollectionDummy resource.",
+                      "returns": "#NoCollectionDummy"
+                  },
+                  {
+                      "@type": "hydra:ReplaceResourceOperation",
+                      "expects": "#NoCollectionDummy",
+                      "hydra:method": "PUT",
+                      "hydra:title": "Replaces the NoCollectionDummy resource.",
+                      "rdfs:label": "Replaces the NoCollectionDummy resource.",
+                      "returns": "#NoCollectionDummy"
+                  },
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "DELETE",
+                      "hydra:title": "Deletes the NoCollectionDummy resource.",
+                      "rdfs:label": "Deletes the NoCollectionDummy resource.",
+                      "returns": "owl:Nothing"
+                  }
+              ]
+          },
+          {
               "@id": "#Entrypoint",
               "@type": "hydra:Class",
               "hydra:title": "The API entrypoint",
