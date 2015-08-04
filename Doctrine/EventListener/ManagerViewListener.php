@@ -43,10 +43,6 @@ class ManagerViewListener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $request = $event->getRequest();
         if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_DELETE])) {
             return;
