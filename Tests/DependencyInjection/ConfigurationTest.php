@@ -91,7 +91,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'collection_operations' => ['GET', 'POST'],
                 'item_custom_operations' => [],
                 'collection_custom_operations' => [],
-                'json_ld_context_embedded' => false,
+                'jsonld_context_embedded' => false,
                 'normalization_groups' => [],
                 'denormalization_groups' => [],
                 'validation_groups' => [],
