@@ -58,7 +58,6 @@ class ManagerViewListener
         if (null === $objectManager = $this->getManager($resourceType, $controllerResult)) {
             return $controllerResult;
         }
-
         switch ($request->getMethod()) {
             case Request::METHOD_POST:
                 $objectManager->persist($controllerResult);

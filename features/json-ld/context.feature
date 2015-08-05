@@ -14,6 +14,7 @@ Feature: JSON-LD contexts generation
         "@context": "\/contexts\/Entrypoint",
         "@id": "\/",
         "@type": "Entrypoint",
+        "user": "\/users",
         "dummy": "\/dummies",
         "relatedDummy": "\/related_dummies",
         "relationEmbedder": "\/relation_embedders",
