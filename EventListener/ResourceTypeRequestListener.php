@@ -39,10 +39,6 @@ class ResourceTypeRequestListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $request = $event->getRequest();
         if (!$request->attributes->has('_resource')) {
             return;

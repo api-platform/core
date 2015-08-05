@@ -44,10 +44,6 @@ class RequestExceptionListener
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $request = $event->getRequest();
         if (!$request->attributes->has('_resource_type') || self::FORMAT !== $request->attributes->get('_api_format')) {
             return;

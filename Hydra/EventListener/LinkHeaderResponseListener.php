@@ -40,10 +40,6 @@ class LinkHeaderResponseListener
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $event->getResponse()->headers->set('Link', sprintf(
             '<%s>; rel="%sapiDocumentation"',
             $this->router->generate('api_hydra_vocab', [], UrlGeneratorInterface::ABSOLUTE_URL), ContextBuilder::HYDRA_NS)
