@@ -12,7 +12,9 @@
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Dunglas\ApiBundle\DunglasApiBundle;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\TestBundle;
+use FOS\UserBundle\FOSUserBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -30,8 +32,10 @@ class AppKernel extends Kernel
     {
         return [
             new FrameworkBundle(),
+            new FOSUserBundle(),
             new DoctrineBundle(),
             new DunglasApiBundle(),
+            new SecurityBundle(),
             new TestBundle(),
         ];
     }
