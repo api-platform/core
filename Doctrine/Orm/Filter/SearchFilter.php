@@ -119,8 +119,8 @@ class SearchFilter extends AbstractFilter
                 $value = $this->getFilterValueFromUrl($value);
 
                 $queryBuilder
-                    ->join(sprintf('o.%s', $property), $property)
-                    ->andWhere(sprintf('%1$s.id = :%1$s', $property))
+                    ->join(sprintf('o.%s', $property), 'api_'.$property)
+                    ->andWhere(sprintf('%s.id = :%s', 'api_'.$property, $property))
                     ->setParameter($property, $value)
                 ;
             }
