@@ -96,12 +96,10 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * process resources configuration
+     * process resources configuration.
      *
      * @param ContainerBuilder $container
-     * @param array $resources
-     * @access public
-     * @return void
+     * @param array            $resources
      */
     public function processResources(ContainerBuilder $container, array $resources)
     {
@@ -174,13 +172,12 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * addItemOperations
+     * add item operations.
      *
-     * @param Definition $resourceDefinition
+     * @param Definition       $resourceDefinition
      * @param ContainerBuilder $container
-     * @param string $serviceId
-     * @param array $itemOperations
-     * @access private
+     * @param string           $serviceId
+     * @param array            $itemOperations
      * @return Definition
      */
     private function addItemOperations(
@@ -216,13 +213,12 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * addCollectionOperations
+     * add collection operations.
      *
-     * @param Definition $resourceDefinition
+     * @param Definition       $resourceDefinition
      * @param ContainerBuilder $container
-     * @param string $serviceId
-     * @param array $collectionOperations
-     * @access private
+     * @param string           $serviceId
+     * @param array            $collectionOperations
      * @return Definition
      */
     private function addCollectionOperations(
