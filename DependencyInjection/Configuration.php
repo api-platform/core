@@ -79,11 +79,9 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * addResourceSection
+     * add the resource section.
      *
      * @param Node $rootNode
-     * @access private
-     * @return void
      */
     private function addResourceSection($rootNode)
     {
