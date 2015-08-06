@@ -131,8 +131,8 @@ class SearchFilter extends AbstractFilter
                 $values = array_map([$this, 'getFilterValueFromUrl'], $values);
 
                 $queryBuilder
-                    ->join(sprintf('o.%s', $property), $property)
-                    ->andWhere(sprintf('%1$s.id IN (:%1$s)', $property))
+                    ->join(sprintf('o.%s', $property), 'api_'.$property)
+                    ->andWhere(sprintf('%s.id IN (:%s)', 'api_'.$property, $property))
                     ->setParameter($property, $values)
                 ;
             }
