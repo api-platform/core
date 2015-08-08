@@ -2,9 +2,20 @@
 
 This bundle is shipped with a bridge for the [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle). If the FOSUserBundle is enabled, this bridges registers to the persist, update and delete events to pass user objects to the UserManager, before redispatching the event. 
 
+## Enable the FOSUser integration
+
+In order to enable the integration, simply set the `enable_fos_user` to `true`:
+
+```yaml
+dunglas_api:
+    enable_fos_user: true
+```
+
+The bundle extension will load the [`fos_user.xml`](../config/fos_user.xml) configuration file, registering the `api.fos_user.event_subscriber` service into the container.
+
 ## Creating a `User` entity with serialization groups
 
-Here's an example of declaration of a [doctrine ORM User class](https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Resources/doc/index.md#a-doctrine-orm-user-class). As shown you can use serialization groups to hide properties like `plainPassword` (only in read) and `password`. The properties shown are handled with the [`normalizationContext`](serialization-groups-and-relations.md#normalization), while the properties you can modify are handled with [`denormalizationContext`](serialization-groups-and-relations.md#denormalization).
+Here's an example of declaration of a [doctrine ORM User class](https://github.com/FriendsOfSymfony/FOSUserBundle/blob/master/Resources/doc/index.rst#a-doctrine-orm-user-class). As shown you can use serialization groups to hide properties like `plainPassword` (only in read) and `password`. The properties shown are handled with the [`normalizationContext`](serialization-groups-and-relations.md#normalization), while the properties you can modify are handled with [`denormalizationContext`](serialization-groups-and-relations.md#denormalization).
 
 First register the following service:
 
