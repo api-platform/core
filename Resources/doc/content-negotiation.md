@@ -25,30 +25,45 @@ dunglas_api:
 
 ## Registering a custom format in the Negotiation library
 
-If the format you want to use is not supported by default in the Negotiation library, you must register it in your bundle
-extension:
+If the format you want to use is not supported by default in the Negotiation library, you must register it using a [compiler pass](http://symfony.com/doc/current/components/dependency_injection/compilation.html#creating-a-compiler-pass):
 
 ```php
-// src/AppBundle/DependencyInjection/AppBundleExtension.php
+// src/AppBundle/DependencyInjection/Compiler/MyFormatPass.php
 
-namespace AppBundle\DependencyInjection;
+namespace AppBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-/**
- * The extension of this bundle.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class AppBundleExtension extends Extension
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+
+class MyFormatPass implements CompilerPassInterface
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function process(ContainerBuilder $container)
     {
         // ...
 
-        $container->getDefinition('api.format_negotiator')->addMethodCall('registerFormat', [		
-            'myformat', ['application/vnd.myformat'], true,		
-        ]);		
+        $container->getDefinition('api.format_negotiator')->addMethodCall('registerFormat', [
+            'myformat', ['application/vnd.myformat'], true,
+        ]);
+    }
+}
+```
+
+Don't forget to register your compiler pass into the container from the `Bundle::build(ContainerBuilder $container)` method of your bundle:
+
+```php
+// src/AppBundle/AppBundle.php
+
+namespace AppBundle;
+
+use AppBundle\DependencyInjection\Compiler\MyFormatPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class AppBundle extends Bundle
+{
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new MyFormatPass());
     }
 }
 ```
@@ -67,7 +82,7 @@ parameter during the deserialization process.
 Finally, you need to create a class that will convert the raw data to formatted data and the according HTTP response.
 Here is an example responder using the builtin XML serializer:
 
-```
+```php
 // src/AppBundle/EventListener/XmlResponderViewListener.php
 
 <?php
