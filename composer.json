@@ -35,6 +35,7 @@
     "behat/mink-browserkit-driver": "~1.1",
     "behatch/contexts": "dev-master",
     "symfony/finder": "~2.3",
+    "symfony/security": "~2.7.2|~3.0",
     "phpunit/phpunit": "~4.6"
   },
   "suggest": {
