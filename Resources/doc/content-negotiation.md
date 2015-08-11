@@ -131,10 +131,6 @@ class XmlResponderViewListener
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        if (!$event->isMasterRequest()) {
-            return;
-        }
-
         $controllerResult = $event->getControllerResult();
 
         if ($controllerResult instanceof Response) {
