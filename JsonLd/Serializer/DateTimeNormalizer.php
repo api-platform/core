@@ -37,7 +37,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return self::FORMAT === $format && 'DateTime' === $type;
+        return self::FORMAT === $format
+            && 'DateTime' === $type
+            && (is_string($data) || (is_array($data) && isset($data['date']) && isset($data['timezone'])))
+        ;
     }
 
     /**
@@ -53,6 +56,16 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        // $data may either be a string with a valid date format or an array with the date, timezone type and timezone
+        if (is_array($data)) {
+            return \DateTime::createFromFormat(
+                'Y-m-d H:i:s.u',
+                $data['date'],
+                new \DateTimeZone($data['timezone']
+                )
+            );
+        }
+
         return new \DateTime($data);
     }
 }
