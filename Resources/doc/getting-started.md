@@ -71,6 +71,18 @@ dunglas_api:
                 number:                30               # The default number of items perm page in collections.
                 enable_client_request: false            # Allow the client to change the number of elements by page.
                 parameter_name:        itemsPerPage     # The name of the parameter to change the number of elements by page client side.
+    resources:
+        product:
+            resource_class: Dunglas\ApiBundle\Resource # Optional
+            entry_class: AppBundle\Entity\Product # Required
+            short_name: MyProduct # Optional, guessed if not set
+            item_operations: [ "GET", "PUT", "DELETE" ] # Default to GET, PUT, DELETE
+            collection_operations: [ "GET", "POST" ] # Default to GET, POST
+            filters: [ my_filter_service_name ] # Optional
+            jsonld_context_embedded: false # Optional, default to false
+            normalization_groups: [ a, b ] # Optional, default to null
+            denormalization_groups: [ a, b ] # Optional, default to null
+            validation_groups: [ a, b] # Optional, default to null
 ```
 
 The name and the description you give will be accessible through the auto-generated Hydra documentation.
@@ -151,21 +163,18 @@ class Offer
 }
 ```
 
-## Registering the services
+## Registering the resources
 
-Register the following services (for example in `app/config/services.yml`):
+Update your configuration in `app/config/config.yml`:
 
 ```yaml
-services:
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        tags:      [ { name: "api.resource" } ]
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
 
-    resource.offer:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Offer" ]
-        tags:      [ { name: "api.resource" } ]
+        offer:
+            entry_class: "AppBundle\Entity\Offer"
 ```
 
 **You're done!**

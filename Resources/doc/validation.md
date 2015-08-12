@@ -9,15 +9,11 @@ The built-in controller is able to leverage Symfony's [validation groups](http:/
 To take care of them, edit your service declaration and add groups you want to use when the validation occurs:
 
 ```yaml
-services:
-    resource.product:
-        parent:    "api.resource"
-        arguments: [ "AppBundle\Entity\Product" ]
-        calls:
-            -      method:    "initValidationGroups"
-                   arguments: [ [ "group1", "group2" ] ]
-        tags:      [ { name: "api.resource" } ]
-```
+dunglas_api:
+    resources:
+        product:
+            entry_class: "AppBundle\Entity\Product"
+            validation_groups: [ "group1", "group2"  ]
 
 With the previous definition, the validations groups `group1` and `group2` will be used when the validation occurs.
 
