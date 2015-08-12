@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api.nelmio_api_doc.annotations_provider.api_annotation_provider" class="Dunglas\ApiBundle\Nelmio\Extractor\AnnotationsProvider\ApiProvider">
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.hydra.documentation_builder" />
+            <argument type="service" id="api.mapping.class_metadata_factory" />
+
+            <tag name="nelmio_api_doc.extractor.annotations_provider" />
+        </service>
+
+        <service id="api.nelmio_api_doc.parser.api_parser" class="Dunglas\ApiBundle\Nelmio\Parser\ApiParser">
+            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.mapping.class_metadata_factory" />
+
+            <tag name="nelmio_api_doc.extractor.parser" />
+        </service>
+    </services>
+
+</container>

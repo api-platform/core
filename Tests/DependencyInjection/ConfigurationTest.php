@@ -25,6 +25,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         'supported_formats' => ['jsonld'],
         'cache' => false,
         'enable_fos_user' => false,
+        'nelmio_api_doc' => false,
         'collection' => [
             'filter_name' => [
                 'order' => 'order',
