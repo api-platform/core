@@ -72,11 +72,11 @@ class Dummy
      */
     public $relatedDummy;
     /**
-     * @var ArrayCollection Several dummies.
+     * @var ArrayCollection|RelatedDummy[] Several dummies.
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
-    public $relatedDummies;
+    private $relatedDummies;
     /**
      * @var Array serialize data.
      *
@@ -147,5 +147,37 @@ class Dummy
     public function getJsonData()
     {
         return $this->jsonData;
+    }
+
+    /**
+     * @return ArrayCollection|RelatedDummy[]|null
+     */
+    public function getRelatedDummies()
+    {
+        return $this->relatedDummies;
+    }
+
+    /**
+     * @param RelatedDummy $relatedDummy
+     *
+     * @return $this
+     */
+    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummies[] = $relatedDummy;
+
+        return $this;
+    }
+
+    /**
+     * @param RelatedDummy $relatedDummy
+     *
+     * @return $this
+     */
+    public function removeRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummies->removeElement($relatedDummy);
+
+        return $this;
     }
 }
