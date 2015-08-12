@@ -84,11 +84,11 @@ class ReflectionLoader implements LoaderInterface
     ) {
         // Methods
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            $numberOfRequiredParameters = $reflectionMethod->getNumberOfRequiredParameters();
+            $numberOfParameters = $reflectionMethod->getNumberOfParameters();
             $methodName = $reflectionMethod->name;
 
             $newClassMetadata = $this->populateFromSetter(
-                $classMetadata, $methodName, $numberOfRequiredParameters, $normalizationGroups, $denormalizationGroups
+                $classMetadata, $methodName, $numberOfParameters, $normalizationGroups, $denormalizationGroups
             );
 
             if ($newClassMetadata) {
@@ -96,7 +96,7 @@ class ReflectionLoader implements LoaderInterface
                 continue;
             }
 
-            if (0 !== $numberOfRequiredParameters) {
+            if (0 !== $numberOfParameters) {
                 continue;
             }
 
@@ -132,13 +132,13 @@ class ReflectionLoader implements LoaderInterface
     private function populateFromSetter(
         ClassMetadataInterface $classMetadata,
         $methodName,
-        $numberOfRequiredParameters,
+        $numberOfParameters,
         array $normalizationGroups = null,
         array $denormalizationGroups = null
     ) {
         if (
             null !== $denormalizationGroups ||
-            1 !== $numberOfRequiredParameters ||
+            1 !== $numberOfParameters ||
             !preg_match('/^(set|add|remove)(.+)$/i', $methodName, $matches)
         ) {
             return;
