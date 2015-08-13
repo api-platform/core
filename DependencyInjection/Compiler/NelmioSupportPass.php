@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\DependencyInjection\Compiler;
 
+use Dunglas\ApiBundle\Nelmio\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\DependencyInjection\RegisterExtractorParsersPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -37,6 +38,7 @@ class NelmioSupportPass implements CompilerPassInterface
         $container->removeDefinition('nelmio_api_doc.parser.dunglas_api_parser');
 
         $apiDocExtractorDefinition = $container->getDefinition('nelmio_api_doc.extractor.api_doc_extractor');
+        $apiDocExtractorDefinition->setClass(ApiDocExtractor::class);
         /** @var Reference[] $annotationsProviderReferences */
         $annotationsProviderReferences = $apiDocExtractorDefinition->getArgument(6);
 
