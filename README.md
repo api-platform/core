@@ -102,6 +102,19 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   1. [Enabling the metadata cache](Resources/doc/performances.md#enabling-the-metadata-cache)
 16. [AngularJS integration](Resources/doc/angular-integration.md)
 
+## Known issues
+
+### Usage with JMS Serializer
+
+There is a small incompatibility issue when using this bundle with [JMSSerializerBundle](https://github.com/schmittjoh/JMSSerializerBundle). To fix it, you have to prevent the JMSSerializerBundle to override the Symfony serializer service definition:
+
+```yaml
+jms_serializer:
+    enable_short_alias: false
+```
+
+Beware that this implies no longer using the JMS Serializer via the `@serializer` service but instead the `@jms_serializer` one.
+
 ## Other resources
 
 ### Filters
