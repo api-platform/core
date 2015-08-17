@@ -53,7 +53,7 @@ class EventListener
                 break;
 
             case Request::METHOD_DELETE:
-                $this->userManager->deleteUser($user, false);
+                $this->userManager->deleteUser($user);
                 $event->setControllerResult(null);
                 break;
         }
