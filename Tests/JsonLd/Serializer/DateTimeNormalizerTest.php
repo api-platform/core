@@ -54,9 +54,9 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $dateTime = $this->normalizer->denormalize(
             [
-                'date'          => '2015-05-05 10:50:13.1234',
+                'date' => '2015-05-05 10:50:13.1234',
                 'timezone_type' => 3,
-                'timezone'      => 'Europe/Zurich',
+                'timezone' => 'Europe/Zurich',
             ],
             '\DateTime'
         );
@@ -73,9 +73,9 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         try {
             $this->normalizer->denormalize(
                 [
-                    'date'          => '2015-05-05 10:50:13.1234',
+                    'date' => '2015-05-05 10:50:13.1234',
                     'timezone_type' => 3,
-                    'timezone'      => 'azerty',
+                    'timezone' => 'azerty',
                 ],
                 '\DateTime'
             );
@@ -90,9 +90,9 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         try {
             $this->normalizer->denormalize(
                 [
-                    'date'          => '2015-05-05 10:50:13+00:00',
+                    'date' => '2015-05-05 10:50:13+00:00',
                     'timezone_type' => 3,
-                    'timezone'      => 'Europe/Paris',
+                    'timezone' => 'Europe/Paris',
                 ],
                 '\DateTime'
             );
@@ -104,9 +104,9 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         try {
             $this->normalizer->denormalize(
                 [
-                    'date'          => '2015-05-05T10:50:13',
+                    'date' => '2015-05-05T10:50:13',
                     'timezone_type' => 3,
-                    'timezone'      => 'Europe/Paris',
+                    'timezone' => 'Europe/Paris',
                 ],
                 '\DateTime'
             );
@@ -141,7 +141,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(
             $this->normalizer->supportsDenormalization(
                 [
-                    'date'     => true,
+                    'date' => true,
                     'timezone' => true,
                 ],
                 'DateTime',
@@ -151,7 +151,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(
             $this->normalizer->supportsDenormalization(
                 [
-                    'date'     => true,
+                    'date' => true,
                     'timezone' => true,
                 ],
                 '\DateTime',
@@ -162,7 +162,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->normalizer->supportsDenormalization(
                 [
-                    'date'     => true,
+                    'date' => true,
                     'timezone' => true,
                 ],
                 'DateTime'
@@ -171,7 +171,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->normalizer->supportsDenormalization(
                 [
-                    'date'     => true,
+                    'date'  => true,
                     'timezone' => true,
                 ],
                 '\DateTime',
