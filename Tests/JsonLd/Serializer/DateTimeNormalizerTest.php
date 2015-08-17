@@ -124,7 +124,6 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new \DateTime()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \DateTime()), 'any');
 
-
         $this->assertFalse($this->normalizer->supportsNormalization('string'));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
@@ -136,7 +135,6 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->normalizer->supportsDenormalization('string', 'DateTime'));
         $this->assertFalse($this->normalizer->supportsDenormalization('string', '\DateTime', 'any'));
-
 
         $this->assertTrue(
             $this->normalizer->supportsDenormalization(
@@ -171,7 +169,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->normalizer->supportsDenormalization(
                 [
-                    'date'  => true,
+                    'date' => true,
                     'timezone' => true,
                 ],
                 '\DateTime',
