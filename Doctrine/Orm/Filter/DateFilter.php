@@ -26,9 +26,9 @@ class DateFilter extends AbstractFilter
 {
     const PARAMETER_BEFORE = 'before';
     const PARAMETER_AFTER = 'after';
-    const EXCLUDE_NULL = 0;
-    const INCLUDE_NULL_BEFORE = 1;
-    const INCLUDE_NULL_AFTER = 2;
+    const EXCLUDE_NULL = 'exclude_null';
+    const INCLUDE_NULL_BEFORE = 'include_null_before';
+    const INCLUDE_NULL_AFTER = 'include_null_after';
 
     /**
      * @var array

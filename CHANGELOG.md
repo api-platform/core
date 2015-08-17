@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0 beta 4
+
+* Use string values for `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter` null-management constants
+
 ## 1.0.0 beta 3
 
 * The Hydra documentation URL is now `/apidoc` (was `/vocab`)
