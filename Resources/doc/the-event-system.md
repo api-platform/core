@@ -1,6 +1,6 @@
 # The event system
 
-**Outdated documentation, only applicable to 1.0.0 beta 5 and below. See https://github.com/dunglas/DunglasApiBundle/pull/191**
+**Outdated documentation, only applicable to 1.0.0 beta 3 and below. See https://github.com/dunglas/DunglasApiBundle/pull/191**
 
 DunglasApiBundle leverages the [Symfony Event Dispatcher Component](http://symfony.com/doc/current/components/event_dispatcher/index.html)
 to provide a powerful event system triggered in the object lifecycle.
