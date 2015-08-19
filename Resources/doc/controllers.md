@@ -1,6 +1,6 @@
 # Controllers
 
-**Outdated documentation, only applicable to 1.0.0 beta 5 and below. See https://github.com/dunglas/DunglasApiBundle/pull/191**
+**Outdated documentation, only applicable to 1.0.0 beta 3 and below. See https://github.com/dunglas/DunglasApiBundle/pull/191**
 
 The bundle provide a default controller class implementing CRUD operations: `Dunglas\ApiBundle\Controller\ResourceController`.
 Basically this controller class extends the default controller class of the FrameworkBundle of Symfony providing implementations
