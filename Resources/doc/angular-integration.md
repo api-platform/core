@@ -58,4 +58,4 @@ var app = angular
 
 ```
 
-Previous chapter: [Performances](performances.md)
+Previous chapter: [Performance](performance.md)
