@@ -98,7 +98,7 @@ This bundle is documented and tested with Behat (take a look at [the `features/`
   3. [Registering a custom serializer](Resources/doc/content-negotiation.md#registering-a-custom-serializer)
   4. [Creating a responder](Resources/doc/content-negotiation.md#creating-a-responder)
 14. [Security](Resources/doc/security.md)
-15. [Performance](Resources/doc/performance.md)
+15. [Performances](Resources/doc/performances.md)
   1. [Enabling the metadata cache](Resources/doc/performances.md#enabling-the-metadata-cache)
 16. [AngularJS integration](Resources/doc/angular-integration.md)
 
