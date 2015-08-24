@@ -1,4 +1,4 @@
-# Performance
+# Performances
 
 ## Enabling the metadata cache
 
