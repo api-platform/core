@@ -7,4 +7,4 @@ This bundle relies on security features provided by the [Symfony Security Compon
 It is also possible to use the [Event system](the-event-system.md) for more advanced logic or even [Custom controlers](controllers.md#using-a-custom-controller) if you really need to.
 
 Previous chapter: [Content negotiation](content-negotiation.md)<br>
-Next chapter: [Performances](performances.md)
+Next chapter: [Performance](performance.md)
