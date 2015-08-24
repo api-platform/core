@@ -161,6 +161,17 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            [
+                [
+                    'properties' => ['id' => null, 'name' => null, 'relatedDummies' => null],
+                ],
+                [
+                    'relatedDummies' => 'exact',
+                ],
+                [
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relateddummies api_relateddummies WHERE api_relateddummies.id IN (:relateddummies)',
+                ],
+            ],
         ];
     }
 }

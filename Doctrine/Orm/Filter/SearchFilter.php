@@ -110,7 +110,7 @@ class SearchFilter extends AbstractFilter
 
                 $queryBuilder
                     ->join(sprintf('o.%s', $property), 'api_'.$property)
-                    ->andWhere(sprintf('%s.id = :%s', 'api_'.$property, $property))
+                    ->andWhere(sprintf('api_%1$s.id = :%1$s', $property))
                     ->setParameter($property, $value)
                 ;
             } elseif ($metadata->isCollectionValuedAssociation($property)) {
@@ -131,8 +131,8 @@ class SearchFilter extends AbstractFilter
                 $values = array_map([$this, 'getFilterValueFromUrl'], $values);
 
                 $queryBuilder
-                    ->join(sprintf('o.%s', $property), $property)
-                    ->andWhere(sprintf('%1$s.id IN (:%1$s)', $property))
+                    ->join(sprintf('o.%s', $property), 'api_'.$property)
+                    ->andWhere(sprintf('api_%1$s.id IN (:%1$s)', $property))
                     ->setParameter($property, $values)
                 ;
             }
