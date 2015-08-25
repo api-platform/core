@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -52,19 +53,39 @@ class OrderFilter extends AbstractFilter
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
         $properties = $this->extractProperties($request);
-        $fieldNames = array_flip($this->getClassMetadata($resource)->getFieldNames());
 
         foreach ($properties as $property => $order) {
-            if (!$this->isPropertyEnabled($property) || !isset($fieldNames[$property])) {
+            if (!$this->isPropertyEnabled($property) || !$this->isPropertyMapped($property, $resource)) {
                 continue;
-            } elseif ('' === $order && isset($this->properties[$property])) {
+            }
+
+            if ('' === $order && isset($this->properties[$property])) {
                 $order = $this->properties[$property];
             }
 
             $order = strtoupper($order);
-            if ('ASC' === $order || 'DESC' === $order) {
-                $queryBuilder->addOrderBy(sprintf('o.%s', $property), $order);
+            if (!in_array($order, ['ASC', 'DESC'])) {
+                continue;
             }
+
+            $alias = 'o';
+            $field = $property;
+
+            if ($this->isPropertyNested($property)) {
+                $propertyParts = $this->splitPropertyParts($property);
+
+                $parentAlias = $alias;
+
+                foreach ($propertyParts['associations'] as $association) {
+                    $alias = QueryUtils::generateJoinAlias($association);
+                    $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
+                    $parentAlias = $alias;
+                }
+
+                $field = $propertyParts['field'];
+            }
+
+            $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $order);
         }
     }
 
@@ -74,16 +95,22 @@ class OrderFilter extends AbstractFilter
     public function getDescription(ResourceInterface $resource)
     {
         $description = [];
-        $metadata = $this->getClassMetadata($resource);
 
-        foreach ($metadata->getFieldNames() as $fieldName) {
-            if ($this->isPropertyEnabled($fieldName)) {
-                $description[sprintf('%s[%s]', $this->orderParameter, $fieldName)] = [
-                    'property' => $fieldName,
-                    'type' => 'string',
-                    'required' => false,
-                ];
+        $properties = $this->properties;
+        if (null === $properties) {
+            $properties = array_fill_keys($this->getClassMetadata($resource)->getFieldNames(), null);
+        }
+
+        foreach ($properties as $property => $order) {
+            if (!$this->isPropertyMapped($property, $resource)) {
+                continue;
             }
+
+            $description[sprintf('%s[%s]', $this->orderParameter, $property)] = [
+                'property' => $property,
+                'type' => 'string',
+                'required' => false,
+            ];
         }
 
         return $description;

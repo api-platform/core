@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0 beta 4
+
+* Support nested properties in Doctrine filters
+* Add method to avoid naming collision of DQL join alias and bound parameter name
+
 ## 1.0.0 beta 3
 
 * The Hydra documentation URL is now `/apidoc` (was `/vocab`)
