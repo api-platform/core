@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\SearchFilter;
+use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class SearchFilterTest extends KernelTestCase
 {
+    use PHPMock;
+
     /**
      * @var ManagerRegistry
      */
@@ -72,6 +75,9 @@ class SearchFilterTest extends KernelTestCase
             $this->propertyAccessor,
             $filterParameters['properties']
         );
+
+        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
+        $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         $filter->apply($this->resource, $queryBuilder);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
@@ -125,24 +131,24 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.name = :name',
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.name = :name_123456abcdefg',
                     'parameters' => [
-                        'name' => 'exact',
+                        'name_123456abcdefg' => 'exact',
                     ],
                 ],
             ],
             // partial values
             [
                 [
-                    'properties' => ['id' => null, 'name' => null],
+                    'properties' => ['id' => null, 'name' => 'partial'],
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.name = :name',
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.name like :name_123456abcdefg',
                     'parameters' => [
-                        'name' => 'partial',
+                        'name_123456abcdefg' => '%partial%',
                     ],
                 ],
             ],
@@ -155,9 +161,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relateddummy api_relateddummy WHERE api_relateddummy.id = :relateddummy',
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg',
                     'parameters' => [
-                        'relatedDummy' => 'exact',
+                        'relatedDummy_123456abcdefg' => 'exact',
                     ],
                 ],
             ],
@@ -169,7 +175,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relateddummies api_relateddummies WHERE api_relateddummies.id IN (:relateddummies)',
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relatedDummies relatedDummies_123456abcdefg WHERE relatedDummies_123456abcdefg.id IN (:relatedDummies_123456abcdefg)',
                 ],
             ],
         ];
