@@ -39,7 +39,7 @@ trait ActionUtilTrait
     {
         $data = $dataProvider->getItem($resourceType, $id, true);
         if (!$data) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('Not Found');
         }
 
         return $data;
