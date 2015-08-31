@@ -21,5 +21,9 @@ services:
 
 With the previous definition, the validations groups `group1` and `group2` will be used when the validation occurs.
 
+## Dynamic validation groups
+
+If you need to dynamically determine which validation groups to use for an entity in different scenarios, use Symfony's [group sequence provider](http://symfony.com/doc/current/book/validation.html#group-sequence-providers).
+
 Previous chapter: [Serialization groups and relations](serialization-groups-and-relations.md)<br>
 Next chapter: [The event system](the-event-system.md)
