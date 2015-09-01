@@ -49,7 +49,16 @@ class ValidationViewListener
             return;
         }
 
-        $violations = $this->validator->validate($event->getControllerResult(), null, $resourceType->getValidationGroups());
+        $data = $event->getControllerResult();
+        $validationGroups = $resourceType->getValidationGroups();
+
+        if (is_callable($validationGroups)) {
+            $validationGroups = call_user_func_array($validationGroups, [
+                $data,
+            ]);
+        }
+
+        $violations = $this->validator->validate($data, null, $validationGroups);
         if (0 !== count($violations)) {
             throw new ValidationException($violations);
         }

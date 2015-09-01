@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Api;
 
 use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\Operation\OperationInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * An API resource.
@@ -87,7 +88,7 @@ interface ResourceInterface
     /**
      * Gets validation groups to use.
      *
-     * @return string[]|null
+     * @return string[]|GroupSequence|callable|null
      */
     public function getValidationGroups();
 
