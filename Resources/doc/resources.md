@@ -16,6 +16,7 @@ one. To do so, the `Dunglas\ApiBundle\Api\ResourceInterface` interface must be i
 namespace AppBundle\Api;
 
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Symfony\Component\Routing\Route;
 
 class MyCustomResource implements ResourceInterface
 {
