@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -20,6 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
+ * @Resource(attributes={"normalization_context"={"groups": {"circular"}}})
  * @ORM\Entity
  */
 class CircularReference
@@ -30,12 +32,14 @@ class CircularReference
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
     /**
      * @ORM\ManyToOne(targetEntity="CircularReference", inversedBy="children")
      *
      * @Groups({"circular"})
      */
     public $parent;
+
     /**
      * @ORM\OneToMany(targetEntity="CircularReference", mappedBy="parent")
      *

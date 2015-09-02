@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\EventListener;
 
-use Dunglas\ApiBundle\EventListener\ValidationViewListener;
+use Dunglas\ApiBundle\Bridge\Symfony\Validator\EventListener\ViewListener;
 use Dunglas\ApiBundle\Tests\Fixtures\DummyEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -46,7 +46,7 @@ class ValidationViewListenerTest extends \PHPUnit_Framework_TestCase
         $request->setMethod(Request::METHOD_POST);
         $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
 
-        $validationViewListener = new ValidationViewListener($validator);
+        $validationViewListener = new ViewListener($validator);
         $validationViewListener->onKernelView($event);
     }
 }

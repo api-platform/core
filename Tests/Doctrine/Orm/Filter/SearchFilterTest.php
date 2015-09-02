@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use Dunglas\ApiBundle\Api\IriConverter;
+use Dunglas\ApiBundle\Bridge\Symfony\IriConverter;
 use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\SearchFilter;

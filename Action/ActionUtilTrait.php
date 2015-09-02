@@ -11,9 +11,8 @@
 
 namespace Dunglas\ApiBundle\Action;
 
-use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
+use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -28,16 +27,17 @@ trait ActionUtilTrait
      * Gets an item using the data provider. Throws a 404 error if not found.
      *
      * @param DataProviderInterface $dataProvider
-     * @param ResourceInterface     $resourceType
+     * @param string                $resourceClass
+     * @param string                $operationName
      * @param string|int            $id
      *
      * @return object
      *
      * @throws NotFoundHttpException
      */
-    private function getItem(DataProviderInterface $dataProvider, ResourceInterface $resourceType, $id)
+    private function getItem(DataProviderInterface $dataProvider, string $resourceClass, string $operationName, $id)
     {
-        $data = $dataProvider->getItem($resourceType, $id, true);
+        $data = $dataProvider->getItem($resourceClass, $id, $operationName, true);
         if (!$data) {
             throw new NotFoundHttpException('Not Found');
         }
@@ -46,7 +46,7 @@ trait ActionUtilTrait
     }
 
     /**
-     * Extract resource type and format request attributes. Throws an exception if the request does not contain required
+     * Extract resource class, operation name and format request attributes. Throws an exception if the request does not contain required
      * attributes.
      *
      * @param Request $request
@@ -57,12 +57,24 @@ trait ActionUtilTrait
      */
     private function extractAttributes(Request $request)
     {
-        $resourceType = $request->attributes->get('_resource_type');
-        $format = $request->attributes->get('_api_format');
-        if (!$resourceType || !$format) {
-            throw new RuntimeException('The API is not properly configured.');
+        $resourceClass = $request->attributes->get('_resource_class');
+
+        if (!$resourceClass) {
+            throw new RuntimeException('The request attribute "_resource_class" must be defined.');
         }
 
-        return [$resourceType, $format];
+        $collectionOperation = $request->attributes->get('_collection_operation_name');
+        $itemOperation = $request->attributes->get('_item_operation_name');
+
+        if (!$itemOperation && !$collectionOperation) {
+            throw new RuntimeException('One of the request attribute "_item_operation_name" or "_collection_operation_name" must be defined.');
+        }
+
+        $format = $request->attributes->get('_api_format');
+        if (!$format) {
+            throw new RuntimeException('The request attribute "_api_format" must be defined.');
+        }
+
+        return [$resourceClass, $collectionOperation, $itemOperation, $format];
     }
 }

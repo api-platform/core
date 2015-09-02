@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -19,6 +20,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
+ * @Resource(attributes={
+ *     "normalization_context"={"groups"={"barcelona"}},
+ *     "denormalization_context"={"groups"={"chicago"}},
+ *     "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
+ * }, itemOperations={
+ *     "get"={"method"="GET"},
+ *     "put"={"method"="PUT"},
+ *     "custom_get"={"route_name"="relation_embedded.custom_get"}
+ * })
  * @ORM\Entity
  */
 class RelationEmbedder
@@ -29,21 +39,25 @@ class RelationEmbedder
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
     /**
      * @ORM\Column
      * @Groups({"chicago"})
      */
     public $paris = 'Paris';
+
     /**
      * @ORM\Column
      * @Groups({"barcelona", "chicago"})
      */
     public $krondstadt = 'Krondstadt';
+
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy", cascade={"persist"})
      * @Groups({"chicago", "barcelona"})
      */
     public $anotherRelated;
+
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      * @Groups({"barcelona", "chicago"})

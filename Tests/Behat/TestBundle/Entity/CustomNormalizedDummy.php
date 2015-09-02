@@ -12,7 +12,8 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Dunglas\ApiBundle\Annotation\Iri;
+use Dunglas\ApiBundle\Annotation\Property;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,6 +22,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Mikaël Labrut <labrut@gmail.com>
  *
+ * @Resource(attributes={
+ *     "normalization_context"={"groups"={"output"}},
+ *     "denormalization_context"={"groups"={"input"}}
+ * })
  * @ORM\Entity
  */
 class CustomNormalizedDummy
@@ -33,20 +38,22 @@ class CustomNormalizedDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string The dummy name.
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Iri("http://schema.org/name")
+     * @Property(iri="http://schema.org/name")
      * @Groups({"input", "output"})
      */
     private $name;
+
     /**
      * @var string The dummy name alias.
      *
      * @ORM\Column(nullable=true)
-     * @Iri("https://schema.org/alternateName")
+     * @Property(iri="https://schema.org/alternateName")
      * @Groups({"input", "output"})
      */
     private $alias;

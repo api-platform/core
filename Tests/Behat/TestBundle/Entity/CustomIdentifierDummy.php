@@ -12,10 +12,12 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Resource;
 
 /**
  * Custom identifier dummy.
  *
+ * @Resource
  * @ORM\Entity
  */
 class CustomIdentifierDummy
@@ -32,7 +34,7 @@ class CustomIdentifierDummy
     /**
      * @var string The dummy name.
      *
-     * @ORM\Column(name="name", type="string", length=30)
+     * @ORM\Column(length=30)
      */
     private $name;
 

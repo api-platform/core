@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\JsonLd\Action;
 
-use Dunglas\ApiBundle\JsonLd\EntrypointBuilder;
+use Dunglas\ApiBundle\JsonLd\EntrypointBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,14 +19,14 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class EntrypointAction
+final class EntrypointAction
 {
     /**
-     * @var EntrypointBuilder
+     * @var EntrypointBuilderInterface
      */
     private $entrypointBuilder;
 
-    public function __construct(EntrypointBuilder $entrypointBuilder)
+    public function __construct(EntrypointBuilderInterface $entrypointBuilder)
     {
         $this->entrypointBuilder = $entrypointBuilder;
     }
@@ -38,7 +38,7 @@ class EntrypointAction
      *
      * @return array
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request) : array
     {
         $request->attributes->set('_api_format', 'jsonld');
 

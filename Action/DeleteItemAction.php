@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Action;
 
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
+use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DeleteItemAction
+final class DeleteItemAction
 {
     use ActionUtilTrait;
 
@@ -48,8 +48,8 @@ class DeleteItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceType) = $this->extractAttributes($request);
+        list($resourceClass, , $operationName) = $this->extractAttributes($request);
 
-        return $this->getItem($this->dataProvider, $resourceType, $id);
+        return $this->getItem($this->dataProvider, $resourceClass, $operationName, $id);
     }
 }

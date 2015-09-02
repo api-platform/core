@@ -40,11 +40,10 @@ Feature: Relations support
       "@id": "/related_dummies/1",
       "@type": "https://schema.org/Product",
       "name": null,
-      "symfony": "symfony",
       "dummyDate": null,
-      "age": null,
       "thirdLevel": "/third_levels/1",
-      "unknown": null
+      "symfony": "symfony",
+      "age": null
     }
     """
 
@@ -69,18 +68,18 @@ Feature: Relations support
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",
-      "name": "Dummy with relations",
-      "alias": null,
       "description": null,
+      "dummy": null,
       "dummyDate": null,
       "dummyPrice": null,
-      "jsonData": [],
       "relatedDummy": "/related_dummies/1",
-      "dummy": null,
       "relatedDummies": [
           "/related_dummies/1"
       ],
-      "name_converted": null
+      "jsonData": [],
+      "name_converted": null,
+      "name": "Dummy with relations",
+      "alias": null
     }
     """
 
@@ -173,6 +172,7 @@ Feature: Relations support
       }
       """
 
+  @wip
   Scenario: Create an existing relation
     When I send a "POST" request to "/relation_embedders" with body:
     """

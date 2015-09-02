@@ -29,9 +29,6 @@ class ExceptionAction
      */
     private $normalizer;
 
-    /**
-     * @param NormalizerInterface $normalizer
-     */
     public function __construct(NormalizerInterface $normalizer)
     {
         $this->normalizer = $normalizer;

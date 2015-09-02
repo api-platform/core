@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api.fos_user.event_listener" class="Dunglas\ApiBundle\FosUser\EventListener">
+        <service id="api.fos_user.event_listener" class="Dunglas\ApiBundle\Bridge\FosUser\EventListener">
             <argument type="service" id="fos_user.user_manager" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="11" />

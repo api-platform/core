@@ -49,7 +49,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testFilters()
     {
-        $filters = [$this->prophesize('Dunglas\ApiBundle\Api\Filter\FilterInterface')->reveal()];
+        $filters = [$this->prophesize('Dunglas\ApiBundle\Api\FilterInterface')->reveal()];
 
         $resource = new Resource('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity');
         $resource->initFilters($filters);

@@ -80,16 +80,3 @@ Feature: Error handling
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should exist
     And the JSON node "trace" should exist
-
-  Scenario: I can't normalize unknown resources
-    Given I send a "POST" request to "/related_dummies" with body:
-    """
-    {
-      "unknown": "foo"
-    }
-    """
-    Then the response status code should be 400
-    And the response should be in JSON
-    And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
-    And the JSON node "hydra:description" should be equal to 'IRI  not supported (found "foo" in "unknown" of "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy")'

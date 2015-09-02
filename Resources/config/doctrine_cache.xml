@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="api.mapping.cache.prefix" />
+    </parameters>
+
+    <services>
+        <!-- Cache -->
+
+        <service id="api.cache" alias="api.cache.apcu" />
+
+        <service id="api.cache.apcu" class="Doctrine\Common\Cache\ApcuCache" public="false">
+            <call method="setNamespace">
+                <argument>api.mapping.cache.prefix</argument>
+            </call>
+        </service>
+
+        <!-- Resource collection -->
+
+        <service id="api.metadata.resource.factory.collection.cache" class="Dunglas\ApiBundle\Bridge\Doctrine\Cache\Mapping\Resource\CollectionMetadataFactory" decorates="api.metadata.resource.factory.collection" public="false">
+            <argument type="service" id="api.cache" />
+            <argument type="service" id="api.metadata.resource.factory.collection.cache.inner" />
+        </service>
+
+        <!-- Resource item -->
+
+        <service id="api.metadata.resource.factory.item.cache" class="Dunglas\ApiBundle\Bridge\Doctrine\Cache\Metadata\Resource\ItemMetadataFactory" decorates="api.metadata.resource.factory.item" public="false">
+            <argument type="service" id="api.cache" />
+            <argument type="service" id="api.metadata.resource.factory.item.cache.inner" />
+        </service>
+
+        <!-- Property collection -->
+
+        <service id="api.metadata.property.factory.collection.cache" class="Dunglas\ApiBundle\Bridge\Doctrine\Cache\Mapping\Property\CollectionMetadataFactory" decorates="api.metadata.property.factory.collection" public="false">
+            <argument type="service" id="api.cache" />
+            <argument type="service" id="api.metadata.property.factory.collection.cache.inner" />
+        </service>
+
+        <!-- Property item -->
+
+        <service id="api.metadata.property.factory.item.cache" class="Dunglas\ApiBundle\Bridge\Doctrine\Cache\Metadata\Property\ItemMetadataFactory" decorates="api.metadata.property.factory.item" public="false">
+            <argument type="service" id="api.cache" />
+            <argument type="service" id="api.metadata.property.factory.item.cache.inner" />
+        </service>
+
+    </services>
+
+</container>

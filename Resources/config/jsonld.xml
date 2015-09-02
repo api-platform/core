@@ -5,27 +5,31 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api.jsonld.entrypoint_builder" class="Dunglas\ApiBundle\JsonLd\EntrypointBuilder" lazy="true">
-            <argument type="service" id="api.resource_collection" />
+        <service id="api.jsonld.entrypoint_builder" class="Dunglas\ApiBundle\JsonLd\EntrypointBuilder" public="false">
+            <argument type="service" id="api.metadata.resource.factory.collection" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
             <argument type="service" id="api.iri_converter" />
-            <argument type="service" id="router" />
+            <argument type="service" id="api.router" />
         </service>
 
-        <service id="api.jsonld.context_builder" class="Dunglas\ApiBundle\JsonLd\ContextBuilder">
-            <argument type="service" id="router" />
-            <argument type="service" id="event_dispatcher" />
-            <argument type="service" id="api.resource_collection" />
+        <service id="api.jsonld.context_builder" class="Dunglas\ApiBundle\JsonLd\ContextBuilder" public="false">
+            <argument type="service" id="api.metadata.resource.factory.collection" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="api.metadata.property.factory.collection" />
+            <argument type="service" id="api.metadata.property.factory.item" />
+            <argument type="service" id="api.router" />
         </service>
 
         <!-- Serializer -->
 
         <service id="api.jsonld.normalizer.item" class="Dunglas\ApiBundle\JsonLd\Serializer\ItemNormalizer" public="false">
-            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="api.metadata.property.factory.collection" />
+            <argument type="service" id="api.metadata.property.factory.item" />
             <argument type="service" id="api.iri_converter" />
-            <argument type="service" id="api.mapping.class_metadata_factory" />
+            <argument type="service" id="api.resource_class_resolver" />
             <argument type="service" id="api.jsonld.context_builder" />
             <argument type="service" id="api.property_accessor" />
-            <argument type="service" id="api.resource_resolver" />
             <argument type="service" id="api.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" />
@@ -41,13 +45,6 @@
 
         <!-- Event listeners -->
 
-        <service id="api.jsonld.resource_context_builder_listener" class="Dunglas\ApiBundle\JsonLd\EventListener\ResourceContextBuilderListener">
-            <argument type="service" id="api.mapping.class_metadata_factory" />
-            <argument type="service" id="api.name_converter" on-invalid="ignore" />
-
-            <tag name="kernel.event_subscriber" />
-        </service>
-
         <service id="api.jsonld.listener.view.responder" class="Dunglas\ApiBundle\JsonLd\EventListener\ResponderViewListener">
             <argument type="service" id="api.serializer" />
 
@@ -58,7 +55,8 @@
 
         <service id="api.jsonld.action.context" class="Dunglas\ApiBundle\JsonLd\Action\ContextAction">
             <argument type="service" id="api.jsonld.context_builder" />
-            <argument type="service" id="api.resource_collection" />
+            <argument type="service" id="api.metadata.resource.factory.collection" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
         </service>
 
         <service id="api.jsonld.action.entrypoint" class="Dunglas\ApiBundle\JsonLd\Action\EntrypointAction">

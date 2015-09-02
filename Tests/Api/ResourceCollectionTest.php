@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\Api;
 
-use Dunglas\ApiBundle\Api\ResourceCollection;
+use Dunglas\ApiBundle\Api\ResourceTypeRegistry;
 use Dunglas\ApiBundle\Tests\Fixtures\DummyEntity;
 
 /**
@@ -28,7 +28,7 @@ class ResourceCollectionTest extends \PHPUnit_Framework_TestCase
 
         $resources = [$resource];
 
-        $resourceCollection = new ResourceCollection();
+        $resourceCollection = new ResourceTypeRegistry();
         $resourceCollection->init($resources);
 
         $this->assertInstanceOf('Dunglas\ApiBundle\Api\ResourceCollectionInterface', $resourceCollection);
@@ -49,7 +49,7 @@ class ResourceCollectionTest extends \PHPUnit_Framework_TestCase
 
         $resources = [$resource, $resource];
 
-        $resourceCollection = new ResourceCollection();
+        $resourceCollection = new ResourceTypeRegistry();
         $resourceCollection->init($resources);
     }
 
@@ -71,7 +71,7 @@ class ResourceCollectionTest extends \PHPUnit_Framework_TestCase
 
         $resources = [$resource1, $resource2];
 
-        $resourceCollection = new ResourceCollection();
+        $resourceCollection = new ResourceTypeRegistry();
         $resourceCollection->init($resources);
     }
 
@@ -84,7 +84,7 @@ class ResourceCollectionTest extends \PHPUnit_Framework_TestCase
 
         $resources = [$resource];
 
-        $resourceCollection = new ResourceCollection();
+        $resourceCollection = new ResourceTypeRegistry();
         $resourceCollection->init($resources);
 
         $this->assertEquals($resource, $resourceCollection->getResourceForEntity('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity'));

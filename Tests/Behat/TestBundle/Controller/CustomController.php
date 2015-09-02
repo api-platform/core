@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class CustomController extends Controller
 {
     /**
-     * @return Response
+     * @return \Dunglas\ApiBundle\JsonLd\Response
      */
     public function customAction($id)
     {

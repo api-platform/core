@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PostCollectionAction
+final class PostCollectionAction
 {
     use ActionUtilTrait;
 
@@ -45,13 +45,9 @@ class PostCollectionAction
      */
     public function __invoke(Request $request)
     {
-        list($resourceType, $format) = $this->extractAttributes($request);
+        list($resourceClass, $operationName, , $format) = $this->extractAttributes($request);
+        $context = ['resource_class' => $resourceClass, 'collection_operation_name' => $operationName];
 
-        return $this->serializer->deserialize(
-            $request->getContent(),
-            $resourceType->getEntityClass(),
-            $format,
-            $resourceType->getDenormalizationContext()
-        );
+        return $this->serializer->deserialize($request->getContent(), $resourceClass, $format, $context);
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\DependencyInjection\Compiler;
 
-use Dunglas\ApiBundle\DependencyInjection\Compiler\ResourcePass;
+use Dunglas\ApiBundle\DependencyInjection\Compiler\ResourceTypePass;
 use Prophecy\Argument;
 
 /**
@@ -23,7 +23,7 @@ class ResourcePassTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestSkipped('To be refactored');
 
-        $resourcePass = new ResourcePass();
+        $resourcePass = new ResourceTypePass();
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $resourcePass);
 

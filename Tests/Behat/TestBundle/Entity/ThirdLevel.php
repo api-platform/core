@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -19,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
+ * @Resource
  * @ORM\Entity
  */
 class ThirdLevel
@@ -31,6 +33,7 @@ class ThirdLevel
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var int
      *
@@ -38,6 +41,7 @@ class ThirdLevel
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 3;
+
     /**
      * @var bool
      *

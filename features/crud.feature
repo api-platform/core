@@ -27,21 +27,21 @@ Feature: Create-Retrieve-Update-Delete
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",
-      "name": "My Dummy",
-      "alias": null,
       "description": null,
+      "dummy": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
       "dummyPrice": null,
-      "jsonData": {
-        "key": [
-          "value1",
-          "value2"
-        ]
-      },
       "relatedDummy": null,
-      "dummy": null,
       "relatedDummies": [],
-      "name_converted": null
+      "jsonData": {
+          "key": [
+              "value1",
+              "value2"
+          ]
+      },
+      "name_converted": null,
+      "name": "My Dummy",
+      "alias": null
     }
     """
 
@@ -56,21 +56,21 @@ Feature: Create-Retrieve-Update-Delete
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",
-      "name": "My Dummy",
-      "alias": null,
       "description": null,
+      "dummy": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
       "dummyPrice": null,
-      "jsonData": {
-        "key": [
-          "value1",
-          "value2"
-        ]
-      },
       "relatedDummy": null,
-      "dummy": null,
       "relatedDummies": [],
-      "name_converted": null
+      "jsonData": {
+          "key": [
+              "value1",
+              "value2"
+          ]
+      },
+      "name_converted": null,
+      "name": "My Dummy",
+      "alias": null
     }
     """
 
@@ -85,34 +85,34 @@ Feature: Create-Retrieve-Update-Delete
       "@context": "/contexts/Dummy",
       "@id": "/dummies",
       "@type": "hydra:PagedCollection",
+      "hydra:member": [
+          {
+              "@id": "/dummies/1",
+              "@type": "Dummy",
+              "description": null,
+              "dummy": null,
+              "dummyDate": "2015-03-01T10:00:00+00:00",
+              "dummyPrice": null,
+              "relatedDummy": null,
+              "relatedDummies": [],
+              "jsonData": {
+                  "key": [
+                      "value1",
+                      "value2"
+                  ]
+              },
+              "name_converted": null,
+              "name": "My Dummy",
+              "alias": null
+          }
+      ],
       "hydra:totalItems": 1,
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "hydra:member": [
-        {
-          "@id":"/dummies/1",
-          "@type":"Dummy",
-          "name":"My Dummy",
-          "alias": null,
-          "description": null,
-          "dummyDate": "2015-03-01T10:00:00+00:00",
-          "dummyPrice": null,
-          "jsonData": {
-            "key": [
-              "value1",
-              "value2"
-            ]
-          },
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
-        }
-      ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -177,6 +177,30 @@ Feature: Create-Retrieve-Update-Delete
               },
               {
                   "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[before]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyDate[after]",
+                  "property": "dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummy.dummyDate[before]",
+                  "property": "relatedDummy.dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummy.dummyDate[after]",
+                  "property": "relatedDummy.dummyDate",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
                   "variable": "dummyPrice[between]",
                   "property": "dummyPrice",
                   "required": false
@@ -203,30 +227,6 @@ Feature: Create-Retrieve-Update-Delete
                   "@type": "IriTemplateMapping",
                   "variable": "dummyPrice[lte]",
                   "property": "dummyPrice",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummy.dummyDate[before]",
-                  "property": "relatedDummy.dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummy.dummyDate[after]",
-                  "property": "relatedDummy.dummyDate",
                   "required": false
               }
           ]
@@ -258,22 +258,23 @@ Feature: Create-Retrieve-Update-Delete
         "@context": "/contexts/Dummy",
         "@id": "/dummies/1",
         "@type": "Dummy",
-        "name": "A nice dummy",
-        "alias": null,
         "description": null,
+        "dummy": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
         "dummyPrice": null,
-        "jsonData": [{
-            "key": "value1"
-          },
-          {
-            "key": "value2"
-          }
-        ],
         "relatedDummy": null,
-        "dummy": null,
         "relatedDummies": [],
-        "name_converted": null
+        "jsonData": [
+            {
+                "key": "value1"
+            },
+            {
+                "key": "value2"
+            }
+        ],
+        "name_converted": null,
+        "name": "A nice dummy",
+        "alias": null
       }
       """
 

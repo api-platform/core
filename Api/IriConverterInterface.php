@@ -12,7 +12,6 @@
 namespace Dunglas\ApiBundle\Api;
 
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Converts item and resources to IRI and vice versa.
@@ -27,33 +26,33 @@ interface IriConverterInterface
      * @param string $iri
      * @param bool   $fetchData
      *
-     * @return object|null
+     * @return object
      *
      * @throws InvalidArgumentException
      */
-    public function getItemFromIri($iri, $fetchData = false);
+    public function getItemFromIri(string $iri, bool $fetchData = false);
 
     /**
      * Gets the IRI associated with the given item.
      *
      * @param object $item
-     * @param bool   $referenceType
+     * @param string $referenceType
      *
      * @return string
      *
      * @throws InvalidArgumentException
      */
-    public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH);
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
 
     /**
      * Gets the IRI associated with the given resource collection.
      *
-     * @param ResourceInterface $resource
-     * @param bool              $referenceType
+     * @param string $resourceClass
+     * @param string $referenceType
      *
      * @return string
      *
      * @throws InvalidArgumentException
      */
-    public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH);
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
 }

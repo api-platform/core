@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Action;
 
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
+use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class GetCollectionAction
+final class GetCollectionAction
 {
     use ActionUtilTrait;
 
@@ -45,8 +45,8 @@ class GetCollectionAction
      */
     public function __invoke(Request $request)
     {
-        list($resourceType) = $this->extractAttributes($request);
+        list($resourceClass, $operationName) = $this->extractAttributes($request);
 
-        return $this->dataProvider->getCollection($resourceType);
+        return $this->dataProvider->getCollection($resourceClass, $operationName);
     }
 }

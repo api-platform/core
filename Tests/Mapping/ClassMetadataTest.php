@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\Doctrine\Mapping;
 
-use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Mapping\ResourceClassMetadata\ResourceClassMetadata;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -19,13 +19,13 @@ use Dunglas\ApiBundle\Mapping\ClassMetadata;
 class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ClassMetadata
+     * @var ResourceClassMetadata
      */
     private $classMetadata;
 
     public function setUp()
     {
-        $this->classMetadata = new ClassMetadata('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity');
+        $this->classMetadata = new ResourceClassMetadata('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity');
     }
 
     public function testInitialize()

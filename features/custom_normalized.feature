@@ -53,10 +53,6 @@ Feature: Using custom normalized entity
       "@context": "/contexts/CustomNormalizedDummy",
       "@id": "/custom_normalized_dummies",
       "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/custom_normalized_dummies",
-      "hydra:lastPage": "/custom_normalized_dummies",
       "hydra:member": [
         {
           "@id": "/custom_normalized_dummies/1",
@@ -64,7 +60,11 @@ Feature: Using custom normalized entity
           "name": "My Dummy",
           "alias": "My alias"
         }
-      ]
+      ],
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/custom_normalized_dummies",
+      "hydra:lastPage": "/custom_normalized_dummies"
     }
     """
 

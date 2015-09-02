@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class JsonLdEncoder extends JsonEncoder
+final class JsonLdEncoder extends JsonEncoder
 {
     const FORMAT = 'jsonld';
 

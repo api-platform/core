@@ -13,7 +13,8 @@ namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Dunglas\ApiBundle\Annotation\Iri;
+use Dunglas\ApiBundle\Annotation\Property;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -21,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
+ * @Resource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range"}})
  * @ORM\Entity
  */
 class Dummy
@@ -33,38 +35,44 @@ class Dummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string The dummy name.
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Iri("http://schema.org/name")
+     * @Property(iri="http://schema.org/name")
      */
     private $name;
+
     /**
      * @var string The dummy name alias.
      *
      * @ORM\Column(nullable=true)
-     * @Iri("https://schema.org/alternateName")
+     * @Property(iri="https://schema.org/alternateName")
      */
     private $alias;
+
     /**
      * @var array foo
      */
     private $foo;
+
     /**
      * @var string A short description of the item.
      *
      * @ORM\Column(nullable=true)
-     * @Iri("https://schema.org/description")
+     * @Property(iri="https://schema.org/description")
      */
     public $description;
+
     /**
      * @var string A dummy.
      *
      * @ORM\Column(nullable=true)
      */
     public $dummy;
+
     /**
      * @var \DateTime A dummy date.
      *
@@ -72,6 +80,7 @@ class Dummy
      * @Assert\DateTime
      */
     public $dummyDate;
+
     /**
      * @var string A dummy price.
      *
@@ -84,18 +93,21 @@ class Dummy
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */
     public $relatedDummy;
+
     /**
      * @var ArrayCollection Several dummies.
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
     public $relatedDummies;
+
     /**
      * @var array serialize data.
      *
      * @ORM\Column(type="json_array", nullable=true)
      */
     public $jsonData;
+
     /**
      * @var string
      *

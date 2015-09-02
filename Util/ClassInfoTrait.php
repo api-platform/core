@@ -16,6 +16,8 @@ use Doctrine\Common\Util\ClassUtils;
 /**
  * Retrieves information about a class.
  *
+ * @internal
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 trait ClassInfoTrait

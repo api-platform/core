@@ -27,10 +27,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
      * @var ManagerRegistry
      */
     private $doctrine;
+
     /**
      * @var \Doctrine\Common\Persistence\ObjectManager
      */
     private $manager;
+
     /**
      * @var Request
      */

@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\Doctrine\Mapping;
 
-use Dunglas\ApiBundle\Mapping\AttributeMetadata;
+use Dunglas\ApiBundle\Mapping\AttributeMetadata\AttributeMetadata;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
