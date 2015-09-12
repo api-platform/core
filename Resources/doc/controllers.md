@@ -43,5 +43,5 @@ appear in documentations.
 
 Note that you shouldn't use `@Route` annotations, as this will cause bugs. The bundle auto-registers routes within Symfony2, so you don't need to use `@Route` annotations.
 
-Previous chapter: [Controllers](controllers.md)<br>
+Previous chapter: [Resources](resources.md)<br>
 Next chapter: [Using external (JSON-LD) vocabularies](external-vocabularies.md)
