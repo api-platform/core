@@ -239,44 +239,45 @@ class ItemNormalizer extends AbstractNormalizer
             }
 
             $type = $attributesMetadata[$attributeName]->getType();
-            if (
-                $attributeValue &&
-                $type->isCollection() &&
-                ($collectionType = $type->getCollectionType()) &&
-                ($class = $collectionType->getClass())
-            ) {
-                $values = [];
-                foreach ($attributeValue as $index => $obj) {
-                    $values[$index] = $this->denormalizeRelation(
-                        $resource,
-                        $attributeName,
-                        $attributesMetadata[$attributeName],
-                        $class,
-                        $obj,
-                        $context
-                    );
+            if ($type && $attributeValue) {
+                if (
+                    $type->isCollection() &&
+                    ($collectionType = $type->getCollectionType()) &&
+                    ($class = $collectionType->getClass())
+                ) {
+                    $values = [];
+                    foreach ($attributeValue as $index => $obj) {
+                        $values[$index] = $this->denormalizeRelation(
+                            $resource,
+                            $attributeName,
+                            $attributesMetadata[$attributeName],
+                            $class,
+                            $obj,
+                            $context
+                        );
+                    }
+
+                    $this->setValue($object, $attributeName, $values);
+
+                    continue;
                 }
 
-                $this->setValue($object, $attributeName, $values);
-
-                continue;
-            }
-
-            if ($attributeValue && ($class = $type->getClass())) {
-                $this->setValue(
-                    $object,
-                    $attributeName,
-                    $this->denormalizeRelation(
-                        $resource,
+                if ($class = $type->getClass()) {
+                    $this->setValue(
+                        $object,
                         $attributeName,
-                        $attributesMetadata[$attributeName],
-                        $class,
-                        $attributeValue,
-                        $context
-                    )
-                );
+                        $this->denormalizeRelation(
+                            $resource,
+                            $attributeName,
+                            $attributesMetadata[$attributeName],
+                            $class,
+                            $attributeValue,
+                            $context
+                        )
+                    );
 
-                continue;
+                    continue;
+                }
             }
 
             $this->setValue($object, $attributeName, $attributeValue);
