@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
@@ -121,6 +122,15 @@ class DataProvider implements DataProviderInterface
 
         $classMetaData = $manager->getClassMetadata($entityClass);
         $identifiers = $classMetaData->getIdentifier();
+
+        foreach ($classMetaData->getAssociationNames() as $i => $association) {
+            $mapping = $classMetaData->associationMappings[$association];
+
+            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
+                $queryBuilder->join('o.'.$association, 'a'.$i);
+                $queryBuilder->addSelect('a'.$i);
+            }
+        }
 
         if (null !== $this->order && 1 === count($identifiers)) {
             $identifier = $identifiers[0];
