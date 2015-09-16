@@ -127,7 +127,7 @@ class DataProvider implements DataProviderInterface
             $mapping = $classMetaData->associationMappings[$association];
 
             if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
-                $queryBuilder->join('o.'.$association, 'a'.$i);
+                $queryBuilder->leftJoin('o.'.$association, 'a'.$i);
                 $queryBuilder->addSelect('a'.$i);
             }
         }
