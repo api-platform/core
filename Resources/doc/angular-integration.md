@@ -59,3 +59,4 @@ var app = angular
 ```
 
 Previous chapter: [Performance](performance.md)
+[Back to Table of Contents](../../README.md#official-documentation)
