@@ -236,11 +236,14 @@ class ItemNormalizer extends AbstractNormalizer
                 $type = $types[0];
 
                 if (
-                    $attributeValue &&
                     $type->isCollection() &&
                     ($collectionType = $type->getCollectionType()) &&
                     ($class = $collectionType->getClass())
                 ) {
+                    if (!is_array($attributeValue)) {
+                        continue;
+                    }
+
                     $values = [];
                     foreach ($attributeValue as $index => $obj) {
                         $values[$index] = $this->denormalizeRelation(
