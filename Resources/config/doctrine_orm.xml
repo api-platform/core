@@ -54,6 +54,11 @@
 
         <!-- Doctrine Query extensions -->
 
+        <service id="api.doctrine.orm.query_extension.eager_loading" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\EagerLoadingExtension">
+            <tag name="api.doctrine.orm.query_extension.item" />
+            <tag name="api.doctrine.orm.query_extension.collection" />
+        </service>
+
         <service id="api.doctrine.orm.query_extension.filter" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\FilterExtension">
             <tag name="api.doctrine.orm.query_extension.collection" />
         </service>
