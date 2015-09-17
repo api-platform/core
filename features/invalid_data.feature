@@ -1,0 +1,62 @@
+Feature: Handle properly invalid data submitted to the API
+  In order to have robust API
+  As a client software developer
+  I can send unsupported attributes that will be ignored
+
+  @createSchema
+  Scenario: Create a resource
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Not existing",
+      "unsupported": true
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "name": "Not existing",
+      "alias": null,
+      "dummyDate": null,
+      "jsonData": [],
+      "dummy": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "name_converted": null
+    }
+    """
+
+  @dropSchema
+  Scenario: Send non-array data when an array is expected
+    When I send a "POST" request to "/dummies" with body:
+        """
+    {
+      "name": "Invalid",
+      "relatedDummies": "hello"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    """
+    And the JSON should be equal to:
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/2",
+      "@type": "Dummy",
+      "name": "Invalid",
+      "alias": null,
+      "dummyDate": null,
+      "jsonData": [],
+      "dummy": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "name_converted": null
+    }
+    """
