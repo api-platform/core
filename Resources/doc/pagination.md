@@ -1,3 +1,0 @@
-# Pagination
-
-TODO
