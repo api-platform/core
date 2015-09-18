@@ -32,6 +32,18 @@ Feature: Handle properly invalid data submitted to the API
     }
     """
 
+  Scenario: Ignore invalid dates
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Invalid date",
+      "dummyDate": "Invalid"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+
   @dropSchema
   Scenario: Send non-array data when an array is expected
     When I send a "POST" request to "/dummies" with body:
