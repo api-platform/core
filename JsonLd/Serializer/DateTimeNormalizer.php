@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\JsonLd\Serializer;
 
+use Dunglas\ApiBundle\Exception\DeserializationException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -53,6 +54,10 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        return new \DateTime($data);
+        try {
+            return new \DateTime($data);
+        } catch (\Exception $exception) {
+            throw new DeserializationException($exception->getMessage(), $exception->getCode(), $exception);
+        }
     }
 }

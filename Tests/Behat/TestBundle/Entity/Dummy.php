@@ -129,7 +129,7 @@ class Dummy
     {
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate = null)
     {
         $this->dummyDate = $dummyDate;
     }
