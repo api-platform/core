@@ -27,7 +27,7 @@ interface IriConverterInterface
      * @param string $iri
      * @param bool   $fetchData
      *
-     * @return object
+     * @return object|null
      *
      * @throws InvalidArgumentException
      */
