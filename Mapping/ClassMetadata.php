@@ -145,7 +145,10 @@ class ClassMetadata implements ClassMetadataInterface
     public function getIdentifierName()
     {
         if (!$this->identifierName) {
-            throw new RuntimeException(sprintf('The class "%s" has no identifier.', $this->name));
+            throw new RuntimeException(
+                sprintf(
+                    'The class "%s" has no identifier. Maybe you forgot to define the Entity Identifier, or using composite identifiers (which are not supported)?',
+                    $this->name));
         }
 
         return $this->identifierName;

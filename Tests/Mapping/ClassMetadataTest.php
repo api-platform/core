@@ -56,7 +56,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Dunglas\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The class "Dunglas\ApiBundle\Tests\Fixtures\DummyEntity" has no identifier.
+     * @expectedExceptionMessage The class "Dunglas\ApiBundle\Tests\Fixtures\DummyEntity" has no identifier. Maybe you forgot to define the Entity Identifier, or using composite identifiers (which are not supported)?
      */
     public function testIdentifierNameNotSet()
     {
