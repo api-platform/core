@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Mapping\Loader;
 use Doctrine\Common\Annotations\Reader;
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Util\ReflectionTrait;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Annotation loader.
@@ -30,6 +31,11 @@ class AnnotationLoader implements LoaderInterface
      * @var string
      */
     const IRI_ANNOTATION_NAME = 'Dunglas\ApiBundle\Annotation\Iri';
+
+    /**
+     * @var string
+     */
+    const CONSTRAINT_ANNOTATION_NAME = 'Symfony\Component\Validator\Constraints';
 
     /**
      * @var Reader
@@ -61,6 +67,29 @@ class AnnotationLoader implements LoaderInterface
             if ($reflectionProperty = $this->getReflectionProperty($reflectionClass, $attributeName)) {
                 if ($iri = $this->reader->getPropertyAnnotation($reflectionProperty, self::IRI_ANNOTATION_NAME)) {
                     $attributeMetadata->setIri($iri->value);
+                }
+                if ($annotations = $this->reader->getPropertyAnnotations($reflectionProperty)) {
+                    $constraints = [];
+                    foreach ($annotations as $annotation) {
+                        if ($annotation instanceof Constraint) {
+                            $annotationOptions = (array) $annotation;
+
+                            // Cleanup the options by removing useless data (remove payload and messages)
+                            unset($annotationOptions['payload']);
+                            unset($annotationOptions['message']);
+                            foreach ($annotationOptions as $key => $annotationOption) {
+                                if (substr(strtolower($key), -7) == 'message') {
+                                    unset($annotationOptions[$key]);
+                                }
+                            }
+
+                            $constraints[] = [
+                                'name' => get_class($annotation),
+                                'options' => $annotationOptions,
+                            ];
+                        }
+                    }
+                    $attributeMetadata->setSymfonyConstraints($constraints);
                 }
             }
         }

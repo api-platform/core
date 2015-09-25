@@ -51,6 +51,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('api.title', $config['title']);
         $container->setParameter('api.description', $config['description']);
+        $container->setParameter('api.enable_apidoc_symfony_constraints', $config['enable_apidoc_symfony_constraints']);
         $container->setParameter('api.collection.filter_name.order', $config['collection']['filter_name']['order']);
         $container->setParameter('api.collection.order', $config['collection']['order']);
         $container->setParameter('api.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);

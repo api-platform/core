@@ -12,6 +12,7 @@
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument>%api.title%</argument>
             <argument>%api.description%</argument>
+            <argument>%api.enable_apidoc_symfony_constraints%</argument>
         </service>
 
         <!-- Event listeners -->

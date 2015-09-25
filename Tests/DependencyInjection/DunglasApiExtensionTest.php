@@ -179,6 +179,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.constraint_violation_list', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.error', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api.enable_apidoc_symfony_constraints', false)->shouldBeCalled();
 
         return $containerBuilderProphecy;
     }
