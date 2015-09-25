@@ -47,6 +47,11 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $description;
 
     /**
+     * @var bool
+     */
+    private $enableSymfonyConstraints;
+
+    /**
      * @param ResourceCollectionInterface   $resourceCollection
      * @param ContextBuilder                $contextBuilder
      * @param RouterInterface               $router
@@ -60,7 +65,8 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         RouterInterface $router,
         ClassMetadataFactoryInterface $classMetadataFactory,
         $title,
-        $description
+        $description,
+        $enableSymfonyConstraints
     ) {
         $this->resourceCollection = $resourceCollection;
         $this->contextBuilder = $contextBuilder;
@@ -68,6 +74,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $this->classMetadataFactory = $classMetadataFactory;
         $this->title = $title;
         $this->description = $description;
+        $this->enableSymfonyConstraints = $enableSymfonyConstraints;
     }
 
     /**
@@ -153,6 +160,10 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
                 if ($description = $attributeMetadata->getDescription()) {
                     $property['hydra:description'] = $description;
+                }
+
+                if ($this->enableSymfonyConstraints) {
+                    $property['symfony:constraints'] = $attributeMetadata->getSymfonyConstraints();
                 }
 
                 $properties[] = $property;

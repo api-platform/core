@@ -100,6 +100,14 @@ class AttributeMetadata implements AttributeMetadataInterface
      *           {@link isIdentifier()} instead.
      */
     public $identifier;
+    /**
+     * @var string|null
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getSymfonyConstraints()} instead.
+     */
+    public $symfonyConstraints;
 
     /**
      * @param string    $name
@@ -245,6 +253,22 @@ class AttributeMetadata implements AttributeMetadataInterface
     public function getIri()
     {
         return $this->iri;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setSymfonyConstraints(array $symfonyConstraints)
+    {
+        $this->symfonyConstraints = $symfonyConstraints;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSymfonyConstraints()
+    {
+        return $this->symfonyConstraints;
     }
 
     /**

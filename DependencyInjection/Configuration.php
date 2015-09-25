@@ -61,6 +61,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->booleanNode('enable_apidoc_symfony_constraints')->defaultValue(false)->info('Enable display of symfony:constraints in /apidoc end point.')->end()
             ->end()
         ;
 

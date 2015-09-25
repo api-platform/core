@@ -38,6 +38,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ],
+        'enable_apidoc_symfony_constraints' => false,
     ];
 
     public function testDefaultConfig()
