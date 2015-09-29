@@ -147,7 +147,8 @@ class ItemNormalizer extends AbstractNormalizer
             if (
                 $attributeValue &&
                 $type &&
-                $type->isCollection()
+                $type->isCollection() &&
+                $type->getCollectionType()
             ) {
                 $values = [];
                 foreach ($attributeValue as $index => $obj) {
