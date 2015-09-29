@@ -147,12 +147,11 @@ class ItemNormalizer extends AbstractNormalizer
             if (
                 $attributeValue &&
                 $type &&
-                $type->isCollection() &&
-                ($collectionType = $type->getCollectionType()) &&
-                $subResource = $this->resourceResolver->getResourceFromType($collectionType)
+                $type->isCollection()
             ) {
                 $values = [];
                 foreach ($attributeValue as $index => $obj) {
+                    $subResource = $this->resourceResolver->guessResource($obj);
                     $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
                 }
 
