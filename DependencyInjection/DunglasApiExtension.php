@@ -66,7 +66,10 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('api.xml');
         $loader->load('property_info.xml');
         $loader->load('mapping.xml');
-        $loader->load('doctrine_orm.xml');
+
+        if ($config['enable_doctrine_orm']) {
+            $loader->load('doctrine_orm.xml');
+        }
 
         $this->enableJsonLd($container, $loader);
 
