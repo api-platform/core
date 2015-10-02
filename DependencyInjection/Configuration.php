@@ -29,11 +29,15 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('dunglas_api');
 
+        // We chack if symfony's doctrine bridge is enabled or not to choose the defaultValue for `enable_doctrine_orm`.
+        $enableDoctrineOrm = interface_exists('\Symfony\Bridge\Doctrine\RegistryInterface');
+
         $rootNode
             ->children()
                 ->scalarNode('title')->cannotBeEmpty()->isRequired()->info('The title of the API.')->end()
                 ->scalarNode('description')->cannotBeEmpty()->isRequired()->info('The description of the API.')->end()
                 ->scalarNode('cache')->defaultFalse()->info('The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.')->end()
+                ->booleanNode('enable_doctrine_orm')->defaultValue($enableDoctrineOrm)->info('Enable the Doctrine ORM integration.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()

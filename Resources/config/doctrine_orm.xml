@@ -47,6 +47,10 @@
         <service id="api.mapping.loaders.doctrine_identifier" class="Dunglas\ApiBundle\Mapping\Loader\DoctrineIdentifierLoader" public="false">
             <argument type="service" id="doctrine" />
         </service>
+
+        <service id="api.property_info.doctrine_extractor" class="PropertyInfo\Extractors\DoctrineExtractor" public="false">
+            <argument type="service" id="api.doctrine.metadata_factory" />
+        </service>
     </services>
 
 </container>

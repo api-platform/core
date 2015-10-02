@@ -120,7 +120,16 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::$defaultConfig, ['dunglas_api' => ['cache' => true]]), $containerBuilder);
     }
 
-    private function getContainerBuilderProphecy()
+    public function testDisableDoctrine()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy(false);
+        $containerBuilderProphecy->removeDefinition('api.cache_warmer.metadata')->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::$defaultConfig, ['dunglas_api' => ['enable_doctrine_orm' => false]]), $containerBuilder);
+    }
+
+    private function getContainerBuilderProphecy($withDoctrine = true)
     {
         $parameterBagProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface');
         $parameterBagProphecy->add(Argument::any())->shouldBeCalled();
@@ -148,7 +157,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.router', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.iri_converter', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.property_info.doctrine_extractor', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info.php_doc_extractor', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info.setter_extractor', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.class_metadata_factory', $definitionArgument)->shouldBeCalled();
@@ -159,14 +167,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.validator_metadata', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.phpdoc', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.mapping.loaders.annotation', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.metadata_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.event_subscriber', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.search_filter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.order_filter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.date_filter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.doctrine_identifier', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.json_ld.entrypoint_builder', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.json_ld.context_builder', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.json_ld.resource_context_builder_listener', $definitionArgument)->shouldBeCalled();
@@ -179,6 +179,28 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.constraint_violation_list', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.error', $definitionArgument)->shouldBeCalled();
+
+        if ($withDoctrine) {
+            $definitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
+            $definitionProphecy->getArgument(Argument::exact(0))->willReturn([])->shouldBeCalled();
+            $definitionProphecy->replaceArgument(Argument::exact(0), Argument::type('array'))->shouldBeCalled();
+            $definition = $definitionProphecy->reveal();
+
+            $containerBuilderProphecy->getDefinition('api.property_info')->shouldBeCalled()->willReturn($definition);
+            $containerBuilderProphecy->getDefinition('api.property_info.doctrine_extractor')->shouldBeCalled()->willReturn($definition);
+            $containerBuilderProphecy->getDefinition('api.mapping.loaders.chain')->shouldBeCalled()->willReturn($definition);
+            $containerBuilderProphecy->getDefinition('api.mapping.loaders.doctrine_identifier')->shouldBeCalled()->willReturn($definition);
+
+            $containerBuilderProphecy->setDefinition('api.doctrine.metadata_factory', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.event_subscriber', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.orm.data_provider', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_data_provider', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.orm.search_filter', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.orm.order_filter', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.orm.date_filter', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.mapping.loaders.doctrine_identifier', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.property_info.doctrine_extractor', $definitionArgument)->shouldBeCalled();
+        }
 
         return $containerBuilderProphecy;
     }

@@ -62,7 +62,12 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('api.xml');
         $loader->load('property_info.xml');
         $loader->load('mapping.xml');
-        $loader->load('doctrine_orm.xml');
+
+        if ($config['enable_doctrine_orm']) {
+            $loader->load('doctrine_orm.xml');
+
+            $this->enableDoctrine($container);
+        }
 
         // JSON-LD and Hydra support
         $loader->load('json_ld.xml');
@@ -86,5 +91,30 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         } else {
             $container->removeDefinition('api.cache_warmer.metadata');
         }
+    }
+
+    private function enableDoctrine(ContainerBuilder $container)
+    {
+        $propertyInfoDefinition = $container->getDefinition('api.property_info');
+        $propertyInfoDefinition->replaceArgument(
+            0,
+            array_merge(
+                [
+                    $container->getDefinition('api.property_info.doctrine_extractor'),
+                ],
+                $propertyInfoDefinition->getArgument(0)
+            )
+        );
+
+        $loaderChainDefintion = $container->getDefinition('api.mapping.loaders.chain');
+        $loaderChainDefintion->replaceArgument(
+            0,
+            array_merge(
+                $loaderChainDefintion->getArgument(0),
+                [
+                    $container->getDefinition('api.mapping.loaders.doctrine_identifier'),
+                ]
+            )
+        );
     }
 }
