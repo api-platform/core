@@ -13,6 +13,8 @@ namespace Dunglas\ApiBundle\JsonLd;
 
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -48,7 +50,7 @@ class EntrypointBuilder
     /**
      * Gets the entrypoint of the API.
      *
-     * return array
+     * @return array
      */
     public function getEntrypoint()
     {
@@ -60,10 +62,35 @@ class EntrypointBuilder
 
         foreach ($this->resourceCollection as $resource) {
             if (!empty($resource->getCollectionOperations())) {
-                $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+                try {
+                    $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+                } catch (InvalidArgumentException $ex) {
+                    if ($this->hasGetCollectionOperation($resource)) {
+                        throw $ex;
+                    }
+                }
             }
         }
 
         return $entrypoint;
+    }
+
+    /**
+     * Returns true if at least one GET collection operation exists for the given resource.
+     *
+     * @param ResourceInterface $resource
+     *
+     * @return bool
+     */
+    private function hasGetCollectionOperation(ResourceInterface $resource)
+    {
+        foreach ($resource->getCollectionOperations() as $operation) {
+            $methods = $operation->getRoute()->getMethods();
+            if (empty($methods) || in_array('GET', $methods)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
