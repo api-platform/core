@@ -70,7 +70,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([])->shouldBeCalled();
-        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldBeCalled();
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->prepend($containerBuilder);
