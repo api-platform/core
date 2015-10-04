@@ -30,7 +30,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container)
     {
-        if (null !== ($frameworkConfiguration = $container->getExtensionConfig('framework'))) {
+        if (!empty($frameworkConfiguration = $container->getExtensionConfig('framework'))) {
             if (!isset($frameworkConfiguration['serializer']) || !isset($frameworkConfiguration['serializer']['enabled'])) {
                 $container->prependExtensionConfig('framework', [
                     'serializer' => [
