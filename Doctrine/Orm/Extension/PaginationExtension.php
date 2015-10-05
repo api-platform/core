@@ -17,7 +17,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Paginator;
 use Dunglas\ApiBundle\Doctrine\Orm\QueryResultExtensionInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryUtils;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryChecker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -63,8 +63,7 @@ class PaginationExtension implements QueryResultExtensionInterface
 
         $queryBuilder
             ->setFirstResult(($this->getPage($resource, $request) - 1) * $itemsPerPage)
-            ->setMaxResults($itemsPerPage)
-        ;
+            ->setMaxResults($itemsPerPage);
     }
 
     /**
@@ -74,7 +73,9 @@ class PaginationExtension implements QueryResultExtensionInterface
      */
     public function supportsResult(ResourceInterface $resource)
     {
-        return $this->isPaginationEnabled($resource, $this->requestStack->getCurrentRequest());
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request !== null && $this->isPaginationEnabled($resource, $request);
     }
 
     /**
@@ -132,7 +133,8 @@ class PaginationExtension implements QueryResultExtensionInterface
     private function getItemsPerPage(ResourceInterface $resource, Request $request)
     {
         if ($resource->isClientAllowedToChangeItemsPerPage()
-            && $itemsPerPage = $request->get($resource->getItemsPerPageParameter())) {
+            && $itemsPerPage = $request->get($resource->getItemsPerPageParameter())
+        ) {
             return (float) $itemsPerPage;
         }
 
@@ -153,7 +155,7 @@ class PaginationExtension implements QueryResultExtensionInterface
          *
          * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L50
          */
-        if (QueryUtils::hasHavingClause($queryBuilder)) {
+        if (QueryChecker::hasHavingClause($queryBuilder)) {
             return true;
         }
 
@@ -162,7 +164,7 @@ class PaginationExtension implements QueryResultExtensionInterface
          *
          * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L87
          */
-        if (QueryUtils::hasRootEntityWithForeignKeyIdentifier($queryBuilder, $this->managerRegistry)) {
+        if (QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder, $this->managerRegistry)) {
             return true;
         }
 
@@ -172,8 +174,8 @@ class PaginationExtension implements QueryResultExtensionInterface
          * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L149
          */
         if (
-            QueryUtils::hasMaxResults($queryBuilder)
-            && QueryUtils::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
+            QueryChecker::hasMaxResults($queryBuilder)
+            && QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
         ) {
             return true;
         }

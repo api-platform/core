@@ -14,6 +14,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 use Sanpi\Behatch\HttpCall\Request;
 
@@ -99,6 +100,48 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is :nb dummy objects with relatedDummy
+     */
+    public function thereIsDummyObjectsWithRelatedDummy($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = new RelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setRelatedDummy($relatedDummy);
+
+            $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummy objects with relatedDummies
+     */
+    public function thereIsDummyObjectsWithRelatedDummies($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = new RelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->addRelatedDummy($relatedDummy);
+
+            $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is :nb dummy objects with dummyDate
      */
     public function thereIsDummyObjectsWithDummyDate($nb)
@@ -118,6 +161,34 @@ class FeatureContext implements Context, SnippetAcceptingContext
                 $dummy->setDummyDate($date);
             }
 
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummy objects with dummyDate and relatedDummy
+     */
+    public function thereIsDummyObjectsWithDummyDateAndRelatedDummy($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $relatedDummy = new RelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+            $relatedDummy->setDummyDate($date);
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setRelatedDummy($relatedDummy);
+            // Last Dummy has a null date
+            if ($nb !== $i) {
+                $dummy->setDummyDate($date);
+            }
+
+            $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
         }
 

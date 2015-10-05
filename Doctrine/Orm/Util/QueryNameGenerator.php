@@ -21,14 +21,14 @@ use Doctrine\ORM\QueryBuilder;
  * Utility functions for working with Doctrine ORM query.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class QueryUtils
+abstract class QueryNameGenerator
 {
     /**
      * Generates a unique alias for DQL join.
      *
      * @param string $association
-     * @param string $namespace
      *
      * @return string
      */
@@ -41,117 +41,12 @@ abstract class QueryUtils
      * Generates a unique parameter name for DQL query.
      *
      * @param string $name
-     * @param string $namespace
      *
      * @return string
      */
     public static function generateParameterName($name)
     {
         return sprintf('%s_%s', $name, uniqid());
-    }
-
-    /**
-     * Determines whether the query builder uses a HAVING clause.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
-     */
-    public static function hasHavingClause(QueryBuilder $queryBuilder)
-    {
-        return !empty($queryBuilder->getDQLPart('having'));
-    }
-
-    /**
-     * Determines whether the query builder has any root entity with foreign key identifier.
-     *
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return bool
-     */
-    public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry)
-    {
-        foreach ($queryBuilder->getRootEntities() as $rootEntity) {
-            $rootMetadata = $managerRegistry
-                ->getManagerForClass($rootEntity)
-                ->getClassMetadata($rootEntity)
-            ;
-
-            if ($rootMetadata->containsForeignIdentifier) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Determines whether the query builder has the maximum number of results specified.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
-     */
-    public static function hasMaxResults(QueryBuilder $queryBuilder)
-    {
-        return null !== $queryBuilder->getMaxResults();
-    }
-
-    /**
-     * Determines whether the query builder has ORDER BY on entity joined through
-     * to-many association.
-     *
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return bool
-     */
-    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry)
-    {
-        if (
-            empty($orderByParts = $queryBuilder->getDQLPart('orderBy'))
-            || empty($joinParts = $queryBuilder->getDQLPart('join'))
-        ) {
-            return false;
-        }
-
-        $orderByAliases = [];
-        foreach ($orderByParts as $orderBy) {
-            $parts = QueryBuilderUtil::getOrderByParts($orderBy);
-
-            foreach ($parts as $part) {
-                if (false !== ($pos = strpos($part, '.'))) {
-                    $alias = substr($part, 0, $pos);
-
-                    $orderByAliases[$alias] = true;
-                }
-            }
-        }
-
-        if (!empty($orderByAliases)) {
-            foreach ($joinParts as $rootAlias => $joins) {
-                foreach ($joins as $join) {
-                    $alias = QueryBuilderUtil::getJoinAlias($join);
-
-                    if (isset($orderByAliases[$alias])) {
-                        $relationship = QueryBuilderUtil::getJoinRelationship($join);
-
-                        $relationshipParts = explode('.', $relationship);
-                        $parentAlias = $relationshipParts[0];
-                        $association = $relationshipParts[1];
-
-                        $parentMetadata = QueryBuilderUtil::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
-
-                        if ($parentMetadata->isCollectionValuedAssociation($association)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -180,8 +75,8 @@ abstract class QueryUtils
             $aliasMap[$rootAlias] = 'root';
 
             foreach ($joins as $join) {
-                $alias = QueryBuilderUtil::getJoinAlias($join);
-                $relationship = QueryBuilderUtil::getJoinRelationship($join);
+                $alias = self::getJoinAlias($join);
+                $relationship = self::getJoinRelationship($join);
 
                 $pos = strpos($relationship, '.');
 

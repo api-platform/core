@@ -15,7 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryUtils;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -31,6 +31,7 @@ class SearchFilter extends AbstractFilter
      * @var string Exact matching.
      */
     const STRATEGY_EXACT = 'exact';
+
     /**
      * @var string The value must be contained in the field.
      */
@@ -52,10 +53,12 @@ class SearchFilter extends AbstractFilter
      * @var IriConverterInterface
      */
     private $iriConverter;
+
     /**
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
+
     /**
      * @var RequestStack
      */
@@ -94,9 +97,9 @@ class SearchFilter extends AbstractFilter
 
         foreach ($this->extractProperties($request) as $property => $value) {
             if (
-                !$this->isPropertyEnabled($property)
-                || !$this->isPropertyMapped($property, $resource, true)
-                || null === $value
+                !$this->isPropertyEnabled($property) ||
+                !$this->isPropertyMapped($property, $resource, true) ||
+                null === $value
             ) {
                 continue;
             }
@@ -110,7 +113,7 @@ class SearchFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryUtils::generateJoinAlias($association);
+                    $alias = QueryNameGenerator::generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -142,14 +145,13 @@ class SearchFilter extends AbstractFilter
                 $value = $this->getFilterValueFromUrl($value);
 
                 $association = $field;
-                $associationAlias = QueryUtils::generateJoinAlias($association);
-                $valueParameter = QueryUtils::generateParameterName($association);
+                $associationAlias = QueryNameGenerator::generateJoinAlias($association);
+                $valueParameter = QueryNameGenerator::generateParameterName($association);
 
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
                     ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
-                    ->setParameter($valueParameter, $value)
-                ;
+                    ->setParameter($valueParameter, $value);
             } elseif ($metadata->isCollectionValuedAssociation($field)) {
                 $values = $value;
                 if (!is_array($values)) {
@@ -168,14 +170,13 @@ class SearchFilter extends AbstractFilter
                 $values = array_map([$this, 'getFilterValueFromUrl'], $values);
 
                 $association = $field;
-                $associationAlias = QueryUtils::generateJoinAlias($association);
-                $valuesParameter = QueryUtils::generateParameterName($association);
+                $associationAlias = QueryNameGenerator::generateJoinAlias($association);
+                $valuesParameter = QueryNameGenerator::generateParameterName($association);
 
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
                     ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valuesParameter))
-                    ->setParameter($valuesParameter, $values)
-                ;
+                    ->setParameter($valuesParameter, $values);
             }
         }
     }
@@ -195,40 +196,35 @@ class SearchFilter extends AbstractFilter
      */
     private function addWhereByStrategy($strategy, QueryBuilder $queryBuilder, $alias, $field, $value)
     {
-        $valueParameter = QueryUtils::generateParameterName($field);
+        $valueParameter = QueryNameGenerator::generateParameterName($field);
 
         switch ($strategy) {
             case null:
             case self::STRATEGY_EXACT:
                 return $queryBuilder
                     ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value)
-                ;
+                    ->setParameter($valueParameter, $value);
 
             case self::STRATEGY_PARTIAL:
                 return $queryBuilder
                     ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, sprintf('%%%s%%', $value))
-                ;
+                    ->setParameter($valueParameter, sprintf('%%%s%%', $value));
 
             case self::STRATEGY_START:
                 return $queryBuilder
                     ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, sprintf('%s%%', $value))
-                ;
+                    ->setParameter($valueParameter, sprintf('%s%%', $value));
 
             case self::STRATEGY_END:
                 return $queryBuilder
                     ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, sprintf('%%%s', $value))
-                ;
+                    ->setParameter($valueParameter, sprintf('%%%s', $value));
 
             case self::STRATEGY_WORD_START:
                 return $queryBuilder
                     ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_1 OR %1$s.%2$s LIKE :%3$s_2', $alias, $field, $valueParameter))
                     ->setParameter(sprintf('%s_1', $valueParameter), sprintf('%s%%', $value))
-                    ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value))
-                ;
+                    ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value));
         }
 
         throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));

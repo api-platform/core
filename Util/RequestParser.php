@@ -17,8 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
  * Utility functions for working with Symfony HttpFoundation request.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class RequestUtils
+abstract class RequestParser
 {
     /**
      * Gets a fixed request.
@@ -27,13 +28,12 @@ abstract class RequestUtils
      *
      * @return Request
      */
-    public static function getFixedRequest(Request $request)
+    public static function parseAndDuplicateRequest(Request $request)
     {
-        $query = self::parseRequestParams($_SERVER['QUERY_STRING']);
-        $body = self::parseRequestParams(file_get_contents('php://input'));
-        $cookies = isset($_SERVER['HTTP_COOKIE']) ? self::parseRequestParams($_SERVER['HTTP_COOKIE']) : [];
+        $query = self::parseRequestParams($request->getQueryString());
+        $body = self::parseRequestParams($request->getContent());
 
-        return $request->duplicate($query, $body, null, $cookies, null, null);
+        return $request->duplicate($query, $body);
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class RequestUtils
      *
      * @return array
      */
-    public static function parseRequestParams($source)
+    private static function parseRequestParams($source)
     {
         $source = urldecode($source);
 

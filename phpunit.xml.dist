@@ -5,8 +5,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.6/phpunit.xsd"
          backupGlobals="false"
          bootstrap="features/fixtures/TestApp/bootstrap.php"
-         colors="true"
->
+         colors="true">
     <php>
         <server name="KERNEL_DIR" value="features/fixtures/TestApp/" />
     </php>
