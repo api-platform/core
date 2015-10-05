@@ -50,52 +50,58 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/AbstractDummy",
-      "@id": "/abstract_dummies",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/abstract_dummies",
-      "hydra:lastPage": "/abstract_dummies",
-      "hydra:member": [
-        {
-          "@id":"/concrete_dummies/1",
-          "@type":"ConcreteDummy",
-          "instance": "Concrete",
-          "name": "My Dummy"
+        "@context": "/contexts/AbstractDummy",
+        "@id": "/abstract_dummies",
+        "@type": "hydra:PagedCollection",
+        "hydra:totalItems": 1,
+        "hydra:itemsPerPage": 3,
+        "hydra:firstPage": "/abstract_dummies",
+        "hydra:lastPage": "/abstract_dummies",
+        "hydra:member": [
+            {
+                "@id": "/concrete_dummies/1",
+                "@type": "ConcreteDummy",
+                "instance": "Concrete",
+                "name": "My Dummy"
+            }
+        ],
+        "hydra:search": {
+            "@type": "hydra:IriTemplate",
+            "hydra:template": "/abstract_dummies{?id,name,relatedDummy.name,order[id],order[name]}",
+            "hydra:variableRepresentation": "BasicRepresentation",
+            "hydra:mapping": [
+                {
+                    "@type": "IriTemplateMapping",
+                    "variable": "id",
+                    "property": "id",
+                    "required": false
+                },
+                {
+                    "@type": "IriTemplateMapping",
+                    "variable": "name",
+                    "property": "name",
+                    "required": false
+                },
+                {
+                    "@type": "IriTemplateMapping",
+                    "variable": "relatedDummy.name",
+                    "property": "relatedDummy.name",
+                    "required": false
+                },
+                {
+                    "@type": "IriTemplateMapping",
+                    "variable": "order[id]",
+                    "property": "id",
+                    "required": false
+                },
+                {
+                    "@type": "IriTemplateMapping",
+                    "variable": "order[name]",
+                    "property": "name",
+                    "required": false
+                }
+            ]
         }
-      ],
-      "hydra:search": {
-              "@type": "hydra:IriTemplate",
-              "hydra:template": "\/abstract_dummies{?id,name,order[id],order[name]}",
-              "hydra:variableRepresentation": "BasicRepresentation",
-              "hydra:mapping": [
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "id",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "name",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[id]",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[name]",
-                      "property": "name",
-                      "required": false
-                  }
-              ]
-      }
     }
     """
 

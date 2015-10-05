@@ -19,12 +19,12 @@ Feature: JSON-LD contexts generation
             "description": "https://schema.org/description",
             "foo": "#Dummy/foo",
             "dummyDate": "#Dummy/dummyDate",
-            "jsonData": "#Dummy\/jsonData",
-            "dummy": "#Dummy/dummy",
+            "jsonData": "#Dummy/jsonData",
             "relatedDummy": {
                 "@id": "#Dummy/relatedDummy",
                 "@type": "@id"
             },
+            "dummy": "#Dummy/dummy",
             "relatedDummies": {
                 "@id": "#Dummy/relatedDummies",
                 "@type": "@id"
@@ -50,12 +50,12 @@ Feature: JSON-LD contexts generation
             "description": "https://schema.org/description",
             "foo": "#Dummy/foo",
             "dummyDate": "#Dummy/dummyDate",
-            "jsonData": "#Dummy\/jsonData",
-            "dummy": "#Dummy/dummy",
+            "jsonData": "#Dummy/jsonData",
             "relatedDummy": {
                 "@id": "#Dummy/relatedDummy",
                 "@type": "@id"
             },
+            "dummy": "#Dummy/dummy",
             "relatedDummies": {
                 "@id": "#Dummy/relatedDummies",
                 "@type": "@id"

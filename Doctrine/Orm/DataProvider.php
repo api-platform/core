@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryChecker;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -141,6 +142,14 @@ class DataProvider implements DataProviderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports(ResourceInterface $resource)
+    {
+        return null !== $this->managerRegistry->getManagerForClass($resource->getEntityClass());
+    }
+
+    /**
      * Gets the paginator.
      *
      * @param QueryBuilder $queryBuilder
@@ -151,16 +160,49 @@ class DataProvider implements DataProviderInterface
     {
         $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder);
         // Disable output walkers by default (performance)
-        $doctrineOrmPaginator->setUseOutputWalkers(false);
+        $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         return new Paginator($doctrineOrmPaginator);
     }
 
     /**
-     * {@inheritdoc}
+     * Determines whether output walkers should be used.
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
      */
-    public function supports(ResourceInterface $resource)
+    private function useOutputWalkers(QueryBuilder $queryBuilder)
     {
-        return null !== $this->managerRegistry->getManagerForClass($resource->getEntityClass());
+        /*
+         * "Cannot count query that uses a HAVING clause. Use the output walkers for pagination"
+         *
+         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L50
+         */
+        if (QueryChecker::hasHavingClause($queryBuilder)) {
+            return true;
+        }
+        /*
+         * "Paginating an entity with foreign key as identifier only works when using the Output Walkers. Call Paginator#setUseOutputWalkers(true) before iterating the paginator."
+         *
+         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L87
+         */
+        if (QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder, $this->managerRegistry)) {
+            return true;
+        }
+        /*
+         * "Cannot select distinct identifiers from query with LIMIT and ORDER BY on a column from a fetch joined to-many association. Use output walkers."
+         *
+         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L149
+         */
+        if (
+            QueryChecker::hasMaxResults($queryBuilder)
+            && QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
+        ) {
+            return true;
+        }
+
+        // Disable output walkers by default (performance)
+        return false;
     }
 }

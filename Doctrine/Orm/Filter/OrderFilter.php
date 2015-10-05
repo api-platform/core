@@ -14,7 +14,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryUtils;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class OrderFilter extends AbstractFilter
 {
@@ -59,7 +60,7 @@ class OrderFilter extends AbstractFilter
                 continue;
             }
 
-            if ('' === $order && isset($this->properties[$property])) {
+            if (empty($order) && isset($this->properties[$property])) {
                 $order = $this->properties[$property];
             }
 
@@ -77,7 +78,7 @@ class OrderFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryUtils::generateJoinAlias($association);
+                    $alias = QueryNameGenerator::generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }

@@ -9,21 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\OrderFilter;
+use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  */
 class OrderFilterTest extends KernelTestCase
 {
+    use PHPMock;
+
     /**
      * @var ManagerRegistry
      */
@@ -58,13 +62,16 @@ class OrderFilterTest extends KernelTestCase
     public function testApply(array $filterParameters, array $query, $expected)
     {
         $request = Request::create('/api/dummies', 'GET', $query);
-        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder = $this->repository->createQueryBuilder('o');
         $parameter = (array_key_exists('parameter', $filterParameters)) ? $filterParameters['parameter'] : 'order';
         $filter = new OrderFilter(
             $this->managerRegistry,
             $parameter,
             $filterParameters['properties']
         );
+
+        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
+        $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         $filter->apply($this->resource, $queryBuilder, $request);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
@@ -77,12 +84,72 @@ class OrderFilterTest extends KernelTestCase
         );
     }
 
-    /**
-     * @return \Doctrine\ORM\QueryBuilder QueryBuilder for filters.
-     */
-    public function getQueryBuilder()
+    public function testGetDescription()
     {
-        return $this->repository->createQueryBuilder('o');
+        $filter = new OrderFilter($this->managerRegistry, 'order', [
+            'id' => null,
+            'name' => null,
+            'foo' => null,
+        ]);
+        $this->assertEquals([
+            'order[id]' => [
+                'property' => 'id',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[name]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+            ],
+        ], $filter->getDescription($this->resource));
+    }
+
+    public function testGetDescriptionDefaultFields()
+    {
+        $filter = new OrderFilter($this->managerRegistry, 'order');
+        $this->assertEquals([
+            'order[id]' => [
+                'property' => 'id',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[name]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[alias]' => [
+                'property' => 'alias',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[description]' => [
+                'property' => 'description',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[dummy]' => [
+                'property' => 'dummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[dummyDate]' => [
+                'property' => 'dummyDate',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[jsonData]' => [
+                'property' => 'jsonData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'order[nameConverted]' => [
+                'property' => 'nameConverted',
+                'type' => 'string',
+                'required' => false,
+            ],
+        ], $filter->getDescription($this->resource));
     }
 
     /**
@@ -203,6 +270,33 @@ class OrderFilterTest extends KernelTestCase
                     ],
                 ],
                 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name ASC',
+            ],
+            // Related properties enabled with valid values
+            [
+                [
+                    'properties' => ['id' => null, 'name' => null, 'relatedDummy.symfony' => null],
+                ],
+                [
+                    'order' => [
+                        'id' => 'asc',
+                        'name' => 'desc',
+                        'relatedDummy.symfony' => 'desc',
+                    ],
+                ],
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o INNER JOIN o.relatedDummy relatedDummy_123456abcdefg ORDER BY o.id ASC, o.name DESC, relatedDummy_123456abcdefg.symfony DESC',
+            ],
+            // Properties enabled with empty request (default values)
+            [
+                [
+                    'properties' => ['id' => 'asc', 'name' => 'desc'],
+                ],
+                [
+                    'order' => [
+                        'id' => null,
+                        'name' => null,
+                    ],
+                ],
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name DESC',
             ],
         ];
     }

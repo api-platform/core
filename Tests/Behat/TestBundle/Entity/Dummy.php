@@ -165,4 +165,19 @@ class Dummy
     {
         return $this->jsonData;
     }
+
+    public function getRelatedDummy()
+    {
+        return $this->relatedDummy;
+    }
+
+    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummy = $relatedDummy;
+    }
+
+    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummies->add($relatedDummy);
+    }
 }

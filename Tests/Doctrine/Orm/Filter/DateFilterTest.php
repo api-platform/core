@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
+namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
@@ -62,7 +62,7 @@ class DateFilterTest extends KernelTestCase
     public function testApply(array $filterParameters, array $query, $expected)
     {
         $request = Request::create('/api/dummies', 'GET', $query);
-        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new DateFilter(
             $this->managerRegistry,
             $filterParameters['properties']
@@ -71,7 +71,7 @@ class DateFilterTest extends KernelTestCase
         $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
-        $filter->apply($this->resource, $queryBuilder);
+        $filter->apply($this->resource, $queryBuilder, $request);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -82,12 +82,21 @@ class DateFilterTest extends KernelTestCase
         );
     }
 
-    /**
-     * @return \Doctrine\ORM\QueryBuilder QueryBuilder for filters.
-     */
-    public function getQueryBuilder()
+    public function testGetDescription()
     {
-        return $this->repository->createQueryBuilder('o');
+        $filter = new DateFilter($this->managerRegistry);
+        $this->assertEquals([
+            'dummyDate[before]' => [
+                'property' => 'dummyDate',
+                'type' => '\DateTime',
+                'required' => false,
+            ],
+            'dummyDate[after]' => [
+                'property' => 'dummyDate',
+                'type' => '\DateTime',
+                'required' => false,
+            ],
+        ], $filter->getDescription($this->resource));
     }
 
     /**
@@ -192,6 +201,62 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o',
+            ],
+            // Test with association
+            [
+                [
+                    'properties' => [
+                        'relatedDummy.dummyDate' => true,
+                    ],
+                ],
+                [
+                    'relatedDummy.dummyDate' => [
+                        'after' => '2015-04-05',
+                    ],
+                ],
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o INNER JOIN o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.dummydate >= :dummydate_after_123456abcdefg AND relatedDummy_123456abcdefg.dummydate IS NOT NULL',
+            ],
+            // Test exclude_null
+            [
+                [
+                    'properties' => [
+                        'dummyDate' => 0,
+                    ],
+                ],
+                [
+                    'dummyDate' => [
+                        'after' => '2015-04-05',
+                    ],
+                ],
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.dummydate >= :dummydate_after_123456abcdefg AND o.dummydate IS NOT NULL',
+            ],
+            // Test with include_null_before
+            [
+                [
+                    'properties' => [
+                        'dummyDate' => 1,
+                    ],
+                ],
+                [
+                    'dummyDate' => [
+                        'before' => '2015-04-05',
+                    ],
+                ],
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.dummydate <= :dummydate_before_123456abcdefg OR o.dummydate IS NULL',
+            ],
+            // Test with include_null_after
+            [
+                [
+                    'properties' => [
+                        'dummyDate' => 2,
+                    ],
+                ],
+                [
+                    'dummyDate' => [
+                        'after' => '2015-04-05',
+                    ],
+                ],
+                'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.dummydate >= :dummydate_after_123456abcdefg OR o.dummydate IS NULL',
             ],
         ];
     }

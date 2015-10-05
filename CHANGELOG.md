@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 beta 4
+## 1.1.0
 
 * Support nested properties in Doctrine filters
 * Add method to avoid naming collision of DQL join alias and bound parameter name

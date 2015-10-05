@@ -40,7 +40,9 @@ Feature: Relations support
       "@id": "/related_dummies/1",
       "@type": "https://schema.org/Product",
       "unknown": null,
+      "name": null,
       "symfony": "symfony",
+      "dummyDate": null,
       "age": null,
       "thirdLevel": "/third_levels/1"
     }
@@ -72,10 +74,10 @@ Feature: Relations support
       "description": null,
       "dummyDate": null,
       "jsonData": [],
-      "dummy": null,
       "relatedDummy": "/related_dummies/1",
+      "dummy": null,
       "relatedDummies": [
-        "/related_dummies/1"
+          "/related_dummies/1"
       ],
       "name_converted": null
     }
@@ -86,7 +88,7 @@ Feature: Relations support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -112,62 +114,42 @@ Feature: Relations support
           ],
           "name_converted": null
         }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
+    }
+    """
+
+  Scenario: Filter on a to-many relation
+    When I send a "GET" request to "/dummies?relatedDummies[]=%2Frelated_dummies%2F1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies?relatedDummies[]=%2Frelated_dummies%2F1",
+      "@type": "hydra:PagedCollection",
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/dummies?relatedDummies%5B%5D=%2Frelated_dummies%2F1",
+      "hydra:lastPage": "/dummies?relatedDummies%5B%5D=%2Frelated_dummies%2F1",
+      "hydra:member": [
+        {
+          "@id": "/dummies/1",
+          "@type": "Dummy",
+          "name": "Dummy with relations",
+          "alias": null,
+          "description": null,
+          "dummyDate": null,
+          "jsonData": [],
+          "dummy": null,
+          "relatedDummy": "/related_dummies/1",
+          "relatedDummies": [
+            "/related_dummies/1"
+          ],
+          "name_converted": null
+        }
+      ]
     }
     """
 

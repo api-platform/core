@@ -14,7 +14,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Util\RequestUtils;
+use Dunglas\ApiBundle\Util\RequestParser;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 abstract class AbstractFilter implements FilterInterface
 {
@@ -180,7 +181,7 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         if ($needsFixing) {
-            $request = RequestUtils::getFixedRequest($request);
+            $request = RequestParser::parseAndDuplicateRequest($request);
         }
 
         return $request->query->all();

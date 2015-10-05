@@ -11,7 +11,7 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
         "@context": "/contexts/Dummy",
@@ -31,8 +31,8 @@ Feature: Search filter on collections
                 "description": "Smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             },
@@ -44,8 +44,8 @@ Feature: Search filter on collections
                 "description": "Not so smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             },
@@ -57,67 +57,12 @@ Feature: Search filter on collections
                 "description": "Smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             }
-        ],
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "id",
-                    "property": "id",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name",
-                    "property": "name",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "alias",
-                    "property": "alias",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "description",
-                    "property": "description",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "order[id]",
-                    "property": "id",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "order[name]",
-                    "property": "name",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "dummyDate[before]",
-                    "property": "dummyDate",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "dummyDate[after]",
-                    "property": "dummyDate",
-                    "required": false
-                }
-            ]
-        }
+        ]
     }
     """
 
@@ -126,7 +71,7 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
         "@context": "/contexts/Dummy",
@@ -146,8 +91,8 @@ Feature: Search filter on collections
                 "description": "Smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             },
@@ -159,8 +104,8 @@ Feature: Search filter on collections
                 "description": "Not so smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             },
@@ -172,67 +117,12 @@ Feature: Search filter on collections
                 "description": "Smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             }
-        ],
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "id",
-                    "property": "id",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name",
-                    "property": "name",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "alias",
-                    "property": "alias",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "description",
-                    "property": "description",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "order[id]",
-                    "property": "id",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "order[name]",
-                    "property": "name",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "dummyDate[before]",
-                    "property": "dummyDate",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "dummyDate[after]",
-                    "property": "dummyDate",
-                    "required": false
-                }
-            ]
-        }
+        ]
     }
     """
 
@@ -241,7 +131,7 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
         "@context": "/contexts/Dummy",
@@ -261,8 +151,8 @@ Feature: Search filter on collections
                 "description": "Smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             },
@@ -274,8 +164,8 @@ Feature: Search filter on collections
                 "description": "Not so smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             },
@@ -287,67 +177,12 @@ Feature: Search filter on collections
                 "description": "Smart dummy.",
                 "dummyDate": null,
                 "jsonData": [],
-                "dummy": null,
                 "relatedDummy": null,
+                "dummy": null,
                 "relatedDummies": [],
                 "name_converted": null
             }
-        ],
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "id",
-                    "property": "id",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "name",
-                    "property": "name",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "alias",
-                    "property": "alias",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "description",
-                    "property": "description",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "order[id]",
-                    "property": "id",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "order[name]",
-                    "property": "name",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "dummyDate[before]",
-                    "property": "dummyDate",
-                    "required": false
-                },
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "dummyDate[after]",
-                    "property": "dummyDate",
-                    "required": false
-                }
-            ]
-        }
+        ]
     }
     """
 
@@ -357,7 +192,7 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -367,61 +202,6 @@ Feature: Search filter on collections
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies?name=MuYm",
       "hydra:lastPage": "/dummies?name=MuYm",
-      "hydra:member": [],
-      "hydra:search": {
-          "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
-          "hydra:variableRepresentation": "BasicRepresentation",
-          "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-          ]
-      }
+      "hydra:member": []
     }
     """

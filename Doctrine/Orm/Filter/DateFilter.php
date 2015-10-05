@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryUtils;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -46,12 +46,10 @@ class DateFilter extends AbstractFilter
      */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
-        $fieldNames = $this->getDateFieldNames($resource);
-
         foreach ($this->extractProperties($request) as $property => $values) {
             // Expect $values to be an array having the period as keys and the date value as values
             if (
-                !isset($fieldNames[$property]) ||
+                !$this->isDateField($property, $resource) ||
                 !is_array($values) ||
                 !$this->isPropertyEnabled($property) ||
                 !$this->isPropertyMapped($property, $resource)
@@ -68,7 +66,7 @@ class DateFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryUtils::generateJoinAlias($association);
+                    $alias = QueryNameGenerator::generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -77,10 +75,6 @@ class DateFilter extends AbstractFilter
             }
 
             $nullManagement = isset($this->properties[$property]) ? $this->properties[$property] : null;
-
-            if (self::EXCLUDE_NULL === $nullManagement) {
-                $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
-            }
 
             if (isset($values[self::PARAMETER_BEFORE])) {
                 $this->addWhere(
@@ -110,22 +104,21 @@ class DateFilter extends AbstractFilter
      * Adds the where clause according to the chosen null management.
      *
      * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $field
-     * @param string       $operator
-     * @param string       $value
-     * @param int|null     $nullManagement
+     * @param string $alias
+     * @param string $field
+     * @param string $operator
+     * @param string $value
+     * @param int|null $nullManagement
      */
     private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value, $nullManagement)
     {
-        $valueParameter = QueryUtils::generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($baseWhere);
         } elseif (
-            (self::PARAMETER_BEFORE === $operator && self::INCLUDE_NULL_BEFORE === $nullManagement)
-            ||
+            (self::PARAMETER_BEFORE === $operator && self::INCLUDE_NULL_BEFORE === $nullManagement) ||
             (self::PARAMETER_AFTER === $operator && self::INCLUDE_NULL_AFTER === $nullManagement)
         ) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
@@ -140,6 +133,10 @@ class DateFilter extends AbstractFilter
         }
 
         $queryBuilder->setParameter($valueParameter, new \DateTime($value));
+
+        if (self::EXCLUDE_NULL === $nullManagement) {
+            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
+        }
     }
 
     /**
@@ -148,11 +145,19 @@ class DateFilter extends AbstractFilter
     public function getDescription(ResourceInterface $resource)
     {
         $description = [];
-        foreach ($this->getClassMetadata($resource)->getFieldNames() as $fieldName) {
-            if ($this->isPropertyEnabled($fieldName)) {
-                $description += $this->getFilterDescription($fieldName, self::PARAMETER_BEFORE);
-                $description += $this->getFilterDescription($fieldName, self::PARAMETER_AFTER);
+
+        $properties = $this->properties;
+        if (null === $properties) {
+            $properties = array_fill_keys($this->getClassMetadata($resource)->getFieldNames(), null);
+        }
+
+        foreach ($properties as $property => $nullManagement) {
+            if (!$this->isPropertyMapped($property, $resource) || !$this->isDateField($property, $resource)) {
+                continue;
             }
+            
+            $description += $this->getFilterDescription($property, self::PARAMETER_BEFORE);
+            $description += $this->getFilterDescription($property, self::PARAMETER_AFTER);
         }
 
         return $description;
@@ -178,23 +183,18 @@ class DateFilter extends AbstractFilter
     }
 
     /**
-     * Gets names of fields with a date type.
+     * Determines whether the given property refers to a date field.
      *
+     * @param string $property
      * @param ResourceInterface $resource
      *
      * @return array
      */
-    private function getDateFieldNames(ResourceInterface $resource)
+    private function isDateField($property, ResourceInterface $resource)
     {
-        $classMetadata = $this->getClassMetadata($resource);
-        $dateFieldNames = [];
+        $propertyParts = $this->splitPropertyParts($property);
+        $metadata = $this->getNestedMetadata($resource, $propertyParts['associations']);
 
-        foreach ($classMetadata->getFieldNames() as $fieldName) {
-            if (isset(self::$doctrineDateTypes[$classMetadata->getTypeOfField($fieldName)])) {
-                $dateFieldNames[$fieldName] = true;
-            }
-        }
-
-        return $dateFieldNames;
+        return isset(self::$doctrineDateTypes[$metadata->getTypeOfField($propertyParts['field'])]);
     }
 }
