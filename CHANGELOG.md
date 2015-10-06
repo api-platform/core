@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 beta 4
+## 2.0.0
 
 * Use string values for `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter` null-management constants
 
