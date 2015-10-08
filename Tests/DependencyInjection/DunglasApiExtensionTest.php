@@ -176,7 +176,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.hydra.documentation_builder', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.controller.exception', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.listener.link_header_response', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.listener.exception', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.hydra.listener.request_exception', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.constraint_violation_list', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.error', $definitionArgument)->shouldBeCalled();

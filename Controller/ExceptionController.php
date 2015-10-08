@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Controller;
 
+use Dunglas\ApiBundle\Exception\DeserializationException;
 use Dunglas\ApiBundle\JsonLd\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +51,8 @@ class ExceptionController
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
         if (
-            'Dunglas\ApiBundle\Exception\DeserializationException' === $exception->getClass()
-            || is_subclass_of($exception->getClass(), 'Dunglas\ApiBundle\Exception\DeserializationException')
+            DeserializationException::class === $exception->getClass() ||
+            is_subclass_of($exception->getClass(), DeserializationException::class)
         ) {
             $exception->setStatusCode(Response::HTTP_BAD_REQUEST);
         }

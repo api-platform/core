@@ -13,7 +13,6 @@ namespace Dunglas\ApiBundle;
 
 use Dunglas\ApiBundle\DependencyInjection\Compiler\DataProviderPass;
 use Dunglas\ApiBundle\DependencyInjection\Compiler\ResourcePass;
-use Dunglas\ApiBundle\DependencyInjection\Compiler\TwigExceptionListenerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -33,6 +32,5 @@ class DunglasApiBundle extends Bundle
 
         $container->addCompilerPass(new ResourcePass());
         $container->addCompilerPass(new DataProviderPass());
-        $container->addCompilerPass(new TwigExceptionListenerPass());
     }
 }

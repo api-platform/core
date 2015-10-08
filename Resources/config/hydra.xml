@@ -28,11 +28,11 @@
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
-        <service id="api.hydra.listener.exception" class="Symfony\Component\HttpKernel\EventListener\ExceptionListener">
-            <argument>api.hydra.controller.exception:showAction</argument>
+        <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
+            <argument type="string">api.hydra.controller.exception:showAction</argument>
             <argument type="service" id="logger" on-invalid="null" />
 
-            <tag name="kernel.event_subscriber" />
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
             <tag name="monolog.logger" channel="request" />
         </service>
 
