@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('dunglas_api');
 
-        // We chack if symfony's doctrine bridge is enabled or not to choose the defaultValue for `enable_doctrine_orm`.
+        // We check if symfony's doctrine bridge is enabled or not to choose the defaultValue for `enable_doctrine_orm`.
         $enableDoctrineOrm = interface_exists('\Symfony\Bridge\Doctrine\RegistryInterface');
 
         $rootNode
