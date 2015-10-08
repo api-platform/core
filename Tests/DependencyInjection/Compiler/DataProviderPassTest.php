@@ -36,4 +36,21 @@ class DataProviderPassTest extends \PHPUnit_Framework_TestCase
 
         $dataProviderPass->process($containerBuilder);
     }
+
+    /**
+     * @expectedException \Dunglas\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage No DataProvider found. Did you forget to tag your own data provider?
+     */
+    public function testProcessWithoutTaggedServices()
+    {
+        $dataProviderPass = new DataProviderPass();
+
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $dataProviderPass);
+
+        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy->findTaggedServiceIds('api.data_provider')->willReturn([])->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $dataProviderPass->process($containerBuilder);
+    }
 }

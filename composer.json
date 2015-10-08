@@ -19,9 +19,7 @@
     "symfony/framework-bundle": "~2.6|~3.0",
     "symfony/proxy-manager-bridge": "~2.3",
     "ocramius/proxy-manager": "~1.0",
-    "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/inflector": "~1.0",
-    "doctrine/doctrine-bundle": "~1.2",
     "dunglas/php-property-info": "~0.2",
     "phpdocumentor/reflection": "^1.0.7"
   },
@@ -34,9 +32,12 @@
     "behat/mink-browserkit-driver": "~1.1",
     "behatch/contexts": "dev-master#eef7ab39ca896796bf3ba25a0fa5a95f15276eb7",
     "symfony/finder": "~2.3",
-    "phpunit/phpunit": "~4.6"
+    "phpunit/phpunit": "~4.6",
+    "doctrine/orm": "~2.2,>=2.2.3",
+    "doctrine/doctrine-bundle": "~1.2"
   },
   "suggest": {
+    "doctrine/doctrine-bundle": "To use the Doctrine ORM bridge.",
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
   },
   "autoload": {
