@@ -196,6 +196,7 @@ class ItemNormalizer extends AbstractNormalizer
         $resource = $this->resourceResolver->guessResource($data, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
+        $context = $this->createContext($resource, $context);
         $attributesMetadata = $this->getMetadata($resource, $context)->getAttributesMetadata();
 
         $allowedAttributes = [];
