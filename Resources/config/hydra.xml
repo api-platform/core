@@ -14,6 +14,12 @@
             <argument>%api.description%</argument>
         </service>
 
+        <!-- Controllers -->
+
+        <service id="api.hydra.controller.exception" class="Dunglas\ApiBundle\Controller\ExceptionController">
+            <argument type="service" id="api.hydra.normalizer.error" />
+        </service>
+
         <!-- Event listeners -->
 
         <service id="api.hydra.listener.link_header_response" class="Dunglas\ApiBundle\Hydra\EventListener\LinkHeaderResponseListener">
@@ -23,9 +29,11 @@
         </service>
 
         <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
-            <argument type="service" id="api.hydra.normalizer.error" />
+            <argument type="string">api.hydra.controller.exception:showAction</argument>
+            <argument type="service" id="logger" on-invalid="null" />
 
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
+            <tag name="monolog.logger" channel="request" />
         </service>
 
         <!-- Serializer -->
