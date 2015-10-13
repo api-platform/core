@@ -11,13 +11,8 @@
 
 namespace Dunglas\ApiBundle\Hydra\EventListener;
 
-use Dunglas\ApiBundle\Exception\InvalidArgumentException;
-use Dunglas\ApiBundle\Exception\ValidationException;
-use Dunglas\ApiBundle\JsonLd\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
 
 /**
  * Handle requests errors.
@@ -25,52 +20,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class RequestExceptionListener
+class RequestExceptionListener extends ExceptionListener
 {
-    const FORMAT = 'jsonld';
-
-    /**
-     * @var NormalizerInterface
-     */
-    private $normalizer;
-
-    public function __construct(NormalizerInterface $normalizer)
-    {
-        $this->normalizer = $normalizer;
-    }
-
     /**
      * @param GetResponseForExceptionEvent $event
      */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        $request = $event->getRequest();
-        if (!$request->attributes->has('_resource_type') || self::FORMAT !== $request->attributes->get('_api_format')) {
+        // Normalize exceptions with hydra errors only for resources
+        if (!$event->getRequest()->attributes->has('_resource_type')) {
             return;
         }
 
-        $exception = $event->getException();
-        $headers = [];
-
-        if ($exception instanceof HttpException) {
-            $status = $exception->getStatusCode();
-            $headers = $exception->getHeaders();
-            $data = $exception;
-        } elseif ($exception instanceof ValidationException) {
-            $status = Response::HTTP_BAD_REQUEST;
-            $data = $exception->getConstraintViolationList();
-        } elseif ($exception instanceof ExceptionInterface || $exception instanceof InvalidArgumentException) {
-            $status = Response::HTTP_BAD_REQUEST;
-            $data = $exception;
-        } else {
-            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
-            $data = $exception;
-        }
-
-        $event->setResponse(new Response(
-            $this->normalizer->normalize($data, 'hydra-error'),
-            $status,
-            $headers
-        ));
+        parent::onKernelException($event);
     }
 }
