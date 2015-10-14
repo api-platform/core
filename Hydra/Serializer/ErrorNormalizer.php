@@ -11,11 +11,13 @@
 
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Converts {@see \Exception} to a Hydra error representation.
+ * Converts {@see \Exception} or {@see \Symfony\Component\Debug\Exception\FlattenException}
+ * to a Hydra error representation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
@@ -48,7 +50,7 @@ class ErrorNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = array())
     {
-        if ($object instanceof \Exception) {
+        if ($object instanceof \Exception || $object instanceof FlattenException) {
             $message = $object->getMessage();
 
             if ($this->debug) {
@@ -75,6 +77,6 @@ class ErrorNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && $data instanceof \Exception;
+        return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 }

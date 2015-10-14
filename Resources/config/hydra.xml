@@ -23,10 +23,18 @@
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
-        <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
-            <argument type="service" id="api.serializer" />
+        <service id="api.hydra.listener.validation_exception" class="Dunglas\ApiBundle\Hydra\EventListener\ValidationExceptionListener">
+            <argument type="service" id="api.hydra.normalizer.constraint_violation_list" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+
+        <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
+            <argument type="service" id="api.hydra.action.exception" />
+            <argument type="service" id="logger" on-invalid="null" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
+            <tag name="monolog.logger" channel="request" />
         </service>
 
         <!-- Serializer -->
@@ -56,6 +64,10 @@
         <service id="api.hydra.action.documentation" class="Dunglas\ApiBundle\Hydra\Action\DocumentationAction">
             <argument type="service" id="api.hydra.documentation_builder" />
         </service>
+
+        <service id="api.hydra.action.exception" class="Dunglas\ApiBundle\Hydra\Action\ExceptionAction">
+            <argument type="service" id="api.hydra.normalizer.error" />
+       </service>
 
         <!-- Serializer enhancers -->
 
