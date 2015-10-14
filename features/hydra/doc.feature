@@ -512,6 +512,109 @@ Feature: Documentation support
               ]
           },
           {
+              "@id": "#AbstractDummy",
+              "@type": "hydra:Class",
+              "rdfs:label": "AbstractDummy",
+              "hydra:title": "AbstractDummy",
+              "hydra:description": "AbstractDummy.",
+              "hydra:supportedProperty": [
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "http://schema.org/name",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "name",
+                          "domain": "#AbstractDummy",
+                          "range": "xmls:string"
+                      },
+                      "hydra:title": "name",
+                      "hydra:required": true,
+                      "hydra:readable": true,
+                      "hydra:writable": true,
+                      "hydra:description": "The dummy name."
+                  }
+              ],
+              "hydra:supportedOperation": [
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "GET",
+                      "hydra:title": "Retrieves AbstractDummy resource.",
+                      "rdfs:label": "Retrieves AbstractDummy resource.",
+                      "returns": "#AbstractDummy"
+                  },
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "DELETE",
+                      "hydra:title": "Deletes the AbstractDummy resource.",
+                      "rdfs:label": "Deletes the AbstractDummy resource.",
+                      "returns": "owl:Nothing"
+                  }
+              ]
+          },
+          {
+              "@id": "#ConcreteDummy",
+              "@type": "hydra:Class",
+              "rdfs:label": "ConcreteDummy",
+              "hydra:title": "ConcreteDummy",
+              "hydra:description": "ConcreteDummy.",
+              "hydra:supportedProperty": [
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#ConcreteDummy/instance",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "instance",
+                          "domain": "#ConcreteDummy",
+                          "range": "xmls:string"
+                      },
+                      "hydra:title": "instance",
+                      "hydra:required": true,
+                      "hydra:readable": true,
+                      "hydra:writable": true,
+                      "hydra:description": "a concrete thing"
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "http://schema.org/name",
+                          "@type": "rdf:Property",
+                          "rdfs:label": "name",
+                          "domain": "#ConcreteDummy",
+                          "range": "xmls:string"
+                      },
+                      "hydra:title": "name",
+                      "hydra:required": false,
+                      "hydra:readable": true,
+                      "hydra:writable": true,
+                      "hydra:description": "The dummy name."
+                  }
+              ],
+              "hydra:supportedOperation": [
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "GET",
+                      "hydra:title": "Retrieves ConcreteDummy resource.",
+                      "rdfs:label": "Retrieves ConcreteDummy resource.",
+                      "returns": "#ConcreteDummy"
+                  },
+                  {
+                      "@type": "hydra:ReplaceResourceOperation",
+                      "expects": "#ConcreteDummy",
+                      "hydra:method": "PUT",
+                      "hydra:title": "Replaces the ConcreteDummy resource.",
+                      "rdfs:label": "Replaces the ConcreteDummy resource.",
+                      "returns": "#ConcreteDummy"
+                  },
+                  {
+                      "@type": "hydra:Operation",
+                      "hydra:method": "DELETE",
+                      "hydra:title": "Deletes the ConcreteDummy resource.",
+                      "rdfs:label": "Deletes the ConcreteDummy resource.",
+                      "returns": "owl:Nothing"
+                  }
+              ]
+          },
+          {
               "@id": "#Custom",
               "@type": "hydra:Class",
               "rdfs:label": "Custom",
@@ -1008,6 +1111,58 @@ Feature: Documentation support
                           ]
                       },
                       "hydra:title": "The collection of RelationEmbedder resources",
+                      "hydra:readable": true,
+                      "hydra:writable": false
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#Entrypoint/abstractDummy",
+                          "@type": "hydra:Link",
+                          "domain": "#Entrypoint",
+                          "rdfs:label": "The collection of AbstractDummy resources",
+                          "range": "hydra:PagedCollection",
+                          "hydra:supportedOperation": [
+                              {
+                                  "@type": "hydra:Operation",
+                                  "hydra:method": "GET",
+                                  "hydra:title": "Retrieves the collection of AbstractDummy resources.",
+                                  "rdfs:label": "Retrieves the collection of AbstractDummy resources.",
+                                  "returns": "hydra:PagedCollection"
+                              }
+                          ]
+                      },
+                      "hydra:title": "The collection of AbstractDummy resources",
+                      "hydra:readable": true,
+                      "hydra:writable": false
+                  },
+                  {
+                      "@type": "hydra:SupportedProperty",
+                      "hydra:property": {
+                          "@id": "#Entrypoint/concreteDummy",
+                          "@type": "hydra:Link",
+                          "domain": "#Entrypoint",
+                          "rdfs:label": "The collection of ConcreteDummy resources",
+                          "range": "hydra:PagedCollection",
+                          "hydra:supportedOperation": [
+                              {
+                                  "@type": "hydra:Operation",
+                                  "hydra:method": "GET",
+                                  "hydra:title": "Retrieves the collection of ConcreteDummy resources.",
+                                  "rdfs:label": "Retrieves the collection of ConcreteDummy resources.",
+                                  "returns": "hydra:PagedCollection"
+                              },
+                              {
+                                  "@type": "hydra:CreateResourceOperation",
+                                  "expects": "#ConcreteDummy",
+                                  "hydra:method": "POST",
+                                  "hydra:title": "Creates a ConcreteDummy resource.",
+                                  "rdfs:label": "Creates a ConcreteDummy resource.",
+                                  "returns": "#ConcreteDummy"
+                              }
+                          ]
+                      },
+                      "hydra:title": "The collection of ConcreteDummy resources",
                       "hydra:readable": true,
                       "hydra:writable": false
                   },

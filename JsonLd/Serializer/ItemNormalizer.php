@@ -206,8 +206,6 @@ class ItemNormalizer extends AbstractNormalizer
             }
         }
 
-        $reflectionClass = new \ReflectionClass($class);
-
         if (isset($data['@id']) && !isset($context['object_to_populate'])) {
             $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id']);
 
@@ -217,9 +215,20 @@ class ItemNormalizer extends AbstractNormalizer
             $overrideClass = false;
         }
 
+        $instanceClass = $overrideClass ? get_class($context['object_to_populate']) : $class;
+        $reflectionClass = new \ReflectionClass($instanceClass);
+        if ($reflectionClass->isAbstract()) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Cannot create an instance of %s from serialized data because it is an abstract resource',
+                    $instanceClass
+                )
+            );
+        }
+
         $object = $this->instantiateObject(
             $normalizedData,
-            $overrideClass ? get_class($context['object_to_populate']) : $class,
+            $instanceClass,
             $context,
             $reflectionClass,
             $allowedAttributes
