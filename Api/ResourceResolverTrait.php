@@ -67,6 +67,13 @@ trait ResourceResolverTrait
         }
 
         if ($strict && isset($isObject) && $resource->getEntityClass() !== $type) {
+            if (is_subclass_of($type, $resource->getEntityClass())) {
+                $resource = $this->resourceCollection->getResourceForEntity($type);
+                if (null !== $resource) {
+                    return $resource;
+                }
+            }
+
             throw new InvalidArgumentException(
                 sprintf('No resource found for object of type "%s"', $type)
             );

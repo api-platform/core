@@ -42,23 +42,39 @@ class ResourcePass implements CompilerPassInterface
                 continue;
             }
 
+            $isAbstract = $this->isAbstract($resourceDefinition->getArgument(0));
             if (!$resourceDefinition->hasMethodCall('initItemOperations')) {
-                $resourceDefinition->addMethodCall('initItemOperations', [[
-                    $this->createOperation($container, $serviceId, 'GET', false),
-                    $this->createOperation($container, $serviceId, 'PUT', false),
-                    $this->createOperation($container, $serviceId, 'DELETE', false),
-                ]]);
+                $methods = $isAbstract ? ['GET', 'DELETE'] : ['GET', 'PUT', 'DELETE'];
+                $resourceDefinition->addMethodCall('initItemOperations', [$this->createOperations($container, $serviceId, $methods, false)]);
             }
 
             if (!$resourceDefinition->hasMethodCall('initCollectionOperations')) {
-                $resourceDefinition->addMethodCall('initCollectionOperations', [[
-                    $this->createOperation($container, $serviceId, 'GET', true),
-                    $this->createOperation($container, $serviceId, 'POST', true),
-                ]]);
+                $methods = $isAbstract ? ['GET'] : ['GET', 'POST'];
+                $resourceDefinition->addMethodCall('initCollectionOperations', [$this->createOperations($container, $serviceId, $methods, true)]);
             }
         }
 
         $resourceCollectionDefinition->addMethodCall('init', [$resourceReferences]);
+    }
+
+    /**
+     * Adds a list of operations.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $serviceId
+     * @param array            $methods
+     * @param bool             $collection
+     *
+     * @return Reference[]
+     */
+    private function createOperations(ContainerBuilder $container, $serviceId, $methods, $collection)
+    {
+        $operations = [];
+        foreach ($methods as $method) {
+            $operations[] = $this->createOperation($container, $serviceId, $method, $collection);
+        }
+
+        return $operations;
     }
 
     /**
@@ -92,6 +108,20 @@ class ResourcePass implements CompilerPassInterface
         $container->setDefinition($operationId, $operation);
 
         return new Reference($operationId);
+    }
+
+    /**
+     * Returns if the given class is abstract.
+     *
+     * @param string $instanceClass
+     *
+     * @return bool
+     */
+    private function isAbstract($instanceClass)
+    {
+        $reflectionClass = new \ReflectionClass($instanceClass);
+
+        return $reflectionClass->isAbstract();
     }
 
     /**
