@@ -22,7 +22,7 @@ Feature: Collections support
       "hydra:member": [],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -35,6 +35,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -89,6 +101,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #1",
           "alias": "Alias #29",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -101,6 +114,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #2",
           "alias": "Alias #28",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -113,6 +127,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #3",
           "alias": "Alias #27",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -123,7 +138,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -136,6 +151,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -190,6 +217,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #19",
           "alias": "Alias #11",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -202,6 +230,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #20",
           "alias": "Alias #10",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -214,6 +243,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #21",
           "alias": "Alias #9",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -224,7 +254,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -237,6 +267,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -290,6 +332,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #28",
             "alias": "Alias #2",
+            "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
             "dummy": null,
@@ -302,6 +345,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #29",
             "alias": "Alias #1",
+            "description": "Smart dummy.",
             "dummyDate": null,
             "jsonData": [],
             "dummy": null,
@@ -314,6 +358,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #30",
             "alias": "Alias #0",
+            "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
             "dummy": null,
@@ -324,7 +369,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -337,6 +382,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -395,6 +452,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #11",
           "alias": "Alias #19",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -409,6 +467,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #12",
           "alias": "Alias #18",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -423,6 +482,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #13",
           "alias": "Alias #17",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -437,6 +497,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #14",
           "alias": "Alias #16",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -451,6 +512,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #15",
           "alias": "Alias #15",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -465,6 +527,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #16",
           "alias": "Alias #14",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -479,6 +542,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #17",
           "alias": "Alias #13",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -493,6 +557,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #18",
           "alias": "Alias #12",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -507,6 +572,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #19",
           "alias": "Alias #11",
+          "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -521,6 +587,7 @@ Feature: Collections support
           "@type": "Dummy",
           "name": "Dummy #20",
           "alias": "Alias #10",
+          "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
           "dummy": null,
@@ -533,7 +600,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -546,6 +613,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -598,6 +677,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #8",
             "alias": "Alias #22",
+            "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
             "dummy": null,
@@ -608,7 +688,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -621,6 +701,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -673,6 +765,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #8",
             "alias": "Alias #22",
+            "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
             "dummy": null,
@@ -683,7 +776,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -696,6 +789,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -749,6 +854,7 @@ Feature: Collections support
             "@type": "Dummy",
             "name": "Dummy #8",
             "alias": "Alias #22",
+            "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
             "dummy": null,
@@ -759,7 +865,7 @@ Feature: Collections support
       ],
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+        "hydra:template": "\/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
               {
@@ -772,6 +878,18 @@ Feature: Collections support
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {

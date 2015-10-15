@@ -27,6 +27,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #28",
               "alias": "Alias #2",
+              "description": "Not so smart dummy.",
               "dummyDate": "2015-04-28T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -39,6 +40,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #29",
               "alias": "Alias #1",
+              "description": "Smart dummy.",
               "dummyDate": "2015-04-29T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -49,7 +51,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -62,6 +64,18 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -114,6 +128,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #1",
               "alias": "Alias #29",
+              "description": "Smart dummy.",
               "dummyDate": "2015-04-01T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -126,6 +141,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #2",
               "alias": "Alias #28",
+              "description": "Not so smart dummy.",
               "dummyDate": "2015-04-02T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -138,6 +154,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #3",
               "alias": "Alias #27",
+              "description": "Smart dummy.",
               "dummyDate": "2015-04-03T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -148,7 +165,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -161,6 +178,18 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -214,6 +243,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #5",
               "alias": "Alias #25",
+              "description": "Smart dummy.",
               "dummyDate": "2015-04-05T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -224,7 +254,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -237,6 +267,18 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -288,6 +330,7 @@ Feature: Order filter on collections
               "@type": "Dummy",
               "name": "Dummy #5",
               "alias": "Alias #25",
+              "description": "Smart dummy.",
               "dummyDate": "2015-04-05T00:00:00+00:00",
               "jsonData": [],
               "dummy": null,
@@ -298,7 +341,7 @@ Feature: Order filter on collections
       ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -311,6 +354,18 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
@@ -361,7 +416,7 @@ Feature: Order filter on collections
       "hydra:member": [],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,order[id],order[name],dummyDate[before],dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,order[id],order[name],dummyDate[before],dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -374,6 +429,18 @@ Feature: Order filter on collections
                   "@type": "IriTemplateMapping",
                   "variable": "name",
                   "property": "name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "alias",
+                  "property": "alias",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "description",
+                  "property": "description",
                   "required": false
               },
               {
