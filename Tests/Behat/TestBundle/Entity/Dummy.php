@@ -53,6 +53,13 @@ class Dummy
      */
     private $foo;
     /**
+     * @var string A short description of the item.
+     *
+     * @ORM\Column(nullable=true)
+     * @Iri("https://schema.org/description")
+     */
+    public $description;
+    /**
      * @var string A dummy.
      *
      * @ORM\Column(nullable=true)
@@ -119,6 +126,16 @@ class Dummy
     public function getAlias()
     {
         return $this->alias;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     public function hasRole($role)

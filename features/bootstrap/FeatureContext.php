@@ -66,10 +66,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsDummyObjects($nb)
     {
+        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
+
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDescription($i % 2 ? $descriptions[0] : $descriptions[1]);
 
             $this->manager->persist($dummy);
         }
@@ -82,12 +85,16 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsDummyObjectsWithDummyDate($nb)
     {
+        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
+
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDescription($i % 2 ? $descriptions[0] : $descriptions[1]);
+
             // Last Dummy has a null date
             if ($nb !== $i) {
                 $dummy->setDummyDate($date);
