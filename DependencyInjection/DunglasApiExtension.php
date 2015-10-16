@@ -51,12 +51,16 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('api.title', $config['title']);
         $container->setParameter('api.description', $config['description']);
+        $container->setParameter('api.supported_formats', $config['supported_formats']);
         $container->setParameter('api.collection.filter_name.order', $config['collection']['filter_name']['order']);
         $container->setParameter('api.collection.order', $config['collection']['order']);
-        $container->setParameter('api.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
-        $container->setParameter('api.collection.pagination.items_per_page.number', $config['collection']['pagination']['items_per_page']['number']);
-        $container->setParameter('api.collection.pagination.items_per_page.enable_client_request', $config['collection']['pagination']['items_per_page']['enable_client_request']);
-        $container->setParameter('api.collection.pagination.items_per_page.parameter_name', $config['collection']['pagination']['items_per_page']['parameter_name']);
+        $container->setParameter('api.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
+        $container->setParameter('api.collection.pagination.client_can_enable', $config['collection']['pagination']['client_can_enable']);
+        $container->setParameter('api.collection.pagination.enable_parameter', $config['collection']['pagination']['enable_parameter']);
+        $container->setParameter('api.collection.pagination.page_parameter', $config['collection']['pagination']['page_parameter']);
+        $container->setParameter('api.collection.pagination.items_per_page.default', $config['collection']['pagination']['items_per_page']['default']);
+        $container->setParameter('api.collection.pagination.items_per_page.client_can_change', $config['collection']['pagination']['items_per_page']['client_can_change']);
+        $container->setParameter('api.collection.pagination.items_per_page.parameter', $config['collection']['pagination']['items_per_page']['parameter']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
@@ -69,9 +73,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
             $this->enableDoctrine($container);
         }
 
-        // JSON-LD and Hydra support
-        $loader->load('json_ld.xml');
-        $loader->load('hydra.xml');
+        $this->enableJsonLd($container, $loader);
 
         // FOSUser support
         if ($config['enable_fos_user']) {

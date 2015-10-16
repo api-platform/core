@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\JsonLd\EventListener;
 
 use Dunglas\ApiBundle\JsonLd\Event\ContextBuilderEvent;
 use Dunglas\ApiBundle\JsonLd\Event\Events;
-use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
+use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -63,24 +63,25 @@ class ResourceContextBuilderListener implements EventSubscriberInterface
 
         $prefixedShortName = sprintf('#%s', $resource->getShortName());
 
-        $attributes = $this->classMetadataFactory->getMetadataFor(
+        $classMetadata = $this->classMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
             $resource->getNormalizationGroups(),
             $resource->getDenormalizationGroups(),
             $resource->getValidationGroups()
-        )->getAttributes();
+        );
 
-        foreach ($attributes as $attributeName => $attribute) {
-            if ($attribute->isIdentifier()) {
+        $identifierName = $classMetadata->getIdentifierName();
+        foreach ($classMetadata->getAttributesMetadata() as $attributeName => $attributeMetadata) {
+            if ($identifierName === $attributeName) {
                 continue;
             }
             $convertedName = $this->nameConverter ? $this->nameConverter->normalize($attributeName) : $attributeName;
 
-            if (!$id = $attribute->getIri()) {
+            if (!$id = $attributeMetadata->getIri()) {
                 $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
             }
 
-            if ($attribute->isNormalizationLink()) {
+            if ($attributeMetadata->isNormalizationLink()) {
                 $context[$convertedName] = [
                     '@id' => $id,
                     '@type' => '@id',

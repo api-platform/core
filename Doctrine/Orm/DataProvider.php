@@ -15,15 +15,14 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\ORM\QueryBuilder;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Dunglas\ApiBundle\Model\DataProviderInterface;
 
 /**
  * Data provider for the Doctrine ORM.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Samuel ROZE <samuel.roze@gmail.com>
  */
 class DataProvider implements DataProviderInterface
 {
@@ -31,49 +30,46 @@ class DataProvider implements DataProviderInterface
      * @var ManagerRegistry
      */
     private $managerRegistry;
-    /**
-     * @var string|null
-     */
-    private $order;
-    /**
-     * @var string
-     */
-    private $pageParameter;
-    /**
-     * @var int
-     */
-    private $itemsPerPage;
-    /**
-     * @var bool
-     */
-    private $enableClientRequestItemsPerPage;
-    /**
-     * @var string
-     */
-    private $itemsPerPageParameter;
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     * @param string|null     $order
-     * @param string          $pageParameter
-     * @param int             $itemsPerPage
-     * @param bool            $enableClientRequestItemsPerPage
-     * @param string          $itemsPerPageParameter
+     * @var QueryItemExtensionInterface[]
+     */
+    private $itemExtensions;
+
+    /**
+     * @var QueryCollectionExtensionInterface[]
+     */
+    private $collectionExtensions;
+
+    /**
+     * @param ManagerRegistry                     $managerRegistry
+     * @param QueryCollectionExtensionInterface[] $collectionExtensions
+     * @param QueryItemExtensionInterface[]       $itemExtensions
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
-        $order,
-        $pageParameter,
-        $itemsPerPage,
-        $enableClientRequestItemsPerPage,
-        $itemsPerPageParameter
+        array $collectionExtensions = [],
+        array $itemExtensions = []
     ) {
         $this->managerRegistry = $managerRegistry;
-        $this->order = $order;
-        $this->pageParameter = $pageParameter;
-        $this->itemsPerPage = $itemsPerPage;
-        $this->enableClientRequestItemsPerPage = $enableClientRequestItemsPerPage;
-        $this->itemsPerPageParameter = $itemsPerPageParameter;
+        $this->itemExtensions = $itemExtensions;
+        $this->collectionExtensions = $collectionExtensions;
+    }
+
+    /**
+     * @param QueryItemExtensionInterface $extension
+     */
+    public function addItemExtension(QueryItemExtensionInterface $extension)
+    {
+        $this->itemExtensions[] = $extension;
+    }
+
+    /**
+     * @param QueryCollectionExtensionInterface $extension
+     */
+    public function addCollectionExtension(QueryCollectionExtensionInterface $extension)
+    {
+        $this->collectionExtensions[] = $extension;
     }
 
     /**
@@ -85,7 +81,16 @@ class DataProvider implements DataProviderInterface
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
 
         if ($fetchData || !method_exists($manager, 'getReference')) {
-            return $manager->find($entityClass, $id);
+            $repository = $manager->getRepository($entityClass);
+            $queryBuilder = $repository->createQueryBuilder('o');
+            $identifier = $manager->getClassMetadata($resource->getEntityClass())->getIdentifierFieldNames()[0];
+            $queryBuilder->where($queryBuilder->expr()->eq('o.'.$identifier, ':id'))->setParameter('id', $id);
+
+            foreach ($this->itemExtensions as $extension) {
+                $extension->applyToItem($resource, $queryBuilder, $id);
+            }
+
+            return $queryBuilder->getQuery()->getOneOrNullResult();
         }
 
         return $manager->getReference($entityClass, $id);
@@ -94,29 +99,21 @@ class DataProvider implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollection(ResourceInterface $resource, Request $request)
+    public function getCollection(ResourceInterface $resource)
     {
         $entityClass = $resource->getEntityClass();
 
         $manager = $this->managerRegistry->getManagerForClass($resource->getEntityClass());
         $repository = $manager->getRepository($entityClass);
+        $queryBuilder = $repository->createQueryBuilder('o');
 
-        $page = (int) $request->get($this->pageParameter, 1);
+        foreach ($this->collectionExtensions as $extension) {
+            $extension->applyToCollection($resource, $queryBuilder);
 
-        $itemsPerPage = $this->itemsPerPage;
-        if ($this->enableClientRequestItemsPerPage && $requestedItemsPerPage = $request->get($this->itemsPerPageParameter)) {
-            $itemsPerPage = (int) $requestedItemsPerPage;
-        }
-
-        $queryBuilder = $repository
-            ->createQueryBuilder('o')
-            ->setFirstResult(($page - 1) * $itemsPerPage)
-            ->setMaxResults($itemsPerPage)
-        ;
-
-        foreach ($resource->getFilters() as $filter) {
-            if ($filter instanceof FilterInterface) {
-                $filter->apply($resource, $queryBuilder, $request);
+            if ($extension instanceof QueryResultExtensionInterface) {
+                if ($extension->supportsResult($resource)) {
+                    return $extension->getResult($queryBuilder);
+                }
             }
         }
 
@@ -137,23 +134,7 @@ class DataProvider implements DataProviderInterface
             $queryBuilder->addOrderBy('o.'.$identifier, $this->order);
         }
 
-        return $this->getPaginator($queryBuilder);
-    }
-
-    /**
-     * Gets the paginator.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return Paginator
-     */
-    protected function getPaginator(QueryBuilder $queryBuilder)
-    {
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder);
-        // Disable output walkers by default (performance)
-        $doctrineOrmPaginator->setUseOutputWalkers(false);
-
-        return new Paginator($doctrineOrmPaginator);
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**

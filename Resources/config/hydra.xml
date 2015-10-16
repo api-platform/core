@@ -5,9 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+
         <service id="api.hydra.documentation_builder" class="Dunglas\ApiBundle\Hydra\ApiDocumentationBuilder">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.jsonld.context_builder" />
             <argument type="service" id="router" />
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument>%api.title%</argument>
@@ -33,9 +34,8 @@
         <!-- Serializer -->
 
         <service id="api.hydra.normalizer.collection" class="Dunglas\ApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.json_ld.context_builder" />
-            <argument>%api.collection.pagination.page_parameter_name%</argument>
+            <argument type="service" id="api.jsonld.context_builder" />
+            <argument type="service" id="api.resource_resolver" />
 
             <tag name="serializer.normalizer" priority="50" />
         </service>
@@ -52,6 +52,33 @@
 
             <tag name="serializer.normalizer" />
         </service>
+
+        <!-- Action -->
+
+        <service id="api.hydra.action.documentation" class="Dunglas\ApiBundle\Hydra\Action\DocumentationAction">
+            <argument type="service" id="api.hydra.documentation_builder" />
+        </service>
+
+        <!-- Serializer enhancers -->
+
+        <service
+                id="api.hydra.normalizer.paginated_collection_enhancer"
+                class="Dunglas\ApiBundle\Hydra\Serializer\PaginatedCollectionEnhancer"
+                decorates="api.hydra.normalizer.collection"
+                public="false">
+            <argument type="service" id="api.hydra.normalizer.paginated_collection_enhancer.inner" />
+            <argument type="service" id="api.resource_resolver" />
+        </service>
+
+        <service
+                id="api.hydra.normalizer.collection_filters_enhancer"
+                class="Dunglas\ApiBundle\Hydra\Serializer\CollectionFiltersEnhancer"
+                decorates="api.hydra.normalizer.collection"
+                public="false">
+            <argument type="service" id="api.hydra.normalizer.collection_filters_enhancer.inner" />
+            <argument type="service" id="api.resource_resolver" />
+        </service>
+
     </services>
 
 </container>

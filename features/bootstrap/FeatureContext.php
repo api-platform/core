@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
+use Sanpi\Behatch\HttpCall\Request;
 
 /**
  * Defines application features from the specific context.
@@ -29,6 +30,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
      * @var \Doctrine\Common\Persistence\ObjectManager
      */
     private $manager;
+    /**
+     * @var Request
+     */
+    private $request;
 
     /**
      * Initializes context.
@@ -37,12 +42,25 @@ class FeatureContext implements Context, SnippetAcceptingContext
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, Request $request)
     {
         $this->doctrine = $doctrine;
         $this->manager = $doctrine->getManager();
         $this->schemaTool = new SchemaTool($this->manager);
         $this->classes = $this->manager->getMetadataFactory()->getAllMetadata();
+        $this->request = $request;
+    }
+
+    /**
+     * Sets the default Accept HTTP header to the JSON-LD mime type.
+     *
+     * Contains a workaround for BrowserKit (HTTP_Accept instead of Accept).
+     *
+     * @BeforeScenario
+     */
+    public function acceptJsonLd()
+    {
+        $this->request->setHttpHeader('HTTP_Accept', 'application/ld+json');
     }
 
     /**

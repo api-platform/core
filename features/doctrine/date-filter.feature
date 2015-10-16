@@ -1,8 +1,7 @@
-@dateFilter
-Feature: Order filter on collections
-  In order to retrieve ordered large collections of resources
+Feature: Date filter on collections
+  In order to retrieve large collections of resources filtered by date
   As a client software developer
-  I need to retrieve collections ordered properties
+  I need to retrieve collections filtered by date
 
   @createSchema
   Scenario: Get collection filtered by date

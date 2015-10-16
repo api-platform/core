@@ -55,15 +55,21 @@ class SearchFilter extends AbstractFilter
      * @var PropertyAccessorInterface
      */
     private $propertyAccessor;
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
 
     /**
      * @param ManagerRegistry           $managerRegistry
+     * @param RequestStack              $requestStack
      * @param IriConverterInterface     $iriConverter
      * @param PropertyAccessorInterface $propertyAccessor
      * @param null|array                $properties       Null to allow filtering on all properties with the exact strategy or a map of property name with strategy.
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
+        RequestStack $requestStack,
         IriConverterInterface $iriConverter,
         PropertyAccessorInterface $propertyAccessor,
         array $properties = null
@@ -72,22 +78,34 @@ class SearchFilter extends AbstractFilter
 
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor;
+        $this->requestStack = $requestStack;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
         $metadata = $this->getClassMetadata($resource);
         $fieldNames = array_flip($metadata->getFieldNames());
 
         foreach ($this->extractProperties($request) as $property => $value) {
-            if (!is_string($value) || !$this->isPropertyEnabled($property)) {
+            if (null === $value || !$this->isPropertyEnabled($property)) {
                 continue;
             }
 
             if (isset($fieldNames[$property])) {
+                if (!is_string($value)) {
+                    continue;
+                }
+
+                $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$property];
+
                 if ('id' === $property) {
                     $value = $this->getFilterValueFromUrl($value);
                 }
@@ -101,8 +119,8 @@ class SearchFilter extends AbstractFilter
                 $value = $this->getFilterValueFromUrl($value);
 
                 $queryBuilder
-                    ->join(sprintf('o.%s', $property), $property)
-                    ->andWhere(sprintf('%1$s.id = :%1$s', $property))
+                    ->join(sprintf('o.%s', $property), 'api_'.$property)
+                    ->andWhere(sprintf('api_%1$s.id = :%1$s', $property))
                     ->setParameter($property, $value)
                 ;
             }
@@ -181,7 +199,11 @@ class SearchFilter extends AbstractFilter
 
         foreach ($metadata->getAssociationNames() as $associationName) {
             if ($this->isPropertyEnabled($associationName)) {
-                $description[$associationName] = [
+                $paramName = $associationName;
+                if ($metadata->isCollectionValuedAssociation($associationName)) {
+                    $paramName .= '[]';
+                }
+                $description[$paramName] = [
                     'property' => $associationName,
                     'type' => 'iri',
                     'required' => false,

@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Dunglas\ApiBundle\Util\ReflectionTrait;
 use phpDocumentor\Reflection\FileReflector;
 use PropertyInfo\PropertyInfoInterface;
@@ -50,7 +50,7 @@ class PhpDocLoader implements LoaderInterface
      * {@inheritdoc}
      */
     public function loadClassMetadata(
-        ClassMetadata $classMetadata,
+        ClassMetadataInterface $classMetadata,
         array $normalizationGroups = null,
         array $denormalizationGroups = null,
         array $validationGroups = null
@@ -59,18 +59,19 @@ class PhpDocLoader implements LoaderInterface
             ($classReflector = $this->getClassReflector($classMetadata->getReflectionClass())) &&
             $docBlock = $classReflector->getDocBlock()
         ) {
-            $classMetadata->setDescription($docBlock->getShortDescription());
+            $classMetadata = $classMetadata->withDescription($docBlock->getShortDescription());
         }
 
-        foreach ($classMetadata->getAttributes() as $attributeMetadata) {
-            if ($reflectionProperty = $this->getReflectionProperty(
-                $classMetadata->getReflectionClass(), $attributeMetadata->getName())
-            ) {
-                $attributeMetadata->setDescription($this->propertyInfo->getShortDescription($reflectionProperty));
+        foreach ($classMetadata->getAttributesMetadata() as $attributeName => $attributeMetadata) {
+            if ($reflectionProperty = $this->getReflectionProperty($classMetadata->getReflectionClass(), $attributeName)) {
+                $attributeMetadata = $attributeMetadata->withDescription(
+                    $this->propertyInfo->getShortDescription($reflectionProperty)
+                );
+                $classMetadata = $classMetadata->withAttributeMetadata($attributeName, $attributeMetadata);
             }
         }
 
-        return true;
+        return $classMetadata;
     }
 
     /**

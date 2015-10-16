@@ -100,7 +100,7 @@ class Dummy
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
-        $this->jsonData = array();
+        $this->jsonData = [];
     }
 
     public function getId()

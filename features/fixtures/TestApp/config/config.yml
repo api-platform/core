@@ -1,3 +1,6 @@
+imports:
+    - { resource: security.yml }
+
 framework:
     secret:                           "dunglas.fr"
     router:
@@ -25,18 +28,57 @@ doctrine:
 dunglas_api:
     title:                             "My Dummy API"
     description:                       "This is a test API."
+    supported_formats:                 [ "jsonld", "xml" ]
+    enable_fos_user:                   true
     collection:
         filter_name:
             order:                     "order"
         order:                         "ASC"
         pagination:
+            client_can_enable:         true
             items_per_page:
-                number:                3
-                enable_client_request: true
+                default:               3
+                client_can_change:     true
+
+fos_user:
+    db_driver:        orm
+    firewall_name:    api
+    service:
+        user_manager: api.user_manager
+    user_class:       "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User"
 
 services:
+    api.user_manager:
+        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\Manager\UserManager"
+        arguments:
+            -  @security.encoder_factory
+            -  @fos_user.util.username_canonicalizer
+            -  @fos_user.util.email_canonicalizer
+            -  @fos_user.entity_manager
+            -  %fos_user.model.user.class%
+
+    fos_user.mailer.default:
+        class: "Dunglas\ApiBundle\Tests\Mock\MailerMock"
+
     api.name_converter:
-        class: Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\NameConverter\CustomConverter
+        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\\NameConverter\CustomConverter"
+
+    xml_responder_view_listener:
+        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\EventListener\XmlResponderViewListener"
+        arguments:
+            - @api.serializer
+        tags:
+            - { name: "kernel.event_listener", event: "kernel.view", method: "onKernelView" }
+
+    user:
+        parent:                      "api.resource"
+        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User" ]
+        calls:
+                                     - method:    "initNormalizationContext"
+                                       arguments: [ { groups: [ "user", "user-read" ] } ]
+                                     - method:    "initDenormalizationContext"
+                                       arguments: [ { groups: [ "user", "user-write" ] } ]
+        tags:                        [ { name: "api.resource" } ]
 
     ressource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
@@ -152,3 +194,12 @@ services:
                                       arguments:
                                           -      { groups: [ "input" ] }
         tags:                       [ { name: "api.resource" } ]
+
+    no_collection_resource:
+        parent:                     "api.resource"
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\NoCollectionDummy' ]
+        tags:                       [ { name: "api.resource" } ]
+        calls:
+                                    - method:    "initCollectionOperations"
+                                      arguments:
+                                            - []

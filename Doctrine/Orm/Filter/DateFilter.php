@@ -11,9 +11,10 @@
 
 namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by date intervals.
@@ -25,9 +26,9 @@ class DateFilter extends AbstractFilter
 {
     const PARAMETER_BEFORE = 'before';
     const PARAMETER_AFTER = 'after';
-    const EXCLUDE_NULL = 0;
-    const INCLUDE_NULL_BEFORE = 1;
-    const INCLUDE_NULL_AFTER = 2;
+    const EXCLUDE_NULL = 'exclude_null';
+    const INCLUDE_NULL_BEFORE = 'include_null_before';
+    const INCLUDE_NULL_AFTER = 'include_null_after';
 
     /**
      * @var array
@@ -40,11 +41,33 @@ class DateFilter extends AbstractFilter
     ];
 
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param RequestStack    $requestStack
+     * @param array|null      $properties
+     */
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    {
+        parent::__construct($managerRegistry, $properties);
+
+        $this->requestStack = $requestStack;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
         $fieldNames = $this->getDateFieldNames($resource);
+
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
 
         foreach ($this->extractProperties($request) as $property => $values) {
             // Expect $values to be an array having the period as keys and the date value as values

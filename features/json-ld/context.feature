@@ -4,7 +4,7 @@ Feature: JSON-LD contexts generation
   I need to access to a JSON-LD context describing data types
 
   Scenario: Retrieve Entrypoint context
-    When I send a "GET" request to "/contexts/Dummy"
+    When I send a "GET" request to "/"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -76,10 +76,10 @@ Feature: JSON-LD contexts generation
         "@context": {
           "@vocab": "http://example.com/apidoc#",
           "hydra": "http://www.w3.org/ns/hydra/core#",
-          "related": "#RelationEmbedder/related",
           "paris": "#RelationEmbedder/paris",
           "krondstadt": "#RelationEmbedder/krondstadt",
-          "anotherRelated": "#RelationEmbedder/anotherRelated"
+          "anotherRelated": "#RelationEmbedder/anotherRelated",
+          "related": "#RelationEmbedder/related"
         }
       }
       """

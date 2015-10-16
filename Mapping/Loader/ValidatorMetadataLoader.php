@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Dunglas\ApiBundle\Mapping\ClassMetadata;
+use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
@@ -46,21 +46,19 @@ class ValidatorMetadataLoader implements LoaderInterface
      * {@inheritdoc}
      */
     public function loadClassMetadata(
-        ClassMetadata $classMetadata,
+        ClassMetadataInterface $classMetadata,
         array $normalizationGroups = null,
         array $denormalizationGroups = null,
         array $validationGroups = null
     ) {
         $validatorClassMetadata = $this->validatorMetadataFactory->getMetadataFor($classMetadata->getName());
 
-        foreach ($classMetadata->getAttributes() as $attributeMetadata) {
-            $attributeName = $attributeMetadata->getName();
-
+        foreach ($classMetadata->getAttributesMetadata() as $attributeName => $attributeMetadata) {
             foreach ($validatorClassMetadata->getPropertyMetadata($attributeName) as $propertyMetadata) {
                 if (null === $validationGroups) {
                     foreach ($propertyMetadata->findConstraints($validatorClassMetadata->getDefaultGroup()) as $constraint) {
                         if ($this->isRequired($constraint)) {
-                            $attributeMetadata->setRequired(true);
+                            $attributeMetadata = $attributeMetadata->withRequired(true);
 
                             break 2;
                         }
@@ -69,7 +67,7 @@ class ValidatorMetadataLoader implements LoaderInterface
                     foreach ($validationGroups as $validationGroup) {
                         foreach ($propertyMetadata->findConstraints($validationGroup) as $constraint) {
                             if ($this->isRequired($constraint)) {
-                                $attributeMetadata->setRequired(true);
+                                $attributeMetadata = $attributeMetadata->withRequired(true);
 
                                 break 3;
                             }
@@ -77,9 +75,11 @@ class ValidatorMetadataLoader implements LoaderInterface
                     }
                 }
             }
+
+            $classMetadata = $classMetadata->withAttributeMetadata($attributeName, $attributeMetadata);
         }
 
-        return true;
+        return $classMetadata;
     }
 
     /**

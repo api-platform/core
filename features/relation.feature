@@ -39,10 +39,10 @@ Feature: Relations support
       "@context": "/contexts/RelatedDummy",
       "@id": "/related_dummies/1",
       "@type": "https://schema.org/Product",
-      "unknown": null,
       "symfony": "symfony",
       "age": null,
-      "thirdLevel": "/third_levels/1"
+      "thirdLevel": "/third_levels/1",
+      "unknown": null
     }
     """
 
@@ -187,6 +187,8 @@ Feature: Relations support
         "@context": "/contexts/RelationEmbedder",
         "@id": "/relation_embedders/1",
         "@type": "RelationEmbedder",
+        "krondstadt": "Krondstadt",
+        "anotherRelated": null,
         "related": {
             "@id": "/related_dummies/1",
             "@type": "https://schema.org/Product",
@@ -196,9 +198,7 @@ Feature: Relations support
                     "@type": "ThirdLevel",
                     "level": 3
                 }
-        },
-        "krondstadt": "Krondstadt",
-        "anotherRelated": null
+        }
       }
       """
 
@@ -220,14 +220,14 @@ Feature: Relations support
       "@context": "/contexts/RelationEmbedder",
       "@id": "/relation_embedders/2",
       "@type": "RelationEmbedder",
-      "related": null,
       "krondstadt": "Krondstadt",
       "anotherRelated": {
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
         "symfony": "laravel",
         "thirdLevel": null
-      }
+      },
+      "related": null
     }
     """
 
@@ -250,14 +250,14 @@ Feature: Relations support
       "@context": "/contexts/RelationEmbedder",
       "@id": "/relation_embedders/2",
       "@type": "RelationEmbedder",
-      "related": null,
       "krondstadt": "Krondstadt",
       "anotherRelated": {
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
         "symfony": "API Platform",
         "thirdLevel": null
-      }
+      },
+      "related": null
     }
     """
 
@@ -282,13 +282,13 @@ Feature: Relations support
       "@context": "/contexts/RelationEmbedder",
       "@id": "/relation_embedders/3",
       "@type": "RelationEmbedder",
-      "related": null,
       "krondstadt": "Krondstadt",
       "anotherRelated": {
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
         "symfony": "phalcon",
         "thirdLevel": null
-      }
+      },
+      "related": null
     }
     """

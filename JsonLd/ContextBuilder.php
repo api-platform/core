@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\JsonLd;
 
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\JsonLd\Event\ContextBuilderEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -81,7 +82,7 @@ class ContextBuilder
      */
     public function getResourceContext(ResourceInterface $resource, array $normalizationContext)
     {
-        if (isset($normalizationContext['json_ld_context_embedded'])) {
+        if (isset($normalizationContext['jsonld_context_embedded'])) {
             return $this->getContext($resource);
         }
 
@@ -98,7 +99,7 @@ class ContextBuilder
     public function getContext(ResourceInterface $resource = null)
     {
         $context = $this->getBaseContext();
-        $event = new Event\ContextBuilderEvent($context, $resource);
+        $event = new ContextBuilderEvent($context, $resource);
         $this->eventDispatcher->dispatch(Event\Events::CONTEXT_BUILDER, $event);
 
         return $event->getContext();
@@ -113,7 +114,7 @@ class ContextBuilder
      */
     public function getContextUri(ResourceInterface $resource)
     {
-        return $this->router->generate('api_json_ld_context', ['shortName' => $resource->getShortName()]);
+        return $this->router->generate('api_jsonld_context', ['shortName' => $resource->getShortName()]);
     }
 
     /**

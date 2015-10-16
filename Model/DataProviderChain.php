@@ -12,7 +12,6 @@
 namespace Dunglas\ApiBundle\Model;
 
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * A chain of data providers.
@@ -49,10 +48,10 @@ class DataProviderChain implements DataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollection(ResourceInterface $resource, Request $request)
+    public function getCollection(ResourceInterface $resource)
     {
         foreach ($this->dataProviders as $dataProvider) {
-            if ($dataProvider->supports($resource) && $result = $dataProvider->getCollection($resource, $request)) {
+            if ($dataProvider->supports($resource) && $result = $dataProvider->getCollection($resource)) {
                 return $result;
             }
         }

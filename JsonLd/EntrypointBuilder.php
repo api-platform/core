@@ -53,13 +53,15 @@ class EntrypointBuilder
     public function getEntrypoint()
     {
         $entrypoint = [
-            '@context' => $this->router->generate('api_json_ld_entrypoint_context'),
-            '@id' => $this->router->generate('api_json_ld_entrypoint'),
+            '@context' => $this->router->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
+            '@id' => $this->router->generate('api_jsonld_entrypoint'),
             '@type' => 'Entrypoint',
         ];
 
         foreach ($this->resourceCollection as $resource) {
-            $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+            if (!empty($resource->getCollectionOperations())) {
+                $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+            }
         }
 
         return $entrypoint;

@@ -25,6 +25,11 @@ class CustomResource implements ResourceInterface
         return 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Custom';
     }
 
+    public function getShortName()
+    {
+        return 'Custom';
+    }
+
     public function getItemOperations()
     {
         return [new Operation(new Route('/customs/{id}'), 'custom_item')];
@@ -65,8 +70,38 @@ class CustomResource implements ResourceInterface
         return;
     }
 
-    public function getShortName()
+    public function isPaginationEnabledByDefault()
     {
-        return 'Custom';
+        return false;
+    }
+
+    public function isClientAllowedToEnablePagination()
+    {
+        return false;
+    }
+
+    public function getItemsPerPageByDefault()
+    {
+        return 0.;
+    }
+
+    public function isClientAllowedToChangeItemsPerPage()
+    {
+        return false;
+    }
+
+    public function getEnablePaginationParameter()
+    {
+        return '';
+    }
+
+    public function getPageParameter()
+    {
+        return '';
+    }
+
+    public function getItemsPerPageParameter()
+    {
+        return '';
     }
 }
