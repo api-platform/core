@@ -144,7 +144,7 @@ class ReflectionLoader implements LoaderInterface
             return;
         }
 
-        $attributeName = lcfirst($matches[2]);
+        $attributeName = $this->getAttributeName($matches[2]);
         $attributeMetadata = $this->attributeMetadataFactory->getAttributeMetadataFor(
             $classMetadata, $attributeName, $normalizationGroups, $denormalizationGroups
         )->withWritable(true);
@@ -175,7 +175,7 @@ class ReflectionLoader implements LoaderInterface
             return;
         }
 
-        $attributeName = lcfirst(substr($methodName, 3));
+        $attributeName = $this->getAttributeName(substr($methodName, 3));
         $attributeMetadata = $this->attributeMetadataFactory->getAttributeMetadataFor(
             $classMetadata, $attributeName, $normalizationGroups, $denormalizationGroups
         )->withReadable(true);
@@ -199,7 +199,7 @@ class ReflectionLoader implements LoaderInterface
             return;
         }
 
-        $attributeName = lcfirst(substr($methodName, 2));
+        $attributeName = $this->getAttributeName(substr($methodName, 2));
         $attributeMetadata = $this->attributeMetadataFactory->getAttributeMetadataFor(
             $classMetadata, $attributeName, $normalizationGroups, $denormalizationGroups
         )->withReadable(true);
@@ -257,5 +257,11 @@ class ReflectionLoader implements LoaderInterface
         }
 
         return $classMetadata;
+    }
+
+    private function getAttributeName($name)
+    {
+        //if more than two uppercase characters don't lcfirst
+        return preg_match('/[A-Z]{2,}$/', $name) ? $name : lcfirst($name);
     }
 }
