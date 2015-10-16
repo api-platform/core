@@ -7,7 +7,7 @@
     <services>
         <service id="api.hydra.documentation_builder" class="Dunglas\ApiBundle\Hydra\ApiDocumentationBuilder">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.jsonld.context_builder" />
             <argument type="service" id="router" />
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument>%api.title%</argument>
@@ -34,7 +34,7 @@
 
         <service id="api.hydra.normalizer.collection" class="Dunglas\ApiBundle\Hydra\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api.resource_collection" />
-            <argument type="service" id="api.json_ld.context_builder" />
+            <argument type="service" id="api.jsonld.context_builder" />
             <argument>%api.collection.pagination.page_parameter_name%</argument>
 
             <tag name="serializer.normalizer" priority="50" />

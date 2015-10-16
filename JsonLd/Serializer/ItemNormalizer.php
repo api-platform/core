@@ -43,7 +43,7 @@ class ItemNormalizer extends AbstractNormalizer
     /**
      * @var string
      */
-    const FORMAT = 'json-ld';
+    const FORMAT = 'jsonld';
 
     /**
      * @var IriConverterInterface
@@ -111,7 +111,7 @@ class ItemNormalizer extends AbstractNormalizer
         $resource = $this->guessResource($object, $context, true);
 
         $data = [];
-        if (!isset($context['json_ld_has_context'])) {
+        if (!isset($context['jsonld_has_context'])) {
             $data['@context'] = $this->contextBuilder->getResourceContext($resource, $context);
         }
 
@@ -407,9 +407,9 @@ class ItemNormalizer extends AbstractNormalizer
     {
         return $this->apiClassMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
-            isset($context['json_ld_normalization_groups']) ? $context['json_ld_normalization_groups'] : $resource->getNormalizationGroups(),
-            isset($context['json_ld_denormalization_groups']) ? $context['json_ld_denormalization_groups'] : $resource->getDenormalizationGroups(),
-            isset($context['json_ld_validation_groups']) ? $context['json_ld_validation_groups'] : $resource->getValidationGroups()
+            isset($context['jsonld_normalization_groups']) ? $context['jsonld_normalization_groups'] : $resource->getNormalizationGroups(),
+            isset($context['jsonld_denormalization_groups']) ? $context['jsonld_denormalization_groups'] : $resource->getDenormalizationGroups(),
+            isset($context['jsonld_validation_groups']) ? $context['jsonld_validation_groups'] : $resource->getValidationGroups()
         );
     }
 }

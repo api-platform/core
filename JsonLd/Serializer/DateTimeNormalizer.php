@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    const FORMAT = 'json-ld';
+    const FORMAT = 'jsonld';
 
     /**
      * {@inheritdoc}

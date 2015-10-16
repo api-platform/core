@@ -137,10 +137,14 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitionArgument = Argument::type('Symfony\Component\DependencyInjection\Definition');
 
+        $formatNegociatorDefinition = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
+        $formatNegociatorDefinition->addMethodCall('registerFormat', ['jsonld', ['application/ld+json'], true])->shouldBeCalled();
+
         $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
         $containerBuilderProphecy->getParameterBag()->willReturn($parameterBag)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.title', 'title')->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.description', 'description')->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api.supported_formats', ['jsonld'])->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.collection.filter_name.order', 'order')->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.collection.order', null)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.collection.pagination.page_parameter_name', 'page')->shouldBeCalled();
@@ -151,11 +155,20 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->addResource(Argument::type('Symfony\Component\Config\Resource\ResourceInterface'))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.resource', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.resource_collection', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.format_negotiator', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.data_provider', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.operation_factory', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.route_loader', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.router', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.iri_converter', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.listener.request.resource_type', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.listener.request.format', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.action.post_collection', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.action.get_item', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.action.put_item', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.action.delete_item', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info.php_doc_extractor', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.property_info.setter_extractor', $definitionArgument)->shouldBeCalled();
@@ -179,6 +192,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.collection', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.constraint_violation_list', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.hydra.normalizer.error', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api.format_negotiator')->willReturn($formatNegociatorDefinition)->shouldBeCalled();
 
         if ($withDoctrine) {
             $definitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');

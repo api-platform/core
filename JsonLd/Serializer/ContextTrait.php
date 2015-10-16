@@ -30,15 +30,15 @@ trait ContextTrait
      */
     private function createContext(ResourceInterface $resource, $context)
     {
-        if (!isset($context['json_ld_has_context'])) {
+        if (!isset($context['jsonld_has_context'])) {
             $context += [
                 'resource' => $resource,
-                'json_ld_has_context' => true,
+                'jsonld_has_context' => true,
                 // Don't use hydra:Collection in sub levels
-                'json_ld_sub_level' => true,
-                'json_ld_normalization_groups' => $resource->getNormalizationGroups(),
-                'json_ld_denormalization_groups' => $resource->getDenormalizationGroups(),
-                'json_ld_validation_groups' => $resource->getValidationGroups(),
+                'jsonld_sub_level' => true,
+                'jsonld_normalization_groups' => $resource->getNormalizationGroups(),
+                'jsonld_denormalization_groups' => $resource->getDenormalizationGroups(),
+                'jsonld_validation_groups' => $resource->getValidationGroups(),
             ];
         }
 

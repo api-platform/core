@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
  */
 class JsonLdEncoder extends JsonEncoder
 {
-    const FORMAT = 'json-ld';
+    const FORMAT = 'jsonld';
 
     /**
      * {@inheritdoc}
