@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -33,6 +34,18 @@ class SearchFilter extends AbstractFilter
      * @var string The value must be contained in the field.
      */
     const STRATEGY_PARTIAL = 'partial';
+    /**
+     * @var string Finds fields that are starting with the value.
+     */
+    const STRATEGY_START = 'start';
+    /**
+     * @var string Finds fields that are ending with the value.
+     */
+    const STRATEGY_END = 'end';
+    /**
+     * @var string Finds fields that are starting with the word.
+     */
+    const STRATEGY_WORD_START = 'word_start';
 
     /**
      * @var IriConverterInterface
@@ -91,16 +104,13 @@ class SearchFilter extends AbstractFilter
                     continue;
                 }
 
-                $partial = null !== $this->properties && self::STRATEGY_PARTIAL === $this->properties[$property];
-
                 if ('id' === $property) {
                     $value = $this->getFilterValueFromUrl($value);
                 }
 
-                $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
-                    ->setParameter($property, $partial ? sprintf('%%%s%%', $value) : $value)
-                ;
+                $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
+
+                $this->addWhereByStrategy($strategy, $queryBuilder, $property, $value);
             } elseif ($metadata->isSingleValuedAssociation($property)) {
                 if (!is_string($value)) {
                     continue;
@@ -137,6 +147,57 @@ class SearchFilter extends AbstractFilter
                 ;
             }
         }
+    }
+
+    /**
+     * Adds where clause according to the strategy.
+     *
+     * @param string       $strategy
+     * @param QueryBuilder $queryBuilder
+     * @param string       $property
+     * @param string       $value
+     *
+     * @return string
+     *
+     * @throws InvalidArgumentException If strategy does not exist
+     */
+    private function addWhereByStrategy($strategy, QueryBuilder $queryBuilder, $property, $value)
+    {
+        switch ($strategy) {
+            case null:
+            case self::STRATEGY_EXACT:
+                return $queryBuilder
+                    ->andWhere(sprintf('o.%1$s = :%1$s', $property))
+                    ->setParameter($property, $value)
+                ;
+
+            case self::STRATEGY_PARTIAL:
+                return $queryBuilder
+                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
+                    ->setParameter($property, sprintf('%%%s%%', $value))
+                ;
+
+            case self::STRATEGY_START:
+                return $queryBuilder
+                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
+                    ->setParameter($property, sprintf('%s%%', $value))
+                ;
+
+            case self::STRATEGY_END:
+                return $queryBuilder
+                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
+                    ->setParameter($property, sprintf('%%%s', $value))
+                ;
+
+            case self::STRATEGY_WORD_START:
+                return $queryBuilder
+                    ->andWhere(sprintf('o.%1$s LIKE :%1$s_1 OR o.%1$s LIKE :%1$s_2', $property))
+                    ->setParameter(sprintf('%s_1', $property), sprintf('%s%%', $value))
+                    ->setParameter(sprintf('%s_2', $property), sprintf('%% %s%%', $value))
+                ;
+        }
+
+        throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
     }
 
     /**

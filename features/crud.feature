@@ -29,6 +29,7 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "Dummy",
       "name": "My Dummy",
       "alias": null,
+      "description": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
       "jsonData": {
         "key": [
@@ -56,6 +57,7 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "Dummy",
       "name": "My Dummy",
       "alias": null,
+      "description": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
       "jsonData": {
         "key": [
@@ -91,6 +93,7 @@ Feature: Create-Retrieve-Update-Delete
           "@type":"Dummy",
           "name":"My Dummy",
           "alias": null,
+          "description": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
           "jsonData": {
             "key": [
@@ -106,7 +109,7 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,name,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
+              "hydra:template": "\/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -119,6 +122,18 @@ Feature: Create-Retrieve-Update-Delete
                       "@type": "IriTemplateMapping",
                       "variable": "name",
                       "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "alias",
+                      "property": "alias",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "description",
+                      "property": "description",
                       "required": false
                   },
                   {
@@ -182,6 +197,7 @@ Feature: Create-Retrieve-Update-Delete
         "@type": "Dummy",
         "name": "A nice dummy",
         "alias": null,
+        "description": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
         "jsonData": [{
             "key": "value1"
