@@ -25,6 +25,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         'cache' => false,
         'enable_doctrine_orm' => true,
         'enable_fos_user' => false,
+        'denormalize_relations' => true,
         'collection' => [
             'filter_name' => [
                 'order' => 'order',

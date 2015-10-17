@@ -43,6 +43,7 @@
             <argument type="service" id="api.resource_collection" />
             <argument type="service" id="api.property_info" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+            <argument>%api.mapping.attributes.denormalize_relations%</argument>
         </service>
 
         <service id="api.mapping.loaders.validator_metadata" class="Dunglas\ApiBundle\Mapping\Loader\ValidatorMetadataLoader" public="false">

@@ -147,6 +147,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setParameter('api.collection.pagination.items_per_page.number', 30)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.collection.pagination.items_per_page.enable_client_request', false)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api.collection.pagination.items_per_page.parameter_name', 'itemsPerPage')->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api.mapping.attributes.denormalize_relations', true)->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
         $containerBuilderProphecy->addResource(Argument::type('Symfony\Component\Config\Resource\ResourceInterface'))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.resource', $definitionArgument)->shouldBeCalled();

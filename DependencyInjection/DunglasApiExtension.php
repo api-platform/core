@@ -57,6 +57,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('api.collection.pagination.items_per_page.number', $config['collection']['pagination']['items_per_page']['number']);
         $container->setParameter('api.collection.pagination.items_per_page.enable_client_request', $config['collection']['pagination']['items_per_page']['enable_client_request']);
         $container->setParameter('api.collection.pagination.items_per_page.parameter_name', $config['collection']['pagination']['items_per_page']['parameter_name']);
+        $container->setParameter('api.mapping.attributes.denormalize_relations', $config['denormalize_relations']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');

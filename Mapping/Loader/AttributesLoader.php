@@ -39,15 +39,21 @@ class AttributesLoader implements LoaderInterface
      * @var ClassMetadataFactoryInterface|null
      */
     private $serializerClassMetadataFactory;
+    /**
+     * @var bool
+     */
+    private $denormalizeRelations;
 
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         PropertyInfoInterface $propertyInfo,
-        ClassMetadataFactoryInterface $serializerClassMetadataFactory = null
+        ClassMetadataFactoryInterface $serializerClassMetadataFactory = null,
+        $denormalizeRelations = true
     ) {
         $this->resourceCollection = $resourceCollection;
         $this->propertyInfo = $propertyInfo;
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
+        $this->denormalizeRelations = $denormalizeRelations;
     }
 
     /**
@@ -212,6 +218,13 @@ class AttributesLoader implements LoaderInterface
             ($class = $types[0]->getCollectionType()->getClass()) &&
             $this->resourceCollection->getResourceForEntity($class)
         )) {
+            return $attributeMetadata;
+        }
+
+        if (!$this->denormalizeRelations) {
+            $attributeMetadata->setNormalizationLink(false);
+            $attributeMetadata->setDenormalizationLink(false);
+
             return $attributeMetadata;
         }
 

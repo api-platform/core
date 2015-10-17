@@ -39,6 +39,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache')->defaultFalse()->info('The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.')->end()
                 ->booleanNode('enable_doctrine_orm')->defaultValue($enableDoctrineOrm)->info('Enable the Doctrine ORM integration.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('denormalize_relations')->defaultValue(true)->info('Denormalize all relations of an entity.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
