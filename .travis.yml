@@ -26,5 +26,6 @@ install:
 
 script:
     - vendor/bin/behat
+    - vendor/bin/behat --profile normalize_relations
     - vendor/bin/phpunit
     - if [[ "$TRAVIS_PHP_VERSION" = "5.6" ]]; then php php-cs-fixer.phar fix --no-interaction --dry-run --diff -vvv; fi;

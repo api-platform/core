@@ -1,6 +1,9 @@
 default:
   suites:
     default:
+      paths:
+        - features/suites/common
+        - features/suites/denormalize_relations
       contexts:
         - FeatureContext: { doctrine: "@doctrine" }
         - HydraContext
@@ -8,15 +11,41 @@ default:
         - Sanpi\Behatch\Context\RestContext
         - Sanpi\Behatch\Context\JsonContext
   extensions:
-    Behat\Symfony2Extension:
-      kernel:
-        env: "test"
-        debug: "true"
-        path: "features/fixtures/TestApp/AppKernel.php"
-        bootstrap: "features/fixtures/TestApp/bootstrap.php"
     Behat\MinkExtension:
       base_url: "http://example.com/"
       sessions:
         default:
           symfony2: ~
     Sanpi\Behatch\Extension: ~
+    Behat\Symfony2Extension:
+      kernel:
+        env: "test"
+        debug: "true"
+        path: "features/fixtures/TestApp/AppKernel.php"
+        bootstrap: "features/fixtures/TestApp/bootstrap.php"
+
+normalize_relations:
+  suites:
+    default:
+      paths:
+        - features/suites/common
+        - features/suites/normalize_relations
+      contexts:
+        - FeatureContext: { doctrine: "@doctrine" }
+        - HydraContext
+        - Behat\MinkExtension\Context\MinkContext
+        - Sanpi\Behatch\Context\RestContext
+        - Sanpi\Behatch\Context\JsonContext
+  extensions:
+    Behat\MinkExtension:
+      base_url: "http://example.com/"
+      sessions:
+        default:
+          symfony2: ~
+    Sanpi\Behatch\Extension: ~
+    Behat\Symfony2Extension:
+      kernel:
+        env: "test"
+        debug: "true"
+        path: "features/fixtures/TestAppNormalizeRelations/AppKernel.php"
+        bootstrap: "features/fixtures/TestAppNormalizeRelations/bootstrap.php"
