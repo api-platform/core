@@ -54,12 +54,12 @@ class DoctrineIdentifierLoader implements LoaderInterface
             return $classMetadata;
         }
 
-        $doctrineClassMetaData = $manager->getClassMetadata($className);
-        if (!$doctrineClassMetaData) {
+        $doctrineClassMetadata = $manager->getClassMetadata($className);
+        if (!$doctrineClassMetadata) {
             return $classMetadata;
         }
 
-        $identifiers = $doctrineClassMetaData->getIdentifier();
+        $identifiers = $doctrineClassMetadata->getIdentifier();
         if (1 !== count($identifiers)) {
             return $classMetadata;
         }
@@ -69,6 +69,10 @@ class DoctrineIdentifierLoader implements LoaderInterface
             $attributeMetadata = $this->attributeMetadataFactory->getAttributeMetadataFor(
                 $classMetadata, $identifierName, $normalizationGroups, $denormalizationGroups
             );
+            if ($doctrineClassMetadata->isIdentifierNatural()) {
+                $attributeMetadata = $attributeMetadata->withWritable(false);
+            }
+
             $classMetadata = $classMetadata->withAttributeMetadata($identifierName, $attributeMetadata);
         }
 
