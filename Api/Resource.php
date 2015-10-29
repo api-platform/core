@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Api;
 use Dunglas\ApiBundle\Api\Filter\FilterInterface;
 use Dunglas\ApiBundle\Api\Operation\OperationInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * {@inheritdoc}
@@ -47,7 +48,7 @@ class Resource implements ResourceInterface
      */
     private $denormalizationContext = [];
     /**
-     * @var string[]
+     * @var string[]|GroupSequence|callable
      */
     private $validationGroups;
     /**
@@ -223,9 +224,9 @@ class Resource implements ResourceInterface
     /**
      * Initializes validation groups.
      *
-     * @param array $validationGroups
+     * @param string[]|GroupSequence|callable $validationGroups
      */
-    public function initValidationGroups(array $validationGroups)
+    public function initValidationGroups($validationGroups)
     {
         $this->validationGroups = $validationGroups;
     }

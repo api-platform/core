@@ -65,6 +65,10 @@ class ValidatorMetadataLoader implements LoaderInterface
                     }
                 } else {
                     foreach ($validationGroups as $validationGroup) {
+                        if (!is_string($validationGroup)) {
+                            continue;
+                        }
+
                         foreach ($propertyMetadata->findConstraints($validationGroup) as $constraint) {
                             if ($this->isRequired($constraint)) {
                                 $attributeMetadata = $attributeMetadata->withRequired(true);
