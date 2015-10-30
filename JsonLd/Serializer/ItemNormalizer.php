@@ -21,7 +21,6 @@ use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
-use PropertyInfo\Type;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
