@@ -75,6 +75,11 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
             $loader->load('fos_user.xml');
         }
 
+        // NelmioApiDoc support
+        if ($config['nelmio_api_doc']) {
+            $loader->load('nelmio_api_doc.xml');
+        }
+
         // Cache
         if (isset($config['cache']) && $config['cache']) {
             $container->setParameter(

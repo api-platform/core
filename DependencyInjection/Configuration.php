@@ -41,6 +41,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('cache')->defaultFalse()->info('The caching service to use. Set to "dunglas_api.mapping.cache.apc" to enable APC metadata caching.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
