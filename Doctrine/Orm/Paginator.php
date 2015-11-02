@@ -42,6 +42,11 @@ class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     private $totalItems;
 
+    /**
+     * @var \Traversable
+     */
+    private $iterator;
+
     public function __construct(DoctrineOrmPaginator $paginator)
     {
         $this->paginator = $paginator;
@@ -88,7 +93,11 @@ class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getIterator()
     {
-        return $this->paginator->getIterator();
+        if (null === $this->iterator) {
+            $this->iterator = $this->paginator->getIterator();
+        }
+
+        return $this->iterator;
     }
 
     /**
