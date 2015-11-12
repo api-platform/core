@@ -26,8 +26,8 @@ Feature: Handle properly invalid data submitted to the API
       "description": null,
       "dummyDate": null,
       "jsonData": [],
-      "dummy": null,
       "relatedDummy": null,
+      "dummy": null,
       "relatedDummies": [],
       "name_converted": null
     }
@@ -68,8 +68,8 @@ Feature: Handle properly invalid data submitted to the API
       "description": null,
       "dummyDate": null,
       "jsonData": [],
-      "dummy": null,
       "relatedDummy": null,
+      "dummy": null,
       "relatedDummies": [],
       "name_converted": null
     }

@@ -64,7 +64,9 @@
         </service>
 
         <service id="api.doctrine.orm.query_extension.pagination" class="Dunglas\ApiBundle\Doctrine\Orm\Extension\PaginationExtension">
+            <argument type="service" id="doctrine" />
             <argument type="service" id="request_stack" />
+
             <tag name="api.doctrine.orm.query_extension.collection" />
         </service>
 

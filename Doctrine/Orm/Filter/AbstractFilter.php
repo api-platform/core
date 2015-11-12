@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Util\RequestParser;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -61,7 +62,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * Is the given property enabled?
+     * Determines whether the given property is enabled.
      *
      * @param string $property
      *
@@ -69,7 +70,94 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function isPropertyEnabled($property)
     {
-        return null === $this->properties || array_key_exists($property, $this->properties);
+        if (null === $this->properties) {
+            // to ensure sanity, nested properties must still be explicitly enabled
+            return !$this->isPropertyNested($property);
+        }
+
+        return array_key_exists($property, $this->properties);
+    }
+
+    /**
+     * Determines whether the given property is mapped.
+     *
+     * @param string            $property
+     * @param ResourceInterface $resource
+     * @param bool              $allowAssociation
+     *
+     * @return bool
+     */
+    protected function isPropertyMapped($property, ResourceInterface $resource, $allowAssociation = false)
+    {
+        if ($this->isPropertyNested($property)) {
+            $propertyParts = $this->splitPropertyParts($property);
+            $metadata = $this->getNestedMetadata($resource, $propertyParts['associations']);
+            $property = $propertyParts['field'];
+        } else {
+            $metadata = $this->getClassMetadata($resource);
+        }
+
+        return $metadata->hasField($property) || ($allowAssociation && $metadata->hasAssociation($property));
+    }
+
+    /**
+     * Determines whether the given property is nested.
+     *
+     * @param string $property
+     *
+     * @return bool
+     */
+    protected function isPropertyNested($property)
+    {
+        return false !== strpos($property, '.');
+    }
+
+    /**
+     * Gets nested class metadata for the given resource.
+     *
+     * @param ResourceInterface $resource
+     * @param string[]          $associations
+     *
+     * @return ClassMetadata
+     */
+    protected function getNestedMetadata(ResourceInterface $resource, array $associations)
+    {
+        $metadata = $this->getClassMetadata($resource);
+
+        foreach ($associations as $association) {
+            if ($metadata->hasAssociation($association)) {
+                $associationClass = $metadata->getAssociationTargetClass($association);
+
+                $metadata = $this
+                    ->managerRegistry
+                    ->getManagerForClass($associationClass)
+                    ->getClassMetadata($associationClass)
+                ;
+            }
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * Splits the given property into parts.
+     *
+     * Returns an array with the following keys:
+     *   - associations: array of associations according to nesting order
+     *   - field: string holding the actual field (leaf node)
+     *
+     * @param string $property
+     *
+     * @return array
+     */
+    protected function splitPropertyParts($property)
+    {
+        $parts = explode('.', $property);
+
+        return [
+            'associations' => array_slice($parts, 0, -1),
+            'field' => end($parts),
+        ];
     }
 
     /**
@@ -81,6 +169,20 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function extractProperties(Request $request)
     {
+        $needsFixing = false;
+
+        if (null !== $this->properties) {
+            foreach ($this->properties as $property => $value) {
+                if ($this->isPropertyNested($property) && $request->query->has(str_replace('.', '_', $property))) {
+                    $needsFixing = true;
+                }
+            }
+        }
+
+        if ($needsFixing) {
+            $request = RequestParser::parseAndDuplicateRequest($request);
+        }
+
         return $request->query->all();
     }
 }

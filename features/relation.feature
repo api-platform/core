@@ -39,7 +39,9 @@ Feature: Relations support
       "@context": "/contexts/RelatedDummy",
       "@id": "/related_dummies/1",
       "@type": "https://schema.org/Product",
+      "name": null,
       "symfony": "symfony",
+      "dummyDate": null,
       "age": null,
       "thirdLevel": "/third_levels/1",
       "unknown": null
@@ -72,10 +74,10 @@ Feature: Relations support
       "description": null,
       "dummyDate": null,
       "jsonData": [],
-      "dummy": null,
       "relatedDummy": "/related_dummies/1",
+      "dummy": null,
       "relatedDummies": [
-        "/related_dummies/1"
+          "/related_dummies/1"
       ],
       "name_converted": null
     }
@@ -86,7 +88,7 @@ Feature: Relations support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -112,68 +114,7 @@ Feature: Relations support
           ],
           "name_converted": null
         }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -182,7 +123,7 @@ Feature: Relations support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -208,68 +149,7 @@ Feature: Relations support
           ],
           "name_converted": null
         }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 

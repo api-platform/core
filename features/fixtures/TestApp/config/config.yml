@@ -82,19 +82,19 @@ services:
 
     ressource.date_filter:
         parent:    "api.doctrine.orm.date_filter"
-        arguments: [ { "dummyDate": ~ } ]
+        arguments: [ { "dummyDate": ~, "relatedDummy.dummyDate": ~ } ]
 
     my_dummy_resource.search_filter:
         parent:                     "api.doctrine.orm.search_filter"
-        arguments:                  [ { "id": "exact", "name": "partial", "alias": "start", "description": "word_start", "relatedDummies": "exact"  } ]
+        arguments:                  [ { "id": "exact", "name": "partial", "alias": "start", "description": "word_start", "relatedDummy.name": "exact", "relatedDummies": "exact"  } ]
 
     my_dummy_resource.order_filter:
         parent:                     "api.doctrine.orm.order_filter"
-        arguments:                  [ { "id": ~, "name": "desc" } ]
+        arguments:                  [ { "id": ~, "name": "desc", "relatedDummy.symfony": ~ } ]
 
     my_dummy_resource.date_filter:
             parent:                 "api.doctrine.orm.date_filter"
-            arguments:              [ { "dummyDate": ~ } ]
+            arguments:              [ { "dummyDate": ~, "relatedDummy.dummyDate": ~ } ]
 
     my_dummy_resource:
         parent:                      "api.resource"

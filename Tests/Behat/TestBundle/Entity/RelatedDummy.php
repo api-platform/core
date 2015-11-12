@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 use Dunglas\ApiBundle\Annotation\Iri;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Related dummy.
@@ -32,10 +33,23 @@ class RelatedDummy extends ParentDummy
      */
     private $id;
     /**
+     * @var string A name.
+     *
+     * @ORM\Column(nullable=true)
+     */
+    public $name;
+    /**
      * @ORM\Column
      * @Groups({"barcelona", "chicago"})
      */
     protected $symfony = 'symfony';
+    /**
+     * @var \DateTime A dummy date.
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Assert\DateTime
+     */
+    public $dummyDate;
     /**
      * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
      * @Groups({"barcelona", "chicago"})
@@ -56,6 +70,16 @@ class RelatedDummy extends ParentDummy
         return $this->id;
     }
 
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
     public function getSymfony()
     {
         return $this->symfony;
@@ -64,5 +88,15 @@ class RelatedDummy extends ParentDummy
     public function setSymfony($symfony)
     {
         $this->symfony = $symfony;
+    }
+
+    public function setDummyDate(\DateTime $dummyDate)
+    {
+        $this->dummyDate = $dummyDate;
+    }
+
+    public function getDummyDate()
+    {
+        return $this->dummyDate;
     }
 }

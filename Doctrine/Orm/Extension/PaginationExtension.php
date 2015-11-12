@@ -11,12 +11,14 @@
 
 namespace Dunglas\ApiBundle\Doctrine\Orm\Extension;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Paginator;
 use Dunglas\ApiBundle\Doctrine\Orm\QueryResultExtensionInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryChecker;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -28,15 +30,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class PaginationExtension implements QueryResultExtensionInterface
 {
     /**
+     * @var ManagerRegistry
+     */
+    private $managerRegistry;
+
+    /**
      * @var RequestStack
      */
     private $requestStack;
 
     /**
-     * @param RequestStack $requestStack
+     * @param ManagerRegistry $managerRegistry
+     * @param RequestStack    $requestStack
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack)
     {
+        $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
     }
 
@@ -54,8 +63,7 @@ class PaginationExtension implements QueryResultExtensionInterface
 
         $queryBuilder
             ->setFirstResult(($this->getPage($resource, $request) - 1) * $itemsPerPage)
-            ->setMaxResults($itemsPerPage)
-        ;
+            ->setMaxResults($itemsPerPage);
     }
 
     /**
@@ -65,7 +73,9 @@ class PaginationExtension implements QueryResultExtensionInterface
      */
     public function supportsResult(ResourceInterface $resource)
     {
-        return $this->isPaginationEnabled($resource, $this->requestStack->getCurrentRequest());
+        $request = $this->requestStack->getCurrentRequest();
+
+        return $request !== null && $this->isPaginationEnabled($resource, $request);
     }
 
     /**
@@ -74,8 +84,8 @@ class PaginationExtension implements QueryResultExtensionInterface
     public function getResult(QueryBuilder $queryBuilder)
     {
         $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder);
-        // Disable output walkers by default (performance)
-        $doctrineOrmPaginator->setUseOutputWalkers(false);
+
+        $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         return new Paginator($doctrineOrmPaginator);
     }
@@ -123,10 +133,54 @@ class PaginationExtension implements QueryResultExtensionInterface
     private function getItemsPerPage(ResourceInterface $resource, Request $request)
     {
         if ($resource->isClientAllowedToChangeItemsPerPage()
-            && $itemsPerPage = $request->get($resource->getItemsPerPageParameter())) {
+            && $itemsPerPage = $request->get($resource->getItemsPerPageParameter())
+        ) {
             return (float) $itemsPerPage;
         }
 
         return $resource->getItemsPerPageByDefault();
+    }
+
+    /**
+     * Determines whether output walkers should be used.
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
+     */
+    private function useOutputWalkers(QueryBuilder $queryBuilder)
+    {
+        /*
+         * "Cannot count query that uses a HAVING clause. Use the output walkers for pagination"
+         *
+         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L50
+         */
+        if (QueryChecker::hasHavingClause($queryBuilder)) {
+            return true;
+        }
+
+        /*
+         * "Paginating an entity with foreign key as identifier only works when using the Output Walkers. Call Paginator#setUseOutputWalkers(true) before iterating the paginator."
+         *
+         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L87
+         */
+        if (QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder, $this->managerRegistry)) {
+            return true;
+        }
+
+        /*
+         * "Cannot select distinct identifiers from query with LIMIT and ORDER BY on a column from a fetch joined to-many association. Use output walkers."
+         *
+         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L149
+         */
+        if (
+            QueryChecker::hasMaxResults($queryBuilder)
+            && QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
+        ) {
+            return true;
+        }
+
+        // Disable output walkers by default (performance)
+        return false;
     }
 }

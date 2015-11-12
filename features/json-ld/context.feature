@@ -43,11 +43,11 @@ Feature: JSON-LD contexts generation
               "description": "https://schema.org/description",
               "dummyDate": "#Dummy/dummyDate",
               "jsonData": "#Dummy/jsonData",
-              "dummy": "#Dummy/dummy",
               "relatedDummy": {
                   "@id": "#Dummy/relatedDummy",
                   "@type": "@id"
               },
+              "dummy": "#Dummy/dummy",
               "relatedDummies": {
                   "@id": "#Dummy/relatedDummies",
                   "@type": "@id"

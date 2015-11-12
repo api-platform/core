@@ -36,7 +36,8 @@
     "behatch/contexts": "dev-master",
     "symfony/finder": "~2.3",
     "symfony/security": "~2.7.2|~3.0",
-    "phpunit/phpunit": "~4.6"
+    "phpunit/phpunit": "~4.6",
+    "php-mock/php-mock-phpunit": "^0.3"
   },
   "suggest": {
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."

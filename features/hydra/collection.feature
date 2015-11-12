@@ -9,7 +9,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -19,68 +19,7 @@ Feature: Collections support
       "hydra:itemsPerPage": 3,
       "hydra:firstPage": "/dummies",
       "hydra:lastPage": "/dummies",
-      "hydra:member": [],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      "hydra:member": []
     }
     """
 
@@ -90,7 +29,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -110,8 +49,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [],
           "name_converted": null
         },
@@ -123,8 +62,8 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [],
           "name_converted": null
         },
@@ -136,74 +75,12 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [],
           "name_converted": null
         }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -212,7 +89,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -233,8 +110,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [],
           "name_converted": null
         },
@@ -246,8 +123,8 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [],
           "name_converted": null
         },
@@ -259,74 +136,12 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [],
           "name_converted": null
         }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -335,7 +150,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -355,8 +170,8 @@ Feature: Collections support
             "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
-            "dummy": null,
             "relatedDummy": null,
+            "dummy": null,
             "relatedDummies": [],
             "name_converted": null
           },
@@ -368,8 +183,8 @@ Feature: Collections support
             "description": "Smart dummy.",
             "dummyDate": null,
             "jsonData": [],
-            "dummy": null,
             "relatedDummy": null,
+            "dummy": null,
             "relatedDummies": [],
             "name_converted": null
           },
@@ -381,74 +196,12 @@ Feature: Collections support
             "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
-            "dummy": null,
             "relatedDummy": null,
+            "dummy": null,
             "relatedDummies": [],
             "name_converted": null
           }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -457,7 +210,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
       {
           "@context": "/contexts/Dummy",
@@ -472,8 +225,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -485,8 +238,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -498,8 +251,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -511,8 +264,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -524,8 +277,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -537,8 +290,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -550,8 +303,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -563,8 +316,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -576,8 +329,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -589,8 +342,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -602,8 +355,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -615,8 +368,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -628,8 +381,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -641,8 +394,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -654,8 +407,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -667,8 +420,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -680,8 +433,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -693,8 +446,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -706,8 +459,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -719,8 +472,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -732,8 +485,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -745,8 +498,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -758,8 +511,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -771,8 +524,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -784,8 +537,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -797,8 +550,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -810,8 +563,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -823,8 +576,8 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -836,8 +589,8 @@ Feature: Collections support
                   "description": "Smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               },
@@ -849,73 +602,12 @@ Feature: Collections support
                   "description": "Not so smart dummy.",
                   "dummyDate": null,
                   "jsonData": [],
-                  "dummy": null,
                   "relatedDummy": null,
+                  "dummy": null,
                   "relatedDummies": [],
                   "name_converted": null
               }
-          ],
-          "hydra:search": {
-              "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-              "hydra:variableRepresentation": "BasicRepresentation",
-              "hydra:mapping": [
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "id",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "name",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "alias",
-                      "property": "alias",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "description",
-                      "property": "description",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies[]",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[id]",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[name]",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "dummyDate[before]",
-                      "property": "dummyDate",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "dummyDate[after]",
-                      "property": "dummyDate",
-                      "required": false
-                  }
-              ]
-          }
+          ]
       }
     """
 
@@ -924,7 +616,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -945,8 +637,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -960,8 +652,8 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -975,8 +667,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -990,8 +682,8 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -1005,8 +697,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -1020,8 +712,8 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -1035,8 +727,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -1050,8 +742,8 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -1065,8 +757,8 @@ Feature: Collections support
           "description": "Smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
@@ -1080,76 +772,14 @@ Feature: Collections support
           "description": "Not so smart dummy.",
           "dummyDate": null,
           "jsonData": [],
-          "dummy": null,
           "relatedDummy": null,
+          "dummy": null,
           "relatedDummies": [
 
           ],
           "name_converted": null
         }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -1158,7 +788,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -1177,74 +807,12 @@ Feature: Collections support
             "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
-            "dummy": null,
             "relatedDummy": null,
+            "dummy": null,
             "relatedDummies": [],
             "name_converted": null
           }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -1253,7 +821,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -1272,74 +840,12 @@ Feature: Collections support
             "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
-            "dummy": null,
             "relatedDummy": null,
+            "dummy": null,
             "relatedDummies": [],
             "name_converted": null
           }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
 
@@ -1349,7 +855,7 @@ Feature: Collections support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
       "@context": "/contexts/Dummy",
@@ -1368,73 +874,11 @@ Feature: Collections support
             "description": "Not so smart dummy.",
             "dummyDate": null,
             "jsonData": [],
-            "dummy": null,
             "relatedDummy": null,
+            "dummy": null,
             "relatedDummies": [],
             "name_converted": null
           }
-      ],
-      "hydra:search": {
-        "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?id,name,alias,description,relatedDummies[],order[id],order[name],dummyDate[before],dummyDate[after]}",
-        "hydra:variableRepresentation": "BasicRepresentation",
-        "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              }
-        ]
-      }
+      ]
     }
     """
