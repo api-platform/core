@@ -30,7 +30,7 @@
         </service>
 
         <service id="api.hydra.listener.request_exception" class="Dunglas\ApiBundle\Hydra\EventListener\RequestExceptionListener">
-            <argument type="service" id="api.hydra.action.exception" />
+            <argument>api.hydra.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
