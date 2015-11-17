@@ -8,27 +8,36 @@ cache:
 
 php:
     - 5.5
-    - 5.6
+    - 7.0
     - nightly
     - hhvm
 
 matrix:
-    allow_failures:
-        - php: nightly
     fast_finish: true
     include:
         - php: 5.6
-          env: DEPENDENCIES=dev
+          env: SYMFONY_VERSION=2.7.*
+        - php: 5.6
+          env: SYMFONY_VERSION=2.8.*@dev
+        - php: 5.6
+          env: SYMFONY_VERSION="3.0.*@dev"
+        - php: 7.0
 
-before_script:
+    allow_failures:
+        - php: 7.0
+        - php: nightly
+        - env: SYMFONY_VERSION=2.8.*@dev
+        - env: SYMFONY_VERSION="3.0.*@dev"
+
+before_install:
     - composer self-update
-    - if [ "$TRAVIS_PHP_VERSION" = "5.6" ] && [ "$DEPENDENCIES" != "dev" ]; then wget http://get.sensiolabs.org/php-cs-fixer.phar; fi;
-    - if [ "$DEPENDENCIES" = "dev" ]; then perl -pi -e 's/^}$/,"minimum-stability":"dev"}/' composer.json; fi;
+    - if [ "$SYMFONY_VERSION" != "" ]; then
+          composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update;
+      fi;
 
 install:
-    - composer install
+    - composer update --no-interaction --prefer-dist
 
 script:
-    - vendor/bin/behat
     - vendor/bin/phpunit
-    - if [ "$TRAVIS_PHP_VERSION" = "5.6" ] && [ "$DEPENDENCIES" != "dev" ]; then php php-cs-fixer.phar fix --no-interaction --dry-run --diff -vvv; fi;
+    - vendor/bin/behat
