@@ -14,41 +14,28 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?dummyDate[after]=2015-04-28",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 2,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?dummyDate%5Bafter%5D=2015-04-28",
-      "hydra:lastPage": "/dummies?dummyDate%5Bafter%5D=2015-04-28",
-      "hydra:member": [
-        {
-          "@id": "/dummies/28",
-          "@type": "Dummy",
-          "name": "Dummy #28",
-          "alias": "Alias #2",
-          "description": "Not so smart dummy.",
-          "dummyDate": "2015-04-28T00:00:00+00:00",
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/29",
-          "@type": "Dummy",
-          "name": "Dummy #29",
-          "alias": "Alias #1",
-          "description": "Smart dummy.",
-          "dummyDate": "2015-04-29T00:00:00+00:00",
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-28$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 2},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/28$"},
+                  {"pattern": "^/dummies/29$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 2
         }
-      ]
+      }
     }
     """
 
@@ -59,55 +46,29 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?dummyDate[before]=2015-04-05",
-      "@type": "hydra:PagedCollection",
-      "hydra:nextPage": "/dummies?dummyDate%5Bbefore%5D=2015-04-05&page=2",
-      "hydra:totalItems": 5,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?dummyDate%5Bbefore%5D=2015-04-05",
-      "hydra:lastPage": "/dummies?dummyDate%5Bbefore%5D=2015-04-05&page=2",
-      "hydra:member": [
-          {
-              "@id": "/dummies/1",
-              "@type": "Dummy",
-              "name": "Dummy #1",
-              "alias": "Alias #29",
-              "description": "Smart dummy.",
-              "dummyDate": "2015-04-01T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": null,
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 5},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
           },
-          {
-              "@id": "/dummies/2",
-              "@type": "Dummy",
-              "name": "Dummy #2",
-              "alias": "Alias #28",
-              "description": "Not so smart dummy.",
-              "dummyDate": "2015-04-02T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": null,
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          },
-          {
-              "@id": "/dummies/3",
-              "@type": "Dummy",
-              "name": "Dummy #3",
-              "alias": "Alias #27",
-              "description": "Smart dummy.",
-              "dummyDate": "2015-04-03T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": null,
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          }
-      ]
+          "maxItems": 3
+        }
+      }
     }
     """
 
@@ -120,28 +81,27 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?dummyDate[before]=2015-04-05&dummyDate[after]=2015-04-05",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?dummyDate%5Bbefore%5D=2015-04-05&dummyDate%5Bafter%5D=2015-04-05",
-      "hydra:lastPage": "/dummies?dummyDate%5Bbefore%5D=2015-04-05&dummyDate%5Bafter%5D=2015-04-05",
-      "hydra:member": [
-          {
-              "@id": "/dummies/5",
-              "@type": "Dummy",
-              "name": "Dummy #5",
-              "alias": "Alias #25",
-              "description": "Smart dummy.",
-              "dummyDate": "2015-04-05T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": null,
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          }
-      ]
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05\\&dummyDate\\[after\\]=2015-04-05$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/5$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 1
+        }
+      }
     }
     """
 
@@ -152,28 +112,27 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?dummyDate[after]=2015-04-05&dummyDate[before]=2015-04-05",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?dummyDate%5Bafter%5D=2015-04-05&dummyDate%5Bbefore%5D=2015-04-05",
-      "hydra:lastPage": "/dummies?dummyDate%5Bafter%5D=2015-04-05&dummyDate%5Bbefore%5D=2015-04-05",
-      "hydra:member": [
-          {
-              "@id": "/dummies/5",
-              "@type": "Dummy",
-              "name": "Dummy #5",
-              "alias": "Alias #25",
-              "description": "Smart dummy.",
-              "dummyDate": "2015-04-05T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": null,
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          }
-      ]
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-05\\&dummyDate\\[before\\]=2015-04-05$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/5$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 1
+        }
+      }
     }
     """
 
@@ -185,14 +144,17 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?dummyDate[after]=2015-04-06&dummyDate[before]=2015-04-04",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 0,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?dummyDate%5Bafter%5D=2015-04-06&dummyDate%5Bbefore%5D=2015-04-04",
-      "hydra:lastPage": "/dummies?dummyDate%5Bafter%5D=2015-04-06&dummyDate%5Bbefore%5D=2015-04-04",
-      "hydra:member": []
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-06\\&dummyDate\\[before\\]=2015-04-04$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 0},
+        "hydra:member": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
     }
     """
 
@@ -206,54 +168,29 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?relatedDummy.dummyDate[after]=2015-04-28",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 3,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?relatedDummy_dummyDate%5Bafter%5D=2015-04-28",
-      "hydra:lastPage": "/dummies?relatedDummy_dummyDate%5Bafter%5D=2015-04-28",
-      "hydra:member": [
-          {
-              "@id": "/dummies/58",
-              "@type": "Dummy",
-              "name": "Dummy #28",
-              "alias": "Alias #2",
-              "description": null,
-              "dummyDate": "2015-04-28T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": "/related_dummies/28",
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 3},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/58$"},
+                  {"pattern": "^/dummies/59$"},
+                  {"pattern": "^/dummies/60$"}
+                ]
+              }
+            }
           },
-          {
-              "@id": "/dummies/59",
-              "@type": "Dummy",
-              "name": "Dummy #29",
-              "alias": "Alias #1",
-              "description": null,
-              "dummyDate": "2015-04-29T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": "/related_dummies/29",
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          },
-          {
-              "@id": "/dummies/60",
-              "@type": "Dummy",
-              "name": "Dummy #30",
-              "alias": "Alias #0",
-              "description": null,
-              "dummyDate": null,
-              "jsonData": [],
-              "relatedDummy": "/related_dummies/30",
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          }
-      ]
+          "maxItems": 3
+        }
+      }
     }
     """
 
@@ -264,53 +201,28 @@ Feature: Order filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?relatedDummy.dummyDate[after]=2015-04-28&relatedDummy_dummyDate[after]=2015-04-28",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 3,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?relatedDummy_dummyDate%5Bafter%5D=2015-04-28",
-      "hydra:lastPage": "/dummies?relatedDummy_dummyDate%5Bafter%5D=2015-04-28",
-      "hydra:member": [
-          {
-              "@id": "/dummies/58",
-              "@type": "Dummy",
-              "name": "Dummy #28",
-              "alias": "Alias #2",
-              "description": null,
-              "dummyDate": "2015-04-28T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": "/related_dummies/28",
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28\\&relatedDummy_dummyDate\\[after\\]=2015-04-28$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 3},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/58$"},
+                  {"pattern": "^/dummies/59$"},
+                  {"pattern": "^/dummies/60$"}
+                ]
+              }
+            }
           },
-          {
-              "@id": "/dummies/59",
-              "@type": "Dummy",
-              "name": "Dummy #29",
-              "alias": "Alias #1",
-              "description": null,
-              "dummyDate": "2015-04-29T00:00:00+00:00",
-              "jsonData": [],
-              "relatedDummy": "/related_dummies/29",
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          },
-          {
-              "@id": "/dummies/60",
-              "@type": "Dummy",
-              "name": "Dummy #30",
-              "alias": "Alias #0",
-              "description": null,
-              "dummyDate": null,
-              "jsonData": [],
-              "relatedDummy": "/related_dummies/30",
-              "dummy": null,
-              "relatedDummies": [],
-              "name_converted": null
-          }
-      ]
+          "maxItems": 3
+        }
+      }
     }
     """

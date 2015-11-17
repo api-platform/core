@@ -91,30 +91,24 @@ Feature: Relations support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?relatedDummy=%2Frelated_dummies%2F1",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?relatedDummy=%2Frelated_dummies%2F1",
-      "hydra:lastPage": "/dummies?relatedDummy=%2Frelated_dummies%2F1",
-      "hydra:member": [
-        {
-          "@id": "/dummies/1",
-          "@type": "Dummy",
-          "name": "Dummy with relations",
-          "alias": null,
-          "description": null,
-          "dummyDate": null,
-          "jsonData": [],
-          "dummy": null,
-          "relatedDummy": "/related_dummies/1",
-          "relatedDummies": [
-            "/related_dummies/1"
-          ],
-          "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?relatedDummy=%2Frelated_dummies%2F1$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/1$"}
+            }
+          },
+          "maxItems": 1
         }
-      ]
+      }
     }
     """
 
@@ -126,30 +120,24 @@ Feature: Relations support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?relatedDummies[]=%2Frelated_dummies%2F1",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?relatedDummies%5B%5D=%2Frelated_dummies%2F1",
-      "hydra:lastPage": "/dummies?relatedDummies%5B%5D=%2Frelated_dummies%2F1",
-      "hydra:member": [
-        {
-          "@id": "/dummies/1",
-          "@type": "Dummy",
-          "name": "Dummy with relations",
-          "alias": null,
-          "description": null,
-          "dummyDate": null,
-          "jsonData": [],
-          "dummy": null,
-          "relatedDummy": "/related_dummies/1",
-          "relatedDummies": [
-            "/related_dummies/1"
-          ],
-          "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?relatedDummies\\[\\]=%2Frelated_dummies%2F1$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/1$"}
+            }
+          },
+          "maxItems": 1
         }
-      ]
+      }
     }
     """
 

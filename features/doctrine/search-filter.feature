@@ -14,55 +14,27 @@ Feature: Search filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-        "@context": "/contexts/Dummy",
-        "@id": "/dummies?name=my",
-        "@type": "hydra:PagedCollection",
-        "hydra:nextPage": "/dummies?name=my&page=2",
-        "hydra:totalItems": 30,
-        "hydra:itemsPerPage": 3,
-        "hydra:firstPage": "/dummies?name=my",
-        "hydra:lastPage": "/dummies?name=my&page=10",
-        "hydra:member": [
-            {
-                "@id": "/dummies/1",
-                "@type": "Dummy",
-                "name": "Dummy #1",
-                "alias": "Alias #29",
-                "description": "Smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
-            },
-            {
-                "@id": "/dummies/2",
-                "@type": "Dummy",
-                "name": "Dummy #2",
-                "alias": "Alias #28",
-                "description": "Not so smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
-            },
-            {
-                "@id": "/dummies/3",
-                "@type": "Dummy",
-                "name": "Dummy #3",
-                "alias": "Alias #27",
-                "description": "Smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?name=my$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
             }
-        ]
+          }
+        }
+      }
     }
     """
 
@@ -74,55 +46,27 @@ Feature: Search filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-        "@context": "/contexts/Dummy",
-        "@id": "/dummies?alias=Ali",
-        "@type": "hydra:PagedCollection",
-        "hydra:nextPage": "/dummies?alias=Ali&page=2",
-        "hydra:totalItems": 30,
-        "hydra:itemsPerPage": 3,
-        "hydra:firstPage": "/dummies?alias=Ali",
-        "hydra:lastPage": "/dummies?alias=Ali&page=10",
-        "hydra:member": [
-            {
-                "@id": "/dummies/1",
-                "@type": "Dummy",
-                "name": "Dummy #1",
-                "alias": "Alias #29",
-                "description": "Smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
-            },
-            {
-                "@id": "/dummies/2",
-                "@type": "Dummy",
-                "name": "Dummy #2",
-                "alias": "Alias #28",
-                "description": "Not so smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
-            },
-            {
-                "@id": "/dummies/3",
-                "@type": "Dummy",
-                "name": "Dummy #3",
-                "alias": "Alias #27",
-                "description": "Smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?alias=Ali$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
             }
-        ]
+          }
+        }
+      }
     }
     """
 
@@ -134,55 +78,27 @@ Feature: Search filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-        "@context": "/contexts/Dummy",
-        "@id": "/dummies?description=smart",
-        "@type": "hydra:PagedCollection",
-        "hydra:nextPage": "/dummies?description=smart&page=2",
-        "hydra:totalItems": 30,
-        "hydra:itemsPerPage": 3,
-        "hydra:firstPage": "/dummies?description=smart",
-        "hydra:lastPage": "/dummies?description=smart&page=10",
-        "hydra:member": [
-            {
-                "@id": "/dummies/1",
-                "@type": "Dummy",
-                "name": "Dummy #1",
-                "alias": "Alias #29",
-                "description": "Smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
-            },
-            {
-                "@id": "/dummies/2",
-                "@type": "Dummy",
-                "name": "Dummy #2",
-                "alias": "Alias #28",
-                "description": "Not so smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
-            },
-            {
-                "@id": "/dummies/3",
-                "@type": "Dummy",
-                "name": "Dummy #3",
-                "alias": "Alias #27",
-                "description": "Smart dummy.",
-                "dummyDate": null,
-                "jsonData": [],
-                "relatedDummy": null,
-                "dummy": null,
-                "relatedDummies": [],
-                "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?description=smart$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
             }
-        ]
+          }
+        }
+      }
     }
     """
 
@@ -195,13 +111,15 @@ Feature: Search filter on collections
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?name=MuYm",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 0,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?name=MuYm",
-      "hydra:lastPage": "/dummies?name=MuYm",
-      "hydra:member": []
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?name=MuYm$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:member": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
     }
     """

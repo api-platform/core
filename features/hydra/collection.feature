@@ -12,14 +12,22 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 0,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies",
-      "hydra:member": []
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 0},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:firstPage": {"pattern": "^/dummies$"},
+        "hydra:lastPage": {"pattern": "^/dummies$"},
+        "hydra:member": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
     }
     """
 
@@ -32,55 +40,32 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies",
-      "@type": "hydra:PagedCollection",
-      "hydra:nextPage": "/dummies?page=2",
-      "hydra:totalItems": 30,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies?page=10",
-      "hydra:member": [
-        {
-          "@id": "/dummies/1",
-          "@type": "Dummy",
-          "name": "Dummy #1",
-          "alias": "Alias #29",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/2",
-          "@type": "Dummy",
-          "name": "Dummy #2",
-          "alias": "Alias #28",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/3",
-          "@type": "Dummy",
-          "name": "Dummy #3",
-          "alias": "Alias #27",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:firstPage": {"pattern": "^/dummies$"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?page=10$"},
+        "hydra:nextPage": {"pattern": "^/dummies\\?page=2$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
         }
-      ]
+      }
     }
     """
 
@@ -92,56 +77,33 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?page=7",
-      "@type": "hydra:PagedCollection",
-      "hydra:previousPage": "/dummies?page=6",
-      "hydra:nextPage": "/dummies?page=8",
-      "hydra:totalItems": 30,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies?page=10",
-      "hydra:member": [
-        {
-          "@id": "/dummies/19",
-          "@type": "Dummy",
-          "name": "Dummy #19",
-          "alias": "Alias #11",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/20",
-          "@type": "Dummy",
-          "name": "Dummy #20",
-          "alias": "Alias #10",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/21",
-          "@type": "Dummy",
-          "name": "Dummy #21",
-          "alias": "Alias #9",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [],
-          "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?page=7$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:firstPage": {"pattern": "^/dummies$"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?page=10$"},
+        "hydra:nextPage": {"pattern": "^/dummies\\?page=8$"},
+        "hydra:previousPage": {"pattern": "^/dummies\\?page=6$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/19$"},
+                  {"pattern": "^/dummies/20$"},
+                  {"pattern": "^/dummies/21$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
         }
-      ]
+      }
     }
     """
 
@@ -153,462 +115,36 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?page=10",
-      "@type": "hydra:PagedCollection",
-      "hydra:previousPage": "/dummies?page=9",
-      "hydra:totalItems": 30,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies?page=10",
-      "hydra:member": [
-          {
-            "@id": "/dummies/28",
-            "@type": "Dummy",
-            "name": "Dummy #28",
-            "alias": "Alias #2",
-            "description": "Not so smart dummy.",
-            "dummyDate": null,
-            "jsonData": [],
-            "relatedDummy": null,
-            "dummy": null,
-            "relatedDummies": [],
-            "name_converted": null
-          },
-          {
-            "@id": "/dummies/29",
-            "@type": "Dummy",
-            "name": "Dummy #29",
-            "alias": "Alias #1",
-            "description": "Smart dummy.",
-            "dummyDate": null,
-            "jsonData": [],
-            "relatedDummy": null,
-            "dummy": null,
-            "relatedDummies": [],
-            "name_converted": null
-          },
-          {
-            "@id": "/dummies/30",
-            "@type": "Dummy",
-            "name": "Dummy #30",
-            "alias": "Alias #0",
-            "description": "Not so smart dummy.",
-            "dummyDate": null,
-            "jsonData": [],
-            "relatedDummy": null,
-            "dummy": null,
-            "relatedDummies": [],
-            "name_converted": null
-          }
-      ]
-    }
-    """
-
-  Scenario: Disable the pagination client side
-    When I send a "GET" request to "/dummies?enablePagination=0"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be valid according to this schema:
-    """
-      {
-          "@context": "/contexts/Dummy",
-          "@id": "/dummies?enablePagination=0",
-          "@type": "hydra:Collection",
-          "hydra:member": [
-              {
-                  "@id": "/dummies/1",
-                  "@type": "Dummy",
-                  "name": "Dummy #1",
-                  "alias": "Alias #29",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/2",
-                  "@type": "Dummy",
-                  "name": "Dummy #2",
-                  "alias": "Alias #28",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/3",
-                  "@type": "Dummy",
-                  "name": "Dummy #3",
-                  "alias": "Alias #27",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/4",
-                  "@type": "Dummy",
-                  "name": "Dummy #4",
-                  "alias": "Alias #26",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/5",
-                  "@type": "Dummy",
-                  "name": "Dummy #5",
-                  "alias": "Alias #25",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/6",
-                  "@type": "Dummy",
-                  "name": "Dummy #6",
-                  "alias": "Alias #24",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/7",
-                  "@type": "Dummy",
-                  "name": "Dummy #7",
-                  "alias": "Alias #23",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/8",
-                  "@type": "Dummy",
-                  "name": "Dummy #8",
-                  "alias": "Alias #22",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/9",
-                  "@type": "Dummy",
-                  "name": "Dummy #9",
-                  "alias": "Alias #21",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/10",
-                  "@type": "Dummy",
-                  "name": "Dummy #10",
-                  "alias": "Alias #20",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/11",
-                  "@type": "Dummy",
-                  "name": "Dummy #11",
-                  "alias": "Alias #19",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/12",
-                  "@type": "Dummy",
-                  "name": "Dummy #12",
-                  "alias": "Alias #18",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/13",
-                  "@type": "Dummy",
-                  "name": "Dummy #13",
-                  "alias": "Alias #17",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/14",
-                  "@type": "Dummy",
-                  "name": "Dummy #14",
-                  "alias": "Alias #16",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/15",
-                  "@type": "Dummy",
-                  "name": "Dummy #15",
-                  "alias": "Alias #15",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/16",
-                  "@type": "Dummy",
-                  "name": "Dummy #16",
-                  "alias": "Alias #14",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/17",
-                  "@type": "Dummy",
-                  "name": "Dummy #17",
-                  "alias": "Alias #13",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/18",
-                  "@type": "Dummy",
-                  "name": "Dummy #18",
-                  "alias": "Alias #12",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/19",
-                  "@type": "Dummy",
-                  "name": "Dummy #19",
-                  "alias": "Alias #11",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/20",
-                  "@type": "Dummy",
-                  "name": "Dummy #20",
-                  "alias": "Alias #10",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/21",
-                  "@type": "Dummy",
-                  "name": "Dummy #21",
-                  "alias": "Alias #9",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/22",
-                  "@type": "Dummy",
-                  "name": "Dummy #22",
-                  "alias": "Alias #8",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/23",
-                  "@type": "Dummy",
-                  "name": "Dummy #23",
-                  "alias": "Alias #7",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/24",
-                  "@type": "Dummy",
-                  "name": "Dummy #24",
-                  "alias": "Alias #6",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/25",
-                  "@type": "Dummy",
-                  "name": "Dummy #25",
-                  "alias": "Alias #5",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/26",
-                  "@type": "Dummy",
-                  "name": "Dummy #26",
-                  "alias": "Alias #4",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/27",
-                  "@type": "Dummy",
-                  "name": "Dummy #27",
-                  "alias": "Alias #3",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/28",
-                  "@type": "Dummy",
-                  "name": "Dummy #28",
-                  "alias": "Alias #2",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/29",
-                  "@type": "Dummy",
-                  "name": "Dummy #29",
-                  "alias": "Alias #1",
-                  "description": "Smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
-              },
-              {
-                  "@id": "/dummies/30",
-                  "@type": "Dummy",
-                  "name": "Dummy #30",
-                  "alias": "Alias #0",
-                  "description": "Not so smart dummy.",
-                  "dummyDate": null,
-                  "jsonData": [],
-                  "relatedDummy": null,
-                  "dummy": null,
-                  "relatedDummies": [],
-                  "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?page=10$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:firstPage": {"pattern": "^/dummies$"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?page=10$"},
+        "hydra:previousPage": {"pattern": "^/dummies\\?page=9$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/28$"},
+                  {"pattern": "^/dummies/29$"},
+                  {"pattern": "^/dummies/30$"}
+                ]
               }
-          ]
-      }
+            }
+          },
+          "maxItems": 3
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
+    }
     """
 
   Scenario: Retrieve a non-existing page of the collection
@@ -623,167 +159,25 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?page=2&itemsPerPage=10",
-      "@type": "hydra:PagedCollection",
-      "hydra:previousPage": "/dummies?itemsPerPage=10",
-      "hydra:nextPage": "/dummies?itemsPerPage=10&page=3",
-      "hydra:totalItems": 30,
-      "hydra:itemsPerPage": 10,
-      "hydra:firstPage": "/dummies?itemsPerPage=10",
-      "hydra:lastPage": "/dummies?itemsPerPage=10&page=3",
-      "hydra:member": [
-        {
-          "@id": "/dummies/11",
-          "@type": "Dummy",
-          "name": "Dummy #11",
-          "alias": "Alias #19",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?page=2\\&itemsPerPage=10$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 10},
+        "hydra:firstPage": {"pattern": "^/dummies\\?itemsPerPage=10$"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?itemsPerPage=10\\&page=3$"},
+        "hydra:previousPage": {"pattern": "^/dummies\\?itemsPerPage=10$"},
+        "hydra:nextPage": {"pattern": "^/dummies\\?itemsPerPage=10\\&page=3$"},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10
         },
-        {
-          "@id": "/dummies/12",
-          "@type": "Dummy",
-          "name": "Dummy #12",
-          "alias": "Alias #18",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/13",
-          "@type": "Dummy",
-          "name": "Dummy #13",
-          "alias": "Alias #17",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/14",
-          "@type": "Dummy",
-          "name": "Dummy #14",
-          "alias": "Alias #16",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/15",
-          "@type": "Dummy",
-          "name": "Dummy #15",
-          "alias": "Alias #15",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/16",
-          "@type": "Dummy",
-          "name": "Dummy #16",
-          "alias": "Alias #14",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/17",
-          "@type": "Dummy",
-          "name": "Dummy #17",
-          "alias": "Alias #13",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/18",
-          "@type": "Dummy",
-          "name": "Dummy #18",
-          "alias": "Alias #12",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/19",
-          "@type": "Dummy",
-          "name": "Dummy #19",
-          "alias": "Alias #11",
-          "description": "Smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        },
-        {
-          "@id": "/dummies/20",
-          "@type": "Dummy",
-          "name": "Dummy #20",
-          "alias": "Alias #10",
-          "description": "Not so smart dummy.",
-          "dummyDate": null,
-          "jsonData": [],
-          "relatedDummy": null,
-          "dummy": null,
-          "relatedDummies": [
-
-          ],
-          "name_converted": null
-        }
-      ]
+        "hydra:search": {}
+      },
+      "additionalProperties": false
     }
     """
 
@@ -795,28 +189,28 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?id=8",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?id=8",
-      "hydra:lastPage": "/dummies?id=8",
-      "hydra:member": [
-          {
-            "@id": "/dummies/8",
-            "@type": "Dummy",
-            "name": "Dummy #8",
-            "alias": "Alias #22",
-            "description": "Not so smart dummy.",
-            "dummyDate": null,
-            "jsonData": [],
-            "relatedDummy": null,
-            "dummy": null,
-            "relatedDummies": [],
-            "name_converted": null
-          }
-      ]
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?id=8$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:firstPage": {"pattern": "^/dummies\\?id=8"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?id=8"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/8$"}
+            }
+          },
+          "maxItems": 1
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
     }
     """
 
@@ -828,28 +222,28 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?id=%2fdummies%2f8",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?id=%2Fdummies%2F8",
-      "hydra:lastPage": "/dummies?id=%2Fdummies%2F8",
-      "hydra:member": [
-          {
-            "@id": "/dummies/8",
-            "@type": "Dummy",
-            "name": "Dummy #8",
-            "alias": "Alias #22",
-            "description": "Not so smart dummy.",
-            "dummyDate": null,
-            "jsonData": [],
-            "relatedDummy": null,
-            "dummy": null,
-            "relatedDummies": [],
-            "name_converted": null
-          }
-      ]
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?id=%2fdummies%2f8$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:firstPage": {"pattern": "^/dummies\\?id=%2Fdummies%2F8$"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?id=%2Fdummies%2F8$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/8$"}
+            }
+          },
+          "maxItems": 1
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
     }
     """
 
@@ -862,27 +256,27 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies?name=Dummy%20%238",
-      "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies?name=Dummy+%238",
-      "hydra:lastPage": "/dummies?name=Dummy+%238",
-      "hydra:member": [
-          {
-            "@id": "/dummies/8",
-            "@type": "Dummy",
-            "name": "Dummy #8",
-            "alias": "Alias #22",
-            "description": "Not so smart dummy.",
-            "dummyDate": null,
-            "jsonData": [],
-            "relatedDummy": null,
-            "dummy": null,
-            "relatedDummies": [],
-            "name_converted": null
-          }
-      ]
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?name=Dummy%20%238$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:firstPage": {"pattern": "^/dummies\\?name=Dummy\\+%238$"},
+        "hydra:lastPage": {"pattern": "^/dummies\\?name=Dummy\\+%238$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {"pattern": "^/dummies/8$"}
+            }
+          },
+          "maxItems": 1
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
     }
     """
