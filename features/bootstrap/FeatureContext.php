@@ -16,6 +16,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\DummyWithCollection;
 use Sanpi\Behatch\HttpCall\Request;
 
 /**
@@ -203,6 +204,26 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $relationEmbedder = new RelationEmbedder();
 
         $this->manager->persist($relationEmbedder);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummy with collection objects with Dummy
+     */
+    public function thereIsDummyWithCollectionObjectsWithDummy($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyWithCollection = new DummyWithCollection();
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $this->manager->persist($dummy);
+
+            $dummyWithCollection->addElement($dummy);
+
+            $this->manager->persist($dummyWithCollection);
+        }
+
         $this->manager->flush();
     }
 }
