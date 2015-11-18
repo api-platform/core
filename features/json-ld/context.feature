@@ -18,6 +18,8 @@ Feature: JSON-LD contexts generation
         "dummy": "/dummies",
         "relatedDummy": "/related_dummies",
         "relationEmbedder": "/relation_embedders",
+        "abstractDummy": "/abstract_dummies",
+        "concreteDummy": "/concrete_dummies",
         "custom": "/customs",
         "thirdLevel": "/third_levels",
         "circularReference": "/circular_references",
