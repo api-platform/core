@@ -48,12 +48,12 @@ class DoctrineIdentifierLoader implements LoaderInterface
             return true;
         }
 
-        $doctrineClassMetaData = $manager->getClassMetadata($className);
-        if (!$doctrineClassMetaData) {
+        $doctrineClassMetadata = $manager->getClassMetadata($className);
+        if (!$doctrineClassMetadata) {
             return true;
         }
 
-        $identifiers = $doctrineClassMetaData->getIdentifier();
+        $identifiers = $doctrineClassMetadata->getIdentifier();
         if (1 !== count($identifiers)) {
             return true;
         }
@@ -62,6 +62,10 @@ class DoctrineIdentifierLoader implements LoaderInterface
         foreach ($classMetadata->getAttributes() as $attribute) {
             if ($attribute->getName() === $identifierName) {
                 $attribute->setIdentifier(true);
+
+                if (!$doctrineClassMetadata->isIdentifierNatural()) {
+                    $attribute->setWritable(false);
+                }
 
                 return true;
             }
