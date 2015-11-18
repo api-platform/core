@@ -152,3 +152,8 @@ services:
                                       arguments:
                                           -      { groups: [ "input" ] }
         tags:                       [ { name: "api.resource" } ]
+
+    my_dummy_with_collection_resource:
+        parent:                      "api.resource"
+        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\DummyWithCollection" ]
+        tags:                        [ { name: "api.resource" } ]

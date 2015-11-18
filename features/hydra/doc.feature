@@ -764,6 +764,81 @@ Feature: Documentation support
                   ]
               },
               {
+                  "@id": "#DummyWithCollection",
+                  "@type": "hydra:Class",
+                  "rdfs:label": "DummyWithCollection",
+                  "hydra:title": "DummyWithCollection",
+                  "hydra:description": "DummyWithCollection",
+                  "hydra:supportedProperty": [
+                      {
+                          "@type": "hydra:SupportedProperty",
+                          "hydra:property": {
+                              "@id": "#DummyWithCollection\/element",
+                              "@type": "rdf:Property",
+                              "rdfs:label": "element",
+                              "domain": "#DummyWithCollection"
+                          },
+                          "hydra:title": "element",
+                          "hydra:required": false,
+                          "hydra:readable": false,
+                          "hydra:writable": true
+                      },
+                      {
+                          "@type": "hydra:SupportedProperty",
+                          "hydra:property": {
+                              "@id": "#DummyWithCollection\/elements",
+                              "@type": "Hydra:Link",
+                              "rdfs:label": "elements",
+                              "domain": "#DummyWithCollection",
+                              "range": "#Dummy"
+                          },
+                          "hydra:title": "elements",
+                          "hydra:required": false,
+                          "hydra:readable": true,
+                          "hydra:writable": true
+                      },
+                      {
+                          "@type": "hydra:SupportedProperty",
+                          "hydra:property": {
+                              "@id": "#DummyWithCollection\/id",
+                              "@type": "rdf:Property",
+                              "rdfs:label": "id",
+                              "domain": "#DummyWithCollection",
+                              "range": "xmls:integer"
+                          },
+                          "hydra:title": "id",
+                          "hydra:required": false,
+                          "hydra:readable": false,
+                          "hydra:writable": true,
+                          "hydra:description": "The id."
+                      }
+                  ],
+                  "hydra:supportedOperation": [
+                      {
+                          "@type": "hydra:Operation",
+                          "hydra:method": "GET",
+                          "hydra:title": "Retrieves DummyWithCollection resource.",
+                          "rdfs:label": "Retrieves DummyWithCollection resource.",
+                          "returns": "#DummyWithCollection"
+                      },
+                      {
+                          "@type": "hydra:ReplaceResourceOperation",
+                          "expects": "#DummyWithCollection",
+                          "hydra:method": "PUT",
+                          "hydra:title": "Replaces the DummyWithCollection resource.",
+                          "rdfs:label": "Replaces the DummyWithCollection resource.",
+                          "returns": "#DummyWithCollection"
+                      },
+                      {
+                          "@type": "hydra:Operation",
+                          "hydra:method": "DELETE",
+                          "hydra:title": "Deletes the DummyWithCollection resource.",
+                          "rdfs:label": "Deletes the DummyWithCollection resource.",
+                          "returns": "owl:Nothing"
+                      }
+                  ]
+              },
+              {
                   "@id": "#Entrypoint",
                   "@type": "hydra:Class",
                   "hydra:title": "The API entrypoint",
@@ -1027,6 +1102,36 @@ Feature: Documentation support
                               ]
                           },
                           "hydra:title": "The collection of CustomNormalizedDummy resources",
+                          "hydra:readable": true,
+                          "hydra:writable": false
+                      },
+                      {
+                          "@type": "hydra:SupportedProperty",
+                          "hydra:property": {
+                              "@id": "#Entrypoint\/dummyWithCollection",
+                              "@type": "hydra:Link",
+                              "domain": "#Entrypoint",
+                              "rdfs:label": "The collection of DummyWithCollection resources",
+                              "range": "hydra:PagedCollection",
+                              "hydra:supportedOperation": [
+                                  {
+                                      "@type": "hydra:Operation",
+                                      "hydra:method": "GET",
+                                      "hydra:title": "Retrieves the collection of DummyWithCollection resources.",
+                                      "rdfs:label": "Retrieves the collection of DummyWithCollection resources.",
+                                      "returns": "hydra:PagedCollection"
+                                  },
+                                  {
+                                      "@type": "hydra:CreateResourceOperation",
+                                      "expects": "#DummyWithCollection",
+                                      "hydra:method": "POST",
+                                      "hydra:title": "Creates a DummyWithCollection resource.",
+                                      "rdfs:label": "Creates a DummyWithCollection resource.",
+                                      "returns": "#DummyWithCollection"
+                                  }
+                              ]
+                          },
+                          "hydra:title": "The collection of DummyWithCollection resources",
                           "hydra:readable": true,
                           "hydra:writable": false
                       }
