@@ -112,6 +112,19 @@ services:
                                               -      "@my_relation_embedder_resource.item_operation.custom_get"
         tags:                       [ { name: "api.resource" } ]
 
+    my_abstract_dummy_resource:
+        parent:                      "api.resource"
+        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AbstractDummy" ]
+        calls:
+                                     - method:    "initFilters"
+                                       arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.date_filter" ] ]
+        tags:                        [ { name: "api.resource" } ]
+
+    my_concrete_dummy_resource:
+        parent:                      "api.resource"
+        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ConcreteDummy" ]
+        tags:                        [ { name: "api.resource" } ]
+
     custom_resource:
         parent:                     "api.resource"
         class:                      "Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource"

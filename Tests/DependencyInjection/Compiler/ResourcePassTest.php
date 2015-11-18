@@ -37,6 +37,7 @@ class ResourcePassTest extends \PHPUnit_Framework_TestCase
 
         $builtinResourceDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
         $builtinResourceDefinitionProphecy->getClass()->willReturn('Dunglas\ApiBundle\Api\Resource')->shouldBeCalled();
+        $builtinResourceDefinitionProphecy->getArgument(0)->willReturn('stdClass')->shouldBeCalled();
         $builtinResourceDefinitionProphecy->hasMethodCall('initItemOperations')->willReturn(true)->shouldBeCalled();
         $builtinResourceDefinitionProphecy->addMethodCall('initItemOperations')->shouldNotBeCalled();
         $builtinResourceDefinitionProphecy->hasMethodCall('initCollectionOperations', Argument::any())->willReturn(true)->shouldBeCalled();
@@ -50,6 +51,7 @@ class ResourcePassTest extends \PHPUnit_Framework_TestCase
         $decoratedResourceDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\DefinitionDecorator');
         $decoratedResourceDefinitionProphecy->getClass()->willReturn(false)->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->getParent()->willReturn('inner_resource')->shouldBeCalled();
+        $decoratedResourceDefinitionProphecy->getArgument(0)->willReturn('stdClass')->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->hasMethodCall('initItemOperations')->willReturn(false)->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->addMethodCall('initItemOperations', Argument::type('array'))->shouldBeCalled();
         $decoratedResourceDefinitionProphecy->hasMethodCall('initCollectionOperations')->willReturn(false)->shouldBeCalled();
