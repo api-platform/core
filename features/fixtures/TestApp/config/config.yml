@@ -216,3 +216,8 @@ services:
                                     - method:    "initCollectionOperations"
                                       arguments:
                                             - []
+
+    my_dummy_with_collection_resource:
+        parent:                      "api.resource"
+        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\DummyWithCollection" ]
+        tags:                        [ { name: "api.resource" } ]
