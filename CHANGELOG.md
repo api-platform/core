@@ -2,6 +2,8 @@
 
 ## 2.0.0
 
+* Use the ADR pattern
+* Remove the event system in favor of builtin Symfony Kernel events
 * Use string values for `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter` null-management constants
 
 ## 1.1.0 beta 1
