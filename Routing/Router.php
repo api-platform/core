@@ -45,7 +45,7 @@ class Router implements RouterInterface
      */
     public function getContext()
     {
-        $this->router->getContext();
+        return $this->router->getContext();
     }
 
     /**
@@ -53,7 +53,7 @@ class Router implements RouterInterface
      */
     public function getRouteCollection()
     {
-        $this->router->getRouteCollection();
+        return $this->router->getRouteCollection();
     }
 
     /*
@@ -67,6 +67,7 @@ class Router implements RouterInterface
         $request = Request::create($pathInfo);
         $context = (new RequestContext())->fromRequest($request);
         $context->setPathInfo($pathInfo);
+        $context->setScheme($baseContext->getScheme());
 
         try {
             $this->router->setContext($context);
