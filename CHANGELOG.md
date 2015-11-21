@@ -3,8 +3,35 @@
 ## 2.0.0
 
 * Use string values for `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter` null-management constants
+
+## 1.1.0 beta 1
+
+* Support Symfony 3.0
+>>>>>>> 71f28ff... Update changelog
 * Support nested properties in Doctrine filters
+* Add new `start` and `word_start` strategies to the Doctrine Search filter
+* Add support for abstract resources
+* Add a new option to totally disable Doctrine
+* Remove the ID attribute from the Hydra documentation when it is read only
 * Add method to avoid naming collision of DQL join alias and bound parameter name
+* Make exception available in the Symfony Debug Toolbar
+* Improve the Doctrine Paginator performance in some cases
+* Enhance HTTPS support and fix some bugs in the router
+* Fix some edge cases in the date and time normalizer
+* Propagate denormalization groups through relations
+* Run tests against all supported Symfony versions
+* Add a contribution documentation
+* Refactor tests
+* Check CS with StyleCI
+
+## 1.0.1
+
+* Avoid an error if the attribute isn't an array
+
+## 1.0.0
+
+* Extract the documentation in a separate repository
+* Add support for eager loading in collections
 
 ## 1.0.0 beta 3
 
