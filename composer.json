@@ -34,7 +34,8 @@
     "symfony/finder": "~2.3",
     "phpunit/phpunit": "~4.6",
     "doctrine/orm": "~2.2,>=2.2.3",
-    "doctrine/doctrine-bundle": "~1.2"
+    "doctrine/doctrine-bundle": "~1.2",
+    "php-mock/php-mock-phpunit": "^0.3"
   },
   "suggest": {
     "doctrine/doctrine-bundle": "To use the Doctrine ORM bridge.",

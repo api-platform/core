@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -23,6 +24,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Théo FIDRY <theo.fidry@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class SearchFilter extends AbstractFilter
 {
@@ -30,18 +33,22 @@ class SearchFilter extends AbstractFilter
      * @var string Exact matching.
      */
     const STRATEGY_EXACT = 'exact';
+
     /**
      * @var string The value must be contained in the field.
      */
     const STRATEGY_PARTIAL = 'partial';
+
     /**
      * @var string Finds fields that are starting with the value.
      */
     const STRATEGY_START = 'start';
+
     /**
      * @var string Finds fields that are ending with the value.
      */
     const STRATEGY_END = 'end';
+
     /**
      * @var string Finds fields that are starting with the word.
      */
@@ -51,6 +58,7 @@ class SearchFilter extends AbstractFilter
      * @var IriConverterInterface
      */
     private $iriConverter;
+
     /**
      * @var PropertyAccessorInterface
      */
@@ -79,32 +87,88 @@ class SearchFilter extends AbstractFilter
      */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
-        $metadata = $this->getClassMetadata($resource);
-        $fieldNames = array_flip($metadata->getFieldNames());
-
         foreach ($this->extractProperties($request) as $property => $value) {
-            if (!is_string($value) || !$this->isPropertyEnabled($property)) {
+            if (
+                empty($value) ||
+                !$this->isPropertyEnabled($property) ||
+                !$this->isPropertyMapped($property, $resource, true)
+            ) {
                 continue;
             }
 
-            if (isset($fieldNames[$property])) {
-                if ('id' === $property) {
+            $alias = 'o';
+            $field = $property;
+
+            if ($this->isPropertyNested($property)) {
+                $propertyParts = $this->splitPropertyParts($property);
+
+                $parentAlias = $alias;
+
+                foreach ($propertyParts['associations'] as $association) {
+                    $alias = QueryNameGenerator::generateJoinAlias($association);
+                    $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
+                    $parentAlias = $alias;
+                }
+
+                $field = $propertyParts['field'];
+
+                $metadata = $this->getNestedMetadata($resource, $propertyParts['associations']);
+            } else {
+                $metadata = $this->getClassMetadata($resource);
+            }
+
+            if ($metadata->hasField($field)) {
+                if (!is_string($value)) {
+                    continue;
+                }
+
+                if ('id' === $field) {
                     $value = $this->getFilterValueFromUrl($value);
                 }
 
                 $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
 
-                $this->addWhereByStrategy($strategy, $queryBuilder, $property, $value);
-            } elseif ($metadata->isSingleValuedAssociation($property)
-                || $metadata->isCollectionValuedAssociation($property)
-            ) {
+                $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $value);
+            } elseif ($metadata->isSingleValuedAssociation($field)) {
+                if (!is_string($value)) {
+                    continue;
+                }
+
                 $value = $this->getFilterValueFromUrl($value);
 
+                $association = $field;
+                $associationAlias = QueryNameGenerator::generateJoinAlias($association);
+                $valueParameter = QueryNameGenerator::generateParameterName($association);
+
                 $queryBuilder
-                    ->join(sprintf('o.%s', $property), $property)
-                    ->andWhere(sprintf('%1$s.id = :%1$s', $property))
-                    ->setParameter($property, $value)
-                ;
+                    ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
+                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+            } elseif ($metadata->isCollectionValuedAssociation($field)) {
+                $values = $value;
+                if (!is_array($values)) {
+                    $values = [$value];
+                }
+                foreach ($values as $k => $v) {
+                    if (!is_int($k) || !is_string($v)) {
+                        unset($values[$k]);
+                    }
+                }
+
+                if (empty($values)) {
+                    continue;
+                }
+
+                $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+
+                $association = $field;
+                $associationAlias = QueryNameGenerator::generateJoinAlias($association);
+                $valuesParameter = QueryNameGenerator::generateParameterName($association);
+
+                $queryBuilder
+                    ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
+                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valuesParameter))
+                    ->setParameter($valuesParameter, $values);
             }
         }
     }
@@ -114,46 +178,45 @@ class SearchFilter extends AbstractFilter
      *
      * @param string       $strategy
      * @param QueryBuilder $queryBuilder
-     * @param string       $property
+     * @param string       $alias
+     * @param string       $field
      * @param string       $value
      *
      * @return string
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    private function addWhereByStrategy($strategy, QueryBuilder $queryBuilder, $property, $value)
+    private function addWhereByStrategy($strategy, QueryBuilder $queryBuilder, $alias, $field, $value)
     {
+        $valueParameter = QueryNameGenerator::generateParameterName($field);
+
         switch ($strategy) {
+            case null:
             case self::STRATEGY_EXACT:
                 return $queryBuilder
-                    ->andWhere(sprintf('o.%1$s = :%1$s', $property))
-                    ->setParameter($property, $value)
-                ;
+                    ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
 
             case self::STRATEGY_PARTIAL:
                 return $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
-                    ->setParameter($property, sprintf('%%%s%%', $value))
-                ;
+                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, sprintf('%%%s%%', $value));
 
             case self::STRATEGY_START:
                 return $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
-                    ->setParameter($property, sprintf('%s%%', $value))
-                ;
+                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, sprintf('%s%%', $value));
 
             case self::STRATEGY_END:
                 return $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s', $property))
-                    ->setParameter($property, sprintf('%%%s', $value))
-                ;
+                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, sprintf('%%%s', $value));
 
             case self::STRATEGY_WORD_START:
                 return $queryBuilder
-                    ->andWhere(sprintf('o.%1$s LIKE :%1$s_1 OR o.%1$s LIKE :%1$s_2', $property))
-                    ->setParameter(sprintf('%s_1', $property), sprintf('%s%%', $value))
-                    ->setParameter(sprintf('%s_2', $property), sprintf('%% %s%%', $value))
-                ;
+                    ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_1 OR %1$s.%2$s LIKE :%3$s_2', $alias, $field, $valueParameter))
+                    ->setParameter(sprintf('%s_1', $valueParameter), sprintf('%s%%', $value))
+                    ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value));
         }
 
         throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
@@ -165,24 +228,44 @@ class SearchFilter extends AbstractFilter
     public function getDescription(ResourceInterface $resource)
     {
         $description = [];
-        $metadata = $this->getClassMetadata($resource);
 
-        foreach ($metadata->getFieldNames() as $fieldName) {
-            $found = isset($this->properties[$fieldName]);
-            if ($found || null === $this->properties) {
-                $description[$fieldName] = [
-                    'property' => $fieldName,
-                    'type' => $metadata->getTypeOfField($fieldName),
-                    'required' => false,
-                    'strategy' => $found ? $this->properties[$fieldName] : self::STRATEGY_EXACT,
-                ];
-            }
+        $properties = $this->properties;
+        if (null === $properties) {
+            $properties = array_fill_keys($this->getClassMetadata($resource)->getFieldNames(), null);
         }
 
-        foreach ($metadata->getAssociationNames() as $associationName) {
-            if ($this->isPropertyEnabled($associationName)) {
-                $description[$associationName] = [
-                    'property' => $associationName,
+        foreach ($properties as $property => $strategy) {
+            if (!$this->isPropertyMapped($property, $resource, true)) {
+                continue;
+            }
+
+            if ($this->isPropertyNested($property)) {
+                $propertyParts = $this->splitPropertyParts($property);
+
+                $field = $propertyParts['field'];
+
+                $metadata = $this->getNestedMetadata($resource, $propertyParts['associations']);
+            } else {
+                $field = $property;
+
+                $metadata = $this->getClassMetadata($resource);
+            }
+
+            if ($metadata->hasField($field)) {
+                $description[$property] = [
+                    'property' => $property,
+                    'type' => $metadata->getTypeOfField($field),
+                    'required' => false,
+                    'strategy' => isset($this->properties[$property]) ? $this->properties[$property] : self::STRATEGY_EXACT,
+                ];
+            } elseif ($metadata->hasAssociation($field)) {
+                $association = $field;
+                $paramName = $property;
+                if ($metadata->isCollectionValuedAssociation($association)) {
+                    $paramName .= '[]';
+                }
+                $description[$paramName] = [
+                    'property' => $property,
                     'type' => 'iri',
                     'required' => false,
                     'strategy' => self::STRATEGY_EXACT,

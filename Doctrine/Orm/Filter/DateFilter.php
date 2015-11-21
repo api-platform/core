@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class DateFilter extends AbstractFilter
 {
@@ -44,24 +46,41 @@ class DateFilter extends AbstractFilter
      */
     public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
     {
-        $fieldNames = $this->getDateFieldNames($resource);
-
         foreach ($this->extractProperties($request) as $property => $values) {
             // Expect $values to be an array having the period as keys and the date value as values
-            if (!isset($fieldNames[$property]) || !is_array($values) || !$this->isPropertyEnabled($property)) {
+            if (
+                !$this->isDateField($property, $resource) ||
+                !is_array($values) ||
+                !$this->isPropertyEnabled($property) ||
+                !$this->isPropertyMapped($property, $resource)
+            ) {
                 continue;
+            }
+
+            $alias = 'o';
+            $field = $property;
+
+            if ($this->isPropertyNested($property)) {
+                $propertyParts = $this->splitPropertyParts($property);
+
+                $parentAlias = $alias;
+
+                foreach ($propertyParts['associations'] as $association) {
+                    $alias = QueryNameGenerator::generateJoinAlias($association);
+                    $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
+                    $parentAlias = $alias;
+                }
+
+                $field = $propertyParts['field'];
             }
 
             $nullManagement = isset($this->properties[$property]) ? $this->properties[$property] : null;
 
-            if (self::EXCLUDE_NULL === $nullManagement) {
-                $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('o.%s', $property)));
-            }
-
             if (isset($values[self::PARAMETER_BEFORE])) {
                 $this->addWhere(
                     $queryBuilder,
-                    $property,
+                    $alias,
+                    $field,
                     self::PARAMETER_BEFORE,
                     $values[self::PARAMETER_BEFORE],
                     $nullManagement
@@ -71,7 +90,8 @@ class DateFilter extends AbstractFilter
             if (isset($values[self::PARAMETER_AFTER])) {
                 $this->addWhere(
                     $queryBuilder,
-                    $property,
+                    $alias,
+                    $field,
                     self::PARAMETER_AFTER,
                     $values[self::PARAMETER_AFTER],
                     $nullManagement
@@ -81,44 +101,42 @@ class DateFilter extends AbstractFilter
     }
 
     /**
-     * Adds the where clause accordingly to the choosed null management.
+     * Adds the where clause according to the chosen null management.
      *
      * @param QueryBuilder $queryBuilder
-     * @param string       $property
-     * @param string       $parameter
-     * @param string       $value
-     * @param int|null     $nullManagement
+     * @param string $alias
+     * @param string $field
+     * @param string $operator
+     * @param string $value
+     * @param int|null $nullManagement
      */
-    private function addWhere(QueryBuilder $queryBuilder, $property, $parameter, $value, $nullManagement)
+    private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value, $nullManagement)
     {
-        $queryParameter = sprintf('date_%s_%s', $parameter, $property);
-        $where = sprintf('o.%s %s= :%s', $property, self::PARAMETER_BEFORE === $parameter ? '<' : '>', $queryParameter);
-
-        $queryBuilder->setParameter($queryParameter, new \DateTime($value));
+        $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
+        $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
-            $queryBuilder->andWhere($where);
-
-            return;
-        }
-
-        if (
-            (self::PARAMETER_BEFORE === $parameter && self::INCLUDE_NULL_BEFORE === $nullManagement)
-            ||
-            (self::PARAMETER_AFTER === $parameter && self::INCLUDE_NULL_AFTER === $nullManagement)
+            $queryBuilder->andWhere($baseWhere);
+        } elseif (
+            (self::PARAMETER_BEFORE === $operator && self::INCLUDE_NULL_BEFORE === $nullManagement) ||
+            (self::PARAMETER_AFTER === $operator && self::INCLUDE_NULL_AFTER === $nullManagement)
         ) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $where,
-                $queryBuilder->expr()->isNull(sprintf('o.%s', $property))
+                $baseWhere,
+                $queryBuilder->expr()->isNull(sprintf('%s.%s', $alias, $field))
             ));
-
-            return;
+        } else {
+            $queryBuilder->andWhere($queryBuilder->expr()->andX(
+                $baseWhere,
+                $queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field))
+            ));
         }
 
-        $queryBuilder->andWhere($queryBuilder->expr()->andX(
-            $where,
-            $queryBuilder->expr()->isNotNull(sprintf('o.%s', $property))
-        ));
+        $queryBuilder->setParameter($valueParameter, new \DateTime($value));
+
+        if (self::EXCLUDE_NULL === $nullManagement) {
+            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
+        }
     }
 
     /**
@@ -127,11 +145,19 @@ class DateFilter extends AbstractFilter
     public function getDescription(ResourceInterface $resource)
     {
         $description = [];
-        foreach ($this->getClassMetadata($resource)->getFieldNames() as $fieldName) {
-            if ($this->isPropertyEnabled($fieldName)) {
-                $description += $this->getFilterDescription($fieldName, self::PARAMETER_BEFORE);
-                $description += $this->getFilterDescription($fieldName, self::PARAMETER_AFTER);
+
+        $properties = $this->properties;
+        if (null === $properties) {
+            $properties = array_fill_keys($this->getClassMetadata($resource)->getFieldNames(), null);
+        }
+
+        foreach ($properties as $property => $nullManagement) {
+            if (!$this->isPropertyMapped($property, $resource) || !$this->isDateField($property, $resource)) {
+                continue;
             }
+            
+            $description += $this->getFilterDescription($property, self::PARAMETER_BEFORE);
+            $description += $this->getFilterDescription($property, self::PARAMETER_AFTER);
         }
 
         return $description;
@@ -157,23 +183,18 @@ class DateFilter extends AbstractFilter
     }
 
     /**
-     * Gets names of fields with a date type.
+     * Determines whether the given property refers to a date field.
      *
+     * @param string $property
      * @param ResourceInterface $resource
      *
      * @return array
      */
-    private function getDateFieldNames(ResourceInterface $resource)
+    private function isDateField($property, ResourceInterface $resource)
     {
-        $classMetadata = $this->getClassMetadata($resource);
-        $dateFieldNames = [];
+        $propertyParts = $this->splitPropertyParts($property);
+        $metadata = $this->getNestedMetadata($resource, $propertyParts['associations']);
 
-        foreach ($classMetadata->getFieldNames() as $fieldName) {
-            if (isset(self::$doctrineDateTypes[$classMetadata->getTypeOfField($fieldName)])) {
-                $dateFieldNames[$fieldName] = true;
-            }
-        }
-
-        return $dateFieldNames;
+        return isset(self::$doctrineDateTypes[$metadata->getTypeOfField($propertyParts['field'])]);
     }
 }
