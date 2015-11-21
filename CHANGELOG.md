@@ -7,7 +7,6 @@
 ## 1.1.0 beta 1
 
 * Support Symfony 3.0
->>>>>>> 71f28ff... Update changelog
 * Support nested properties in Doctrine filters
 * Add new `start` and `word_start` strategies to the Doctrine Search filter
 * Add support for abstract resources
