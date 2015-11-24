@@ -89,9 +89,9 @@ class SearchFilter extends AbstractFilter
     {
         foreach ($this->extractProperties($request) as $property => $value) {
             if (
-                empty($value) ||
                 !$this->isPropertyEnabled($property) ||
-                !$this->isPropertyMapped($property, $resource, true)
+                !$this->isPropertyMapped($property, $resource, true) ||
+                null === $value
             ) {
                 continue;
             }
