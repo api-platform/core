@@ -97,6 +97,31 @@ class EventSubscriberTest extends \PHPUnit_Framework_TestCase
         $eventSubscriber->deleteObject($event);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Foo
+     */
+    public function testFlushError()
+    {
+        $data = new \stdClass();
+        $eventProphecy = $this->getEventProphecy($data, false);
+        $eventProphecy->stopPropagation()->shouldNotBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $objectManagerProphecy = $this->prophesize('Doctrine\Common\Persistence\ObjectManager');
+        $objectManagerProphecy->persist($data)->shouldBeCalled();
+        $objectManagerProphecy->flush()->willThrow(new \RuntimeException('Foo'))->shouldBeCalled();
+        $objectManager = $objectManagerProphecy->reveal();
+
+        $eventDispatcherProphecy = $this->prophesize('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $eventDispatcherProphecy->dispatch(Events::POST_CREATE, $event)->shouldNotBeCalled();
+        $eventDispatcherProphecy->dispatch(Events::SAVE_ERROR, $event)->shouldBeCalled();
+        $eventDispatcher = $eventDispatcherProphecy->reveal();
+
+        $eventSubscriber = new EventSubscriber($eventDispatcher, $this->getManagerRegistryProphecy($objectManager)->reveal());
+        $eventSubscriber->persistObject($event);
+    }
+
     private function getEventProphecy($data)
     {
         $resourceProphecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
