@@ -11,19 +11,19 @@
 
 namespace Dunglas\ApiBundle\Controller;
 
-use Dunglas\ApiBundle\Event\Events;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Event\DataEvent;
+use Dunglas\ApiBundle\Event\Events;
 use Dunglas\ApiBundle\Exception\DeserializationException;
 use Dunglas\ApiBundle\Exception\ExceptionInterface;
-use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
-use Dunglas\ApiBundle\Model\PaginatorInterface;
 use Dunglas\ApiBundle\JsonLd\Response;
+use Dunglas\ApiBundle\Model\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * CRUD operations for the API.

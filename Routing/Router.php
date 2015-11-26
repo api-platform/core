@@ -59,6 +59,7 @@ class Router implements RouterInterface
     /*
      * {@inheritdoc}
      */
+
     public function match($pathInfo)
     {
         $baseContext = $this->router->getContext();
@@ -81,6 +82,7 @@ class Router implements RouterInterface
     /*
      * {@inheritdoc}
      */
+
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
     {
         return $this->router->generate($name, $parameters, $referenceType);

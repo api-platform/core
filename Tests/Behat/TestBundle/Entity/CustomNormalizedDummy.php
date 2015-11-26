@@ -86,6 +86,7 @@ class CustomNormalizedDummy
     /**n
      * @param string $alias
      */
+
     public function setAlias($alias)
     {
         $this->alias = $alias;

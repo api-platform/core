@@ -85,7 +85,7 @@ class Dummy
      */
     public $relatedDummies;
     /**
-     * @var Array serialize data.
+     * @var array serialize data.
      *
      * @ORM\Column(type="json_array", nullable=true)
      */
@@ -100,7 +100,7 @@ class Dummy
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
-        $this->jsonData = array();
+        $this->jsonData = [];
     }
 
     public function getId()
