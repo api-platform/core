@@ -14,6 +14,9 @@ namespace Dunglas\ApiBundle\Doctrine\EventListener;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Event\Events;
+use Dunglas\ApiBundle\Event\SaveErrorEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -29,9 +32,19 @@ class ManagerViewListener
      */
     private $managerRegistry;
 
-    public function __construct(ManagerRegistry $managerRegistry)
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function __construct(ManagerRegistry $managerRegistry, EventDispatcher $eventDispatcher)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -40,6 +53,8 @@ class ManagerViewListener
      * @param GetResponseForControllerResultEvent $event
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -69,7 +84,12 @@ class ManagerViewListener
             break;
         }
 
-        $objectManager->flush();
+        try {
+            $objectManager->flush();
+        } catch (\Exception $e) {
+            $this->eventDispatcher->dispatch(Events::SAVE_ERROR, new SaveErrorEvent($controllerResult));
+            throw $e;
+        }
     }
 
     /**
