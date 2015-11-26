@@ -48,6 +48,7 @@
 
         <service id="api.doctrine.listener.view.manager" class="Dunglas\ApiBundle\Doctrine\EventListener\ManagerViewListener">
             <argument type="service" id="doctrine" />
+            <argument type="service" id="event_dispatcher" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
         </service>
