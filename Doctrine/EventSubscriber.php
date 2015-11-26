@@ -11,10 +11,10 @@
 
 namespace Dunglas\ApiBundle\Doctrine;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\ApiBundle\Event\Events;
+use Doctrine\Common\Persistence\ObjectManager;
 use Dunglas\ApiBundle\Event\DataEvent;
+use Dunglas\ApiBundle\Event\Events;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -56,6 +56,8 @@ class EventSubscriber implements EventSubscriberInterface
      * Persists the given object and flushes.
      *
      * @param DataEvent $event
+     *
+     * @throws \Exception
      */
     public function persistObject(DataEvent $event)
     {
@@ -64,9 +66,15 @@ class EventSubscriber implements EventSubscriberInterface
         }
 
         $objectManager->persist($event->getData());
-        $objectManager->flush();
+        $eventName = Events::SAVE_ERROR;
 
-        $this->eventDispatcher->dispatch(Events::POST_CREATE, $event);
+        try {
+            $objectManager->flush();
+            $eventName = Events::POST_CREATE;
+        } finally {
+            $this->eventDispatcher->dispatch($eventName, $event);
+        }
+
         $event->stopPropagation();
     }
 
@@ -74,6 +82,8 @@ class EventSubscriber implements EventSubscriberInterface
      * Updates the given object and flushes.
      *
      * @param DataEvent $event
+     *
+     * @throws \Exception
      */
     public function updateObject(DataEvent $event)
     {
@@ -81,9 +91,15 @@ class EventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $objectManager->flush();
+        $eventName = Events::SAVE_ERROR;
 
-        $this->eventDispatcher->dispatch(Events::POST_UPDATE, $event);
+        try {
+            $objectManager->flush();
+            $eventName = Events::POST_UPDATE;
+        } finally {
+            $this->eventDispatcher->dispatch($eventName, $event);
+        }
+
         $event->stopPropagation();
     }
 
@@ -91,6 +107,8 @@ class EventSubscriber implements EventSubscriberInterface
      * Removes the given object and flushes.
      *
      * @param DataEvent $event
+     *
+     * @throws \Exception
      */
     public function deleteObject(DataEvent $event)
     {
@@ -99,9 +117,15 @@ class EventSubscriber implements EventSubscriberInterface
         }
 
         $objectManager->remove($event->getData());
-        $objectManager->flush();
+        $eventName = Events::SAVE_ERROR;
 
-        $this->eventDispatcher->dispatch(Events::POST_DELETE, $event);
+        try {
+            $objectManager->flush();
+            $eventName = Events::POST_DELETE;
+        } finally {
+            $this->eventDispatcher->dispatch($eventName, $event);
+        }
+
         $event->stopPropagation();
     }
 

@@ -74,4 +74,10 @@ final class Events
      * @var string
      */
     const POST_DELETE = 'api.post_delete';
+    /**
+     * The SAVE_ERROR event occurs when an error occurred on save.
+     *
+     * @var string
+     */
+    const SAVE_ERROR = 'api.save_error';
 }
