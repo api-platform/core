@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Doctrine\Orm;
+namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
 
 use Dunglas\ApiBundle\Doctrine\Orm\Paginator;
 
