@@ -33,6 +33,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('title')->cannotBeEmpty()->isRequired()->info('The title of the API.')->end()
                 ->scalarNode('description')->cannotBeEmpty()->isRequired()->info('The description of the API.')->end()
+                ->scalarNode('reference_type')->cannotBeEmpty()->defaultValue(false)->info('The type how references are generated')->end()
                 ->arrayNode('supported_formats')
                     ->defaultValue(['jsonld'])
                     ->cannotBeEmpty()
