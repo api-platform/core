@@ -95,9 +95,10 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
     /**
      * Translates the string reference types to the constant values of the UrlGeneratorInterface.
      *
+     * @param $contextReferenceType string One of absolute_url, absolute_path, relative_path or network_path
      * @return bool|string
      */
-    private function getContextReferenceType ($contextReferenceType) {
+    private function getContextReferenceType($contextReferenceType) {
         switch ($contextReferenceType) {
             case 'absolute_url':
                 return UrlGeneratorInterface::ABSOLUTE_URL;
