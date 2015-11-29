@@ -16,6 +16,7 @@ use Dunglas\ApiBundle\Mapping\Factory\ClassMetadataFactoryInterface;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -50,12 +51,18 @@ class IriConverter implements IriConverterInterface
      */
     private $classMetadataFactory;
 
+    /**
+     * @var bool|string The type of reference to be generated (one of the {@see UrlGeneratorInterface} constants)
+     */
+    private $referenceType;
+
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         DataProviderInterface $dataProvider,
         ClassMetadataFactoryInterface $classMetadataFactory,
         RouterInterface $router,
-        PropertyAccessorInterface $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor,
+        $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ) {
         $this->resourceCollection = $resourceCollection;
         $this->dataProvider = $dataProvider;
@@ -63,6 +70,7 @@ class IriConverter implements IriConverterInterface
         $this->router = $router;
         $this->propertyAccessor = $propertyAccessor;
         $this->routeCache = new \SplObjectStorage();
+        $this->referenceType = $referenceType;
     }
 
     /**
@@ -94,8 +102,12 @@ class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH)
+    public function getIriFromItem($item, $referenceType = null)
     {
+        if ($referenceType === null) {
+            $referenceType = $this->referenceType;
+        }
+
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
             $identifierName = $this->getIdentifierNameFromResource($resource);
 
@@ -112,8 +124,12 @@ class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH)
+    public function getIriFromResource(ResourceInterface $resource, $referenceType = null)
     {
+        if ($referenceType === null) {
+            $referenceType = $this->referenceType;
+        }
+
         try {
             return $this->router->generate($this->getRouteName($resource, 'collection'), [], $referenceType);
         } catch (ExceptionInterface $e) {

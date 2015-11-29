@@ -43,14 +43,21 @@ class ContextBuilder
      */
     private $resourceCollection;
 
+    /**
+     * @var bool|string The type of reference to be generated (one of the {@see UrlGeneratorInterface} constants)
+     */
+    private $referenceType;
+
     public function __construct(
         RouterInterface $router,
         EventDispatcherInterface $eventDispatcher,
-        ResourceCollectionInterface $resourceCollection
+        ResourceCollectionInterface $resourceCollection,
+        $referenceType
     ) {
         $this->router = $router;
         $this->eventDispatcher = $eventDispatcher;
         $this->resourceCollection = $resourceCollection;
+        $this->referenceType = $referenceType;
     }
 
     /**
@@ -114,7 +121,7 @@ class ContextBuilder
      */
     public function getContextUri(ResourceInterface $resource)
     {
-        return $this->router->generate('api_jsonld_context', ['shortName' => $resource->getShortName()]);
+        return $this->router->generate('api_jsonld_context', ['shortName' => $resource->getShortName()], $this->referenceType);
     }
 
     /**

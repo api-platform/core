@@ -63,7 +63,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         $resource = $this->resourceResolver->guessResource($object, $context);
 

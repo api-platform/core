@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
-use Dunglas\ApiBundle\Annotation\Iri;
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Iri;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 

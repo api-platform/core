@@ -15,6 +15,7 @@
             <argument type="service" id="router" />
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="api.resource_collection" />
+            <argument key="referenceType">%api.reference_type%</argument>
         </service>
 
         <!-- Serializer -->

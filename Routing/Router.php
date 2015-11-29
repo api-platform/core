@@ -56,7 +56,7 @@ class Router implements RouterInterface
         return $this->router->getRouteCollection();
     }
 
-    /*
+    /**
      * {@inheritdoc}
      */
     public function match($pathInfo)
@@ -78,7 +78,7 @@ class Router implements RouterInterface
         }
     }
 
-    /*
+    /**
      * {@inheritdoc}
      */
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)

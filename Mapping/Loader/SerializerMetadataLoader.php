@@ -11,9 +11,9 @@
 
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactoryInterface;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
+use Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface as SerializerAttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
