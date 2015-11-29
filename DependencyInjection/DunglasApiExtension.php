@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * The extension of this bundle.
@@ -52,7 +53,7 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('api.title', $config['title']);
         $container->setParameter('api.description', $config['description']);
         $container->setParameter('api.supported_formats', $config['supported_formats']);
-        $container->setParameter('api.reference_type', $config['reference_type']);
+        $container->setParameter('api.reference_type', $this->getContextReferenceType($config['reference_type']));
         $container->setParameter('api.collection.filter_name.order', $config['collection']['filter_name']['order']);
         $container->setParameter('api.collection.order', $config['collection']['order']);
         $container->setParameter('api.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
@@ -88,6 +89,26 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
             );
         } else {
             $container->removeDefinition('api.cache_warmer.metadata');
+        }
+    }
+
+    /**
+     * Translates the string reference types to the constant values of the UrlGeneratorInterface.
+     *
+     * @return bool|string
+     */
+    private function getContextReferenceType ($contextReferenceType) {
+        switch ($contextReferenceType) {
+            case "absolute_url":
+                return UrlGeneratorInterface::ABSOLUTE_URL;
+            case "absolute_path":
+                return UrlGeneratorInterface::ABSOLUTE_PATH;
+            case "relative_path":
+                return UrlGeneratorInterface::RELATIVE_PATH;
+            case "network_path":
+                return UrlGeneratorInterface::NETWORK_PATH;
+            default:
+                break;
         }
     }
 

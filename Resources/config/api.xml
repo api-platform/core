@@ -34,6 +34,7 @@
             <argument type="service" id="api.mapping.class_metadata_factory" />
             <argument type="service" id="api.router" />
             <argument type="service" id="api.property_accessor" />
+            <argument key="referenceType">%api.reference_type%</argument>
         </service>
 
         <service id="api.format_negotiator" class="Negotiation\FormatNegotiator" public="false" />
