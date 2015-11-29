@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
                 ->enumNode('reference_type')
                     ->values(['absolute_url', 'absolute_path', 'relative_path', 'network_path'])
                     ->cannotBeEmpty()
-                    ->defaultValue("absolute_path")
+                    ->defaultValue('absolute_path')
                     ->info('The type how context URIs are generated')
                 ->end()
                 ->arrayNode('supported_formats')

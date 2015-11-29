@@ -15,7 +15,6 @@ use Dunglas\ApiBundle\Routing\Router;
 use Prophecy\Argument;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Router as SymfonyRouter;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

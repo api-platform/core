@@ -12,8 +12,8 @@
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactoryInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
+use Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactoryInterface;
 
 /**
  * Doctrine identifier loader.

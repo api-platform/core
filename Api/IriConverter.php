@@ -56,7 +56,6 @@ class IriConverter implements IriConverterInterface
      */
     private $referenceType;
 
-
     public function __construct(
         ResourceCollectionInterface $resourceCollection,
         DataProviderInterface $dataProvider,

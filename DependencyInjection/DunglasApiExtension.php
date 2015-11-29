@@ -99,13 +99,13 @@ class DunglasApiExtension extends Extension implements PrependExtensionInterface
      */
     private function getContextReferenceType ($contextReferenceType) {
         switch ($contextReferenceType) {
-            case "absolute_url":
+            case 'absolute_url':
                 return UrlGeneratorInterface::ABSOLUTE_URL;
-            case "absolute_path":
+            case 'absolute_path':
                 return UrlGeneratorInterface::ABSOLUTE_PATH;
-            case "relative_path":
+            case 'relative_path':
                 return UrlGeneratorInterface::RELATIVE_PATH;
-            case "network_path":
+            case 'network_path':
                 return UrlGeneratorInterface::NETWORK_PATH;
             default:
                 break;

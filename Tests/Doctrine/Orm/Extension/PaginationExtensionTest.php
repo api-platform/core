@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Extension;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Extension\PaginationExtension;
 use Prophecy\Argument;

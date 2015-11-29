@@ -19,6 +19,7 @@ class Query
     public function getFirstResult()
     {
     }
+
     public function getMaxResults()
     {
     }
