@@ -15,6 +15,7 @@ use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\JsonLd\Event\ContextBuilderEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -121,7 +122,27 @@ class ContextBuilder
      */
     public function getContextUri(ResourceInterface $resource)
     {
-        return $this->router->generate('api_jsonld_context', ['shortName' => $resource->getShortName()], $this->contextReferenceType);
+        return $this->router->generate('api_jsonld_context', ['shortName' => $resource->getShortName()], $this->getContextReferenceType());
+    }
+
+    /**
+     * Translates the string reference types to the constant values of the UrlGeneratorInterface.
+     *
+     * @return bool|string
+     */
+    private function getContextReferenceType () {
+        switch ($this->contextReferenceType) {
+            case "absolute_url":
+                return UrlGeneratorInterface::ABSOLUTE_URL;
+            case "absolute_path":
+                return UrlGeneratorInterface::ABSOLUTE_PATH;
+            case "relative_path":
+                return UrlGeneratorInterface::RELATIVE_PATH;
+            case "network_path":
+                return UrlGeneratorInterface::NETWORK_PATH;
+            default:
+                break;
+        }
     }
 
     /**
