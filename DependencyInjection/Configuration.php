@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('items_per_page')
                                     ->addDefaultsIfNotSet()
                                     ->children()
-                                        ->integerNode('number')->min(1)->defaultValue(30)->cannotBeEmpty()->info('The default number of items perm page in collections.')->end()
+                                        ->integerNode('number')->min(1)->defaultValue(30)->info('The default number of items perm page in collections.')->end()
                                         ->booleanNode('enable_client_request')->defaultValue(false)->info('Allow the client to change the number of elements by page.')->end()
                                         ->scalarNode('parameter_name')->defaultValue('itemsPerPage')->info('The name of the parameter to change the number of elements by page client side.')->end()
                                     ->end()
