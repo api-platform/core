@@ -8,26 +8,23 @@ cache:
 
 php:
     - 5.5
+    - 5.6
     - 7.0
-    - nightly
     - hhvm
 
 matrix:
     fast_finish: true
     include:
-        - php: 5.6
+        - php: 7.0
           env: SYMFONY_VERSION=2.7.*
-        - php: 5.6
-          env: SYMFONY_VERSION=2.8.*@dev
-        - php: 5.6
-          env: SYMFONY_VERSION="3.0.*@dev"
+        - php: 7.0
+          env: SYMFONY_VERSION=2.8.*
+        - php: 7.0
+          env: SYMFONY_VERSION=3.0.*
         - php: 7.0
 
     allow_failures:
-        - php: 7.0
-        - php: nightly
-        - env: SYMFONY_VERSION=2.8.*@dev
-        - env: SYMFONY_VERSION="3.0.*@dev"
+        - env: SYMFONY_VERSION=3.0.*
 
 before_install:
     - composer self-update

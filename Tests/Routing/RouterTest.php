@@ -14,8 +14,9 @@ namespace Dunglas\ApiBundle\Tests\Routing;
 use Dunglas\ApiBundle\Routing\Router;
 use Prophecy\Argument;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as SymfonyRouter;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -49,7 +50,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testGenerate()
     {
         $mockedRouter = $this->prophesize('Symfony\Component\Routing\RouterInterface');
-        $mockedRouter->generate('foo', [], false)->willReturn('/bar')->shouldBeCalled();
+        $mockedRouter->generate('foo', [], RouterInterface::ABSOLUTE_PATH)->willReturn('/bar')->shouldBeCalled();
 
         $router = new Router($mockedRouter->reveal());
         $this->assertSame('/bar', $router->generate('foo'));
