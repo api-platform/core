@@ -32,6 +32,10 @@
             <argument>%api.collection.filter_name.order%</argument>
         </service>
 
+        <service id="api.doctrine.orm.range_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\RangeFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+        </service>
+
         <service id="api.doctrine.orm.date_filter" class="Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument type="service" id="request_stack" />

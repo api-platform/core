@@ -144,6 +144,11 @@ class OrderFilterTest extends KernelTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'order[dummyPrice]' => [
+                'property' => 'dummyPrice',
+                'type' => 'string',
+                'required' => false,
+            ],
             'order[jsonData]' => [
                 'property' => 'jsonData',
                 'type' => 'string',

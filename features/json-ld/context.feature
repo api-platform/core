@@ -44,6 +44,7 @@ Feature: JSON-LD contexts generation
               "alias": "https://schema.org/alternateName",
               "description": "https://schema.org/description",
               "dummyDate": "#Dummy/dummyDate",
+              "dummyPrice": "#Dummy/dummyPrice",
               "jsonData": "#Dummy/jsonData",
               "relatedDummy": {
                   "@id": "#Dummy/relatedDummy",

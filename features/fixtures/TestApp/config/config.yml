@@ -92,6 +92,10 @@ services:
         parent:                     "api.doctrine.orm.order_filter"
         arguments:                  [ { "id": ~, "name": "desc", "relatedDummy.symfony": ~ } ]
 
+    my_dummy_resource.range_filter:
+            parent:                 "api.doctrine.orm.range_filter"
+            arguments:              [ { "dummyPrice": ~ } ]
+
     my_dummy_resource.date_filter:
             parent:                 "api.doctrine.orm.date_filter"
             arguments:              [ { "dummyDate": ~, "relatedDummy.dummyDate": ~ } ]
@@ -101,7 +105,7 @@ services:
         arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
         calls:
                                      - method:    "initFilters"
-                                       arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.date_filter" ] ]
+                                       arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.range_filter", "@my_dummy_resource.date_filter" ] ]
         tags:                        [ { name: "api.resource" } ]
 
     my_related_dummy_resource:
