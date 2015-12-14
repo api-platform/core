@@ -137,31 +137,14 @@ class SearchFilter extends AbstractFilter
                 $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
 
                 $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $value);
-            } elseif ($metadata->isSingleValuedAssociation($field)) {
-                if (!is_string($value)) {
-                    continue;
-                }
-
-                $value = $this->getFilterValueFromUrl($value);
-
-                $association = $field;
-                $associationAlias = QueryNameGenerator::generateJoinAlias($association);
-                $valueParameter = QueryNameGenerator::generateParameterName($association);
-
-                $queryBuilder
-                    ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
-                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-            } elseif ($metadata->isCollectionValuedAssociation($field)) {
-                $values = $value;
-                if (!is_array($values)) {
-                    $values = [$value];
-                }
+            } elseif ($metadata->hasAssociation($field)) {
+                $values = (array) $value;
                 foreach ($values as $k => $v) {
                     if (!is_int($k) || !is_string($v)) {
                         unset($values[$k]);
                     }
                 }
+                $values = array_values($values);
 
                 if (empty($values)) {
                     continue;
@@ -171,12 +154,20 @@ class SearchFilter extends AbstractFilter
 
                 $association = $field;
                 $associationAlias = QueryNameGenerator::generateJoinAlias($association);
-                $valuesParameter = QueryNameGenerator::generateParameterName($association);
+                $valueParameter = QueryNameGenerator::generateParameterName($association);
 
                 $queryBuilder
-                    ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
-                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valuesParameter))
-                    ->setParameter($valuesParameter, $values);
+                    ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+
+                if (1 === count($values)) {
+                    $queryBuilder
+                        ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                        ->setParameter($valueParameter, $values[0]);
+                } else {
+                    $queryBuilder
+                        ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                        ->setParameter($valueParameter, $values);
+                }
             }
         }
     }
@@ -268,16 +259,20 @@ class SearchFilter extends AbstractFilter
                 ];
             } elseif ($metadata->hasAssociation($field)) {
                 $association = $field;
-                $paramName = $property;
-                if ($metadata->isCollectionValuedAssociation($association)) {
-                    $paramName .= '[]';
-                }
-                $description[$paramName] = [
+                $description[$property] = [
                     'property' => $property,
                     'type' => 'iri',
                     'required' => false,
                     'strategy' => self::STRATEGY_EXACT,
                 ];
+                if ($metadata->hasAssociation($association)) {
+                    $description[$property.'[]'] = [
+                        'property' => $property,
+                        'type' => 'iri',
+                        'required' => false,
+                        'strategy' => self::STRATEGY_EXACT,
+                    ];
+                }
             }
         }
 

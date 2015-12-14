@@ -109,7 +109,7 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -140,6 +140,12 @@ Feature: Create-Retrieve-Update-Delete
                   "@type": "IriTemplateMapping",
                   "variable": "relatedDummy.name",
                   "property": "relatedDummy.name",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "relatedDummies",
+                  "property": "relatedDummies",
                   "required": false
               },
               {
