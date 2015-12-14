@@ -73,6 +73,12 @@ class Dummy
      */
     public $dummyDate;
     /**
+     * @var string A dummy price.
+     *
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
+     */
+    public $dummyPrice;
+    /**
      * @var RelatedDummy A related dummy.
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
@@ -154,6 +160,18 @@ class Dummy
     public function getDummyDate()
     {
         return $this->dummyDate;
+    }
+
+    public function setDummyPrice($dummyPrice)
+    {
+        $this->dummyPrice = $dummyPrice;
+
+        return $this;
+    }
+
+    public function getDummyPrice()
+    {
+        return $this->dummyPrice;
     }
 
     public function setJsonData($jsonData)

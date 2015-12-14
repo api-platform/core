@@ -19,6 +19,7 @@ Feature: JSON-LD contexts generation
             "description": "https://schema.org/description",
             "foo": "#Dummy/foo",
             "dummyDate": "#Dummy/dummyDate",
+            "dummyPrice": "#Dummy/dummyPrice",
             "jsonData": "#Dummy/jsonData",
             "relatedDummy": {
                 "@id": "#Dummy/relatedDummy",
@@ -50,6 +51,7 @@ Feature: JSON-LD contexts generation
             "description": "https://schema.org/description",
             "foo": "#Dummy/foo",
             "dummyDate": "#Dummy/dummyDate",
+            "dummyPrice": "#Dummy/dummyPrice",
             "jsonData": "#Dummy/jsonData",
             "relatedDummy": {
                 "@id": "#Dummy/relatedDummy",
