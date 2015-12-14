@@ -13,12 +13,12 @@ namespace Dunglas\ApiBundle\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\FilterInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryChecker;
 use Dunglas\ApiBundle\Model\DataProviderInterface;
-use Dunglas\ApiBundle\Api\ResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

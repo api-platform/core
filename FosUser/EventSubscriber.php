@@ -11,10 +11,10 @@
 
 namespace Dunglas\ApiBundle\FosUser;
 
-use Dunglas\ApiBundle\Event\Events;
 use Dunglas\ApiBundle\Event\DataEvent;
-use FOS\UserBundle\Model\UserManagerInterface;
+use Dunglas\ApiBundle\Event\Events;
 use FOS\UserBundle\Model\UserInterface;
+use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

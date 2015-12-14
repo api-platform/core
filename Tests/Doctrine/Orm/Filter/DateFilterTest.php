@@ -12,14 +12,15 @@
 namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
+use Dunglas\ApiBundle\Api\ResourceInterface;
+use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
+use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use phpmock\phpunit\PHPMock;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>
@@ -40,7 +41,7 @@ class DateFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     protected $resource;
 

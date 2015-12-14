@@ -77,10 +77,10 @@ class RangeFilter extends AbstractFilter
      * Adds the where clause according to the operator.
      *
      * @param QueryBuilder $queryBuilder
-     * @param string $alias
-     * @param string $field
-     * @param string $operator
-     * @param string $value
+     * @param string       $alias
+     * @param string       $field
+     * @param string       $operator
+     * @param string       $value
      */
     private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value)
     {

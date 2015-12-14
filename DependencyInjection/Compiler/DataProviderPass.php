@@ -11,10 +11,10 @@
 
 namespace Dunglas\ApiBundle\DependencyInjection\Compiler;
 
+use Dunglas\ApiBundle\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Dunglas\ApiBundle\Exception\RuntimeException;
 
 /**
  * Injects data managers in the chain.
