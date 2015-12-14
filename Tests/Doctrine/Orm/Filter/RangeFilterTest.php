@@ -40,7 +40,7 @@ class RangeFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var Resource
+     * @var resource
      */
     protected $resource;
 
@@ -70,7 +70,7 @@ class RangeFilterTest extends KernelTestCase
 
         $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
-        
+
         try {
             $filter->apply($this->resource, $queryBuilder, $request);
         } catch (InvalidArgumentException $e) {
@@ -78,7 +78,7 @@ class RangeFilterTest extends KernelTestCase
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
-        
+
         $this->assertEquals(
             $expected,
             $actual,

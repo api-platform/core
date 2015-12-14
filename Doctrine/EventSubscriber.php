@@ -11,10 +11,10 @@
 
 namespace Dunglas\ApiBundle\Doctrine;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Dunglas\ApiBundle\Event\Events;
+use Doctrine\Common\Persistence\ObjectManager;
 use Dunglas\ApiBundle\Event\DataEvent;
+use Dunglas\ApiBundle\Event\Events;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

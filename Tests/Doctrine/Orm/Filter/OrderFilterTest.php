@@ -39,7 +39,7 @@ class OrderFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var Resource
+     * @var resource
      */
     protected $resource;
 

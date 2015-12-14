@@ -104,11 +104,11 @@ class DateFilter extends AbstractFilter
      * Adds the where clause according to the chosen null management.
      *
      * @param QueryBuilder $queryBuilder
-     * @param string $alias
-     * @param string $field
-     * @param string $operator
-     * @param string $value
-     * @param int|null $nullManagement
+     * @param string       $alias
+     * @param string       $field
+     * @param string       $operator
+     * @param string       $value
+     * @param int|null     $nullManagement
      */
     private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value, $nullManagement)
     {
@@ -155,7 +155,7 @@ class DateFilter extends AbstractFilter
             if (!$this->isPropertyMapped($property, $resource) || !$this->isDateField($property, $resource)) {
                 continue;
             }
-            
+
             $description += $this->getFilterDescription($property, self::PARAMETER_BEFORE);
             $description += $this->getFilterDescription($property, self::PARAMETER_AFTER);
         }
@@ -185,7 +185,7 @@ class DateFilter extends AbstractFilter
     /**
      * Determines whether the given property refers to a date field.
      *
-     * @param string $property
+     * @param string            $property
      * @param ResourceInterface $resource
      *
      * @return array

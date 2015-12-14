@@ -142,7 +142,7 @@ class AttributesLoader implements LoaderInterface
                 if ($attribute->isIdentifier()) {
                     continue;
                 }
-                $attributeGroups = isset($normalizationAttributes[$attribute->getName()]) ? $normalizationAttributes[$attribute->getName()]->getGroups() : array();
+                $attributeGroups = isset($normalizationAttributes[$attribute->getName()]) ? $normalizationAttributes[$attribute->getName()]->getGroups() : [];
                 $readable = true;
                 $writable = true;
 
