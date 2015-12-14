@@ -247,6 +247,12 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'relatedDummy[]' => [
+                'property' => 'relatedDummy',
+                'type' => 'iri',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
         ], $filter->getDescription($this->resource));
     }
 
@@ -300,8 +306,10 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o',
-                    'parameters' => [],
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg',
+                    'parameters' => [
+                        'relatedDummy_123456abcdefg' => 'foo',
+                    ],
                 ],
             ],
             // partial values
@@ -393,15 +401,17 @@ class SearchFilterTest extends KernelTestCase
             ],
             [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummies' => null],
+                    'properties' => ['id' => null, 'name' => null, 'relatedDummy' => null, 'relatedDummies' => null],
                 ],
                 [
-                    'relatedDummies' => 'exact',
+                    'relatedDummy' => ['/related_dummies/1', '2'],
+                    'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relatedDummies relatedDummies_123456abcdefg WHERE relatedDummies_123456abcdefg.id IN (:relatedDummies_123456abcdefg)',
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg inner join o.relatedDummies relatedDummies_123456abcdefg WHERE relatedDummy_123456abcdefg.id IN (:relatedDummy_123456abcdefg) AND relatedDummies_123456abcdefg.id = :relatedDummies_123456abcdefg',
                     'parameters' => [
-                        'relatedDummies_123456abcdefg' => ['exact'],
+                        'relatedDummy_123456abcdefg' => [1, 2],
+                        'relatedDummies_123456abcdefg' => 1,
                     ],
                 ],
             ],
