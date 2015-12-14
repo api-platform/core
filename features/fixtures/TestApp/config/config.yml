@@ -45,11 +45,11 @@ fos_user:
     firewall_name:    api
     service:
         user_manager: api.user_manager
-    user_class:       "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User"
+    user_class:       'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User'
 
 services:
     api.user_manager:
-        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\Manager\UserManager"
+        class: 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Manager\UserManager'
         arguments:
             -  @security.encoder_factory
             -  @fos_user.util.username_canonicalizer
@@ -58,13 +58,13 @@ services:
             -  %fos_user.model.user.class%
 
     fos_user.mailer.default:
-        class: "Dunglas\ApiBundle\Tests\Mock\MailerMock"
+        class: 'Dunglas\ApiBundle\Tests\Mock\MailerMock'
 
     api.name_converter:
-        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\\NameConverter\CustomConverter"
+        class: 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\NameConverter\CustomConverter'
 
     xml_responder_view_listener:
-        class: "Dunglas\ApiBundle\Tests\Behat\TestBundle\EventListener\XmlResponderViewListener"
+        class: 'Dunglas\ApiBundle\Tests\Behat\TestBundle\EventListener\XmlResponderViewListener'
         arguments:
             - @api.serializer
         tags:
@@ -72,7 +72,7 @@ services:
 
     user:
         parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User" ]
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User' ]
         calls:
                                      - method:    "initNormalizationContext"
                                        arguments: [ { groups: [ "user", "user-read" ] } ]
@@ -98,7 +98,7 @@ services:
 
     my_dummy_resource:
         parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy' ]
         calls:
                                      - method:    "initFilters"
                                        arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.date_filter" ] ]
@@ -106,23 +106,23 @@ services:
 
     my_related_dummy_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy' ]
         tags:                       [ { name: "api.resource" } ]
 
     my_relation_embedder_resource.item_operation.get:
-        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
+        class:                      'Dunglas\ApiBundle\Api\Operation\Operation'
         public:                     false
         factory:                    [ "@api.operation_factory", "createItemOperation" ]
         arguments:                  [ "@my_relation_embedder_resource", "GET" ]
 
     my_relation_embedder_resource.item_operation.put:
-        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
+        class:                      'Dunglas\ApiBundle\Api\Operation\Operation'
         public:                     false
         factory:                    [ "@api.operation_factory", "createItemOperation" ]
         arguments:                  [ "@my_relation_embedder_resource", "PUT" ]
 
     my_relation_embedder_resource.item_operation.custom_get:
-        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
+        class:                      'Dunglas\ApiBundle\Api\Operation\Operation'
         public:                     false
         factory:                    [ "@api.operation_factory", "createItemOperation" ]
         arguments:
@@ -138,7 +138,7 @@ services:
 
     my_relation_embedder_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder' ]
         calls:
                                     - method:    "initNormalizationContext"
                                       arguments:
@@ -156,7 +156,7 @@ services:
 
     my_abstract_dummy_resource:
         parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AbstractDummy" ]
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AbstractDummy' ]
         calls:
                                      - method:    "initFilters"
                                        arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.date_filter" ] ]
@@ -164,22 +164,22 @@ services:
 
     my_concrete_dummy_resource:
         parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ConcreteDummy" ]
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ConcreteDummy' ]
         tags:                        [ { name: "api.resource" } ]
 
     custom_resource:
         parent:                     "api.resource"
-        class:                      "Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource"
+        class:                      'Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource'
         tags:                       [ { name: "api.resource" } ]
 
     third_level_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ThirdLevel" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ThirdLevel' ]
         tags:                       [ { name: "api.resource" } ]
 
     circular_reference_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CircularReference" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CircularReference' ]
         calls:
                                     - method:    "initNormalizationContext"
                                       arguments:
@@ -188,17 +188,17 @@ services:
 
     custom_identifier_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomIdentifierDummy" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomIdentifierDummy' ]
         tags:                       [ { name: "api.resource" } ]
 
     custom_writable_identifier_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomWritableIdentifierDummy" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomWritableIdentifierDummy' ]
         tags:                       [ { name: "api.resource" } ]
 
     custom_normalized_resource:
         parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomNormalizedDummy" ]
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomNormalizedDummy' ]
         calls:
                                     - method:    "initNormalizationContext"
                                       arguments:
