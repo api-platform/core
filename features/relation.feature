@@ -73,6 +73,7 @@ Feature: Relations support
       "alias": null,
       "description": null,
       "dummyDate": null,
+      "dummyPrice": null,
       "jsonData": [],
       "relatedDummy": "/related_dummies/1",
       "dummy": null,

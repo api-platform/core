@@ -197,6 +197,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_data_provider', $definitionArgument)->shouldBeCalled();
             $containerBuilderProphecy->setDefinition('api.doctrine.orm.search_filter', $definitionArgument)->shouldBeCalled();
             $containerBuilderProphecy->setDefinition('api.doctrine.orm.order_filter', $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition('api.doctrine.orm.range_filter', $definitionArgument)->shouldBeCalled();
             $containerBuilderProphecy->setDefinition('api.doctrine.orm.date_filter', $definitionArgument)->shouldBeCalled();
             $containerBuilderProphecy->setDefinition('api.mapping.loaders.doctrine_identifier', $definitionArgument)->shouldBeCalled();
             $containerBuilderProphecy->setDefinition('api.property_info.doctrine_extractor', $definitionArgument)->shouldBeCalled();
