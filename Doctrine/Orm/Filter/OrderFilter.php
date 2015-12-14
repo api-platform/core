@@ -79,7 +79,7 @@ class OrderFilter extends AbstractFilter
 
                 foreach ($propertyParts['associations'] as $association) {
                     $alias = QueryNameGenerator::generateJoinAlias($association);
-                    $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
+                    $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
 
