@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\OrderFilter;
 use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
@@ -39,7 +40,7 @@ class OrderFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var resource
+     * @var ResourceInterface
      */
     protected $resource;
 

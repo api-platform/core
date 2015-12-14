@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\RangeFilter;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
@@ -40,7 +41,7 @@ class RangeFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var resource
+     * @var ResourceInterface
      */
     protected $resource;
 

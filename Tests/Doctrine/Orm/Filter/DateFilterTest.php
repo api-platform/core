@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use phpmock\phpunit\PHPMock;
@@ -40,7 +41,7 @@ class DateFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var resource
+     * @var ResourceInterface
      */
     protected $resource;
 
