@@ -19,7 +19,6 @@
     "symfony/framework-bundle": "~2.6|~3.0",
     "symfony/proxy-manager-bridge": "~2.3|~3.0",
     "ocramius/proxy-manager": "~1.0",
-    "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/inflector": "~1.0",
     "dunglas/php-property-info": "~0.2",
     "phpdocumentor/reflection": "^1.0.7",
@@ -35,6 +34,7 @@
     "behatch/contexts": "dev-master",
     "symfony/finder": "~2.3",
     "symfony/security": "~2.7.2|~3.0",
+    "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/doctrine-bundle": "~1.2",
     "php-mock/php-mock-phpunit": "~1.1"
   },
