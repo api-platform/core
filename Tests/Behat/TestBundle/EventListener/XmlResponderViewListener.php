@@ -72,8 +72,12 @@ class XmlResponderViewListener
         }
 
         $resourceType = $request->attributes->get('_resource_type');
+
+        $context = $resourceType->getNormalizationContext();
+        unset($context['resource']);
+
         $response = new Response(
-            $this->serializer->serialize($controllerResult, self::FORMAT, $resourceType->getNormalizationContext()),
+            $this->serializer->serialize($controllerResult, self::FORMAT, $context),
             $status,
             ['Content-Type' => 'application/xml']
         );
