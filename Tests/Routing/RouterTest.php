@@ -14,7 +14,6 @@ namespace Dunglas\ApiBundle\Tests\Routing;
 use Dunglas\ApiBundle\Routing\Router;
 use Prophecy\Argument;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Router as SymfonyRouter;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 

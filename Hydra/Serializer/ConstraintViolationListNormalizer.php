@@ -33,6 +33,7 @@ class ConstraintViolationListNormalizer implements NormalizerInterface
     {
         $this->router = $router;
     }
+
     /**
      * {@inheritdoc}
      */
