@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Doctrine\Orm\Extension;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\QueryCollectionExtensionInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\QueryItemExtensionInterface;

@@ -38,7 +38,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
     private $requestStackMock;
 
     /**
-     * @var ObjectProphecy|ResourceInterface|Resource
+     * @var ObjectProphecy|ResourceInterface
      */
     protected $resourceMock;
 

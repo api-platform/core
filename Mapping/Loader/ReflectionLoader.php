@@ -11,9 +11,9 @@
 
 namespace Dunglas\ApiBundle\Mapping\Loader;
 
-use Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactoryInterface;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataInterface;
+use Dunglas\ApiBundle\Mapping\Factory\AttributeMetadataFactoryInterface;
 
 /**
  * Uses serialization groups or alternatively reflection to populate attributes.

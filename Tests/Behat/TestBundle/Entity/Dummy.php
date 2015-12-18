@@ -85,7 +85,7 @@ class Dummy
      */
     public $relatedDummies;
     /**
-     * @var Array serialize data.
+     * @var array serialize data.
      *
      * @ORM\Column(type="json_array", nullable=true)
      */
