@@ -48,17 +48,18 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateCollectionOperationWithAllParameters()
     {
         $operation = $this->operationFactory->createCollectionOperation(
-            $this->resource, ['GET', 'HEAD'], '/bar', 'AppBundle:Test:cget', 'baz', ['kevin' => 'dunglas']
+            $this->resource, ['GET', 'HEAD'], '/bar/{baz}', 'AppBundle:Test:cget', 'qux', ['kevin' => 'dunglas'], ['baz' => '\d']
         );
 
-        $this->assertEquals('/bar', $operation->getRoute()->getPath());
+        $this->assertEquals('/bar/{baz}', $operation->getRoute()->getPath());
         $this->assertEquals(['GET', 'HEAD'], $operation->getRoute()->getMethods());
+        $this->assertArrayHasKey('baz', $operation->getRoute()->getRequirements());
 
         $defaults = $operation->getRoute()->getDefaults();
         $this->assertEquals('AppBundle:Test:cget', $defaults['_controller']);
         $this->assertEquals('Foo', $defaults['_resource']);
 
-        $this->assertEquals('baz', $operation->getRouteName());
+        $this->assertEquals('qux', $operation->getRouteName());
         $this->assertEquals(['kevin' => 'dunglas'], $operation->getContext());
     }
 
@@ -80,11 +81,12 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateItemOperationWithAllParameters()
     {
         $operation = $this->operationFactory->createItemOperation(
-            $this->resource, ['GET', 'HEAD'], '/bar/{id}', 'AppBundle:Test:cget', 'baz', ['kevin' => 'dunglas']
+            $this->resource, ['GET', 'HEAD'], '/bar/{id}', 'AppBundle:Test:cget', 'baz', ['kevin' => 'dunglas'], ['id' => '\d']
         );
 
         $this->assertEquals('/bar/{id}', $operation->getRoute()->getPath());
         $this->assertEquals(['GET', 'HEAD'], $operation->getRoute()->getMethods());
+        $this->assertArrayHasKey('id', $operation->getRoute()->getRequirements());
 
         $defaults = $operation->getRoute()->getDefaults();
         $this->assertEquals('AppBundle:Test:cget', $defaults['_controller']);

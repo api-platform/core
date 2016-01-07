@@ -20,7 +20,7 @@ use Dunglas\ApiBundle\Exception\InvalidArgumentException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Resource implements ResourceInterface
+class Resource implements RoutedResourceInterface
 {
     /**
      * @var string
@@ -54,6 +54,14 @@ class Resource implements ResourceInterface
      * @var string|null
      */
     private $shortName;
+    /**
+     * @var string|null
+     */
+    private $itemRouteName;
+    /**
+     * @var string|null
+     */
+    private $collectionRouteName;
 
     /**
      * @param string $entityClass
@@ -226,5 +234,37 @@ class Resource implements ResourceInterface
     public function getShortName()
     {
         return $this->shortName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemRouteName()
+    {
+        return $this->itemRouteName;
+    }
+
+    /**
+     * @param string|null $itemRouteName
+     */
+    public function setItemRouteName($itemRouteName)
+    {
+        $this->itemRouteName = $itemRouteName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCollectionRouteName()
+    {
+        return $this->collectionRouteName;
+    }
+
+    /**
+     * @param string|null $collectionRouteName
+     */
+    public function setCollectionRouteName($collectionRouteName)
+    {
+        $this->collectionRouteName = $collectionRouteName;
     }
 }

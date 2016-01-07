@@ -141,6 +141,18 @@ class IriConverter implements IriConverterInterface
             return $this->routeCache[$resource][$key];
         }
 
+        if ($resource instanceof RoutedResourceInterface) {
+            $method    = 'get' . ucfirst($key);
+            $routeName = $resource->$method();
+            if ($routeName) {
+                $data                        = $this->routeCache[$resource];
+                $data[$key]                  = $routeName;
+                $this->routeCache[$resource] = $data;
+
+                return $data[$key];
+            }
+        }
+
         $operations = 'item' === $prefix ? $resource->getItemOperations() : $resource->getCollectionOperations();
         foreach ($operations as $operation) {
             $methods = $operation->getRoute()->getMethods();
