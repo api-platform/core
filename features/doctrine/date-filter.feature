@@ -226,3 +226,71 @@ Feature: Order filter on collections
       }
     }
     """
+
+  @createSchema
+  @dropSchema
+  Scenario: Search for entities within a range
+    Given there is "2" dummy objects with dummyDate
+    When I send a "GET" request to "/dummies?dummyDate[after]="
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON node "hydra:totalItems" should be equal to "2"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"}
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    When I send a "GET" request to "/dummies?dummyDate[before]="
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON node "hydra:totalItems" should be equal to "2"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:totalItems": {"type":"number"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"}
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+    """
