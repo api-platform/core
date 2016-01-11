@@ -76,7 +76,7 @@ class DateFilter extends AbstractFilter
 
             $nullManagement = isset($this->properties[$property]) ? $this->properties[$property] : null;
 
-            if (isset($values[self::PARAMETER_BEFORE])) {
+            if (!empty($values[self::PARAMETER_BEFORE])) {
                 $this->addWhere(
                     $queryBuilder,
                     $alias,
@@ -87,7 +87,7 @@ class DateFilter extends AbstractFilter
                 );
             }
 
-            if (isset($values[self::PARAMETER_AFTER])) {
+            if (!empty($values[self::PARAMETER_AFTER])) {
                 $this->addWhere(
                     $queryBuilder,
                     $alias,
