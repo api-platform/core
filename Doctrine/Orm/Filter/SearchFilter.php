@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
@@ -117,13 +118,15 @@ class SearchFilter extends AbstractFilter
                 $metadata = $this->getClassMetadata($resource);
             }
 
+            $propertyIdentifier = $this->getIdentifierFieldName($metadata);
+
             if ($metadata->hasField($field)) {
                 if (!is_string($value)) {
                     continue;
                 }
 
-                if ('id' === $field) {
-                    $value = $this->getFilterValueFromUrl($value);
+                if ($propertyIdentifier === $field) {
+                    $value = $this->getFilterValueFromUrl($propertyIdentifier, $value);
                 }
 
                 $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
@@ -134,7 +137,7 @@ class SearchFilter extends AbstractFilter
                     continue;
                 }
 
-                $value = $this->getFilterValueFromUrl($value);
+                $value = $this->getFilterValueFromUrl($propertyIdentifier, $value);
 
                 $association = $field;
                 $associationAlias = QueryNameGenerator::generateJoinAlias($association);
@@ -142,7 +145,7 @@ class SearchFilter extends AbstractFilter
 
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
-                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                    ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $propertyIdentifier, $valueParameter))
                     ->setParameter($valueParameter, $value);
             } elseif ($metadata->isCollectionValuedAssociation($field)) {
                 $values = $value;
@@ -153,13 +156,20 @@ class SearchFilter extends AbstractFilter
                     if (!is_int($k) || !is_string($v)) {
                         unset($values[$k]);
                     }
+
+                    $values[$k] = [$propertyIdentifier, $v];
                 }
 
                 if (empty($values)) {
                     continue;
                 }
 
-                $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+                $values = array_map(
+                    function ($args) {
+                        return call_user_func_array([$this, 'getFilterValueFromUrl'], $args);
+                    },
+                    $values
+                );
 
                 $association = $field;
                 $associationAlias = QueryNameGenerator::generateJoinAlias($association);
@@ -167,7 +177,7 @@ class SearchFilter extends AbstractFilter
 
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
-                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valuesParameter))
+                    ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $propertyIdentifier, $valuesParameter))
                     ->setParameter($valuesParameter, $values);
             }
         }
@@ -283,16 +293,27 @@ class SearchFilter extends AbstractFilter
      *
      * @return string
      */
-    private function getFilterValueFromUrl($value)
+    private function getFilterValueFromUrl($identifier, $value)
     {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value)) {
-                return $this->propertyAccessor->getValue($item, 'id');
+                return $this->propertyAccessor->getValue($item, $identifier);
             }
         } catch (\InvalidArgumentException $e) {
             // Do nothing, return the raw value
         }
 
         return $value;
+    }
+
+    private function getIdentifierFieldName(ClassMetadata $metadata)
+    {
+        $identifier = $metadata->getIdentifierFieldNames();
+
+        if (1 !== count($identifier)) {
+            throw new RuntimeException('Complex identifiers are not supported.');
+        }
+
+        return end($identifier);
     }
 }
