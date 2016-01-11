@@ -39,6 +39,7 @@ class OperationFactory
      * @param null              $controller
      * @param null              $routeName
      * @param array             $context
+     * @param array             $requirements
      *
      * @return Operation
      */
@@ -48,9 +49,10 @@ class OperationFactory
         $path = null,
         $controller = null,
         $routeName = null,
-        array $context = []
+        array $context = [],
+        $requirements = []
     ) {
-        return $this->createOperation($resource, true, $methods, $path, $controller, $routeName, $context);
+        return $this->createOperation($resource, true, $methods, $path, $controller, $routeName, $context, $requirements);
     }
 
     /**
@@ -62,6 +64,7 @@ class OperationFactory
      * @param null              $controller
      * @param null              $routeName
      * @param array             $context
+     * @param array             $requirements
      *
      * @return Operation
      */
@@ -71,9 +74,10 @@ class OperationFactory
         $path = null,
         $controller = null,
         $routeName = null,
-        array $context = []
+        array $context = [],
+        $requirements = []
     ) {
-        return $this->createOperation($resource, false, $methods, $path, $controller, $routeName, $context);
+        return $this->createOperation($resource, false, $methods, $path, $controller, $routeName, $context, $requirements);
     }
 
     /**
@@ -86,6 +90,7 @@ class OperationFactory
      * @param string|null       $controller
      * @param string|null       $routeName
      * @param array             $context
+     * @param array             $requirements
      *
      * @return Operation
      */
@@ -96,7 +101,8 @@ class OperationFactory
         $path = null,
         $controller = null,
         $routeName = null,
-        array $context = []
+        array $context = [],
+        $requirements = []
     ) {
         $shortName = $resource->getShortName();
 
@@ -143,7 +149,7 @@ class OperationFactory
                     '_controller' => $controller,
                     '_resource' => $shortName,
                 ],
-                [],
+                $requirements,
                 [],
                 '',
                 [],
