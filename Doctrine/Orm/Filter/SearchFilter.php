@@ -57,6 +57,16 @@ class SearchFilter extends AbstractFilter
     const STRATEGY_WORD_START = 'word_start';
 
     /**
+     * @var string Doctrine expression to case insensitivity comparison
+     */
+    const CASE_INSENSITIVE = 'LOWER';
+
+    /**
+     * @var bool whether it's case sensitive or not
+     */
+    private $caseSensitive = true;
+
+    /**
      * @var IriConverterInterface
      */
     private $iriConverter;
@@ -131,6 +141,10 @@ class SearchFilter extends AbstractFilter
                 }
 
                 $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
+                if (strpos($strategy, 'i') === 0) {
+                    $strategy = substr($strategy, 1);
+                    $this->caseSensitive = false;
+                }
 
                 $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $value);
 
@@ -214,27 +228,42 @@ class SearchFilter extends AbstractFilter
             case null:
             case self::STRATEGY_EXACT:
                 return $queryBuilder
-                    ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf(
+                        $this->caseWrap('%s.%s').' = '.$this->caseWrap(':%s'),
+                        $alias, $field, $valueParameter
+                    ))
                     ->setParameter($valueParameter, $value);
 
             case self::STRATEGY_PARTIAL:
                 return $queryBuilder
-                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf(
+                        $this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'),
+                        $alias, $field, $valueParameter
+                    ))
                     ->setParameter($valueParameter, sprintf('%%%s%%', $value));
 
             case self::STRATEGY_START:
                 return $queryBuilder
-                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf(
+                        $this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'),
+                        $alias, $field, $valueParameter
+                    ))
                     ->setParameter($valueParameter, sprintf('%s%%', $value));
 
             case self::STRATEGY_END:
                 return $queryBuilder
-                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf(
+                        $this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'),
+                        $alias, $field, $valueParameter
+                    ))
                     ->setParameter($valueParameter, sprintf('%%%s', $value));
 
             case self::STRATEGY_WORD_START:
+                $andWhere = $this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap(':%3$s_1');
+                $andWhere .= ' OR '.$this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap(':%3$s_2');
+
                 return $queryBuilder
-                    ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_1 OR %1$s.%2$s LIKE :%3$s_2', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf($andWhere, $alias, $field, $valueParameter))
                     ->setParameter(sprintf('%s_1', $valueParameter), sprintf('%s%%', $value))
                     ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value));
         }
@@ -335,5 +364,22 @@ class SearchFilter extends AbstractFilter
         }
 
         throw new RuntimeException('Complex identifiers are not supported.');
+    }
+
+    /**
+     * Wraps a string with a doctrine expression according to the case property
+     * Example: caseWrap(o.id) => LOWER(o.id).
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    private function caseWrap($string)
+    {
+        if ($this->caseSensitive !== false) {
+            return $string;
+        }
+
+        return sprintf('%s(%s)', self::CASE_INSENSITIVE, $string);
     }
 }
