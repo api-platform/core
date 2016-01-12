@@ -283,6 +283,21 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // Exact case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'iexact'],
+                ],
+                [
+                    'name' => 'exact',
+                ],
+                [
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE LOWER(o.name) = LOWER(:name_123456abcdefg)',
+                    'parameters' => [
+                        'name_123456abcdefg' => 'exact',
+                    ],
+                ],
+            ],
             // invalid values
             [
                 [
@@ -327,6 +342,22 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // partial values case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'ipartial'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)',
+                    'parameters' => [
+                        'name_123456abcdefg' => '%partial%',
+                    ],
+                ],
+            ],
+            // start
             [
                 [
                     'properties' => ['id' => null, 'name' => 'start'],
@@ -341,6 +372,22 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // start case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'istart'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)',
+                    'parameters' => [
+                        'name_123456abcdefg' => 'partial%',
+                    ],
+                ],
+            ],
+            // end
             [
                 [
                     'properties' => ['id' => null, 'name' => 'end'],
@@ -355,6 +402,22 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // end case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'iend'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)',
+                    'parameters' => [
+                        'name_123456abcdefg' => '%partial',
+                    ],
+                ],
+            ],
+            // word start
             [
                 [
                     'properties' => ['id' => null, 'name' => 'word_start'],
@@ -364,6 +427,22 @@ class SearchFilterTest extends KernelTestCase
                 ],
                 [
                     'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE o.name like :name_123456abcdefg_1 OR o.name like :name_123456abcdefg_2',
+                    'parameters' => [
+                        'name_123456abcdefg_1' => 'partial%',
+                        'name_123456abcdefg_2' => '% partial%',
+                    ],
+                ],
+            ],
+            // word start case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'iword_start'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => 'SELECT o FROM Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg_1) OR LOWER(o.name) like LOWER(:name_123456abcdefg_2)',
                     'parameters' => [
                         'name_123456abcdefg_1' => 'partial%',
                         'name_123456abcdefg_2' => '% partial%',
