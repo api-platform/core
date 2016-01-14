@@ -18,6 +18,10 @@ use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 use Sanpi\Behatch\HttpCall\Request;
 
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeItem;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeLabel;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeRelation;
+
 /**
  * Defines application features from the specific context.
  */
@@ -201,6 +205,31 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $relationEmbedder = new RelationEmbedder();
 
         $this->manager->persist($relationEmbedder);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are Composite identifier objects
+     */
+    public function thereIsACompositeIdentifierObject()
+    {
+        $item = new CompositeItem();
+        $item->setField1('foobar');
+        $this->manager->persist($item);
+
+        for($i = 0; $i < 4; $i++) {
+            $label = new CompositeLabel();
+            $label->setValue('foo-'.$i);
+
+            $rel = new CompositeRelation();
+            $rel->setCompositeLabel($label);
+            $rel->setCompositeItem($item);
+            $rel->setValue(uniqid());
+
+            $this->manager->persist($label);
+            $this->manager->persist($rel);
+        }
+
         $this->manager->flush();
     }
 }
