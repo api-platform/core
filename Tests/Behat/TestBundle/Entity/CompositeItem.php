@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -37,7 +37,7 @@ class CompositeItem
      * @Groups({"default"})
      */
     private $compositeValues;
-    
+
     /**
      * Get id.
      *
@@ -47,7 +47,7 @@ class CompositeItem
     {
         return $this->id;
     }
-    
+
     /**
      * Get field1.
      *
@@ -57,7 +57,7 @@ class CompositeItem
     {
         return $this->field1;
     }
-    
+
     /**
      * Set field1.
      *
@@ -67,7 +67,7 @@ class CompositeItem
     {
         $this->field1 = $field1;
     }
-    
+
     /**
      * Get compositeValues.
      *

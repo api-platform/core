@@ -133,7 +133,7 @@ class ItemNormalizer extends AbstractNormalizer
 
         try {
             $identifierName = $classMetadata->getIdentifierName();
-        } catch(\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $identifierName = null;
         }
 

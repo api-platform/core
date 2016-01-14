@@ -25,7 +25,10 @@ Feature: JSON-LD contexts generation
         "circularReference": "/circular_references",
         "customIdentifierDummy": "/custom_identifier_dummies",
         "customWritableIdentifierDummy": "/custom_writable_identifier_dummies",
-        "customNormalizedDummy": "/custom_normalized_dummies"
+        "customNormalizedDummy": "/custom_normalized_dummies",
+        "compositeItem": "/composite_items",
+        "compositeRelation": "/composite_relations",
+        "compositeLabel": "/composite_labels"
     }
     """
 

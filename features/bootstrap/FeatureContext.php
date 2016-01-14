@@ -13,14 +13,13 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeItem;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeLabel;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeRelation;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
 use Sanpi\Behatch\HttpCall\Request;
-
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeItem;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeLabel;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeRelation;
 
 /**
  * Defines application features from the specific context.
@@ -217,7 +216,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $item->setField1('foobar');
         $this->manager->persist($item);
 
-        for($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; ++$i) {
             $label = new CompositeLabel();
             $label->setValue('foo-'.$i);
 

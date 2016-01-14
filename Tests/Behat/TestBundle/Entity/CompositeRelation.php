@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -40,12 +40,14 @@ class CompositeRelation
      * @Groups({"default"})
      */
     private $compositeLabel;
-    
+
     /**
-     * Get composite id
+     * Get composite id.
+     *
      * @return string
      */
-    public function getId() {
+    public function getId()
+    {
         return sprintf('%s-%s', $this->compositeItem->getId(), $this->compositeLabel->getId());
     }
 
@@ -58,7 +60,7 @@ class CompositeRelation
     {
         return $this->value;
     }
-    
+
     /**
      * Set value.
      *
@@ -68,7 +70,7 @@ class CompositeRelation
     {
         $this->value = $value;
     }
-    
+
     /**
      * Get compositeItem.
      *
@@ -78,7 +80,7 @@ class CompositeRelation
     {
         return $this->compositeItem;
     }
-    
+
     /**
      * Set compositeItem.
      *
@@ -88,7 +90,7 @@ class CompositeRelation
     {
         $this->compositeItem = $compositeItem;
     }
-    
+
     /**
      * Get compositeLabel.
      *
@@ -98,7 +100,7 @@ class CompositeRelation
     {
         return $this->compositeLabel;
     }
-    
+
     /**
      * Set compositeLabel.
      *

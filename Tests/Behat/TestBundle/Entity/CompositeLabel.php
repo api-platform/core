@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -31,7 +31,7 @@ class CompositeLabel
      * @Groups({"default"})
      */
     private $value;
-    
+
     /**
      * Get id.
      *
@@ -41,7 +41,7 @@ class CompositeLabel
     {
         return $this->id;
     }
-    
+
     /**
      * Get value.
      *
@@ -51,7 +51,7 @@ class CompositeLabel
     {
         return $this->value;
     }
-    
+
     /**
      * Set value.
      *
