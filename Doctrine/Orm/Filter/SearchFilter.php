@@ -12,11 +12,13 @@
 namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Dunglas\ApiBundle\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -117,24 +119,30 @@ class SearchFilter extends AbstractFilter
                 $metadata = $this->getClassMetadata($resource);
             }
 
+            $propertyIdentifier = $this->getIdentifierFieldName($metadata);
+
             if ($metadata->hasField($field)) {
                 if (!is_string($value)) {
                     continue;
                 }
 
-                if ('id' === $field) {
-                    $value = $this->getFilterValueFromUrl($value);
+                if ($propertyIdentifier === $field) {
+                    $value = $this->getFilterValueFromUrl($propertyIdentifier, $value);
                 }
 
                 $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
 
                 $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $value);
-            } elseif ($metadata->isSingleValuedAssociation($field)) {
+
+                continue;
+            }
+
+            if ($metadata->isSingleValuedAssociation($field)) {
                 if (!is_string($value)) {
                     continue;
                 }
 
-                $value = $this->getFilterValueFromUrl($value);
+                $value = $this->getFilterValueFromUrl($propertyIdentifier, $value);
 
                 $association = $field;
                 $associationAlias = QueryNameGenerator::generateJoinAlias($association);
@@ -142,24 +150,35 @@ class SearchFilter extends AbstractFilter
 
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
-                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                    ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $propertyIdentifier, $valueParameter))
                     ->setParameter($valueParameter, $value);
-            } elseif ($metadata->isCollectionValuedAssociation($field)) {
+
+                continue;
+            }
+
+            if ($metadata->isCollectionValuedAssociation($field)) {
                 $values = $value;
                 if (!is_array($values)) {
                     $values = [$value];
                 }
+
+                $filteredValues = [];
                 foreach ($values as $k => $v) {
-                    if (!is_int($k) || !is_string($v)) {
-                        unset($values[$k]);
+                    if (is_int($k) && is_string($v)) {
+                        $filteredValues[$k] = [$propertyIdentifier, $v];
                     }
                 }
 
-                if (empty($values)) {
+                if (empty($filteredValues)) {
                     continue;
                 }
 
-                $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+                $filteredValues = array_map(
+                    function ($args) {
+                        return call_user_func_array([$this, 'getFilterValueFromUrl'], $args);
+                    },
+                    $filteredValues
+                );
 
                 $association = $field;
                 $associationAlias = QueryNameGenerator::generateJoinAlias($association);
@@ -167,8 +186,9 @@ class SearchFilter extends AbstractFilter
 
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
-                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valuesParameter))
-                    ->setParameter($valuesParameter, $values);
+                    ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $propertyIdentifier, $valuesParameter))
+                    ->setParameter($valuesParameter, $filteredValues)
+                ;
             }
         }
     }
@@ -279,20 +299,41 @@ class SearchFilter extends AbstractFilter
     /**
      * Gets the ID from an URI or a raw ID.
      *
+     * @param string $identifier
      * @param string $value
      *
      * @return string
      */
-    private function getFilterValueFromUrl($value)
+    private function getFilterValueFromUrl($identifier, $value)
     {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value)) {
-                return $this->propertyAccessor->getValue($item, 'id');
+                return $this->propertyAccessor->getValue($item, $identifier);
             }
         } catch (\InvalidArgumentException $e) {
             // Do nothing, return the raw value
         }
 
         return $value;
+    }
+
+    /**
+     * Gets the name of the identifier property.
+     *
+     * @param ClassMetadata $metadata
+     *
+     * @return string
+     *
+     * @throws RuntimeException
+     */
+    private function getIdentifierFieldName(ClassMetadata $metadata)
+    {
+        $identifier = $metadata->getIdentifierFieldNames();
+
+        if (1 === count($identifier)) {
+            return end($identifier);
+        }
+
+        throw new RuntimeException('Complex identifiers are not supported.');
     }
 }
