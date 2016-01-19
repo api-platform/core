@@ -80,7 +80,7 @@ class DataProvider implements DataProviderInterface
         if ($fetchData || !method_exists($manager, 'getReference')) {
             $repository = $manager->getRepository($entityClass);
             $queryBuilder = $repository->createQueryBuilder('o');
-            $identifier = $manager->getClassMetadata($resource->getEntityClass())->getIdentifierFieldNames()[0];
+            $identifier = $manager->getClassMetadata($entityClass)->getIdentifierFieldNames()[0];
             $queryBuilder->where($queryBuilder->expr()->eq('o.'.$identifier, ':id'))->setParameter('id', $id);
 
             foreach ($this->itemExtensions as $extension) {
@@ -100,7 +100,7 @@ class DataProvider implements DataProviderInterface
     {
         $entityClass = $resource->getEntityClass();
 
-        $manager = $this->managerRegistry->getManagerForClass($resource->getEntityClass());
+        $manager = $this->managerRegistry->getManagerForClass($entityClass);
         $repository = $manager->getRepository($entityClass);
         $queryBuilder = $repository->createQueryBuilder('o');
 
