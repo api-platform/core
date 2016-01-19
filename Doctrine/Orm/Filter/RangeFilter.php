@@ -11,11 +11,12 @@
 
 namespace Dunglas\ApiBundle\Doctrine\Orm\Filter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Util\QueryNameGenerator;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by range.
@@ -31,10 +32,32 @@ class RangeFilter extends AbstractFilter
     const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param RequestStack    $requestStack
+     * @param array|null      $properties
+     */
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    {
+        parent::__construct($managerRegistry, $properties);
+
+        $this->requestStack = $requestStack;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder, Request $request)
+    public function apply(ResourceInterface $resource, QueryBuilder $queryBuilder)
     {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
         foreach ($this->extractProperties($request) as $property => $values) {
             if (
                 !is_array($values) ||
@@ -77,10 +100,10 @@ class RangeFilter extends AbstractFilter
      * Adds the where clause according to the operator.
      *
      * @param QueryBuilder $queryBuilder
-     * @param string $alias
-     * @param string $field
-     * @param string $operator
-     * @param string $value
+     * @param string       $alias
+     * @param string       $field
+     * @param string       $operator
+     * @param string       $value
      */
     private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value)
     {
@@ -133,7 +156,7 @@ class RangeFilter extends AbstractFilter
             $properties = array_fill_keys($this->getClassMetadata($resource)->getFieldNames(), null);
         }
 
-        foreach ($properties as $property => $operator) {
+        foreach ($properties as $property => $unused) {
             if (!$this->isPropertyMapped($property, $resource)) {
                 continue;
             }
@@ -152,14 +175,14 @@ class RangeFilter extends AbstractFilter
      * Gets filter description.
      *
      * @param string $fieldName
-     * @param string $period
+     * @param string $operator
      *
      * @return array
      */
-    private function getFilterDescription($fieldName, $period)
+    private function getFilterDescription($fieldName, $operator)
     {
         return [
-            sprintf('%s[%s]', $fieldName, $period) => [
+            sprintf('%s[%s]', $fieldName, $operator) => [
                 'property' => $fieldName,
                 'type' => 'string',
                 'required' => false,
