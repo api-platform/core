@@ -14,6 +14,7 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
+use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Doctrine\Orm\Filter\RangeFilter;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
@@ -21,6 +22,7 @@ use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Lee Siong Chan <ahlee2326@me.com>
@@ -40,7 +42,7 @@ class RangeFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var Resource
+     * @var ResourceInterface
      */
     protected $resource;
 
@@ -62,23 +64,26 @@ class RangeFilterTest extends KernelTestCase
     public function testApply(array $filterParameters, array $query, $expected)
     {
         $request = Request::create('/api/dummies', 'GET', $query);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new RangeFilter(
             $this->managerRegistry,
+            $requestStack,
             $filterParameters['properties']
         );
 
         $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
-        
+
         try {
-            $filter->apply($this->resource, $queryBuilder, $request);
+            $filter->apply($this->resource, $queryBuilder);
         } catch (InvalidArgumentException $e) {
         }
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
-        
+
         $this->assertEquals(
             $expected,
             $actual,
@@ -88,7 +93,7 @@ class RangeFilterTest extends KernelTestCase
 
     public function testGetDescription()
     {
-        $filter = new RangeFilter($this->managerRegistry);
+        $filter = new RangeFilter($this->managerRegistry, new RequestStack());
         $this->assertEquals([
             'id[between]' => [
                 'property' => 'id',
