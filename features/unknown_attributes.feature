@@ -26,6 +26,7 @@ Feature: Ignore unknown attributes
       "alias": null,
       "description": null,
       "dummyDate": null,
+      "dummyPrice": null,
       "jsonData": [],
       "relatedDummy": null,
       "dummy": null,

@@ -16,7 +16,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
 <?xml version="1.0"?>
-<response><id>1</id><name>XML!</name><alias/><description/><dummyDate/><jsonData/><relatedDummy/><dummy/><relatedDummies/><nameConverted/></response>
+<response><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummy/><relatedDummies/><nameConverted/></response>
     """
 
   @dropSchema
@@ -34,6 +34,7 @@ Feature: Content Negotiation support
         "alias": null,
         "description": null,
         "dummyDate": null,
+        "dummyPrice": null,
         "jsonData": [],
         "relatedDummy": null,
         "dummy": null,

@@ -31,6 +31,7 @@ Feature: Create-Retrieve-Update-Delete
       "alias": null,
       "description": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyPrice": null,
       "jsonData": {
         "key": [
           "value1",
@@ -59,6 +60,7 @@ Feature: Create-Retrieve-Update-Delete
       "alias": null,
       "description": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyPrice": null,
       "jsonData": {
         "key": [
           "value1",
@@ -95,6 +97,7 @@ Feature: Create-Retrieve-Update-Delete
           "alias": null,
           "description": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
+          "dummyPrice": null,
           "jsonData": {
             "key": [
               "value1",
@@ -109,7 +112,7 @@ Feature: Create-Retrieve-Update-Delete
       ],
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after]}",
+          "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after]}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -174,6 +177,36 @@ Feature: Create-Retrieve-Update-Delete
               },
               {
                   "@type": "IriTemplateMapping",
+                  "variable": "dummyPrice[between]",
+                  "property": "dummyPrice",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyPrice[gt]",
+                  "property": "dummyPrice",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyPrice[gte]",
+                  "property": "dummyPrice",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyPrice[lt]",
+                  "property": "dummyPrice",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyPrice[lte]",
+                  "property": "dummyPrice",
+                  "required": false
+              },
+              {
+                  "@type": "IriTemplateMapping",
                   "variable": "dummyDate[before]",
                   "property": "dummyDate",
                   "required": false
@@ -229,6 +262,7 @@ Feature: Create-Retrieve-Update-Delete
         "alias": null,
         "description": null,
         "dummyDate": "2015-03-01T10:00:00+00:00",
+        "dummyPrice": null,
         "jsonData": [{
             "key": "value1"
           },

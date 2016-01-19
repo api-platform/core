@@ -89,7 +89,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->setDescription($i % 2 ? $descriptions[0] : $descriptions[1]);
+            $dummy->setDescription($descriptions[($i - 1) % 2]);
 
             $this->manager->persist($dummy);
         }
@@ -152,7 +152,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->setDescription($i % 2 ? $descriptions[0] : $descriptions[1]);
+            $dummy->setDescription($descriptions[($i - 1) % 2]);
 
             // Last Dummy has a null date
             if ($nb !== $i) {
@@ -187,6 +187,27 @@ class FeatureContext implements Context, SnippetAcceptingContext
             }
 
             $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummy objects with dummyPrice
+     */
+    public function thereIsDummyObjectsWithDummyPrice($nb)
+    {
+        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
+        $prices = [9.99, 12.99, 15.99, 19.99];
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDescription($descriptions[($i - 1) % 2]);
+            $dummy->setDummyPrice($prices[($i - 1) % 4]);
+
             $this->manager->persist($dummy);
         }
 

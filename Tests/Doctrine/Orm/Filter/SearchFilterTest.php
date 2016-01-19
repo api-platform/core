@@ -160,6 +160,12 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'dummyPrice' => [
+                'property' => 'dummyPrice',
+                'type' => 'decimal',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'jsonData' => [
                 'property' => 'jsonData',
                 'type' => 'json_array',
