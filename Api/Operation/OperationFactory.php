@@ -108,7 +108,7 @@ class OperationFactory
         $pluralizedName = $resource->getPluralizedName();
 
         if (null !== $pluralizedName) {
-            Inflector::rules('plural', array('irregular' => array(Inflector::tableize($shortName) => $pluralizedName)));
+            Inflector::rules('plural', ['irregular' => [Inflector::tableize($shortName) => $pluralizedName]]);
         }
 
         if (!isset(self::$inflectorCache[$shortName])) {
