@@ -69,4 +69,9 @@ class CustomResource implements ResourceInterface
     {
         return 'Custom';
     }
+
+    public function getPluralizedName()
+    {
+        return;
+    }
 }
