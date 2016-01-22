@@ -28,6 +28,7 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
 
         $prophecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
         $prophecy->getShortName()->willReturn('Foo');
+        $prophecy->getPluralizedName()->willReturn(null);
         $this->resource = $prophecy->reveal();
 
         $prophecy2 = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
