@@ -30,10 +30,10 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
         $prophecy->getShortName()->willReturn('Foo');
         $this->resource = $prophecy->reveal();
 
-        $prophecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
-        $prophecy->getShortName()->willReturn('Bar');
-        $prophecy->getPluralizedName()->willReturn('Barz');
-        $this->resource2 = $prophecy->reveal();
+        $prophecy2 = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
+        $prophecy2->getShortName()->willReturn('Bar');
+        $prophecy2->getPluralizedName()->willReturn('Barz');
+        $this->resource2 = $prophecy2->reveal();
     }
 
     public function testCreateCollectionOperationWithDefaultValues()
