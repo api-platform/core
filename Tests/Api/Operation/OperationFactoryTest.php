@@ -20,6 +20,7 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
 {
     private $operationFactory;
     private $resource;
+    private $resource2;
 
     public function setUp()
     {
@@ -28,6 +29,11 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
         $prophecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
         $prophecy->getShortName()->willReturn('Foo');
         $this->resource = $prophecy->reveal();
+
+        $prophecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
+        $prophecy->getShortName()->willReturn('Bar');
+        $prophecy->getPluralizedName()->willReturn('Barz');
+        $this->resource2 = $prophecy->reveal();
     }
 
     public function testCreateCollectionOperationWithDefaultValues()
@@ -48,7 +54,13 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateCollectionOperationWithAllParameters()
     {
         $operation = $this->operationFactory->createCollectionOperation(
-            $this->resource, ['GET', 'HEAD'], '/bar/{baz}', 'AppBundle:Test:cget', 'qux', ['kevin' => 'dunglas'], ['baz' => '\d']
+            $this->resource,
+            ['GET', 'HEAD'],
+            '/bar/{baz}',
+            'AppBundle:Test:cget',
+            'qux',
+            ['kevin' => 'dunglas'],
+            ['baz' => '\d']
         );
 
         $this->assertEquals('/bar/{baz}', $operation->getRoute()->getPath());
@@ -81,7 +93,13 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateItemOperationWithAllParameters()
     {
         $operation = $this->operationFactory->createItemOperation(
-            $this->resource, ['GET', 'HEAD'], '/bar/{id}', 'AppBundle:Test:cget', 'baz', ['kevin' => 'dunglas'], ['id' => '\d']
+            $this->resource,
+            ['GET', 'HEAD'],
+            '/bar/{id}',
+            'AppBundle:Test:cget',
+            'baz',
+            ['kevin' => 'dunglas'],
+            ['id' => '\d']
         );
 
         $this->assertEquals('/bar/{id}', $operation->getRoute()->getPath());
@@ -94,5 +112,20 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('baz', $operation->getRouteName());
         $this->assertEquals(['kevin' => 'dunglas'], $operation->getContext());
+    }
+
+    public function testCreateCollectionOperationWithCustomPluralizedName()
+    {
+        $operation = $this->operationFactory->createCollectionOperation($this->resource2, ['GET', 'DELETE']);
+
+        $this->assertEquals('/barz', $operation->getRoute()->getPath());
+        $this->assertEquals(['GET', 'DELETE'], $operation->getRoute()->getMethods());
+
+        $defaults = $operation->getRoute()->getDefaults();
+        $this->assertEquals('DunglasApiBundle:Resource:cget', $defaults['_controller']);
+        $this->assertEquals('Bar', $defaults['_resource']);
+
+        $this->assertEquals('api_barz_cget', $operation->getRouteName());
+        $this->assertEquals([], $operation->getContext());
     }
 }

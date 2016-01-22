@@ -57,6 +57,10 @@ class Resource implements RoutedResourceInterface
     /**
      * @var string|null
      */
+    private $pluralizedName;
+    /**
+     * @var string|null
+     */
     private $itemRouteName;
     /**
      * @var string|null
@@ -234,6 +238,24 @@ class Resource implements RoutedResourceInterface
     public function getShortName()
     {
         return $this->shortName;
+    }
+
+    /**
+     * Initializes pluralized name.
+     *
+     * @param string $pluralizedName
+     */
+    public function initPluralizedName($pluralizedName)
+    {
+        $this->pluralizedName = $pluralizedName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPluralizedName()
+    {
+        return $this->pluralizedName;
     }
 
     /**

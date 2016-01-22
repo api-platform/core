@@ -119,6 +119,14 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', $resource->getShortName());
     }
 
+    public function testPluralizedName()
+    {
+        $resource = new Resource('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity');
+        $resource->initPluralizedName('Tests');
+
+        $this->assertEquals('Test', $resource->getPluralizedName());
+    }
+
     /**
      * @expectedException \Dunglas\ApiBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage The class "Foo\Bar" does not exist.
