@@ -124,7 +124,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $resource = new Resource('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity');
         $resource->initPluralizedName('Tests');
 
-        $this->assertEquals('Test', $resource->getPluralizedName());
+        $this->assertEquals('Tests', $resource->getPluralizedName());
     }
 
     /**
