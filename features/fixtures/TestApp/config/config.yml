@@ -1,34 +1,34 @@
 framework:
-    secret:                           "dunglas.fr"
+    secret:                           'dunglas.fr'
     router:
-        resource:                     "%kernel.root_dir%/config/routing.yml"
-        strict_requirements:          "%kernel.debug%"
+        resource:                     '%kernel.root_dir%/config/routing.yml'
+        strict_requirements:          '%kernel.debug%'
     validation:
         enable_annotations:            true
     serializer:
         enable_annotations:            true
-    trusted_proxies: ~
-    test: ~
+    trusted_proxies:                   ~
+    test:                              ~
     session:
-        storage_id:                    "session.storage.mock_file"
+        storage_id:                    'session.storage.mock_file'
 
 doctrine:
     dbal:
-        driver:                        "pdo_sqlite"
-        path:                          "%kernel.cache_dir%/db.sqlite"
-        charset:                       "UTF8"
+        driver:                        'pdo_sqlite'
+        path:                          '%kernel.cache_dir%/db.sqlite'
+        charset:                       'UTF8'
 
     orm:
-        auto_generate_proxy_classes:   "%kernel.debug%"
+        auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
 
 dunglas_api:
-    title:                             "My Dummy API"
-    description:                       "This is a test API."
+    title:                             'My Dummy API'
+    description:                       'This is a test API.'
     collection:
         filter_name:
-            order:                     "order"
-        order:                         "ASC"
+            order:                     'order'
+        order:                         'ASC'
         pagination:
             items_per_page:
                 number:                3
@@ -36,136 +36,136 @@ dunglas_api:
 
 services:
     api.name_converter:
-        class: Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\NameConverter\CustomConverter
+        class:                      'Dunglas\ApiBundle\Tests\Behat\TestBundle\Serializer\NameConverter\CustomConverter'
 
     ressource.date_filter:
-        parent:    "api.doctrine.orm.date_filter"
-        arguments: [ { "dummyDate": ~, "relatedDummy.dummyDate": ~ } ]
+        parent:                     'api.doctrine.orm.date_filter'
+        arguments:                  [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
 
     my_dummy_resource.search_filter:
-        parent:                     "api.doctrine.orm.search_filter"
-        arguments:                  [ { "id": "exact", "name": "partial", "alias": "start", "description": "word_start", "relatedDummy.name": "exact", "relatedDummies": "exact"  } ]
+        parent:                     'api.doctrine.orm.search_filter'
+        arguments:                  [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact'  } ]
 
     my_dummy_resource.order_filter:
-        parent:                     "api.doctrine.orm.order_filter"
-        arguments:                  [ { "id": ~, "name": "desc", "relatedDummy.symfony": ~ } ]
+        parent:                     'api.doctrine.orm.order_filter'
+        arguments:                  [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
 
     my_dummy_resource.range_filter:
-            parent:                 "api.doctrine.orm.range_filter"
-            arguments:              [ { "dummyPrice": ~ } ]
+            parent:                 'api.doctrine.orm.range_filter'
+            arguments:              [ { 'dummyPrice': ~ } ]
 
     my_dummy_resource.date_filter:
-            parent:                 "api.doctrine.orm.date_filter"
-            arguments:              [ { "dummyDate": ~, "relatedDummy.dummyDate": ~ } ]
+            parent:                 'api.doctrine.orm.date_filter'
+            arguments:              [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
 
     my_dummy_resource:
-        parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" ]
+        parent:                      'api.resource'
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy' ]
         calls:
-                                     - method:    "initFilters"
-                                       arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.range_filter", "@my_dummy_resource.date_filter" ] ]
-        tags:                        [ { name: "api.resource" } ]
+                                     - method:    'initFilters'
+                                       arguments: [ [ '@my_dummy_resource.search_filter', '@my_dummy_resource.order_filter', '@my_dummy_resource.range_filter', '@my_dummy_resource.date_filter' ] ]
+        tags:                        [ { name: 'api.resource' } ]
 
     my_related_dummy_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy" ]
-        tags:                       [ { name: "api.resource" } ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy' ]
+        tags:                       [ { name: 'api.resource' } ]
 
     my_relation_embedder_resource.item_operation.get:
-        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
+        class:                      'Dunglas\ApiBundle\Api\Operation\Operation'
         public:                     false
-        factory:                    [ "@api.operation_factory", "createItemOperation" ]
-        arguments:                  [ "@my_relation_embedder_resource", "GET" ]
+        factory:                    [ '@api.operation_factory', 'createItemOperation' ]
+        arguments:                  [ '@my_relation_embedder_resource', 'GET' ]
 
     my_relation_embedder_resource.item_operation.put:
-        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
+        class:                      'Dunglas\ApiBundle\Api\Operation\Operation'
         public:                     false
-        factory:                    [ "@api.operation_factory", "createItemOperation" ]
-        arguments:                  [ "@my_relation_embedder_resource", "PUT" ]
+        factory:                    [ '@api.operation_factory', 'createItemOperation' ]
+        arguments:                  [ '@my_relation_embedder_resource', 'PUT' ]
 
     my_relation_embedder_resource.item_operation.custom_get:
-        class:                      "Dunglas\ApiBundle\Api\Operation\Operation"
+        class:                      'Dunglas\ApiBundle\Api\Operation\Operation'
         public:                     false
-        factory:                    [ "@api.operation_factory", "createItemOperation" ]
+        factory:                    [ '@api.operation_factory', 'createItemOperation' ]
         arguments:
-                                    - "@my_relation_embedder_resource"
-                                    - [ "GET", "HEAD" ]
-                                    - "/relation_embedders/{id}/custom"
-                                    - "TestBundle:Custom:custom"
-                                    - "my_custom_route"
+                                    - '@my_relation_embedder_resource'
+                                    - [ 'GET', 'HEAD' ]
+                                    - '/relation_embedders/{id}/custom'
+                                    - 'TestBundle:Custom:custom'
+                                    - 'my_custom_route'
                                     -
-                                        "@type":       "hydra:Operation"
-                                        "hydra:title": "A custom operation"
-                                        "returns":     "xmls:string"
+                                        '@type':       'hydra:Operation'
+                                        'hydra:title': 'A custom operation'
+                                        'returns':     'xmls:string'
 
     my_relation_embedder_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder" ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder' ]
         calls:
-                                    - method:    "initNormalizationContext"
+                                    - method:    'initNormalizationContext'
                                       arguments:
-                                          -      { groups: [ "barcelona" ] }
-                                    - method:    "initDenormalizationContext"
+                                          -      { groups: [ 'barcelona' ] }
+                                    - method:    'initDenormalizationContext'
                                       arguments:
-                                          -      { groups: [ "chicago" ] }
-                                    - method:    "initItemOperations"
+                                          -      { groups: [ 'chicago' ] }
+                                    - method:    'initItemOperations'
                                       arguments:
                                           -
-                                              -      "@my_relation_embedder_resource.item_operation.get"
-                                              -      "@my_relation_embedder_resource.item_operation.put"
-                                              -      "@my_relation_embedder_resource.item_operation.custom_get"
-        tags:                       [ { name: "api.resource" } ]
+                                              -      '@my_relation_embedder_resource.item_operation.get'
+                                              -      '@my_relation_embedder_resource.item_operation.put'
+                                              -      '@my_relation_embedder_resource.item_operation.custom_get'
+        tags:                       [ { name: 'api.resource' } ]
 
     my_abstract_dummy_resource:
-        parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AbstractDummy" ]
+        parent:                      'api.resource'
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\AbstractDummy' ]
         calls:
-                                     - method:    "initFilters"
-                                       arguments: [ [ "@my_dummy_resource.search_filter", "@my_dummy_resource.order_filter", "@my_dummy_resource.date_filter" ] ]
-        tags:                        [ { name: "api.resource" } ]
+                                     - method:    'initFilters'
+                                       arguments: [ [ '@my_dummy_resource.search_filter', '@my_dummy_resource.order_filter', '@my_dummy_resource.date_filter' ] ]
+        tags:                        [ { name: 'api.resource' } ]
 
     my_concrete_dummy_resource:
-        parent:                      "api.resource"
-        arguments:                   [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ConcreteDummy" ]
-        tags:                        [ { name: "api.resource" } ]
+        parent:                      'api.resource'
+        arguments:                   [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ConcreteDummy' ]
+        tags:                        [ { name: 'api.resource' } ]
 
     custom_resource:
-        parent:                     "api.resource"
-        class:                      "Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource"
-        tags:                       [ { name: "api.resource" } ]
+        parent:                     'api.resource'
+        class:                      'Dunglas\ApiBundle\Tests\Behat\TestBundle\Api\CustomResource'
+        tags:                       [ { name: 'api.resource' } ]
 
     third_level_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ThirdLevel" ]
-        tags:                       [ { name: "api.resource" } ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\ThirdLevel' ]
+        tags:                       [ { name: 'api.resource' } ]
 
     circular_reference_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CircularReference" ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CircularReference' ]
         calls:
-                                    - method:    "initNormalizationContext"
+                                    - method:    'initNormalizationContext'
                                       arguments:
-                                          -      { groups: [ "circular" ] }
-        tags:                       [ { name: "api.resource" } ]
+                                          -      { groups: [ 'circular' ] }
+        tags:                       [ { name: 'api.resource' } ]
 
     custom_identifier_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomIdentifierDummy" ]
-        tags:                       [ { name: "api.resource" } ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomIdentifierDummy' ]
+        tags:                       [ { name: 'api.resource' } ]
 
     custom_writable_identifier_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomWritableIdentifierDummy" ]
-        tags:                       [ { name: "api.resource" } ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomWritableIdentifierDummy' ]
+        tags:                       [ { name: 'api.resource' } ]
 
     custom_normalized_resource:
-        parent:                     "api.resource"
-        arguments:                  [ "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomNormalizedDummy" ]
+        parent:                     'api.resource'
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CustomNormalizedDummy' ]
         calls:
-                                    - method:    "initNormalizationContext"
+                                    - method:    'initNormalizationContext'
                                       arguments:
-                                          -      { groups: [ "output" ] }
-                                    - method:    "initDenormalizationContext"
+                                          -      { groups: [ 'output' ] }
+                                    - method:    'initDenormalizationContext'
                                       arguments:
-                                          -      { groups: [ "input" ] }
-        tags:                       [ { name: "api.resource" } ]
+                                          -      { groups: [ 'input' ] }
+        tags:                       [ { name: 'api.resource' } ]
