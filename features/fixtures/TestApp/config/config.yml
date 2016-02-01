@@ -41,21 +41,21 @@ dunglas_api:
                 client_can_change:     true
 
 fos_user:
-    db_driver:        orm
-    firewall_name:    api
+    db_driver:        'orm'
+    firewall_name:    'api'
     service:
-        user_manager: api.user_manager
+        user_manager: 'api.user_manager'
     user_class:       'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\User'
 
 services:
     api.user_manager:
         class: 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Manager\UserManager'
         arguments:
-            -  @security.encoder_factory
-            -  @fos_user.util.username_canonicalizer
-            -  @fos_user.util.email_canonicalizer
-            -  @fos_user.entity_manager
-            -  %fos_user.model.user.class%
+            -  '@security.encoder_factory'
+            -  '@fos_user.util.username_canonicalizer'
+            -  '@fos_user.util.email_canonicalizer'
+            -  '@fos_user.entity_manager'
+            -  '%fos_user.model.user.class%'
 
     fos_user.mailer.default:
         class: 'Dunglas\ApiBundle\Tests\Mock\MailerMock'
@@ -66,7 +66,7 @@ services:
     xml_responder_view_listener:
         class: 'Dunglas\ApiBundle\Tests\Behat\TestBundle\EventListener\XmlResponderViewListener'
         arguments:
-            - @api.serializer
+            - '@api.serializer'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.view', method: 'onKernelView' }
 
