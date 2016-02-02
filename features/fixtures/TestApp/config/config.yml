@@ -220,3 +220,20 @@ services:
                                     - method:    'initCollectionOperations'
                                       arguments:
                                             - []
+    composite_identifier_item_resource:
+        parent:                     "api.resource"
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeItem' ]
+        tags:                       [ { name: "api.resource" } ]
+        calls:
+                                    - method:    "initNormalizationContext"
+                                      arguments:
+                                          -      { groups: [ "default" ] }
+
+    composite_identifier_relation_resource:
+        parent:                     "api.resource"
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeRelation' ]
+        tags:                       [ { name: "api.resource" } ]
+    composite_identifier_label_resource:
+        parent:                     "api.resource"
+        arguments:                  [ 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\CompositeLabel' ]
+        tags:                       [ { name: "api.resource" } ]
