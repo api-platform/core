@@ -119,12 +119,12 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', $resource->getShortName());
     }
 
-    public function testPluralizedName()
+    public function testBasePath()
     {
         $resource = new Resource('Dunglas\ApiBundle\Tests\Fixtures\DummyEntity');
-        $resource->initPluralizedName('Tests');
+        $resource->initBasePath('Tests');
 
-        $this->assertEquals('Tests', $resource->getPluralizedName());
+        $this->assertEquals('Tests', $resource->getBasePath());
     }
 
     /**

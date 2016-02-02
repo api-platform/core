@@ -57,7 +57,7 @@ class Resource implements RoutedResourceInterface
     /**
      * @var string|null
      */
-    private $pluralizedName;
+    private $basePath;
     /**
      * @var string|null
      */
@@ -241,21 +241,21 @@ class Resource implements RoutedResourceInterface
     }
 
     /**
-     * Initializes pluralized name.
+     * Initializes base path.
      *
-     * @param string $pluralizedName
+     * @param string $basePath
      */
-    public function initPluralizedName($pluralizedName)
+    public function initBasePath($basePath)
     {
-        $this->pluralizedName = $pluralizedName;
+        $this->basePath = $basePath;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPluralizedName()
+    public function getBasePath()
     {
-        return $this->pluralizedName;
+        return $this->basePath;
     }
 
     /**

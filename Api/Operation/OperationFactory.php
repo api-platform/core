@@ -105,10 +105,10 @@ class OperationFactory
         $requirements = []
     ) {
         $shortName = $resource->getShortName();
-        $pluralizedName = $resource->getPluralizedName();
+        $basePath = $resource->getBasePath();
 
-        if (null !== $pluralizedName) {
-            Inflector::rules('plural', ['irregular' => [Inflector::tableize($shortName) => $pluralizedName]]);
+        if (null !== $basePath) {
+            Inflector::rules('plural', ['irregular' => [Inflector::tableize($shortName) => $basePath]]);
         }
 
         if (!isset(self::$inflectorCache[$shortName])) {

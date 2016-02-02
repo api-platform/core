@@ -26,14 +26,14 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->operationFactory = new OperationFactory();
 
-        $prophecy = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
+        $prophecy = $this->prophesize('Dunglas\ApiBundle\Api\RoutedResourceInterface');
         $prophecy->getShortName()->willReturn('Foo');
-        $prophecy->getPluralizedName()->willReturn(null);
+        $prophecy->getBasePath()->willReturn(null);
         $this->resource = $prophecy->reveal();
 
-        $prophecy2 = $this->prophesize('Dunglas\ApiBundle\Api\ResourceInterface');
+        $prophecy2 = $this->prophesize('Dunglas\ApiBundle\Api\RoutedResourceInterface');
         $prophecy2->getShortName()->willReturn('Bar');
-        $prophecy2->getPluralizedName()->willReturn('Barz');
+        $prophecy2->getBasePath()->willReturn('Barz');
         $this->resource2 = $prophecy2->reveal();
     }
 
@@ -115,7 +115,7 @@ class OperationFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['kevin' => 'dunglas'], $operation->getContext());
     }
 
-    public function testCreateCollectionOperationWithCustomPluralizedName()
+    public function testCreateCollectionOperationWithCustomBasePath()
     {
         $operation = $this->operationFactory->createCollectionOperation($this->resource2, ['GET', 'DELETE']);
 

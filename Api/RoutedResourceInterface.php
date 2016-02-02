@@ -31,4 +31,11 @@ interface RoutedResourceInterface extends ResourceInterface
      * @return string|null
      */
     public function getCollectionRouteName();
+
+    /**
+     * Gets the custom base path of the resource.
+     *
+     * @return string
+     */
+    public function getBasePath();
 }

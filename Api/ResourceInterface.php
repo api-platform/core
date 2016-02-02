@@ -90,11 +90,4 @@ interface ResourceInterface
      * @return string
      */
     public function getShortName();
-
-    /**
-     * Gets the custom pluralized name of the resource.
-     *
-     * @return string
-     */
-    public function getPluralizedName();
 }
