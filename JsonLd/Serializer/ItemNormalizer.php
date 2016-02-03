@@ -228,8 +228,8 @@ class ItemNormalizer extends AbstractNormalizer
         );
 
         foreach ($normalizedData as $attributeName => $attributeValue) {
-            // Ignore JSON-LD special attributes
-            if ('@' === $attributeName[0]) {
+            // Ignore JSON-LD special attributes and null attribute names
+            if ('@' === $attributeName[0] || is_null($attributeName[0])) {
                 continue;
             }
 
