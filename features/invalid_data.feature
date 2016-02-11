@@ -46,6 +46,28 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
 
+  Scenario: Send a document with an integer as key (invalid JSON)
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      0: "bar"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+
+  Scenario: Send a document with an empty as key (valid JSON)
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "": "bar"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+
   @dropSchema
   Scenario: Send non-array data when an array is expected
     When I send a "POST" request to "/dummies" with body:

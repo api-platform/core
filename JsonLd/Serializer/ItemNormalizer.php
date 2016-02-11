@@ -187,9 +187,7 @@ class ItemNormalizer extends AbstractNormalizer
 
         $resource = $this->guessResource($data, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
-
         $context = $this->createContext($resource, $context);
-
         $attributesMetadata = $this->getMetadata($resource, $context)->getAttributes();
 
         $allowedAttributes = [];
@@ -228,11 +226,6 @@ class ItemNormalizer extends AbstractNormalizer
         );
 
         foreach ($normalizedData as $attributeName => $attributeValue) {
-            // Ignore JSON-LD special attributes
-            if ('@' === $attributeName[0]) {
-                continue;
-            }
-
             if ($this->nameConverter) {
                 $attributeName = $this->nameConverter->denormalize($attributeName);
             }
