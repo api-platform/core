@@ -32,11 +32,8 @@
         <service id="api.doctrine.orm.search_filter" class="Dunglas\ApiBundle\Bridge\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument type="service" id="request_stack" />
+            <argument type="service" id="api.iri_converter" />
             <argument type="service" id="api.property_accessor" />
-
-            <!--<call method="setIriConverter">
-                <argument type="service" id="api.iri_converter" />
-            </call>-->
         </service>
 
         <service id="api.doctrine.orm.order_filter" class="Dunglas\ApiBundle\Bridge\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">

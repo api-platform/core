@@ -124,7 +124,7 @@ final class DunglasApiExtension extends Extension implements PrependExtensionInt
      */
     private function registerCache(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!isset($config['cache']) || !$config['cache']) {
+        /*if (!isset($config['cache']) || !$config['cache']) {
             return;
         }
 
@@ -140,6 +140,6 @@ final class DunglasApiExtension extends Extension implements PrependExtensionInt
         $container->getDefinition('api.mapping.resource.loader.collection.cache_decorator')->addArgument($cacheReference);
         $container->getDefinition('api.mapping.resource.loader.metadata.cache_decorator')->addArgument($cacheReference);
         $container->getDefinition('api.mapping.property.loader.collection.cache_decorator')->addArgument($cacheReference);
-        $container->getDefinition('api.mapping.property.loader.metadata.cache_decorator')->addArgument($cacheReference);
+        $container->getDefinition('api.mapping.property.loader.metadata.cache_decorator')->addArgument($cacheReference);*/
     }
 }
