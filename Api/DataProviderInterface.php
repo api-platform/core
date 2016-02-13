@@ -21,32 +21,4 @@ use Dunglas\ApiBundle\Exception\InvalidArgumentException;
  */
 interface DataProviderInterface
 {
-    /**
-     * Retrieves an item.
-     *
-     * @param string      $resourceClass
-     * @param string|null $operationName
-     * @param int|string  $id
-     * @param bool        $fetchData
-     *
-     * @throws ResourceClassNotSupportedException
-     * @throws InvalidArgumentException
-     *
-     * @return object|null
-     */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false);
-
-    /**
-     * Retrieves a collection.
-     *
-     * @param string      $resourceClass
-     * @param string|null $operationName
-     *
-     * @throws ResourceClassNotSupportedException
-     *
-     * @return array|PaginatorInterface|\Traversable
-     */
-    public function getCollection(string $resourceClass, string $operationName = null);
-
-    // Missing supports
 }

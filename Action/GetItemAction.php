@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Action;
 
+use Dunglas\ApiBundle\Api\ItemDataProviderInterface;
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -25,14 +25,11 @@ final class GetItemAction
 {
     use ActionUtilTrait;
 
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
+    private $itemDataProvider;
 
-    public function __construct(DataProviderInterface $dataProvider)
+    public function __construct(ItemDataProviderInterface $itemDataProvider)
     {
-        $this->dataProvider = $dataProvider;
+        $this->itemDataProvider = $itemDataProvider;
     }
 
     /**
@@ -50,6 +47,6 @@ final class GetItemAction
     {
         list($resourceClass, , $operationName) = $this->extractAttributes($request);
 
-        return $this->getItem($this->dataProvider, $resourceClass, $operationName, $id);
+        return $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Action;
 
+use Dunglas\ApiBundle\Api\ItemDataProviderInterface;
 use Dunglas\ApiBundle\Exception\RuntimeException;
 use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,19 +27,12 @@ final class PutItemAction
 {
     use ActionUtilTrait;
 
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
-
-    /**
-     * @var SerializerInterface
-     */
+    private $itemDataProvider;
     private $serializer;
 
-    public function __construct(DataProviderInterface $dataProvider, SerializerInterface $serializer)
+    public function __construct(ItemDataProviderInterface $itemDataProvider, SerializerInterface $serializer)
     {
-        $this->dataProvider = $dataProvider;
+        $this->itemDataProvider = $itemDataProvider;
         $this->serializer = $serializer;
     }
 
@@ -56,7 +50,7 @@ final class PutItemAction
     public function __invoke(Request $request, $id)
     {
         list($resourceClass, , $operationName, $format) = $this->extractAttributes($request);
-        $data = $this->getItem($this->dataProvider, $resourceClass, $operationName, $id);
+        $data = $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
 
         $context = ['object_to_populate' => $data, 'resource_class' => $resourceClass, 'item_operation_name' => $operationName];
 

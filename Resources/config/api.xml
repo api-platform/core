@@ -37,7 +37,7 @@
         <service id="api.iri_converter" class="Dunglas\ApiBundle\Bridge\Symfony\Routing\IriConverter" public="false">
             <argument type="service" id="api.metadata.property.factory.collection" />
             <argument type="service" id="api.metadata.property.factory.item" />
-            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="api.item_data_provider" />
             <argument type="service" id="api.router" />
             <argument type="service" id="api.property_accessor" />
         </service>
@@ -63,7 +63,7 @@
         <!-- Action -->
 
         <service id="api.action.get_collection" class="Dunglas\ApiBundle\Action\GetCollectionAction">
-            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="api.collection_data_provider" />
         </service>
 
         <service id="api.action.post_collection" class="Dunglas\ApiBundle\Action\PostCollectionAction">
@@ -71,16 +71,16 @@
         </service>
 
         <service id="api.action.get_item" class="Dunglas\ApiBundle\Action\GetItemAction">
-            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="api.item_data_provider" />
         </service>
 
         <service id="api.action.put_item" class="Dunglas\ApiBundle\Action\PutItemAction">
-            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="api.item_data_provider" />
             <argument type="service" id="api.serializer" />
         </service>
 
         <service id="api.action.delete_item" class="Dunglas\ApiBundle\Action\DeleteItemAction">
-            <argument type="service" id="api.data_provider" />
+            <argument type="service" id="api.item_data_provider" />
         </service>
 
     </services>

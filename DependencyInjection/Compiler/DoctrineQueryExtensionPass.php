@@ -30,10 +30,11 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $dataProviderDefinition = $container->getDefinition('api.doctrine.orm.data_provider');
+        $collectionDataProviderDefinition = $container->getDefinition('api.doctrine.orm.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api.doctrine.orm.item_data_provider');
 
-        $dataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.collection'));
-        $dataProviderDefinition->replaceArgument(4, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.item'));
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.item'));
     }
 
     /**

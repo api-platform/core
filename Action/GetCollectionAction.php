@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Action;
 
+use Dunglas\ApiBundle\Api\CollectionDataProviderInterface;
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,14 +24,11 @@ final class GetCollectionAction
 {
     use ActionUtilTrait;
 
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
+    private $collectionDataProvider;
 
-    public function __construct(DataProviderInterface $dataProvider)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider)
     {
-        $this->dataProvider = $dataProvider;
+        $this->collectionDataProvider = $collectionDataProvider;
     }
 
     /**
@@ -39,7 +36,7 @@ final class GetCollectionAction
      *
      * @param Request $request
      *
-     * @return array|\Dunglas\ApiBundle\Model\PaginatorInterface|\Traversable
+     * @return array|\Dunglas\ApiBundle\Api\PaginatorInterface|\Traversable
      *
      * @throws RuntimeException
      */
@@ -47,6 +44,6 @@ final class GetCollectionAction
     {
         list($resourceClass, $operationName) = $this->extractAttributes($request);
 
-        return $this->dataProvider->getCollection($resourceClass, $operationName);
+        return $this->collectionDataProvider->getCollection($resourceClass, $operationName);
     }
 }

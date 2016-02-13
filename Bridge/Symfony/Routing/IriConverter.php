@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Bridge\Symfony\Routing;
 
 use Dunglas\ApiBundle\Api\IriConverterInterface;
+use Dunglas\ApiBundle\Api\ItemDataProviderInterface;
 use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
@@ -32,36 +33,17 @@ final class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
 
-    /**
-     * @var CollectionMetadataFactoryInterface
-     */
     private $collectionMetadataFactory;
-
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
-
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
-
-    /**
-     * @var RouterInterface
-     */
+    private $itemDataProvider;
     private $router;
-
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
-    public function __construct(CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory, DataProviderInterface $dataProvider, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->collectionMetadataFactory = $collectionMetadataFactory;
         $this->itemMetadataFactory = $itemMetadataFactory;
-        $this->dataProvider = $dataProvider;
+        $this->itemDataProvider = $itemDataProvider;
         $this->router = $router;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
@@ -81,7 +63,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        if ($item = $this->dataProvider->getItem($parameters['_resource_class'], $parameters['id'], $fetchData)) {
+        if ($item = $this->itemDataProvider->getItem($parameters['_resource_class'], $parameters['id'], $fetchData)) {
             return $item;
         }
 

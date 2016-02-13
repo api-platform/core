@@ -77,66 +77,7 @@ final class DataProvider implements DataProviderInterface
         $this->decorated = $decorated;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
-    {
-        if ($this->decorated) {
-            try {
-                return $this->decorated->getItem($resourceClass, $id, $operationName, $fetchData);
-            } catch (ResourceClassNotSupportedException $resourceClassNotSupportedException) {
-                // Ignore it
-            }
-        }
 
-        if (!$this->supports($resourceClass)) {
-            throw new ResourceClassNotSupportedException();
-        }
-
-        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-
-        $identifierValues = explode('-', $id);
-        $identifiers = [];
-        $i = 0;
-
-        foreach ($this->collectionMetadataFactory->create($resourceClass) as $propertyName) {
-            $itemMetadata = $this->itemMetadataFactory->create($resourceClass, $propertyName);
-
-            if (!$itemMetadata->isIdentifier()) {
-                continue;
-            }
-
-            if (!isset($identifierValues[$i])) {
-                throw new InvalidArgumentException(sprintf('Invalid identifier "%s".', $id));
-            }
-
-            $identifiers[$propertyName] = $identifierValues[$i];
-            ++$i;
-        }
-
-        if (!$fetchData || $manager instanceof EntityManagerInterface) {
-            return $manager->getReference($resourceClass, $identifiers);
-        }
-
-        $repository = $manager->getRepository($resourceClass);
-        $queryBuilder = $repository->createQueryBuilder('o');
-
-        foreach ($identifiers as $propertyName => $value) {
-            $placeholder = 'id_'.$propertyName;
-
-            $queryBuilder
-                ->where($queryBuilder->expr()->eq('o.'.$propertyName, ':'.$placeholder))
-                ->setParameter($placeholder, $value)
-            ;
-        }
-
-        foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
-        }
-
-        return $queryBuilder->getQuery()->getOneOrNullResult();
-    }
 
     /**
      * {@inheritdoc}
@@ -173,7 +114,7 @@ final class DataProvider implements DataProviderInterface
     }
 
     /**
-     * Is this class supported.
+     * Is this class supported?
      */
     private function supports(string $resourceClass) : bool
     {
