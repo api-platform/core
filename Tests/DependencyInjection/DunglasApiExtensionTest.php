@@ -19,7 +19,7 @@ use Prophecy\Argument;
  */
 class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    private static $defaultConfig = [
+    const DEFAULT_CONFIG = [
         'dunglas_api' => [
             'title' => 'title',
             'description' => 'description',
@@ -89,20 +89,18 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
-        $containerBuilderProphecy->removeDefinition('api.cache_warmer.metadata')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
-        $this->extension->load(self::$defaultConfig, $containerBuilder);
+        $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api.fos_user.event_subscriber', Argument::type('Symfony\Component\DependencyInjection\Definition'))->shouldBeCalled();
-        $containerBuilderProphecy->removeDefinition('api.cache_warmer.metadata')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
-        $this->extension->load(array_merge_recursive(self::$defaultConfig, ['dunglas_api' => ['enable_fos_user' => true]]), $containerBuilder);
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['dunglas_api' => ['enable_fos_user' => true]]), $containerBuilder);
     }
 
     public function testEnableCache()
@@ -117,7 +115,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->getDefinition('api.mapping.class_metadata_factory')->willReturn($metadataFactoryDefinition)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
-        $this->extension->load(array_merge_recursive(self::$defaultConfig, ['dunglas_api' => ['cache' => true]]), $containerBuilder);
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['dunglas_api' => ['cache' => true]]), $containerBuilder);
     }
 
     private function getContainerBuilderProphecy()
@@ -160,24 +158,10 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api.action.get_item', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.put_item', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.action.delete_item', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.property_info', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.property_info.doctrine_extractor', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.property_info.php_doc_extractor', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.property_info.setter_extractor', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.cache_warmer.metadata', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.class_metadata_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.attribute_metadata_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.cache.apc', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.chain', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.serializer_metadata', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.validator_metadata', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.reflection', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.phpdoc', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.mapping.loaders.annotation', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.mapping.loaders.identifier', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.metadata_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_data_provider', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.doctrine.orm.collection_data_provider', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.doctrine.orm.item_data_provider', $definitionArgument)->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_item_data_provider', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.search_filter', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.order_filter', $definitionArgument)->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api.doctrine.orm.date_filter', $definitionArgument)->shouldBeCalled();
