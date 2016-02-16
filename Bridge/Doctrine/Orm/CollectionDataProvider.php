@@ -13,7 +13,6 @@ namespace Dunglas\ApiBundle\Bridge\Doctrine\Orm;
 
 use Dunglas\ApiBundle\Api\CollectionDataProviderInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
 use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;

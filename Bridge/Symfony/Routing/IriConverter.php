@@ -17,7 +17,6 @@ use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Dunglas\ApiBundle\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;

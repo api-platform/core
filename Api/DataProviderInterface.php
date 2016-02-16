@@ -11,9 +11,6 @@
 
 namespace Dunglas\ApiBundle\Api;
 
-use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
-use Dunglas\ApiBundle\Exception\InvalidArgumentException;
-
 /**
  * Data provider interface.
  *

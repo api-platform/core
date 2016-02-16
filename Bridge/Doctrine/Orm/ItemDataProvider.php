@@ -18,7 +18,6 @@ use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Api\DataProviderInterface;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 
 /**

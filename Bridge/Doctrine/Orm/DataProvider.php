@@ -12,8 +12,6 @@
 namespace Dunglas\ApiBundle\Bridge\Doctrine\Orm;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
-use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface;
@@ -76,8 +74,6 @@ final class DataProvider implements DataProviderInterface
         $this->collectionExtensions = $collectionExtensions;
         $this->decorated = $decorated;
     }
-
-
 
     /**
      * {@inheritdoc}

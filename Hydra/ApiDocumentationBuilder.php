@@ -390,7 +390,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     {
         $type = $propertyItemMetadata->getType();
         if (!$type) {
-            return null;
+            return;
         }
 
         if ($type->isCollection() && $collectionType = $type->getCollectionValueType()) {
@@ -426,7 +426,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             break;
         }
 
-        return null;
+        return;
     }
 
     /**

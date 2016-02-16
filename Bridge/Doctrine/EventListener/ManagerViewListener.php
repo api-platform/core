@@ -13,7 +13,6 @@ namespace Dunglas\ApiBundle\Bridge\Doctrine\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Dunglas\ApiBundle\Api\ResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -86,7 +85,7 @@ final class ManagerViewListener
         $objectManager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         if (null === $objectManager || !is_object($data)) {
-            return null;
+            return;
         }
 
         return $objectManager;
