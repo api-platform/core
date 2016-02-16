@@ -98,7 +98,14 @@ class IriConverter implements IriConverterInterface
     public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
         if ($resource = $this->resourceCollection->getResourceForEntity($item)) {
+
             $identifier = $this->getIdentifierFromResource($resource);
+
+
+            if(!$identifier)
+            {
+                return false;
+            }
 
             return $this->router->generate(
                 $this->getRouteName($resource, 'item'),
@@ -173,12 +180,28 @@ class IriConverter implements IriConverterInterface
      */
     private function getIdentifierFromResource(ResourceInterface $resource)
     {
+
+        if($resource->getEntityClass() != 'AppBundle\Entity\ParkingSpace')
+        {
+//            dump($resource);
+//            die();
+        }
+
+
         $classMetadata = $this->classMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
             $resource->getNormalizationGroups(),
             $resource->getDenormalizationGroups(),
             $resource->getValidationGroups()
         );
+
+//        echo "foo";
+        if($classMetadata->getName() != 'AppBundle\Entity\ParkingSpace')
+        {
+//            dump($classMetadata);
+//            die();
+
+        }
 
         return $classMetadata->getIdentifier();
     }
