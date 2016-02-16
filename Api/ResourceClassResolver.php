@@ -25,9 +25,6 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
 {
     use ClassInfoTrait;
 
-    /**
-     * @var CollectionMetadataFactoryInterface
-     */
     private $collectionMetadataFactory;
 
     public function __construct(CollectionMetadataFactoryInterface $collectionMetadataFactory)

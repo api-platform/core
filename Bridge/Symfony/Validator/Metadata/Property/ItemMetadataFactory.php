@@ -30,14 +30,7 @@ final class ItemMetadataFactory implements ItemMetadataFactoryInterface
      */
     const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
-    /**
-     * @var LoaderInterface
-     */
     private $decorated;
-
-    /**
-     * @var MetadataFactoryInterface
-     */
     private $metadataFactory;
 
     public function __construct(MetadataFactoryInterface $metadataFactory, ItemMetadataFactoryInterface $decorated)

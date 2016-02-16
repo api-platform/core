@@ -30,9 +30,6 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         UrlGeneratorInterface::NET_PATH => RouterInterface::NETWORK_PATH,
     ];
 
-    /**
-     * @var RouterInterface
-     */
     private $router;
 
     public function __construct(RouterInterface $router)

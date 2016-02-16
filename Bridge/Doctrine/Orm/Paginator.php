@@ -22,9 +22,6 @@ use Dunglas\ApiBundle\Api\PaginatorInterface;
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
-    /**
-     * @var DoctrineOrmPaginator
-     */
     private $paginator;
 
     /**

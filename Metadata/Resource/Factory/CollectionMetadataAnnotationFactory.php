@@ -22,19 +22,8 @@ use Dunglas\ApiBundle\Metadata\Resource\CollectionMetadata;
  */
 final class CollectionMetadataAnnotationFactory implements CollectionMetadataFactoryInterface
 {
-    /**
-     * @var Reader
-     */
     private $reader;
-
-    /**
-     * @var string[]
-     */
     private $paths;
-
-    /**
-     * @var CollectionMetadataFactoryInterface|null
-     */
     private $decorated;
 
     /**

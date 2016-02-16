@@ -18,11 +18,8 @@ use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemMetadataOperationFactory implements ItemMetadataFactoryInterface
+final class ItemMetadataOperationFactory implements ItemMetadataFactoryInterface
 {
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $decorated;
 
     public function __construct(ItemMetadataFactoryInterface $decorated)

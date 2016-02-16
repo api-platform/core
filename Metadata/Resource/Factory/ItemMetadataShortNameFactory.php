@@ -20,9 +20,6 @@ use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
  */
 final class ItemMetadataShortNameFactory implements ItemMetadataFactoryInterface
 {
-    /**
-     * @var LoaderInterface
-     */
     private $decorated;
 
     public function __construct(ItemMetadataFactoryInterface $decorated)

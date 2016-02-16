@@ -17,16 +17,9 @@ use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-class OperationMethodResolver implements OperationMethodResolverInterface
+final class OperationMethodResolver implements OperationMethodResolverInterface
 {
-    /**
-     * @var RouterInterface
-     */
     private $router;
-
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
 
     public function __construct(RouterInterface $router, ItemMetadataFactoryInterface $itemMetadataFactory)

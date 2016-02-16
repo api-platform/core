@@ -21,14 +21,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 final class FormatRequestListener
 {
-    /**
-     * @var FormatNegotiatorInterface
-     */
     private $formatNegotiator;
-
-    /**
-     * @var string[]
-     */
     private $supportedFormats;
 
     /**

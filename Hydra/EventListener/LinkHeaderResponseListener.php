@@ -22,9 +22,6 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 final class LinkHeaderResponseListener
 {
-    /**
-     * @var UrlGeneratorInterface
-     */
     private $urlGenerator;
 
     public function __construct(UrlGeneratorInterface $urlGenerator)

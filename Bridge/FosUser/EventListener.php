@@ -24,9 +24,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  */
 final class EventListener
 {
-    /**
-     * @var UserManagerInterface
-     */
     private $userManager;
 
     public function __construct(UserManagerInterface $userManager)

@@ -29,10 +29,6 @@ class DateFilter extends AbstractFilter
     const EXCLUDE_NULL = 'exclude_null';
     const INCLUDE_NULL_BEFORE = 'include_null_before';
     const INCLUDE_NULL_AFTER = 'include_null_after';
-
-    /**
-     * @var array
-     */
     const DOCTRINE_DATE_TYPES = [
         'date' => true,
         'datetime' => true,
@@ -40,9 +36,6 @@ class DateFilter extends AbstractFilter
         'time' => true,
     ];
 
-    /**
-     * @var RequestStack
-     */
     private $requestStack;
 
     /**

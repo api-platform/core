@@ -25,14 +25,7 @@ use Dunglas\ApiBundle\Metadata\Resource\PaginationMetadata;
  */
 final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterface
 {
-    /**
-     * @var Reader
-     */
     private $reader;
-
-    /**
-     * @var ItemMetadataFactoryInterface|null
-     */
     private $decorated;
 
     public function __construct(Reader $reader, ItemMetadataFactoryInterface $decorated = null)

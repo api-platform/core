@@ -18,9 +18,6 @@ namespace Dunglas\ApiBundle\Metadata\Resource;
  */
 final class CollectionMetadata implements \IteratorAggregate, \Countable
 {
-    /**
-     * @var string[]
-     */
     private $classes;
 
     /**

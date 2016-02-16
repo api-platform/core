@@ -26,14 +26,7 @@ final class ErrorNormalizer implements NormalizerInterface
 {
     const FORMAT = 'hydra-error';
 
-    /**
-     * @var UrlGeneratorInterface
-     */
     private $urlGenerator;
-
-    /**
-     * @var bool
-     */
     private $debug;
 
     public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug)

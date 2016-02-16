@@ -22,14 +22,7 @@ use Dunglas\ApiBundle\Metadata\Property\ItemMetadata;
  */
 final class ItemMetadataFactory implements ItemMetadataFactoryInterface
 {
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $decorated;
-
-    /**
-     * @var ManagerRegistry
-     */
     private $managerRegistry;
 
     public function __construct(ManagerRegistry $managerRegistry, ItemMetadataFactoryInterface $decorated)

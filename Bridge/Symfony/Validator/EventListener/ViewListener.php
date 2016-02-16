@@ -24,14 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class ViewListener
 {
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
-
-    /**
-     * @var ValidatorInterface
-     */
     private $validator;
 
     public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, ValidatorInterface $validator)

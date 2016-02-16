@@ -27,7 +27,7 @@ use Dunglas\ApiBundle\Metadata\Property\ItemMetadata as PropertyItemMetadata;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
+final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 {
     /**
      * @var ResourceCollectionMetadataFactoryInterface

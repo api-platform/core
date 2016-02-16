@@ -25,29 +25,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ContextBuilder implements ContextBuilderInterface
 {
-    /**
-     * @var ResourceCollectionMetadataFactoryInterface
-     */
     private $resourceCollectionMetadataFactory;
-
-    /**
-     * @var ResourceItemMetadataFactoryInterface
-     */
     private $resourceItemMetadataFactory;
-
-    /**
-     * @var PropertyCollectionMetadataFactoryInterface
-     */
     private $propertyCollectionMetadataFactory;
-
-    /**
-     * @var PropertyItemMetadataFactoryInterface
-     */
     private $propertyItemMetadataFactory;
-
-    /**
-     * @var UrlGeneratorInterface
-     */
     private $urlGenerator;
 
     /**

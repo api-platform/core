@@ -28,34 +28,11 @@ use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterfac
  */
 final class DataProvider implements DataProviderInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
     private $managerRegistry;
-
-    /**
-     * @var CollectionMetadataFactoryInterface
-     */
     private $collectionMetadataFactory;
-
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
-
-    /**
-     * @var QueryItemExtensionInterface[]
-     */
     private $itemExtensions;
-
-    /**
-     * @var QueryCollectionExtensionInterface[]
-     */
     private $collectionExtensions;
-
-    /**
-     * @var DataProviderInterface|null
-     */
     private $decorated;
 
     /**

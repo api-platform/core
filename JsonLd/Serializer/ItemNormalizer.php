@@ -38,44 +38,14 @@ final class ItemNormalizer extends AbstractNormalizer
 {
     use ContextTrait;
 
-    /**
-     * @var string
-     */
     const FORMAT = 'jsonld';
 
-    /**
-     * @var ResourceItemMetadataFactoryInterface
-     */
     private $resourceItemMetadataFactory;
-
-    /**
-     * @var PropertyCollectionMetadataFactoryInterface
-     */
     private $propertyCollectionMetadataFactory;
-
-    /**
-     * @var PropertyItemMetadataFactoryInterface
-     */
     private $propertyItemMetadataFactory;
-
-    /**
-     * @var IriConverterInterface
-     */
     private $iriConverter;
-
-    /**
-     * @var ResourceClassResolverInterface
-     */
     private $resourceClassResolver;
-
-    /**
-     * @var ContextBuilderInterface
-     */
     private $contextBuilder;
-
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
     public function __construct(ResourceItemMetadataFactoryInterface $resourceItemMetadataFactory, PropertyCollectionMetadataFactoryInterface $propertyCollectionMetadataFactory, PropertyItemMetadataFactoryInterface $propertyItemMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null)

@@ -24,27 +24,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ContextAction
 {
-    /**
-     * @var array
-     */
     const RESERVED_SHORT_NAMES = [
         'ConstraintViolationList' => true,
         'Error' => true,
     ];
 
-    /**
-     * @var ContextBuilderInterface
-     */
     private $contextBuilder;
-
-    /**
-     * @var CollectionMetadataFactoryInterface
-     */
     private $collectionMetadataFactory;
-
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
 
     public function __construct(ContextBuilderInterface $contextBuilder, CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory)

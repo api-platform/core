@@ -20,9 +20,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class ValidationException extends \RuntimeException
 {
-    /**
-     * @var ConstraintViolationListInterface
-     */
     private $constraintViolationList;
 
     public function __construct(ConstraintViolationListInterface $constraintViolationList, $message = '', $code = 0, \Exception $previous = null)

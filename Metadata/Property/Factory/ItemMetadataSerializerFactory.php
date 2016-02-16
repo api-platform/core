@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemMetadataSerializerFactory implements ItemMetadataFactoryInterface
+final class ItemMetadataSerializerFactory implements ItemMetadataFactoryInterface
 {
     private $resourceItemMetadataFactory;
     private $classMetadataFactory;

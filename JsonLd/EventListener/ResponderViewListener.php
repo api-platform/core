@@ -26,9 +26,6 @@ final class ResponderViewListener
 {
     const FORMAT = 'jsonld';
 
-    /**
-     * @var NormalizerInterface
-     */
     private $normalizer;
 
     public function __construct(NormalizerInterface $normalizer)

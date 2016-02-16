@@ -18,37 +18,14 @@ namespace Dunglas\ApiBundle\Metadata\Resource;
  */
 final class ItemMetadata
 {
-    /**
-     * @var string|null
-     */
     private $shortName;
-
-    /**
-     * @var string|null
-     */
     private $description;
-
-    /**
-     * @var string|null
-     */
     private $iri;
-
-    /**
-     * @var array|null
-     */
     private $itemOperations;
-
-    /**
-     * @var array|null
-     */
     private $collectionOperations;
-
-    /**
-     * @var array
-     */
     private $attributes;
 
-    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes)
+    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = [])
     {
         $this->shortName = $shortName;
         $this->description = $description;

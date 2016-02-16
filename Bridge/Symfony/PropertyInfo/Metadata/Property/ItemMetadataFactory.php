@@ -23,14 +23,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class ItemMetadataFactory implements ItemMetadataFactoryInterface
 {
-    /**
-     * @var PropertyInfoExtractorInterface
-     */
     private $propertyInfo;
-
-    /**
-     * @var ItemMetadataFactoryInterface|null
-     */
     private $decorated;
 
     public function __construct(PropertyInfoExtractorInterface $propertyInfo, ItemMetadataFactoryInterface $decorated = null)

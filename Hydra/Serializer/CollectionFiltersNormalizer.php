@@ -29,19 +29,8 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
 {
     use ContextTrait;
 
-    /**
-     * @var NormalizerInterface
-     */
     private $collectionNormalizer;
-
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
-
-    /**
-     * @var ResourceClassResolverInterface
-     */
     private $resourceClassResolver;
 
     /**

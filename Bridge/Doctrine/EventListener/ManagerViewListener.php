@@ -23,9 +23,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  */
 final class ManagerViewListener
 {
-    /**
-     * @var ManagerRegistry
-     */
     private $managerRegistry;
 
     public function __construct(ManagerRegistry $managerRegistry)

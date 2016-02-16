@@ -30,9 +30,6 @@ class RangeFilter extends AbstractFilter
     const PARAMETER_LESS_THAN = 'lt';
     const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
-    /**
-     * @var RequestStack
-     */
     private $requestStack;
 
     /**

@@ -22,9 +22,6 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
  */
 final class RequestExceptionListener extends ExceptionListener
 {
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         // Normalize exceptions with hydra errors only for resources

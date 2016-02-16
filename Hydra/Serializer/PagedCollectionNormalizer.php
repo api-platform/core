@@ -26,30 +26,15 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PagedCollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
+final class PagedCollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
 {
     use ContextTrait;
 
     const HYDRA_PAGED_COLLECTION = 'hydra:PagedCollection';
 
-    /**
-     * @var NormalizerInterface
-     */
     private $collectionNormalizer;
-
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
-
-    /**
-     * @var ResourceClassResolverInterface
-     */
     private $resourceClassResolver;
-
-    /**
-     * @var string
-     */
     private $pageParameterName;
 
     public function __construct(NormalizerInterface $collectionNormalizer, ItemMetadataFactoryInterface $itemMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName)

@@ -24,9 +24,6 @@ final class PostCollectionAction
 {
     use ActionUtilTrait;
 
-    /**
-     * @var SerializerInterface
-     */
     private $serializer;
 
     public function __construct(SerializerInterface $serializer)

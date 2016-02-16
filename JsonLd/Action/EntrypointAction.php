@@ -21,9 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class EntrypointAction
 {
-    /**
-     * @var EntrypointBuilderInterface
-     */
     private $entrypointBuilder;
 
     public function __construct(EntrypointBuilderInterface $entrypointBuilder)

@@ -32,9 +32,6 @@ final class ItemMetadataPhpDocFactory implements ItemMetadataFactoryInterface
      */
     private static $classReflectors = [];
 
-    /**
-     * @var LoaderInterface
-     */
     private $decorated;
 
     public function __construct(ItemMetadataFactoryInterface $decorated)

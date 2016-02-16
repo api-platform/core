@@ -32,19 +32,8 @@ final class ApiLoader extends Loader
     const ROUTE_NAME_PREFIX = 'api_';
     const DEFAULT_ACTION_PATTERN = 'api.action.';
 
-    /**
-     * @var XmlFileLoader
-     */
     private $fileLoader;
-
-    /**
-     * @var ResourceCollectionMetadataFactoryInterface
-     */
     private $resourceCollectionMetadataFactory;
-
-    /**
-     * @var ResourceItemMetadataFactoryInterface
-     */
     private $resourceItemMetadataFactory;
 
     public function __construct(KernelInterface $kernel, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory, ResourceItemMetadataFactoryInterface $resourceItemMetadataFactory)

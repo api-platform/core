@@ -24,19 +24,8 @@ use Dunglas\ApiBundle\Util\Reflection;
  */
 final class CollectionMetadataAnnotationFactory implements CollectionMetadataFactoryInterface
 {
-    /**
-     * @var Reader
-     */
     private $reader;
-
-    /**
-     * @var CollectionMetadataFactoryInterface|null
-     */
     private $decorated;
-
-    /**
-     * @var Reflection
-     */
     private $reflection;
 
     public function __construct(Reader $reader, CollectionMetadataFactoryInterface $decorated = null)

@@ -20,54 +20,15 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class ItemMetadata
 {
-    /**
-     * @var Type|null
-     */
     private $type;
-
-    /**
-     * @var string|null
-     */
     private $description;
-
-    /**
-     * @var bool|null
-     */
     private $readable;
-
-    /**
-     * @var bool|null
-     */
     private $writable;
-
-    /**
-     * @var bool|null
-     */
     private $readableLink;
-
-    /**
-     * @var bool|null
-     */
     private $writableLink;
-
-    /**
-     * @var bool|null
-     */
     private $required;
-
-    /**
-     * @var string|null
-     */
     private $iri;
-
-    /**
-     * @var bool
-     */
     private $identifier;
-
-    /**
-     * @var array
-     */
     private $attributes;
 
     public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, array $attributes = [])

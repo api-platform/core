@@ -23,9 +23,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ValidationExceptionListener
 {
-    /**
-     * @var NormalizerInterface
-     */
     private $normalizer;
 
     public function __construct(NormalizerInterface $normalizer)

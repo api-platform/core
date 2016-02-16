@@ -33,19 +33,8 @@ final class CollectionNormalizer extends SerializerAwareNormalizer implements No
     const FORMAT = 'jsonld';
     const HYDRA_COLLECTION = 'hydra:Collection';
 
-    /**
-     * @var ItemMetadataFactoryInterface
-     */
     private $itemMetadataFactory;
-
-    /**
-     * @var ContextBuilderInterface
-     */
     private $contextBuilder;
-
-    /**
-     * @var ResourceClassResolverInterface
-     */
     private $resourceClassResolver;
 
     public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver)

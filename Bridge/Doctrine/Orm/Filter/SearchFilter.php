@@ -52,19 +52,8 @@ class SearchFilter extends AbstractFilter
      */
     const STRATEGY_WORD_START = 'word_start';
 
-    /**
-     * @var RequestStack
-     */
     private $requestStack;
-
-    /**
-     * @var IriConverterInterface|null
-     */
     private $iriConverter;
-
-    /**
-     * @var PropertyAccessorInterface
-     */
     private $propertyAccessor;
 
     /**

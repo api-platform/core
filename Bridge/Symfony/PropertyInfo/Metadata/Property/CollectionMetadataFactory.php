@@ -24,9 +24,6 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  */
 final class CollectionMetadataFactory implements CollectionMetadataFactoryInterface
 {
-    /**
-     * @var PropertyInfoExtractorInterface
-     */
     private $propertyInfo;
 
     public function __construct(PropertyInfoExtractorInterface $propertyInfo)
