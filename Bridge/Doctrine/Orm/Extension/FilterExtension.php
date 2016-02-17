@@ -36,7 +36,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName)
     {
         $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
         $resourceFilters = $itemMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);

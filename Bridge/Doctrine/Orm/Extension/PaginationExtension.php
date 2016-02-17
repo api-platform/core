@@ -57,7 +57,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -76,10 +76,8 @@ class PaginationExtension implements QueryResultExtensionInterface
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
         }
 
-        $page = $request->query->get($pageParameterName, 1);
-
         $queryBuilder
-            ->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setFirstResult(($request->query->get($pageParameterName, 1) - 1) * $itemsPerPage)
             ->setMaxResults($itemsPerPage)
         ;
     }
@@ -87,7 +85,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName = null) : bool
+    public function supportsResult(string $resourceClass, string $operationName) : bool
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {

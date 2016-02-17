@@ -16,6 +16,7 @@ use Doctrine\ORM\QueryBuilder;
 use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,193 +24,176 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testApplyToCollection()
     {
         $requestStack = new RequestStack();
-        $requestStack->push(new Request());
+        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]));
 
-        $managerRegistryMock = $this->prophesize(ManagerRegistry::class);
-        $itemMetadataFactoryMock = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_page_parameter' => '_page',
+            'pagination_items_per_page' => 40,
+        ];
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        $extension = new PaginationExtension($managerRegistryMock, $requestStack, $itemMetadataFactoryMock);
-        $extension->applyToCollection($this->resourceMock->reveal(), $this->queryBuilderMock->reveal());
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(40)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(40)->shouldBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory
+        );
+        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
     }
 
     public function testApplyToCollectionNoRequest()
     {
-        /* @see PaginationExtension::applyToCollection */
-        $this->requestStackMock->getCurrentRequest()->shouldBeCalledTimes(1);
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(Argument::any())->shouldNotBeCalled();
+        $queryBuilderProphecy->setMaxResults(Argument::any())->shouldNotBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->shouldNotBeCalled();
-        $this->resourceMock->isClientAllowedToEnablePagination()->shouldNotBeCalled();
-
-        /* @see PaginationExtension::getItemsPerPage */
-        $this->resourceMock->isClientAllowedToChangeItemsPerPage()->shouldNotBeCalled();
-        $this->resourceMock->getItemsPerPageParameter()->shouldNotBeCalled();
-
-        /* @see PaginationExtension::getPage */
-        $this->resourceMock->getPageParameter()->shouldNotBeCalled();
-
-        /* @see PaginationExtension::applyToCollection */
-        $this->queryBuilderMock->setFirstResult(Argument::any())->shouldNotBeCalled();
-        $this->queryBuilderMock->setMaxResults(Argument::any())->shouldNotBeCalled();
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $extension->applyToCollection($this->resourceMock->reveal(), $this->queryBuilderMock->reveal());
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            new RequestStack(),
+            $this->prophesize(ItemMetadataFactoryInterface::class)->reveal()
+        );
+        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
     }
 
     public function testApplyToCollectionEmptyRequest()
     {
-        /** @var ObjectProphecy|Request $requestMock */
-        $requestMock = $this->prophesize('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
 
-        /* @see PaginationExtension::applyToCollection */
-        $this->requestStackMock->getCurrentRequest()->willReturn($requestMock->reveal())->shouldBeCalledTimes(1);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], []))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->willReturn('enablePagination')->shouldBeCalledTimes(1);
-        $requestMock->get('enablePagination')->shouldBeCalledTimes(1);
-        $this->resourceMock->isClientAllowedToEnablePagination()->willReturn(true)->shouldBeCalledTimes(1);
-        $this->resourceMock->isPaginationEnabledByDefault()->willReturn(true)->shouldBeCalledTimes(1);
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(30)->shouldBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
 
-        /* @see PaginationExtension::getItemsPerPage */
-        $this->resourceMock->isClientAllowedToChangeItemsPerPage()->willReturn(true)->shouldBeCalledTimes(1);
-        $this->resourceMock->getItemsPerPageParameter()->willReturn('itemsPerPage')->shouldBeCalledTimes(1);
-        $requestMock->get('itemsPerPage')->shouldBeCalledTimes(1);
-        $this->resourceMock->getItemsPerPageByDefault()->willReturn(15)->shouldBeCalledTimes(1);
-
-        /* @see PaginationExtension::getPage */
-        $this->resourceMock->getPageParameter()->willReturn('page')->shouldBeCalledTimes(1);
-        $requestMock->get('page', 1)->willReturn(1)->shouldBeCalledTimes(1);
-
-        /* @see PaginationExtension::applyToCollection */
-        $this->queryBuilderMock->setFirstResult(0)->willReturn($this->queryBuilderMock->reveal())->shouldBeCalledTimes(1);
-        $this->queryBuilderMock->setMaxResults(15)->willReturn($this->queryBuilderMock->reveal())->shouldBeCalledTimes(1);
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $extension->applyToCollection($this->resourceMock->reveal(), $this->queryBuilderMock->reveal());
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory
+        );
+        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
     }
 
     public function testApplyToCollectionPaginationDisabled()
     {
-        /** @var ObjectProphecy|Request $requestMock */
-        $requestMock = $this->prophesize('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
 
-        /* @see PaginationExtension::applyToCollection */
-        $this->requestStackMock->getCurrentRequest()->willReturn($requestMock->reveal())->shouldBeCalledTimes(1);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], []))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->willReturn('enablePagination')->shouldBeCalledTimes(1);
-        $requestMock->get('enablePagination')->willReturn('true')->shouldBeCalledTimes(1);
-        $this->resourceMock->isClientAllowedToEnablePagination()->willReturn(false)->shouldBeCalledTimes(1);
-        $this->resourceMock->isPaginationEnabledByDefault()->willReturn(false)->shouldBeCalledTimes(1);
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(Argument::any())->shouldNotBeCalled();
+        $queryBuilderProphecy->setMaxResults(Argument::any())->shouldNotBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
 
-        /* @see PaginationExtension::getItemsPerPage */
-        $this->resourceMock->isClientAllowedToChangeItemsPerPage()->shouldNotBeCalled();
-        $this->resourceMock->getItemsPerPageParameter()->shouldNotBeCalled();
-        $requestMock->get('itemsPerPage')->shouldNotBeCalled();
-
-        /* @see PaginationExtension::getPage */
-        $this->resourceMock->getPageParameter()->shouldNotBeCalled();
-        $requestMock->get('page', 1)->shouldNotBeCalled();
-
-        /* @see PaginationExtension::applyToCollection */
-        $this->queryBuilderMock->setFirstResult(Argument::any())->shouldNotBeCalled();
-        $this->queryBuilderMock->setMaxResults(Argument::any())->shouldNotBeCalled();
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $extension->applyToCollection($this->resourceMock->reveal(), $this->queryBuilderMock->reveal());
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory,
+            false
+        );
+        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
     }
 
     public function testSupportsResult()
     {
-        /** @var ObjectProphecy|Request $requestMock */
-        $requestMock = $this->prophesize('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
 
-        /* @see PaginationExtension::supportsResult */
-        $this->requestStackMock->getCurrentRequest()->willReturn($requestMock->reveal())->shouldBeCalledTimes(1);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], []))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->willReturn('enablePagination')->shouldBeCalledTimes(1);
-        $requestMock->get('enablePagination')->willReturn('true')->shouldBeCalledTimes(1);
-        $this->resourceMock->isClientAllowedToEnablePagination()->willReturn(true)->shouldBeCalledTimes(1);
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $this->assertTrue($extension->supportsResult($this->resourceMock->reveal()));
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory
+        );
+        $this->assertTrue($extension->supportsResult('Foo', 'op'));
     }
 
     public function testSupportsResultNoRequest()
     {
-        /* @see PaginationExtension::supportsResult */
-        $this->requestStackMock->getCurrentRequest()->shouldBeCalledTimes(1);
-
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->shouldNotBeCalled();
-        $this->resourceMock->isClientAllowedToEnablePagination()->shouldNotBeCalled();
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $this->assertFalse($extension->supportsResult($this->resourceMock->reveal()));
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            new RequestStack(),
+            $this->prophesize(ItemMetadataFactoryInterface::class)->reveal()
+        );
+        $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 
     public function testSupportsResultEmptyRequest()
     {
-        /** @var ObjectProphecy|Request $requestMock */
-        $requestMock = $this->prophesize('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
 
-        /* @see PaginationExtension::supportsResult */
-        $this->requestStackMock->getCurrentRequest()->willReturn($requestMock->reveal())->shouldBeCalledTimes(1);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], []))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->willReturn('enablePagination')->shouldBeCalledTimes(1);
-        $requestMock->get('enablePagination')->shouldBeCalledTimes(1);
-        $this->resourceMock->isClientAllowedToEnablePagination()->willReturn(true)->shouldBeCalledTimes(1);
-        $this->resourceMock->isPaginationEnabledByDefault()->willReturn(true)->shouldBeCalledTimes(1);
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $this->assertTrue($extension->supportsResult($this->resourceMock->reveal()));
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory
+        );
+        $this->assertTrue($extension->supportsResult('Foo', 'op'));
     }
 
     public function testSupportsResultClientNotAllowedToPaginate()
     {
-        /** @var ObjectProphecy|Request $requestMock */
-        $requestMock = $this->prophesize('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['pagination' => true]));
 
-        /* @see PaginationExtension::supportsResult */
-        $this->requestStackMock->getCurrentRequest()->willReturn($requestMock->reveal())->shouldBeCalledTimes(1);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], []))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->willReturn('enablePagination')->shouldBeCalledTimes(1);
-        $requestMock->get('enablePagination')->willReturn('true')->shouldBeCalledTimes(1);
-        $this->resourceMock->isClientAllowedToEnablePagination()->willReturn(false)->shouldBeCalledTimes(1);
-        $this->resourceMock->isPaginationEnabledByDefault()->willReturn(true)->shouldBeCalledTimes(1);
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $this->assertTrue($extension->supportsResult($this->resourceMock->reveal()));
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory,
+            false,
+            false
+        );
+        $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 
     public function testSupportsResultPaginationDisabled()
     {
-        /** @var ObjectProphecy|Request $requestMock */
-        $requestMock = $this->prophesize('Symfony\Component\HttpFoundation\Request');
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
 
-        /* @see PaginationExtension::supportsResult */
-        $this->requestStackMock->getCurrentRequest()->willReturn($requestMock->reveal())->shouldBeCalledTimes(1);
+        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
+        $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], []))->shouldBeCalled();
+        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
 
-        /* @see PaginationExtension::isPaginationEnabled */
-        $this->resourceMock->getEnablePaginationParameter()->willReturn('enablePagination')->shouldBeCalledTimes(1);
-        $requestMock->get('enablePagination')->willReturn('true')->shouldBeCalledTimes(1);
-        $this->resourceMock->isClientAllowedToEnablePagination()->willReturn(false)->shouldBeCalledTimes(1);
-        $this->resourceMock->isPaginationEnabledByDefault()->willReturn(false)->shouldBeCalledTimes(1);
-
-        $extension = new PaginationExtension($this->managerRegistryMock->reveal(), $this->requestStackMock->reveal());
-        $this->assertFalse($extension->supportsResult($this->resourceMock->reveal()));
-    }
-
-    public function testGetResult()
-    {
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $itemMetadataFactory,
+            false
+        );
+        $this->assertFalse($extension->supportsResult('Foo', 'op'));
     }
 }

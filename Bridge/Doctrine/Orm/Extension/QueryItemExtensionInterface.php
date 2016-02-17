@@ -25,7 +25,7 @@ interface QueryItemExtensionInterface
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
      * @param array        $identifiers
-     * @param string|null  $operationName
+     * @param string       $operationName
      */
-    public function applyToItem(QueryBuilder $queryBuilder, string $resourceClass, array $identifiers, string $operationName = null);
+    public function applyToItem(QueryBuilder $queryBuilder, string $resourceClass, array $identifiers, string $operationName);
 }

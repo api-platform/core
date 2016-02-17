@@ -25,7 +25,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName)
     {
         $this->joinRelations($queryBuilder, $resourceClass);
     }
@@ -33,7 +33,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function applyToItem(QueryBuilder $queryBuilder, string $resourceClass,  array $identifiers, string $operationName = null)
+    public function applyToItem(QueryBuilder $queryBuilder, string $resourceClass,  array $identifiers, string $operationName)
     {
         $this->joinRelations($queryBuilder, $resourceClass);
     }

@@ -31,7 +31,7 @@ class OrderExtension implements QueryCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName)
     {
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
