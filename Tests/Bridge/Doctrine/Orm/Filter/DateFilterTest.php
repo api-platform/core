@@ -15,7 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter;
+use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Filter\DateFilter;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
@@ -44,7 +44,7 @@ class DateFilterTest extends KernelTestCase
     /**
      * @var ResourceInterface
      */
-    protected $resource;
+    protected $resourceClass;
 
     /**
      * {@inheritdoc}
@@ -55,7 +55,7 @@ class DateFilterTest extends KernelTestCase
         $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
         $this->repository = $manager->getRepository(Dummy::class);
-        $this->resource = new Resource(Dummy::class);
+        $this->resourceClass = Dummy::class;
     }
 
     /**
@@ -73,10 +73,10 @@ class DateFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
-        $filter->apply($this->resource, $queryBuilder);
+        $filter->apply($queryBuilder, $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -101,7 +101,7 @@ class DateFilterTest extends KernelTestCase
                 'type' => '\DateTime',
                 'required' => false,
             ],
-        ], $filter->getDescription($this->resource));
+        ], $filter->getDescription($this->resourceClass));
     }
 
     /**

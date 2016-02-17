@@ -125,9 +125,9 @@ class DateFilter extends AbstractFilter
      * @param string       $field
      * @param string       $operator
      * @param string       $value
-     * @param int|null     $nullManagement
+     * @param string|null  $nullManagement
      */
-    private function addWhere(QueryBuilder $queryBuilder, string $alias, string $field, string $operator, string $value, int $nullManagement = null)
+    private function addWhere(QueryBuilder $queryBuilder, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
     {
         $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
