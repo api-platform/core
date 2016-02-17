@@ -101,7 +101,6 @@ class IriConverter implements IriConverterInterface
 
             $identifier = $this->getIdentifierFromResource($resource);
 
-
             if(!$identifier)
             {
                 return false;
@@ -180,28 +179,12 @@ class IriConverter implements IriConverterInterface
      */
     private function getIdentifierFromResource(ResourceInterface $resource)
     {
-
-        if($resource->getEntityClass() != 'AppBundle\Entity\ParkingSpace')
-        {
-//            dump($resource);
-//            die();
-        }
-
-
         $classMetadata = $this->classMetadataFactory->getMetadataFor(
             $resource->getEntityClass(),
             $resource->getNormalizationGroups(),
             $resource->getDenormalizationGroups(),
             $resource->getValidationGroups()
         );
-
-//        echo "foo";
-        if($classMetadata->getName() != 'AppBundle\Entity\ParkingSpace')
-        {
-//            dump($classMetadata);
-//            die();
-
-        }
 
         return $classMetadata->getIdentifier();
     }

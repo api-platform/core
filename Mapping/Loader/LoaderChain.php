@@ -76,8 +76,7 @@ class LoaderChain implements LoaderInterface
 
     /**
      * @param ClassMetadata $classMetaData
-     *
-     * @throws \RunTimeException
+     * @return bool
      */
     private function checkClassMetaData(ClassMetadata $classMetaData)
     {

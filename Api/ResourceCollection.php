@@ -64,7 +64,16 @@ class ResourceCollection extends \ArrayObject implements ResourceCollectionInter
             $entityClass = $this->getObjectClass($entityClass);
         }
 
-        return isset($this->entityClassIndex[$entityClass]) ? $this->entityClassIndex[$entityClass] : null;
+        if(isset($this->entityClassIndex[$entityClass]))
+        {
+            $resource =  $this->entityClassIndex[$entityClass];
+        }
+        elseif(isset($this->entityClassIndex[get_parent_class($entityClass)]))
+        {
+            $resource = $this->entityClassIndex[get_parent_class($entityClass)];
+        }
+
+        return isset($resource) ? $resource : null;
     }
 
     /**

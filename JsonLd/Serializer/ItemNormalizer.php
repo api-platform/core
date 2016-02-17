@@ -11,7 +11,6 @@
 
 namespace Dunglas\ApiBundle\JsonLd\Serializer;
 
-use AppBundle\Entity\Address;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
 use Dunglas\ApiBundle\Api\ResourceInterface;
@@ -34,6 +33,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * Converts between objects and array including JSON-LD and Hydra metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Felix Baeder <felix.baeder@socialbit.de>
  */
 class ItemNormalizer extends AbstractNormalizer
 {
@@ -109,9 +109,10 @@ class ItemNormalizer extends AbstractNormalizer
         }
         $resource = $this->guessResource($object, $context, true);
 
+        $data = [];
+
         if($resource)
         {
-            $data = [];
             if (!isset($context['json_ld_has_context'])) {
                 $data['@context'] = $this->contextBuilder->getResourceContext($resource, $context);
             }
@@ -125,59 +126,61 @@ class ItemNormalizer extends AbstractNormalizer
                 $data['@id'] = $iriFromItem;
                 $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $resource->getShortName();
             }
+
         }
         else
         {
             $classMetadata = $this->getMetadataForEmbedded($object, $context);
+            $iriFromItem = $this->iriConverter->getIriFromItem($object);
+            if($iriFromItem) {
+                $data = $iriFromItem;
+            }
         }
 
-        if($classMetadata->getIdentifier() == null || $resource) {
+        $attributesMetadata = $classMetadata->getAttributes();
 
-            $attributesMetadata = $classMetadata->getAttributes();
+        foreach ($attributesMetadata as $attributeMetadata) {
 
-            foreach ($attributesMetadata as $attributeMetadata) {
+            if ($attributeMetadata->isIdentifier() || !$attributeMetadata->isReadable()) {
+                continue;
+            }
+            $attributeName = $attributeMetadata->getName();
+            $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
-                if ($attributeMetadata->isIdentifier() || !$attributeMetadata->isReadable()) {
+            if ($this->nameConverter) {
+                $attributeName = $this->nameConverter->normalize($attributeName);
+            }
+
+            if (isset($attributeMetadata->getTypes()[0])) {
+
+                $type = $attributeMetadata->getTypes()[0];
+
+                if (
+                    $attributeValue &&
+                    $type->isCollection() &&
+                    ($collectionType = $type->getCollectionType()) &&
+                    $subResource = $this->getResourceFromType($collectionType)
+                ) {
+                    $values = [];
+                    foreach ($attributeValue as $index => $obj) {
+                        $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
+                    }
+
+                    $data[$attributeName] = $values;
+
                     continue;
                 }
-                $attributeName = $attributeMetadata->getName();
-                $attributeValue = $this->propertyAccessor->getValue($object, $attributeName);
 
-                if ($this->nameConverter) {
-                    $attributeName = $this->nameConverter->normalize($attributeName);
+                if ($attributeValue && $subResource = $this->getResourceFromType($type)) {
+
+                    $data[$attributeName] = $this->normalizeRelation($attributeMetadata, $attributeValue, $subResource, $context);
+
+                    continue;
                 }
-
-                if (isset($attributeMetadata->getTypes()[0])) {
-
-                    $type = $attributeMetadata->getTypes()[0];
-
-                    if (
-                        $attributeValue &&
-                        $type->isCollection() &&
-                        ($collectionType = $type->getCollectionType()) &&
-                        $subResource = $this->getResourceFromType($collectionType)
-                    ) {
-                        $values = [];
-                        foreach ($attributeValue as $index => $obj) {
-                            $values[$index] = $this->normalizeRelation($attributeMetadata, $obj, $subResource, $context);
-                        }
-
-                        $data[$attributeName] = $values;
-
-                        continue;
-                    }
-
-                    if ($attributeValue && $subResource = $this->getResourceFromType($type)) {
-
-                        $data[$attributeName] = $this->normalizeRelation($attributeMetadata, $attributeValue, $subResource, $context);
-
-                        continue;
-                    }
-                }
-
-                $data[$attributeName] = $this->serializer->normalize($attributeValue, self::FORMAT, $context);
-
             }
+
+            $data[$attributeName] = $this->serializer->normalize($attributeValue, self::FORMAT, $context);
+
         }
 
         return $data;
@@ -395,20 +398,8 @@ class ItemNormalizer extends AbstractNormalizer
 
         if(is_array($value))
         {
-            $object = new $class;
-
-            if(is_object($object))
-            {
-                foreach($value as $key => $content)
-                {
-                    $setter = 'set'. ucfirst($key);
-                    if(method_exists($object, $setter))
-                    {
-                        $object->$setter($content);
-                    }
-                }
-                return $object;
-            }
+            $object = new $class($value);
+            return $object;
         }
 
         if (!$resource = $this->resourceCollection->getResourceForEntity($class)) {
