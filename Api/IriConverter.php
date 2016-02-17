@@ -11,6 +11,7 @@
 
 namespace Dunglas\ApiBundle\Api;
 
+use AppBundle\Entity\GeoCircle;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Mapping\AttributeMetadataInterface;
 use Dunglas\ApiBundle\Mapping\ClassMetadataFactoryInterface;
@@ -113,7 +114,7 @@ class IriConverter implements IriConverterInterface
             );
         }
 
-        throw new InvalidArgumentException(sprintf('No resource associated with the type "%s".', get_class($item)));
+        return false;
     }
 
     /**
