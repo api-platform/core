@@ -13,6 +13,15 @@ namespace Dunglas\ApiBundle\Tests\DependencyInjection;
 
 use Dunglas\ApiBundle\DependencyInjection\DunglasApiExtension;
 use Prophecy\Argument;
+use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -41,14 +50,14 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->extension = new DunglasApiExtension();
 
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface', $this->extension);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Extension\ExtensionInterface', $this->extension);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface', $this->extension);
+        $this->assertInstanceOf(PrependExtensionInterface::class, $this->extension);
+        $this->assertInstanceOf(ExtensionInterface::class, $this->extension);
+        $this->assertInstanceOf(ConfigurationExtensionInterface::class, $this->extension);
     }
 
     public function testNotPrependWhenNull()
     {
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -58,7 +67,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testNotPrependWhenConfigExist()
     {
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => ['enabled' => false]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -68,7 +77,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependWhenNotConfigured()
     {
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -78,7 +87,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependWhenNotEnabled()
     {
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => []])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -97,92 +106,138 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
-        $containerBuilderProphecy->setDefinition('api.fos_user.event_subscriber', Argument::type('Symfony\Component\DependencyInjection\Definition'))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.fos_user.event_subscriber', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['dunglas_api' => ['enable_fos_user' => true]]), $containerBuilder);
     }
 
-    public function testEnableCache()
-    {
-        $metadataFactoryDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
-        $metadataFactoryDefinitionProphecy->addArgument(Argument::type('Symfony\Component\DependencyInjection\Reference'))->shouldBeCalled();
-        $metadataFactoryDefinition = $metadataFactoryDefinitionProphecy->reveal();
-
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
-        $containerBuilderProphecy->getParameter('kernel.root_dir')->willReturn('test')->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.mapping.cache.prefix', Argument::type('string'))->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.mapping.class_metadata_factory')->willReturn($metadataFactoryDefinition)->shouldBeCalled();
-        $containerBuilder = $containerBuilderProphecy->reveal();
-
-        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['dunglas_api' => ['cache' => true]]), $containerBuilder);
-    }
-
     private function getContainerBuilderProphecy()
     {
-        $this->markTestSkipped('Must be refactored');
-
-        $parameterBagProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface');
+        $parameterBagProphecy = $this->prophesize(ParameterBagInterface::class);
         $parameterBagProphecy->add(Argument::any())->shouldBeCalled();
         $parameterBag = $parameterBagProphecy->reveal();
 
-        $definitionArgument = Argument::type('Symfony\Component\DependencyInjection\Definition');
+        $definitionArgument = Argument::type(Definition::class);
 
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameterBag()->willReturn($parameterBag)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.title', 'title')->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.description', 'description')->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.supported_formats', ['jsonld'])->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.collection.filter_name.order', 'order')->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.collection.order', null)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.collection.pagination.page_parameter_name', 'page')->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.collection.pagination.items_per_page.number', 30)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.collection.pagination.items_per_page.enable_client_request', false)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api.collection.pagination.items_per_page.parameter_name', 'itemsPerPage')->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([])->shouldBeCalled();
+
+        $parameters = [
+            'api.title' => 'title',
+            'api.description' => 'description',
+            'api.supported_formats' => ['jsonld'],
+            'api.collection.order' => null,
+            'api.collection.order_parameter_name' => 'order',
+            'api.collection.pagination.enabled' => true,
+            'api.collection.pagination.client_enabled' => false,
+            'api.collection.pagination.client_items_per_page' => false,
+            'api.collection.pagination.items_per_page' => 30,
+            'api.collection.pagination.page_parameter_name' => 'page',
+            'api.collection.pagination.enabled_parameter_name' => 'pagination',
+            'api.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
+        ];
+        foreach ($parameters as $key => $value) {
+            $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
+        }
+
+
+        $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
-        $containerBuilderProphecy->addResource(Argument::type('Symfony\Component\Config\Resource\ResourceInterface'))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.resource', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.resource_collection', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.format_negotiator', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.operation_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.route_loader', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.router', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.iri_converter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.listener.request.resource_type', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.listener.view.validation', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.listener.request.format', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.action.get_collection', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.action.post_collection', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.action.get_item', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.action.put_item', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.action.delete_item', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.metadata_factory', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.collection_data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.item_data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.default_item_data_provider', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.search_filter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.order_filter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.orm.date_filter', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.doctrine.listener.view.manager', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.entrypoint_builder', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.context_builder', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.resource_context_builder_listener', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.normalizer.item', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.normalizer.datetime', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.encoder', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.listener.view.responder', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.action.context', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.jsonld.action.entrypoint', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.documentation_builder', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.controller.exception', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.listener.link_header_response', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.listener.request_exception', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.normalizer.collection', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.normalizer.constraint_violation_list', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.normalizer.error', $definitionArgument)->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api.hydra.action.documentation', $definitionArgument)->shouldBeCalled();
+
+        $aliases = [
+            'api.serializer',
+            'api.property_accessor',
+            'api.property_info',
+            'api.metadata.resource.factory.collection',
+            'api.metadata.resource.factory.item',
+            'api.metadata.property.factory.collection',
+            'api.metadata.property.factory.item',
+            'api.item_data_provider',
+            'api.collection_data_provider',
+        ];
+        foreach ($aliases as $alias) {
+            $containerBuilderProphecy->setAlias($alias, Argument::type(Alias::class))->shouldBeCalled();
+        }
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->addArgument([])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api.metadata.resource.factory.collection.annotation')->willReturn($definition);
+
+        $definitions = [
+            'api.filters',
+            'api.resource_class_resolver',
+            'api.operation_method_resolver',
+            'api.metadata.resource.factory.collection',
+            'api.metadata.resource.factory.collection.annotation',
+            'api.metadata.resource.factory.item.annotation',
+            'api.metadata.resource.factory.item.php_doc',
+            'api.metadata.resource.factory.item.short_name',
+            'api.metadata.resource.factory.item.operation',
+            'api.metadata.property.factory.collection.property_info',
+            'api.metadata.property.factory.item.annotation',
+            'api.metadata.property.factory.item.property_info',
+            'api.metadata.property.factory.item.serializer',
+            'api.metadata.property.factory.item.validator',
+            'api.metadata.resource.factory.collection.annotation',
+            'api.format_negotiator',
+            'api.data_provider',
+            'api.operation_factory',
+            'api.route_loader',
+            'api.router',
+            'api.iri_converter',
+            'api.listener.request.resource_type',
+            'api.listener.view.validation',
+            'api.listener.request.format',
+            'api.action.get_collection',
+            'api.action.post_collection',
+            'api.action.get_item',
+            'api.action.put_item',
+            'api.action.delete_item',
+            'api.doctrine.metadata_factory',
+            'api.doctrine.orm.collection_data_provider',
+            'api.doctrine.orm.item_data_provider',
+            'api.doctrine.orm.default_item_data_provider',
+            'api.doctrine.orm.search_filter',
+            'api.doctrine.orm.order_filter',
+            'api.doctrine.orm.date_filter',
+            'api.doctrine.orm.range_filter',
+            'api.doctrine.orm.default.collection_data_provider',
+            'api.doctrine.orm.default.item_data_provider',
+            'api.doctrine.orm.metadata.property.factory.item',
+            'api.doctrine.orm.query_extension.eager_loading',
+            'api.doctrine.orm.query_extension.filter',
+            'api.doctrine.orm.query_extension.pagination',
+            'api.doctrine.orm.query_extension.order',
+            'api.doctrine.listener.view.manager',
+            'api.jsonld.entrypoint_builder',
+            'api.jsonld.context_builder',
+            'api.jsonld.resource_context_builder_listener',
+            'api.jsonld.normalizer.item',
+            'api.jsonld.normalizer.datetime',
+            'api.jsonld.encoder',
+            'api.jsonld.listener.view.responder',
+            'api.jsonld.action.context',
+            'api.jsonld.action.entrypoint',
+            'api.hydra.documentation_builder',
+            'api.hydra.controller.exception',
+            'api.hydra.listener.validation_exception',
+            'api.hydra.listener.link_header_response',
+            'api.hydra.listener.request_exception',
+            'api.hydra.normalizer.collection',
+            'api.hydra.normalizer.paged_collection',
+            'api.hydra.normalizer.collection_filters',
+            'api.hydra.normalizer.constraint_violation_list',
+            'api.hydra.normalizer.error',
+            'api.hydra.action.documentation',
+            'api.hydra.action.exception',
+            'api.fos_user.event_listener',
+        ];
+        foreach ($definitions as $definition) {
+            $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
+        }
 
         return $containerBuilderProphecy;
     }

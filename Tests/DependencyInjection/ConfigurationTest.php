@@ -12,6 +12,8 @@
 namespace Dunglas\ApiBundle\Tests\DependencyInjection;
 
 use Dunglas\ApiBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
@@ -26,8 +28,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration($configuration, ['dunglas_api' => ['title' => 'title', 'description' => 'description']]);
 
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\ConfigurationInterface', $configuration);
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $treeBuilder);
+        $this->assertInstanceOf(ConfigurationInterface::class, $configuration);
+        $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',

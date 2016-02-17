@@ -15,7 +15,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -70,7 +69,6 @@ final class DunglasApiExtension extends Extension implements PrependExtensionInt
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
-        $this->registerCache($config, $container, $loader);
 
         // Doctrine ORM support
         if (class_exists('Doctrine\ORM\Version')) {
@@ -113,33 +111,5 @@ final class DunglasApiExtension extends Extension implements PrependExtensionInt
         }
 
         $container->getDefinition('api.metadata.resource.factory.collection.annotation')->addArgument($paths);
-    }
-
-    /**
-     * Registers cache decorators.
-     *
-     * @param array            $config
-     * @param ContainerBuilder $container
-     * @param XmlFileLoader    $loader
-     */
-    private function registerCache(array $config, ContainerBuilder $container, XmlFileLoader $loader)
-    {
-        /*if (!isset($config['cache']) || !$config['cache']) {
-            return;
-        }
-
-        $loader->load('doctrine_cache.xml');
-
-        $container->setParameter(
-            'api.mapping.cache.prefix',
-            'api_'.hash('sha256', $container->getParameter('kernel.root_dir'))
-        );
-
-        $cacheReference = new Reference($config['cache']);
-
-        $container->getDefinition('api.mapping.resource.loader.collection.cache_decorator')->addArgument($cacheReference);
-        $container->getDefinition('api.mapping.resource.loader.metadata.cache_decorator')->addArgument($cacheReference);
-        $container->getDefinition('api.mapping.property.loader.collection.cache_decorator')->addArgument($cacheReference);
-        $container->getDefinition('api.mapping.property.loader.metadata.cache_decorator')->addArgument($cacheReference);*/
     }
 }
