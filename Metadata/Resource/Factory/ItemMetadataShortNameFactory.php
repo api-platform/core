@@ -11,7 +11,7 @@
 
 namespace Dunglas\ApiBundle\Metadata\Resource\Factory;
 
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface;
 
 /**
  * Guesses the short name from the class name if not already set.
@@ -30,7 +30,7 @@ final class ItemMetadataShortNameFactory implements ItemMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ItemMetadata
+    public function create(string $resourceClass) : ItemMetadataInterface
     {
         $itemMetadata = $this->decorated->create($resourceClass);
 

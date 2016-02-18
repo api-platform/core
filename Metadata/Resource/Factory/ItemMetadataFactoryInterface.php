@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Metadata\Resource\Factory;
 
 use Dunglas\ApiBundle\Exception\ResourceClassNotFoundException;
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface;
 
 /**
  * Creates an item metadata value object.
@@ -26,9 +26,9 @@ interface ItemMetadataFactoryInterface
      *
      * @param string $resourceClass
      *
-     * @return ItemMetadata
+     * @return ItemMetadataInterface
      *
      * @throws ResourceClassNotFoundException
      */
-    public function create(string $resourceClass) : ItemMetadata;
+    public function create(string $resourceClass) : ItemMetadataInterface;
 }

@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\Tests\Bridge\Symfony\Validator\EventListener;
 
 use Dunglas\ApiBundle\Bridge\Symfony\Validator\EventListener\ViewListener;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface;
 use Dunglas\ApiBundle\Tests\Fixtures\DummyEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -70,11 +70,9 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createEventObject($expectedValidationGroups, $data)
     {
-        $itemMetadata = new ItemMetadata(null, null, null, [
-            'create' => [
-                'validation_groups' => $expectedValidationGroups,
-            ],
-        ]);
+        $itemMetadataProphecy = $this->prophesize(ItemMetadataInterface::class);
+        $itemMetadataProphecy->getItemOperationAttribute('create', 'validation_groups')->willReturn($expectedValidationGroups);
+        $itemMetadata = $itemMetadataProphecy->reveal();
 
         $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
         $itemMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($itemMetadata);

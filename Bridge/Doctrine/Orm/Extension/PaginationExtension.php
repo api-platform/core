@@ -17,7 +17,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Paginator;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Util\QueryChecker;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -108,7 +108,7 @@ class PaginationExtension implements QueryResultExtensionInterface
         return new Paginator($doctrineOrmPaginator);
     }
 
-    private function isPaginationEnabled(Request $request, ItemMetadata $itemMetadata, string $operationName = null) : bool
+    private function isPaginationEnabled(Request $request, ItemMetadataInterface $itemMetadata, string $operationName = null) : bool
     {
         $enabled = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
         $clientEnabled = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);

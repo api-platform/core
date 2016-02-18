@@ -13,7 +13,7 @@ namespace Dunglas\ApiBundle\JsonLd\Serializer;
 
 use Dunglas\ApiBundle\Api\ResourceClassResolverInterface;
 use Dunglas\ApiBundle\JsonLd\ContextBuilderInterface;
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface;
 
 /**
  * Creates and manipulates the Serializer context.
@@ -25,13 +25,13 @@ trait ContextTrait
     /**
      * Import the context defined in metadata and set some default values.
      *
-     * @param string       $resourceClass
-     * @param ItemMetadata $itemMetadata
-     * @param array        $context
+     * @param string                $resourceClass
+     * @param ItemMetadataInterface $itemMetadata
+     * @param array                 $context
      *
      * @return array
      */
-    private function createContext(string $resourceClass, ItemMetadata $itemMetadata, array $context, bool $normalization) : array
+    private function createContext(string $resourceClass, ItemMetadataInterface $itemMetadata, array $context, bool $normalization) : array
     {
         if (isset($context['jsonld_has_context'])) {
             return $context;
@@ -71,14 +71,14 @@ trait ContextTrait
     /**
      * Gets a context value.
      *
-     * @param ItemMetadata $resourceItemMetadata
-     * @param array        $context
-     * @param string       $key
-     * @param mixed        $defaultValue
+     * @param ItemMetadataInterface $resourceItemMetadata
+     * @param array                 $context
+     * @param string                $key
+     * @param mixed                 $defaultValue
      *
      * @return mixed
      */
-    private function getContextValue(ItemMetadata $resourceItemMetadata, array $context, string $key, $defaultValue = null)
+    private function getContextValue(ItemMetadataInterface $resourceItemMetadata, array $context, string $key, $defaultValue = null)
     {
         if (isset($context[$key])) {
             return $context[$key];

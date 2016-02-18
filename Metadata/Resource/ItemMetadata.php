@@ -16,7 +16,7 @@ namespace Dunglas\ApiBundle\Metadata\Resource;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadata
+final class ItemMetadata implements ItemMetadataInterface
 {
     private $shortName;
     private $description;
@@ -36,9 +36,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets the short name.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getShortName()
     {
@@ -46,13 +44,9 @@ final class ItemMetadata
     }
 
     /**
-     * Returns a new instance with the given short name.
-     *
-     * @param string $shortName
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function withShortName(string $shortName) : self
+    public function withShortName(string $shortName) : ItemMetadataInterface
     {
         $metadata = clone $this;
         $metadata->shortName = $shortName;
@@ -61,9 +55,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets the description.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -71,13 +63,9 @@ final class ItemMetadata
     }
 
     /**
-     * Returns a new instance with the given description.
-     *
-     * @param string $description
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function withDescription(string $description) : self
+    public function withDescription(string $description) : ItemMetadataInterface
     {
         $metadata = clone $this;
         $metadata->description = $description;
@@ -86,9 +74,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets the associated IRI.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getIri()
     {
@@ -96,13 +82,9 @@ final class ItemMetadata
     }
 
     /**
-     * Returns a new instance with the given IRI.
-     *
-     * @param string $iri
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function withIri(string $iri) : self
+    public function withIri(string $iri) : ItemMetadataInterface
     {
         $metadata = clone $this;
         $metadata->iri = $iri;
@@ -111,9 +93,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets item operations.
-     *
-     * @return array|null
+     * {@inheritdoc}
      */
     public function getItemOperations()
     {
@@ -121,13 +101,9 @@ final class ItemMetadata
     }
 
     /**
-     * Returns a new instance with the given item operations.
-     *
-     * @param array $itemOperations
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function withItemOperations(array $itemOperations) : self
+    public function withItemOperations(array $itemOperations) : ItemMetadataInterface
     {
         $metadata = clone $this;
         $metadata->itemOperations = $itemOperations;
@@ -136,9 +112,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets collection operations.
-     *
-     * @return array|null
+     * {@inheritdoc}
      */
     public function getCollectionOperations()
     {
@@ -146,13 +120,9 @@ final class ItemMetadata
     }
 
     /**
-     * Returns a new instance with the given collection operations.
-     *
-     * @param array $collectionOperations
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function withCollectionOperations(array $collectionOperations) : self
+    public function withCollectionOperations(array $collectionOperations) : ItemMetadataInterface
     {
         $metadata = clone $this;
         $metadata->collectionOperations = $collectionOperations;
@@ -161,14 +131,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets a collection operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getCollectionOperationAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -176,14 +139,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets an item operation attribute, optionally fallback to a resource attribute.
-     *
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getItemOperationAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
@@ -215,9 +171,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets attributes.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getAttributes() : array
     {
@@ -225,12 +179,7 @@ final class ItemMetadata
     }
 
     /**
-     * Gets an attribute.
-     *
-     * @param string $key
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getAttribute(string $key, $defaultValue = null)
     {
@@ -242,13 +191,9 @@ final class ItemMetadata
     }
 
     /**
-     * Returns a new instance with the given attribute.
-     *
-     * @param array $attributes
-     *
-     * @return self
+     * {@inheritdoc}
      */
-    public function withAttributes(array $attributes) : self
+    public function withAttributes(array $attributes) : ItemMetadataInterface
     {
         $metadata = clone $this;
         $metadata->attributes = $attributes;
