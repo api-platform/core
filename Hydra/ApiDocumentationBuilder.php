@@ -20,7 +20,7 @@ use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface as 
 use Dunglas\ApiBundle\Metadata\Property\ItemMetadata as PropertyItemMetadata;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata as ResourceItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface as ResourceItemMetadata;
 
 /**
  * Creates a machine readable Hydra API documentation.

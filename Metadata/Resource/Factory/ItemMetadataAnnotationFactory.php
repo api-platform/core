@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Reader;
 use Dunglas\ApiBundle\Annotation\Resource;
 use Dunglas\ApiBundle\Exception\ResourceClassNotFoundException;
 use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadataInterface;
 use Dunglas\ApiBundle\Metadata\Resource\Operation;
 use Dunglas\ApiBundle\Metadata\Resource\PaginationMetadata;
 
@@ -37,7 +38,7 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ItemMetadata
+    public function create(string $resourceClass) : ItemMetadataInterface
     {
         $parentItemMetadata = null;
         if ($this->decorated) {
@@ -65,14 +66,14 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ItemMetadata|null $parentMetadata
-     * @param string            $resourceClass
+     * @param ItemMetadataInterface|null $parentMetadata
+     * @param string                     $resourceClass
      *
-     * @return ItemMetadata
+     * @return ItemMetadataInterface
      *
      * @throws ResourceClassNotFoundException
      */
-    private function handleNotFound(ItemMetadata $parentMetadata = null, string $resourceClass) : ItemMetadata
+    private function handleNotFound(ItemMetadataInterface $parentMetadata = null, string $resourceClass) : ItemMetadataInterface
     {
         if (null !== $parentMetadata) {
             return $parentMetadata;
@@ -81,7 +82,7 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
         throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
     }
 
-    private function createMetadata(Resource $annotation, ItemMetadata $parentItemMetadata = null) : ItemMetadata
+    private function createMetadata(Resource $annotation, ItemMetadataInterface $parentItemMetadata = null) : ItemMetadataInterface
     {
         if (!$parentItemMetadata) {
             return new ItemMetadata(
@@ -145,13 +146,13 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
     /**
      * Creates a new instance of metadata if the property is not already set.
      *
-     * @param ItemMetadata $metadata
-     * @param string       $property
-     * @param mixed        $value
+     * @param ItemMetadataInterface $metadata
+     * @param string                $property
+     * @param mixed                 $value
      *
-     * @return ItemMetadata
+     * @return ItemMetadataInterface
      */
-    private function createWith(ItemMetadata $metadata, string $property, $value) : ItemMetadata
+    private function createWith(ItemMetadataInterface $metadata, string $property, $value) : ItemMetadataInterface
     {
         $ucfirstedProperty = ucfirst($property);
         $getter = 'get'.$ucfirstedProperty;
