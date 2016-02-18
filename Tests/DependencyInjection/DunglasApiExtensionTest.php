@@ -17,6 +17,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -65,11 +66,27 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->prepend($containerBuilder);
     }
 
-    public function testNotPrependWhenConfigExist()
+    public function testNotPrependSerializerWhenConfigExist()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => ['enabled' => false]])->shouldBeCalled();
-        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldNotBeCalled();
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null);
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function(array $config) {
+            return array_key_exists('serializer', $config);
+        }))->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->prepend($containerBuilder);
+    }
+
+    public function testNotPrependPropertyInfoWhenConfigExist()
+    {
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['property_info' => ['enabled' => false]])->shouldBeCalled();
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null);
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function(array $config) {
+            return array_key_exists('property_info', $config);
+        }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->prepend($containerBuilder);
@@ -106,7 +123,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
-        $containerBuilderProphecy->setDefinition('api.fos_user.event_subscriber', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['dunglas_api' => ['enable_fos_user' => true]]), $containerBuilder);
@@ -114,14 +131,11 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
     private function getContainerBuilderProphecy()
     {
-        $parameterBagProphecy = $this->prophesize(ParameterBagInterface::class);
-        $parameterBagProphecy->add(Argument::any())->shouldBeCalled();
-        $parameterBag = $parameterBagProphecy->reveal();
-
-        $definitionArgument = Argument::type(Definition::class);
+        $definitionArgument = Argument::that(function($argument) {
+            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
+        });
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getParameterBag()->willReturn($parameterBag)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([])->shouldBeCalled();
 
         $parameters = [
@@ -170,7 +184,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             'api.filters',
             'api.resource_class_resolver',
             'api.operation_method_resolver',
-            'api.metadata.resource.factory.collection',
             'api.metadata.resource.factory.collection.annotation',
             'api.metadata.resource.factory.item.annotation',
             'api.metadata.resource.factory.item.php_doc',
@@ -183,12 +196,10 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             'api.metadata.property.factory.item.validator',
             'api.metadata.resource.factory.collection.annotation',
             'api.format_negotiator',
-            'api.data_provider',
-            'api.operation_factory',
             'api.route_loader',
             'api.router',
             'api.iri_converter',
-            'api.listener.request.resource_type',
+            'api.listener.request.format',
             'api.listener.view.validation',
             'api.listener.request.format',
             'api.action.get_collection',
@@ -199,7 +210,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             'api.doctrine.metadata_factory',
             'api.doctrine.orm.collection_data_provider',
             'api.doctrine.orm.item_data_provider',
-            'api.doctrine.orm.default_item_data_provider',
+            'api.doctrine.orm.default.item_data_provider',
             'api.doctrine.orm.search_filter',
             'api.doctrine.orm.order_filter',
             'api.doctrine.orm.date_filter',
@@ -214,7 +225,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             'api.doctrine.listener.view.manager',
             'api.jsonld.entrypoint_builder',
             'api.jsonld.context_builder',
-            'api.jsonld.resource_context_builder_listener',
+            'api.jsonld.listener.view.responder',
             'api.jsonld.normalizer.item',
             'api.jsonld.normalizer.datetime',
             'api.jsonld.encoder',
@@ -222,7 +233,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             'api.jsonld.action.context',
             'api.jsonld.action.entrypoint',
             'api.hydra.documentation_builder',
-            'api.hydra.controller.exception',
             'api.hydra.listener.validation_exception',
             'api.hydra.listener.link_header_response',
             'api.hydra.listener.request_exception',
@@ -233,10 +243,17 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
             'api.hydra.normalizer.error',
             'api.hydra.action.documentation',
             'api.hydra.action.exception',
-            'api.fos_user.event_listener',
         ];
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
+        }
+
+        $aliases = [
+            'api.metadata.resource.factory.collection' => 'api.metadata.resource.factory.collection.annotation',
+        ];
+
+        foreach ($aliases as $alias => $service) {
+            $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
         return $containerBuilderProphecy;

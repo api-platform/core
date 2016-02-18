@@ -48,13 +48,8 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $dataProviderPass);
 
-        $definitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
-        $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-
         $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
         $containerBuilderProphecy->findTaggedServiceIds('api.filter')->willReturn(['foo' => [], 'bar' => [0 => ['hi' => 'hello']]])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.filters')->willReturn($definition)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $dataProviderPass->process($containerBuilder);
