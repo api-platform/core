@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <!-- Resource collection -->
+
+        <service id="api.metadata.resource.factory.collection" alias="api.metadata.resource.factory.collection.annotation" />
+
+        <service id="api.metadata.resource.factory.collection.annotation" class="Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataAnnotationFactory" public="false">
+            <argument type="service" id="annotation_reader" />
+        </service>
+
+        <!-- Resource item -->
+
+        <service id="api.metadata.resource.factory.item" alias="api.metadata.resource.factory.item.annotation" />
+
+        <service id="api.metadata.resource.factory.item.annotation" class="Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataAnnotationFactory" public="false">
+            <argument type="service" id="annotation_reader" />
+        </service>
+
+        <service id="api.metadata.resource.factory.item.php_doc" class="Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataPhpDocFactory" decorates="api.metadata.resource.factory.item" public="false">
+            <argument type="service" id="api.metadata.resource.factory.item.php_doc.inner" />
+        </service>
+
+        <service id="api.metadata.resource.factory.item.short_name" class="Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataShortNameFactory" decorates="api.metadata.resource.factory.item" public="false">
+            <argument type="service" id="api.metadata.resource.factory.item.short_name.inner" />
+        </service>
+
+        <service id="api.metadata.resource.factory.item.operation" class="Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataOperationFactory" decorates="api.metadata.resource.factory.item" public="false">
+            <argument type="service" id="api.metadata.resource.factory.item.operation.inner" />
+        </service>
+
+        <!-- Property collection -->
+
+        <service id="api.metadata.property.factory.collection" alias="api.metadata.property.factory.collection.property_info" />
+
+        <!--
+        Not used, the PropertyInfo factory is preferred.
+
+        <service id="api.metadata.property.factory.collection.annotation" class="Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataAnnotationFactory" public="false">
+            <argument type="service" id="annotation_reader" />
+        </service>
+        -->
+
+        <service id="api.metadata.property.factory.collection.property_info" class="Dunglas\ApiBundle\Bridge\Symfony\PropertyInfo\Metadata\Property\CollectionMetadataFactory" public="false">
+            <argument type="service" id="api.property_info" />
+        </service>
+
+        <!-- Property item -->
+
+        <service id="api.metadata.property.factory.item" alias="api.metadata.property.factory.item.annotation" />
+
+        <service id="api.metadata.property.factory.item.annotation" class="Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataAnnotationFactory" public="false">
+            <argument type="service" id="annotation_reader" />
+        </service>
+
+        <!-- The PropertyInfo decorator must always be the first decorator, it will create the metadata if it doesn't exist -->
+        <service id="api.metadata.property.factory.item.property_info" class="Dunglas\ApiBundle\Bridge\Symfony\PropertyInfo\Metadata\Property\ItemMetadataFactory" decorates="api.metadata.property.factory.item" public="false">
+            <argument type="service" id="api.property_info" />
+            <argument type="service" id="api.metadata.property.factory.item.property_info.inner" />
+        </service>
+
+        <service id="api.metadata.property.factory.item.serializer" class="Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataSerializerFactory" decorates="api.metadata.property.factory.item" public="false">
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+            <argument type="service" id="api.metadata.property.factory.item.serializer.inner" />
+        </service>
+
+        <service id="api.metadata.property.factory.item.validator" class="Dunglas\ApiBundle\Bridge\Symfony\Validator\Metadata\Property\ItemMetadataFactory" decorates="api.metadata.property.factory.item" public="false">
+            <argument type="service" id="validator" />
+            <argument type="service" id="api.metadata.property.factory.item.validator.inner" />
+        </service>
+
+    </services>
+
+</container>

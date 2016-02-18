@@ -19,11 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DocumentationAction
+final class DocumentationAction
 {
-    /**
-     * @var ApiDocumentationBuilderInterface
-     */
     private $apiDocumentationBuilder;
 
     public function __construct(ApiDocumentationBuilderInterface $apiDocumentationBuilder)

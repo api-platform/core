@@ -2,6 +2,7 @@
 
 ## 2.0.0
 
+* The metadata system has been fully rewritten
 * Use the ADR pattern
 * Remove the event system in favor of builtin Symfony Kernel events
 * Use string values for `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter` null-management constants

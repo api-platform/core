@@ -20,15 +20,12 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class RequestExceptionListener extends ExceptionListener
+final class RequestExceptionListener extends ExceptionListener
 {
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         // Normalize exceptions with hydra errors only for resources
-        if (!$event->getRequest()->attributes->has('_resource_type')) {
+        if (!$event->getRequest()->attributes->has('_resource_class')) {
             return;
         }
 

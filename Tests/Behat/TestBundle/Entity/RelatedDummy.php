@@ -12,7 +12,7 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Dunglas\ApiBundle\Annotation\Iri;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
+ * @Resource(iri="https://schema.org/Product")
  * @ORM\Entity
- * @Iri("https://schema.org/Product")
  */
 class RelatedDummy extends ParentDummy
 {
@@ -32,17 +32,20 @@ class RelatedDummy extends ParentDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string A name.
      *
      * @ORM\Column(nullable=true)
      */
     public $name;
+
     /**
      * @ORM\Column
      * @Groups({"barcelona", "chicago"})
      */
     protected $symfony = 'symfony';
+
     /**
      * @var \DateTime A dummy date.
      *
@@ -50,20 +53,12 @@ class RelatedDummy extends ParentDummy
      * @Assert\DateTime
      */
     public $dummyDate;
+
     /**
      * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
      * @Groups({"barcelona", "chicago"})
      */
     public $thirdLevel;
-    /**
-     * @ORM\ManyToOne(targetEntity="UnknownDummy", cascade={"persist"})
-     */
-    public $unknown;
-
-    public function setUnknown()
-    {
-        $this->unknown = new UnknownDummy();
-    }
 
     public function getId()
     {

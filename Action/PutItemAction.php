@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Action;
 
+use Dunglas\ApiBundle\Api\ItemDataProviderInterface;
 use Dunglas\ApiBundle\Exception\RuntimeException;
-use Dunglas\ApiBundle\Model\DataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -22,22 +22,16 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PutItemAction
+final class PutItemAction
 {
     use ActionUtilTrait;
 
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
-    /**
-     * @var SerializerInterface
-     */
+    private $itemDataProvider;
     private $serializer;
 
-    public function __construct(DataProviderInterface $dataProvider, SerializerInterface $serializer)
+    public function __construct(ItemDataProviderInterface $itemDataProvider, SerializerInterface $serializer)
     {
-        $this->dataProvider = $dataProvider;
+        $this->itemDataProvider = $itemDataProvider;
         $this->serializer = $serializer;
     }
 
@@ -54,19 +48,11 @@ class PutItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceType, $format) = $this->extractAttributes($request);
-        $data = $this->getItem($this->dataProvider, $resourceType, $id);
+        list($resourceClass, , $operationName, $format) = $this->extractAttributes($request);
+        $data = $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
 
-        $context = $resourceType->getDenormalizationContext();
-        $context['object_to_populate'] = $data;
+        $context = ['object_to_populate' => $data, 'resource_class' => $resourceClass, 'item_operation_name' => $operationName];
 
-        $data = $this->serializer->deserialize(
-            $request->getContent(),
-            $resourceType->getEntityClass(),
-            $format,
-            $context
-        );
-
-        return $data;
+        return $this->serializer->deserialize($request->getContent(), $resourceClass, $format, $context);
     }
 }

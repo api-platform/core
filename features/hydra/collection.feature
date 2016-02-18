@@ -148,7 +148,7 @@ Feature: Collections support
     """
 
   Scenario: Disable the pagination client side
-    When I send a "GET" request to "/dummies?enablePagination=0"
+    When I send a "GET" request to "/dummies?pagination=0"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -158,7 +158,7 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?enablePagination=0$"},
+        "@id": {"pattern": "^/dummies\\?pagination=0$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",

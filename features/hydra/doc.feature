@@ -39,7 +39,6 @@ Feature: Documentation support
     And the Hydra class "A constraint violation" exist
     And the Hydra class "A constraint violation list" exist
     And the Hydra class "CircularReference" exist
-    And the Hydra class "Custom" exist
     And the Hydra class "CustomIdentifierDummy" exist
     And the Hydra class "CustomNormalizedDummy" exist
     And the Hydra class "CustomWritableIdentifierDummy" exist

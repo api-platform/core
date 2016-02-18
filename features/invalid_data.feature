@@ -21,16 +21,16 @@ Feature: Handle properly invalid data submitted to the API
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",
-      "name": "Not existing",
-      "alias": null,
       "description": null,
+      "dummy": null,
       "dummyDate": null,
       "dummyPrice": null,
-      "jsonData": [],
       "relatedDummy": null,
-      "dummy": null,
       "relatedDummies": [],
-      "name_converted": null
+      "jsonData": [],
+      "name_converted": null,
+      "name": "Not existing",
+      "alias": null
     }
     """
 

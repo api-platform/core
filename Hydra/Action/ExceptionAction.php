@@ -22,16 +22,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ExceptionAction
+final class ExceptionAction
 {
-    /**
-     * @var NormalizerInterface
-     */
     private $normalizer;
 
-    /**
-     * @param NormalizerInterface $normalizer
-     */
     public function __construct(NormalizerInterface $normalizer)
     {
         $this->normalizer = $normalizer;

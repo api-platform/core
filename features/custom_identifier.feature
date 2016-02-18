@@ -50,17 +50,17 @@ Feature: Using custom identifier on resource
       "@context": "/contexts/CustomIdentifierDummy",
       "@id": "/custom_identifier_dummies",
       "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/custom_identifier_dummies",
-      "hydra:lastPage": "/custom_identifier_dummies",
       "hydra:member": [
         {
           "@id": "/custom_identifier_dummies/1",
           "@type": "CustomIdentifierDummy",
           "name": "My Dummy"
         }
-      ]
+      ],
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/custom_identifier_dummies",
+      "hydra:lastPage": "/custom_identifier_dummies"
     }
     """
 

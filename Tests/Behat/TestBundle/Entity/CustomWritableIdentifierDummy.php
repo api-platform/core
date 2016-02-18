@@ -12,10 +12,12 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Resource;
 
 /**
  * Custom writable identifier dummy.
  *
+ * @Resource
  * @ORM\Entity
  */
 class CustomWritableIdentifierDummy

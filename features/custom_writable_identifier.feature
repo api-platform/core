@@ -51,17 +51,17 @@ Feature: Using custom writable identifier on resource
       "@context": "/contexts/CustomWritableIdentifierDummy",
       "@id": "/custom_writable_identifier_dummies",
       "@type": "hydra:PagedCollection",
-      "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/custom_writable_identifier_dummies",
-      "hydra:lastPage": "/custom_writable_identifier_dummies",
       "hydra:member": [
         {
           "@id": "/custom_writable_identifier_dummies/my_slug",
           "@type": "CustomWritableIdentifierDummy",
           "name": "My Dummy"
         }
-      ]
+      ],
+      "hydra:totalItems": 1,
+      "hydra:itemsPerPage": 3,
+      "hydra:firstPage": "/custom_writable_identifier_dummies",
+      "hydra:lastPage": "/custom_writable_identifier_dummies"
     }
     """
 

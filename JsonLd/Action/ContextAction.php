@@ -11,8 +11,9 @@
 
 namespace Dunglas\ApiBundle\JsonLd\Action;
 
-use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
-use Dunglas\ApiBundle\JsonLd\ContextBuilder;
+use Dunglas\ApiBundle\JsonLd\ContextBuilderInterface;
+use Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
+use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,40 +22,35 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ContextAction
+final class ContextAction
 {
-    /**
-     * @var array
-     */
-    private static $reservedShortNames = [
+    const RESERVED_SHORT_NAMES = [
         'ConstraintViolationList' => true,
         'Error' => true,
     ];
 
-    /**
-     * @var ContextBuilder
-     */
     private $contextBuilder;
-    /**
-     * @var ResourceCollectionInterface
-     */
-    private $resourceTypeCollection;
+    private $collectionMetadataFactory;
+    private $itemMetadataFactory;
 
-    public function __construct(ContextBuilder $contextBuilder, ResourceCollectionInterface $resourceTypeCollection)
+    public function __construct(ContextBuilderInterface $contextBuilder, CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory)
     {
         $this->contextBuilder = $contextBuilder;
-        $this->resourceTypeCollection = $resourceTypeCollection;
+        $this->collectionMetadataFactory = $collectionMetadataFactory;
+        $this->itemMetadataFactory = $itemMetadataFactory;
     }
 
     /**
      * Generates a context according to the type requested.
      *
      * @param Request $request
-     * @param $shortName
+     * @param string  $shortName
      *
      * @return array
+     *
+     * @throws NotFoundHttpException
      */
-    public function __invoke(Request $request, $shortName)
+    public function __invoke(Request $request, string $shortName) : array
     {
         $request->attributes->set('_api_format', 'jsonld');
 
@@ -62,16 +58,18 @@ class ContextAction
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
         }
 
-        if (isset(self::$reservedShortNames[$shortName])) {
-            $resource = null;
-        } else {
-            $resource = $this->resourceTypeCollection->getResourceForShortName($shortName);
+        if (isset(self::RESERVED_SHORT_NAMES[$shortName])) {
+            return ['@context' => $this->contextBuilder->getBaseContext()];
+        }
 
-            if (!$resource) {
-                throw new NotFoundHttpException();
+        foreach ($this->collectionMetadataFactory->create() as $resourceClass) {
+            $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+
+            if ($shortName === $itemMetadata->getShortName()) {
+                return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)];
             }
         }
 
-        return ['@context' => $this->contextBuilder->getContext($resource)];
+        throw new NotFoundHttpException();
     }
 }

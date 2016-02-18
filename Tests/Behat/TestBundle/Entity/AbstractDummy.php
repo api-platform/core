@@ -13,6 +13,8 @@ namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Dunglas\ApiBundle\Annotation\Iri;
+use Dunglas\ApiBundle\Annotation\Property;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
+ * @Resource(attributes={"filters": {"my_dummy.search", "my_dummy.order", "my_dummy.date"}})
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string", length=16)
@@ -35,12 +38,13 @@ abstract class AbstractDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
     /**
      * @var string The dummy name.
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Iri("http://schema.org/name")
+     * @Property(iri="http://schema.org/name")
      */
     private $name;
 

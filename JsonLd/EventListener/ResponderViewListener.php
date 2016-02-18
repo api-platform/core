@@ -22,13 +22,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResponderViewListener
+final class ResponderViewListener
 {
     const FORMAT = 'jsonld';
 
-    /**
-     * @var NormalizerInterface
-     */
     private $normalizer;
 
     public function __construct(NormalizerInterface $normalizer)
@@ -72,14 +69,24 @@ class ResponderViewListener
                 break;
         }
 
-        $resourceType = $request->attributes->get('_resource_type');
-        $response = new JsonLdResponse(
-            $resourceType ? $this->normalizer->normalize(
-                $controllerResult, self::FORMAT, $resourceType->getNormalizationContext() + ['request_uri' => $request->getRequestUri()]
-            ) : $controllerResult,
-            $status
-        );
+        $resourceClass = $request->attributes->get('_resource_class');
+        $collectionOperationName = $request->attributes->get('_collection_operation_name');
+        $itemOperationName = $request->attributes->get('_item_operation_name');
 
+        if (!$resourceClass || (!$collectionOperationName && !$itemOperationName)) {
+            $event->setResponse(new JsonLdResponse($controllerResult, $status));
+
+            return;
+        }
+
+        $context = ['request_uri' => $request->getRequestUri(), 'resource_class' => $resourceClass];
+        if ($collectionOperationName) {
+            $context['collection_operation_name'] = $collectionOperationName;
+        } else {
+            $context['item_operation_name'] = $itemOperationName;
+        }
+
+        $response = new JsonLdResponse($this->normalizer->normalize($controllerResult, self::FORMAT, $context), $status);
         $event->setResponse($response);
     }
 }

@@ -18,25 +18,34 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Injects query extensions.
  *
+ * @internal
+ *
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DoctrineQueryExtensionPass implements CompilerPassInterface
+final class DoctrineQueryExtensionPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $dataProviderDefinition = $container->getDefinition('api.doctrine.orm.data_provider');
-        foreach ($this->findSortedExtensions($container, 'api.doctrine.orm.query_extension.item') as $extension) {
-            $dataProviderDefinition->addMethodCall('addItemExtension', [$extension]);
-        }
-        foreach ($this->findSortedExtensions($container, 'api.doctrine.orm.query_extension.collection') as $extension) {
-            $dataProviderDefinition->addMethodCall('addCollectionExtension', [$extension]);
-        }
+        $collectionDataProviderDefinition = $container->getDefinition('api.doctrine.orm.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api.doctrine.orm.item_data_provider');
+
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.item'));
     }
 
-    private function findSortedExtensions(ContainerBuilder $container, $tag)
+    /**
+     * Finds services having the given tag and sorts them by their priority attribute.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $tag
+     *
+     * @return Reference[]
+     */
+    private function findSortedServices(ContainerBuilder $container, $tag)
     {
         $extensions = [];
         foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {

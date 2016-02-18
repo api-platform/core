@@ -12,6 +12,7 @@
 namespace Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Dunglas\ApiBundle\Annotation\Resource;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jérémy Derusse <jeremy@derusse.com>
  *
+ * @Resource
  * @ORM\Entity
  */
 class ConcreteDummy extends AbstractDummy

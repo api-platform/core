@@ -19,41 +19,36 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class FormatRequestListener
+final class FormatRequestListener
 {
-    /**
-     * @var FormatNegotiatorInterface
-     */
     private $formatNegotiator;
-    /**
-     * @var string[]
-     */
     private $supportedFormats;
 
     /**
      * @param FormatNegotiatorInterface $formatNegotiator
      * @param string[]                  $supportedFormats
      */
-    public function __construct(FormatNegotiatorInterface $formatNegotiator, $supportedFormats)
+    public function __construct(FormatNegotiatorInterface $formatNegotiator, array $supportedFormats)
     {
         $this->formatNegotiator = $formatNegotiator;
         $this->supportedFormats = $supportedFormats;
     }
 
     /**
-     * Assign the format to use to the _api_format Request attribute.
+     * Assigns the format to use to the _api_format Request attribute.
      *
      * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->attributes->get('_resource_type')) {
+        if (!$request->attributes->get('_resource_class')) {
             return;
         }
 
         // Use the Symfony request format if available and applicable
         $format = $request->getRequestFormat(null);
+
         if (null === $format || !in_array($format, $this->supportedFormats)) {
             if (null !== $accept = $request->headers->get('Accept')) {
                 // Try to guess the best format to use

@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Configuration implements ConfigurationInterface
+final class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritdoc}
@@ -44,28 +44,19 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('filter_name')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('order')->defaultValue('order')->cannotBeEmpty()->info('The name of the keyword for the order filter.')->end()
-                            ->end()
-                        ->end()
                         ->scalarNode('order')->defaultNull()->info('The default order of results.')->end()
+                        ->scalarNode('order_parameter_name')->defaultValue('order')->cannotBeEmpty()->info('The name of the query parameter to order results.')->end()
                         ->arrayNode('pagination')
                             ->canBeDisabled()
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->booleanNode('client_can_enable')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
-                                ->scalarNode('enable_parameter')->defaultValue('enablePagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
-                                ->scalarNode('page_parameter')->defaultValue('page')->cannotBeEmpty()->info('The name of the parameter handling the page number.')->end()
-                                ->arrayNode('items_per_page')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->integerNode('default')->min(1)->defaultValue(30)->info('The default number of items perm page in collections.')->end()
-                                        ->booleanNode('client_can_change')->defaultValue(false)->info('Allow the client to change the number of elements by page.')->end()
-                                        ->scalarNode('parameter')->defaultValue('itemsPerPage')->info('The name of the parameter to change the number of elements by page client side.')->end()
-                                    ->end()
-                                ->end()
+                                ->booleanNode('enabled')->defaultTrue()->info('To enable or disable pagination for all resource collections by default.')->end()
+                                ->booleanNode('client_enabled')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
+                                ->booleanNode('client_items_per_page')->defaultFalse()->info('To allow the client to set the number of items per page.')->end()
+                                ->integerNode('items_per_page')->defaultValue(30)->info('The default number of items per page.')->end()
+                                ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The default name of the parameter handling the page number.')->end()
+                                ->scalarNode('enabled_parameter_name')->defaultValue('pagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
+                                ->scalarNode('items_per_page_parameter_name')->defaultValue('itemsPerPage')->cannotBeEmpty()->info('The name of the query parameter to set the number of items per page.')->end()
                             ->end()
                         ->end()
                     ->end()
