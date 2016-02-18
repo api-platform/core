@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Hydra\Serializer;
 
-use Dunglas\ApiBundle\Api\ResourceClassResolverInterface;
 use Dunglas\ApiBundle\Api\PaginatorInterface;
+use Dunglas\ApiBundle\Api\ResourceClassResolverInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\JsonLd\Serializer\ContextTrait;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;

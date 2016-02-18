@@ -14,11 +14,11 @@ namespace Dunglas\ApiBundle\Bridge\Doctrine\Orm;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Dunglas\ApiBundle\Api\ItemDataProviderInterface;
+use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 
 /**
  * Item data provider for the Doctrine ORM.

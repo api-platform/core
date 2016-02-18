@@ -14,8 +14,6 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\IriConverterInterface;
-use Dunglas\ApiBundle\Api\Resource;
-use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use phpmock\phpunit\PHPMock;

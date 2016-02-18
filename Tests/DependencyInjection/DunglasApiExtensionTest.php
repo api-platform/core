@@ -21,8 +21,6 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -71,7 +69,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => ['enabled' => false]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null);
-        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function(array $config) {
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('serializer', $config);
         }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -84,7 +82,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['property_info' => ['enabled' => false]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null);
-        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function(array $config) {
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('property_info', $config);
         }))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -131,7 +129,7 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
 
     private function getContainerBuilderProphecy()
     {
-        $definitionArgument = Argument::that(function($argument) {
+        $definitionArgument = Argument::that(function ($argument) {
             return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
         });
 
@@ -155,7 +153,6 @@ class DunglasApiExtensionTest extends \PHPUnit_Framework_TestCase
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
         }
-
 
         $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();

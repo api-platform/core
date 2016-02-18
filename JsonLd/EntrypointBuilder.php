@@ -12,10 +12,10 @@
 namespace Dunglas\ApiBundle\JsonLd;
 
 use Dunglas\ApiBundle\Api\IriConverterInterface;
+use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 
 /**
  * {@inheritdoc}

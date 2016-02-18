@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Bridge\Doctrine\Orm;
 
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Dunglas\ApiBundle\Api\PaginatorInterface;
 
 /**

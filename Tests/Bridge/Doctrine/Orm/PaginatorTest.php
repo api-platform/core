@@ -11,9 +11,9 @@
 
 namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
 
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Paginator;
 use Dunglas\ApiBundle\Tests\Fixtures\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 class PaginatorTest extends \PHPUnit_Framework_TestCase
 {

@@ -65,14 +65,15 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expectedValidationGroups
      * @param mixed $data
+     *
      * @return array
      */
     private function createEventObject($expectedValidationGroups, $data)
     {
         $itemMetadata = new ItemMetadata(null, null, null, [
             'create' => [
-                'validation_groups' => $expectedValidationGroups
-            ]
+                'validation_groups' => $expectedValidationGroups,
+            ],
         ]);
 
         $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
@@ -88,6 +89,6 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
         $request->setMethod(Request::METHOD_POST);
         $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
 
-        return array($itemMetadataFactory, $event);
+        return [$itemMetadataFactory, $event];
     }
 }

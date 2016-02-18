@@ -13,12 +13,10 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Extension;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
-use Dunglas\ApiBundle\Api\ResourceInterface;
 use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

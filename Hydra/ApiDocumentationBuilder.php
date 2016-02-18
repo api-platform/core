@@ -15,12 +15,12 @@ use Dunglas\ApiBundle\Api\OperationMethodResolverInterface;
 use Dunglas\ApiBundle\Api\ResourceClassResolverInterface;
 use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 use Dunglas\ApiBundle\JsonLd\ContextBuilderInterface;
-use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata as ResourceItemMetadata;
-use Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
-use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\ItemMetadata as PropertyItemMetadata;
+use Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
+use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use Dunglas\ApiBundle\Metadata\Resource\ItemMetadata as ResourceItemMetadata;
 
 /**
  * Creates a machine readable Hydra API documentation.

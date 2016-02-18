@@ -11,11 +11,11 @@
 
 namespace Dunglas\ApiBundle\JsonLd;
 
+use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
 use Dunglas\ApiBundle\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
-use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**

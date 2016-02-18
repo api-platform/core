@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\JsonLd;
 
-use Dunglas\ApiBundle\Exception\ResourceClassNotFoundException;
 use Dunglas\ApiBundle\Api\UrlGeneratorInterface;
+use Dunglas\ApiBundle\Exception\ResourceClassNotFoundException;
 
 /**
  * JSON-LD context builder interface.

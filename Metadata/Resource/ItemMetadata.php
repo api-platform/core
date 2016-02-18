@@ -94,6 +94,7 @@ final class ItemMetadata
     {
         return $this->iri;
     }
+
     /**
      * Returns a new instance with the given IRI.
      *

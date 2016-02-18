@@ -11,8 +11,8 @@
 
 namespace Dunglas\ApiBundle\Api;
 
-use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
+use Dunglas\ApiBundle\Exception\ResourceClassNotSupportedException;
 
 /**
  * Retrieves items from a persistence layer.
