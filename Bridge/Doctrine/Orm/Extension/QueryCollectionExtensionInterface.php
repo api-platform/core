@@ -26,5 +26,5 @@ interface QueryCollectionExtensionInterface
      * @param string       $resourceClass
      * @param string       $operationName
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName);
+    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null);
 }

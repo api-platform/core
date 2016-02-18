@@ -121,9 +121,7 @@ class SearchFilter extends AbstractFilter
                     $value = $this->getFilterValueFromUrl($value);
                 }
 
-                $strategy = null !== $this->properties ? $this->properties[$property] : self::STRATEGY_EXACT;
-
-                $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $value);
+                $this->addWhereByStrategy($this->properties[$property] ?? self::STRATEGY_EXACT, $queryBuilder, $alias, $field, $value);
             } elseif ($metadata->hasAssociation($field)) {
                 $values = (array) $value;
                 foreach ($values as $k => $v) {

@@ -23,12 +23,12 @@ use Doctrine\ORM\QueryBuilder;
 interface QueryResultExtensionInterface extends QueryCollectionExtensionInterface
 {
     /**
-     * @param string $resourceClass
-     * @param string $operationName
+     * @param string      $resourceClass
+     * @param string|null $operationName
      *
      * @return bool
      */
-    public function supportsResult(string $resourceClass, string $operationName) : bool;
+    public function supportsResult(string $resourceClass, string $operationName = null) : bool;
 
     /**
      * @param QueryBuilder $queryBuilder

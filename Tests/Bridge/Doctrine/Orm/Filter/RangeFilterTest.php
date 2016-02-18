@@ -15,7 +15,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\RangeFilter;
+use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use phpmock\phpunit\PHPMock;
@@ -42,9 +42,9 @@ class RangeFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var ResourceInterface
+     * @var string
      */
-    protected $resource;
+    protected $resourceClass;
 
     /**
      * {@inheritdoc}
@@ -55,7 +55,7 @@ class RangeFilterTest extends KernelTestCase
         $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
         $this->repository = $manager->getRepository(Dummy::class);
-        $this->resource = new Resource(Dummy::class);
+        $this->resourceClass = Dummy::class;
     }
 
     /**
@@ -73,11 +73,11 @@ class RangeFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         try {
-            $filter->apply($this->resource, $queryBuilder);
+            $filter->apply($queryBuilder, $this->resourceClass);
         } catch (InvalidArgumentException $e) {
         }
 
@@ -320,7 +320,7 @@ class RangeFilterTest extends KernelTestCase
                 'type' => 'string',
                 'required' => false,
             ],
-        ], $filter->getDescription($this->resource));
+        ], $filter->getDescription($this->resourceClass));
     }
 
     /**

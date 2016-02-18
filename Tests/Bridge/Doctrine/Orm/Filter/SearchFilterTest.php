@@ -13,16 +13,17 @@ namespace Dunglas\ApiBundle\Tests\Doctrine\Orm\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use Dunglas\ApiBundle\Bridge\Symfony\IriConverter;
+use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\Resource;
 use Dunglas\ApiBundle\Api\ResourceInterface;
-use Dunglas\ApiBundle\Doctrine\Orm\Filter\SearchFilter;
+use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
 use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
@@ -43,17 +44,17 @@ class SearchFilterTest extends KernelTestCase
     private $repository;
 
     /**
-     * @var ResourceInterface
+     * @var string
      */
-    protected $resource;
+    protected $resourceClass;
 
     /**
-     * @var IriConverter
+     * @var IriConverterInterface
      */
     protected $iriConverter;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
@@ -63,13 +64,12 @@ class SearchFilterTest extends KernelTestCase
     protected function setUp()
     {
         self::bootKernel();
-        $class = 'Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy';
         $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
         $this->iriConverter = self::$kernel->getContainer()->get('api.iri_converter');
-        $this->propertyAccessor = self::$kernel->getContainer()->get('api.property_accessor');
-        $this->repository = $manager->getRepository($class);
-        $this->resource = new Resource($class);
+        $this->propertyAccessor = self::$kernel->getContainer()->get('property_accessor');
+        $this->repository = $manager->getRepository(Dummy::class);
+        $this->resourceClass = Dummy::class;
     }
 
     /**
@@ -89,10 +89,10 @@ class SearchFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('Dunglas\ApiBundle\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
-        $filter->apply($this->resource, $queryBuilder);
+        $filter->apply($queryBuilder, $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expectedDql = strtolower($expected['dql']);
 
@@ -178,7 +178,7 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
-        ], $filter->getDescription($this->resource));
+        ], $filter->getDescription($this->resourceClass));
 
         $filter = new SearchFilter(
             $this->managerRegistry,
@@ -259,7 +259,7 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
-        ], $filter->getDescription($this->resource));
+        ], $filter->getDescription($this->resourceClass));
     }
 
     /**

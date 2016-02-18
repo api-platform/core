@@ -11,7 +11,9 @@
 
 namespace Dunglas\ApiBundle\Tests\Doctrine\Orm;
 
-use Dunglas\ApiBundle\Doctrine\Orm\Paginator;
+use Dunglas\ApiBundle\Bridge\Doctrine\Orm\Paginator;
+use Dunglas\ApiBundle\Tests\Fixtures\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 class PaginatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,11 +38,11 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
 
     public function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42)
     {
-        $query = $this->prophesize('Dunglas\ApiBundle\Tests\Fixtures\Query');
+        $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($firstResult)->shouldBeCalled();
         $query->getMaxResults()->willReturn($maxResults)->shouldBeCalled();
 
-        $doctrinePaginator = $this->prophesize('Doctrine\ORM\Tools\Pagination\Paginator');
+        $doctrinePaginator = $this->prophesize(DoctrinePaginator::class);
 
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn($totalItems)->shouldBeCalled();

@@ -57,7 +57,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName)
+    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -85,7 +85,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName) : bool
+    public function supportsResult(string $resourceClass, string $operationName = null) : bool
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
