@@ -6,21 +6,17 @@ cache:
   directories:
     - $HOME/.composer/cache
 
-php:
-    - 7.0
-    - hhvm
-
 matrix:
     fast_finish: true
     include:
         - php: 7.0
-          env: SYMFONY_VERSION=2.8.*
         - php: 7.0
           env: SYMFONY_VERSION=3.0.*
-        - php: 7.0
+        - php: hhvm
 
     allow_failures:
         - env: SYMFONY_VERSION=3.0.*
+        - php: hhvm
 
 before_install:
     - composer self-update
