@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Builder\Annotation\Resource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Builder\Annotation\Resource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**

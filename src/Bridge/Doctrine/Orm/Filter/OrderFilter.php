@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Builder\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

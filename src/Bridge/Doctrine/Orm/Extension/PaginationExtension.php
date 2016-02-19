@@ -11,13 +11,13 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

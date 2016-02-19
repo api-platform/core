@@ -44,7 +44,9 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     }
 
     /**
-     * @param array $operation
+     * @param string $resourceClass
+     * @param string $operationName
+     * @param bool   $collection
      *
      * @return string
      *

@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Metadata\Property;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
 use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * Use Doctrine metadata to populate the identifier property.

@@ -11,11 +11,11 @@
 
 namespace ApiPlatform\Builder\Metadata\Property\Factory;
 
-use Doctrine\Common\Annotations\Reader;
 use ApiPlatform\Builder\Annotation\Property;
 use ApiPlatform\Builder\Exception\PropertyNotFoundException;
 use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
 use ApiPlatform\Builder\Util\Reflection;
+use Doctrine\Common\Annotations\Reader;
 
 /**
  * Creates a property metadata from {@see Property} annotations.

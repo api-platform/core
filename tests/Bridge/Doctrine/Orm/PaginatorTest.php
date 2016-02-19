@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Tests\Doctrine\Orm;
 
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Builder\Tests\Fixtures\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 class PaginatorTest extends \PHPUnit_Framework_TestCase
 {

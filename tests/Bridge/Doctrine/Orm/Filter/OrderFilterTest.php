@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Builder\Tests\Doctrine\Orm\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
