@@ -11,14 +11,14 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Builder\Api\ItemDataProviderInterface;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Builder\Exception\InvalidArgumentException;
 use ApiPlatform\Builder\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Builder\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
 use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Item data provider for the Doctrine ORM.

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use Sanpi\Behatch\HttpCall\Request;
 
 /**

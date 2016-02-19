@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm;
 
+use ApiPlatform\Builder\Api\PaginatorInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use ApiPlatform\Builder\Api\PaginatorInterface;
 
 /**
  * Decorates the Doctrine ORM paginator.

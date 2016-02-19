@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Builder\Annotation\Property;
 use ApiPlatform\Builder\Annotation\Resource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

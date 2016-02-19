@@ -11,11 +11,11 @@
 
 namespace ApiPlatform\Builder\Tests\Doctrine\Orm\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\QueryBuilder;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;

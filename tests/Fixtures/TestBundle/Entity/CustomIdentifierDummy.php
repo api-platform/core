@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Builder\Annotation\Resource;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom identifier dummy.

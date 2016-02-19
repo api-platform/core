@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Builder\Annotation\Resource;
+use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;

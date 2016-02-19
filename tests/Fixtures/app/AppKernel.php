@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use ApiPlatform\Builder\Bridge\Symfony\Bundle\ApiPlatformBuilderBundle;
 use ApiPlatform\Builder\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
