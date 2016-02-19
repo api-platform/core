@@ -11,12 +11,12 @@
 
 namespace ApiPlatform\Builder\Metadata\Resource\Factory;
 
-use Doctrine\Common\Annotations\Reader;
 use ApiPlatform\Builder\Annotation\Resource;
 use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
 use ApiPlatform\Builder\Metadata\Resource\Operation;
 use ApiPlatform\Builder\Metadata\Resource\PaginationMetadata;
+use Doctrine\Common\Annotations\Reader;
 
 /**
  * Parses Resource annotation and create an item metadata.

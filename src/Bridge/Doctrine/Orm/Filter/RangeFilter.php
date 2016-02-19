@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\QueryBuilder;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Builder\Exception\InvalidArgumentException;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**

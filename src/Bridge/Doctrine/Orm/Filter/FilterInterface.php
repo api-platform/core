@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
 
-use Doctrine\ORM\QueryBuilder;
 use ApiPlatform\Builder\Api\FilterInterface as BaseFilterInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Doctrine ORM filter interface.

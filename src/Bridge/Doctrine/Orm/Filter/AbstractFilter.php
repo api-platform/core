@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Builder\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use ApiPlatform\Builder\Util\RequestParser;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

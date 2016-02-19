@@ -11,11 +11,11 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use ApiPlatform\Builder\Api\CollectionDataProviderInterface;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
 use ApiPlatform\Builder\Exception\ResourceClassNotSupportedException;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
  * Collection data provider for the Doctrine ORM.
