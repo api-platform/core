@@ -35,6 +35,12 @@
             <tag name="serializer.normalizer" priority="50" />
         </service>
 
+        <service id="api.jsonld.normalizer.embedded" class="Dunglas\ApiBundle\JsonLd\Serializer\EmbeddedNormalizer" public="false" abstract="true">
+            <argument type="service" id="api.mapping.class_metadata_factory" />
+            <argument type="service" id="api.property_accessor" />
+            <argument type="service" id="api.name_converter" on-invalid="ignore" />
+        </service>
+
         <service id="api.jsonld.encoder" class="Dunglas\ApiBundle\JsonLd\Serializer\JsonLdEncoder" public="false">
             <tag name="serializer.encoder" />
         </service>
