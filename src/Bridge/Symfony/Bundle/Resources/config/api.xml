@@ -79,10 +79,7 @@
             <argument type="service" id="api.serializer" />
         </service>
 
-        <service id="api.action.delete_item" class="ApiPlatform\Builder\Action\DeleteItemAction">
-            <argument type="service" id="api.item_data_provider" />
-        </service>
-
+        <service id="api.action.delete_item" alias="api.action.get_item" />
     </services>
 
 </container>
