@@ -75,7 +75,8 @@ class ItemDataProvider implements ItemDataProviderInterface
         foreach ($this->collectionMetadataFactory->create($resourceClass) as $propertyName) {
             $itemMetadata = $this->itemMetadataFactory->create($resourceClass, $propertyName);
 
-            if (!$itemMetadata->isIdentifier()) {
+            $identifier = $itemMetadata->isIdentifier();
+            if (null === $identifier || false === $identifier) {
                 continue;
             }
 

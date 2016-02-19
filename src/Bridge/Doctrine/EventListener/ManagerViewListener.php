@@ -72,7 +72,7 @@ final class ManagerViewListener
     /**
      * Gets the manager if applicable.
      *
-     * @param string $resourceType
+     * @param string $resourceClass
      * @param mixed  $data
      *
      * @return ObjectManager|null

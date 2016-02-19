@@ -167,6 +167,7 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
             'api.metadata.property.factory.item',
             'api.item_data_provider',
             'api.collection_data_provider',
+            'api.action.delete_item',
         ];
         foreach ($aliases as $alias) {
             $containerBuilderProphecy->setAlias($alias, Argument::type(Alias::class))->shouldBeCalled();
@@ -203,7 +204,6 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
             'api.action.post_collection',
             'api.action.get_item',
             'api.action.put_item',
-            'api.action.delete_item',
             'api.doctrine.metadata_factory',
             'api.doctrine.orm.collection_data_provider',
             'api.doctrine.orm.item_data_provider',

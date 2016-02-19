@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Default API action retrieving a resource.
+ * Default API action retrieving a resource (used for GET and DELETE methods).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

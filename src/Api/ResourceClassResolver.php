@@ -42,7 +42,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         } elseif (null === $resourceClass) {
             throw new InvalidArgumentException(sprintf('No resource class found.'));
         } else {
-            $typeToFind = $resourceClass;
+            $typeToFind = $type = $resourceClass;
         }
 
         if (!$this->isResourceClass($typeToFind) || ($strict && isset($type) && $resourceClass !== $type)) {

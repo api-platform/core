@@ -225,13 +225,10 @@ class SearchFilter extends AbstractFilter
 
             if ($this->isPropertyNested($property)) {
                 $propertyParts = $this->splitPropertyParts($property);
-
                 $field = $propertyParts['field'];
-
                 $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
             } else {
                 $field = $property;
-
                 $metadata = $this->getClassMetadata($resourceClass);
             }
 
