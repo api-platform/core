@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="api.hydra.documentation_builder" class="ApiPlatform\Builder\Hydra\ApiDocumentationBuilder" public="false">
+            <argument type="service" id="api.metadata.resource.factory.collection" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="api.metadata.property.factory.collection" />
+            <argument type="service" id="api.metadata.property.factory.item" />
+            <argument type="service" id="api.jsonld.context_builder" />
+            <argument type="service" id="api.resource_class_resolver" />
+            <argument type="service" id="api.operation_method_resolver" />
+            <argument type="service" id="api.router" />
+            <argument>%api.title%</argument>
+            <argument>%api.description%</argument>
+        </service>
+
+        <!-- Event listeners -->
+
+        <service id="api.hydra.listener.link_header_response" class="ApiPlatform\Builder\Hydra\EventListener\LinkHeaderResponseListener">
+            <argument type="service" id="api.router" />
+
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
+        </service>
+
+        <service id="api.hydra.listener.validation_exception" class="ApiPlatform\Builder\Bridge\Symfony\Validator\Hydra\EventListener\ValidationExceptionListener">
+            <argument type="service" id="api.hydra.normalizer.constraint_violation_list" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+
+        <service id="api.hydra.listener.request_exception" class="ApiPlatform\Builder\Hydra\EventListener\RequestExceptionListener">
+            <argument>api.hydra.action.exception</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
+            <tag name="monolog.logger" channel="request" />
+        </service>
+
+        <!-- Serializer -->
+
+        <service id="api.hydra.normalizer.collection" class="ApiPlatform\Builder\Hydra\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="api.jsonld.context_builder" />
+            <argument type="service" id="api.resource_class_resolver" />
+
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
+        <service id="api.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Builder\Bridge\Symfony\Validator\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument type="service" id="api.router" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api.hydra.normalizer.error" class="ApiPlatform\Builder\Hydra\Serializer\ErrorNormalizer" public="false">
+            <argument type="service" id="api.router" />
+            <argument>%kernel.debug%</argument>
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api.hydra.normalizer.paged_collection" class="ApiPlatform\Builder\Hydra\Serializer\PagedCollectionNormalizer" decorates="api.hydra.normalizer.collection" public="false">
+            <argument type="service" id="api.hydra.normalizer.paged_collection.inner" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="api.resource_class_resolver" />
+            <argument>%api.collection.pagination.page_parameter_name%</argument>
+        </service>
+
+        <service id="api.hydra.normalizer.collection_filters" class="ApiPlatform\Builder\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api.hydra.normalizer.collection" public="false">
+            <argument type="service" id="api.hydra.normalizer.collection_filters.inner" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="api.resource_class_resolver" />
+            <argument type="service" id="api.filters" />
+        </service>
+
+        <!-- Action -->
+
+        <service id="api.hydra.action.documentation" class="ApiPlatform\Builder\Hydra\Action\DocumentationAction">
+            <argument type="service" id="api.hydra.documentation_builder" />
+        </service>
+
+        <service id="api.hydra.action.exception" class="ApiPlatform\Builder\Hydra\Action\ExceptionAction">
+            <argument type="service" id="api.hydra.normalizer.error" />
+       </service>
+
+    </services>
+
+</container>

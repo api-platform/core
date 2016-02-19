@@ -1,0 +1,92 @@
+imports:
+    - { resource: security.yml }
+
+framework:
+    secret:                           'dunglas.fr'
+    router:
+        resource:                     '%kernel.root_dir%/config/routing.yml'
+        strict_requirements:          '%kernel.debug%'
+    validation:
+        enable_annotations:            true
+    serializer:
+        enable_annotations:            true
+    trusted_proxies:                   ~
+    test:                              ~
+    session:
+        storage_id:                    'session.storage.mock_file'
+    form:                              ~ # For FOSUser
+
+doctrine:
+    dbal:
+        driver:                        'pdo_sqlite'
+        path:                          '%kernel.cache_dir%/db.sqlite'
+        charset:                       'UTF8'
+
+    orm:
+        auto_generate_proxy_classes:   '%kernel.debug%'
+        auto_mapping:                  true
+
+api_platform_builder:
+    title:                             'My Dummy API'
+    description:                       'This is a test API.'
+    supported_formats:                 [ 'jsonld', 'xml' ]
+    enable_fos_user:                   true
+    collection:
+        order_parameter_name:          'order'
+        order:                         'ASC'
+        pagination:
+            client_enabled:            true
+            client_items_per_page:     true
+            items_per_page:            3
+
+fos_user:
+    db_driver:        'orm'
+    firewall_name:    'api'
+    service:
+        user_manager: 'api.user_manager'
+    user_class:       'ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\User'
+
+services:
+    api.user_manager:
+        class: 'ApiPlatform\Builder\Tests\Fixtures\TestBundle\Manager\UserManager'
+        arguments:
+            -  '@security.encoder_factory'
+            -  '@fos_user.util.username_canonicalizer'
+            -  '@fos_user.util.email_canonicalizer'
+            -  '@fos_user.object_manager'
+            -  '%fos_user.model.user.class%'
+
+    fos_user.mailer.default:
+        class: 'ApiPlatform\Builder\Bridge\Symfony\Bundle\Tests\Mock\MailerMock'
+
+    api.name_converter:
+        class: 'ApiPlatform\Builder\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
+
+    xml_responder_view_listener:
+        class: 'ApiPlatform\Builder\Tests\Fixtures\TestBundle\EventListener\XmlResponderViewListener'
+        arguments:
+            - '@api.serializer'
+
+            - '@api.metadata.resource.factory.item'
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.view', method: 'onKernelView' }
+
+    my_dummy_resource.search_filter:
+        parent:    'api.doctrine.orm.search_filter'
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact'  } ]
+        tags:      [ { name: 'api.filter', id: 'my_dummy.search' } ]
+
+    my_dummy_resource.order_filter:
+        parent:    'api.doctrine.orm.order_filter'
+        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
+        tags:      [ { name: 'api.filter', id: 'my_dummy.order' } ]
+
+    my_dummy_resource.date_filter:
+        parent:    'api.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
+        tags:      [ { name: 'api.filter', id: 'my_dummy.date' } ]
+
+    my_dummy_resource.range_filter:
+        parent:    'api.doctrine.orm.range_filter'
+        arguments: [ { 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api.filter', id: 'my_dummy.range' } ]

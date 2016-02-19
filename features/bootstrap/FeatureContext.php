@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasApiBundle package.
+ * This file is part of the API Platform Builder package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *
@@ -13,9 +13,9 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelatedDummy;
-use Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use Sanpi\Behatch\HttpCall\Request;
 
 /**

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the DunglasApiBundle package.
+ * This file is part of the API Platform Builder package.
  *
  * (c) Kévin Dunglas <dunglas@gmail.com>
  *

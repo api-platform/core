@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api.serializer" alias="serializer" />
+
+        <service id="api.property_accessor" alias="property_accessor" public="false" />
+
+        <service id="api.property_info" alias="property_info" public="false" />
+
+        <service id="api.filters" class="ApiPlatform\Builder\Api\FilterCollection" public="false" />
+
+        <service id="api.resource_class_resolver" class="ApiPlatform\Builder\Api\ResourceClassResolver" public="false">
+            <argument type="service" id="api.metadata.resource.factory.collection" />
+        </service>
+
+        <service id="api.operation_method_resolver" class="ApiPlatform\Builder\Bridge\Symfony\Routing\OperationMethodResolver" public="false">
+            <argument type="service" id="api.router" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+        </service>
+
+        <service id="api.route_loader" class="ApiPlatform\Builder\Bridge\Symfony\Routing\ApiLoader" public="false">
+            <argument type="service" id="kernel" />
+            <argument type="service" id="api.metadata.resource.factory.collection" />
+            <argument type="service" id="api.metadata.resource.factory.item" />
+
+            <tag name="routing.loader" />
+        </service>
+
+        <service id="api.router" class="ApiPlatform\Builder\Bridge\Symfony\Routing\Router" public="false">
+            <argument type="service" id="router" />
+        </service>
+
+        <service id="api.iri_converter" class="ApiPlatform\Builder\Bridge\Symfony\Routing\IriConverter" public="false">
+            <argument type="service" id="api.metadata.property.factory.collection" />
+            <argument type="service" id="api.metadata.property.factory.item" />
+            <argument type="service" id="api.item_data_provider" />
+            <argument type="service" id="api.router" />
+            <argument type="service" id="api.property_accessor" />
+        </service>
+
+        <service id="api.format_negotiator" class="Negotiation\FormatNegotiator" public="false" />
+
+        <!-- Event listeners -->
+
+        <service id="api.listener.request.format" class="ApiPlatform\Builder\EventListener\FormatRequestListener">
+            <argument type="service" id="api.format_negotiator" />
+            <argument>%api.supported_formats%</argument>
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+        </service>
+
+        <service id="api.listener.view.validation" class="ApiPlatform\Builder\Bridge\Symfony\Validator\EventListener\ViewListener">
+            <argument type="service" id="api.metadata.resource.factory.item" />
+            <argument type="service" id="validator" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="20" />
+        </service>
+
+        <!-- Action -->
+
+        <service id="api.action.get_collection" class="ApiPlatform\Builder\Action\GetCollectionAction">
+            <argument type="service" id="api.collection_data_provider" />
+        </service>
+
+        <service id="api.action.post_collection" class="ApiPlatform\Builder\Action\PostCollectionAction">
+            <argument type="service" id="api.serializer" />
+        </service>
+
+        <service id="api.action.get_item" class="ApiPlatform\Builder\Action\GetItemAction">
+            <argument type="service" id="api.item_data_provider" />
+        </service>
+
+        <service id="api.action.put_item" class="ApiPlatform\Builder\Action\PutItemAction">
+            <argument type="service" id="api.item_data_provider" />
+            <argument type="service" id="api.serializer" />
+        </service>
+
+        <service id="api.action.delete_item" class="ApiPlatform\Builder\Action\DeleteItemAction">
+            <argument type="service" id="api.item_data_provider" />
+        </service>
+
+    </services>
+
+</container>

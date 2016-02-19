@@ -3,13 +3,13 @@
   "type": "symfony-bundle",
   "description": "JSON-LD / Hydra REST API for Symfony",
   "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
-  "homepage": "http://api-platform.com",
+  "homepage": "https://api-platform.com",
   "license": "MIT",
   "authors": [
     {
       "name": "Kévin Dunglas",
       "email": "dunglas@gmail.com",
-      "homepage": "http://dunglas.fr"
+      "homepage": "https://dunglas.fr"
     }
   ],
   "repositories": [
@@ -20,12 +20,9 @@
   ],
   "require": {
     "php": ">=7.0",
+    "symfony/http-foundation": "~2.3",
     "symfony/serializer": "~3.1@dev",
-    "symfony/property-info": "~3.1@dev",
-    "symfony/validator": "~2.5|~3.0",
-    "symfony/framework-bundle": "~3.1@dev",
     "doctrine/inflector": "~1.0",
-    "phpdocumentor/reflection": "^1.0.7",
     "willdurand/negotiation": "~1.4"
   },
   "require-dev": {
@@ -36,9 +33,13 @@
     "behat/mink-extension": "~2.0",
     "behat/mink-browserkit-driver": "~1.1",
     "behatch/contexts": "dev-master",
+    "symfony/framework-bundle": "~3.1@dev",
     "symfony/finder": "~2.3",
     "symfony/security": "~2.7|~3.0",
+    "symfony/property-info": "~3.1@dev",
     "symfony/dependency-injection": "~2.8@dev",
+    "symfony/validator": "~2.5|~3.0",
+    "phpdocumentor/reflection": "^1.0.7",
     "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/doctrine-bundle": "dev-property_info",
     "php-mock/php-mock-phpunit": "~1.1"
@@ -47,10 +48,10 @@
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
   },
   "autoload": {
-    "psr-4": { "Dunglas\\ApiBundle\\": "" },
-    "exclude-from-classmap": [
-      "/Tests/"
-    ]
+    "psr-4": { "ApiPlatform\\Builder\\": "src/" }
+  },
+  "autoload-dev": {
+    "psr-4": { "ApiPlatform\\Builder\\Tests\\": "tests/" }
   },
   "extra": {
     "branch-alias": {

@@ -3,5 +3,5 @@ composer.phar
 composer.lock
 phpunit.xml
 /vendor/
-/features/fixtures/TestApp/cache/*
-/features/fixtures/TestApp/logs/*
+/tests/Fixtures/app/cache/*
+/tests/Fixtures/app/logs/*

@@ -1,0 +1,44 @@
+<?php
+
+/*
+ * This file is part of the API Platform Builder package.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use ApiPlatform\Builder\Bridge\Symfony\Bundle\ApiPlatformBuilderBundle;
+use ApiPlatform\Builder\Tests\Fixtures\TestBundle\TestBundle;
+use FOS\UserBundle\FOSUserBundle;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\Kernel;
+
+/**
+ * AppKernel for tests.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class AppKernel extends Kernel
+{
+    public function registerBundles()
+    {
+        return [
+            new FrameworkBundle(),
+            new FOSUserBundle(),
+            new DoctrineBundle(),
+            new ApiPlatformBuilderBundle(),
+            new SecurityBundle(),
+            new TestBundle(),
+        ];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+        $loader->load($this->getRootDir().'/config/config.yml');
+    }
+}

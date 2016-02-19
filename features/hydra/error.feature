@@ -43,7 +43,7 @@ Feature: Error handling
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummy" of "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
+    And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummy" of "ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
     And the JSON node "trace" should exist
 
   Scenario: Get an error during deserialization of collection
@@ -62,7 +62,7 @@ Feature: Error handling
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummies" of "Dunglas\ApiBundle\Tests\Behat\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
+    And the JSON node "hydra:description" should be equal to 'Nested objects for attribute "relatedDummies" of "ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
     And the JSON node "trace" should exist
 
   Scenario: Get an error because of an invalid JSON

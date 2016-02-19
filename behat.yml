@@ -2,21 +2,21 @@ default:
   suites:
     default:
       contexts:
-        - FeatureContext: { doctrine: "@doctrine" }
-        - HydraContext
-        - Behat\MinkExtension\Context\MinkContext
-        - Sanpi\Behatch\Context\RestContext
-        - Sanpi\Behatch\Context\JsonContext
+        - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'HydraContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Sanpi\Behatch\Context\RestContext'
+        - 'Sanpi\Behatch\Context\JsonContext'
   extensions:
-    Behat\Symfony2Extension:
+    'Behat\Symfony2Extension':
       kernel:
-        env: "test"
-        debug: "true"
-        path: "features/fixtures/TestApp/AppKernel.php"
-        bootstrap: "features/fixtures/TestApp/bootstrap.php"
-    Behat\MinkExtension:
+        env:       'test'
+        debug:     'true'
+        path:      'tests/Fixtures/app/AppKernel.php'
+        bootstrap: 'tests/Fixtures/app/bootstrap.php'
+    'Behat\MinkExtension':
       base_url: "http://example.com/"
       sessions:
         default:
           symfony2: ~
-    Sanpi\Behatch\Extension: ~
+    'Sanpi\Behatch\Extension': ~
