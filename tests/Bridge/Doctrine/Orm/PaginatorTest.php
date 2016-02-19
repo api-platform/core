@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Tests\Doctrine\Orm;
 
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Builder\Tests\Fixtures\Query;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 class PaginatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,7 +47,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn($totalItems)->shouldBeCalled();
 
-        $doctrinePaginator->getIterator()->will(function() {
+        $doctrinePaginator->getIterator()->will(function () {
             return new \ArrayIterator();
         });
 

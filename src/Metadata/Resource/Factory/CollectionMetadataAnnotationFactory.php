@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Builder\Metadata\Resource\Factory;
 
-use Doctrine\Common\Annotations\Reader;
 use ApiPlatform\Builder\Annotation\Resource;
 use ApiPlatform\Builder\Metadata\Resource\CollectionMetadata;
+use Doctrine\Common\Annotations\Reader;
 
 /**
  * Creates a resource collection metadata from {@see Resource} annotations.

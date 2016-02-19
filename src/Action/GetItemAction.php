@@ -45,7 +45,7 @@ final class GetItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceClass,, $operationName) = $this->extractAttributes($request);
+        list($resourceClass, , $operationName) = $this->extractAttributes($request);
 
         return $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
     }

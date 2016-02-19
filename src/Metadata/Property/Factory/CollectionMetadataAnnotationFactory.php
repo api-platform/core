@@ -11,11 +11,11 @@
 
 namespace ApiPlatform\Builder\Metadata\Property\Factory;
 
-use Doctrine\Common\Annotations\Reader;
 use ApiPlatform\Builder\Annotation\Property;
 use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Builder\Metadata\Property\CollectionMetadata;
 use ApiPlatform\Builder\Util\Reflection;
+use Doctrine\Common\Annotations\Reader;
 
 /**
  * Creates a property collection metadata from {@see Property} annotations.

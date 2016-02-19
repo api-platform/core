@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Builder\Bridge\Symfony\Routing;
 
-use Doctrine\Common\Inflector\Inflector;
 use ApiPlatform\Builder\Exception\RuntimeException;
 use ApiPlatform\Builder\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\HttpKernel\KernelInterface;

@@ -42,7 +42,7 @@ final class PostCollectionAction
      */
     public function __invoke(Request $request)
     {
-        list($resourceClass, $operationName,, $format) = $this->extractAttributes($request);
+        list($resourceClass, $operationName, , $format) = $this->extractAttributes($request);
         $context = ['resource_class' => $resourceClass, 'collection_operation_name' => $operationName];
 
         return $this->serializer->deserialize($request->getContent(), $resourceClass, $format, $context);

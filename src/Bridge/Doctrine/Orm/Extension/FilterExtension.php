@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension;
 
-use Doctrine\ORM\QueryBuilder;
 use ApiPlatform\Builder\Api\FilterCollection;
 use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Applies filters on a resource query.
