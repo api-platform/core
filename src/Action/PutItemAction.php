@@ -48,7 +48,7 @@ final class PutItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceClass, , $operationName, $format) = $this->extractAttributes($request);
+        list($resourceClass,, $operationName, $format) = $this->extractAttributes($request);
         $data = $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
 
         $context = ['object_to_populate' => $data, 'resource_class' => $resourceClass, 'item_operation_name' => $operationName];

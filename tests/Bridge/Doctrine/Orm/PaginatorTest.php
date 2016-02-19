@@ -47,7 +47,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn($totalItems)->shouldBeCalled();
 
-        $doctrinePaginator->getIterator()->will(function () {
+        $doctrinePaginator->getIterator()->will(function() {
             return new \ArrayIterator();
         });
 

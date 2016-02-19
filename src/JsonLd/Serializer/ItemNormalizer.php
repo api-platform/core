@@ -294,7 +294,7 @@ final class ItemNormalizer extends AbstractNormalizer
      * @param string               $resourceClass
      * @param string               $attributeName
      * @param PropertyItemMetadata $propertyItemMetadata
-     * @param string               $class
+     * @param string               $className
      * @param mixed                $value
      * @param array                $context
      *

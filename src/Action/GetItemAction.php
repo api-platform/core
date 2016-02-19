@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Default API action retrieving a resource.
+ * Default API action retrieving a resource (used for GET and DELETE methods).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -45,7 +45,7 @@ final class GetItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceClass, , $operationName) = $this->extractAttributes($request);
+        list($resourceClass,, $operationName) = $this->extractAttributes($request);
 
         return $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
     }
