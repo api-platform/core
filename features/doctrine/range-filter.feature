@@ -17,9 +17,8 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[between\\]=12.99..15.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 15},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -47,6 +46,10 @@ Feature: Range filter on collections
             }
           },
           "maxItems": 15
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[between\\]=12.99..15.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -63,9 +66,8 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[lt\\]=12.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 8},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -86,6 +88,10 @@ Feature: Range filter on collections
             }
           },
           "maxItems": 8
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[lt\\]=12.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -102,9 +108,8 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[lte\\]=12.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 16},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -133,6 +138,10 @@ Feature: Range filter on collections
             }
           },
           "maxItems": 16
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[lte\\]=12.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -149,9 +158,8 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=15.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 7},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -171,6 +179,10 @@ Feature: Range filter on collections
             }
           },
           "maxItems": 7
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=15.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -187,9 +199,8 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[gte\\]=15.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 14},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -216,6 +227,10 @@ Feature: Range filter on collections
             }
           },
           "maxItems": 14
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gte\\]=15.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -232,9 +247,8 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=12.99\\&dummyPrice\\[lt\\]=19.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 7},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -254,6 +268,10 @@ Feature: Range filter on collections
             }
           },
           "maxItems": 7
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=12.99\\&dummyPrice\\[lt\\]=19.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -271,11 +289,15 @@ Feature: Range filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=19.99$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "maxItems": 0
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=19.99$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }

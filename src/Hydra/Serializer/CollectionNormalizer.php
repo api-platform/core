@@ -16,8 +16,11 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * This normalizer handles collections.
@@ -25,22 +28,24 @@ use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
  * @author Kevin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class CollectionNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
+final class CollectionNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use ContextTrait;
+    use SerializerAwareTrait;
 
     const FORMAT = 'jsonld';
-    const HYDRA_COLLECTION = 'hydra:Collection';
 
     private $itemMetadataFactory;
     private $contextBuilder;
     private $resourceClassResolver;
+    private $iriConverter;
 
-    public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver)
+    public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter)
     {
         $this->itemMetadataFactory = $itemMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -48,7 +53,11 @@ final class CollectionNormalizer extends SerializerAwareNormalizer implements No
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_array($data) || $data instanceof \Traversable);
+        if (self::FORMAT !== $format) {
+            return false;
+        }
+
+        return is_array($data) || ($data instanceof \Traversable && $data instanceof \Countable);
     }
 
     /**
@@ -74,13 +83,15 @@ final class CollectionNormalizer extends SerializerAwareNormalizer implements No
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $context = $this->createContext($resourceClass, $resourceItemMetadata, $context, true);
 
-        $data['@id'] = $context['request_uri'];
-        $data['@type'] = self::HYDRA_COLLECTION;
-        $data['hydra:member'] = [];
+        $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+        $data['@type'] = 'hydra:Collection';
 
+        $data['hydra:member'] = [];
         foreach ($object as $obj) {
             $data['hydra:member'][] = $this->serializer->normalize($obj, $format, $context);
         }
+
+        $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
 
         return $data;
     }

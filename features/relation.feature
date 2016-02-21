@@ -94,8 +94,8 @@ Feature: Relations support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?relatedDummy=%2Frelated_dummies%2F1$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
         "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:member": {
@@ -107,6 +107,10 @@ Feature: Relations support
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?relatedDummy=%2Frelated_dummies%2F1$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -123,8 +127,8 @@ Feature: Relations support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?relatedDummies\\[\\]=%2Frelated_dummies%2F1$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
         "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:member": {
@@ -136,6 +140,10 @@ Feature: Relations support
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?relatedDummies\\[\\]=%2Frelated_dummies%2F1$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }

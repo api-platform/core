@@ -16,8 +16,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[id\\]=asc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -32,6 +32,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[id\\]=asc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -48,8 +52,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[id\\]=desc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -64,6 +68,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[id\\]=desc"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -80,8 +88,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[name\\]=asc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -96,6 +104,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[name\\]=asc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -112,8 +124,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[name\\]=desc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -128,6 +140,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[name\\]=desc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -144,8 +160,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[name\\]$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -160,6 +176,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[name\\]$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -177,8 +197,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[relatedDummy\\]=asc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -193,6 +213,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[relatedDummy\\]=asc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -210,8 +234,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[alias\\]=asc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -226,6 +250,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[alias\\]=asc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -241,8 +269,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[alias\\]=desc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -257,6 +285,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[alias\\]=desc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -272,8 +304,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=asc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -288,6 +320,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=asc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -303,8 +339,8 @@ Feature: Order filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=desc$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -319,6 +355,10 @@ Feature: Order filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=desc$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }

@@ -17,8 +17,8 @@ Feature: Search filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?name=my$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -33,6 +33,10 @@ Feature: Search filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?name=my$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -49,8 +53,8 @@ Feature: Search filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?alias=Ali$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -65,6 +69,10 @@ Feature: Search filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?alias=Ali$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -81,8 +89,8 @@ Feature: Search filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?description=smart$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -97,6 +105,10 @@ Feature: Search filter on collections
               }
             }
           }
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?description=smart$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -114,11 +126,15 @@ Feature: Search filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?name=MuYm$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "maxItems": 0
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?name=MuYm$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
