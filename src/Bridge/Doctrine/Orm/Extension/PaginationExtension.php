@@ -69,15 +69,13 @@ class PaginationExtension implements QueryResultExtensionInterface
             return;
         }
 
-        $pageParameterName = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_page_parameter', $this->pageParameterName, true);
-
         $itemsPerPage = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
         if ($itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
         }
 
         $queryBuilder
-            ->setFirstResult(($request->query->get($pageParameterName, 1) - 1) * $itemsPerPage)
+            ->setFirstResult(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
             ->setMaxResults($itemsPerPage)
         ;
     }

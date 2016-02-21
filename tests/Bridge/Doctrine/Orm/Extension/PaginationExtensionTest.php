@@ -35,7 +35,6 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $attributes = [
             'pagination_enabled' => true,
             'pagination_client_enabled' => true,
-            'pagination_page_parameter' => '_page',
             'pagination_items_per_page' => 40,
         ];
         $itemMetadataFactoryProphecy->create('Foo')->willReturn(new ItemMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
@@ -49,7 +48,12 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $requestStack,
-            $itemMetadataFactory
+            $itemMetadataFactory,
+            true,
+            false,
+            false,
+            30,
+            '_page'
         );
         $extension->applyToCollection($queryBuilder, 'Foo', 'op');
     }

@@ -84,7 +84,7 @@ Feature: Create-Retrieve-Update-Delete
     {
       "@context": "/contexts/Dummy",
       "@id": "/dummies",
-      "@type": "hydra:PagedCollection",
+      "@type": "hydra:Collection",
       "hydra:member": [
           {
               "@id": "/dummies/1",
@@ -107,9 +107,6 @@ Feature: Create-Retrieve-Update-Delete
           }
       ],
       "hydra:totalItems": 1,
-      "hydra:itemsPerPage": 3,
-      "hydra:firstPage": "/dummies",
-      "hydra:lastPage": "/dummies",
       "hydra:search": {
           "@type": "hydra:IriTemplate",
           "hydra:template": "/dummies{?id,name,alias,description,relatedDummy.name,relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte]}",

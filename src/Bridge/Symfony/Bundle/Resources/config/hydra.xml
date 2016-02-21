@@ -47,6 +47,7 @@
             <argument type="service" id="api_platform.metadata.resource.factory.item" />
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.iri_converter" />
 
             <tag name="serializer.normalizer" priority="50" />
         </service>
@@ -64,11 +65,10 @@
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api_platform.hydra.normalizer.paged_collection" class="ApiPlatform\Core\Hydra\Serializer\PagedCollectionNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
-            <argument type="service" id="api_platform.hydra.normalizer.paged_collection.inner" />
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
+        <service id="api_platform.hydra.normalizer.partial_collection_view" class="ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
+            <argument type="service" id="api_platform.hydra.normalizer.partial_collection_view.inner" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
         </service>
 
         <service id="api_platform.hydra.normalizer.collection_filters" class="ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">

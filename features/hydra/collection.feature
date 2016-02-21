@@ -16,7 +16,7 @@ Feature: Collections support
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
         "@id": {"pattern": "^/dummies$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 0},
         "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:firstPage": {"pattern": "^/dummies$"},
@@ -44,11 +44,8 @@ Feature: Collections support
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
         "@id": {"pattern": "^/dummies$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 30},
-        "hydra:firstPage": {"pattern": "^/dummies$"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?page=10$"},
-        "hydra:nextPage": {"pattern": "^/dummies\\?page=2$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -64,6 +61,13 @@ Feature: Collections support
             }
           },
           "maxItems": 3
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?page=1$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"},
+          "hydra:first": {"pattern": "^/dummies\\?page=1$"},
+          "hydra:last": {"pattern": "^/dummies\\?page=10$"},
+          "hydra:next": {"pattern": "^/dummies\\?page=2$"}
         }
       }
     }
@@ -80,13 +84,9 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?page=7$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 30},
-        "hydra:firstPage": {"pattern": "^/dummies$"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?page=10$"},
-        "hydra:nextPage": {"pattern": "^/dummies\\?page=8$"},
-        "hydra:previousPage": {"pattern": "^/dummies\\?page=6$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -102,6 +102,14 @@ Feature: Collections support
             }
           },
           "maxItems": 3
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?page=1$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"},
+          "hydra:first": {"pattern": "^/dummies$"},
+          "hydra:last": {"pattern": "^/dummies\\?page=10$"},
+          "hydra:next": {"pattern": "^/dummies\\?page=8$"},
+          "hydra:previous": {"pattern": "^/dummies\\?page=6$"}
         }
       }
     }
@@ -118,13 +126,9 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?page=10$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 30},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
-        "hydra:firstPage": {"pattern": "^/dummies$"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?page=10$"},
-        "hydra:previousPage": {"pattern": "^/dummies\\?page=9$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -140,6 +144,13 @@ Feature: Collections support
             }
           },
           "maxItems": 3
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?page=10$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"},
+          "hydra:first": {"pattern": "^/dummies$"},
+          "hydra:last": {"pattern": "^/dummies\\?page=10$"},
+          "hydra:previous": {"pattern": "^/dummies\\?page=9$"}
         },
         "hydra:search": {}
       },
@@ -158,8 +169,9 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?pagination=0$"},
+        "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "minimum": 30},
         "hydra:member": {
           "type": "array",
           "minItems": 30
@@ -181,18 +193,21 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?page=2\\&itemsPerPage=10$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 30},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 10},
-        "hydra:firstPage": {"pattern": "^/dummies\\?itemsPerPage=10$"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?itemsPerPage=10\\&page=3$"},
-        "hydra:previousPage": {"pattern": "^/dummies\\?itemsPerPage=10$"},
-        "hydra:nextPage": {"pattern": "^/dummies\\?itemsPerPage=10\\&page=3$"},
         "hydra:member": {
           "type": "array",
           "minItems": 10,
           "maxItems": 10
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?page=2\\&itemsPerPage=10$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"},
+          "hydra:first": {"pattern": "^/dummies\\?itemsPerPage=10$"},
+          "hydra:last": {"pattern": "^/dummies\\?itemsPerPage=10\\&page=3$"},
+          "hydra:previous": {"pattern": "^/dummies\\?itemsPerPage=10$"},
+          "hydra:next": {"pattern": "^/dummies\\?itemsPerPage=10\\&page=3$"}
         },
         "hydra:search": {}
       },
@@ -211,12 +226,9 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?id=8$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
-        "hydra:firstPage": {"pattern": "^/dummies\\?id=8"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?id=8"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -226,6 +238,10 @@ Feature: Collections support
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?id=8$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         },
         "hydra:search": {}
       },
@@ -244,12 +260,9 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?id=%2fdummies%2f8$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
-        "hydra:firstPage": {"pattern": "^/dummies\\?id=%2Fdummies%2F8$"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?id=%2Fdummies%2F8$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -259,6 +272,10 @@ Feature: Collections support
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?id=%2fdummies%2f8$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         },
         "hydra:search": {}
       },
@@ -278,12 +295,9 @@ Feature: Collections support
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?name=Dummy%20%238$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
-        "hydra:firstPage": {"pattern": "^/dummies\\?name=Dummy%20%238$"},
-        "hydra:lastPage": {"pattern": "^/dummies\\?name=Dummy%20%238$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -293,6 +307,10 @@ Feature: Collections support
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?name=Dummy%20%238$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         },
         "hydra:search": {}
       },
