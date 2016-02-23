@@ -9,8 +9,8 @@
  * file that was distributed with this source code.
  */
 
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\ApiPlatformBuilderBundle;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -31,7 +31,7 @@ class AppKernel extends Kernel
             new FrameworkBundle(),
             new FOSUserBundle(),
             new DoctrineBundle(),
-            new ApiPlatformBuilderBundle(),
+            new ApiPlatformBundle(),
             new SecurityBundle(),
             new TestBundle(),
         ];

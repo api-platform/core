@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Action;
+namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Builder\Api\CollectionDataProviderInterface;
-use ApiPlatform\Builder\Api\PaginatorInterface;
-use ApiPlatform\Builder\Exception\RuntimeException;
+use ApiPlatform\Core\Api\CollectionDataProviderInterface;
+use ApiPlatform\Core\Api\PaginatorInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

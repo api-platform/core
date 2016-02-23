@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Api;
+namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Builder\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Resolves the HTTP method associated with an operation.

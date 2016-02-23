@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures;
+namespace ApiPlatform\Core\Tests\Fixtures;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Property;
+namespace ApiPlatform\Core\Metadata\Property;
 
 use Symfony\Component\PropertyInfo\Type;
 

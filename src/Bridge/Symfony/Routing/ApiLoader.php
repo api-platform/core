@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Routing;
+namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Builder\Exception\RuntimeException;
-use ApiPlatform\Builder\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouteCollection;
 final class ApiLoader extends Loader
 {
     const ROUTE_NAME_PREFIX = 'api_';
-    const DEFAULT_ACTION_PATTERN = 'api.action.';
+    const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
     private $fileLoader;
     private $resourceCollectionMetadataFactory;
@@ -38,7 +38,7 @@ final class ApiLoader extends Loader
 
     public function __construct(KernelInterface $kernel, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory, ResourceItemMetadataFactoryInterface $resourceItemMetadataFactory)
     {
-        $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBuilderBundle/Resources/config/routing')));
+        $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
         $this->resourceItemMetadataFactory = $resourceItemMetadataFactory;
     }
@@ -74,7 +74,7 @@ final class ApiLoader extends Loader
      */
     public function supports($resource, $type = null)
     {
-        return 'api' === $type;
+        return 'api_platform' === $type;
     }
 
     /**

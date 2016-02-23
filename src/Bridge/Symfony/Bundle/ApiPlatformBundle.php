@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Bundle;
+namespace ApiPlatform\Core\Bridge\Symfony\Bundle;
 
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * ApiPlatformBuilderBundle.
+ * ApiPlatformBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ApiPlatformBuilderBundle extends Bundle
+final class ApiPlatformBundle extends Bundle
 {
     /**
      * {@inheritdoc}

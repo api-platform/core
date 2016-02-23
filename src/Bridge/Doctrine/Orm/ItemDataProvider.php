@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Builder\Api\ItemDataProviderInterface;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Builder\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 

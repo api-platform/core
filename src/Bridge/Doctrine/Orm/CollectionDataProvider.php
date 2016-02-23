@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Builder\Api\CollectionDataProviderInterface;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
-use ApiPlatform\Builder\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Api\CollectionDataProviderInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Routing;
+namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;

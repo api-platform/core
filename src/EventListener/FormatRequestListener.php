@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\EventListener;
+namespace ApiPlatform\Core\EventListener;
 
 use Negotiation\FormatNegotiatorInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;

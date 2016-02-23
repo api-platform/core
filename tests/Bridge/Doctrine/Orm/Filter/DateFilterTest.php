@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use phpmock\phpunit\PHPMock;
@@ -71,7 +71,7 @@ class DateFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Builder\Bridge\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         $filter->apply($queryBuilder, $this->resourceClass);
@@ -125,7 +125,7 @@ class DateFilterTest extends KernelTestCase
                         'after' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummydate >= :dummydate_after_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate >= :dummydate_after_123456abcdefg', Dummy::class),
             ],
             [
                 [
@@ -138,7 +138,7 @@ class DateFilterTest extends KernelTestCase
                         'after' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummydate >= :dummydate_after_123456abcdefg AND o.dummydate IS NOT NULL',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate >= :dummydate_after_123456abcdefg AND o.dummydate IS NOT NULL', Dummy::class),
             ],
             // Test before
             [
@@ -150,7 +150,7 @@ class DateFilterTest extends KernelTestCase
                         'before' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummydate <= :dummydate_before_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate <= :dummydate_before_123456abcdefg', Dummy::class),
             ],
             [
                 [
@@ -163,7 +163,7 @@ class DateFilterTest extends KernelTestCase
                         'before' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummydate <= :dummydate_before_123456abcdefg AND o.dummydate IS NOT NULL',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate <= :dummydate_before_123456abcdefg AND o.dummydate IS NOT NULL', Dummy::class),
             ],
             // with both after and before
             [
@@ -176,7 +176,7 @@ class DateFilterTest extends KernelTestCase
                         'before' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM apiplatform\builder\tests\fixtures\testbundle\entity\dummy o WHERE o.dummydate <= :dummydate_before_123456abcdefg AND o.dummydate >= :dummydate_after_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate <= :dummydate_before_123456abcdefg AND o.dummydate >= :dummydate_after_123456abcdefg', Dummy::class),
             ],
             [
                 [
@@ -190,7 +190,7 @@ class DateFilterTest extends KernelTestCase
                         'before' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM apiplatform\builder\tests\fixtures\testbundle\entity\dummy o WHERE (o.dummydate <= :dummydate_before_123456abcdefg AND o.dummydate IS NOT NULL) AND (o.dummydate >= :dummydate_after_123456abcdefg AND o.dummydate IS NOT NULL)',
+                sprintf('SELECT o FROM %s o WHERE (o.dummydate <= :dummydate_before_123456abcdefg AND o.dummydate IS NOT NULL) AND (o.dummydate >= :dummydate_after_123456abcdefg AND o.dummydate IS NOT NULL)', Dummy::class),
             ],
             // with no property enabled
             [
@@ -203,7 +203,7 @@ class DateFilterTest extends KernelTestCase
                         'before' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
             // Test with association
             [
@@ -217,7 +217,7 @@ class DateFilterTest extends KernelTestCase
                         'after' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o INNER JOIN o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.dummydate >= :dummydate_after_123456abcdefg AND relatedDummy_123456abcdefg.dummydate IS NOT NULL',
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.dummydate >= :dummydate_after_123456abcdefg AND relatedDummy_123456abcdefg.dummydate IS NOT NULL', Dummy::class),
             ],
             // Test with exclude_null
             [
@@ -231,7 +231,7 @@ class DateFilterTest extends KernelTestCase
                         'after' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummydate IS NOT NULL AND o.dummydate >= :dummydate_after_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate IS NOT NULL AND o.dummydate >= :dummydate_after_123456abcdefg', Dummy::class),
             ],
             // Test with include_null_before
             [
@@ -245,7 +245,7 @@ class DateFilterTest extends KernelTestCase
                         'after' => '2015-04-05',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummydate >= :dummydate_after_123456abcdefg OR o.dummydate IS NULL',
+                sprintf('SELECT o FROM %s o WHERE o.dummydate >= :dummydate_after_123456abcdefg OR o.dummydate IS NULL', Dummy::class),
             ],
         ];
     }

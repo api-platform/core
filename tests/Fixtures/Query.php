@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures;
+namespace ApiPlatform\Core\Tests\Fixtures;
 
 /**
  * Replace Doctrine\ORM\Query in tests because it cannot be mocked.

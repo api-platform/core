@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Builder\Metadata\Resource\CollectionMetadata;
+use ApiPlatform\Core\Metadata\Resource\CollectionMetadata;
 
 /**
  * Creates a collection metadata value object.

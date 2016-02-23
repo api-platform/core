@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Metadata\Property;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property;
 
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**

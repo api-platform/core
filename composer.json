@@ -48,10 +48,10 @@
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
   },
   "autoload": {
-    "psr-4": { "ApiPlatform\\Builder\\": "src/" }
+    "psr-4": { "ApiPlatform\\Core\\": "src/" }
   },
   "autoload-dev": {
-    "psr-4": { "ApiPlatform\\Builder\\Tests\\": "tests/" }
+    "psr-4": { "ApiPlatform\\Core\\Tests\\": "tests/" }
   },
   "extra": {
     "branch-alias": {

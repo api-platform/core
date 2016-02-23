@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Routing;
+namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Builder\Api\IriConverterInterface;
-use ApiPlatform\Builder\Api\ItemDataProviderInterface;
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Util\ClassInfoTrait;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface;

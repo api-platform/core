@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Bridge\Symfony\Validator\EventListener;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
-use ApiPlatform\Builder\Bridge\Symfony\Validator\EventListener\ViewListener;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
-use ApiPlatform\Builder\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ViewListener;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -41,7 +41,7 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \ApiPlatform\Builder\Bridge\Symfony\Validator\Exception\ValidationException
+     * @expectedException \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException
      */
     public function testThrowsValidationExceptionWithViolationsFound()
     {

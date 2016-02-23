@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd\EventListener;
+namespace ApiPlatform\Core\JsonLd\EventListener;
 
-use ApiPlatform\Builder\JsonLd\Response as JsonLdResponse;
+use ApiPlatform\Core\JsonLd\Response as JsonLdResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;

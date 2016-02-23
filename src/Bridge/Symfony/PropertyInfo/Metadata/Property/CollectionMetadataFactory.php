@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\PropertyInfo\Metadata\Property;
+namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 
-use ApiPlatform\Builder\Metadata\Property\CollectionMetadata;
-use ApiPlatform\Builder\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\CollectionMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 /**

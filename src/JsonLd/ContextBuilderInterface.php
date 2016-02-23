@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd;
+namespace ApiPlatform\Core\JsonLd;
 
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
-use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 
 /**
  * JSON-LD context builder interface.

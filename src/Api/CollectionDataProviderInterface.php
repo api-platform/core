@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Api;
+namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * Retrieves items from a persistence layer.

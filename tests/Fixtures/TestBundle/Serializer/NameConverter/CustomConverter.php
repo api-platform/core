@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Serializer\NameConverter;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter;
 
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 

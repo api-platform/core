@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Builder\Annotation\Property;
-use ApiPlatform\Builder\Annotation\Resource;
+use ApiPlatform\Core\Annotation\Property;
+use ApiPlatform\Core\Annotation\Resource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;

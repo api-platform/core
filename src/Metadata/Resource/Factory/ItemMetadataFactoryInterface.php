@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
 
 /**
  * Creates an item metadata value object.

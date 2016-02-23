@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra\Serializer;
+namespace ApiPlatform\Core\Hydra\Serializer;
 
-use ApiPlatform\Builder\Api\ResourceClassResolverInterface;
-use ApiPlatform\Builder\Exception\RuntimeException;
-use ApiPlatform\Builder\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Builder\JsonLd\Serializer\ContextTrait;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 

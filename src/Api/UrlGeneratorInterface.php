@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Api;
+namespace ApiPlatform\Core\Api;
 
 /**
  * UrlGeneratorInterface is the interface that all URL generator classes must implement.

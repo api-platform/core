@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Routing;
+namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Builder\Api\OperationMethodResolverInterface;
-use ApiPlatform\Builder\Exception\RuntimeException;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\OperationMethodResolverInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final class OperationMethodResolver implements OperationMethodResolverInterface

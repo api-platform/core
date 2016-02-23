@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd;
+namespace ApiPlatform\Core\JsonLd;
 
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 
 /**
  * API entrypoint builder interface.

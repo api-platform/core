@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Property\Factory;
+namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Builder\Annotation\Property;
-use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Builder\Metadata\Property\CollectionMetadata;
-use ApiPlatform\Builder\Util\Reflection;
+use ApiPlatform\Core\Annotation\Property;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Property\CollectionMetadata;
+use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**

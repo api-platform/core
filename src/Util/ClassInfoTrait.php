@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Util;
+namespace ApiPlatform\Core\Util;
 
 use Doctrine\Common\Util\ClassUtils;
 

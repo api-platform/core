@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

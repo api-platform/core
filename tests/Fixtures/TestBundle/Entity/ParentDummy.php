@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

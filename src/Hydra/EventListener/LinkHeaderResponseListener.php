@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra\EventListener;
+namespace ApiPlatform\Core\Hydra\EventListener;
 
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
-use ApiPlatform\Builder\JsonLd\ContextBuilder;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\JsonLd\ContextBuilder;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 /**

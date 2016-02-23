@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Annotation;
+namespace ApiPlatform\Core\Tests\Annotation;
 
-use ApiPlatform\Builder\Annotation\Resource;
+use ApiPlatform\Core\Annotation\Resource;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

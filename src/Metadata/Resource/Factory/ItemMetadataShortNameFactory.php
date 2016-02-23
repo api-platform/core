@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
 
 /**
  * Guesses the short name from the class name if not already set.

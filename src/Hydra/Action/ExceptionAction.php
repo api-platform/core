@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra\Action;
+namespace ApiPlatform\Core\Hydra\Action;
 
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\JsonLd\Response;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\JsonLd\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -33,7 +33,7 @@ final class ExceptionAction
 
     /**
      * Converts a {@see \Symfony\Component\Debug\Exception\FlattenException}
-     * to a {@see \ApiPlatform\Builder\JsonLd\Response}.
+     * to a {@see \ApiPlatform\Core\JsonLd\Response}.
      *
      * @param FlattenException $exception
      *

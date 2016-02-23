@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Builder\Annotation\Resource;
-use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
-use ApiPlatform\Builder\Metadata\Resource\Operation;
-use ApiPlatform\Builder\Metadata\Resource\PaginationMetadata;
+use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\Operation;
+use ApiPlatform\Core\Metadata\Resource\PaginationMetadata;
 use Doctrine\Common\Annotations\Reader;
 
 /**

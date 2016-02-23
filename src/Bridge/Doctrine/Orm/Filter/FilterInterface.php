@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**

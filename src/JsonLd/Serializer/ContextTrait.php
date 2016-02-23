@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd\Serializer;
+namespace ApiPlatform\Core\JsonLd\Serializer;
 
-use ApiPlatform\Builder\Api\ResourceClassResolverInterface;
-use ApiPlatform\Builder\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
 
 /**
  * Creates and manipulates the Serializer context.

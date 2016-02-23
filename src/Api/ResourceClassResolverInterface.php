@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Api;
+namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 
 /**
  * Guesses which resource is associated with a given object.

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Symfony\Bridge\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
 
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -26,7 +26,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration();
         $treeBuilder = $configuration->getConfigTreeBuilder();
         $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, ['api_platform_builder' => ['title' => 'title', 'description' => 'description']]);
+        $config = $processor->processConfiguration($configuration, ['api_platform' => ['title' => 'title', 'description' => 'description']]);
 
         $this->assertInstanceOf(ConfigurationInterface::class, $configuration);
         $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);

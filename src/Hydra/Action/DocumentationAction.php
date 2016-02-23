@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra\Action;
+namespace ApiPlatform\Core\Hydra\Action;
 
-use ApiPlatform\Builder\Hydra\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Hydra\ApiDocumentationBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

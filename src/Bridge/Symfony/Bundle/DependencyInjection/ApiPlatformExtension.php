@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ApiPlatformBuilderExtension extends Extension implements PrependExtensionInterface
+final class ApiPlatformExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -50,18 +50,18 @@ final class ApiPlatformBuilderExtension extends Extension implements PrependExte
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('api.title', $config['title']);
-        $container->setParameter('api.description', $config['description']);
-        $container->setParameter('api.supported_formats', $config['supported_formats']);
-        $container->setParameter('api.collection.order', $config['collection']['order']);
-        $container->setParameter('api.collection.order_parameter_name', $config['collection']['order_parameter_name']);
-        $container->setParameter('api.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
-        $container->setParameter('api.collection.pagination.client_enabled', $config['collection']['pagination']['client_enabled']);
-        $container->setParameter('api.collection.pagination.client_items_per_page', $config['collection']['pagination']['client_items_per_page']);
-        $container->setParameter('api.collection.pagination.items_per_page', $config['collection']['pagination']['items_per_page']);
-        $container->setParameter('api.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
-        $container->setParameter('api.collection.pagination.enabled_parameter_name', $config['collection']['pagination']['enabled_parameter_name']);
-        $container->setParameter('api.collection.pagination.items_per_page_parameter_name', $config['collection']['pagination']['items_per_page_parameter_name']);
+        $container->setParameter('api_platform.title', $config['title']);
+        $container->setParameter('api_platform.description', $config['description']);
+        $container->setParameter('api_platform.supported_formats', $config['supported_formats']);
+        $container->setParameter('api_platform.collection.order', $config['collection']['order']);
+        $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
+        $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
+        $container->setParameter('api_platform.collection.pagination.client_enabled', $config['collection']['pagination']['client_enabled']);
+        $container->setParameter('api_platform.collection.pagination.client_items_per_page', $config['collection']['pagination']['client_items_per_page']);
+        $container->setParameter('api_platform.collection.pagination.items_per_page', $config['collection']['pagination']['items_per_page']);
+        $container->setParameter('api_platform.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
+        $container->setParameter('api_platform.collection.pagination.enabled_parameter_name', $config['collection']['pagination']['enabled_parameter_name']);
+        $container->setParameter('api_platform.collection.pagination.items_per_page_parameter_name', $config['collection']['pagination']['items_per_page_parameter_name']);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
@@ -110,6 +110,6 @@ final class ApiPlatformBuilderExtension extends Extension implements PrependExte
             }
         }
 
-        $container->getDefinition('api.metadata.resource.factory.collection.annotation')->addArgument($paths);
+        $container->getDefinition('api_platform.metadata.resource.factory.collection.annotation')->addArgument($paths);
     }
 }
