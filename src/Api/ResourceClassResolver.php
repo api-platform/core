@@ -39,6 +39,9 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
     {
         if (is_object($value) && !$value instanceof PaginatorInterface) {
             $typeToFind = $type = $this->getObjectClass($value);
+            if (null === $resourceClass) {
+                $resourceClass = $typeToFind;
+            }
         } elseif (null === $resourceClass) {
             throw new InvalidArgumentException(sprintf('No resource class found.'));
         } else {

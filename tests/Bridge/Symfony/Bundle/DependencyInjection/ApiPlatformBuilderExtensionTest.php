@@ -224,7 +224,6 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
             'api.jsonld.context_builder',
             'api.jsonld.listener.view.responder',
             'api.jsonld.normalizer.item',
-            'api.jsonld.normalizer.datetime',
             'api.jsonld.encoder',
             'api.jsonld.listener.view.responder',
             'api.jsonld.action.context',

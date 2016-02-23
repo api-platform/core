@@ -70,7 +70,17 @@ final class ItemNormalizer extends AbstractNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_object($data) || is_array($data));
+        if (self::FORMAT !== $format || !is_object($data)) {
+            return false;
+        }
+
+        try {
+            $this->resourceClassResolver->getResourceClass($data);
+        } catch (InvalidArgumentException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -153,7 +163,7 @@ final class ItemNormalizer extends AbstractNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return self::FORMAT === $format;
+        return self::FORMAT === $format && $this->resourceClassResolver->isResourceClass($type);
     }
 
     /**
