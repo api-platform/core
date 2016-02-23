@@ -20,7 +20,7 @@
   ],
   "require": {
     "php": ">=7.0",
-    "symfony/http-foundation": "~2.3",
+    "symfony/http-foundation": "~2.3|~3.0",
     "symfony/serializer": "~3.1@dev",
     "doctrine/inflector": "~1.0",
     "willdurand/negotiation": "~1.4"
