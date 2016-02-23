@@ -35,10 +35,6 @@
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api.jsonld.normalizer.datetime" class="ApiPlatform\Builder\JsonLd\Serializer\DateTimeNormalizer" public="false">
-            <tag name="serializer.normalizer" priority="50" />
-        </service>
-
         <service id="api.jsonld.encoder" class="ApiPlatform\Builder\JsonLd\Serializer\JsonLdEncoder" public="false">
             <tag name="serializer.encoder" />
         </service>
