@@ -11,13 +11,13 @@
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\PaginatorInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
