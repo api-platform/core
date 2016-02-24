@@ -29,7 +29,9 @@ doctrine:
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'
-    supported_formats:                 [ 'jsonld', 'xml' ]
+    supported_formats:
+        jsonld:                        ['application/ld+json']
+        xml:                           ['application/xml', 'text/xml']
     enable_fos_user:                   true
     collection:
         order_parameter_name:          'order'
