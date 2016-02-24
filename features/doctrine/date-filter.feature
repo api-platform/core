@@ -16,9 +16,8 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-28$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 2},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -30,6 +29,10 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/29$"}
                 ]
               }
+            },
+            "hydra:view": {
+              "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-28$"},
+              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 2
@@ -48,9 +51,8 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 5},
+        "@id": {"pattern": "^/dummies"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -63,6 +65,10 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/3$"}
                 ]
               }
+            },
+            "hydra:view": {
+              "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05$"},
+              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 3
@@ -83,9 +89,8 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05\\&dummyDate\\[after\\]=2015-04-05$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -96,6 +101,10 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/5$"}
                 ]
               }
+            },
+            "hydra:view": {
+              "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05\\&dummyDate\\[after\\]=2015-04-05$"},
+              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 1
@@ -114,9 +123,8 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-05\\&dummyDate\\[before\\]=2015-04-05$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 1},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -127,6 +135,10 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/5$"}
                 ]
               }
+            },
+            "hydra:view": {
+              "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-05\\&dummyDate\\[before\\]=2015-04-05$"},
+              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 1
@@ -146,12 +158,15 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-06\\&dummyDate\\[before\\]=2015-04-04$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 0},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "maxItems": 0
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-06\\&dummyDate\\[before\\]=2015-04-04$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -170,9 +185,8 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 3},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -185,6 +199,10 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/60$"}
                 ]
               }
+            },
+            "hydra:view": {
+              "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28$"},
+              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 3
@@ -203,9 +221,8 @@ Feature: Date filter on collections
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Dummy$"},
-        "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28\\&relatedDummy_dummyDate\\[after\\]=2015-04-28$"},
-        "@type": {"pattern": "^hydra:PagedCollection$"},
-        "hydra:totalItems": {"type":"number", "maximum": 3},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -218,6 +235,10 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/60$"}
                 ]
               }
+            },
+            "hydra:view": {
+              "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28\\&relatedDummy_dummyDate\\[after\\]=2015-04-28$"},
+              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 3

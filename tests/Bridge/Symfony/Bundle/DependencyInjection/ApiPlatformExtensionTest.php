@@ -233,7 +233,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.listener.link_header_response',
             'api_platform.hydra.listener.request_exception',
             'api_platform.hydra.normalizer.collection',
-            'api_platform.hydra.normalizer.paged_collection',
+            'api_platform.hydra.normalizer.partial_collection_view',
             'api_platform.hydra.normalizer.collection_filters',
             'api_platform.hydra.normalizer.constraint_violation_list',
             'api_platform.hydra.normalizer.error',

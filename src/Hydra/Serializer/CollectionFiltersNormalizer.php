@@ -18,6 +18,7 @@ use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
+use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -136,9 +137,9 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
      */
     public function setSerializer(SerializerInterface $serializer)
     {
-        $this->serializer = $serializer;
+        parent::setSerializer($serializer);
 
-        if ($this->collectionNormalizer instanceof SerializerAwareNormalizer) {
+        if ($this->collectionNormalizer instanceof SerializerAwareInterface) {
             $this->collectionNormalizer->setSerializer($serializer);
         }
     }
