@@ -139,7 +139,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $parameters = [
             'api_platform.title' => 'title',
             'api_platform.description' => 'description',
-            'api_platform.supported_formats' => ['jsonld'],
+            'api_platform.supported_formats' => ['application/ld+json' => 'jsonld'],
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.enabled' => true,
@@ -193,7 +193,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.property.factory.item.serializer',
             'api_platform.metadata.property.factory.item.validator',
             'api_platform.metadata.resource.factory.collection.annotation',
-            'api_platform.format_negotiator',
+            'api_platform.negotiator',
             'api_platform.route_loader',
             'api_platform.router',
             'api_platform.iri_converter',

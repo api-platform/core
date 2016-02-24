@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\EventListener;
 
-use Negotiation\FormatNegotiatorInterface;
+use Negotiation\Negotiator;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
@@ -21,23 +21,17 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 final class FormatRequestListener
 {
-    private $formatNegotiator;
+    private $negotiator;
     private $supportedFormats;
 
-    /**
-     * @param FormatNegotiatorInterface $formatNegotiator
-     * @param string[]                  $supportedFormats
-     */
-    public function __construct(FormatNegotiatorInterface $formatNegotiator, array $supportedFormats)
+    public function __construct(Negotiator $negotiator, array $supportedFormats)
     {
-        $this->formatNegotiator = $formatNegotiator;
+        $this->negotiator = $negotiator;
         $this->supportedFormats = $supportedFormats;
     }
 
     /**
      * Assigns the format to use to the _api_format Request attribute.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -47,15 +41,18 @@ final class FormatRequestListener
         }
 
         // Use the Symfony request format if available and applicable
-        $format = $request->getRequestFormat(null);
-
-        if (null === $format || !in_array($format, $this->supportedFormats)) {
-            if (null !== $accept = $request->headers->get('Accept')) {
+        $requestFormat = $request->getRequestFormat(null);
+        $mimeType = $requestFormat ? $request->getMimeType($requestFormat) : null;
+        if (null === $mimeType || !in_array($mimeType, $this->supportedFormats)) {
+            if (null === $accept = $request->headers->get('Accept')) {
+                $mimeType = null;
+            } else {
                 // Try to guess the best format to use
-                $format = $this->formatNegotiator->getBestFormat($accept, $this->supportedFormats);
+                $acceptHeader = $this->negotiator->getBest($accept, array_keys($this->supportedFormats));
+                $mimeType = $acceptHeader ? $acceptHeader->getType() : null;
             }
         }
 
-        $request->attributes->set('_api_format', $format ?: $this->supportedFormats[0]);
+        $request->attributes->set('_api_format', $mimeType ? $this->supportedFormats[$mimeType] : reset($this->supportedFormats));
     }
 }

@@ -23,7 +23,7 @@
     "symfony/http-foundation": "~2.3|~3.0",
     "symfony/serializer": "~3.1@dev",
     "doctrine/inflector": "~1.0",
-    "willdurand/negotiation": "~1.4"
+    "willdurand/negotiation": "~2.0"
   },
   "require-dev": {
     "friendsofsymfony/user-bundle": "~2.0@dev",

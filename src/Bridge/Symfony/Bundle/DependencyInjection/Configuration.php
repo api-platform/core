@@ -34,10 +34,29 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('title')->cannotBeEmpty()->isRequired()->info('The title of the API.')->end()
                 ->scalarNode('description')->cannotBeEmpty()->isRequired()->info('The description of the API.')->end()
                 ->arrayNode('supported_formats')
-                    ->defaultValue(['jsonld'])
-                    ->cannotBeEmpty()
+                    ->defaultValue(['jsonld' => ['mime_types' => ['application/ld+json']]])
                     ->info('The list of enabled formats. The first one will be the default.')
-                    ->prototype('scalar')->end()
+                    ->normalizeKeys(false)
+                    ->useAttributeAsKey('format')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function ($v) {
+                            foreach ($v as $format => $value) {
+                                if (isset($value['mime_types'])) {
+                                    continue;
+                                }
+
+                                $v[$format] = ['mime_types' => $value];
+                            }
+
+                            return $v;
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('mime_types')->prototype('scalar')->end()->end()
+                        ->end()
+                    ->end()
                 ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->arrayNode('collection')
