@@ -42,12 +42,12 @@
             <argument type="service" id="api_platform.property_accessor" />
         </service>
 
-        <service id="api_platform.format_negotiator" class="Negotiation\FormatNegotiator" public="false" />
+        <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
         <!-- Event listeners -->
 
         <service id="api_platform.listener.request.format" class="ApiPlatform\Core\EventListener\FormatRequestListener">
-            <argument type="service" id="api_platform.format_negotiator" />
+            <argument type="service" id="api_platform.negotiator" />
             <argument>%api_platform.supported_formats%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
