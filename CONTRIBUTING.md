@@ -50,20 +50,7 @@ that you did not make in your PR, you're doing it wrong.
 * Also don't forget to add a comment when you update a PR with a ping to the maintainer (`@dunglas`, `@sroze` or `@theofidry`), so he/she will get a notification.
 * Squash your commits into one commit. (see the next chapter)
 
-All Pull Requests must include the following header:
-
-```markdown
-| Q             | A
-| ------------- | ---
-| Bug fix?      | yes/no
-| New feature?  | yes/no
-| BC breaks?    | no
-| Deprecations? | no
-| Tests pass?   | yes
-| Fixed tickets | #1234, #5678
-| License       | MIT
-| Doc PR        | api-platform/doc#1234
-```
+All Pull Requests must include [this header](.github/PULL_REQUEST_TEMPLATE.md).
 
 ## Squash your commits
 
