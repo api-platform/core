@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Api\IriConverterInterface;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;

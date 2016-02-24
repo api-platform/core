@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Builder\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -31,7 +31,7 @@ final class FilterPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $filters = [];
-        foreach ($container->findTaggedServiceIds('api.filter') as $serviceId => $tags) {
+        foreach ($container->findTaggedServiceIds('api_platform.filter') as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (!isset($tag['id'])) {
                     throw new RuntimeException('Filter tags must have an "id" property.');
@@ -41,6 +41,6 @@ final class FilterPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition('api.filters')->addArgument($filters);
+        $container->getDefinition('api_platform.filters')->addArgument($filters);
     }
 }

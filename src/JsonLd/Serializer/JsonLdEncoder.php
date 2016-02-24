@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd\Serializer;
+namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd;
+namespace ApiPlatform\Core\JsonLd;
 
-use ApiPlatform\Builder\Api\IriConverterInterface;
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 
 /**
  * {@inheritdoc}

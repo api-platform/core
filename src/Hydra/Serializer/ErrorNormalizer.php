@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra\Serializer;
+namespace ApiPlatform\Core\Hydra\Serializer;
 
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

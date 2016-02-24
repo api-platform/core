@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Action;
+namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Builder\Api\ItemDataProviderInterface;
-use ApiPlatform\Builder\Exception\RuntimeException;
+use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

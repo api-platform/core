@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd\Action;
+namespace ApiPlatform\Core\JsonLd\Action;
 
-use ApiPlatform\Builder\JsonLd\EntrypointBuilderInterface;
+use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

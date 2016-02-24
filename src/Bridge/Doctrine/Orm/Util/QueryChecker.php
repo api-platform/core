@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Util;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;

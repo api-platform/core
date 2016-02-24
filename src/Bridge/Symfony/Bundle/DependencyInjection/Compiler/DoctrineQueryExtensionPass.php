@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,11 +30,11 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $collectionDataProviderDefinition = $container->getDefinition('api.doctrine.orm.collection_data_provider');
-        $itemDataProviderDefinition = $container->getDefinition('api.doctrine.orm.item_data_provider');
+        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
 
-        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.collection'));
-        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api.doctrine.orm.query_extension.item'));
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
     }
 
     /**

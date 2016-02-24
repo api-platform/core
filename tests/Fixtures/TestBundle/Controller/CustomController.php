@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Controller;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
-use ApiPlatform\Builder\JsonLd\Response;
+use ApiPlatform\Core\JsonLd\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
@@ -22,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 class CustomController extends Controller
 {
     /**
-     * @return \ApiPlatform\Builder\JsonLd\Response
+     * @return \ApiPlatform\Core\JsonLd\Response
      */
     public function customAction($id)
     {

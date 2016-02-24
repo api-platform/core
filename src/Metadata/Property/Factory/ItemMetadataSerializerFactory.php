@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Property\Factory;
+namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Builder\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**

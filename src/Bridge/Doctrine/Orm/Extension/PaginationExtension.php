@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Paginator;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Util\QueryChecker;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;

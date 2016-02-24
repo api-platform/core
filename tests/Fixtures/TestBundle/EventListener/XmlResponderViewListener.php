@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\EventListener;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\EventListener;
 
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;

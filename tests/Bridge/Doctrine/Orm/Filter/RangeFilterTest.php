@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use phpmock\phpunit\PHPMock;
@@ -71,7 +71,7 @@ class RangeFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Builder\Bridge\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         try {
@@ -342,7 +342,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '9.99..15.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice BETWEEN :dummyprice_between_123456abcdefg_1 AND :dummyPrice_between_123456abcdefg_2',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice BETWEEN :dummyprice_between_123456abcdefg_1 AND :dummyPrice_between_123456abcdefg_2',
             ],
             // Invalid value
             [
@@ -354,7 +354,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '9.99..15.99..99.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o',
             ],
             [
                 [
@@ -365,7 +365,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '15.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o',
             ],
             [
                 [
@@ -376,7 +376,7 @@ class RangeFilterTest extends KernelTestCase
                         'lt' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice < :dummyPrice_lt_123456abcdefg',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice < :dummyPrice_lt_123456abcdefg',
             ],
             [
                 [
@@ -387,7 +387,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice <= :dummyPrice_lte_123456abcdefg',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice <= :dummyPrice_lte_123456abcdefg',
             ],
             [
                 [
@@ -398,7 +398,7 @@ class RangeFilterTest extends KernelTestCase
                         'gt' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice > :dummyPrice_gt_123456abcdefg',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice > :dummyPrice_gt_123456abcdefg',
             ],
             [
                 [
@@ -409,7 +409,7 @@ class RangeFilterTest extends KernelTestCase
                         'gte' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice >= :dummyPrice_gte_123456abcdefg',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice >= :dummyPrice_gte_123456abcdefg',
             ],
             [
                 [
@@ -421,7 +421,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '19.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice >= :dummyPrice_gte_123456abcdefg AND o.dummyPrice <= :dummyPrice_lte_123456abcdefg',
+                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice >= :dummyPrice_gte_123456abcdefg AND o.dummyPrice <= :dummyPrice_lte_123456abcdefg',
             ],
         ];
     }

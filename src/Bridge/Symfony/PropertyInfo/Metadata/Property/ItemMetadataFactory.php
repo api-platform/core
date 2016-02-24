@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\PropertyInfo\Metadata\Property;
+namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 
-use ApiPlatform\Builder\Exception\PropertyNotFoundException;
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 /**

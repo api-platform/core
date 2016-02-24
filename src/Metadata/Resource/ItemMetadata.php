@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Resource;
+namespace ApiPlatform\Core\Metadata\Resource;
 
 /**
  * Resource item metadata.

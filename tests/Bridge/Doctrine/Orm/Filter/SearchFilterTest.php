@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Api\IriConverterInterface;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use phpmock\phpunit\PHPMock;
@@ -64,7 +64,7 @@ class SearchFilterTest extends KernelTestCase
         self::bootKernel();
         $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->iriConverter = self::$kernel->getContainer()->get('api.iri_converter');
+        $this->iriConverter = self::$kernel->getContainer()->get('api_platform.iri_converter');
         $this->propertyAccessor = self::$kernel->getContainer()->get('property_accessor');
         $this->repository = $manager->getRepository(Dummy::class);
         $this->resourceClass = Dummy::class;
@@ -87,7 +87,7 @@ class SearchFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Builder\Bridge\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         $filter->apply($queryBuilder, $this->resourceClass, 'op');
@@ -281,7 +281,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.name = :name_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg' => 'exact',
                     ],
@@ -296,7 +296,7 @@ class SearchFilterTest extends KernelTestCase
                     'foo' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                    'dql' => sprintf('SELECT o FROM %s o', Dummy::class),
                     'parameters' => [],
                 ],
             ],
@@ -310,7 +310,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'relatedDummy_123456abcdefg' => 'foo',
                     ],
@@ -325,7 +325,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.name like :name_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg' => '%partial%',
                     ],
@@ -339,7 +339,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.name like :name_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg' => 'partial%',
                     ],
@@ -353,7 +353,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.name like :name_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg' => '%partial',
                     ],
@@ -367,7 +367,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.name like :name_123456abcdefg_1 OR o.name like :name_123456abcdefg_2',
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg_1 OR o.name like :name_123456abcdefg_2', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg_1' => 'partial%',
                         'name_123456abcdefg_2' => '% partial%',
@@ -383,7 +383,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'relatedDummy_123456abcdefg' => 'exact',
                     ],
@@ -397,7 +397,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.id' => '/related_dummies/1',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :id_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :id_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'id_123456abcdefg' => 1,
                     ],
@@ -412,7 +412,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg inner join o.relatedDummies relatedDummies_123456abcdefg WHERE relatedDummy_123456abcdefg.id IN (:relatedDummy_123456abcdefg) AND relatedDummies_123456abcdefg.id = :relatedDummies_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg inner join o.relatedDummies relatedDummies_123456abcdefg WHERE relatedDummy_123456abcdefg.id IN (:relatedDummy_123456abcdefg) AND relatedDummies_123456abcdefg.id = :relatedDummies_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'relatedDummy_123456abcdefg' => [1, 2],
                         'relatedDummies_123456abcdefg' => 1,
@@ -428,7 +428,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.symfony' => 'exact',
                 ],
                 [
-                    'dql' => 'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE o.name = :name_123456abcdefg AND relatedDummy_123456abcdefg.symfony = :symfony_123456abcdefg',
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE o.name = :name_123456abcdefg AND relatedDummy_123456abcdefg.symfony = :symfony_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg' => 'exact',
                         'symfony_123456abcdefg' => 'exact',

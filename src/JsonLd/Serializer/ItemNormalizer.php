@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd\Serializer;
+namespace ApiPlatform\Core\JsonLd\Serializer;
 
-use ApiPlatform\Builder\Api\IriConverterInterface;
-use ApiPlatform\Builder\Api\ResourceClassResolverInterface;
-use ApiPlatform\Builder\Exception\InvalidArgumentException;
-use ApiPlatform\Builder\Exception\RuntimeException;
-use ApiPlatform\Builder\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Builder\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata as PropertyItemMetadata;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata as PropertyItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;

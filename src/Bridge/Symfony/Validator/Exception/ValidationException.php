@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Validator\Exception;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\Exception;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 

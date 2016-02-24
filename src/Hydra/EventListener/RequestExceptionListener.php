@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra\EventListener;
+namespace ApiPlatform\Core\Hydra\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener;

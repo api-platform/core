@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Action;
+namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Builder\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 

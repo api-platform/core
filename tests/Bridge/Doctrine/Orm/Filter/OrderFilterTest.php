@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use phpmock\phpunit\PHPMock;
@@ -73,7 +73,7 @@ class OrderFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Builder\Bridge\Doctrine\Orm\Util', 'uniqid');
+        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
         $uniqid->expects($this->any())->willReturn('123456abcdefg');
 
         $filter->apply($queryBuilder, $this->resourceClass);
@@ -183,7 +183,7 @@ class OrderFilterTest extends KernelTestCase
                         'name' => 'desc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name DESC',
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
             ],
             // Properties enabled with invalid values
             [
@@ -196,7 +196,7 @@ class OrderFilterTest extends KernelTestCase
                         'name' => 'invalid',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.id ASC',
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC', Dummy::class),
             ],
             // Properties disabled with valid values
             [
@@ -209,7 +209,7 @@ class OrderFilterTest extends KernelTestCase
                         'alias' => 'asc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.id ASC',
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC', Dummy::class),
             ],
             // Properties disabled with invalid values
             [
@@ -223,7 +223,7 @@ class OrderFilterTest extends KernelTestCase
                         'alias' => 'invalid',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.name ASC',
+                sprintf('SELECT o FROM %s o ORDER BY o.name ASC', Dummy::class),
             ],
             // Unkown property disabled
             [
@@ -235,7 +235,7 @@ class OrderFilterTest extends KernelTestCase
                         'unknown' => 'asc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
             // Unkown property enabled
             [
@@ -247,7 +247,7 @@ class OrderFilterTest extends KernelTestCase
                         'unknown' => 'asc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
             // Test with another keyword
             [
@@ -264,7 +264,7 @@ class OrderFilterTest extends KernelTestCase
                         'name' => 'desc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.name DESC',
+                sprintf('SELECT o FROM %s o ORDER BY o.name DESC', Dummy::class),
             ],
             // Test with no list
             [
@@ -277,7 +277,7 @@ class OrderFilterTest extends KernelTestCase
                         'name' => 'asc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name ASC',
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name ASC', Dummy::class),
             ],
             // Related properties enabled with valid values
             [
@@ -291,7 +291,7 @@ class OrderFilterTest extends KernelTestCase
                         'relatedDummy.symfony' => 'desc',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o LEFT JOIN o.relatedDummy relatedDummy_123456abcdefg ORDER BY o.id ASC, o.name DESC, relatedDummy_123456abcdefg.symfony DESC',
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_123456abcdefg ORDER BY o.id ASC, o.name DESC, relatedDummy_123456abcdefg.symfony DESC', Dummy::class),
             ],
             // Properties enabled with empty request (default values)
             [
@@ -304,7 +304,7 @@ class OrderFilterTest extends KernelTestCase
                         'name' => null,
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy o ORDER BY o.id ASC, o.name DESC',
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
             ],
         ];
     }

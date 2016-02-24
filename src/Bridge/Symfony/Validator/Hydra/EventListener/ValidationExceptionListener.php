@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Validator\Hydra\EventListener;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener;
 
-use ApiPlatform\Builder\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Builder\JsonLd\Response;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\JsonLd\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

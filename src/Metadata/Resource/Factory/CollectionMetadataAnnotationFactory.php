@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Builder\Annotation\Resource;
-use ApiPlatform\Builder\Metadata\Resource\CollectionMetadata;
+use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Metadata\Resource\CollectionMetadata;
 use Doctrine\Common\Annotations\Reader;
 
 /**

@@ -9,10 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Symfony\Bridge\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -23,21 +26,21 @@ class DoctrineQueryExtensionPassTest extends \PHPUnit_Framework_TestCase
     {
         $dataProviderPass = new DoctrineQueryExtensionPass();
 
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $dataProviderPass);
+        $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $collectionDataProviderDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
+        $collectionDataProviderDefinitionProphecy = $this->prophesize(Definition::class);
         $collectionDataProviderDefinitionProphecy->replaceArgument(1, Argument::type('array'))->shouldBeCalled();
         $collectionDataProviderDefinition = $collectionDataProviderDefinitionProphecy->reveal();
 
-        $itemDataProviderDefinitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
+        $itemDataProviderDefinitionProphecy = $this->prophesize(Definition::class);
         $itemDataProviderDefinitionProphecy->replaceArgument(3, Argument::type('array'))->shouldBeCalled();
         $itemDataProviderDefinition = $itemDataProviderDefinitionProphecy->reveal();
 
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $containerBuilderProphecy->findTaggedServiceIds('api.doctrine.orm.query_extension.collection')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
-        $containerBuilderProphecy->findTaggedServiceIds('api.doctrine.orm.query_extension.item')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.doctrine.orm.collection_data_provider')->willReturn($collectionDataProviderDefinition)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.doctrine.orm.item_data_provider')->willReturn($itemDataProviderDefinition)->shouldBeCalled();
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.doctrine.orm.query_extension.collection')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.doctrine.orm.query_extension.item')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.collection_data_provider')->willReturn($collectionDataProviderDefinition)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.item_data_provider')->willReturn($itemDataProviderDefinition)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $dataProviderPass->process($containerBuilder);

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Fixtures\TestBundle\Manager;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager;
 
 use FOS\UserBundle\Doctrine\UserManager as BaseUserManager;
 use FOS\UserBundle\Model\UserInterface;

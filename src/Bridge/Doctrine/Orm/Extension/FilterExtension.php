@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
-use ApiPlatform\Builder\Api\FilterCollection;
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter\FilterInterface;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**

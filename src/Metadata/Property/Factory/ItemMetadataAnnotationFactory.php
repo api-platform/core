@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Property\Factory;
+namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Builder\Annotation\Property;
-use ApiPlatform\Builder\Exception\PropertyNotFoundException;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
-use ApiPlatform\Builder\Util\Reflection;
+use ApiPlatform\Core\Annotation\Property;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**

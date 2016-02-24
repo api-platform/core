@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra;
+namespace ApiPlatform\Core\Hydra;
 
-use ApiPlatform\Builder\Api\OperationMethodResolverInterface;
-use ApiPlatform\Builder\Api\ResourceClassResolverInterface;
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
-use ApiPlatform\Builder\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Builder\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata as PropertyItemMetadata;
-use ApiPlatform\Builder\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\ItemMetadata as ResourceItemMetadata;
+use ApiPlatform\Core\Api\OperationMethodResolverInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata as PropertyItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ItemMetadata as ResourceItemMetadata;
 
 /**
  * Creates a machine readable Hydra API documentation.

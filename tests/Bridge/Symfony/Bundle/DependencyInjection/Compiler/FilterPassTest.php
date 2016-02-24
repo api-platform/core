@@ -9,11 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Symfony\Bridge\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection\Compiler;
 
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
-use ApiPlatform\Builder\Exception\RuntimeException;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -24,15 +27,15 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
     {
         $dataProviderPass = new FilterPass();
 
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $dataProviderPass);
+        $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $definitionProphecy = $this->prophesize('Symfony\Component\DependencyInjection\Definition');
+        $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
 
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $containerBuilderProphecy->findTaggedServiceIds('api.filter')->willReturn(['foo' => [], 'bar' => [0 => ['id' => 'my_id']]])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api.filters')->willReturn($definition)->shouldBeCalled();
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [0 => ['id' => 'my_id']]])->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filters')->willReturn($definition)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $dataProviderPass->process($containerBuilder);
@@ -46,10 +49,10 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
     {
         $dataProviderPass = new FilterPass();
 
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface', $dataProviderPass);
+        $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $containerBuilderProphecy = $this->prophesize('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $containerBuilderProphecy->findTaggedServiceIds('api.filter')->willReturn(['foo' => [], 'bar' => [0 => ['hi' => 'hello']]])->shouldBeCalled();
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [0 => ['hi' => 'hello']]])->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $dataProviderPass->process($containerBuilder);

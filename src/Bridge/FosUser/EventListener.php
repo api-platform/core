@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\FosUser;
+namespace ApiPlatform\Core\Bridge\FosUser;
 
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
- * Bridges between FOSUserBundle and ApiPlatformBuilderBundle.
+ * Bridges between FOSUserBundle and ApiPlatformBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>

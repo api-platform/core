@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Doctrine\Orm;
+namespace ApiPlatform\Core\Tests\Doctrine\Orm;
 
-use ApiPlatform\Builder\Bridge\Doctrine\Orm\Paginator;
-use ApiPlatform\Builder\Tests\Fixtures\Query;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
+use ApiPlatform\Core\Tests\Fixtures\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 class PaginatorTest extends \PHPUnit_Framework_TestCase

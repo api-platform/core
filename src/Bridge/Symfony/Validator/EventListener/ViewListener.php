@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Validator\EventListener;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
-use ApiPlatform\Builder\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

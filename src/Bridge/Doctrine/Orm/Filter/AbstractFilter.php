@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Builder\Util\RequestParser;
+use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Symfony\Component\HttpFoundation\Request;

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Tests\Symfony\Bridge\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
 
-use ApiPlatform\Builder\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformBuilderExtension;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use Prophecy\Argument;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -25,10 +25,10 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
+class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const DEFAULT_CONFIG = [
-        'api_platform_builder' => [
+        'api_platform' => [
             'title' => 'title',
             'description' => 'description',
         ],
@@ -37,7 +37,7 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->extension = new ApiPlatformBuilderExtension();
+        $this->extension = new ApiPlatformExtension();
     }
 
     public function tearDown()
@@ -47,7 +47,7 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testConstruct()
     {
-        $this->extension = new ApiPlatformBuilderExtension();
+        $this->extension = new ApiPlatformExtension();
 
         $this->assertInstanceOf(PrependExtensionInterface::class, $this->extension);
         $this->assertInstanceOf(ExtensionInterface::class, $this->extension);
@@ -121,7 +121,7 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
-        $containerBuilderProphecy->setDefinition('api.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_builder' => ['enable_fos_user' => true]]), $containerBuilder);
@@ -137,18 +137,18 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([])->shouldBeCalled();
 
         $parameters = [
-            'api.title' => 'title',
-            'api.description' => 'description',
-            'api.supported_formats' => ['jsonld'],
-            'api.collection.order' => null,
-            'api.collection.order_parameter_name' => 'order',
-            'api.collection.pagination.enabled' => true,
-            'api.collection.pagination.client_enabled' => false,
-            'api.collection.pagination.client_items_per_page' => false,
-            'api.collection.pagination.items_per_page' => 30,
-            'api.collection.pagination.page_parameter_name' => 'page',
-            'api.collection.pagination.enabled_parameter_name' => 'pagination',
-            'api.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
+            'api_platform.title' => 'title',
+            'api_platform.description' => 'description',
+            'api_platform.supported_formats' => ['jsonld'],
+            'api_platform.collection.order' => null,
+            'api_platform.collection.order_parameter_name' => 'order',
+            'api_platform.collection.pagination.enabled' => true,
+            'api_platform.collection.pagination.client_enabled' => false,
+            'api_platform.collection.pagination.client_items_per_page' => false,
+            'api_platform.collection.pagination.items_per_page' => 30,
+            'api_platform.collection.pagination.page_parameter_name' => 'page',
+            'api_platform.collection.pagination.enabled_parameter_name' => 'pagination',
+            'api_platform.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -158,16 +158,16 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
         $aliases = [
-            'api.serializer',
-            'api.property_accessor',
-            'api.property_info',
-            'api.metadata.resource.factory.collection',
-            'api.metadata.resource.factory.item',
-            'api.metadata.property.factory.collection',
-            'api.metadata.property.factory.item',
-            'api.item_data_provider',
-            'api.collection_data_provider',
-            'api.action.delete_item',
+            'api_platform.serializer',
+            'api_platform.property_accessor',
+            'api_platform.property_info',
+            'api_platform.metadata.resource.factory.collection',
+            'api_platform.metadata.resource.factory.item',
+            'api_platform.metadata.property.factory.collection',
+            'api_platform.metadata.property.factory.item',
+            'api_platform.item_data_provider',
+            'api_platform.collection_data_provider',
+            'api_platform.action.delete_item',
         ];
         foreach ($aliases as $alias) {
             $containerBuilderProphecy->setAlias($alias, Argument::type(Alias::class))->shouldBeCalled();
@@ -176,76 +176,76 @@ class ApiPlatformBuilderExtensionTest extends \PHPUnit_Framework_TestCase
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->addArgument([])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api.metadata.resource.factory.collection.annotation')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.factory.collection.annotation')->willReturn($definition);
 
         $definitions = [
-            'api.filters',
-            'api.resource_class_resolver',
-            'api.operation_method_resolver',
-            'api.metadata.resource.factory.collection.annotation',
-            'api.metadata.resource.factory.item.annotation',
-            'api.metadata.resource.factory.item.php_doc',
-            'api.metadata.resource.factory.item.short_name',
-            'api.metadata.resource.factory.item.operation',
-            'api.metadata.property.factory.collection.property_info',
-            'api.metadata.property.factory.item.annotation',
-            'api.metadata.property.factory.item.property_info',
-            'api.metadata.property.factory.item.serializer',
-            'api.metadata.property.factory.item.validator',
-            'api.metadata.resource.factory.collection.annotation',
-            'api.format_negotiator',
-            'api.route_loader',
-            'api.router',
-            'api.iri_converter',
-            'api.listener.request.format',
-            'api.listener.view.validation',
-            'api.listener.request.format',
-            'api.action.get_collection',
-            'api.action.post_collection',
-            'api.action.get_item',
-            'api.action.put_item',
-            'api.doctrine.metadata_factory',
-            'api.doctrine.orm.collection_data_provider',
-            'api.doctrine.orm.item_data_provider',
-            'api.doctrine.orm.default.item_data_provider',
-            'api.doctrine.orm.search_filter',
-            'api.doctrine.orm.order_filter',
-            'api.doctrine.orm.date_filter',
-            'api.doctrine.orm.range_filter',
-            'api.doctrine.orm.default.collection_data_provider',
-            'api.doctrine.orm.default.item_data_provider',
-            'api.doctrine.orm.metadata.property.factory.item',
-            'api.doctrine.orm.query_extension.eager_loading',
-            'api.doctrine.orm.query_extension.filter',
-            'api.doctrine.orm.query_extension.pagination',
-            'api.doctrine.orm.query_extension.order',
-            'api.doctrine.listener.view.manager',
-            'api.jsonld.entrypoint_builder',
-            'api.jsonld.context_builder',
-            'api.jsonld.listener.view.responder',
-            'api.jsonld.normalizer.item',
-            'api.jsonld.encoder',
-            'api.jsonld.listener.view.responder',
-            'api.jsonld.action.context',
-            'api.jsonld.action.entrypoint',
-            'api.hydra.documentation_builder',
-            'api.hydra.listener.validation_exception',
-            'api.hydra.listener.link_header_response',
-            'api.hydra.listener.request_exception',
-            'api.hydra.normalizer.collection',
-            'api.hydra.normalizer.paged_collection',
-            'api.hydra.normalizer.collection_filters',
-            'api.hydra.normalizer.constraint_violation_list',
-            'api.hydra.normalizer.error',
-            'api.hydra.action.documentation',
-            'api.hydra.action.exception',
+            'api_platform.filters',
+            'api_platform.resource_class_resolver',
+            'api_platform.operation_method_resolver',
+            'api_platform.metadata.resource.factory.collection.annotation',
+            'api_platform.metadata.resource.factory.item.annotation',
+            'api_platform.metadata.resource.factory.item.php_doc',
+            'api_platform.metadata.resource.factory.item.short_name',
+            'api_platform.metadata.resource.factory.item.operation',
+            'api_platform.metadata.property.factory.collection.property_info',
+            'api_platform.metadata.property.factory.item.annotation',
+            'api_platform.metadata.property.factory.item.property_info',
+            'api_platform.metadata.property.factory.item.serializer',
+            'api_platform.metadata.property.factory.item.validator',
+            'api_platform.metadata.resource.factory.collection.annotation',
+            'api_platform.format_negotiator',
+            'api_platform.route_loader',
+            'api_platform.router',
+            'api_platform.iri_converter',
+            'api_platform.listener.request.format',
+            'api_platform.listener.view.validation',
+            'api_platform.listener.request.format',
+            'api_platform.action.get_collection',
+            'api_platform.action.post_collection',
+            'api_platform.action.get_item',
+            'api_platform.action.put_item',
+            'api_platform.doctrine.metadata_factory',
+            'api_platform.doctrine.orm.collection_data_provider',
+            'api_platform.doctrine.orm.item_data_provider',
+            'api_platform.doctrine.orm.default.item_data_provider',
+            'api_platform.doctrine.orm.search_filter',
+            'api_platform.doctrine.orm.order_filter',
+            'api_platform.doctrine.orm.date_filter',
+            'api_platform.doctrine.orm.range_filter',
+            'api_platform.doctrine.orm.default.collection_data_provider',
+            'api_platform.doctrine.orm.default.item_data_provider',
+            'api_platform.doctrine.orm.metadata.property.factory.item',
+            'api_platform.doctrine.orm.query_extension.eager_loading',
+            'api_platform.doctrine.orm.query_extension.filter',
+            'api_platform.doctrine.orm.query_extension.pagination',
+            'api_platform.doctrine.orm.query_extension.order',
+            'api_platform.doctrine.listener.view.manager',
+            'api_platform.jsonld.entrypoint_builder',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.listener.view.responder',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.encoder',
+            'api_platform.jsonld.listener.view.responder',
+            'api_platform.jsonld.action.context',
+            'api_platform.jsonld.action.entrypoint',
+            'api_platform.hydra.documentation_builder',
+            'api_platform.hydra.listener.validation_exception',
+            'api_platform.hydra.listener.link_header_response',
+            'api_platform.hydra.listener.request_exception',
+            'api_platform.hydra.normalizer.collection',
+            'api_platform.hydra.normalizer.paged_collection',
+            'api_platform.hydra.normalizer.collection_filters',
+            'api_platform.hydra.normalizer.constraint_violation_list',
+            'api_platform.hydra.normalizer.error',
+            'api_platform.hydra.action.documentation',
+            'api_platform.hydra.action.exception',
         ];
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
         }
 
         $aliases = [
-            'api.metadata.resource.factory.collection' => 'api.metadata.resource.factory.collection.annotation',
+            'api_platform.metadata.resource.factory.collection' => 'api_platform.metadata.resource.factory.collection.annotation',
         ];
 
         foreach ($aliases as $alias => $service) {

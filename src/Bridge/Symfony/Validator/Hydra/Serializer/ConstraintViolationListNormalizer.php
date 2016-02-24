@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Validator\Hydra\Serializer;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\Serializer;
 
-use ApiPlatform\Builder\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 

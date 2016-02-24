@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Exception;
+namespace ApiPlatform\Core\Exception;
 
 /**
  * Resource class not found exception.

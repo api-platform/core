@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Metadata\Property;
+namespace ApiPlatform\Core\Metadata\Property;
 
 /**
  * A collection of properties for a given resource.

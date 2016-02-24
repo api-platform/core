@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Builder\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;

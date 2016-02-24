@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\JsonLd\Action;
+namespace ApiPlatform\Core\JsonLd\Action;
 
-use ApiPlatform\Builder\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Builder\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

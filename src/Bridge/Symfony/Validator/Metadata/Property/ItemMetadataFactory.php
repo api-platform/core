@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Symfony\Validator\Metadata\Property;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property;
 
-use ApiPlatform\Builder\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Builder\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\ItemMetadata;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;

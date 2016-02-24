@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Bridge\Doctrine\Orm;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Builder\Api\PaginatorInterface;
+use ApiPlatform\Core\Api\PaginatorInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 

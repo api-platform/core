@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Builder\Hydra;
+namespace ApiPlatform\Core\Hydra;
 
 /**
  * Hydra's ApiDocumentation builder.
