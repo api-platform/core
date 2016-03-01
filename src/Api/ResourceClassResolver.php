@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 
 /**
@@ -25,11 +25,11 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
 {
     use ClassInfoTrait;
 
-    private $collectionMetadataFactory;
+    private $resourceNameCollectionFactory;
 
-    public function __construct(CollectionMetadataFactoryInterface $collectionMetadataFactory)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
-        $this->collectionMetadataFactory = $collectionMetadataFactory;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
     /**
@@ -64,7 +64,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
      */
     public function isResourceClass(string $type) : bool
     {
-        foreach ($this->collectionMetadataFactory->create() as $resourceClass) {
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             if ($type === $resourceClass) {
                 return true;
             }

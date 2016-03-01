@@ -13,18 +13,18 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final class OperationMethodResolver implements OperationMethodResolverInterface
 {
     private $router;
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
 
-    public function __construct(RouterInterface $router, ItemMetadataFactoryInterface $itemMetadataFactory)
+    public function __construct(RouterInterface $router, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->router = $router;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -54,12 +54,12 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     private function getOperationMethod(string $resourceClass, string $operationName, bool $collection = true) : string
     {
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         if ($collection) {
-            $method = $itemMetadata->getCollectionOperationAttribute($operationName, 'method');
+            $method = $resourceMetadata->getCollectionOperationAttribute($operationName, 'method');
         } else {
-            $method = $itemMetadata->getItemOperationAttribute($operationName, 'method');
+            $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
         }
 
         if (null !== $method) {
@@ -67,9 +67,9 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
         }
 
         if ($collection) {
-            $routeName = $itemMetadata->getCollectionOperationAttribute($operationName, 'route_name');
+            $routeName = $resourceMetadata->getCollectionOperationAttribute($operationName, 'route_name');
         } else {
-            $routeName = $itemMetadata->getItemOperationAttribute($operationName, 'route_name');
+            $routeName = $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
         }
 
         if (null === $routeName) {

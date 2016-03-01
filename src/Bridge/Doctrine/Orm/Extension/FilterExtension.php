@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -24,12 +24,12 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterExtension implements QueryCollectionExtensionInterface
 {
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
     private $filters;
 
-    public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, FilterCollection $filters)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, FilterCollection $filters)
     {
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->filters = $filters;
     }
 
@@ -38,8 +38,8 @@ final class FilterExtension implements QueryCollectionExtensionInterface
      */
     public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
     {
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
-        $resourceFilters = $itemMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
 
         if (empty($resourceFilters)) {
             return;

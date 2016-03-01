@@ -12,8 +12,8 @@
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ViewListener;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -34,9 +34,9 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
         $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
-        list($itemMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
+        list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ViewListener($itemMetadataFactory, $validator);
+        $validationViewListener = new ViewListener($resourceMetadataFactory, $validator);
         $validationViewListener->onKernelView($event);
     }
 
@@ -56,9 +56,9 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
         $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled()->willReturn($violations);
         $validator = $validatorProphecy->reveal();
 
-        list($itemMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
+        list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ViewListener($itemMetadataFactory, $validator);
+        $validationViewListener = new ViewListener($resourceMetadataFactory, $validator);
         $validationViewListener->onKernelView($event);
     }
 
@@ -70,15 +70,15 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createEventObject($expectedValidationGroups, $data)
     {
-        $itemMetadata = new ItemMetadata(null, null, null, [
+        $resourceMetadata = new ResourceMetadata(null, null, null, [
             'create' => [
                 'validation_groups' => $expectedValidationGroups,
             ],
         ]);
 
-        $itemMetadataFactoryProphecy = $this->prophesize(ItemMetadataFactoryInterface::class);
-        $itemMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($itemMetadata);
-        $itemMetadataFactory = $itemMetadataFactoryProphecy->reveal();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $kernel = $this->prophesize('Symfony\Component\HttpKernel\HttpKernelInterface')->reveal();
         $request = new Request([], [], [
@@ -89,6 +89,6 @@ class ViewListenerTest extends \PHPUnit_Framework_TestCase
         $request->setMethod(Request::METHOD_POST);
         $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
 
-        return [$itemMetadataFactory, $event];
+        return [$resourceMetadataFactory, $event];
     }
 }

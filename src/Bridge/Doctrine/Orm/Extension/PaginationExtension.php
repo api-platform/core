@@ -13,8 +13,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
@@ -31,7 +31,7 @@ class PaginationExtension implements QueryResultExtensionInterface
 {
     private $managerRegistry;
     private $requestStack;
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
     private $enabled;
     private $clientEnabled;
     private $clientItemsPerPage;
@@ -40,11 +40,11 @@ class PaginationExtension implements QueryResultExtensionInterface
     private $enabledParameterName;
     private $itemsPerPageParameterName;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ItemMetadataFactoryInterface $itemMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage')
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage')
     {
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->enabled = $enabled;
         $this->clientEnabled = $clientEnabled;
         $this->clientItemsPerPage = $clientItemsPerPage;
@@ -64,13 +64,13 @@ class PaginationExtension implements QueryResultExtensionInterface
             return;
         }
 
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
-        if (!$this->isPaginationEnabled($request, $itemMetadata, $operationName)) {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        if (!$this->isPaginationEnabled($request, $resourceMetadata, $operationName)) {
             return;
         }
 
-        $itemsPerPage = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
-        if ($itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
+        $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
+        if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
         }
 
@@ -90,9 +90,9 @@ class PaginationExtension implements QueryResultExtensionInterface
             return false;
         }
 
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->isPaginationEnabled($request, $itemMetadata, $operationName);
+        return $this->isPaginationEnabled($request, $resourceMetadata, $operationName);
     }
 
     /**
@@ -106,10 +106,10 @@ class PaginationExtension implements QueryResultExtensionInterface
         return new Paginator($doctrineOrmPaginator);
     }
 
-    private function isPaginationEnabled(Request $request, ItemMetadata $itemMetadata, string $operationName = null) : bool
+    private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null) : bool
     {
-        $enabled = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
-        $clientEnabled = $itemMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
+        $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
+        $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
 
         if ($clientEnabled) {
             $enabled = filter_var($request->query->get($this->enabledParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);

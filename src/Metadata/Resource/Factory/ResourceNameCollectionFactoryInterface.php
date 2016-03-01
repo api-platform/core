@@ -11,19 +11,19 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\CollectionMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 
 /**
- * Creates a collection metadata value object.
+ * Creates a resource name collection value object.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface CollectionMetadataFactoryInterface
+interface ResourceNameCollectionFactoryInterface
 {
     /**
-     * Creates the collection metadata.
+     * Creates the resource name collection.
      *
-     * @return CollectionMetadata
+     * @return ResourceNameCollection
      */
-    public function create() : CollectionMetadata;
+    public function create() : ResourceNameCollection;
 }

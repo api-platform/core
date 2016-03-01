@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -32,14 +32,14 @@ class XmlResponderViewListener
     private $serializer;
 
     /**
-     * @var ItemMetadataFactoryInterface
+     * @var ResourceMetadataFactoryInterface
      */
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
 
-    public function __construct(SerializerInterface $serializer, ItemMetadataFactoryInterface $itemMetadataFactory)
+    public function __construct(SerializerInterface $serializer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->serializer = $serializer;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -79,8 +79,8 @@ class XmlResponderViewListener
         }
 
         $resourceClass = $request->attributes->get('_resource_class');
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
-        $context = $itemMetadata->getAttribute('normalization_context', []);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $context = $resourceMetadata->getAttribute('normalization_context', []);
 
         $response = new Response(
             $this->serializer->serialize($controllerResult, self::FORMAT, $context),

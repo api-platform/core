@@ -11,19 +11,19 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property;
 
-use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactoryInterface;
 
 /**
  * Decorates a metadata loader using the validator.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadataFactory implements ItemMetadataFactoryInterface
+final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     /**
      * @var string[] A list of constraint classes making the entity required.
@@ -31,11 +31,11 @@ final class ItemMetadataFactory implements ItemMetadataFactoryInterface
     const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
     private $decorated;
-    private $metadataFactory;
+    private $validatorMetadataFactory;
 
-    public function __construct(MetadataFactoryInterface $metadataFactory, ItemMetadataFactoryInterface $decorated)
+    public function __construct(ValidatorMetadataFactoryInterface $validatorMetadataFactory, PropertyMetadataFactoryInterface $decorated)
     {
-        $this->metadataFactory = $metadataFactory;
+        $this->validatorMetadataFactory = $validatorMetadataFactory;
         $this->decorated = $decorated;
     }
 
@@ -60,14 +60,14 @@ final class ItemMetadataFactory implements ItemMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $name, array $options = []) : ItemMetadata
+    public function create(string $resourceClass, string $name, array $options = []) : PropertyMetadata
     {
-        $itemMetadata = $this->decorated->create($resourceClass, $name, $options);
-        if (null !== $itemMetadata->isRequired()) {
-            return $itemMetadata;
+        $propertyMetadata = $this->decorated->create($resourceClass, $name, $options);
+        if (null !== $propertyMetadata->isRequired()) {
+            return $propertyMetadata;
         }
 
-        $validatorClassMetadata = $this->metadataFactory->getMetadataFor($resourceClass);
+        $validatorClassMetadata = $this->validatorMetadataFactory->getMetadataFor($resourceClass);
 
         foreach ($validatorClassMetadata->getPropertyMetadata($name) as $validatorPropertyMetadata) {
             if (isset($options['validation_groups'])) {
@@ -78,23 +78,23 @@ final class ItemMetadataFactory implements ItemMetadataFactoryInterface
 
                     foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $constraint) {
                         if ($this->isRequired($constraint)) {
-                            return $itemMetadata->withRequired(true);
+                            return $propertyMetadata->withRequired(true);
                         }
                     }
                 }
 
-                return $itemMetadata->withRequired(false);
+                return $propertyMetadata->withRequired(false);
             }
 
             foreach ($validatorPropertyMetadata->findConstraints($validatorClassMetadata->getDefaultGroup()) as $constraint) {
                 if ($this->isRequired($constraint)) {
-                    return $itemMetadata->withRequired(true);
+                    return $propertyMetadata->withRequired(true);
                 }
             }
 
-            return $itemMetadata->withRequired(false);
+            return $propertyMetadata->withRequired(false);
         }
 
-        return $itemMetadata->withRequired(false);
+        return $propertyMetadata->withRequired(false);
     }
 }

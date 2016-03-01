@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Metadata\Resource;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class CollectionMetadata implements \IteratorAggregate, \Countable
+final class ResourceNameCollection implements \IteratorAggregate, \Countable
 {
     private $classes;
 

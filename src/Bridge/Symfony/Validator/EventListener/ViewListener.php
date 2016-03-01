@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -24,12 +24,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class ViewListener
 {
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
     private $validator;
 
-    public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, ValidatorInterface $validator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ValidatorInterface $validator)
     {
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->validator = $validator;
     }
 
@@ -58,17 +58,17 @@ final class ViewListener
 
         $data = $event->getControllerResult();
 
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         if ($collectionOperationName) {
-            $validationGroups = $itemMetadata->getCollectionOperationAttribute($collectionOperationName, 'validation_groups');
+            $validationGroups = $resourceMetadata->getCollectionOperationAttribute($collectionOperationName, 'validation_groups');
         } else {
-            $validationGroups = $itemMetadata->getItemOperationAttribute($itemOperationName, 'validation_groups');
+            $validationGroups = $resourceMetadata->getItemOperationAttribute($itemOperationName, 'validation_groups');
         }
 
         if (!$validationGroups) {
             // Fallback to the resource
-            $validationGroups = $itemMetadata->getAttributes()['validation_groups'] ?? null;
+            $validationGroups = $resourceMetadata->getAttributes()['validation_groups'] ?? null;
         }
 
         if (is_callable($validationGroups)) {

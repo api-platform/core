@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
@@ -21,13 +21,13 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadataPhpDocFactory implements ItemMetadataFactoryInterface
+final class PhpDocResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $decorated;
     private $docBlockFactory;
     private $contextFactory;
 
-    public function __construct(ItemMetadataFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
+    public function __construct(ResourceMetadataFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
     {
         $this->decorated = $decorated;
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
@@ -37,23 +37,23 @@ final class ItemMetadataPhpDocFactory implements ItemMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ItemMetadata
+    public function create(string $resourceClass) : ResourceMetadata
     {
-        $itemMetadata = $this->decorated->create($resourceClass);
+        $resourceMetadata = $this->decorated->create($resourceClass);
 
-        if (null !== $itemMetadata->getDescription()) {
-            return $itemMetadata;
+        if (null !== $resourceMetadata->getDescription()) {
+            return $resourceMetadata;
         }
 
         $reflectionClass = new \ReflectionClass($resourceClass);
 
         try {
             $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
-            $itemMetadata = $itemMetadata->withDescription($docBlock->getSummary());
+            $resourceMetadata = $resourceMetadata->withDescription($docBlock->getSummary());
         } catch (\InvalidArgumentException $e) {
             // Ignore empty DocBlocks
         }
 
-        return $itemMetadata;
+        return $resourceMetadata;
     }
 }

@@ -12,10 +12,10 @@
 namespace ApiPlatform\Core\JsonLd;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface as PropertyCollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface as PropertyItemMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -25,10 +25,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ContextBuilder implements ContextBuilderInterface
 {
-    private $resourceCollectionMetadataFactory;
-    private $resourceItemMetadataFactory;
-    private $propertyCollectionMetadataFactory;
-    private $propertyItemMetadataFactory;
+    private $resourceNameCollectionFactory;
+    private $resourceMetadataFactory;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
     private $urlGenerator;
 
     /**
@@ -36,12 +36,12 @@ final class ContextBuilder implements ContextBuilderInterface
      */
     private $nameConverter;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory, ResourceItemMetadataFactoryInterface $resourceItemMetadataFactory, PropertyCollectionMetadataFactoryInterface $propertyCollectionMetadataFactory, PropertyItemMetadataFactoryInterface $propertyItemMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
     {
-        $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
-        $this->resourceItemMetadataFactory = $resourceItemMetadataFactory;
-        $this->propertyCollectionMetadataFactory = $propertyCollectionMetadataFactory;
-        $this->propertyItemMetadataFactory = $propertyItemMetadataFactory;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->urlGenerator = $urlGenerator;
         $this->nameConverter = $nameConverter;
     }
@@ -64,10 +64,10 @@ final class ContextBuilder implements ContextBuilderInterface
     {
         $context = $this->getBaseContext($referenceType);
 
-        foreach ($this->resourceCollectionMetadataFactory->create() as $resourceClass) {
-            $itemMetadata = $this->resourceItemMetadataFactory->create($resourceClass);
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            $resourceName = lcfirst($itemMetadata->getShortName());
+            $resourceName = lcfirst($resourceMetadata->getShortName());
 
             $context[$resourceName] = [
                 '@id' => 'Entrypoint/'.$resourceName,
@@ -84,23 +84,23 @@ final class ContextBuilder implements ContextBuilderInterface
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : array
     {
         $context = $this->getBaseContext($referenceType, $referenceType);
-        $itemMetadata = $this->resourceItemMetadataFactory->create($resourceClass);
-        $prefixedShortName = sprintf('#%s', $itemMetadata->getShortName());
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $prefixedShortName = sprintf('#%s', $resourceMetadata->getShortName());
 
-        foreach ($this->propertyCollectionMetadataFactory->create($resourceClass) as $propertyName) {
-            $propertyItemMetadata = $this->propertyItemMetadataFactory->create($resourceClass, $propertyName);
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            if ($propertyItemMetadata->isIdentifier() && !$propertyItemMetadata->isWritable()) {
+            if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
                 continue;
             }
 
             $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
 
-            if (!$id = $propertyItemMetadata->getIri()) {
+            if (!$id = $propertyMetadata->getIri()) {
                 $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
             }
 
-            if (!$propertyItemMetadata->isReadableLink()) {
+            if (!$propertyMetadata->isReadableLink()) {
                 $context[$convertedName] = [
                     '@id' => $id,
                     '@type' => '@id',
@@ -115,8 +115,8 @@ final class ContextBuilder implements ContextBuilderInterface
 
     public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string
     {
-        $itemMetadata = $this->resourceItemMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $itemMetadata->getShortName()]);
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()]);
     }
 }
