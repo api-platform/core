@@ -12,8 +12,9 @@
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
-use phpDocumentor\Reflection\ClassReflector;
-use phpDocumentor\Reflection\FileReflector;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use phpDocumentor\Reflection\Types\ContextFactory;
 
 /**
  * Extracts descriptions from PHPDoc.
@@ -22,21 +23,15 @@ use phpDocumentor\Reflection\FileReflector;
  */
 final class ItemMetadataPhpDocFactory implements ItemMetadataFactoryInterface
 {
-    /**
-     * @var FileReflector[]
-     */
-    private static $fileReflectors = [];
-
-    /**
-     * @var ClassReflector[]
-     */
-    private static $classReflectors = [];
-
     private $decorated;
+    private $docBlockFactory;
+    private $contextFactory;
 
-    public function __construct(ItemMetadataFactoryInterface $decorated)
+    public function __construct(ItemMetadataFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
     {
         $this->decorated = $decorated;
+        $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
+        $this->contextFactory = new ContextFactory();
     }
 
     /**
@@ -51,52 +46,10 @@ final class ItemMetadataPhpDocFactory implements ItemMetadataFactoryInterface
         }
 
         $reflectionClass = new \ReflectionClass($resourceClass);
-
-        if (
-            ($classReflector = $this->getClassReflector($reflectionClass)) &&
-            $docBlock = $classReflector->getDocBlock()
-        ) {
-            $itemMetadata = $itemMetadata->withDescription($docBlock->getShortDescription());
+        if ($docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass))) {
+            $itemMetadata = $itemMetadata->withDescription($docBlock->getSummary());
         }
 
         return $itemMetadata;
-    }
-
-    /**
-     * Gets the ClassReflector associated with this class.
-     *
-     * @param \ReflectionClass $reflectionClass
-     *
-     * @return ClassReflector|null
-     */
-    private function getClassReflector(\ReflectionClass $reflectionClass)
-    {
-        $className = $reflectionClass->name;
-
-        if (isset(self::$classReflectors[$className])) {
-            return self::$classReflectors[$className];
-        }
-
-        if (!($fileName = $reflectionClass->getFileName())) {
-            return;
-        }
-
-        if (isset(self::$fileReflectors[$fileName])) {
-            $fileReflector = self::$fileReflectors[$fileName];
-        } else {
-            $fileReflector = self::$fileReflectors[$fileName] = new FileReflector($fileName);
-            $fileReflector->process();
-        }
-
-        foreach ($fileReflector->getClasses() as $classReflector) {
-            $className = $classReflector->getName();
-            if ('\\' === $className[0]) {
-                $className = substr($className, 1);
-            }
-
-            if ($className === $reflectionClass->name) {
-                return self::$classReflectors[$className] = $classReflector;
-            }
-        }
     }
 }
