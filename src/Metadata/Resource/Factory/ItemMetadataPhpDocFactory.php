@@ -12,10 +12,8 @@
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
-use phpDocumentor\Reflection\ClassReflector;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
-use phpDocumentor\Reflection\FileReflector;
 use phpDocumentor\Reflection\Types\ContextFactory;
 
 /**
