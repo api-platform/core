@@ -46,8 +46,12 @@ final class ItemMetadataPhpDocFactory implements ItemMetadataFactoryInterface
         }
 
         $reflectionClass = new \ReflectionClass($resourceClass);
-        if ($docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass))) {
+
+        try {
+            $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
             $itemMetadata = $itemMetadata->withDescription($docBlock->getSummary());
+        } catch (\InvalidArgumentException $e) {
+            // Ignore empty DocBlocks
         }
 
         return $itemMetadata;

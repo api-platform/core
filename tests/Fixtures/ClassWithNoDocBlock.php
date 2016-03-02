@@ -11,11 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures;
 
-/**
- * My dummy entity.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class DummyEntity
+// Must not have a DocBlock
+class ClassWithNoDocBlock
 {
 }
