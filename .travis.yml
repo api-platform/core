@@ -20,11 +20,12 @@ matrix:
 
 before_install:
     - composer self-update
+    - phpunit --self-update
     - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
 
 install:
     - composer update --no-interaction --prefer-dist
 
 script:
-    - vendor/bin/phpunit
+    - phpunit
     - vendor/bin/behat
