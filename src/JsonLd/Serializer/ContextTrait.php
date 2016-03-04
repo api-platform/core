@@ -39,10 +39,7 @@ trait ContextTrait
 
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
         $context = array_merge($context, $this->getContextValue($itemMetadata, $context, $key, []));
-
-        if (!isset($context['resource_class'])) {
-            $context['resource_class'] = $resourceClass;
-        }
+        $context['resource_class'] = $resourceClass;
 
         return array_merge($context, [
             'jsonld_has_context' => true,

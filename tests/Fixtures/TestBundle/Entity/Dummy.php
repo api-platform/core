@@ -87,6 +87,7 @@ class Dummy
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     public $dummyPrice;
+
     /**
      * @var RelatedDummy A related dummy.
      *
