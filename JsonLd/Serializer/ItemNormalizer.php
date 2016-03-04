@@ -212,6 +212,14 @@ class ItemNormalizer extends AbstractNormalizer
             if (is_subclass_of($resource->getEntityClass(), $instanceClass)) {
                 $instanceClass = $resource->getEntityClass();
                 $reflectionClass = new \ReflectionClass($instanceClass);
+                if ($reflectionClass->isAbstract()) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Cannot create an instance of %s from serialized data because it is an abstract resource',
+                            $instanceClass
+                        )
+                    );
+                }
             } else {
                 throw new InvalidArgumentException(
                     sprintf(
