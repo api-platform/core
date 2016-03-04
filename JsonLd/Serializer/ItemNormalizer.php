@@ -209,12 +209,19 @@ class ItemNormalizer extends AbstractNormalizer
         $instanceClass = $overrideClass ? get_class($context['object_to_populate']) : $class;
         $reflectionClass = new \ReflectionClass($instanceClass);
         if ($reflectionClass->isAbstract()) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Cannot create an instance of %s from serialized data because it is an abstract resource',
-                    $instanceClass
-                )
-            );
+            $isAbstract = true;
+            if (is_subclass_of($resource->getEntityClass(), $instanceClass)) {
+                $instanceClass = $resource->getEntityClass();
+                $reflectionClass = new \ReflectionClass($instanceClass);
+                $isAbstract = $reflectionClass->isAbstract();
+            } else {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Cannot create an instance of %s from serialized data because it is an abstract resource',
+                        $instanceClass
+                    )
+                );
+            }
         }
 
         $object = $this->instantiateObject(

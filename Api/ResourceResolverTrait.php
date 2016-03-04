@@ -54,7 +54,9 @@ trait ResourceResolverTrait
             $type = gettype($type);
         }
 
-        if (isset($context['resource'])) {
+        if (is_array($object) && isset($object['@type'])) {
+            $resource = $this->resourceCollection->getResourceForShortName($object['@type']);
+        } elseif (isset($context['resource'])) {
             $resource = $context['resource'];
         } else {
             $resource = $this->resourceCollection->getResourceForEntity($type);
