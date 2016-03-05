@@ -1,6 +1,6 @@
 {
-  "name": "dunglas/api-bundle",
-  "type": "symfony-bundle",
+  "name": "api-platform/core",
+  "type": "library",
   "description": "JSON-LD / Hydra REST API for Symfony",
   "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
   "homepage": "https://api-platform.com",
