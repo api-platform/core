@@ -38,6 +38,35 @@ Feature: Search filter on collections
     }
     """
 
+  Scenario: Search collection by name (partial case insensitive)
+    Given there is "30" dummy objects
+    When I send a "GET" request to "/dummies?dummy=somedummytest1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies\\?dummy=somedummytest1$"},
+        "@type": {"pattern": "^hydra:PagedCollection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dummy": {
+                "pattern": "^SomeDummyTest\\d{1,2}$"
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Search collection by alias (start)
     When I send a "GET" request to "/dummies?alias=Ali"
     Then the response status code should be 200

@@ -44,7 +44,7 @@ services:
 
     my_dummy_resource.search_filter:
         parent:                     'api.doctrine.orm.search_filter'
-        arguments:                  [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact'  } ]
+        arguments:                  [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial' } ]
 
     my_dummy_resource.order_filter:
         parent:                     'api.doctrine.orm.order_filter'
