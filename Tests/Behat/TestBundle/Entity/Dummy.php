@@ -198,4 +198,12 @@ class Dummy
     {
         $this->relatedDummies->add($relatedDummy);
     }
+    public function setDummy($dummy)
+    {
+        $this->dummy = $dummy;
+    }
+    public function getDummy()
+    {
+        return $this->dummy;
+    }
 }
