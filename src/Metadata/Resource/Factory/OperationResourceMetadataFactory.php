@@ -11,18 +11,18 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
  * Creates or completes operations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadataOperationFactory implements ItemMetadataFactoryInterface
+final class OperationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $decorated;
 
-    public function __construct(ItemMetadataFactoryInterface $decorated)
+    public function __construct(ResourceMetadataFactoryInterface $decorated)
     {
         $this->decorated = $decorated;
     }
@@ -30,25 +30,25 @@ final class ItemMetadataOperationFactory implements ItemMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ItemMetadata
+    public function create(string $resourceClass) : ResourceMetadata
     {
-        $itemMetadata = $this->decorated->create($resourceClass);
+        $resourceMetadata = $this->decorated->create($resourceClass);
         $reflectionClass = new \ReflectionClass($resourceClass);
         $isAbstract = $reflectionClass->isAbstract();
 
-        if (null === $itemMetadata->getCollectionOperations()) {
-            $itemMetadata = $itemMetadata->withCollectionOperations($this->createOperations(
+        if (null === $resourceMetadata->getCollectionOperations()) {
+            $resourceMetadata = $resourceMetadata->withCollectionOperations($this->createOperations(
                 $isAbstract ? ['GET'] : ['GET', 'POST']
             ));
         }
 
-        if (null === $itemMetadata->getItemOperations()) {
-            $itemMetadata = $itemMetadata->withItemOperations($this->createOperations(
+        if (null === $resourceMetadata->getItemOperations()) {
+            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations(
                 $isAbstract ? ['GET', 'DELETE'] : ['GET', 'PUT', 'DELETE']
             ));
         }
 
-        return $itemMetadata;
+        return $resourceMetadata;
     }
 
     private function createOperations(array $methods) : array

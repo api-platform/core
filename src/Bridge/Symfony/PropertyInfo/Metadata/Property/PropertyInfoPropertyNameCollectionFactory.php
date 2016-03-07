@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 
-use ApiPlatform\Core\Metadata\Property\CollectionMetadata;
-use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 /**
@@ -22,7 +22,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class CollectionMetadataFactory implements CollectionMetadataFactoryInterface
+final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     private $propertyInfo;
 
@@ -34,8 +34,8 @@ final class CollectionMetadataFactory implements CollectionMetadataFactoryInterf
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, array $options = []) : CollectionMetadata
+    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
     {
-        return new CollectionMetadata($this->propertyInfo->getProperties($resourceClass, $options));
+        return new PropertyNameCollection($this->propertyInfo->getProperties($resourceClass, $options));
     }
 }

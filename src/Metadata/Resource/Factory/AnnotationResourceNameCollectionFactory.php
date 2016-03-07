@@ -12,26 +12,26 @@
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\Resource;
-use ApiPlatform\Core\Metadata\Resource\CollectionMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a resource collection metadata from {@see Resource} annotations.
+ * Creates a resource name collection from {@see Resource} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class CollectionMetadataAnnotationFactory implements CollectionMetadataFactoryInterface
+final class AnnotationResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
     private $reader;
     private $paths;
     private $decorated;
 
     /**
-     * @param Reader                                  $reader
-     * @param string[]                                $paths
-     * @param CollectionMetadataFactoryInterface|null $decorated
+     * @param Reader                                      $reader
+     * @param string[]                                    $paths
+     * @param ResourceNameCollectionFactoryInterface|null $decorated
      */
-    public function __construct(Reader $reader, array $paths, CollectionMetadataFactoryInterface $decorated = null)
+    public function __construct(Reader $reader, array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->paths = $paths;
@@ -41,7 +41,7 @@ final class CollectionMetadataAnnotationFactory implements CollectionMetadataFac
     /**
      * {@inheritdoc}
      */
-    public function create() : CollectionMetadata
+    public function create() : ResourceNameCollection
     {
         $classes = [];
         $includedFiles = [];
@@ -84,6 +84,6 @@ final class CollectionMetadataAnnotationFactory implements CollectionMetadataFac
             }
         }
 
-        return new CollectionMetadata(array_keys($classes));
+        return new ResourceNameCollection(array_keys($classes));
     }
 }

@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property;
 
-use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
@@ -20,12 +20,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadataFactory implements ItemMetadataFactoryInterface
+final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     private $decorated;
     private $managerRegistry;
 
-    public function __construct(ManagerRegistry $managerRegistry, ItemMetadataFactoryInterface $decorated)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $decorated)
     {
         $this->managerRegistry = $managerRegistry;
         $this->decorated = $decorated;
@@ -34,39 +34,39 @@ final class ItemMetadataFactory implements ItemMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : ItemMetadata
+    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
     {
-        $itemMetadata = $this->decorated->create($resourceClass, $property, $options);
+        $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        if (null !== $itemMetadata->isIdentifier()) {
-            return $itemMetadata;
+        if (null !== $propertyMetadata->isIdentifier()) {
+            return $propertyMetadata;
         }
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager) {
-            return $itemMetadata;
+            return $propertyMetadata;
         }
 
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         if (!$doctrineClassMetadata) {
-            return $itemMetadata;
+            return $propertyMetadata;
         }
 
         $identifiers = $doctrineClassMetadata->getIdentifier();
         foreach ($identifiers as $identifier) {
             if ($identifier === $property) {
-                $itemMetadata = $itemMetadata->withIdentifier(true);
-                $itemMetadata = $itemMetadata->withReadable(false);
-                $itemMetadata = $itemMetadata->withWritable($doctrineClassMetadata->isIdentifierNatural());
+                $propertyMetadata = $propertyMetadata->withIdentifier(true);
+                $propertyMetadata = $propertyMetadata->withReadable(false);
+                $propertyMetadata = $propertyMetadata->withWritable($doctrineClassMetadata->isIdentifierNatural());
 
                 break;
             }
         }
 
-        if (null === $itemMetadata->isIdentifier()) {
-            $itemMetadata = $itemMetadata->withIdentifier(false);
+        if (null === $propertyMetadata->isIdentifier()) {
+            $propertyMetadata = $propertyMetadata->withIdentifier(false);
         }
 
-        return $itemMetadata;
+        return $propertyMetadata;
     }
 }

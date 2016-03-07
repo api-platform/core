@@ -12,8 +12,8 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface as ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface as ResourceItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -33,14 +33,14 @@ final class ApiLoader extends Loader
     const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
     private $fileLoader;
-    private $resourceCollectionMetadataFactory;
-    private $resourceItemMetadataFactory;
+    private $resourceNameCollectionFactory;
+    private $resourceMetadataFactory;
 
-    public function __construct(KernelInterface $kernel, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory, ResourceItemMetadataFactoryInterface $resourceItemMetadataFactory)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
-        $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
-        $this->resourceItemMetadataFactory = $resourceItemMetadataFactory;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -53,15 +53,15 @@ final class ApiLoader extends Loader
         $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));
         $routeCollection->addCollection($this->fileLoader->load('hydra.xml'));
 
-        foreach ($this->resourceCollectionMetadataFactory->create() as $resourceClass) {
-            $itemMetadata = $this->resourceItemMetadataFactory->create($resourceClass);
-            $normalizedShortName = Inflector::pluralize(Inflector::tableize($itemMetadata->getShortName()));
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $normalizedShortName = Inflector::pluralize(Inflector::tableize($resourceMetadata->getShortName()));
 
-            foreach ($itemMetadata->getCollectionOperations() as $operationName => $operation) {
+            foreach ($resourceMetadata->getCollectionOperations() as $operationName => $operation) {
                 $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $normalizedShortName, true);
             }
 
-            foreach ($itemMetadata->getItemOperations() as $operationName => $operation) {
+            foreach ($resourceMetadata->getItemOperations() as $operationName => $operation) {
                 $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $normalizedShortName, false);
             }
         }

@@ -13,22 +13,22 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\Property;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Property\CollectionMetadata;
+use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a property collection metadata from {@see Property} annotations.
+ * Creates a property name collection from {@see Property} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class CollectionMetadataAnnotationFactory implements CollectionMetadataFactoryInterface
+final class AnnotationPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     private $reader;
     private $decorated;
     private $reflection;
 
-    public function __construct(Reader $reader, CollectionMetadataFactoryInterface $decorated = null)
+    public function __construct(Reader $reader, PropertyNameCollectionFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
@@ -38,11 +38,11 @@ final class CollectionMetadataAnnotationFactory implements CollectionMetadataFac
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, array $options = []) : CollectionMetadata
+    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
     {
         if ($this->decorated) {
             try {
-                $collectionMetadata = $this->decorated->create($resourceClass, $options);
+                $propertyNameCollection = $this->decorated->create($resourceClass, $options);
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
                 // Ignore not found exceptions from parent
             }
@@ -51,8 +51,8 @@ final class CollectionMetadataAnnotationFactory implements CollectionMetadataFac
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
-            if (isset($collectionMetadata)) {
-                return $collectionMetadata;
+            if (isset($propertyNameCollection)) {
+                return $propertyNameCollection;
             }
 
             throw new ResourceClassNotFoundException(sprintf('The resource class "%s" does not exist.', $resourceClass));
@@ -77,12 +77,12 @@ final class CollectionMetadataAnnotationFactory implements CollectionMetadataFac
         }
 
         // Inherited from parent
-        if (isset($collectionMetadata)) {
-            foreach ($collectionMetadata as $propertyName) {
+        if (isset($propertyNameCollection)) {
+            foreach ($propertyNameCollection as $propertyName) {
                 $propertyNames[$propertyName] = $propertyName;
             }
         }
 
-        return new CollectionMetadata(array_keys($propertyNames));
+        return new PropertyNameCollection(array_keys($propertyNames));
     }
 }

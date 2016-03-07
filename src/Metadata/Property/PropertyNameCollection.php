@@ -12,11 +12,11 @@
 namespace ApiPlatform\Core\Metadata\Property;
 
 /**
- * A collection of properties for a given resource.
+ * A collection of property names for a given resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class CollectionMetadata implements \IteratorAggregate, \Countable
+final class PropertyNameCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @var string[]

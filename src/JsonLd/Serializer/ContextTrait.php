@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
  * Creates and manipulates the Serializer context.
@@ -25,20 +25,20 @@ trait ContextTrait
     /**
      * Import the context defined in metadata and set some default values.
      *
-     * @param string       $resourceClass
-     * @param ItemMetadata $itemMetadata
-     * @param array        $context
+     * @param string           $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     * @param array            $context
      *
      * @return array
      */
-    private function createContext(string $resourceClass, ItemMetadata $itemMetadata, array $context, bool $normalization) : array
+    private function createContext(string $resourceClass, ResourceMetadata $resourceMetadata, array $context, bool $normalization) : array
     {
         if (isset($context['jsonld_has_context'])) {
             return $context;
         }
 
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
-        $context = array_merge($context, $this->getContextValue($itemMetadata, $context, $key, []));
+        $context = array_merge($context, $this->getContextValue($resourceMetadata, $context, $key, []));
         $context['resource_class'] = $resourceClass;
 
         return array_merge($context, [
@@ -68,28 +68,28 @@ trait ContextTrait
     /**
      * Gets a context value.
      *
-     * @param ItemMetadata $resourceItemMetadata
-     * @param array        $context
-     * @param string       $key
-     * @param mixed        $defaultValue
+     * @param ResourceMetadata $resourceMetadata
+     * @param array            $context
+     * @param string           $key
+     * @param mixed            $defaultValue
      *
      * @return mixed
      */
-    private function getContextValue(ItemMetadata $resourceItemMetadata, array $context, string $key, $defaultValue = null)
+    private function getContextValue(ResourceMetadata $resourceMetadata, array $context, string $key, $defaultValue = null)
     {
         if (isset($context[$key])) {
             return $context[$key];
         }
 
         if (isset($context['collection_operation_name'])) {
-            return $resourceItemMetadata->getCollectionOperationAttribute($context['collection_operation_name'], $key, $defaultValue, true);
+            return $resourceMetadata->getCollectionOperationAttribute($context['collection_operation_name'], $key, $defaultValue, true);
         }
 
         if (isset($context['item_operation_name'])) {
-            return $resourceItemMetadata->getItemOperationAttribute($context['item_operation_name'], $key, $defaultValue, true);
+            return $resourceMetadata->getItemOperationAttribute($context['item_operation_name'], $key, $defaultValue, true);
         }
 
-        return $resourceItemMetadata->getAttribute($key, $defaultValue);
+        return $resourceMetadata->getAttribute($key, $defaultValue);
     }
 
     /**

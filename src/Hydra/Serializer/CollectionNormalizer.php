@@ -17,7 +17,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -35,14 +35,14 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
 
     const FORMAT = 'jsonld';
 
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
     private $contextBuilder;
     private $resourceClassResolver;
     private $iriConverter;
 
-    public function __construct(ItemMetadataFactoryInterface $itemMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter)
     {
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
@@ -79,9 +79,9 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
         }
 
         $resourceClass = $this->getResourceClass($this->resourceClassResolver, $object, $context);
-        $resourceItemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-        $context = $this->createContext($resourceClass, $resourceItemMetadata, $context, true);
+        $context = $this->createContext($resourceClass, $resourceMetadata, $context, true);
 
         $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
         $data['@type'] = 'hydra:Collection';

@@ -15,7 +15,7 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -31,7 +31,7 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
     use ContextTrait;
 
     private $collectionNormalizer;
-    private $itemMetadataFactory;
+    private $resourceMetadataFactory;
     private $resourceClassResolver;
 
     /**
@@ -39,10 +39,10 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
      */
     private $filters;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, ItemMetadataFactoryInterface $itemMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, FilterCollection $filters)
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, FilterCollection $filters)
     {
         $this->collectionNormalizer = $collectionNormalizer;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->filters = $filters;
     }
@@ -58,14 +58,14 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
         }
 
         $resourceClass = $this->getResourceClass($this->resourceClassResolver, $object, $context);
-        $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $operationName = $context['collection_operation_name'] ?? null;
 
         if ($operationName) {
-            $resourceFilters = $itemMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         } else {
-            $resourceFilters = $itemMetadata->getAttribute('filters', []);
+            $resourceFilters = $resourceMetadata->getAttribute('filters', []);
         }
 
         if ([] === $resourceFilters) {

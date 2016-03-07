@@ -12,11 +12,11 @@
 namespace ApiPlatform\Core\Metadata\Resource;
 
 /**
- * Resource item metadata.
+ * Resource metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadata
+final class ResourceMetadata
 {
     private $shortName;
     private $description;
