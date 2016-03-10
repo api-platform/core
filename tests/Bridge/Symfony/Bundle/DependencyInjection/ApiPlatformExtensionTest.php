@@ -118,13 +118,24 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
+    public function testSetNameConverter()
+    {
+        $nameConverterId = 'test.name_converter';
+
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['name_converter' => $nameConverterId]]), $containerBuilder);
+    }
+
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
-        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_builder' => ['enable_fos_user' => true]]), $containerBuilder);
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
     }
 
     private function getContainerBuilderProphecy()
@@ -134,7 +145,9 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         });
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([])->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => 'Doctrine\Bundle\DoctrineBundle\DoctrineBundle',
+        ])->shouldBeCalled();
 
         $parameters = [
             'api_platform.title' => 'title',

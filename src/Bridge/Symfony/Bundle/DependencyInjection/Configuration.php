@@ -58,6 +58,7 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
