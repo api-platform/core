@@ -14,18 +14,18 @@
         <service id="api_platform.filters" class="ApiPlatform\Core\Api\FilterCollection" public="false" />
 
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Core\Api\ResourceClassResolver" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.collection" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
 
         <service id="api_platform.operation_method_resolver" class="ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolver" public="false">
             <argument type="service" id="api_platform.router" />
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
         <service id="api_platform.route_loader" class="ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader" public="false">
             <argument type="service" id="kernel" />
-            <argument type="service" id="api_platform.metadata.resource.factory.collection" />
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="routing.loader" />
         </service>
@@ -35,8 +35,8 @@
         </service>
 
         <service id="api_platform.iri_converter" class="ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter" public="false">
-            <argument type="service" id="api_platform.metadata.property.factory.collection" />
-            <argument type="service" id="api_platform.metadata.property.factory.item" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
@@ -54,7 +54,7 @@
         </service>
 
         <service id="api_platform.listener.view.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ViewListener">
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="validator" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="20" />

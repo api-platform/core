@@ -7,10 +7,10 @@
     <services>
 
         <service id="api_platform.hydra.documentation_builder" class="ApiPlatform\Core\Hydra\ApiDocumentationBuilder" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.collection" />
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
-            <argument type="service" id="api_platform.metadata.property.factory.collection" />
-            <argument type="service" id="api_platform.metadata.property.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
@@ -44,7 +44,7 @@
         <!-- Serializer -->
 
         <service id="api_platform.hydra.normalizer.collection" class="ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -73,7 +73,7 @@
 
         <service id="api_platform.hydra.normalizer.collection_filters" class="ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
             <argument type="service" id="api_platform.hydra.normalizer.collection_filters.inner" />
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.filters" />
         </service>

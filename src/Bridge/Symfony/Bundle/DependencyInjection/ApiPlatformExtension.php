@@ -117,6 +117,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
-        $container->getDefinition('api_platform.metadata.resource.factory.collection.annotation')->addArgument($paths);
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument($paths);
     }
 }
