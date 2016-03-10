@@ -57,6 +57,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
+        if ($config['name_converter']) {
+            $container->setAlias('api_platform.name_converter', $config['name_converter']);
+        }
+
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.supported_formats', $supportedFormats);
@@ -77,8 +81,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
 
+        $bundles = $container->getParameter('kernel.bundles');
+
         // Doctrine ORM support
-        if (class_exists('Doctrine\ORM\Version')) {
+        if (isset($bundles['DoctrineBundle']) && class_exists('Doctrine\ORM\Version')) {
             $loader->load('doctrine_orm.xml');
         }
 

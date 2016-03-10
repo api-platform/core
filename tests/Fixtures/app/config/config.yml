@@ -32,6 +32,7 @@ api_platform:
     supported_formats:
         jsonld:                        ['application/ld+json']
         xml:                           ['application/xml', 'text/xml']
+    name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:
         order_parameter_name:          'order'
@@ -45,11 +46,11 @@ fos_user:
     db_driver:        'orm'
     firewall_name:    'api'
     service:
-        user_manager: 'api_platform.user_manager'
+        user_manager: 'app.user_manager'
     user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
 
 services:
-    api_platform.user_manager:
+    app.user_manager:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
         arguments:
             -  '@security.encoder_factory'
@@ -61,10 +62,10 @@ services:
     fos_user.mailer.default:
         class: 'ApiPlatform\Core\Bridge\Symfony\Bundle\Tests\Mock\MailerMock'
 
-    api_platform.name_converter:
+    app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
-    xml_responder_view_listener:
+    app.xml_responder_view_listener:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\EventListener\XmlResponderViewListener'
         arguments:
             - '@api_platform.serializer'
@@ -73,22 +74,22 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.view', method: 'onKernelView' }
 
-    my_dummy_resource.search_filter:
+    app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact'  } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
 
-    my_dummy_resource.order_filter:
+    app.my_dummy_resource.order_filter:
         parent:    'api_platform.doctrine.orm.order_filter'
         arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
-    my_dummy_resource.date_filter:
+    app.my_dummy_resource.date_filter:
         parent:    'api_platform.doctrine.orm.date_filter'
         arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
 
-    my_dummy_resource.range_filter:
+    app.my_dummy_resource.range_filter:
         parent:    'api_platform.doctrine.orm.range_filter'
         arguments: [ { 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
