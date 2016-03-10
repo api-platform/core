@@ -174,10 +174,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.serializer',
             'api_platform.property_accessor',
             'api_platform.property_info',
-            'api_platform.metadata.resource.factory.collection',
-            'api_platform.metadata.resource.factory.item',
-            'api_platform.metadata.property.factory.collection',
-            'api_platform.metadata.property.factory.item',
+            'api_platform.metadata.resource.name_collection_factory',
+            'api_platform.metadata.resource.metadata_factory',
+            'api_platform.metadata.property.name_collection_factory',
+            'api_platform.metadata.property.metadata_factory',
             'api_platform.item_data_provider',
             'api_platform.collection_data_provider',
             'api_platform.action.delete_item',
@@ -189,23 +189,23 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->addArgument([])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.factory.collection.annotation')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definition);
 
         $definitions = [
             'api_platform.filters',
             'api_platform.resource_class_resolver',
             'api_platform.operation_method_resolver',
-            'api_platform.metadata.resource.factory.collection.annotation',
-            'api_platform.metadata.resource.factory.item.annotation',
-            'api_platform.metadata.resource.factory.item.php_doc',
-            'api_platform.metadata.resource.factory.item.short_name',
-            'api_platform.metadata.resource.factory.item.operation',
-            'api_platform.metadata.property.factory.collection.property_info',
-            'api_platform.metadata.property.factory.item.annotation',
-            'api_platform.metadata.property.factory.item.property_info',
-            'api_platform.metadata.property.factory.item.serializer',
-            'api_platform.metadata.property.factory.item.validator',
-            'api_platform.metadata.resource.factory.collection.annotation',
+            'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.php_doc',
+            'api_platform.metadata.resource.metadata_factory.short_name',
+            'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.property.name_collection_factory.property_info',
+            'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory.property_info',
+            'api_platform.metadata.property.metadata_factory.serializer',
+            'api_platform.metadata.property.metadata_factory.validator',
+            'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.negotiator',
             'api_platform.route_loader',
             'api_platform.router',
@@ -258,7 +258,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $aliases = [
-            'api_platform.metadata.resource.factory.collection' => 'api_platform.metadata.resource.factory.collection.annotation',
+            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
         ];
 
         foreach ($aliases as $alias => $service) {

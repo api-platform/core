@@ -70,7 +70,7 @@ services:
         arguments:
             - '@api_platform.serializer'
 
-            - '@api_platform.metadata.resource.factory.item'
+            - '@api_platform.metadata.resource.metadata_factory'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.view', method: 'onKernelView' }
 

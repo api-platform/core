@@ -19,8 +19,8 @@
 
         <service id="api_platform.doctrine.orm.item_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.metadata.property.factory.collection" />
-            <argument type="service" id="api_platform.metadata.property.factory.item" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="collection"></argument> <!-- extensions -->
         </service>
 
@@ -54,7 +54,7 @@
 
         <!-- Metadata loader -->
 
-        <service id="api_platform.doctrine.orm.metadata.property.factory.item" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.factory.item" public="false">
+        <service id="api_platform.doctrine.orm.metadata.property.factory.item" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
             <argument type="service" id="doctrine" />
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.factory.item.inner" />
         </service>
@@ -75,7 +75,7 @@
         </service>
 
         <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filters" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" />
@@ -84,7 +84,7 @@
         <service id="api_platform.doctrine.orm.query_extension.pagination" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine" />
             <argument type="service" id="request_stack" />
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
             <argument>%api_platform.collection.pagination.client_enabled%</argument>
             <argument>%api_platform.collection.pagination.client_items_per_page%</argument>
