@@ -31,9 +31,9 @@ trait ActionUtilTrait
      * @param string                    $operationName
      * @param string|int                $id
      *
-     * @return object
-     *
      * @throws NotFoundHttpException
+     *
+     * @return object
      */
     private function getItem(ItemDataProviderInterface $itemDataProvider, string $resourceClass, string $operationName, $id)
     {
@@ -51,9 +51,9 @@ trait ActionUtilTrait
      *
      * @param Request $request
      *
-     * @return array
-     *
      * @throws RuntimeException
+     *
+     * @return array
      */
     private function extractAttributes(Request $request)
     {

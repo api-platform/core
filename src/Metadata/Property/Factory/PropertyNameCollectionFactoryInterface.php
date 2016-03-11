@@ -27,9 +27,9 @@ interface PropertyNameCollectionFactoryInterface
      * @param string $resourceClass
      * @param array  $options
      *
-     * @return PropertyNameCollection
-     *
      * @throws ResourceClassNotFoundException
+     *
+     * @return PropertyNameCollection
      */
     public function create(string $resourceClass, array $options = []) : PropertyNameCollection;
 }

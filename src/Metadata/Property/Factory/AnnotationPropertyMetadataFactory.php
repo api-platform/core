@@ -90,9 +90,9 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string                $resourceClass
      * @param string                $property
      *
-     * @return PropertyMetadata
-     *
      * @throws PropertyNotFoundException
+     *
+     * @return PropertyMetadata
      */
     private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property) : PropertyMetadata
     {

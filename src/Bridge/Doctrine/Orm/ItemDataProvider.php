@@ -100,8 +100,7 @@ class ItemDataProvider implements ItemDataProviderInterface
 
             $queryBuilder
                 ->where($queryBuilder->expr()->eq('o.'.$propertyName, ':'.$placeholder))
-                ->setParameter($placeholder, $value)
-            ;
+                ->setParameter($placeholder, $value);
         }
 
         foreach ($this->itemExtensions as $extension) {

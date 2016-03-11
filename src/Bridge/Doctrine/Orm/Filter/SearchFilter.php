@@ -166,9 +166,9 @@ class SearchFilter extends AbstractFilter
      * @param string       $field
      * @param string       $value
      *
-     * @return string
-     *
      * @throws InvalidArgumentException If strategy does not exist
+     *
+     * @return string
      */
     private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, string $alias, string $field, string $value) : string
     {

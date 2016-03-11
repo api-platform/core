@@ -28,9 +28,9 @@ interface PropertyMetadataFactoryInterface
      * @param string $property
      * @param array  $options
      *
-     * @return PropertyMetadata
-     *
      * @throws PropertyNotFoundException
+     *
+     * @return PropertyMetadata
      */
     public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata;
 }

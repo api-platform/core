@@ -48,9 +48,9 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      * @param string $operationName
      * @param bool   $collection
      *
-     * @return string
-     *
      * @throws RuntimeException
+     *
+     * @return string
      */
     private function getOperationMethod(string $resourceClass, string $operationName, bool $collection = true) : string
     {

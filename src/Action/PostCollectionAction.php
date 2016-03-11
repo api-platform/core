@@ -36,9 +36,9 @@ final class PostCollectionAction
      *
      * @param Request $request
      *
-     * @return mixed
-     *
      * @throws RuntimeException
+     *
+     * @return mixed
      */
     public function __invoke(Request $request)
     {

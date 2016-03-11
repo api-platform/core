@@ -425,8 +425,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
             break;
         }
-
-        return;
     }
 
     /**

@@ -27,9 +27,9 @@ interface ResourceClassResolverInterface
      * @param string|null $resourceClass
      * @param bool        $strict
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false) : string;
 
