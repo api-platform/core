@@ -26,9 +26,9 @@ interface ResourceMetadataFactoryInterface
      *
      * @param string $resourceClass
      *
-     * @return ResourceMetadata
-     *
      * @throws ResourceClassNotFoundException
+     *
+     * @return ResourceMetadata
      */
     public function create(string $resourceClass) : ResourceMetadata;
 }

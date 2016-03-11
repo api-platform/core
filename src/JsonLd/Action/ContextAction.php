@@ -46,9 +46,9 @@ final class ContextAction
      * @param Request $request
      * @param string  $shortName
      *
-     * @return array
-     *
      * @throws NotFoundHttpException
+     *
+     * @return array
      */
     public function __invoke(Request $request, string $shortName) : array
     {

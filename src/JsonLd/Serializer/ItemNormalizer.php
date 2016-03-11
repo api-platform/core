@@ -288,9 +288,9 @@ final class ItemNormalizer extends AbstractObjectNormalizer
      * @param mixed            $value
      * @param array            $context
      *
-     * @return object|null
-     *
      * @throws InvalidArgumentException
+     *
+     * @return object|null
      */
     private function denormalizeRelation(string $resourceClass, string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, array $context)
     {

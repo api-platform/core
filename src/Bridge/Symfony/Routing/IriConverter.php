@@ -107,9 +107,9 @@ final class IriConverter implements IriConverterInterface
      * @param string $resourceClass
      * @param bool   $collection
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     private function getRouteName(string $resourceClass, bool $collection) : string
     {

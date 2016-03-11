@@ -76,8 +76,7 @@ class PaginationExtension implements QueryResultExtensionInterface
 
         $queryBuilder
             ->setFirstResult(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
-            ->setMaxResults($itemsPerPage)
-        ;
+            ->setMaxResults($itemsPerPage);
     }
 
     /**

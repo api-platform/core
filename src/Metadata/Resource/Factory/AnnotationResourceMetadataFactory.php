@@ -68,9 +68,9 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      * @param ResourceMetadata|null $parentPropertyMetadata
      * @param string                $resourceClass
      *
-     * @return ResourceMetadata
-     *
      * @throws ResourceClassNotFoundException
+     *
+     * @return ResourceMetadata
      */
     private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass) : ResourceMetadata
     {

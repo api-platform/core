@@ -26,9 +26,9 @@ interface IriConverterInterface
      * @param string $iri
      * @param bool   $fetchData
      *
-     * @return object
-     *
      * @throws InvalidArgumentException
+     *
+     * @return object
      */
     public function getItemFromIri(string $iri, bool $fetchData = false);
 
@@ -38,9 +38,9 @@ interface IriConverterInterface
      * @param object $item
      * @param string $referenceType
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
 
@@ -50,9 +50,9 @@ interface IriConverterInterface
      * @param string $resourceClass
      * @param string $referenceType
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
 }
