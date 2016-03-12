@@ -60,26 +60,38 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="20" />
         </service>
 
-        <!-- Action -->
+        <!-- HTTP -->
 
-        <service id="api_platform.action.get_collection" class="ApiPlatform\Core\Action\GetCollectionAction">
+        <service id="api_platform.http.item_data_provider" class="ApiPlatform\Core\Http\ItemDataProvider">
+            <argument type="service" id="api_platform.item_data_provider" />
+        </service>
+
+        <service id="api_platform.http.request_attributes_extractor" class="ApiPlatform\Core\Http\RequestAttributesExtractor">
+            <argument type="service" id="api_platform.item_data_provider" />
+        </service>
+
+        <service id="api_platform.http.action.get_collection" class="ApiPlatform\Core\Http\Action\GetCollectionAction">
             <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.http.request_attributes_extractor" />
         </service>
 
-        <service id="api_platform.action.post_collection" class="ApiPlatform\Core\Action\PostCollectionAction">
+        <service id="api_platform.http.action.post_collection" class="ApiPlatform\Core\Http\Action\PostCollectionAction">
             <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.http.request_attributes_extractor" />
         </service>
 
-        <service id="api_platform.action.get_item" class="ApiPlatform\Core\Action\GetItemAction">
-            <argument type="service" id="api_platform.item_data_provider" />
+        <service id="api_platform.http.action.get_item" class="ApiPlatform\Core\Http\Action\GetItemAction">
+            <argument type="service" id="api_platform.http.item_data_provider" />
+            <argument type="service" id="api_platform.http.request_attributes_extractor" />
         </service>
 
-        <service id="api_platform.action.put_item" class="ApiPlatform\Core\Action\PutItemAction">
-            <argument type="service" id="api_platform.item_data_provider" />
+        <service id="api_platform.http.action.put_item" class="ApiPlatform\Core\Http\Action\PutItemAction">
+            <argument type="service" id="api_platform.http.item_data_provider" />
             <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.http.request_attributes_extractor" />
         </service>
 
-        <service id="api_platform.action.delete_item" alias="api_platform.action.get_item" />
+        <service id="api_platform.http.action.delete_item" alias="api_platform.action.get_item" />
     </services>
 
 </container>
