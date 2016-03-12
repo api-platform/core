@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ExceptionInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
@@ -28,7 +28,7 @@ interface CollectionDataProviderInterface
      * @param string|null $operationName
      *
      * @throws ResourceClassNotSupportedException
-     * @throws InvalidArgumentException
+     * @throws ExceptionInterface
      *
      * @return array|PaginatorInterface|\Traversable
      */
