@@ -60,6 +60,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('enable_nelmio_api_doc')->defaultTrue()->info('Enable the Nelmio Api doc integration.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()

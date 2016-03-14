@@ -42,10 +42,12 @@
     "phpdocumentor/reflection-docblock": "~3.0",
     "doctrine/orm": "~2.2,>=2.2.3",
     "doctrine/doctrine-bundle": "dev-property_info",
-    "php-mock/php-mock-phpunit": "~1.1"
+    "php-mock/php-mock-phpunit": "~1.1",
+    "nelmio/api-doc-bundle": "^2.11.2"
   },
   "suggest": {
-    "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge."
+    "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
+    "nelmio/api-doc-bundle": "To have the api sandbox & documentation."
   },
   "autoload": {
     "psr-4": { "ApiPlatform\\Core\\": "src/" }

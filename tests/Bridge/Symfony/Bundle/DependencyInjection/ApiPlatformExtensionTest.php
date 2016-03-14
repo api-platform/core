@@ -138,6 +138,20 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
     }
 
+    public function testEnableNelmioApiDoc()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => 'Doctrine\Bundle\DoctrineBundle\DoctrineBundle',
+            'NelmioApiDocBundle' => 'Nelmio\ApiDocBundle\NelmioApiDocBundle',
+        ])->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
+    }
+
     private function getContainerBuilderProphecy()
     {
         $definitionArgument = Argument::that(function ($argument) {

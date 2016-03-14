@@ -92,6 +92,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($config['enable_fos_user']) {
             $loader->load('fos_user.xml');
         }
+
+        // NelmioApiDoc support
+        if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
+            $loader->load('nelmio_api_doc.xml');
+        }
     }
 
     /**
