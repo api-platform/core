@@ -35,11 +35,11 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
             return;
         }
 
-        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
-        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
-
-        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
-        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
+        if ($container->hasDefinition('api_platform.doctrine.orm.collection_data_provider')) {
+            $this->handleOrm($container);
+        } elseif($container->hasDefinition('api_platform.doctrine.mongodb.collection_data_provider')) {
+            $this->handleMongoDB($container);
+        }
     }
 
     /**
@@ -63,5 +63,23 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
 
         // Flatten the array
         return empty($extensions) ? [] : call_user_func_array('array_merge', $extensions);
+    }
+
+    private function handleOrm(ContainerBuilder $container)
+    {
+        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
+
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
+    }
+
+    private function handleMongoDB(ContainerBuilder $container)
+    {
+        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.mongodb.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.mongodb.item_data_provider');
+
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.mongodb.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.mongodb.query_extension.item'));
     }
 }
