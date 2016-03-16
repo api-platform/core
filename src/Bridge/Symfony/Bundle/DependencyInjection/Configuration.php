@@ -35,6 +35,8 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('api_platform');
 
+        $supportedDrivers = array('orm', 'mongodb');
+
         $rootNode
             ->children()
                 ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
@@ -54,7 +56,15 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
-
+                ->scalarNode('db_driver')
+                    ->validate()
+                        ->ifNotInArray($supportedDrivers)
+                        ->thenInvalid('The driver %s is not supported. Please choose one of '.json_encode($supportedDrivers))
+                    ->end()
+                    ->cannotBeOverwritten()
+                    ->defaultValue('orm')
+                    ->cannotBeEmpty()
+                ->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()

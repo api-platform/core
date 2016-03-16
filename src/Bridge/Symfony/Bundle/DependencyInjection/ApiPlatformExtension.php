@@ -201,7 +201,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         // Doctrine ORM support
         if (isset($bundles['DoctrineBundle']) && class_exists(Version::class)) {
-            $loader->load('doctrine_orm.xml');
+            $loader->load(sprintf('doctrine_%s.xml', $config['db_driver']));
         }
 
         // FOSUser support
