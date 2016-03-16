@@ -208,6 +208,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc');
         }
 
+        //  Doctrine ORM support
+        if ($config['enable_doctrine_orm']) {
+            $loader->load('doctrine_orm.xml');
+        }
+
+        //  Doctrine MongoDB ODM support
+        if ($config['enable_doctrine_mongodb_odm']) {
+            $loader->load('doctrine_mongodb.xml');
+        }
+
         // FOSUser support
         if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
             $loader->load('fos_user.xml');
