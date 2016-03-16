@@ -19,7 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryResultExtensionInter
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface;
 
 /**
- * Collection data provider for the Doctrine ORM.
+ * Collection data provider for the Doctrine MongoDB ODM.
  */
 class CollectionDataProvider implements CollectionDataProviderInterface
 {

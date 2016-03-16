@@ -22,7 +22,7 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
 
 /**
- * Item data provider for the Doctrine MongoDB.
+ * Item data provider for the Doctrine MongoDB ODM.
  */
 class ItemDataProvider implements ItemDataProviderInterface
 {
