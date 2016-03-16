@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property;
 
-use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 
@@ -20,12 +20,12 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
  * Use Doctrine metadata to populate the identifier property.
  *
  */
-final class ItemMetadataFactory implements ItemMetadataFactoryInterface
+final class DoctrineMongoDBPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     private $decorated;
     private $managerRegistry;
 
-    public function __construct(ManagerRegistry $managerRegistry, ItemMetadataFactoryInterface $decorated)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyMetadataFactoryInterface $decorated)
     {
         $this->managerRegistry = $managerRegistry;
         $this->decorated = $decorated;
@@ -34,7 +34,7 @@ final class ItemMetadataFactory implements ItemMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : ItemMetadata
+    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
     {
         $itemMetadata = $this->decorated->create($resourceClass, $property, $options);
 

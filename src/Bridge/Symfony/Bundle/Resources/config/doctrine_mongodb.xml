@@ -54,7 +54,7 @@
 
         <!-- Metadata loader -->
 
-        <service id="api_platform.doctrine.mongodb.metadata.property.factory.item" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
+        <service id="api_platform.doctrine.mongodb.metadata.property.factory.item" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property\DoctrineMongoDBPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="api_platform.doctrine.mongodb.metadata.property.factory.item.inner" />
         </service>
