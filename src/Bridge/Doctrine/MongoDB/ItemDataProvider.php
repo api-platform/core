@@ -87,8 +87,7 @@ class ItemDataProvider implements ItemDataProviderInterface
         }
 
         if (!$fetchData || $manager instanceof DocumentManager) {
-            // @todo: Check potential problems with using the $id instead of $identifiers
-            return $manager->getReference($resourceClass, $id);
+            return $manager->getReference($resourceClass, $identifiers[0]);
         }
 
         /** @var DocumentRepository $repository */
