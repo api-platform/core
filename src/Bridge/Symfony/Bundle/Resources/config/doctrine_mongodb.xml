@@ -74,12 +74,12 @@
             <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
         <!--</service>-->
 
-        <!--<service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" public="false">-->
-            <!--<argument type="service" id="api_platform.metadata.resource.metadata_factory" />-->
-            <!--<argument type="service" id="api_platform.filters" />-->
+        <service id="api_platform.doctrine.mongodb.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.filters" />
 
-            <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
-        <!--</service>-->
+            <tag name="api_platform.doctrine.mongodb.query_extension.collection" />
+        </service>
 
         <service id="api_platform.doctrine.mongodb.query_extension.pagination" class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine_mongodb" />
