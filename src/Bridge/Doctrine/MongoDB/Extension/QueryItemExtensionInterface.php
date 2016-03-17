@@ -15,7 +15,7 @@ use Doctrine\ODM\MongoDB\Query\Builder;
 
 
 /**
- * Interface of Doctrine ORM query extensions for item queries.
+ * Interface of Doctrine Doctrine ODM query extensions for item queries.
  *
  * @author Maxime STEINHAUSSER <maxime.steinhausser@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>

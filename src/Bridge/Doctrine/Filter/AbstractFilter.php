@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
-abstract class AbstractFilter implements FilterInterface
+abstract class AbstractFilter
 {
     protected $managerRegistry;
     protected $requestStack;
