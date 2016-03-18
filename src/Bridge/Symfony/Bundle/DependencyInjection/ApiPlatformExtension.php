@@ -82,6 +82,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerAnnotationLoaders($container);
         $this->setUpMetadataCaching($container, $config);
 
+        if (!interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
+            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc');
+        }
+
         $bundles = $container->getParameter('kernel.bundles');
 
         // Doctrine ORM support
