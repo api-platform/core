@@ -59,8 +59,8 @@ trait ContextTrait
     private function createRelationContext(string $resourceClass, array $context) : array
     {
         $context['resource_class'] = $resourceClass;
-        unset($context['item_operation']);
-        unset($context['collection_operation']);
+        unset($context['item_operation_name']);
+        unset($context['collection_operation_name']);
 
         return $context;
     }
