@@ -14,7 +14,8 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Annotation\Property;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Util\Reflection;
+use ApiPlatform\Core\Metadata\Reflection\Reflection;
+use ApiPlatform\Core\Metadata\Reflection\ReflectionInterface;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -26,11 +27,13 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 {
     private $reader;
     private $decorated;
+    private $reflection;
 
-    public function __construct(Reader $reader, PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(Reader $reader, PropertyMetadataFactoryInterface $decorated = null, ReflectionInterface $reflection = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
+        $this->reflection = (null === $reflection) ? new Reflection() : $reflection;
     }
 
     /**
@@ -61,7 +64,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
             }
         }
 
-        foreach (array_merge(Reflection::ACCESSOR_PREFIXES, Reflection::MUTATOR_PREFIXES) as $prefix) {
+        foreach ($this->reflection->getPrefixes() as $prefix) {
             $methodName = $prefix.ucfirst($property);
 
             if (!$reflectionClass->hasMethod($methodName)) {
