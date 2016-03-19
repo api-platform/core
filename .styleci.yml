@@ -7,9 +7,3 @@ enabled:
 
 disabled:
   - unalign_equals
-
-finder:
-  path:
-    - features
-    - src
-    - tests
