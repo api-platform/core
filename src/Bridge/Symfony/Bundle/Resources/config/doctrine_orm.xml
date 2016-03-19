@@ -54,9 +54,9 @@
 
         <!-- Metadata loader -->
 
-        <service id="api_platform.doctrine.orm.metadata.property.factory.item" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
+        <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.metadata.property.factory.item.inner" />
+            <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
         </service>
 
         <!-- Event listener -->

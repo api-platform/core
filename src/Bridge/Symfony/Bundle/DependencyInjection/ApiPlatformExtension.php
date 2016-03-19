@@ -80,6 +80,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
+        $this->setUpMetadataCaching($container, $config);
 
         $bundles = $container->getParameter('kernel.bundles');
 
@@ -129,5 +130,36 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument($paths);
+    }
+
+    /**
+     * Sets up metadata caching.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    private function setUpMetadataCaching(ContainerBuilder $container, array $config)
+    {
+        $container->setAlias('api_platform.metadata.resource.cache', $config['metadata']['resource']['cache']);
+        $container->setAlias('api_platform.metadata.property.cache', $config['metadata']['property']['cache']);
+
+        if (!class_exists('Symfony\Component\Cache\Adapter\ArrayAdapter')) {
+            $container->removeDefinition('api_platform.metadata.resource.cache.array');
+            $container->removeDefinition('api_platform.metadata.resource.cache.apcu');
+            $container->removeDefinition('api_platform.metadata.property.cache.array');
+            $container->removeDefinition('api_platform.metadata.property.cache.apcu');
+        }
+
+        if (!$container->has($config['metadata']['resource']['cache'])) {
+            $container->removeAlias('api_platform.metadata.resource.cache');
+            $container->removeDefinition('api_platform.metadata.resource.name_collection_factory.cached');
+            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.cached');
+        }
+
+        if (!$container->has($config['metadata']['property']['cache'])) {
+            $container->removeAlias('api_platform.metadata.property.cache');
+            $container->removeDefinition('api_platform.metadata.property.name_collection_factory.cached');
+            $container->removeDefinition('api_platform.metadata.property.metadata_factory.cached');
+        }
     }
 }
