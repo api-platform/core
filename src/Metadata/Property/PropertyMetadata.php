@@ -60,7 +60,7 @@ final class PropertyMetadata
      *
      * @param Type $type
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withType(Type $type) : self
     {
@@ -85,7 +85,7 @@ final class PropertyMetadata
      *
      * @param string $description
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withDescription($description) : self
     {
@@ -110,7 +110,7 @@ final class PropertyMetadata
      *
      * @param bool $readable
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withReadable(bool $readable) : self
     {
@@ -135,7 +135,7 @@ final class PropertyMetadata
      *
      * @param bool $writable
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withWritable(bool $writable) : self
     {
@@ -160,7 +160,7 @@ final class PropertyMetadata
      *
      * @param bool $required
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withRequired(bool $required) : self
     {
@@ -185,7 +185,7 @@ final class PropertyMetadata
      *
      * @param bool $writableLink
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withWritableLink(bool $writableLink) : self
     {
@@ -210,7 +210,7 @@ final class PropertyMetadata
      *
      * @param bool $readableLink
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withReadableLink(bool $readableLink) : self
     {
@@ -235,7 +235,7 @@ final class PropertyMetadata
      *
      * @param string|null $iri
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withIri(string $iri = null) : self
     {
@@ -260,7 +260,7 @@ final class PropertyMetadata
      *
      * @param bool $identifier
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withIdentifier(bool $identifier) : self
     {
@@ -285,7 +285,7 @@ final class PropertyMetadata
      *
      * @param array $attributes
      *
-     * @return self
+     * @return PropertyMetadata
      */
     public function withAttributes(array $attributes) : self
     {

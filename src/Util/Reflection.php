@@ -37,6 +37,8 @@ class Reflection
         if (preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
             return $matches[2];
         }
+        
+        return null;
     }
 
     /**
@@ -56,5 +58,7 @@ class Reflection
         if ($parent = $reflectionClass->getParentClass()) {
             return $this->getReflectionProperty($parent, $attributeName);
         }
+        
+        //TODO: handle this case
     }
 }
