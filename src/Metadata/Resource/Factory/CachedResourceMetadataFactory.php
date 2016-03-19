@@ -38,7 +38,7 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
      */
     public function create(string $resourceClass) : ResourceMetadata
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.sha1(serialize([$resourceClass]));
+        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass]));
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);

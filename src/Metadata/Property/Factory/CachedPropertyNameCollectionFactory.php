@@ -38,7 +38,7 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
      */
     public function create(string $resourceClass, array $options = []) : PropertyNameCollection
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.sha1(serialize([$resourceClass, $options]));
+        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
