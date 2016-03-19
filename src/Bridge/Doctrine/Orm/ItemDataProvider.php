@@ -15,6 +15,7 @@ use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -45,13 +46,8 @@ class ItemDataProvider implements ItemDataProviderInterface
      * @param QueryItemExtensionInterface[]          $itemExtensions
      * @param ItemDataProviderInterface|null         $decoratedProvider
      */
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
-        PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        array $itemExtensions = [],
-        ItemDataProviderInterface $decoratedProvider = null
-    ) {
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decoratedProvider = null)
+    {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -81,8 +77,9 @@ class ItemDataProvider implements ItemDataProviderInterface
      * @param string|null $operationName
      * @param bool        $fetchData
      *
-     * @return object
      * @throws ResourceClassNotSupportedException
+     *
+     * @return object
      */
     private function fallbackGetItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
     {
@@ -106,8 +103,9 @@ class ItemDataProvider implements ItemDataProviderInterface
     /**
      * @param string $resourceClass
      *
-     * @return ObjectManager
      * @throws ResourceClassNotSupportedException
+     *
+     * @return ObjectManager
      */
     private function getManagerForClass(string $resourceClass)
     {
@@ -120,7 +118,7 @@ class ItemDataProvider implements ItemDataProviderInterface
     }
 
     /**
-     * @param string $resourceClass
+     * @param string     $resourceClass
      * @param int|string $id
      *
      * @return array Identifier values with keys as property names
@@ -154,24 +152,42 @@ class ItemDataProvider implements ItemDataProviderInterface
      * @param ObjectManager $resourceManager
      * @param string        $resourceClass
      *
+     * @throws RuntimeException
+     *
      * @return \Doctrine\ORM\QueryBuilder
      */
     private function retrieveQueryBuilder(ObjectManager $resourceManager, string $resourceClass)
     {
         $repository = $resourceManager->getRepository($resourceClass);
 
-        if ($repository instanceof  EntityRepository) {
+        if ($repository instanceof EntityRepository) {
             return $repository->createQueryBuilder('o');
         }
 
         if ($resourceManager instanceof EntityManagerInterface) {
-            // TODO: check if $resourceClass is good here
             return $resourceManager->createQueryBuilder()
                 ->select('o')
                 ->from($resourceClass, 'o');
         }
 
-        // TODO: handle this case
+        if (method_exists($repository, 'createQueryBuilder')) {
+            return $repository->createQueryBuilder('o');
+        }
+
+        if (method_exists($resourceManager, 'createQueryBuilder')) {
+            return $resourceManager->createQueryBuilder()
+                ->select('o')
+                ->from($resourceClass, 'o');
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'The object manager "%s" or resource manager "%s" of the resource "%s" must have a ::createQueryBuilder() method.',
+                get_class($resourceManager),
+                get_class($repository),
+                $resourceClass
+            )
+        );
     }
 
     private function applyIdentifiersToQueryBuilder(QueryBuilder $queryBuilder, array $identifiers)
