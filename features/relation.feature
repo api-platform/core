@@ -70,6 +70,7 @@ Feature: Relations support
       "@type": "Dummy",
       "description": null,
       "dummy": null,
+      "dummyBoolean":null,
       "dummyDate": null,
       "dummyPrice": null,
       "relatedDummy": "/related_dummies/1",
