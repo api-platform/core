@@ -220,6 +220,26 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is :nb dummy objects with dummyBoolean :bool
+     */
+    public function thereIsDummyObjectsWithDummyBoolean($nb, $bool)
+    {
+        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDescription($descriptions[($i - 1) % 2]);
+            $dummy->setDummyBoolean((bool) $bool);
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a RelationEmbedder object
      */
     public function thereIsARelationEmbedderObject()

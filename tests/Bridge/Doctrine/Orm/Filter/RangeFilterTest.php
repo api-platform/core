@@ -318,6 +318,31 @@ class RangeFilterTest extends KernelTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummyBoolean[between]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBoolean[gt]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBoolean[gte]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBoolean[lt]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBoolean[lte]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
