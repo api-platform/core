@@ -107,8 +107,7 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $decoratedNormalizerProphecy = $this
             ->prophesize(NormalizerInterface::class)
-            ->willImplement(SerializerAwareInterface::class)
-        ;
+            ->willImplement(SerializerAwareInterface::class);
         $decoratedNormalizerProphecy->setSerializer(Argument::type(SerializerInterface::class))->shouldBeCalled();
         $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
 

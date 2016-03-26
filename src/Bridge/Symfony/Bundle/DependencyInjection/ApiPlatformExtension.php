@@ -57,6 +57,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
+        if ($config['name_converter']) {
+            $container->setAlias('api_platform.name_converter', $config['name_converter']);
+        }
+
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.supported_formats', $supportedFormats);
@@ -76,15 +80,27 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
+        $this->setUpMetadataCaching($container, $config);
+
+        if (!interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
+            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc');
+        }
+
+        $bundles = $container->getParameter('kernel.bundles');
 
         // Doctrine ORM support
-        if (class_exists('Doctrine\ORM\Version')) {
+        if (isset($bundles['DoctrineBundle']) && class_exists('Doctrine\ORM\Version')) {
             $loader->load('doctrine_orm.xml');
         }
 
         // FOSUser support
         if ($config['enable_fos_user']) {
             $loader->load('fos_user.xml');
+        }
+
+        // NelmioApiDoc support
+        if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
+            $loader->load('nelmio_api_doc.xml');
         }
     }
 
@@ -117,6 +133,37 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
-        $container->getDefinition('api_platform.metadata.resource.factory.collection.annotation')->addArgument($paths);
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument($paths);
+    }
+
+    /**
+     * Sets up metadata caching.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    private function setUpMetadataCaching(ContainerBuilder $container, array $config)
+    {
+        $container->setAlias('api_platform.metadata.resource.cache', $config['metadata']['resource']['cache']);
+        $container->setAlias('api_platform.metadata.property.cache', $config['metadata']['property']['cache']);
+
+        if (!class_exists('Symfony\Component\Cache\Adapter\ArrayAdapter')) {
+            $container->removeDefinition('api_platform.metadata.resource.cache.array');
+            $container->removeDefinition('api_platform.metadata.resource.cache.apcu');
+            $container->removeDefinition('api_platform.metadata.property.cache.array');
+            $container->removeDefinition('api_platform.metadata.property.cache.apcu');
+        }
+
+        if (!$container->has($config['metadata']['resource']['cache'])) {
+            $container->removeAlias('api_platform.metadata.resource.cache');
+            $container->removeDefinition('api_platform.metadata.resource.name_collection_factory.cached');
+            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.cached');
+        }
+
+        if (!$container->has($config['metadata']['property']['cache'])) {
+            $container->removeAlias('api_platform.metadata.property.cache');
+            $container->removeDefinition('api_platform.metadata.property.name_collection_factory.cached');
+            $container->removeDefinition('api_platform.metadata.property.metadata_factory.cached');
+        }
     }
 }

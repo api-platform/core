@@ -14,8 +14,8 @@ namespace ApiPlatform\Core\JsonLd;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 
 /**
  * {@inheritdoc}
@@ -24,15 +24,15 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
  */
 final class EntrypointBuilder implements EntrypointBuilderInterface
 {
-    private $collectionMetadataFactory;
-    private $itemMetadataFactory;
+    private $resourceNameCollectionFactory;
+    private $resourceMetadataFactory;
     private $iriConverter;
     private $urlGenerator;
 
-    public function __construct(CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
     {
-        $this->collectionMetadataFactory = $collectionMetadataFactory;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;
     }
@@ -48,14 +48,14 @@ final class EntrypointBuilder implements EntrypointBuilderInterface
             '@type' => 'Entrypoint',
         ];
 
-        foreach ($this->collectionMetadataFactory->create() as $resourceClass) {
-            $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if (empty($itemMetadata->getCollectionOperations())) {
+            if (empty($resourceMetadata->getCollectionOperations())) {
                 continue;
             }
             try {
-                $entrypoint[lcfirst($itemMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+                $entrypoint[lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
             } catch (InvalidArgumentException $ex) {
                 // Ignore resources without GET operations
             }

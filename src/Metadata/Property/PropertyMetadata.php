@@ -18,7 +18,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadata
+final class PropertyMetadata
 {
     private $type;
     private $description;

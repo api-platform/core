@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\Property;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
-use ApiPlatform\Core\Metadata\Property\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
@@ -22,12 +22,12 @@ use Doctrine\Common\Annotations\Reader;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterface
+final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     private $reader;
     private $decorated;
 
-    public function __construct(Reader $reader, ItemMetadataFactoryInterface $decorated = null)
+    public function __construct(Reader $reader, PropertyMetadataFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
@@ -36,12 +36,12 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : ItemMetadata
+    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
     {
-        $parentItemMetadata = null;
+        $parentPropertyMetadata = null;
         if (isset($this->decorated)) {
             try {
-                $parentItemMetadata = $this->decorated->create($resourceClass, $property, $options);
+                $parentPropertyMetadata = $this->decorated->create($resourceClass, $property, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
                 // Ignore not found exception from decorated factories
             }
@@ -50,14 +50,14 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
-            return $this->handleNotFound($parentItemMetadata, $resourceClass, $property);
+            return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
 
         if ($reflectionClass->hasProperty($property)) {
             $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), Property::class);
 
             if (null !== $annotation) {
-                return $this->createMetadata($annotation, $parentItemMetadata);
+                return $this->createMetadata($annotation, $parentPropertyMetadata);
             }
         }
 
@@ -76,37 +76,37 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
 
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, Property::class);
             if (null !== $annotation) {
-                return $this->createMetadata($annotation, $parentItemMetadata);
+                return $this->createMetadata($annotation, $parentPropertyMetadata);
             }
         }
 
-        return $this->handleNotFound($parentItemMetadata, $resourceClass, $property);
+        return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
     }
 
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ItemMetadata|null $parentItemMetadata
-     * @param string            $resourceClass
-     * @param string            $property
-     *
-     * @return ItemMetadata
+     * @param PropertyMetadata|null $parentPropertyMetadata
+     * @param string                $resourceClass
+     * @param string                $property
      *
      * @throws PropertyNotFoundException
+     *
+     * @return PropertyMetadata
      */
-    private function handleNotFound(ItemMetadata $parentItemMetadata = null, string $resourceClass, string $property) : ItemMetadata
+    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property) : PropertyMetadata
     {
-        if (isset($parentItemMetadata)) {
-            return $parentItemMetadata;
+        if (isset($parentPropertyMetadata)) {
+            return $parentPropertyMetadata;
         }
 
         throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
-    private function createMetadata(Property $annotation, ItemMetadata $parentItemMetadata = null) : ItemMetadata
+    private function createMetadata(Property $annotation, PropertyMetadata $parentPropertyMetadata = null) : PropertyMetadata
     {
-        if (!$parentItemMetadata) {
-            return new ItemMetadata(
+        if (!$parentPropertyMetadata) {
+            return new PropertyMetadata(
                 null,
                 $annotation->description,
                 $annotation->readable,
@@ -120,25 +120,24 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
             );
         }
 
-        $itemMetadata = $parentItemMetadata;
+        $propertyMetadata = $parentPropertyMetadata;
         foreach (['description', 'readable', 'writable', 'readableLink', 'writableLink', 'required', 'iri', 'identifier', 'attributes'] as $property) {
-            $this->createWith($itemMetadata, $property, $annotation->$property);
+            $this->createWith($propertyMetadata, $property, $annotation->$property);
         }
 
-        return $itemMetadata;
+        return $propertyMetadata;
     }
 
-    private function createWith(ItemMetadata $itemMetadata, string $property, $value) : ItemMetadata
+    private function createWith(PropertyMetadata $propertyMetadata, string $property, $value) : PropertyMetadata
     {
-        $ucfirstedProperty = ucfirst($property);
-        $getter = 'get'.$ucfirstedProperty;
+        $getter = 'get'.ucfirst($property);
 
-        if (null !== $itemMetadata->$getter()) {
-            return $itemMetadata;
+        if (null !== $propertyMetadata->$getter()) {
+            return $propertyMetadata;
         }
 
-        $wither = 'with'.$ucfirstedProperty;
+        $wither = 'with'.ucfirst($property);
 
-        return $itemMetadata->$wither($value);
+        return $propertyMetadata->$wither($value);
     }
 }

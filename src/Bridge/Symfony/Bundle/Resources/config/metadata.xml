@@ -5,73 +5,115 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <!-- Resource collection -->
+        <!-- Resource name collection -->
 
-        <service id="api_platform.metadata.resource.factory.collection" alias="api_platform.metadata.resource.factory.collection.annotation" />
+        <service id="api_platform.metadata.resource.name_collection_factory" alias="api_platform.metadata.resource.name_collection_factory.annotation" />
 
-        <service id="api_platform.metadata.resource.factory.collection.annotation" class="ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataAnnotationFactory" public="false">
+        <service id="api_platform.metadata.resource.name_collection_factory.annotation" class="ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceNameCollectionFactory" public="false">
             <argument type="service" id="annotation_reader" />
         </service>
 
-        <!-- Resource item -->
+        <service id="api_platform.metadata.resource.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceNameCollectionFactory" decorates="api_platform.metadata.resource.name_collection_factory" decoration-priority="-1" public="false">
+            <argument type="service" id="api_platform.metadata.resource.cache" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory.cached.inner" />
+        </service>
 
-        <service id="api_platform.metadata.resource.factory.item" alias="api_platform.metadata.resource.factory.item.annotation" />
+        <!-- Resource metadata -->
 
-        <service id="api_platform.metadata.resource.factory.item.annotation" class="ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataAnnotationFactory" public="false">
+        <service id="api_platform.metadata.resource.metadata_factory" alias="api_platform.metadata.resource.metadata_factory.annotation" />
+
+        <service id="api_platform.metadata.resource.metadata_factory.annotation" class="ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceMetadataFactory" public="false">
             <argument type="service" id="annotation_reader" />
         </service>
 
-        <service id="api_platform.metadata.resource.factory.item.php_doc" class="ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataPhpDocFactory" decorates="api_platform.metadata.resource.factory.item" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.item.php_doc.inner" />
+        <service id="api_platform.metadata.resource.metadata_factory.php_doc" class="ApiPlatform\Core\Metadata\Resource\Factory\PhpDocResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.php_doc.inner" />
         </service>
 
-        <service id="api_platform.metadata.resource.factory.item.short_name" class="ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataShortNameFactory" decorates="api_platform.metadata.resource.factory.item" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.item.short_name.inner" />
+        <service id="api_platform.metadata.resource.metadata_factory.short_name" class="ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.short_name.inner" />
         </service>
 
-        <service id="api_platform.metadata.resource.factory.item.operation" class="ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataOperationFactory" decorates="api_platform.metadata.resource.factory.item" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.item.operation.inner" />
+        <service id="api_platform.metadata.resource.metadata_factory.operation" class="ApiPlatform\Core\Metadata\Resource\Factory\OperationResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.operation.inner" />
         </service>
 
-        <!-- Property collection -->
+        <service id="api_platform.metadata.resource.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="-1" public="false">
+            <argument type="service" id="api_platform.metadata.resource.cache" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.cached.inner" />
+        </service>
 
-        <service id="api_platform.metadata.property.factory.collection" alias="api_platform.metadata.property.factory.collection.property_info" />
+        <!-- Property name collection -->
+
+        <service id="api_platform.metadata.property.name_collection_factory" alias="api_platform.metadata.property.name_collection_factory.property_info" />
 
         <!--
         Not used, the PropertyInfo factory is preferred.
 
-        <service id="api_platform.metadata.property.factory.collection.annotation" class="ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataAnnotationFactory" public="false">
+        <service id="api_platform.metadata.property.name_collection_factory.annotation" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyNameCollectionFactory" public="false">
             <argument type="service" id="annotation_reader" />
         </service>
         -->
 
-        <service id="api_platform.metadata.property.factory.collection.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\CollectionMetadataFactory" public="false">
+        <service id="api_platform.metadata.property.name_collection_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory" public="false">
             <argument type="service" id="api_platform.property_info" />
         </service>
 
-        <!-- Property item -->
+        <service id="api_platform.metadata.property.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="-1" public="false">
+            <argument type="service" id="api_platform.metadata.property.cache" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory.cached.inner" />
+        </service>
 
-        <service id="api_platform.metadata.property.factory.item" alias="api_platform.metadata.property.factory.item.annotation" />
+        <!-- Property metadata -->
 
-        <service id="api_platform.metadata.property.factory.item.annotation" class="ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataAnnotationFactory" public="false">
+        <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.annotation" />
+
+        <service id="api_platform.metadata.property.metadata_factory.annotation" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory" public="false">
             <argument type="service" id="annotation_reader" />
         </service>
 
         <!-- The PropertyInfo decorator must always be the first decorator, it will create the metadata if it doesn't exist -->
-        <service id="api_platform.metadata.property.factory.item.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\ItemMetadataFactory" decorates="api_platform.metadata.property.factory.item" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
             <argument type="service" id="api_platform.property_info" />
-            <argument type="service" id="api_platform.metadata.property.factory.item.property_info.inner" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.property_info.inner" />
         </service>
 
-        <service id="api_platform.metadata.property.factory.item.serializer" class="ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataSerializerFactory" decorates="api_platform.metadata.property.factory.item" public="false">
-            <argument type="service" id="api_platform.metadata.resource.factory.item" />
+        <service id="api_platform.metadata.property.metadata_factory.serializer" class="ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
-            <argument type="service" id="api_platform.metadata.property.factory.item.serializer.inner" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.serializer.inner" />
         </service>
 
-        <service id="api_platform.metadata.property.factory.item.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ItemMetadataFactory" decorates="api_platform.metadata.property.factory.item" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" public="false">
             <argument type="service" id="validator" />
-            <argument type="service" id="api_platform.metadata.property.factory.item.validator.inner" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.validator.inner" />
+        </service>
+
+        <service id="api_platform.metadata.property.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="-1" public="false">
+            <argument type="service" id="api_platform.metadata.property.cache" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.inner" />
+        </service>
+
+        <!-- Cache -->
+
+        <service id="api_platform.metadata.resource.cache.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" public="false">
+            <argument>0</argument>
+            <argument>false</argument>
+        </service>
+
+        <service id="api_platform.metadata.resource.cache.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" public="false">
+            <argument>api_platform_metadata_resource</argument>
+            <argument>0</argument>
+        </service>
+
+        <service id="api_platform.metadata.property.cache.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" public="false">
+            <argument>0</argument>
+            <argument>false</argument>
+        </service>
+
+        <service id="api_platform.metadata.property.cache.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" public="false">
+            <argument>api_platform_metadata_property</argument>
+            <argument>0</argument>
         </service>
 
     </services>

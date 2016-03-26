@@ -9,26 +9,27 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
+use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 
 /**
- * Creates an item metadata value object.
+ * Creates a property name collection value object.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface ItemMetadataFactoryInterface
+interface PropertyNameCollectionFactoryInterface
 {
     /**
-     * Creates a resource item metadata.
+     * Creates the property name collection for the given class and options.
      *
      * @param string $resourceClass
-     *
-     * @return ItemMetadata
+     * @param array  $options
      *
      * @throws ResourceClassNotFoundException
+     *
+     * @return PropertyNameCollection
      */
-    public function create(string $resourceClass) : ItemMetadata;
+    public function create(string $resourceClass, array $options = []) : PropertyNameCollection;
 }

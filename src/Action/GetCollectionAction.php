@@ -37,9 +37,9 @@ final class GetCollectionAction
      *
      * @param Request $request
      *
-     * @return array|PaginatorInterface|\Traversable
-     *
      * @throws RuntimeException
+     *
+     * @return array|PaginatorInterface|\Traversable
      */
     public function __invoke(Request $request)
     {

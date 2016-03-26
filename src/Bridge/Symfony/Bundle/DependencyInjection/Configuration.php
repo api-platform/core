@@ -58,7 +58,9 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('enable_nelmio_api_doc')->defaultTrue()->info('Enable the Nelmio Api doc integration.')->end()
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -79,8 +81,24 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+                ->arrayNode('metadata')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('resource')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('cache')->defaultValue('api_platform.metadata.resource.cache.array')->cannotBeEmpty()->info('Cache service for resource metadata.')->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('property')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('cache')->defaultValue('api_platform.metadata.property.cache.array')->cannotBeEmpty()->info('Cache service for property metadata.')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

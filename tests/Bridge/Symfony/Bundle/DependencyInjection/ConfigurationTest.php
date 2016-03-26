@@ -34,7 +34,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'title' => 'title',
             'description' => 'description',
             'supported_formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
+            'name_converter' => null,
             'enable_fos_user' => false,
+            'enable_nelmio_api_doc' => true,
             'collection' => [
                 'order' => null,
                 'order_parameter_name' => 'order',
@@ -46,6 +48,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
+                ],
+            ],
+            'metadata' => [
+                'resource' => [
+                    'cache' => 'api_platform.metadata.resource.cache.array',
+                ],
+                'property' => [
+                    'cache' => 'api_platform.metadata.property.cache.array',
                 ],
             ],
         ], $config);

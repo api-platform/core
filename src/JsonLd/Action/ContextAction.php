@@ -12,8 +12,8 @@
 namespace ApiPlatform\Core\JsonLd\Action;
 
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -30,14 +30,14 @@ final class ContextAction
     ];
 
     private $contextBuilder;
-    private $collectionMetadataFactory;
-    private $itemMetadataFactory;
+    private $resourceNameCollectionFactory;
+    private $resourceMetadataFactory;
 
-    public function __construct(ContextBuilderInterface $contextBuilder, CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory)
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->contextBuilder = $contextBuilder;
-        $this->collectionMetadataFactory = $collectionMetadataFactory;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -46,9 +46,9 @@ final class ContextAction
      * @param Request $request
      * @param string  $shortName
      *
-     * @return array
-     *
      * @throws NotFoundHttpException
+     *
+     * @return array
      */
     public function __invoke(Request $request, string $shortName) : array
     {
@@ -62,10 +62,10 @@ final class ContextAction
             return ['@context' => $this->contextBuilder->getBaseContext()];
         }
 
-        foreach ($this->collectionMetadataFactory->create() as $resourceClass) {
-            $itemMetadata = $this->itemMetadataFactory->create($resourceClass);
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($shortName === $itemMetadata->getShortName()) {
+            if ($shortName === $resourceMetadata->getShortName()) {
                 return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)];
             }
         }

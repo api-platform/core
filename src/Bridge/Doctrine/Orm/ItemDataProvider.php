@@ -15,8 +15,8 @@ use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -29,23 +29,23 @@ use Doctrine\ORM\EntityManagerInterface;
 class ItemDataProvider implements ItemDataProviderInterface
 {
     private $managerRegistry;
-    private $collectionMetadataFactory;
-    private $itemMetadataFactory;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
     private $itemExtensions;
     private $decorated;
 
     /**
-     * @param ManagerRegistry                    $managerRegistry
-     * @param CollectionMetadataFactoryInterface $collectionMetadataFactory
-     * @param ItemMetadataFactoryInterface       $itemMetadataFactory
-     * @param QueryItemExtensionInterface[]      $itemExtensions
-     * @param ItemDataProviderInterface|null     $decorated
+     * @param ManagerRegistry                        $managerRegistry
+     * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
+     * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
+     * @param QueryItemExtensionInterface[]          $itemExtensions
+     * @param ItemDataProviderInterface|null         $decorated
      */
-    public function __construct(ManagerRegistry $managerRegistry, CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decorated = null)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->collectionMetadataFactory = $collectionMetadataFactory;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
         $this->decorated = $decorated;
     }
@@ -72,10 +72,10 @@ class ItemDataProvider implements ItemDataProviderInterface
         $identifiers = [];
         $i = 0;
 
-        foreach ($this->collectionMetadataFactory->create($resourceClass) as $propertyName) {
-            $itemMetadata = $this->itemMetadataFactory->create($resourceClass, $propertyName);
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            $identifier = $itemMetadata->isIdentifier();
+            $identifier = $propertyMetadata->isIdentifier();
             if (null === $identifier || false === $identifier) {
                 continue;
             }
@@ -100,8 +100,7 @@ class ItemDataProvider implements ItemDataProviderInterface
 
             $queryBuilder
                 ->where($queryBuilder->expr()->eq('o.'.$propertyName, ':'.$placeholder))
-                ->setParameter($placeholder, $value)
-            ;
+                ->setParameter($placeholder, $value);
         }
 
         foreach ($this->itemExtensions as $extension) {

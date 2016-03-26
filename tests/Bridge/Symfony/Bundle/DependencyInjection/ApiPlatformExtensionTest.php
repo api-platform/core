@@ -118,13 +118,57 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
+    public function testSetNameConverter()
+    {
+        $nameConverterId = 'test.name_converter';
+
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['name_converter' => $nameConverterId]]), $containerBuilder);
+    }
+
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
-        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_builder' => ['enable_fos_user' => true]]), $containerBuilder);
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
+    }
+
+    public function testEnableNelmioApiDoc()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => 'Doctrine\Bundle\DoctrineBundle\DoctrineBundle',
+            'NelmioApiDocBundle' => 'Nelmio\ApiDocBundle\NelmioApiDocBundle',
+        ])->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
+    }
+
+    public function testSetApcuMetadataCache()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->setAlias('api_platform.metadata.resource.cache', 'api_platform.metadata.resource.cache.apcu')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.metadata.resource.cache', 'api_platform.metadata.resource.cache.array')->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.metadata.property.cache', 'api_platform.metadata.property.cache.apcu')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.metadata.property.cache', 'api_platform.metadata.property.cache.array')->shouldNotBeCalled();
+        $containerBuilderProphecy->has('api_platform.metadata.resource.cache.apcu')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->has('api_platform.metadata.resource.cache.array')->shouldNotBeCalled();
+        $containerBuilderProphecy->has('api_platform.metadata.property.cache.apcu')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->has('api_platform.metadata.property.cache.array')->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['metadata' => [
+            'resource' => ['cache' => 'api_platform.metadata.resource.cache.apcu'],
+            'property' => ['cache' => 'api_platform.metadata.property.cache.apcu'],
+        ]]]), $containerBuilder);
     }
 
     private function getContainerBuilderProphecy()
@@ -134,7 +178,9 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         });
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([])->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => 'Doctrine\Bundle\DoctrineBundle\DoctrineBundle',
+        ])->shouldBeCalled();
 
         $parameters = [
             'api_platform.title' => 'title',
@@ -161,10 +207,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.serializer',
             'api_platform.property_accessor',
             'api_platform.property_info',
-            'api_platform.metadata.resource.factory.collection',
-            'api_platform.metadata.resource.factory.item',
-            'api_platform.metadata.property.factory.collection',
-            'api_platform.metadata.property.factory.item',
+            'api_platform.metadata.resource.name_collection_factory',
+            'api_platform.metadata.resource.metadata_factory',
+            'api_platform.metadata.property.name_collection_factory',
+            'api_platform.metadata.property.metadata_factory',
             'api_platform.item_data_provider',
             'api_platform.collection_data_provider',
             'api_platform.action.delete_item',
@@ -176,23 +222,30 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->addArgument([])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.factory.collection.annotation')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definition);
 
         $definitions = [
             'api_platform.filters',
             'api_platform.resource_class_resolver',
             'api_platform.operation_method_resolver',
-            'api_platform.metadata.resource.factory.collection.annotation',
-            'api_platform.metadata.resource.factory.item.annotation',
-            'api_platform.metadata.resource.factory.item.php_doc',
-            'api_platform.metadata.resource.factory.item.short_name',
-            'api_platform.metadata.resource.factory.item.operation',
-            'api_platform.metadata.property.factory.collection.property_info',
-            'api_platform.metadata.property.factory.item.annotation',
-            'api_platform.metadata.property.factory.item.property_info',
-            'api_platform.metadata.property.factory.item.serializer',
-            'api_platform.metadata.property.factory.item.validator',
-            'api_platform.metadata.resource.factory.collection.annotation',
+            'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.name_collection_factory.cached',
+            'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.php_doc',
+            'api_platform.metadata.resource.metadata_factory.short_name',
+            'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.resource.metadata_factory.cached',
+            'api_platform.metadata.resource.cache.array',
+            'api_platform.metadata.resource.cache.apcu',
+            'api_platform.metadata.property.name_collection_factory.property_info',
+            'api_platform.metadata.property.name_collection_factory.cached',
+            'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory.property_info',
+            'api_platform.metadata.property.metadata_factory.serializer',
+            'api_platform.metadata.property.metadata_factory.validator',
+            'api_platform.metadata.property.metadata_factory.cached',
+            'api_platform.metadata.property.cache.array',
+            'api_platform.metadata.property.cache.apcu',
             'api_platform.negotiator',
             'api_platform.route_loader',
             'api_platform.router',
@@ -214,7 +267,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.range_filter',
             'api_platform.doctrine.orm.default.collection_data_provider',
             'api_platform.doctrine.orm.default.item_data_provider',
-            'api_platform.doctrine.orm.metadata.property.factory.item',
+            'api_platform.doctrine.orm.metadata.property.metadata_factory',
             'api_platform.doctrine.orm.query_extension.eager_loading',
             'api_platform.doctrine.orm.query_extension.filter',
             'api_platform.doctrine.orm.query_extension.pagination',
@@ -245,12 +298,17 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $aliases = [
-            'api_platform.metadata.resource.factory.collection' => 'api_platform.metadata.resource.factory.collection.annotation',
+            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.cache' => 'api_platform.metadata.resource.cache.array',
+            'api_platform.metadata.property.cache' => 'api_platform.metadata.property.cache.array',
         ];
 
         foreach ($aliases as $alias => $service) {
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
+
+        $containerBuilderProphecy->has('api_platform.metadata.resource.cache.array')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->has('api_platform.metadata.property.cache.array')->willReturn(true)->shouldBeCalled();
 
         return $containerBuilderProphecy;
     }

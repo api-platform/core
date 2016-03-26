@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ExceptionInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
@@ -30,7 +30,7 @@ interface ItemDataProviderInterface
      * @param bool        $fetchData
      *
      * @throws ResourceClassNotSupportedException
-     * @throws InvalidArgumentException
+     * @throws ExceptionInterface
      *
      * @return object|null
      */

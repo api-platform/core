@@ -15,8 +15,8 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\Property\Factory\CollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\ItemMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -32,16 +32,16 @@ final class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
 
-    private $collectionMetadataFactory;
-    private $itemMetadataFactory;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
     private $itemDataProvider;
     private $router;
     private $propertyAccessor;
 
-    public function __construct(CollectionMetadataFactoryInterface $collectionMetadataFactory, ItemMetadataFactoryInterface $itemMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null)
     {
-        $this->collectionMetadataFactory = $collectionMetadataFactory;
-        $this->itemMetadataFactory = $itemMetadataFactory;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemDataProvider = $itemDataProvider;
         $this->router = $router;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
@@ -78,8 +78,8 @@ final class IriConverter implements IriConverterInterface
         $routeName = $this->getRouteName($resourceClass, false);
 
         $identifierValues = [];
-        foreach ($this->collectionMetadataFactory->create($resourceClass) as $propertyName) {
-            $propertyMetadata = $this->itemMetadataFactory->create($resourceClass, $propertyName);
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
             if ($propertyMetadata->isIdentifier()) {
                 $identifierValues[] = $this->propertyAccessor->getValue($item, $propertyName);
@@ -107,9 +107,9 @@ final class IriConverter implements IriConverterInterface
      * @param string $resourceClass
      * @param bool   $collection
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     private function getRouteName(string $resourceClass, bool $collection) : string
     {

@@ -13,22 +13,22 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\Resource;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\ItemMetadata;
 use ApiPlatform\Core\Metadata\Resource\Operation;
 use ApiPlatform\Core\Metadata\Resource\PaginationMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Parses Resource annotation and create an item metadata.
+ * Creates a resource metadata from {@see Resource} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterface
+final class AnnotationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $reader;
     private $decorated;
 
-    public function __construct(Reader $reader, ItemMetadataFactoryInterface $decorated = null)
+    public function __construct(Reader $reader, ResourceMetadataFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
@@ -37,12 +37,12 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ItemMetadata
+    public function create(string $resourceClass) : ResourceMetadata
     {
-        $parentItemMetadata = null;
+        $parentResourceMetadata = null;
         if ($this->decorated) {
             try {
-                $parentItemMetadata = $this->decorated->create($resourceClass);
+                $parentResourceMetadata = $this->decorated->create($resourceClass);
             } catch (ResourceClassNotFoundException $resourceNotFoundException) {
                 // Ignore not found exception from decorated factories
             }
@@ -51,40 +51,40 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
-            return $this->handleNotFound($parentItemMetadata, $resourceClass);
+            return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
         $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, Resource::class);
         if (null === $resourceAnnotation) {
-            return $this->handleNotFound($parentItemMetadata, $resourceClass);
+            return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
-        return $this->createMetadata($resourceAnnotation, $parentItemMetadata);
+        return $this->createMetadata($resourceAnnotation, $parentResourceMetadata);
     }
 
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ItemMetadata|null $parentMetadata
-     * @param string            $resourceClass
-     *
-     * @return ItemMetadata
+     * @param ResourceMetadata|null $parentPropertyMetadata
+     * @param string                $resourceClass
      *
      * @throws ResourceClassNotFoundException
+     *
+     * @return ResourceMetadata
      */
-    private function handleNotFound(ItemMetadata $parentMetadata = null, string $resourceClass) : ItemMetadata
+    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass) : ResourceMetadata
     {
-        if (null !== $parentMetadata) {
-            return $parentMetadata;
+        if (null !== $parentPropertyMetadata) {
+            return $parentPropertyMetadata;
         }
 
         throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
     }
 
-    private function createMetadata(Resource $annotation, ItemMetadata $parentItemMetadata = null) : ItemMetadata
+    private function createMetadata(Resource $annotation, ResourceMetadata $parentResourceMetadata = null) : ResourceMetadata
     {
-        if (!$parentItemMetadata) {
-            return new ItemMetadata(
+        if (!$parentResourceMetadata) {
+            return new ResourceMetadata(
                 $annotation->shortName,
                 $annotation->description,
                 $annotation->iri,
@@ -94,15 +94,15 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
             );
         }
 
-        $itemMetadata = $parentItemMetadata;
+        $resourceMetadata = $parentResourceMetadata;
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
-            $itemMetadata = $this->createWith($itemMetadata, $property, $annotation->$property);
+            $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
         }
 
-        $itemMetadata = $this->createWith($itemMetadata, 'collectionOperations', $this->createOperations($annotation->collectionOperations));
-        $itemMetadata = $this->createWith($itemMetadata, 'itemOperations', $this->createOperations($annotation->itemOperations));
+        $resourceMetadata = $this->createWith($resourceMetadata, 'collectionOperations', $this->createOperations($annotation->collectionOperations));
+        $resourceMetadata = $this->createWith($resourceMetadata, 'itemOperations', $this->createOperations($annotation->itemOperations));
 
-        return $itemMetadata;
+        return $resourceMetadata;
     }
 
     /**
@@ -145,23 +145,22 @@ final class ItemMetadataAnnotationFactory implements ItemMetadataFactoryInterfac
     /**
      * Creates a new instance of metadata if the property is not already set.
      *
-     * @param ItemMetadata $metadata
-     * @param string       $property
-     * @param mixed        $value
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $property
+     * @param mixed            $value
      *
-     * @return ItemMetadata
+     * @return ResourceMetadata
      */
-    private function createWith(ItemMetadata $metadata, string $property, $value) : ItemMetadata
+    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value) : ResourceMetadata
     {
-        $ucfirstedProperty = ucfirst($property);
-        $getter = 'get'.$ucfirstedProperty;
+        $getter = 'get'.ucfirst($property);
 
-        if (null !== $metadata->$getter()) {
-            return $metadata;
+        if (null !== $resourceMetadata->$getter()) {
+            return $resourceMetadata;
         }
 
-        $wither = 'with'.$ucfirstedProperty;
+        $wither = 'with'.ucfirst($property);
 
-        return $metadata->$wither($value);
+        return $resourceMetadata->$wither($value);
     }
 }

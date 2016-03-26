@@ -38,10 +38,10 @@ final class GetItemAction
      * @param Request    $request
      * @param string|int $id
      *
-     * @return mixed
-     *
      * @throws NotFoundHttpException
      * @throws RuntimeException
+     *
+     * @return mixed
      */
     public function __invoke(Request $request, $id)
     {
