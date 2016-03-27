@@ -60,6 +60,13 @@ class RelatedDummy extends ParentDummy
      */
     public $thirdLevel;
 
+    /**
+     * @var bool A dummy bool.
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    public $dummyBoolean;
+
     public function getId()
     {
         return $this->id;
@@ -93,5 +100,21 @@ class RelatedDummy extends ParentDummy
     public function getDummyDate()
     {
         return $this->dummyDate;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDummyBoolean()
+    {
+        return $this->dummyBoolean;
+    }
+
+    /**
+     * @param bool $dummyBoolean
+     */
+    public function setDummyBoolean($dummyBoolean)
+    {
+        $this->dummyBoolean = $dummyBoolean;
     }
 }

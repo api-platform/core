@@ -13,19 +13,18 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filter by a boolean value.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class BooleanFilter extends AbstractFilter
 {
-    /**
+    /*
      * @var RequestStack
      */
     private $requestStack;
@@ -62,7 +61,10 @@ class BooleanFilter extends AbstractFilter
             if (empty($boolean) && isset($this->properties[$property])) {
                 $boolean = $this->properties[$property];
             }
-            if (is_null(filter_var($boolean, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) && !empty($boolean)) {
+
+            $filterBoolean = filter_var($boolean, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+            if (is_null($filterBoolean) && !empty($boolean)) {
                 continue;
             }
 
@@ -82,11 +84,11 @@ class BooleanFilter extends AbstractFilter
 
                 $field = $propertyParts['field'];
             }
-            $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $boolean));
+            $valueParameter = QueryNameGenerator::generateParameterName($field);
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, filter_var($boolean, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+                ->setParameter($valueParameter, $filterBoolean);
         }
     }
 
@@ -118,14 +120,6 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function extractProperties(Request $request) : array
-    {
-        return $request->query->all();
-    }
-
-    /**
      * Determines whether the given property is a boolean or not.
      *
      * @param string $property
@@ -138,6 +132,6 @@ class BooleanFilter extends AbstractFilter
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
-        return 'boolean' == $metadata->getTypeOfField($propertyParts['field']) ? true : false;
+        return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);
     }
 }

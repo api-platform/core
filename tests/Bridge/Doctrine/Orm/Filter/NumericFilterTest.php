@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @author Théo FIDRY <theo.fidry@gmail.com>
- * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class NumericFilterTest extends KernelTestCase
@@ -132,28 +130,28 @@ class NumericFilterTest extends KernelTestCase
     public function filterProvider()
     {
         return [
-            // test with true value
+            // test with positive value
             [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
                 ],
                 [
-                    'id' => 21,
+                    'dummyPrice' => 21,
 
                 ],
-                sprintf('SELECT o FROM %s o where o.id = :id_equals_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
             ],
-            // test with false value
+            // test with negative value
             [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
                 ],
                 [
-                    'id' => -21,
+                    'dummyPrice' => -21,
                 ],
-                sprintf('SELECT o FROM %s o where o.id = :id_equals_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
             ],
-            // test with non-boolean value
+            // test with non-numeric value
             [
                 [
                     'properties' => ['id' => null],
@@ -171,30 +169,40 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'dummyPrice' => 0,
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_equals_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
             ],
-            // test with multiple 1 value
+            // test with nested properties.
             [
                 [
-                    'properties' => ['id' => null, 'name' => null],
+                    'properties' => ['id' => null, 'name' => null, 'relatedDummy.id' => null],
                 ],
                 [
-                   'id' => 10,
+                    'relatedDummy.id' => 0,
+                ],
+                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_123456abcdefg where relateddummy_123456abcdefg.id = :id_123456abcdefg', Dummy::class),
+            ],
+            // test with one correct and one wrong value
+            [
+                [
+                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
+                ],
+                [
+                   'dummyPrice' => 10,
                    'name' => '15toto',
                 ],
-                sprintf('SELECT o FROM %s o where o.id = :id_equals_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
             ],
             // test with numeric, non-numeric and inexisting field
             [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
                 ],
                 [
                     'toto' => 'toto',
                     'name' => 'gerard',
-                    'id' => '0',
+                    'dummyPrice' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.id = :id_equals_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
             ],
         ];
     }
