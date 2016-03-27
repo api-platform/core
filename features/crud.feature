@@ -116,7 +116,7 @@ Feature: Create-Retrieve-Update-Delete
       "hydra:totalItems": 1,
       "hydra:search": {
           "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte]}",
+          "hydra:template": "/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyPrice}",
           "hydra:variableRepresentation": "BasicRepresentation",
           "hydra:mapping": [
               {
@@ -244,7 +244,19 @@ Feature: Create-Retrieve-Update-Delete
                   "variable": "dummyPrice[lte]",
                   "property": "dummyPrice",
                   "required": false
-              }
+              },
+              {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyBoolean",
+                  "property": "dummyBoolean",
+                  "required": false
+               },
+               {
+                  "@type": "IriTemplateMapping",
+                  "variable": "dummyPrice",
+                   "property": "dummyPrice",
+                   "required": false
+               }
           ]
       }
     }

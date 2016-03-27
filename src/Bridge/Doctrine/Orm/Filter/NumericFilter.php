@@ -13,31 +13,31 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filter by a numeric value.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class NumericFilter extends AbstractFilter
 {
-    /*
-     * Type of numeric in Doctrine see http://doctrine-orm.readthedocs.org/projects/doctrine-dbal/en/latest/reference/types.html
+    /**
+     * Type of numeric in Doctrine.
+     *
+     * @see http://doctrine-orm.readthedocs.org/projects/doctrine-dbal/en/latest/reference/types.html
      */
     const DOCTRINE_NUMERIC_TYPES = [
-        'bigint' => true,
-        'smallint' => true,
-        'integer' => true,
-        'time' => true,
-        'decimal' => true,
-        'float' => true,
+        DBALType::BIGINT => true,
+        DBALType::DECIMAL => true,
+        DBALType::FLOAT => true,
+        DBALType::INTEGER => true,
+        DBALType::SMALLINT => true,
     ];
 
-    /**
+    /*
      * @var RequestStack
      */
     private $requestStack;
@@ -93,7 +93,7 @@ class NumericFilter extends AbstractFilter
 
                 $field = $propertyParts['field'];
             }
-            $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, 'equals'));
+            $valueParameter = QueryNameGenerator::generateParameterName($field);
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
@@ -114,7 +114,7 @@ class NumericFilter extends AbstractFilter
         }
 
         foreach ($properties as $property => $numerical) {
-            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isNumericalField($property, $resourceClass)) {
+            if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isNumericField($property, $resourceClass)) {
                 continue;
             }
             $propertyParts = $this->splitPropertyParts($property);
@@ -131,22 +131,14 @@ class NumericFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function extractProperties(Request $request) : array
-    {
-        return $request->query->all();
-    }
-
-    /**
-     * Determines whether the given property is a numerical or not.
+     * Determines whether the given property is a numeric or not.
      *
      * @param string $property
      * @param string $resourceClass
      *
      * @return bool
      */
-    private function isNumericalField(string $property, string $resourceClass) : bool
+    private function isNumericField(string $property, string $resourceClass) : bool
     {
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);

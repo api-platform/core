@@ -24,7 +24,7 @@ Feature: Ignore unknown attributes
       "@type": "Dummy",
       "description": null,
       "dummy": null,
-      "dummyBoolean":null,
+      "dummyBoolean": null,
       "dummyDate": null,
       "dummyPrice": null,
       "relatedDummy": null,

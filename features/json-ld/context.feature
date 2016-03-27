@@ -23,12 +23,11 @@ Feature: JSON-LD contexts generation
       "customIdentifierDummy": "/custom_identifier_dummies",
       "customNormalizedDummy": "/custom_normalized_dummies",
       "customWritableIdentifierDummy": "/custom_writable_identifier_dummies",
-      "relatedDummy": "/related_dummies",
       "relationEmbedder": "/relation_embedders",
       "thirdLevel": "/third_levels",
       "user": "/users",
-      "dummy": "/dummies"
-
+      "dummy": "/dummies",
+      "relatedDummy": "/related_dummies"
     }
     """
 
@@ -45,7 +44,7 @@ Feature: JSON-LD contexts generation
               "hydra": "http://www.w3.org/ns/hydra/core#",
               "description": "https://schema.org/description",
               "dummy": "#Dummy/dummy",
-              "dummyBoolean":"#Dummy/dummyBoolean",
+              "dummyBoolean": "#Dummy/dummyBoolean",
               "dummyDate": "#Dummy/dummyDate",
               "dummyPrice": "#Dummy/dummyPrice",
               "relatedDummy": {
