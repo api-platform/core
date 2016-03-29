@@ -31,6 +31,21 @@ class OperationFactory
     private static $inflectorCache = [];
 
     /**
+     * @var string
+     */
+    private $defaultController = self::DEFAULT_CONTROLLER;
+
+    /**
+     * Sets the name of the default controller to use.
+     *
+     * @param string $defaultController
+     */
+    public function setDefaultController($defaultController)
+    {
+        $this->defaultController = $defaultController;
+    }
+
+    /**
      * Creates collection operation.
      *
      * @param ResourceInterface $resource
@@ -134,7 +149,7 @@ class OperationFactory
                 $defaultAction = 'c'.$defaultAction;
             }
 
-            $controller = self::DEFAULT_CONTROLLER.':'.$defaultAction;
+            $controller = $this->defaultController.':'.$defaultAction;
 
             // Populate route name
             if (null === $routeName) {
