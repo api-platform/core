@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 beta 2
+
+* Allow to configure the default controller to use
+* Ability to add route requirements
+* Add a range filter
+* Search filter: add a case sensitivity setting
+* Search filter: fix the behavior of the search filter when 0 is provided as value
+* Search filter: allow to use identifiers different than id
+* Exclude tests from classmap
+* Fix some deprecations and tests
+
 ## 1.1.0 beta 1
 
 * Support Symfony 3.0
