@@ -105,8 +105,7 @@ abstract class QueryNameGenerator
 
         $rootMetadata = $managerRegistry
             ->getManagerForClass($rootEntity)
-            ->getClassMetadata($rootEntity)
-        ;
+            ->getClassMetadata($rootEntity);
 
         $metadata = $rootMetadata;
 
@@ -115,8 +114,7 @@ abstract class QueryNameGenerator
 
             $metadata = $managerRegistry
                 ->getManagerForClass($associationClass)
-                ->getClassMetadata($associationClass)
-            ;
+                ->getClassMetadata($associationClass);
         }
 
         return $metadata;

@@ -47,7 +47,6 @@ class CustomResource implements ResourceInterface
 
     public function getNormalizationGroups()
     {
-        return;
     }
 
     public function getDenormalizationContext()
@@ -57,12 +56,10 @@ class CustomResource implements ResourceInterface
 
     public function getDenormalizationGroups()
     {
-        return;
     }
 
     public function getValidationGroups()
     {
-        return;
     }
 
     public function getShortName()

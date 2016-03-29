@@ -37,9 +37,9 @@ trait ResourceResolverTrait
      * @param array|null $context
      * @param bool       $strict
      *
-     * @return ResourceInterface
-     *
      * @throws InvalidArgumentException
+     *
+     * @return ResourceInterface
      */
     public function guessResource($object, array $context = null, $strict = false)
     {

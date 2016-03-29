@@ -36,9 +36,9 @@ interface ClassMetadataFactoryInterface
      * @param string[]|null $denormalizationGroups
      * @param string[]|null $validationGroups
      *
-     * @return ClassMetadataInterface
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return ClassMetadataInterface
      */
     public function getMetadataFor($value, array $normalizationGroups = null, array $denormalizationGroups = null, array $validationGroups = null);
 
