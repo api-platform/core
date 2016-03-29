@@ -47,8 +47,7 @@ abstract class QueryChecker
         foreach ($queryBuilder->getRootEntities() as $rootEntity) {
             $rootMetadata = $managerRegistry
                 ->getManagerForClass($rootEntity)
-                ->getClassMetadata($rootEntity)
-            ;
+                ->getClassMetadata($rootEntity);
 
             if ($rootMetadata->containsForeignIdentifier) {
                 return true;

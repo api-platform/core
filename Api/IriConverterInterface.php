@@ -27,9 +27,9 @@ interface IriConverterInterface
      * @param string $iri
      * @param bool   $fetchData
      *
-     * @return object|null
-     *
      * @throws InvalidArgumentException
+     *
+     * @return object|null
      */
     public function getItemFromIri($iri, $fetchData = false);
 
@@ -39,9 +39,9 @@ interface IriConverterInterface
      * @param object $item
      * @param bool   $referenceType
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function getIriFromItem($item, $referenceType = RouterInterface::ABSOLUTE_PATH);
 
@@ -51,9 +51,9 @@ interface IriConverterInterface
      * @param ResourceInterface $resource
      * @param bool              $referenceType
      *
-     * @return string
-     *
      * @throws InvalidArgumentException
+     *
+     * @return string
      */
     public function getIriFromResource(ResourceInterface $resource, $referenceType = RouterInterface::ABSOLUTE_PATH);
 }

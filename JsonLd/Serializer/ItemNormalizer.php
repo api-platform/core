@@ -322,9 +322,9 @@ class ItemNormalizer extends AbstractNormalizer
      * @param mixed                      $value
      * @param array                      $context
      *
-     * @return object|null
-     *
      * @throws InvalidArgumentException
+     *
+     * @return object|null
      */
     private function denormalizeRelation(
         ResourceInterface $currentResource,

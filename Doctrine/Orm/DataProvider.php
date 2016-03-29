@@ -112,8 +112,7 @@ class DataProvider implements DataProviderInterface
         $queryBuilder = $repository
             ->createQueryBuilder('o')
             ->setFirstResult(($page - 1) * $itemsPerPage)
-            ->setMaxResults($itemsPerPage)
-        ;
+            ->setMaxResults($itemsPerPage);
 
         foreach ($resource->getFilters() as $filter) {
             if ($filter instanceof FilterInterface) {

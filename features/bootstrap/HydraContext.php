@@ -180,9 +180,9 @@ class HydraContext implements Context
      * @param string $propertyName
      * @param string $className
      *
-     * @return array
-     *
      * @throws Exception
+     *
+     * @return array
      */
     private function getProperty($propertyName, $className)
     {
@@ -207,9 +207,9 @@ class HydraContext implements Context
      * @param string $className
      * @param string $method
      *
-     * @return array
-     *
      * @throws Exception
+     *
+     * @return array
      */
     private function getOperation($method, $className)
     {
@@ -227,9 +227,9 @@ class HydraContext implements Context
      *
      * @param string $className
      *
-     * @return array
-     *
      * @throws Exception
+     *
+     * @return array
      */
     private function getOperations($className)
     {
@@ -243,9 +243,9 @@ class HydraContext implements Context
      *
      * @param string $className
      *
-     * @return array
-     *
      * @throws Exception
+     *
+     * @return array
      */
     private function getProperties($className)
     {
@@ -259,9 +259,9 @@ class HydraContext implements Context
      *
      * @param string $className
      *
-     * @return array
-     *
      * @throws Exception
+     *
+     * @return array
      */
     private function getClassInfos($className)
     {

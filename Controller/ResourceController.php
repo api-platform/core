@@ -43,9 +43,9 @@ class ResourceController extends Controller
      *
      * @param Request $request
      *
-     * @return ResourceInterface
-     *
      * @throws InvalidArgumentException
+     *
+     * @return ResourceInterface
      */
     protected function getResource(Request $request)
     {
@@ -108,9 +108,9 @@ class ResourceController extends Controller
      * @param ResourceInterface $resource
      * @param string|int        $id
      *
-     * @return object
-     *
      * @throws NotFoundHttpException
+     *
+     * @return object
      */
     protected function findOrThrowNotFound(ResourceInterface $resource, $id)
     {
@@ -140,9 +140,9 @@ class ResourceController extends Controller
      *
      * @param Request $request
      *
-     * @return Response
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return Response
      */
     public function cgetAction(Request $request)
     {
@@ -166,9 +166,9 @@ class ResourceController extends Controller
      *
      * @param Request $request
      *
-     * @return Response
-     *
      * @throws DeserializationException
+     *
+     * @return Response
      */
     public function cpostAction(Request $request)
     {
@@ -205,10 +205,10 @@ class ResourceController extends Controller
      * @param Request $request
      * @param int     $id
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      * @throws \InvalidArgumentException
+     *
+     * @return Response
      */
     public function getAction(Request $request, $id)
     {
@@ -226,9 +226,9 @@ class ResourceController extends Controller
      * @param Request $request
      * @param string  $id
      *
-     * @return Response
-     *
      * @throws DeserializationException
+     *
+     * @return Response
      */
     public function putAction(Request $request, $id)
     {
@@ -270,10 +270,10 @@ class ResourceController extends Controller
      * @param Request $request
      * @param string  $id
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      * @throws \InvalidArgumentException
+     *
+     * @return Response
      */
     public function deleteAction(Request $request, $id)
     {
