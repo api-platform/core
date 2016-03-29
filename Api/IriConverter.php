@@ -142,11 +142,11 @@ class IriConverter implements IriConverterInterface
         }
 
         if ($resource instanceof RoutedResourceInterface) {
-            $method    = 'get'.ucfirst($key);
+            $method = 'get'.ucfirst($key);
             $routeName = $resource->$method();
             if ($routeName) {
-                $data                        = $this->routeCache[$resource];
-                $data[$key]                  = $routeName;
+                $data = $this->routeCache[$resource];
+                $data[$key] = $routeName;
                 $this->routeCache[$resource] = $data;
 
                 return $data[$key];

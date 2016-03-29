@@ -58,8 +58,7 @@ abstract class AbstractFilter implements FilterInterface
         return $this
             ->managerRegistry
             ->getManagerForClass($entityClass)
-            ->getClassMetadata($entityClass)
-        ;
+            ->getClassMetadata($entityClass);
     }
 
     /**
@@ -132,8 +131,7 @@ abstract class AbstractFilter implements FilterInterface
                 $metadata = $this
                     ->managerRegistry
                     ->getManagerForClass($associationClass)
-                    ->getClassMetadata($associationClass)
-                ;
+                    ->getClassMetadata($associationClass);
             }
         }
 

@@ -199,8 +199,7 @@ class SearchFilter extends AbstractFilter
                 $queryBuilder
                     ->join(sprintf('%s.%s', $alias, $association), $associationAlias)
                     ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $propertyIdentifier, $valuesParameter))
-                    ->setParameter($valuesParameter, $filteredValues)
-                ;
+                    ->setParameter($valuesParameter, $filteredValues);
             }
         }
     }
@@ -214,9 +213,9 @@ class SearchFilter extends AbstractFilter
      * @param string       $field
      * @param string       $value
      *
-     * @return string
-     *
      * @throws InvalidArgumentException If strategy does not exist
+     *
+     * @return string
      */
     private function addWhereByStrategy($strategy, QueryBuilder $queryBuilder, $alias, $field, $value)
     {
@@ -349,9 +348,9 @@ class SearchFilter extends AbstractFilter
      *
      * @param ClassMetadata $metadata
      *
-     * @return string
-     *
      * @throws RuntimeException
+     *
+     * @return string
      */
     private function getIdentifierFieldName(ClassMetadata $metadata)
     {
