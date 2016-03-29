@@ -21,6 +21,7 @@ install:
   - echo memory_limit=1G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
   - php -r "readfile('http://getcomposer.org/installer');" | php
+  - php composer.phar require "ocramius/proxy-manager:~1.0" --no-update
   - php composer.phar install --no-interaction --no-progress
   - appveyor DownloadFile https://phar.phpunit.de/phpunit.phar
 

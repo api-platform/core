@@ -18,7 +18,7 @@
     "symfony/validator": "~2.5|~3.0",
     "symfony/framework-bundle": "~2.6|~3.0",
     "symfony/proxy-manager-bridge": "~2.3|~3.0",
-    "ocramius/proxy-manager": "~1.0",
+    "ocramius/proxy-manager": "~1.0|~2.0",
     "doctrine/inflector": "~1.0",
     "dunglas/php-property-info": "~0.2",
     "phpdocumentor/reflection": "^1.0.7"
