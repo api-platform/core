@@ -43,25 +43,6 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
     }
 
-    public function testNormalizeDoesNotTotalItemsWhenFilterApplied()
-    {
-        $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedNormalizerProphecy->normalize(Argument::any(), null, Argument::type('array'))->willReturn(['hydra:totalItems' => 40, 'foo' => 'bar'])->shouldBeCalled();
-        $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
-
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizer);
-        $this->assertEquals(
-            [
-                'foo' => 'bar',
-                'hydra:view' => [
-                    '@id' => '/?baz=22',
-                    '@type' => 'hydra:PartialCollectionView',
-                ],
-            ],
-            $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?baz=22'])
-        );
-    }
-
     public function testNormalizePaginator()
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
