@@ -67,11 +67,6 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Seri
             return $data;
         }
 
-        if ([] !== $appliedFilters) {
-            // Don't display a false result, and don't retrieve the size of the whole collection for performance
-            unset($data['hydra:totalItems']);
-        }
-
         $data['hydra:view'] = [
             '@id' => $this->getId($parts, $parameters, $paginated ? $currentPage : null),
             '@type' => 'hydra:PartialCollectionView',
