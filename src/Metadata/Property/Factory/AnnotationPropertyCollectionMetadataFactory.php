@@ -14,7 +14,8 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Annotation\Property;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Util\Reflection;
+use ApiPlatform\Core\Metadata\Reflection\Reflection;
+use ApiPlatform\Core\Metadata\Reflection\ReflectionInterface;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -28,11 +29,11 @@ final class AnnotationPropertyCollectionMetadataFactory implements PropertyNameC
     private $decorated;
     private $reflection;
 
-    public function __construct(Reader $reader, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(Reader $reader, PropertyNameCollectionFactoryInterface $decorated = null, ReflectionInterface $reflection = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
-        $this->reflection = new Reflection();
+        $this->reflection = (null === $reflection) ? new Reflection() : $reflection;
     }
 
     /**
