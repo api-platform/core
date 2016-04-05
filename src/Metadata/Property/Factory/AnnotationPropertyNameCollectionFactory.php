@@ -22,7 +22,7 @@ use Doctrine\Common\Annotations\Reader;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class AnnotationPropertyCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
+final class AnnotationPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     private $reader;
     private $decorated;
