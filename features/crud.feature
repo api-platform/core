@@ -74,6 +74,10 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  Scenario: Get a resource that does not exist
+    When I send a "GET" request to "/dummies/9999"
+    Then the response status code should be 404
+
   Scenario: Get a collection
     When I send a "GET" request to "/dummies"
     Then the response status code should be 200
