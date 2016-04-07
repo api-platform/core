@@ -130,7 +130,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'id[]' => [
+                'property' => 'id',
+                'type' => 'integer',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'name[]' => [
                 'property' => 'name',
                 'type' => 'string',
                 'required' => false,
@@ -142,7 +154,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'alias[]' => [
+                'property' => 'alias',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'description' => [
+                'property' => 'description',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'description[]' => [
                 'property' => 'description',
                 'type' => 'string',
                 'required' => false,
@@ -154,7 +178,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'dummy[]' => [
+                'property' => 'dummy',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'dummyDate' => [
+                'property' => 'dummyDate',
+                'type' => 'datetime',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'dummyDate[]' => [
                 'property' => 'dummyDate',
                 'type' => 'datetime',
                 'required' => false,
@@ -166,13 +202,31 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'dummyPrice[]' => [
+                'property' => 'dummyPrice',
+                'type' => 'decimal',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'jsonData' => [
                 'property' => 'jsonData',
                 'type' => 'json_array',
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'jsonData[]' => [
+                'property' => 'jsonData',
+                'type' => 'json_array',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'nameConverted' => [
+                'property' => 'nameConverted',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'nameConverted[]' => [
                 'property' => 'nameConverted',
                 'type' => 'string',
                 'required' => false,
@@ -205,7 +259,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'id[]' => [
+                'property' => 'id',
+                'type' => 'integer',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'name[]' => [
                 'property' => 'name',
                 'type' => 'string',
                 'required' => false,
@@ -217,7 +283,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'alias[]' => [
+                'property' => 'alias',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'dummy' => [
+                'property' => 'dummy',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'dummy[]' => [
                 'property' => 'dummy',
                 'type' => 'string',
                 'required' => false,
@@ -229,7 +307,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'dummyDate[]' => [
+                'property' => 'dummyDate',
+                'type' => 'datetime',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'jsonData' => [
+                'property' => 'jsonData',
+                'type' => 'json_array',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'jsonData[]' => [
                 'property' => 'jsonData',
                 'type' => 'json_array',
                 'required' => false,
@@ -241,7 +331,19 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'nameConverted[]' => [
+                'property' => 'nameConverted',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'relatedDummies.dummyDate' => [
+                'property' => 'relatedDummies.dummyDate',
+                'type' => 'datetime',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'relatedDummies.dummyDate[]' => [
                 'property' => 'relatedDummies.dummyDate',
                 'type' => 'datetime',
                 'required' => false,
