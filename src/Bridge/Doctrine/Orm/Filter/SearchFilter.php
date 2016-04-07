@@ -113,15 +113,37 @@ class SearchFilter extends AbstractFilter
             }
 
             if ($metadata->hasField($field)) {
-                if (!is_string($value)) {
+                $values = (array) $value;
+                foreach ($values as $k => $v) {
+                    if (!is_int($k) || !is_string($v)) {
+                        unset($values[$k]);
+                    }
+                }
+                $values = array_values($values);
+
+                if (empty($values)) {
                     continue;
                 }
 
                 if ('id' === $field) {
-                    $value = $this->getFilterValueFromUrl($value);
+                    $values = array_map([$this, 'getFilterValueFromUrl'], $values);
                 }
 
-                $this->addWhereByStrategy($this->properties[$property] ?? self::STRATEGY_EXACT, $queryBuilder, $alias, $field, $value);
+                $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
+
+                if (1 === count($values)) {
+                    $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $values[0]);
+                } else {
+                    if (self::STRATEGY_EXACT !== $strategy) {
+                        continue;
+                    }
+
+                    $valueParameter = QueryNameGenerator::generateParameterName($field);
+
+                    $queryBuilder
+                        ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                        ->setParameter($valueParameter, $values);
+                }
             } elseif ($metadata->hasAssociation($field)) {
                 $values = (array) $value;
                 foreach ($values as $k => $v) {
@@ -167,43 +189,47 @@ class SearchFilter extends AbstractFilter
      * @param string       $value
      *
      * @throws InvalidArgumentException If strategy does not exist
-     *
-     * @return string
      */
-    private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, string $alias, string $field, string $value) : string
+    private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, string $alias, string $field, string $value)
     {
         $valueParameter = QueryNameGenerator::generateParameterName($field);
 
         switch ($strategy) {
             case null:
             case self::STRATEGY_EXACT:
-                return $queryBuilder
+                $queryBuilder
                     ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
+                break;
 
             case self::STRATEGY_PARTIAL:
-                return $queryBuilder
+                $queryBuilder
                     ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, sprintf('%%%s%%', $value));
+                break;
 
             case self::STRATEGY_START:
-                return $queryBuilder
+                $queryBuilder
                     ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, sprintf('%s%%', $value));
+                break;
 
             case self::STRATEGY_END:
-                return $queryBuilder
+                $queryBuilder
                     ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, sprintf('%%%s', $value));
+                break;
 
             case self::STRATEGY_WORD_START:
-                return $queryBuilder
+                $queryBuilder
                     ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_1 OR %1$s.%2$s LIKE :%3$s_2', $alias, $field, $valueParameter))
                     ->setParameter(sprintf('%s_1', $valueParameter), sprintf('%s%%', $value))
                     ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value));
-        }
+                break;
 
-        throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
+            default:
+                throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
+        }
     }
 
     /**
@@ -233,22 +259,30 @@ class SearchFilter extends AbstractFilter
             }
 
             if ($metadata->hasField($field)) {
-                $description[$property] = [
-                    'property' => $property,
-                    'type' => $metadata->getTypeOfField($field),
-                    'required' => false,
-                    'strategy' => isset($this->properties[$property]) ? $this->properties[$property] : self::STRATEGY_EXACT,
+                $typeOfField = $metadata->getTypeOfField($field);
+                $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
+                $filterParameterNames = [
+                    $property,
                 ];
+                if (self::STRATEGY_EXACT === $strategy) {
+                    $filterParameterNames[] = $property.'[]';
+                }
+                foreach ($filterParameterNames as $filterParameterName) {
+                    $description[$filterParameterName] = [
+                        'property' => $property,
+                        'type' => $typeOfField,
+                        'required' => false,
+                        'strategy' => $strategy,
+                    ];
+                }
             } elseif ($metadata->hasAssociation($field)) {
                 $association = $field;
-                $description[$property] = [
-                    'property' => $property,
-                    'type' => 'iri',
-                    'required' => false,
-                    'strategy' => self::STRATEGY_EXACT,
+                $filterParameterNames = [
+                    $property,
+                    $property.'[]',
                 ];
-                if ($metadata->hasAssociation($association)) {
-                    $description[$property.'[]'] = [
+                foreach ($filterParameterNames as $filterParameterName) {
+                    $description[$filterParameterName] = [
                         'property' => $property,
                         'type' => 'iri',
                         'required' => false,
