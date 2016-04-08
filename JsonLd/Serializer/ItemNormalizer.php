@@ -132,8 +132,11 @@ class ItemNormalizer extends AbstractNormalizer
         {
             $classMetadata = $this->getMetadataForEmbedded($object, $context);
             $iriFromItem = $this->iriConverter->getIriFromItem($object);
-            if($iriFromItem) {
-                $data = $iriFromItem;
+            if($iriFromItem)
+            {
+                $subResource = $this->guessResource($object, null, true);
+                $data['@id'] = $iriFromItem;
+                $data['@type'] = ($iri = $classMetadata->getIri()) ? $iri : $subResource->getShortName();
             }
         }
 
