@@ -214,6 +214,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -266,11 +267,18 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             'relatedDummy' => [
-                'dataType' => null,
+                'dataType' => 'IRI',
                 'required' => false,
                 'description' => 'A related dummy.',
                 'readonly' => false,
-                'actualType' => DataTypes::MODEL,
+                'actualType' => DataTypes::STRING,
+            ],
+            'relatedDummies' => [
+                'dataType' => null,
+                'required' => false,
+                'description' => 'Several dummies.',
+                'readonly' => false,
+                'actualType' => DataTypes::COLLECTION,
                 'subType' => RelatedDummy::class,
                 'children' => [
                     'id' => [
@@ -286,14 +294,6 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
                         'readonly' => false,
                     ],
                 ],
-            ],
-            'relatedDummies' => [
-                'dataType' => 'array of IRIs',
-                'required' => false,
-                'description' => 'Several dummies.',
-                'readonly' => false,
-                'actualType' => DataTypes::COLLECTION,
-                'subType' => DataTypes::STRING,
             ],
         ], $actual);
     }
