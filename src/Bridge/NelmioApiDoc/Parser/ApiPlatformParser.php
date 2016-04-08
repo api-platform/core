@@ -169,7 +169,9 @@ final class ApiPlatformParser implements ParserInterface
                 }
 
                 $data['subType'] = $subProperty['subType'];
-                $data['children'] = $subProperty['children'];
+                if (isset($subProperty['children'])) {
+                    $data['children'] = $subProperty['children'];
+                }
             }
 
             return $data;
@@ -186,9 +188,18 @@ final class ApiPlatformParser implements ParserInterface
                 return $data;
             }
 
+            try {
+                $this->resourceMetadataFactory->create($className);
+            } catch (ResourceClassNotFoundException $e) {
+                $data['actualType'] = DataTypes::MODEL;
+                $data['subType'] = $className;
+
+                return $data;
+            }
+
             if (
-                (self::OUT_PREFIX === $io && $propertyMetadata->isReadableLink()) ||
-                (self::IN_PREFIX === $io && $propertyMetadata->isWritableLink())
+                (self::OUT_PREFIX === $io && !$propertyMetadata->isReadableLink()) ||
+                (self::IN_PREFIX === $io && !$propertyMetadata->isWritableLink())
             ) {
                 $data['dataType'] = self::TYPE_IRI;
                 $data['actualType'] = DataTypes::STRING;
