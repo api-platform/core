@@ -9,6 +9,9 @@
  * file that was distributed with this source code.
  */
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -224,6 +227,31 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $relationEmbedder = new RelationEmbedder();
 
         $this->manager->persist($relationEmbedder);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are Composite identifier objects
+     */
+    public function thereIsACompositeIdentifierObject()
+    {
+        $item = new CompositeItem();
+        $item->setField1('foobar');
+        $this->manager->persist($item);
+
+        for ($i = 0; $i < 4; $i++) {
+            $label = new CompositeLabel();
+            $label->setValue('foo-'.$i);
+
+            $rel = new CompositeRelation();
+            $rel->setCompositeLabel($label);
+            $rel->setCompositeItem($item);
+            $rel->setValue('somefoobardummy');
+
+            $this->manager->persist($label);
+            $this->manager->persist($rel);
+        }
+
         $this->manager->flush();
     }
 }
