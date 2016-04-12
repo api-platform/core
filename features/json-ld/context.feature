@@ -24,7 +24,10 @@ Feature: JSON-LD contexts generation
       "relatedDummy": "/related_dummies",
       "relationEmbedder": "/relation_embedders",
       "thirdLevel": "/third_levels",
-      "user": "/users"
+      "user": "/users",
+      "compositeItem": "/composite_items",
+      "compositeLabel": "/composite_labels",
+      "compositeRelation": "/composite_relations"
     }
     """
 
