@@ -16,6 +16,9 @@ Feature: JSON-LD contexts generation
       "@type": "Entrypoint",
       "abstractDummy": "/abstract_dummies",
       "circularReference": "/circular_references",
+      "compositeItem": "/composite_items",
+      "compositeLabel": "/composite_labels",
+      "compositeRelation": "/composite_relations",
       "concreteDummy": "/concrete_dummies",
       "customIdentifierDummy": "/custom_identifier_dummies",
       "customNormalizedDummy": "/custom_normalized_dummies",
@@ -24,10 +27,7 @@ Feature: JSON-LD contexts generation
       "relatedDummy": "/related_dummies",
       "relationEmbedder": "/relation_embedders",
       "thirdLevel": "/third_levels",
-      "user": "/users",
-      "compositeItem": "/composite_items",
-      "compositeLabel": "/composite_labels",
-      "compositeRelation": "/composite_relations"
+      "user": "/users"
     }
     """
 
