@@ -17,7 +17,7 @@ Feature: Error handling
       "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
       "hydra:title": "An error occurred",
-      "hydra:description": "name: This value should not be blank.\n",
+      "hydra:description": "name: This value should not be blank.",
       "violations": [
         {
           "propertyPath": "name",
