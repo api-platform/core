@@ -401,8 +401,7 @@ class ItemNormalizer extends AbstractNormalizer
 
         if(is_array($value))
         {
-            $object = new $class($value);
-            return $object;
+            return $this->serializer->denormalize($value, $class, null, $context);
         }
 
         if (!$resource = $this->resourceCollection->getResourceForEntity($class)) {
