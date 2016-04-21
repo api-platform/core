@@ -99,7 +99,7 @@ class PaginationExtension implements QueryResultExtensionInterface
      */
     public function getResult(QueryBuilder $queryBuilder)
     {
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder);
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         return new Paginator($doctrineOrmPaginator);
@@ -115,6 +115,20 @@ class PaginationExtension implements QueryResultExtensionInterface
         }
 
         return $enabled;
+    }
+
+    /**
+     * Determines whether the Paginator should fetch join collections, if the root entity uses composite identifiers it should not.
+     *
+     * @see https://github.com/doctrine/doctrine2/issues/2910
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
+     */
+    private function useFetchJoinCollection(QueryBuilder $queryBuilder): bool
+    {
+        return !QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry);
     }
 
     /**
@@ -153,6 +167,13 @@ class PaginationExtension implements QueryResultExtensionInterface
             QueryChecker::hasMaxResults($queryBuilder) &&
             QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
         ) {
+            return true;
+        }
+
+        /*
+         * When using composite identifiers pagination will need Output walkers
+         */
+        if (QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry)) {
             return true;
         }
 
