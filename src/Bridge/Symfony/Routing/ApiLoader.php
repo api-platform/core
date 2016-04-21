@@ -99,16 +99,25 @@ final class ApiLoader extends Loader
             throw new RuntimeException('Either a "route_name" or a "method" operation attribute must exist.');
         }
 
-        if (isset($operation['controller'])) {
-            $controller = $operation['controller'];
-        } else {
-            $actionName = sprintf('%s_%s', strtolower($operation['method']), $collection ? 'collection' : 'item');
+        $controller = $operation['controller'] ?? null;
+        $actionName = sprintf('%s_%s', strtolower($operation['method']), $collection ? 'collection' : 'item');
+
+        if (null === $controller) {
             $controller = self::DEFAULT_ACTION_PATTERN.$actionName;
         }
 
-        $path = '/'.$normalizedShortName;
-        if (!$collection) {
-            $path .= '/{id}';
+        if ($operationName !== strtolower($operation['method'])) {
+            $actionName = sprintf('%s_%s', $operationName, $collection ? 'collection' : 'item');
+        }
+
+        $path = $operation['path'] ?? null;
+
+        if (null === $path) {
+            $path = '/'.$normalizedShortName;
+
+            if (!$collection) {
+                $path .= '/{id}';
+            }
         }
 
         $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $normalizedShortName, $actionName);
