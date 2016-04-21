@@ -58,6 +58,29 @@ abstract class QueryChecker
     }
 
     /**
+     * Determines whether the query builder has any composite identifier.
+     *
+     * @param QueryBuilder    $queryBuilder
+     * @param ManagerRegistry $managerRegistry
+     *
+     * @return bool
+     */
+    public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    {
+        foreach ($queryBuilder->getRootEntities() as $rootEntity) {
+            $rootMetadata = $managerRegistry
+                ->getManagerForClass($rootEntity)
+                ->getClassMetadata($rootEntity);
+
+            if ($rootMetadata->isIdentifierComposite) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determines whether the query builder has the maximum number of results specified.
      *
      * @param QueryBuilder $queryBuilder
