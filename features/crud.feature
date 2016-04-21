@@ -74,6 +74,10 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  Scenario: Get a not found exception
+    When I send a "GET" request to "/dummies/42"
+    Then the response status code should be 404
+
   Scenario: Get a collection
     When I send a "GET" request to "/dummies"
     Then the response status code should be 200

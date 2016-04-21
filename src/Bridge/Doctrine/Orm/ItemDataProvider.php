@@ -88,7 +88,7 @@ class ItemDataProvider implements ItemDataProviderInterface
             ++$i;
         }
 
-        if (!$fetchData || $manager instanceof EntityManagerInterface) {
+        if (!$fetchData && $manager instanceof EntityManagerInterface) {
             return $manager->getReference($resourceClass, $identifiers);
         }
 
