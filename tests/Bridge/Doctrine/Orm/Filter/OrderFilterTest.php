@@ -157,6 +157,11 @@ class OrderFilterTest extends KernelTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'order[dummyBoolean]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 

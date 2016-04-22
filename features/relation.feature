@@ -42,6 +42,7 @@ Feature: Relations support
       "name": null,
       "dummyDate": null,
       "thirdLevel": "/third_levels/1",
+      "dummyBoolean": null,
       "symfony": "symfony",
       "age": null
     }
@@ -70,6 +71,7 @@ Feature: Relations support
       "@type": "Dummy",
       "description": null,
       "dummy": null,
+      "dummyBoolean": null,
       "dummyDate": null,
       "dummyPrice": null,
       "relatedDummy": "/related_dummies/1",
