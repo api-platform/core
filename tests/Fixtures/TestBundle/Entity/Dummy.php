@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @Resource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range"}})
+ * @Resource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
  * @ORM\Entity
  */
 class Dummy
@@ -72,6 +72,13 @@ class Dummy
      * @ORM\Column(nullable=true)
      */
     public $dummy;
+
+    /**
+     * @var bool A dummy boolean.
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    public $dummyBoolean;
 
     /**
      * @var \DateTime A dummy date.
@@ -210,5 +217,21 @@ class Dummy
     public function addRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummies->add($relatedDummy);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDummyBoolean()
+    {
+        return $this->dummyBoolean;
+    }
+
+    /**
+     * @param bool $dummyBoolean
+     */
+    public function setDummyBoolean($dummyBoolean)
+    {
+        $this->dummyBoolean = $dummyBoolean;
     }
 }

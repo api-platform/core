@@ -23,6 +23,7 @@ Feature: Handle properly invalid data submitted to the API
       "@type": "Dummy",
       "description": null,
       "dummy": null,
+      "dummyBoolean": null,
       "dummyDate": null,
       "dummyPrice": null,
       "relatedDummy": null,

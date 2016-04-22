@@ -232,6 +232,18 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'dummyBoolean' => [
+                'property' => 'dummyBoolean',
+                'type' => 'boolean',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'dummyBoolean[]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'boolean',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
         ], $filter->getDescription($this->resourceClass));
 
         $filter = new SearchFilter(

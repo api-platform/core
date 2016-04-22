@@ -93,3 +93,13 @@ services:
         parent:    'api_platform.doctrine.orm.range_filter'
         arguments: [ { 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
+
+    app.my_dummy_resource.boolean_filter:
+        parent:    'api_platform.doctrine.orm.boolean_filter'
+        arguments: [ { 'dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
+
+    app.my_dummy_resource.numeric_filter:
+        parent:    'api_platform.doctrine.orm.numeric_filter'
+        arguments: [ { 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
