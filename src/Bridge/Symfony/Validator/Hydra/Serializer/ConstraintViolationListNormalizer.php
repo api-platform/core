@@ -40,7 +40,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $violations = [];
-        $message = '';
+        $messages = [];
 
         foreach ($object as $violation) {
             $violations[] = [
@@ -51,14 +51,14 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             $propertyPath = $violation->getPropertyPath();
             $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
 
-            $message .= $prefix.$violation->getMessage()."\n";
+            $messages [] = $prefix.$violation->getMessage();
         }
 
         return [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
             '@type' => 'ConstraintViolationList',
             'hydra:title' => $context['title'] ?? 'An error occurred',
-            'hydra:description' => $message ?? (string) $object,
+            'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,
             'violations' => $violations,
         ];
     }
