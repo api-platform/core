@@ -47,7 +47,7 @@ abstract class RequestParser
      *
      * @return array
      */
-    private static function parseRequestParams($source)
+    public static function parseRequestParams($source)
     {
         $source = urldecode($source);
 

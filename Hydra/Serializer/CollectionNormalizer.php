@@ -18,6 +18,7 @@ use Dunglas\ApiBundle\Api\ResourceResolverTrait;
 use Dunglas\ApiBundle\JsonLd\ContextBuilder;
 use Dunglas\ApiBundle\JsonLd\Serializer\ContextTrait;
 use Dunglas\ApiBundle\Model\PaginatorInterface;
+use Dunglas\ApiBundle\Util\RequestParser;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
@@ -147,7 +148,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
 
         $parameters = [];
         if (isset($parts['query'])) {
-            parse_str($parts['query'], $parameters);
+            $parameters = RequestParser::parseRequestParams($parts['query']);
 
             // Remove existing page parameter
             if (isset($parameters[$this->pageParameterName])) {
