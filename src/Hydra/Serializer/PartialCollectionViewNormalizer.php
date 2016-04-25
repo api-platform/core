@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 use ApiPlatform\Core\Api\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
+use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -100,7 +101,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Seri
 
         $parameters = [];
         if (isset($parts['query'])) {
-            parse_str($parts['query'], $parameters);
+            $parameters = RequestParser::parseRequestParams($parts['query']);
 
             // Remove existing page parameter
             unset($parameters[$this->pageParameterName]);
