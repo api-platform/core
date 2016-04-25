@@ -23,11 +23,11 @@ Feature: JSON-LD contexts generation
       "customIdentifierDummy": "/custom_identifier_dummies",
       "customNormalizedDummy": "/custom_normalized_dummies",
       "customWritableIdentifierDummy": "/custom_writable_identifier_dummies",
+      "dummy": "/dummies",
+      "relatedDummy": "/related_dummies",
       "relationEmbedder": "/relation_embedders",
       "thirdLevel": "/third_levels",
-      "user": "/users",
-      "dummy": "/dummies",
-      "relatedDummy": "/related_dummies"
+      "user": "/users"
     }
     """
 
