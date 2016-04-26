@@ -17,6 +17,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Gherkin\Node\TableNode;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
 use Sanpi\Behatch\HttpCall\Request;
@@ -259,7 +260,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $item->setField1('foobar');
         $this->manager->persist($item);
 
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; ++$i) {
             $label = new CompositeLabel();
             $label->setValue('foo-'.$i);
 
@@ -273,5 +274,30 @@ class FeatureContext implements Context, SnippetAcceptingContext
         }
 
         $this->manager->flush();
+    }
+
+    /**
+     * @Then JSON should have following resource classes:
+     */
+    public function jsonShouldHaveFollowingResourceClasses(TableNode $classes)
+    {
+        $data = json_decode($this->request->getContent(), true);
+
+        foreach ($data as $property => $context) {
+            if (in_array($property, ['@context', '@type', '@id'])) {
+                continue;
+            }
+
+            $valid = false;
+            foreach ($classes as $expected) {
+                if ($expected['key'] === $property && $expected['value'] === $context) {
+                    $valid = true;
+                }
+            }
+
+            if (false === $valid) {
+                throw new \Exception(sprintf('%s context was not found or it\'s value is not equal to %s', $property, $context));
+            }
+        }
     }
 }

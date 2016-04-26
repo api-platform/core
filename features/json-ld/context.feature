@@ -8,28 +8,34 @@ Feature: JSON-LD contexts generation
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
+    And the JSON should be valid according to this schema:
     """
     {
-      "@context": "/contexts/Entrypoint",
-      "@id": "/",
-      "@type": "Entrypoint",
-      "abstractDummy": "/abstract_dummies",
-      "circularReference": "/circular_references",
-      "compositeItem": "/composite_items",
-      "compositeLabel": "/composite_labels",
-      "compositeRelation": "/composite_relations",
-      "concreteDummy": "/concrete_dummies",
-      "customIdentifierDummy": "/custom_identifier_dummies",
-      "customNormalizedDummy": "/custom_normalized_dummies",
-      "customWritableIdentifierDummy": "/custom_writable_identifier_dummies",
-      "dummy": "/dummies",
-      "relatedDummy": "/related_dummies",
-      "relationEmbedder": "/relation_embedders",
-      "thirdLevel": "/third_levels",
-      "user": "/users"
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Entrypoint$"},
+        "@id": {"pattern": "^/$"},
+        "@type": {"pattern": "^Entrypoint$"}
+      },
+      "additionalProperties": true
     }
     """
+    And JSON should have following resource classes:
+      | key                           | value                               |
+      | circularReference             | /circular_references                |
+      | compositeItem                 | /composite_items                    |
+      | compositeLabel                | /composite_labels                   |
+      | compositeRelation             | /composite_relations                |
+      | concreteDummy                 | /concrete_dummies                   |
+      | customIdentifierDummy         | /custom_identifier_dummies          |
+      | customNormalizedDummy         | /custom_normalized_dummies          |
+      | customWritableIdentifierDummy | /custom_writable_identifier_dummies |
+      | dummy                         | /dummies                            |
+      | abstractDummy                 | /abstract_dummies                   |
+      | relatedDummy                  | /related_dummies                    |
+      | relationEmbedder              | /relation_embedders                 |
+      | thirdLevel                    | /third_levels                       |
+      | user                          | /users                              |
 
   Scenario: Retrieve Dummy context
     When I send a "GET" request to "/contexts/Dummy"
