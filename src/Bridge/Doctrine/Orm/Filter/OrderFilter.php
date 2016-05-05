@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -78,17 +77,7 @@ class OrderFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
-
-                $parentAlias = $alias;
-
-                foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryNameGenerator::generateJoinAlias($association);
-                    $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
-                    $parentAlias = $alias;
-                }
-
-                $field = $propertyParts['field'];
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
             }
 
             $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $order);

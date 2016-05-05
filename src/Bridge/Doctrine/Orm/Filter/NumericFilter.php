@@ -81,17 +81,7 @@ class NumericFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
-
-                $parentAlias = $alias;
-
-                foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryNameGenerator::generateJoinAlias($association);
-                    $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
-                    $parentAlias = $alias;
-                }
-
-                $field = $propertyParts['field'];
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
             }
             $valueParameter = QueryNameGenerator::generateParameterName($field);
 
