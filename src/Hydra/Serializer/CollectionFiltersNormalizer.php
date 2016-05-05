@@ -17,8 +17,8 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -26,17 +26,16 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
+final class CollectionFiltersNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use ContextTrait;
+    use SerializerAwareTrait {
+        setSerializer as baseSetSerializer;
+    }
 
     private $collectionNormalizer;
     private $resourceMetadataFactory;
     private $resourceClassResolver;
-
-    /**
-     * @var FilterCollection
-     */
     private $filters;
 
     public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, FilterCollection $filters)
@@ -45,6 +44,14 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->filters = $filters;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return $this->collectionNormalizer->supportsNormalization($data, $format);
     }
 
     /**
@@ -92,6 +99,18 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        $this->baseSetSerializer($serializer);
+
+        if ($this->collectionNormalizer instanceof SerializerAwareInterface) {
+            $this->collectionNormalizer->setSerializer($serializer);
+        }
+    }
+
+    /**
      * Returns the content of the Hydra search property.
      *
      * @param string            $resourceClass
@@ -122,25 +141,5 @@ final class CollectionFiltersNormalizer extends SerializerAwareNormalizer implem
             'hydra:variableRepresentation' => 'BasicRepresentation',
             'hydra:mapping' => $mapping,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return $this->collectionNormalizer->supportsNormalization($data, $format);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setSerializer(SerializerInterface $serializer)
-    {
-        parent::setSerializer($serializer);
-
-        if ($this->collectionNormalizer instanceof SerializerAwareInterface) {
-            $this->collectionNormalizer->setSerializer($serializer);
-        }
     }
 }
