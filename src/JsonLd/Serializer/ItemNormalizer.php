@@ -306,6 +306,14 @@ final class ItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->denormalize($value, $className, self::FORMAT, $this->createRelationContext($className, $context));
         }
 
+        if (!is_array($value)) {
+            throw new InvalidArgumentException(sprintf(
+                'Expected IRI or nested object for attribute "%s" of "%s", "%s" given.',
+                $attributeName,
+                $resourceClass,
+                is_object($value) ? get_class($value) : gettype($value)
+            ));
+        }
         throw new InvalidArgumentException(sprintf(
             'Nested objects for attribute "%s" of "%s" are not enabled. Use serialization groups to change that behavior.',
             $attributeName,
