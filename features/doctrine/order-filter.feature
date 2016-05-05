@@ -20,18 +20,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/2$"},
-                  {"pattern": "^/dummies/3$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[id\\]=asc$"},
@@ -56,18 +76,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/30$"},
-                  {"pattern": "^/dummies/29$"},
-                  {"pattern": "^/dummies/28$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/30$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/29$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/28$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[id\\]=desc"},
@@ -92,18 +132,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/10$"},
-                  {"pattern": "^/dummies/11$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/10$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/11$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[name\\]=asc$"},
@@ -128,18 +188,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/9$"},
-                  {"pattern": "^/dummies/8$"},
-                  {"pattern": "^/dummies/7$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/9$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/8$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/7$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[name\\]=desc$"},
@@ -164,18 +244,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/9$"},
-                  {"pattern": "^/dummies/8$"},
-                  {"pattern": "^/dummies/7$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/9$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/8$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/7$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[name\\]$"},
@@ -201,18 +301,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/2$"},
-                  {"pattern": "^/dummies/3$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[relatedDummy\\]=asc$"},
@@ -238,18 +358,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/2$"},
-                  {"pattern": "^/dummies/3$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[alias\\]=asc$"},
@@ -273,18 +413,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/2$"},
-                  {"pattern": "^/dummies/3$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[alias\\]=desc$"},
@@ -308,18 +468,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/2$"},
-                  {"pattern": "^/dummies/3$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=asc$"},
@@ -343,18 +523,38 @@ Feature: Order filter on collections
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:member": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "@id": {
-                "oneOf": [
-                  {"pattern": "^/dummies/1$"},
-                  {"pattern": "^/dummies/2$"},
-                  {"pattern": "^/dummies/3$"}
-                ]
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
               }
             }
-          }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
         },
         "hydra:view": {
           "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=desc$"},
