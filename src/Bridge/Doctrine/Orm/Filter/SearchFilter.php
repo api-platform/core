@@ -113,13 +113,7 @@ class SearchFilter extends AbstractFilter
             }
 
             if ($metadata->hasField($field)) {
-                $values = (array) $value;
-                foreach ($values as $k => $v) {
-                    if (!is_int($k) || !is_string($v)) {
-                        unset($values[$k]);
-                    }
-                }
-                $values = array_values($values);
+                $values = $this->normalizeValues((array) $value);
 
                 if (empty($values)) {
                     continue;
@@ -145,13 +139,7 @@ class SearchFilter extends AbstractFilter
                         ->setParameter($valueParameter, $values);
                 }
             } elseif ($metadata->hasAssociation($field)) {
-                $values = (array) $value;
-                foreach ($values as $k => $v) {
-                    if (!is_int($k) || !is_string($v)) {
-                        unset($values[$k]);
-                    }
-                }
-                $values = array_values($values);
+                $values = $this->normalizeValues((array) $value);
 
                 if (empty($values)) {
                     continue;
@@ -318,4 +306,22 @@ class SearchFilter extends AbstractFilter
 
         return $value;
     }
+
+   /**
+    * Normalize the values array.
+    *
+    * @param array $values
+    *
+    * @return array
+    */
+   private function normalizeValues(array $values) : array
+   {
+       foreach ($values as $key => $value) {
+           if (!is_int($key) || !is_string($value)) {
+               unset($values[$key]);
+           }
+       }
+
+       return array_values($values);
+   }
 }

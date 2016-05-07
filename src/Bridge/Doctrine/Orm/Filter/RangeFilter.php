@@ -67,17 +67,7 @@ class RangeFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
-
-                $parentAlias = $alias;
-
-                foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryNameGenerator::generateJoinAlias($association);
-                    $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
-                    $parentAlias = $alias;
-                }
-
-                $field = $propertyParts['field'];
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
             }
 
             foreach ($values as $operator => $value) {
