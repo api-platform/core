@@ -11,9 +11,12 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -172,5 +175,38 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $request->query->all();
+    }
+
+    /**
+     * Adds the necessary joins for a nested property.
+     *
+     * @param string       $property
+     * @param string       $rootAlias
+     * @param QueryBuilder $queryBuilder
+     *
+     * @throws InvalidArgumentException If property is not nested
+     *
+     * @return array An array where the first element is the join $alias of the leaf entity,
+     *               and the second element is the $field name
+     */
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder) : array
+    {
+        $propertyParts = $this->splitPropertyParts($property);
+
+        if (0 === count($propertyParts['associations'])) {
+            throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
+        }
+
+        $parentAlias = $rootAlias;
+
+        foreach ($propertyParts['associations'] as $association) {
+            $alias = QueryNameGenerator::generateJoinAlias($association);
+            $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
+            $parentAlias = $alias;
+        }
+
+        $field = $propertyParts['field'];
+
+        return [$alias, $field];
     }
 }
