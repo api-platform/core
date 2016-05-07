@@ -5,7 +5,7 @@ Feature: Retrieve data with Composite identifiers
 
   @createSchema
   @dropSchema
-  Scenario: Get collection with composite identifiers
+  Scenario: Get a composite item with composite identifiers
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_items"
     Then the response status code should be 200
@@ -78,3 +78,21 @@ Feature: Retrieve data with Composite identifiers
         }
     }
     """
+
+  @createSchema
+  @dropSchema
+  Scenario: Get the first composite relation
+    Given there are Composite identifier objects
+    When I send a "GET" request to "/composite_relations/1-1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+
+  @createSchema
+  @dropSchema
+  Scenario: Get first composite item
+    Given there are Composite identifier objects
+    When I send a "GET" request to "/composite_items/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
