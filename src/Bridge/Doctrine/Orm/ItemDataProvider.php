@@ -15,16 +15,21 @@ use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Item data provider for the Doctrine ORM.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @author Théo FIDRY <theo.fidry@gmail.com>
  */
 class ItemDataProvider implements ItemDataProviderInterface
 {
@@ -32,22 +37,22 @@ class ItemDataProvider implements ItemDataProviderInterface
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $itemExtensions;
-    private $decorated;
+    private $decoratedProvider;
 
     /**
      * @param ManagerRegistry                        $managerRegistry
      * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
      * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
      * @param QueryItemExtensionInterface[]          $itemExtensions
-     * @param ItemDataProviderInterface|null         $decorated
+     * @param ItemDataProviderInterface|null         $decoratedProvider
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decoratedProvider = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
-        $this->decorated = $decorated;
+        $this->decoratedProvider = $decoratedProvider;
     }
 
     /**
@@ -55,19 +60,71 @@ class ItemDataProvider implements ItemDataProviderInterface
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
     {
-        if ($this->decorated) {
+        if (null !== $this->decoratedProvider) {
             try {
-                return $this->decorated->getItem($resourceClass, $id, $operationName, $fetchData);
+                return $this->decoratedProvider->getItem($resourceClass, $id, $operationName, $fetchData);
             } catch (ResourceClassNotSupportedException $resourceClassNotSupportedException) {
                 // Ignore it
             }
         }
 
-        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-        if (null === $manager) {
-            throw new ResourceClassNotSupportedException();
+        return $this->fallbackGetItem($resourceClass, $id, $operationName, $fetchData);
+    }
+
+    /**
+     * @param string      $resourceClass
+     * @param int|string  $id
+     * @param string|null $operationName
+     * @param bool        $fetchData
+     *
+     * @throws ResourceClassNotSupportedException
+     *
+     * @return object
+     */
+    private function fallbackGetItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
+    {
+        $manager = $this->getManagerForClass($resourceClass);
+        $identifiers = $this->getIdentifiers($resourceClass, $id);
+
+        if (!$fetchData && $manager instanceof EntityManagerInterface) {
+            return $manager->getReference($resourceClass, $identifiers);
         }
 
+        $queryBuilder = $this->retrieveQueryBuilder($manager, $resourceClass);
+        $this->applyIdentifiersToQueryBuilder($queryBuilder, $identifiers);
+
+        foreach ($this->itemExtensions as $extension) {
+            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
+        }
+
+        return $queryBuilder->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * @param string $resourceClass
+     *
+     * @throws ResourceClassNotSupportedException
+     *
+     * @return ObjectManager
+     */
+    private function getManagerForClass(string $resourceClass)
+    {
+        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
+        if (null !== $manager) {
+            return $manager;
+        }
+
+        throw new ResourceClassNotSupportedException();
+    }
+
+    /**
+     * @param string     $resourceClass
+     * @param int|string $id
+     *
+     * @return array Identifier values with keys as property names
+     */
+    private function getIdentifiers(string $resourceClass, $id)
+    {
         $identifierValues = explode('-', $id);
         $identifiers = [];
         $i = 0;
@@ -88,13 +145,53 @@ class ItemDataProvider implements ItemDataProviderInterface
             ++$i;
         }
 
-        if (!$fetchData && $manager instanceof EntityManagerInterface) {
-            return $manager->getReference($resourceClass, $identifiers);
+        return $identifiers;
+    }
+
+    /**
+     * @param ObjectManager $resourceManager
+     * @param string        $resourceClass
+     *
+     * @throws RuntimeException
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    private function retrieveQueryBuilder(ObjectManager $resourceManager, string $resourceClass)
+    {
+        $repository = $resourceManager->getRepository($resourceClass);
+
+        if ($repository instanceof EntityRepository) {
+            return $repository->createQueryBuilder('o');
         }
 
-        $repository = $manager->getRepository($resourceClass);
-        $queryBuilder = $repository->createQueryBuilder('o');
+        if ($resourceManager instanceof EntityManagerInterface) {
+            return $resourceManager->createQueryBuilder()
+                ->select('o')
+                ->from($resourceClass, 'o');
+        }
 
+        if (method_exists($repository, 'createQueryBuilder')) {
+            return $repository->createQueryBuilder('o');
+        }
+
+        if (method_exists($resourceManager, 'createQueryBuilder')) {
+            return $resourceManager->createQueryBuilder()
+                ->select('o')
+                ->from($resourceClass, 'o');
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'The object manager "%s" or resource manager "%s" of the resource "%s" must have a ::createQueryBuilder() method.',
+                get_class($resourceManager),
+                get_class($repository),
+                $resourceClass
+            )
+        );
+    }
+
+    private function applyIdentifiersToQueryBuilder(QueryBuilder $queryBuilder, array $identifiers)
+    {
         foreach ($identifiers as $propertyName => $value) {
             $placeholder = 'id_'.$propertyName;
 
@@ -102,11 +199,5 @@ class ItemDataProvider implements ItemDataProviderInterface
                 ->where($queryBuilder->expr()->eq('o.'.$propertyName, ':'.$placeholder))
                 ->setParameter($placeholder, $value);
         }
-
-        foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
-        }
-
-        return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 }
