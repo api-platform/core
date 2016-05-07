@@ -35,6 +35,23 @@ Feature: Handle properly invalid data submitted to the API
     }
     """
 
+  Scenario: Create a resource with wrong value type for relation
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Foo",
+      "relatedDummy": "1"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'Expected IRI or nested object for attribute "relatedDummy" of "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy", "string" given.'
+    And the JSON node "trace" should exist
+
   Scenario: Ignore invalid dates
     When I send a "POST" request to "/dummies" with body:
     """
