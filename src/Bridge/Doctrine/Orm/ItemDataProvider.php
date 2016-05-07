@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Item data provider for the Doctrine ORM.
@@ -68,7 +69,69 @@ class ItemDataProvider implements ItemDataProviderInterface
             throw new ResourceClassNotSupportedException();
         }
 
-        $identifierValues = explode('-', $id);
+        $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
+
+        if (!$fetchData && $manager instanceof EntityManagerInterface) {
+            return $manager->getReference($resourceClass, $identifiers);
+        }
+
+        $repository = $manager->getRepository($resourceClass);
+        $queryBuilder = $repository->createQueryBuilder('o');
+
+        $this->addWhereForIdentifiers($identifiers, $queryBuilder);
+
+        foreach ($this->itemExtensions as $extension) {
+            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
+        }
+
+        return $queryBuilder->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * Add where into the query when multiple identifiers are passed (composite).
+     *
+     * @param array        $identifiers
+     * @param QueryBuilder $queryBuilder
+     *
+     * Populate the query with where when needed.
+     */
+    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder)
+    {
+        if (empty($identifiers)) {
+            return;
+        }
+
+        foreach ($identifiers as $identifier => $value) {
+            $placeholder = ':id_'.$identifier;
+            $expression = $queryBuilder->expr()->eq(
+                'o.'.$identifier,
+                $placeholder
+            );
+
+            $queryBuilder->andWhere($expression);
+
+            $queryBuilder->setParameter($placeholder, $value);
+        }
+    }
+
+    /**
+     * Transform and check the identifier, composite or not.
+     *
+     * @param $id
+     * @param $manager
+     * @param $resourceClass
+     *
+     * @return array
+     */
+    private function normalizeIdentifiers($id, $manager, $resourceClass) : array
+    {
+        $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
+        $identifierValues = [$id];
+
+        if (count($doctrineMetadataIdentifier) >= 2) {
+            $identifierValues = explode('-', $id);
+        }
+
         $identifiers = [];
         $i = 0;
 
@@ -88,25 +151,6 @@ class ItemDataProvider implements ItemDataProviderInterface
             ++$i;
         }
 
-        if (!$fetchData && $manager instanceof EntityManagerInterface) {
-            return $manager->getReference($resourceClass, $identifiers);
-        }
-
-        $repository = $manager->getRepository($resourceClass);
-        $queryBuilder = $repository->createQueryBuilder('o');
-
-        foreach ($identifiers as $propertyName => $value) {
-            $placeholder = 'id_'.$propertyName;
-
-            $queryBuilder
-                ->where($queryBuilder->expr()->eq('o.'.$propertyName, ':'.$placeholder))
-                ->setParameter($placeholder, $value);
-        }
-
-        foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
-        }
-
-        return $queryBuilder->getQuery()->getOneOrNullResult();
+        return $identifiers;
     }
 }
