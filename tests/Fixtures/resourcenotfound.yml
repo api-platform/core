@@ -1,0 +1,3 @@
+resources:
+    configdummy:
+        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist'
