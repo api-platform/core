@@ -13,6 +13,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use Behat\Behat\Context\Context;
@@ -272,6 +273,18 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $this->manager->persist($rel);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a FileConfigDummy object
+     */
+    public function thereIsAFileConfigDummyObject()
+    {
+        $fileConfigDummy = new FileConfigDummy();
+        $fileConfigDummy->setName('ConfigDummy');
+
+        $this->manager->persist($fileConfigDummy);
         $this->manager->flush();
     }
 }

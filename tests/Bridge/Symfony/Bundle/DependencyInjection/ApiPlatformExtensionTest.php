@@ -224,13 +224,37 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $definition = $definitionProphecy->reveal();
         $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definition);
 
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->willReturn($definition);
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->willReturn($definition);
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->willReturn($definition);
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->willReturn($definition);
+
         $definitions = [
             'api_platform.filters',
             'api_platform.resource_class_resolver',
             'api_platform.operation_method_resolver',
             'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.cached',
+            'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.metadata.resource.name_collection_factory.xml',
             'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.yaml',
+            'api_platform.metadata.resource.metadata_factory.xml',
             'api_platform.metadata.resource.metadata_factory.php_doc',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.operation',
