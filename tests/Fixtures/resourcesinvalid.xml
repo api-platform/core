@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+        <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy">
+                <itemOperations>
+                        <operation key="my_op_name" />
+                </itemOperations>
+        </resource>
+</resources>

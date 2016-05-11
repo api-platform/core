@@ -18,6 +18,16 @@
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.cached.inner" />
         </service>
 
+        <service id="api_platform.metadata.resource.name_collection_factory.yaml" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceNameCollectionFactory" public="false">
+                <argument type="collection" />
+                <argument type="service" id="api_platform.metadata.resource.name_collection_factory.yaml.inner" />
+        </service>
+
+        <service id="api_platform.metadata.resource.name_collection_factory.xml" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceNameCollectionFactory" public="false">
+                <argument type="collection" />
+                <argument type="service" id="api_platform.metadata.resource.name_collection_factory.xml.inner" />
+        </service>
+
         <!-- Resource metadata -->
 
         <service id="api_platform.metadata.resource.metadata_factory" alias="api_platform.metadata.resource.metadata_factory.annotation" />
@@ -28,6 +38,16 @@
 
         <service id="api_platform.metadata.resource.metadata_factory.php_doc" class="ApiPlatform\Core\Metadata\Resource\Factory\PhpDocResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="30" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.php_doc.inner" />
+        </service>
+
+       <service id="api_platform.metadata.resource.metadata_factory.yaml" decorates="api_platform.metadata.resource.metadata_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceMetadataFactory" decoration-priority="40" public="false">
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.yaml.inner" />
+        </service>
+
+        <service id="api_platform.metadata.resource.metadata_factory.xml" decorates="api_platform.metadata.resource.metadata_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceMetadataFactory" decoration-priority="40" public="false">
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory.xml.inner" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_factory.short_name" class="ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="20" public="false">
