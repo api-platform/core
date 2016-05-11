@@ -1,0 +1,6 @@
+resources:
+    configdummy:
+        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy'
+        itemOperations:
+            my_op_name:  
+                method: 'POST'

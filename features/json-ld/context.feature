@@ -25,6 +25,7 @@ Feature: JSON-LD contexts generation
     And the JSON node "relationEmbedder" should be equal to "/relation_embedders"
     And the JSON node "thirdLevel" should be equal to "/third_levels"
     And the JSON node "user" should be equal to "/users"
+    And the JSON node "fileconfigdummy" should be equal to "/fileconfigdummies"
 
   Scenario: Retrieve Dummy context
     When I send a "GET" request to "/contexts/Dummy"

@@ -80,6 +80,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
+        $this->registerFileLoaders($container);
         $this->setUpMetadataCaching($container, $config);
 
         if (!interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
@@ -134,6 +135,37 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument($paths);
+    }
+
+    /**
+     * Registers configuration file loaders.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function registerFileLoaders(ContainerBuilder $container)
+    {
+        $paths = [];
+        foreach ($container->getParameter('kernel.bundles') as $bundle) {
+            $reflectionClass = new \ReflectionClass($bundle);
+            $bundleDirectory = dirname($reflectionClass->getFileName());
+            $glob = $bundleDirectory.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'resources.{xml,yml}';
+
+            $paths = array_merge($paths, glob($glob, GLOB_BRACE | GLOB_NOSORT));
+        }
+
+        $yamlPaths = array_filter($paths, function ($v) {
+            return preg_match('/\.yml$/', $v);
+        });
+
+        $xmlPaths = array_filter($paths, function ($v) {
+            return preg_match('/\.xml$/', $v);
+        });
+
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->replaceArgument(0, $yamlPaths);
+        $container->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->replaceArgument(0, $yamlPaths);
+
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->replaceArgument(0, $xmlPaths);
+        $container->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->replaceArgument(0, $xmlPaths);
     }
 
     /**

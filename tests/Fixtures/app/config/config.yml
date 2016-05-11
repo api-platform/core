@@ -103,3 +103,8 @@ services:
         parent:    'api_platform.doctrine.orm.numeric_filter'
         arguments: [ { 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
+
+    app.config_dummy_resource.controller:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\ConfigCustomController'
+        arguments: ['@api_platform.item_data_provider']
+
