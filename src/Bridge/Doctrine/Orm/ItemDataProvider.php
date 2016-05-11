@@ -88,12 +88,10 @@ class ItemDataProvider implements ItemDataProviderInterface
     }
 
     /**
-     * Add where into the query when multiple identifiers are passed (composite).
+     * Add WHERE conditions to the query for one or more identifiers (simple or composite).
      *
      * @param array        $identifiers
      * @param QueryBuilder $queryBuilder
-     *
-     * Populate the query with where when needed.
      */
     private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder)
     {
@@ -127,9 +125,17 @@ class ItemDataProvider implements ItemDataProviderInterface
     {
         $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
         $identifierValues = [$id];
+        $identifierValuesArray = [];
 
         if (count($doctrineMetadataIdentifier) >= 2) {
-            $identifierValues = explode('-', $id);
+            $identifierValues = explode(';', $id);
+            foreach ($identifierValues as $key => $value) {
+                $identifierValueArray = explode('=', $value);
+                if ($doctrineMetadataIdentifier[$key] === $identifierValueArray[0]) {
+                    $identifierValuesArray[] = $identifierValueArray[1];
+                }
+            }
+            $identifierValues = $identifierValuesArray;
         }
 
         $identifiers = [];
