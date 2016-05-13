@@ -67,23 +67,9 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $resourceMetadata = new ResourceMetadata();
 
-        $metadata = [
-            'shortName' => null,
-            'description' => null,
-            'itemOperations' => [
-                'my_op_name' => ['method' => 'GET'],
-                'my_other_op_name' => ['method' => 'POST'],
-            ],
-            'collectionOperations' => null,
-            'iri' => null,
-            'attributes' => [
-            ],
-        ];
-
-        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'attributes'] as $property) {
-            $wither = 'with'.ucfirst($property);
-            $resourceMetadata = $resourceMetadata->$wither($metadata[$property]);
-        }
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+            'my_op_name' => ['method' => 'POST'],
+        ]);
 
         return [[$resourceMetadata]];
     }
