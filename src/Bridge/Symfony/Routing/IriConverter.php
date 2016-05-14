@@ -77,16 +77,25 @@ final class IriConverter implements IriConverterInterface
         $resourceClass = $this->getObjectClass($item);
         $routeName = $this->getRouteName($resourceClass, false);
 
-        $identifierValues = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
             if ($propertyMetadata->isIdentifier()) {
-                $identifierValues[] = $this->propertyAccessor->getValue($item, $propertyName);
+                $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
             }
         }
 
-        return $this->router->generate($routeName, ['id' => implode('-', $identifierValues)], $referenceType);
+        if (1 === count($identifiers)) {
+            $identifiers = array_map(function ($identifierValue) {
+                return rawurlencode($identifierValue);
+            }, $identifiers);
+        } else {
+            $identifiers = array_map(function ($identifierName, $identifierValue) {
+                return sprintf('%s=%s', $identifierName, rawurlencode($identifierValue));
+            }, array_keys($identifiers), $identifiers);
+        }
+
+        return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
     }
 
     /**

@@ -16,6 +16,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -248,6 +249,19 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $relationEmbedder = new RelationEmbedder();
 
         $this->manager->persist($relationEmbedder);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a Dummy Object mapped by UUID
+     */
+    public function thereIsADummyObjectMappedByUUID()
+    {
+        $dummy = new UuidIdentifierDummy();
+        $dummy->setName('My Dummy');
+        $dummy->setUuid('41B29566-144B-11E6-A148-3E1D05DEFE78');
+
+        $this->manager->persist($dummy);
         $this->manager->flush();
     }
 
