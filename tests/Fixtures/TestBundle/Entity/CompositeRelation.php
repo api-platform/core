@@ -44,16 +44,6 @@ class CompositeRelation
     private $compositeLabel;
 
     /**
-     * Get composite id.
-     *
-     * @return string
-     */
-    public function getId()
-    {
-        return sprintf('%s-%s', $this->compositeItem->getId(), $this->compositeLabel->getId());
-    }
-
-    /**
      * Get value.
      *
      * @return value.
