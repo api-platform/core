@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\Property;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,7 +41,7 @@ class Dummy
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Property(iri="http://schema.org/name")
+     * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
 
@@ -49,7 +49,7 @@ class Dummy
      * @var string The dummy name alias.
      *
      * @ORM\Column(nullable=true)
-     * @Property(iri="https://schema.org/alternateName")
+     * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
 
@@ -62,7 +62,7 @@ class Dummy
      * @var string A short description of the item.
      *
      * @ORM\Column(nullable=true)
-     * @Property(iri="https://schema.org/description")
+     * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
 

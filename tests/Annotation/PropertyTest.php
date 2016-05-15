@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Annotation;
 
-use ApiPlatform\Core\Annotation\Property;
+use ApiPlatform\Core\Annotation\ApiProperty;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -20,7 +20,7 @@ class PropertyTest extends \PHPUnit_Framework_TestCase
 {
     public function testAssignation()
     {
-        $property = new Property();
+        $property = new ApiProperty();
         $property->description = 'description';
         $property->readable = true;
         $property->writable = true;

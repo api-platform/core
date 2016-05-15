@@ -19,7 +19,7 @@ namespace ApiPlatform\Core\Annotation;
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
  */
-final class Property
+final class ApiProperty
 {
     /**
      * @var string
