@@ -11,13 +11,13 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * No collection dummy.
  *
- * @Resource(collectionOperations={})
+ * @ApiResource(collectionOperations={})
  * @ORM\Entity
  */
 class NoCollectionDummy

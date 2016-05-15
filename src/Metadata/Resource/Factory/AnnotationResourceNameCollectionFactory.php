@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Doctrine\Common\Annotations\Reader;
 
@@ -79,7 +79,7 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
         foreach ($declared as $className) {
             $reflectionClass = new \ReflectionClass($className);
             $sourceFile = $reflectionClass->getFileName();
-            if (isset($includedFiles[$sourceFile]) && $this->reader->getClassAnnotation($reflectionClass, Resource::class)) {
+            if (isset($includedFiles[$sourceFile]) && $this->reader->getClassAnnotation($reflectionClass, ApiResource::class)) {
                 $classes[$className] = true;
             }
         }

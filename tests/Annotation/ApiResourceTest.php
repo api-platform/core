@@ -11,16 +11,16 @@
 
 namespace ApiPlatform\Core\Tests\Annotation;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResourceTest extends \PHPUnit_Framework_TestCase
+class ApiResourceTest extends \PHPUnit_Framework_TestCase
 {
     public function testAssignation()
     {
-        $resource = new Resource();
+        $resource = new ApiResource();
         $resource->shortName = 'shortName';
         $resource->description = 'description';
         $resource->iri = 'http://example.com/res';

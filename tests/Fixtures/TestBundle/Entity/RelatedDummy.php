@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @Resource(iri="https://schema.org/Product")
+ * @ApiResource(iri="https://schema.org/Product")
  * @ORM\Entity
  */
 class RelatedDummy extends ParentDummy
