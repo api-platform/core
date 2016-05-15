@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Annotation\Resource;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Symfony\Component\Yaml\Parser as YamlParser;
 

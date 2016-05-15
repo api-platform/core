@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jérémy Derusse <jeremy@derusse.com>
  *
- * @Resource
+ * @ApiResource
  * @ORM\Entity
  */
 class ConcreteDummy extends AbstractDummy

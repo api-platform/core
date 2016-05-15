@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @Resource(attributes={"normalization_context"={"groups": {"circular"}}})
+ * @ApiResource(attributes={"normalization_context"={"groups": {"circular"}}})
  * @ORM\Entity
  */
 class CircularReference

@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\Iri;
 use ApiPlatform\Core\Annotation\Property;
-use ApiPlatform\Core\Annotation\Resource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
- * @Resource(attributes={"filters": {"my_dummy.search", "my_dummy.order", "my_dummy.date"}})
+ * @ApiResource(attributes={"filters": {"my_dummy.search", "my_dummy.order", "my_dummy.date"}})
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string", length=16)

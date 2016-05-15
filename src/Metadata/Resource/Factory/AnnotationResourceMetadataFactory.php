@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Operation;
 use ApiPlatform\Core\Metadata\Resource\PaginationMetadata;
@@ -19,7 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a resource metadata from {@see Resource} annotations.
+ * Creates a resource metadata from {@see ApiResource} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -54,7 +54,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
-        $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, Resource::class);
+        $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, ApiResource::class);
         if (null === $resourceAnnotation) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
@@ -81,7 +81,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
     }
 
-    private function createMetadata(Resource $annotation, ResourceMetadata $parentResourceMetadata = null) : ResourceMetadata
+    private function createMetadata(ApiResource $annotation, ResourceMetadata $parentResourceMetadata = null) : ResourceMetadata
     {
         if (!$parentResourceMetadata) {
             return new ResourceMetadata(
