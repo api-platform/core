@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\Property;
-use ApiPlatform\Core\Annotation\Resource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Mikaël Labrut <labrut@gmail.com>
  *
- * @Resource(attributes={
+ * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"output"}},
  *     "denormalization_context"={"groups"={"input"}}
  * })

@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\Property;
-use ApiPlatform\Core\Annotation\Resource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @Resource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
+ * @ApiResource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
  * @ORM\Entity
  */
 class Dummy
