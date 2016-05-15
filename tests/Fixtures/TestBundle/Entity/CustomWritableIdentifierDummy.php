@@ -11,13 +11,13 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom writable identifier dummy.
  *
- * @Resource
+ * @ApiResource
  * @ORM\Entity
  */
 class CustomWritableIdentifierDummy

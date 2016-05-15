@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\Resource;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @Resource
+ * @ApiResource
  * @ORM\Entity
  */
 class ThirdLevel

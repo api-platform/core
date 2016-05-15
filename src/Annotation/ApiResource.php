@@ -12,14 +12,14 @@
 namespace ApiPlatform\Core\Annotation;
 
 /**
- * Resource annotation.
+ * ApiResource annotation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @Annotation
  * @Target({"CLASS"})
  */
-final class Resource
+final class ApiResource
 {
     /**
      * @var string
