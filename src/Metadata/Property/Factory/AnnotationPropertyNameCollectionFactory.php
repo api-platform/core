@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Annotation\Property;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Util\Reflection;
@@ -62,7 +62,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
 
         // Properties
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            if ($this->reader->getPropertyAnnotation($reflectionProperty, Property::class)) {
+            if ($this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class)) {
                 $propertyNames[$reflectionProperty->name] = true;
             }
         }
@@ -71,7 +71,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             $propertyName = $this->reflection->getProperty($reflectionMethod->name);
 
-            if ($propertyName && $this->reader->getMethodAnnotation($reflectionMethod, Property::class)) {
+            if ($propertyName && $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class)) {
                 $propertyNames[$propertyName] = true;
             }
         }

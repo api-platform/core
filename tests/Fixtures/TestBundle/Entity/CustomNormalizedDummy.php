@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\Property;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -44,7 +44,7 @@ class CustomNormalizedDummy
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Property(iri="http://schema.org/name")
+     * @ApiProperty(iri="http://schema.org/name")
      * @Groups({"input", "output"})
      */
     private $name;
@@ -53,7 +53,7 @@ class CustomNormalizedDummy
      * @var string The dummy name alias.
      *
      * @ORM\Column(nullable=true)
-     * @Property(iri="https://schema.org/alternateName")
+     * @ApiProperty(iri="https://schema.org/alternateName")
      * @Groups({"input", "output"})
      */
     private $alias;

@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\Iri;
-use ApiPlatform\Core\Annotation\Property;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -44,7 +44,7 @@ abstract class AbstractDummy
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Property(iri="http://schema.org/name")
+     * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
 

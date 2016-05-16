@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Annotation\Property;
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Util\Reflection;
@@ -54,7 +54,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         if ($reflectionClass->hasProperty($property)) {
-            $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), Property::class);
+            $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), ApiProperty::class);
 
             if (null !== $annotation) {
                 return $this->createMetadata($annotation, $parentPropertyMetadata);
@@ -74,7 +74,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
                 continue;
             }
 
-            $annotation = $this->reader->getMethodAnnotation($reflectionMethod, Property::class);
+            $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class);
             if (null !== $annotation) {
                 return $this->createMetadata($annotation, $parentPropertyMetadata);
             }
@@ -103,7 +103,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
-    private function createMetadata(Property $annotation, PropertyMetadata $parentPropertyMetadata = null) : PropertyMetadata
+    private function createMetadata(ApiProperty $annotation, PropertyMetadata $parentPropertyMetadata = null) : PropertyMetadata
     {
         if (!$parentPropertyMetadata) {
             return new PropertyMetadata(
