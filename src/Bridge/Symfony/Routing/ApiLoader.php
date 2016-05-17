@@ -11,9 +11,11 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -35,12 +37,14 @@ final class ApiLoader extends Loader
     private $fileLoader;
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
+    private $resourcePathGenerator;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourcePathGeneratorInterface $resourcePathGenerator)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourcePathGenerator = $resourcePathGenerator;
     }
 
     /**
@@ -55,14 +59,18 @@ final class ApiLoader extends Loader
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $normalizedShortName = Inflector::pluralize(Inflector::tableize($resourceMetadata->getShortName()));
+            $resourceShortName = $resourceMetadata->getShortName();
+
+            if (null === $resourceShortName) {
+                throw new InvalidResourceException(sprintf('Resource %s has no short name defined.', $resourceClass));
+            }
 
             foreach ($resourceMetadata->getCollectionOperations() as $operationName => $operation) {
-                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $normalizedShortName, true);
+                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, true);
             }
 
             foreach ($resourceMetadata->getItemOperations() as $operationName => $operation) {
-                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $normalizedShortName, false);
+                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, false);
             }
         }
 
@@ -84,12 +92,12 @@ final class ApiLoader extends Loader
      * @param string          $resourceClass
      * @param string          $operationName
      * @param array           $operation
-     * @param string          $normalizedShortName
+     * @param string          $resourceShortName
      * @param bool            $collection
      *
      * @throws RuntimeException
      */
-    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, string $normalizedShortName, bool $collection)
+    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, string $resourceShortName, bool $collection)
     {
         if (isset($operation['route_name'])) {
             return;
@@ -113,14 +121,15 @@ final class ApiLoader extends Loader
         $path = $operation['path'] ?? null;
 
         if (null === $path) {
-            $path = '/'.$normalizedShortName;
+            $path = '/'.$this->resourcePathGenerator->generateResourceBasePath($resourceShortName);
 
             if (!$collection) {
                 $path .= '/{id}';
             }
         }
 
-        $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $normalizedShortName, $actionName);
+        $resourceRouteName = Inflector::pluralize(Inflector::tableize($resourceShortName));
+        $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $resourceRouteName, $actionName);
 
         $route = new Route(
             $path,
