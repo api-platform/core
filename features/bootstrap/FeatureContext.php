@@ -96,6 +96,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDummy('SomeDummyTest'.$i);
             $dummy->setDescription($descriptions[($i - 1) % 2]);
 
             $this->manager->persist($dummy);
