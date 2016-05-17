@@ -16,6 +16,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Prophecy\Argument;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -85,6 +86,8 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
     public function testNoMethodApiLoader()
     {
         $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withShortName('dummy');
+
         $resourceMetadata = $resourceMetadata->withItemOperations([
             'get' => [],
         ]);
@@ -94,6 +97,14 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidResourceException
+     */
+    public function testNoShortNameApiLoader()
+    {
+        $this->getApiLoaderWithResourceMetadata(new ResourceMetadata())->load(null);
     }
 
     private function getApiLoaderWithResourceMetadata(ResourceMetadata $resourceMetadata): ApiLoader
@@ -109,7 +120,10 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class]));
 
-        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathGeneratorInterface::class);
+        $resourcePathGeneratorProphecy->generateResourceBasePath('dummy')->willReturn('dummies');
+
+        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal());
 
         return $apiLoader;
     }
