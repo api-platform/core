@@ -55,6 +55,7 @@ class SearchFilter extends AbstractFilter
     private $requestStack;
     private $iriConverter;
     private $propertyAccessor;
+    private $caseSensitive;
 
     /**
      * @param ManagerRegistry           $managerRegistry
@@ -112,57 +113,66 @@ class SearchFilter extends AbstractFilter
                 $metadata = $this->getClassMetadata($resourceClass);
             }
 
+            $values = $this->normalizeValues((array) $value);
+
+            if (empty($values)) {
+                continue;
+            }
+
+            $this->caseSensitive = true;
+
             if ($metadata->hasField($field)) {
-                $values = $this->normalizeValues((array) $value);
-
-                if (empty($values)) {
-                    continue;
-                }
-
                 if ('id' === $field) {
                     $values = array_map([$this, 'getFilterValueFromUrl'], $values);
                 }
 
                 $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
+                // prefixing the strategy with i makes it case insensitive
+                if (strpos($strategy, 'i') === 0) {
+                    $strategy = substr($strategy, 1);
+                    $this->caseSensitive = false;
+                }
+
                 if (1 === count($values)) {
                     $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $values[0]);
-                } else {
-                    if (self::STRATEGY_EXACT !== $strategy) {
-                        continue;
-                    }
-
-                    $valueParameter = QueryNameGenerator::generateParameterName($field);
-
-                    $queryBuilder
-                        ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
-                        ->setParameter($valueParameter, $values);
-                }
-            } elseif ($metadata->hasAssociation($field)) {
-                $values = $this->normalizeValues((array) $value);
-
-                if (empty($values)) {
                     continue;
                 }
 
-                $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+                // there are many values, as we translate those to an IN clause, strategy must be exact
+                if (self::STRATEGY_EXACT !== $strategy) {
+                    continue;
+                }
 
-                $association = $field;
-                $associationAlias = QueryNameGenerator::generateJoinAlias($association);
-                $valueParameter = QueryNameGenerator::generateParameterName($association);
+                $valueParameter = QueryNameGenerator::generateParameterName($field);
 
                 $queryBuilder
-                    ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+                    ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $values);
+            }
 
-                if (1 === count($values)) {
-                    $queryBuilder
-                        ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
-                        ->setParameter($valueParameter, $values[0]);
-                } else {
-                    $queryBuilder
-                        ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
-                        ->setParameter($valueParameter, $values);
-                }
+            // metadata doesn't have the field, nor an association on the field
+            if (!$metadata->hasAssociation($field)) {
+                continue;
+            }
+
+            $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+
+            $association = $field;
+            $associationAlias = QueryNameGenerator::generateJoinAlias($association);
+            $valueParameter = QueryNameGenerator::generateParameterName($association);
+
+            $queryBuilder
+                ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+
+            if (1 === count($values)) {
+                $queryBuilder
+                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                    ->setParameter($valueParameter, $values[0]);
+            } else {
+                $queryBuilder
+                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                    ->setParameter($valueParameter, $values);
             }
         }
     }
@@ -186,31 +196,34 @@ class SearchFilter extends AbstractFilter
             case null:
             case self::STRATEGY_EXACT:
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' = '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
                 break;
 
             case self::STRATEGY_PARTIAL:
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, sprintf('%%%s%%', $value));
                 break;
 
             case self::STRATEGY_START:
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, sprintf('%s%%', $value));
                 break;
 
             case self::STRATEGY_END:
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s LIKE :%s', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, sprintf('%%%s', $value));
                 break;
 
             case self::STRATEGY_WORD_START:
+                $andWhere = $this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap(':%3$s_1');
+                $andWhere .= ' OR '.$this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap(':%3$s_2');
+
                 $queryBuilder
-                    ->andWhere(sprintf('%1$s.%2$s LIKE :%3$s_1 OR %1$s.%2$s LIKE :%3$s_2', $alias, $field, $valueParameter))
+                    ->andWhere(sprintf($andWhere, $alias, $field, $valueParameter))
                     ->setParameter(sprintf('%s_1', $valueParameter), sprintf('%s%%', $value))
                     ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value));
                 break;
@@ -218,6 +231,23 @@ class SearchFilter extends AbstractFilter
             default:
                 throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
         }
+    }
+
+    /**
+     * Wraps a string with a doctrine expression according to the current case status
+     * Example: $this->caseWrap('o.id') becomes LOWER(o.id) when $this->caseSensitive is true.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    private function caseWrap(string $string): string
+    {
+        if (false !== $this->caseSensitive) {
+            return $string;
+        }
+
+        return sprintf('LOWER(%s)', $string);
     }
 
     /**

@@ -234,4 +234,14 @@ class Dummy
     {
         $this->dummyBoolean = $dummyBoolean;
     }
+
+    public function setDummy($dummy = null)
+    {
+        $this->dummy = $dummy;
+    }
+
+    public function getDummy()
+    {
+        return $this->dummy;
+    }
 }
