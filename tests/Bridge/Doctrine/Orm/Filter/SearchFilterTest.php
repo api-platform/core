@@ -403,6 +403,21 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // Exact case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'iexact'],
+                ],
+                [
+                    'name' => 'exact',
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) = LOWER(:name_123456abcdefg)', Dummy::class),
+                    'parameters' => [
+                        'name_123456abcdefg' => 'exact',
+                    ],
+                ],
+            ],
             // invalid values
             [
                 [
@@ -447,6 +462,21 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // partial case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'ipartial'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)', Dummy::class),
+                    'parameters' => [
+                        'name_123456abcdefg' => '%partial%',
+                    ],
+                ],
+            ],
             [
                 [
                     'properties' => ['id' => null, 'name' => 'start'],
@@ -456,6 +486,21 @@ class SearchFilterTest extends KernelTestCase
                 ],
                 [
                     'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
+                    'parameters' => [
+                        'name_123456abcdefg' => 'partial%',
+                    ],
+                ],
+            ],
+            // start case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'istart'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg' => 'partial%',
                     ],
@@ -475,6 +520,21 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            // end case insensitive
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'iend'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)', Dummy::class),
+                    'parameters' => [
+                        'name_123456abcdefg' => '%partial',
+                    ],
+                ],
+            ],
             [
                 [
                     'properties' => ['id' => null, 'name' => 'word_start'],
@@ -484,6 +544,21 @@ class SearchFilterTest extends KernelTestCase
                 ],
                 [
                     'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg_1 OR o.name like :name_123456abcdefg_2', Dummy::class),
+                    'parameters' => [
+                        'name_123456abcdefg_1' => 'partial%',
+                        'name_123456abcdefg_2' => '% partial%',
+                    ],
+                ],
+            ],
+            [
+                [
+                    'properties' => ['id' => null, 'name' => 'iword_start'],
+                ],
+                [
+                    'name' => 'partial',
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg_1) OR LOWER(o.name) like LOWER(:name_123456abcdefg_2)', Dummy::class),
                     'parameters' => [
                         'name_123456abcdefg_1' => 'partial%',
                         'name_123456abcdefg_2' => '% partial%',
