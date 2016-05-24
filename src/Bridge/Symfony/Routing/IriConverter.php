@@ -77,25 +77,75 @@ final class IriConverter implements IriConverterInterface
         $resourceClass = $this->getObjectClass($item);
         $routeName = $this->getRouteName($resourceClass, false);
 
+        $identifiers = $this->generateIdentifiersUrl($this->getIdentifiersFromItem($item));
+
+        return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+    }
+
+    /**
+     * Generate the identifier url.
+     *
+     * @param array $identifiers
+     *
+     * @return array
+     */
+    public function generateIdentifiersUrl(array $identifiers) : array
+    {
+        if (1 === count($identifiers)) {
+            return [rawurlencode(array_values($identifiers)[0])];
+        }
+
+        foreach ($identifiers as $name => $value) {
+            $identifiers[$name] = sprintf('%s=%s', $name, $value);
+        }
+
+        return $identifiers;
+    }
+
+    /**
+     * Find identifiers from an Item (Object).
+     *
+     * @param object $item
+     *
+     * @throws RuntimeException
+     *
+     * @return array
+     */
+    private function getIdentifiersFromItem($item) : array
+    {
+        $identifiers = [];
+        $resourceClass = $this->getObjectClass($item);
+
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            if ($propertyMetadata->isIdentifier()) {
-                $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+            if (!$propertyMetadata->isIdentifier()) {
+                continue;
+            }
+
+            $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+
+            if (!is_object($identifiers[$propertyName])) {
+                continue;
+            }
+
+            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
+            $relatedItem = $identifiers[$propertyName];
+
+            foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
+
+                if ($propertyMetadata->isIdentifier()) {
+                    $identifiers[$propertyName] = $this->propertyAccessor->getValue($relatedItem, $relatedPropertyName);
+                }
+            }
+
+            if (empty($identifiers[$propertyName])) {
+                throw new \RuntimeException(sprintf('%s identifiers can not be found', $resourceClass));
             }
         }
 
-        if (1 === count($identifiers)) {
-            $identifiers = array_map(function ($identifierValue) {
-                return rawurlencode($identifierValue);
-            }, $identifiers);
-        } else {
-            $identifiers = array_map(function ($identifierName, $identifierValue) {
-                return sprintf('%s=%s', $identifierName, rawurlencode($identifierValue));
-            }, array_keys($identifiers), $identifiers);
-        }
-
-        return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+        return $identifiers;
     }
 
     /**
