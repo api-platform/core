@@ -77,25 +77,72 @@ final class IriConverter implements IriConverterInterface
         $resourceClass = $this->getObjectClass($item);
         $routeName = $this->getRouteName($resourceClass, false);
 
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+        $identifiers = array_map([$this, 'generateIdentifiersUrl'], $this->getIdentifiersFromItem($item));
 
-            if ($propertyMetadata->isIdentifier()) {
-                $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
-            }
-        }
-
-        if (1 === count($identifiers)) {
-            $identifiers = array_map(function ($identifierValue) {
-                return rawurlencode($identifierValue);
-            }, $identifiers);
-        } else {
+        if (count($identifiers) > 1) {
             $identifiers = array_map(function ($identifierName, $identifierValue) {
                 return sprintf('%s=%s', $identifierName, rawurlencode($identifierValue));
             }, array_keys($identifiers), $identifiers);
         }
 
         return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+    }
+
+    /**
+     * Get the identifier url.
+     *
+     * @param mixed $identifiers
+     *
+     * @return string
+     */
+    public function generateIdentifiersUrl($identifiers) : string
+    {
+        if (!is_array($identifiers)) {
+            return rawurlencode($identifiers);
+        }
+
+        if (1 === count($identifiers)) {
+            return rawurlencode(array_values($identifiers)[0]);
+        }
+
+        return array_map(function ($identifierName, $identifierValue) {
+            return sprintf('%s=%s', $identifierName, $this->generateIdentifiersUrl($identifierValue));
+        }, array_keys($identifiers), $identifiers);
+    }
+
+    /**
+     * Find identifiers from an Item (Object).
+     *
+     * @param object $item
+     *
+     * @throws RuntimeException
+     *
+     * @return array
+     */
+    private function getIdentifiersFromItem($item) : array
+    {
+        $identifiers = [];
+        $resourceClass = $this->getObjectClass($item);
+
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+
+            if ($propertyMetadata->isIdentifier()) {
+                $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+
+                if (!is_object($identifiers[$propertyName])) {
+                    continue;
+                }
+
+                $identifiers[$propertyName] = $this->getIdentifiersFromItem($identifiers[$propertyName]);
+
+                if (0 === count($identifiers[$propertyName])) {
+                    throw new \RuntimeException(sprintf('%s identifiers can not be found', $resourceClass));
+                }
+            }
+        }
+
+        return $identifiers;
     }
 
     /**
