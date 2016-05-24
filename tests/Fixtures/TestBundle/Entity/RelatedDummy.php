@@ -61,6 +61,12 @@ class RelatedDummy extends ParentDummy
     public $thirdLevel;
 
     /**
+     * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, fetch="EAGER", mappedBy="relatedDummy")
+     * @Groups({"fakemanytomany"})
+     */
+    public $relatedToDummyFriend;
+
+    /**
      * @var bool A dummy bool.
      *
      * @ORM\Column(type="boolean", nullable=true)
@@ -116,5 +122,25 @@ class RelatedDummy extends ParentDummy
     public function setDummyBoolean($dummyBoolean)
     {
         $this->dummyBoolean = $dummyBoolean;
+    }
+
+    /**
+     * Get relatedToDummyFriend.
+     *
+     * @return relatedToDummyFriend.
+     */
+    public function getRelatedToDummyFriend()
+    {
+        return $this->relatedToDummyFriend;
+    }
+
+    /**
+     * Set relatedToDummyFriend.
+     *
+     * @param relatedToDummyFriend the value to set.
+     */
+    public function setRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
+    {
+        $this->relatedToDummyFriend = $relatedToDummyFriend;
     }
 }
