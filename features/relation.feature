@@ -85,7 +85,12 @@ Feature: Relations support
       "@context": "/contexts/RelatedToDummyFriend",
       "@id": "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1",
       "@type": "RelatedToDummyFriend",
-      "name": "Friends relation"
+      "name": "Friends relation",
+      "dummyFriend": {
+        "@id": "/dummy_friends/1",
+        "@type": "DummyFriend",
+        "name": "Zoidberg"
+      }
     }
     """
   
@@ -100,7 +105,12 @@ Feature: Relations support
       "@context": "/contexts/RelatedToDummyFriend",
       "@id": "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1",
       "@type": "RelatedToDummyFriend",
-      "name": "Friends relation"
+      "name": "Friends relation",
+      "dummyFriend": {
+        "@id": "/dummy_friends/1",
+        "@type": "DummyFriend",
+        "name": "Zoidberg"
+      }
     }
     """
 

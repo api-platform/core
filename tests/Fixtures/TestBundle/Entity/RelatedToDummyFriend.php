@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Related To Dummy Friend represent an association table for a manytomany relation.
  *
- * @ApiResource()
+ * @ApiResource(attributes={"normalization_context"={"groups": {"fakemanytomany"}}})
  * @ORM\Entity
  */
 class RelatedToDummyFriend
@@ -31,6 +31,7 @@ class RelatedToDummyFriend
      * @ORM\Column
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
+     * @Groups({"fakemanytomany"})
      */
     private $name;
 
@@ -46,7 +47,6 @@ class RelatedToDummyFriend
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="RelatedDummy", inversedBy="relatedToDummyFriend")
      * @ORM\JoinColumn(name="relateddummy_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @Groups({"fakemanytomany"})
      */
     private $relatedDummy;
 

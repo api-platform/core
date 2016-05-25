@@ -33,7 +33,6 @@ class DummyFriend
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"fakemanytomany"})
      */
     private $id;
 
