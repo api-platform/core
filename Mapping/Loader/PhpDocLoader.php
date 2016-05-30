@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\Mapping\Loader;
 
 use Dunglas\ApiBundle\Mapping\ClassMetadata;
 use Dunglas\ApiBundle\Util\ReflectionTrait;
+use phpDocumentor\Reflection\ClassReflector;
 use phpDocumentor\Reflection\FileReflector;
 use PropertyInfo\PropertyInfoInterface;
 
