@@ -26,6 +26,7 @@
             <argument type="service" id="kernel" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.routing.resource_path_generator" />
 
             <tag name="routing.loader" />
         </service>
@@ -43,6 +44,12 @@
         </service>
 
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
+
+        <!-- Resource path generators -->
+
+        <service id="api_platform.routing.resource_path_generator.underscore" class="ApiPlatform\Core\Routing\UnderscoreResourcePathGenerator" public="false" />
+
+        <service id="api_platform.routing.resource_path_generator.dash" class="ApiPlatform\Core\Routing\DashResourcePathGenerator" public="false" />
 
         <!-- Event listeners -->
 

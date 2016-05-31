@@ -274,6 +274,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.route_loader',
             'api_platform.router',
             'api_platform.iri_converter',
+            'api_platform.routing.resource_path_generator.underscore',
+            'api_platform.routing.resource_path_generator.dash',
             'api_platform.listener.request.format',
             'api_platform.listener.view.validation',
             'api_platform.listener.request.format',
@@ -324,6 +326,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $aliases = [
+            'api_platform.routing.resource_path_generator' => 'api_platform.routing.resource_path_generator.underscore',
             'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.cache' => 'api_platform.metadata.resource.cache.array',
             'api_platform.metadata.property.cache' => 'api_platform.metadata.property.cache.array',

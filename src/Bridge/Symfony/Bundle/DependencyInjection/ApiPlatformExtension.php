@@ -57,6 +57,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
+        $container->setAlias('api_platform.routing.resource_path_generator', $config['routing']['resource_path_generator']);
+
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
