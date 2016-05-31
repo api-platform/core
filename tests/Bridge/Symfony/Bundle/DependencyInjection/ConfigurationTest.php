@@ -34,6 +34,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'title' => 'title',
             'description' => 'description',
             'supported_formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
+            'routing' => [
+                'resource_path_generator' => 'api_platform.routing.resource_path_generator.underscore',
+            ],
             'name_converter' => null,
             'enable_fos_user' => false,
             'enable_nelmio_api_doc' => true,
