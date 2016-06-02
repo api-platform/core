@@ -1,10 +1,9 @@
-# ApiBundle
+# Api platform core library
 
-**The `dev-master` version of DunglasApiBundle is part of API Platform 2.0 and is highly experimental, use the 1.0 branch in production.**
+**The `dev-master` version of Api core library is part of API Platform 2.0 and is highly experimental, use the 1.0 branch in production.**
 
-DunglasApiBundle is an easy to use and powerful system to create [hypermedia-driven REST APIs](https://en.wikipedia.org/wiki/HATEOAS).
-It is a component of the [API Platform framework](https://api-platform.com) and it can be used
-as a standalone bundle for [the Symfony framework](https://symfony.com).
+Api core is an easy to use and powerful library to create [hypermedia-driven REST APIs](https://en.wikipedia.org/wiki/HATEOAS).
+It is a component of the [API Platform framework](https://api-platform.com) on top of [the Symfony framework](https://symfony.com).
 
 It embraces [JSON for Linked Data (JSON-LD)](http://json-ld.org) and [Hydra Core Vocabulary](http://www.hydra-cg.com) web standards. 
 
