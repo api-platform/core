@@ -68,7 +68,9 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     {
         $groups = $this->getPropertySerializerGroups($resourceClass, $property);
 
-        if (false !== $propertyMetadata->isReadable()) {
+        if ($propertyMetadata->isIdentifier()) {
+            $propertyMetadata = $propertyMetadata->withReadable(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $groups)));
+        } elseif (false !== $propertyMetadata->isReadable()) {
             $propertyMetadata = $propertyMetadata->withReadable(null === $normalizationGroups || !empty(array_intersect($normalizationGroups, $groups)));
         }
         if (false !== $propertyMetadata->isWritable()) {

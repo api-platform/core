@@ -23,6 +23,24 @@ Feature: Relations support
     }
     """
 
+  Scenario: Create a dummy friend
+    When I send a "POST" request to "/dummy_friends" with body:
+    """
+    {"name": "Zoidberg"}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/DummyFriend",
+      "@id": "/dummy_friends/1",
+      "@type": "DummyFriend",
+      "name": "Zoidberg"
+    }
+    """
+
   Scenario: Create a related dummy
     When I send a "POST" request to "/related_dummies" with body:
     """
@@ -42,11 +60,60 @@ Feature: Relations support
       "name": null,
       "dummyDate": null,
       "thirdLevel": "/third_levels/1",
+      "relatedToDummyFriend": null,
       "dummyBoolean": null,
       "symfony": "symfony",
       "age": null
     }
     """
+
+  Scenario: Create a friend relationship
+    When I send a "POST" request to "/related_to_dummy_friends" with body:
+    """
+    {
+        "name": "Friends relation",
+        "dummyFriend": "/dummy_friends/1",
+        "relatedDummy": "/related_dummies/1"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedToDummyFriend",
+      "@id": "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1",
+      "@type": "RelatedToDummyFriend",
+      "name": "Friends relation",
+      "dummyFriend": {
+        "@id": "/dummy_friends/1",
+        "@type": "DummyFriend",
+        "name": "Zoidberg"
+      }
+    }
+    """
+  
+  Scenario: Get the relationship
+    When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedToDummyFriend",
+      "@id": "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1",
+      "@type": "RelatedToDummyFriend",
+      "name": "Friends relation",
+      "dummyFriend": {
+        "@id": "/dummy_friends/1",
+        "@type": "DummyFriend",
+        "name": "Zoidberg"
+      }
+    }
+    """
+
 
   Scenario: Create a dummy with relations
     When I send a "POST" request to "/dummies" with body:

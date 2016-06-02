@@ -64,7 +64,7 @@
 
         <!-- Metadata loader -->
 
-        <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="10" public="false">
+        <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="doctrine" />
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
         </service>

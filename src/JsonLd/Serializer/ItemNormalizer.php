@@ -193,7 +193,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
             if (
-                (isset($context['jsonld_normalize']) && !$propertyMetadata->isIdentifier() && $propertyMetadata->isReadable()) ||
+                (isset($context['jsonld_normalize']) && $propertyMetadata->isReadable()) ||
                 (isset($context['jsonld_denormalize']) && $propertyMetadata->isWritable())
             ) {
                 $allowedAttributes[] = $propertyName;
