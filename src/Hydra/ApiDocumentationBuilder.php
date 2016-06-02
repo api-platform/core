@@ -29,57 +29,18 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
  */
 final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 {
-    /**
-     * @var ResourceNameCollectionFactoryInterface
-     */
     private $resourceNameCollectionFactory;
-
-    /**
-     * @var ResourceMetadataFactoryInterface
-     */
     private $resourceMetadataFactory;
-
-    /**
-     * @var PropertyNameCollectionFactoryInterface
-     */
     private $propertyNameCollectionFactory;
-
-    /**
-     * @var PropertyMetadataFactoryInterface
-     */
     private $propertyMetadataFactory;
-
-    /**
-     * @var ContextBuilderInterface
-     */
     private $contextBuilder;
-
-    /**
-     * @var ResourceClassResolverInterface
-     */
     private $resourceClassResolver;
-
-    /**
-     * @var OperationMethodResolverInterface
-     */
     private $operationMethodResolver;
-
-    /**
-     * @var UrlGeneratorInterface
-     */
     private $urlGenerator;
-
-    /**
-     * @var string
-     */
     private $title;
-
-    /**
-     * @var string
-     */
     private $description;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, string $title, string $description)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '')
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -275,14 +236,20 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             ],
         ];
 
-        return [
-            '@context' => $this->getContext(),
-            '@id' => $this->urlGenerator->generate('api_hydra_vocab'),
-            'hydra:title' => $this->title,
-            'hydra:description' => $this->description,
-            'hydra:entrypoint' => $this->urlGenerator->generate('api_jsonld_entrypoint'),
-            'hydra:supportedClass' => $classes,
-        ];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_hydra_vocab')];
+
+        if ('' !== $this->title) {
+            $doc['hydra:title'] = $this->title;
+        }
+
+        if ('' !== $this->description) {
+            $doc['hydra:description'] = $this->description;
+        }
+
+        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_jsonld_entrypoint');
+        $doc['hydra:supportedClass'] = $classes;
+
+        return $doc;
     }
 
     /**
