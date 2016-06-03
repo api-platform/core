@@ -1,0 +1,5 @@
+resources:
+    single_file_config:
+        shortName: 'single_file_config'
+        description: 'File configured resource'
+        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy'

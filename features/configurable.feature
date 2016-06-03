@@ -26,6 +26,22 @@ Feature: Configurable resource CRUD
     }
     """
 
+  Scenario: Get a single file configured resource
+    When I send a "GET" request to "/single_file_configs"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/single_file_config",
+      "@id": "/single_file_configs",
+      "@type": "hydra:Collection",
+      "hydra:member": [],
+      "hydra:totalItems": 0
+    }
+    """
+
   @dropSchema
   Scenario: Retrieve the ConfigDummy resource
     When I send a "GET" request to "/fileconfigdummies/1"

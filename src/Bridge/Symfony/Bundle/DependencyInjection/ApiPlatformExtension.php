@@ -149,12 +149,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerFileLoaders(ContainerBuilder $container)
     {
         $paths = [];
+        $globOptions = GLOB_BRACE | GLOB_NOSORT;
+        $prefix = DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
+        $apiResourcesGlob = $prefix.'api_resources.{xml,yml,yaml}';
+        $namedResourcesGlob = $prefix.'api_resources/*.{xml,yml,yaml}';
+
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflectionClass = new \ReflectionClass($bundle);
             $bundleDirectory = dirname($reflectionClass->getFileName());
-            $glob = $bundleDirectory.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'resources.{xml,yml}';
 
-            $paths = array_merge($paths, glob($glob, GLOB_BRACE | GLOB_NOSORT));
+            $paths = array_merge($paths, glob($bundleDirectory.$apiResourcesGlob, $globOptions), glob($bundleDirectory.$namedResourcesGlob, $globOptions));
         }
 
         $yamlPaths = array_filter($paths, function ($v) {
