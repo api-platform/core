@@ -31,8 +31,8 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('title')->cannotBeEmpty()->isRequired()->info('The title of the API.')->end()
-                ->scalarNode('description')->cannotBeEmpty()->isRequired()->info('The description of the API.')->end()
+                ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
+                ->scalarNode('description')->defaultValue('')->info('The description of the API.')->end()
                 ->arrayNode('supported_formats')
                     ->defaultValue(['jsonld' => ['mime_types' => ['application/ld+json']]])
                     ->info('The list of enabled formats. The first one will be the default.')
