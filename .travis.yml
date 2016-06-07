@@ -27,5 +27,5 @@ install:
     - composer update --no-interaction --prefer-dist
 
 script:
-    - phpunit
+    - vendor/bin/phpunit
     - vendor/bin/behat
