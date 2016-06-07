@@ -1,7 +1,7 @@
 Feature: Retrieve data with Composite identifiers
   In order to retrieve relations with composite identifiers
   As a client software developer
-  I need to retrieve all collections 
+  I need to retrieve all collections
 
   @createSchema
   @dropSchema
@@ -77,15 +77,38 @@ Feature: Retrieve data with Composite identifiers
     """
 
   @createSchema
-  @dropSchema
   Scenario: Get the first composite relation
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_relations/compositeItem=1;compositeLabel=1"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "\/contexts\/CompositeRelation",
+        "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
+        "@type": "CompositeRelation",
+        "value": "somefoobardummy"
+    }
+    """
 
-  @createSchema
+  Scenario: Get the first composite relation with a reverse identifiers order
+    Given there are Composite identifier objects
+    When I send a "GET" request to "/composite_relations/compositeLabel=1;compositeItem=1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "\/contexts\/CompositeRelation",
+        "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
+        "@type": "CompositeRelation",
+        "value": "somefoobardummy"
+    }
+    """
+
   @dropSchema
   Scenario: Get first composite item
     Given there are Composite identifier objects
