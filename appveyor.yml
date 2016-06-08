@@ -22,9 +22,8 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
   - php -r "readfile('http://getcomposer.org/installer');" | php
   - php composer.phar install --no-interaction --no-progress
-  - appveyor DownloadFile https://phar.phpunit.de/phpunit.phar
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - php phpunit.phar
   - php vendor\behat\behat\bin\behat
+  - php vendor\phpunit\phpunit\phpunit

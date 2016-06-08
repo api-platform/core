@@ -43,8 +43,6 @@ class PhpDocResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractDescription()
     {
-        $this->markTestSkipped('Require Prophecy to update to phpDocumentor/reflection-docblock 3.');
-
         $decoratedProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedProphecy->create(DummyEntity::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
         $decorated = $decoratedProphecy->reveal();
