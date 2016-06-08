@@ -16,6 +16,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -148,28 +149,31 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerFileLoaders(ContainerBuilder $container)
     {
-        $paths = [];
+        $prefix = DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
+        $yamlResources = [];
+        $xmlResources = [];
+
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflectionClass = new \ReflectionClass($bundle);
-            $bundleDirectory = dirname($reflectionClass->getFileName());
-            $glob = $bundleDirectory.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'resources.{xml,yml}';
+            $configDirectory = dirname($reflectionClass->getFileName()).$prefix;
+            $yamlResources = array_merge($yamlResources, glob($configDirectory.'api_resources.{yml,yaml}'));
 
-            $paths = array_merge($paths, glob($glob, GLOB_BRACE | GLOB_NOSORT));
+            foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.{yml,yaml}') as $file) {
+                $yamlResources[] = $file->getRealPath();
+            }
+
+            $xmlResources = array_merge($xmlResources, glob($configDirectory.'api_resources.xml'));
+
+            foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.xml') as $file) {
+                $xmlResources[] = $file->getRealPath();
+            }
         }
 
-        $yamlPaths = array_filter($paths, function ($v) {
-            return preg_match('/\.yml$/', $v);
-        });
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->replaceArgument(0, $yamlResources);
+        $container->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->replaceArgument(0, $yamlResources);
 
-        $xmlPaths = array_filter($paths, function ($v) {
-            return preg_match('/\.xml$/', $v);
-        });
-
-        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->replaceArgument(0, $yamlPaths);
-        $container->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->replaceArgument(0, $yamlPaths);
-
-        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->replaceArgument(0, $xmlPaths);
-        $container->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->replaceArgument(0, $xmlPaths);
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->replaceArgument(0, $xmlResources);
     }
 
     /**

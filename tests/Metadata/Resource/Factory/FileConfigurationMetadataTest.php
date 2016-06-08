@@ -76,7 +76,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testYamlResourceName()
     {
-        $configPath = __DIR__.'/../../../Fixtures/resources.yml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
         $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
 
         $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([
@@ -86,7 +86,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testXmlResourceName()
     {
-        $configPath = __DIR__.'/../../../Fixtures/resources.xml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
 
         $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([
@@ -99,7 +99,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testYamlCreateResourceMetadata(ResourceMetadata $expectedResourceMetadata)
     {
-        $configPath = __DIR__.'/../../../Fixtures/resources.yml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
         $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
@@ -113,7 +113,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testXmlCreateResourceMetadata($expectedResourceMetadata)
     {
-        $configPath = __DIR__.'/../../../Fixtures/resources.xml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
         $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
@@ -127,7 +127,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testYamlDoesNotExistMetadataFactory()
     {
-        $configPath = __DIR__.'/../../../Fixtures/resourcenotfound.yml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.yml';
         $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
         $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
 
@@ -141,7 +141,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testXmlDoesNotExistMetadataFactory()
     {
-        $configPath = __DIR__.'/../../../Fixtures/resourcenotfound.xml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.xml';
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
         $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
 
@@ -155,7 +155,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotValidXml()
     {
-        $configPath = __DIR__.'/../../../Fixtures/resourcesinvalid.xml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
         $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
 
@@ -169,7 +169,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testXmlOptionalResourceMetadata($expectedResourceMetadata)
     {
-        $configPath = __DIR__.'/../../../Fixtures/resourcesoptional.xml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.xml';
 
         $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
@@ -184,7 +184,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testYamlOptionalResourceMetadata($expectedResourceMetadata)
     {
-        $configPath = __DIR__.'/../../../Fixtures/resourcesoptional.yml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.yml';
 
         $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
