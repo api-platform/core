@@ -38,11 +38,11 @@
     "phpdocumentor/reflection-docblock": "^3.0",
     "symfony/cache": "^3.1@dev",
     "symfony/dependency-injection": "^2.8 || ^3.0",
-    "symfony/finder": "^2.3",
     "symfony/framework-bundle": "^3.1",
     "symfony/phpunit-bridge": "^3.1",
     "symfony/security": "^2.7 || ^3.0",
-    "symfony/validator": "^2.5 || ^3.0"
+    "symfony/validator": "^2.5 || ^3.0",
+    "symfony/finder": "^2.8 || ^3.1"
   },
   "suggest": {
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
