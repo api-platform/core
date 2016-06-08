@@ -125,16 +125,24 @@ class ItemDataProvider implements ItemDataProviderInterface
     {
         $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
         $identifierValues = [$id];
-        $identifierValuesArray = [];
 
         if (count($doctrineMetadataIdentifier) >= 2) {
-            $identifierValues = explode(';', $id);
-            foreach ($identifierValues as $key => $value) {
-                $identifierValueArray = explode('=', $value);
-                if ($doctrineMetadataIdentifier[$key] === $identifierValueArray[0]) {
-                    $identifierValuesArray[] = $identifierValueArray[1];
-                }
+            $identifiers = explode(';', $id);
+            $identifiersMap = [];
+
+            // first transform identifiers to a proper key/value array
+            foreach ($identifiers as $identifier) {
+                $keyValue = explode('=', $identifier);
+                $identifiersMap[$keyValue[0]] = $keyValue[1];
             }
+
+            $identifierValuesArray = [];
+
+            // then, loop through doctrine metadata identifiers to keep the same identifiers order
+            foreach ($doctrineMetadataIdentifier as $metadataIdentifierKey) {
+                $identifierValuesArray[] = $identifiersMap[$metadataIdentifierKey];
+            }
+
             $identifierValues = $identifierValuesArray;
         }
 
