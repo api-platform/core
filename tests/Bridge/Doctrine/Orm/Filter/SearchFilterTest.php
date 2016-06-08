@@ -75,8 +75,6 @@ class SearchFilterTest extends KernelTestCase
      */
     public function testApply(array $filterParameters, array $query, $expected)
     {
-        $this->markTestSkipped('Require Prophecy to update to phpDocumentor/reflection-docblock 3.');
-
         $request = Request::create('/api/dummies', 'GET', $query);
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -441,7 +439,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relateddummy relateddummy_123456abcdefg WHERE o.name = :name_123456abcdefg AND relateddummy_123456abcdefg.id = :relateddummy_123456abcdefg', Dummy::class),
                     'parameters' => [
                         'relatedDummy_123456abcdefg' => 'foo',
                     ],
