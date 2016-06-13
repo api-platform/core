@@ -156,6 +156,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflectionClass = new \ReflectionClass($bundle);
             $configDirectory = dirname($reflectionClass->getFileName()).$prefix;
+
+            if (!is_dir($configDirectory)) {
+                continue;
+            }
+
             $yamlResources = array_merge($yamlResources, glob($configDirectory.'api_resources.{yml,yaml}'));
 
             foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.{yml,yaml}') as $file) {
