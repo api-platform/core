@@ -149,23 +149,23 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerFileLoaders(ContainerBuilder $container)
     {
-        $prefix = DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
         $yamlResources = [];
         $xmlResources = [];
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflectionClass = new \ReflectionClass($bundle);
-            $configDirectory = dirname($reflectionClass->getFileName()).$prefix;
-            $yamlResources = array_merge($yamlResources, glob($configDirectory.'api_resources.{yml,yaml}'));
+            $configDirectory = dirname($reflectionClass->getFileName()).'/Resources/config/';
 
-            foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.{yml,yaml}') as $file) {
-                $yamlResources[] = $file->getRealPath();
-            }
-
-            $xmlResources = array_merge($xmlResources, glob($configDirectory.'api_resources.xml'));
-
-            foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.xml') as $file) {
-                $xmlResources[] = $file->getRealPath();
+            try {
+                foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.{yml,yaml,xml}') as $file) {
+                    if ('xml' === $file->getExtension()) {
+                        $xmlResources[] = $file->getRealPath();
+                    } else {
+                        $yamlResources[] = $file->getRealPath();
+                    }
+                }
+            } catch (\InvalidArgumentException $e) {
+                // Ignore invalid paths
             }
         }
 
