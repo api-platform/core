@@ -53,14 +53,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'items_per_page_parameter_name' => 'itemsPerPage',
                 ],
             ],
-            'metadata' => [
-                'resource' => [
-                    'cache' => 'api_platform.metadata.resource.cache.array',
-                ],
-                'property' => [
-                    'cache' => 'api_platform.metadata.property.cache.array',
-                ],
-            ],
         ], $config);
     }
 }

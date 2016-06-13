@@ -87,23 +87,6 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('metadata')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->arrayNode('resource')
-                        ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('cache')->defaultValue('api_platform.metadata.resource.cache.array')->cannotBeEmpty()->info('Cache service for resource metadata.')->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('property')
-                        ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('cache')->defaultValue('api_platform.metadata.property.cache.array')->cannotBeEmpty()->info('Cache service for property metadata.')->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end();
 
         return $treeBuilder;

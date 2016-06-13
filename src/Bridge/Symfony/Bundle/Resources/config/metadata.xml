@@ -116,24 +116,12 @@
 
         <!-- Cache -->
 
-        <service id="api_platform.metadata.resource.cache.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" public="false">
-            <argument>0</argument>
-            <argument>false</argument>
+        <service id="api_platform.metadata.resource.cache" parent="cache.system" public="false">
+            <tag name="cache.pool" />
         </service>
 
-        <service id="api_platform.metadata.resource.cache.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" public="false">
-            <argument>api_platform_metadata_resource</argument>
-            <argument>0</argument>
-        </service>
-
-        <service id="api_platform.metadata.property.cache.array" class="Symfony\Component\Cache\Adapter\ArrayAdapter" public="false">
-            <argument>0</argument>
-            <argument>false</argument>
-        </service>
-
-        <service id="api_platform.metadata.property.cache.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" public="false">
-            <argument>api_platform_metadata_property</argument>
-            <argument>0</argument>
+        <service id="api_platform.metadata.property.cache" parent="cache.system" public="false">
+            <tag name="cache.pool" />
         </service>
 
     </services>
