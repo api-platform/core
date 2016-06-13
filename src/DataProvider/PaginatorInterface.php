@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Api;
+namespace ApiPlatform\Core\DataProvider;
 
 /**
  * Paginator Interface.

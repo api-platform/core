@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle;
 
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,6 +31,7 @@ final class ApiPlatformBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new DataProviderPass());
         $container->addCompilerPass(new FilterPass());
         $container->addCompilerPass(new DoctrineQueryExtensionPass());
     }

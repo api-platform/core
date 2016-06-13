@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;

@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Api;
 
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;

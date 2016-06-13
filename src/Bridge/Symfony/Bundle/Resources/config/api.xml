@@ -11,8 +11,6 @@
 
         <service id="api_platform.property_info" alias="property_info" public="false" />
 
-        <service id="api_platform.filters" class="ApiPlatform\Core\Api\FilterCollection" public="false" />
-
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Core\Api\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>

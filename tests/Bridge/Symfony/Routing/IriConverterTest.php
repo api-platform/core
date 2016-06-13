@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
 
-use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;

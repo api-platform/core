@@ -211,8 +211,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.resource.metadata_factory',
             'api_platform.metadata.property.name_collection_factory',
             'api_platform.metadata.property.metadata_factory',
-            'api_platform.item_data_provider',
-            'api_platform.collection_data_provider',
             'api_platform.action.delete_item',
         ];
         foreach ($aliases as $alias) {
@@ -245,6 +243,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->willReturn($definition);
 
         $definitions = [
+            'api_platform.item_data_provider',
+            'api_platform.collection_data_provider',
             'api_platform.filters',
             'api_platform.resource_class_resolver',
             'api_platform.operation_method_resolver',

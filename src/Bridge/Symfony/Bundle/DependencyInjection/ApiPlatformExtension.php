@@ -81,6 +81,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
         $loader->load('metadata.xml');
+        $loader->load('data_provider.xml');
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);

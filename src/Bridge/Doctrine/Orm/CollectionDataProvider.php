@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Core\Api\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
@@ -27,18 +27,15 @@ class CollectionDataProvider implements CollectionDataProviderInterface
 {
     private $managerRegistry;
     private $collectionExtensions;
-    private $decorated;
 
     /**
      * @param ManagerRegistry                      $managerRegistry
      * @param QueryCollectionExtensionInterface[]  $collectionExtensions
-     * @param CollectionDataProviderInterface|null $decorated
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions = [], CollectionDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->collectionExtensions = $collectionExtensions;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -46,14 +43,6 @@ class CollectionDataProvider implements CollectionDataProviderInterface
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {
-        if ($this->decorated) {
-            try {
-                return $this->decorated->getCollection($resourceClass, $operationName);
-            } catch (ResourceClassNotSupportedException $resourceClassNotSupportedException) {
-                // Ignore it
-            }
-        }
-
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $manager) {
             throw new ResourceClassNotSupportedException();
