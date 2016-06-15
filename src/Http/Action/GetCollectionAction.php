@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Action;
 use ApiPlatform\Core\Api\CollectionDataProviderInterface;
 use ApiPlatform\Core\Api\PaginatorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Http\RequestAttributesExtractorInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,13 +24,20 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class GetCollectionAction
 {
-    use ActionUtilTrait;
-
+    /**
+     * @var CollectionDataProviderInterface
+     */
     private $collectionDataProvider;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider)
+    /**
+     * @var RequestAttributesExtractorInterface
+     */
+    private $attributesExtractor;
+
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, RequestAttributesExtractorInterface $attributesExtractor)
     {
         $this->collectionDataProvider = $collectionDataProvider;
+        $this->attributesExtractor = $attributesExtractor;
     }
 
     /**
@@ -43,8 +51,11 @@ final class GetCollectionAction
      */
     public function __invoke(Request $request)
     {
-        list($resourceClass, $operationName) = $this->extractAttributes($request);
+        $attributesBag = $this->attributesExtractor->extract($request);
 
-        return $this->collectionDataProvider->getCollection($resourceClass, $operationName);
+        return $this->collectionDataProvider->getCollection(
+            $attributesBag->getResourceClass(),
+            $attributesBag->getCollectionOperationName()
+        );
     }
 }

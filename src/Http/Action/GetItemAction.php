@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Action;
+namespace ApiPlatform\Core\Http\Action;
 
 use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Http\ItemDataProvider;
+use ApiPlatform\Core\Http\RequestAttributesExtractorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -23,13 +25,20 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class GetItemAction
 {
-    use ActionUtilTrait;
-
+    /**
+     * @var ItemDataProvider
+     */
     private $itemDataProvider;
 
-    public function __construct(ItemDataProviderInterface $itemDataProvider)
+    /**
+     * @var RequestAttributesExtractorInterface
+     */
+    private $attributesExtractor;
+
+    public function __construct(ItemDataProviderInterface $itemDataProvider, RequestAttributesExtractorInterface $attributesExtractor)
     {
-        $this->itemDataProvider = $itemDataProvider;
+        $this->itemDataProvider = new ItemDataProvider($itemDataProvider);
+        $this->attributesExtractor = $attributesExtractor;
     }
 
     /**
@@ -45,8 +54,13 @@ final class GetItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceClass, , $operationName) = $this->extractAttributes($request);
+        $attributesBag = $this->attributesExtractor->extract($request);
 
-        return $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
+        return $this->itemDataProvider->getItem(
+            $this->itemDataProvider,
+            $attributesBag->getResourceClass(),
+            $attributesBag->getItemOperationName(),
+            $id
+        );
     }
 }
