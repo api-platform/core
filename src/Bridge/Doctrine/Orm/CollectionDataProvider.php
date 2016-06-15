@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -29,8 +29,8 @@ class CollectionDataProvider implements CollectionDataProviderInterface
     private $collectionExtensions;
 
     /**
-     * @param ManagerRegistry                      $managerRegistry
-     * @param QueryCollectionExtensionInterface[]  $collectionExtensions
+     * @param ManagerRegistry                     $managerRegistry
+     * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions = [])
     {

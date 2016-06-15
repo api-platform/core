@@ -41,7 +41,8 @@ final class DataProviderPass implements CompilerPassInterface
      * @param ContainerBuilder $container
      * @param string           $type
      */
-    private function registerDataProviders(ContainerBuilder $container, string $type) {
+    private function registerDataProviders(ContainerBuilder $container, string $type)
+    {
         $services = $container->findTaggedServiceIds('api_platform.'.$type.'_data_provider');
 
         $queue = new \SplPriorityQueue();
