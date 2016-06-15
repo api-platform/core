@@ -50,7 +50,9 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
         }
 
         foreach ($this->paths as $path) {
-            $resources = $this->yamlParser->parse(file_get_contents($path))['resources'];
+            $resources = $this->yamlParser->parse(file_get_contents($path));
+
+            $resources = $resources['resources'] ?? $resources;
 
             foreach ($resources as $resource) {
                 if (!isset($resource['class'])) {
