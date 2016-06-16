@@ -192,4 +192,52 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
+
+    public function testXmlSingleResourceName()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
+        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
+
+        $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([
+            FileConfigDummy::class,
+        ]));
+    }
+
+    /**
+     * @dataProvider resourceMetadataProvider
+     */
+    public function testXmlSingleResourceMetadata($expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
+
+        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    public function testYamlSingleResourceName()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
+        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
+
+        $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([
+            FileConfigDummy::class,
+        ]));
+    }
+
+    /**
+     * @dataProvider resourceMetadataProvider
+     */
+    public function testYamlSingleResourceMetadata(ResourceMetadata $expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
+
+        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
 }

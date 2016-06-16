@@ -51,27 +51,48 @@ final class XmlResourceNameCollectionFactory implements ResourceNameCollectionFa
         }
 
         foreach ($this->paths as $path) {
-            $this->xmlParser->loadXML(file_get_contents($path));
+            $resources = $this->getResourcesDom($path);
 
             $internalErrors = libxml_use_internal_errors(true);
 
-            if (false === @$this->xmlParser->schemaValidate(self::RESOURCE_SCHEMA)) {
+            if (false === @$resources->schemaValidate(self::RESOURCE_SCHEMA)) {
                 throw new \InvalidArgumentException(sprintf('XML Schema loaded from path %s is not valid! Errors: %s', realpath($path), implode("\n", $this->getXmlErrors($internalErrors))));
             }
 
             libxml_clear_errors();
             libxml_use_internal_errors($internalErrors);
 
-            $xpath = new \DOMXpath($this->xmlParser);
-
-            $resources = $xpath->query('/resources/resource');
-
-            foreach ($resources as $resource) {
+            foreach ($resources->getElementsByTagName('resource') as $resource) {
                 $classes[$resource->getAttribute('class')] = true;
             }
         }
 
         return new ResourceNameCollection(array_keys($classes));
+    }
+
+    /**
+     * Creates a DOMDocument based on `resource` tags of a file-loaded xml document.
+     *
+     * @param string $path the xml file path
+     *
+     * @return \DOMDocument
+     */
+    private function getResourcesDom(string $path) : \DOMDocument
+    {
+        $doc = new \DOMDocument('1.0', 'utf-8');
+        $root = $doc->createElement('resources');
+        $doc->appendChild($root);
+
+        $this->xmlParser->loadXML(file_get_contents($path));
+
+        $xpath = new \DOMXpath($this->xmlParser);
+        $resources = $xpath->query('//resource');
+
+        foreach ($resources as $resource) {
+            $root->appendChild($doc->importNode($resource, true));
+        }
+
+        return $doc;
     }
 
     /**
