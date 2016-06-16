@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.item_data_provider" class="ApiPlatform\Core\DataProvider\ChainItemDataProvider" />
+
+        <service id="api_platform.collection_data_provider" class="ApiPlatform\Core\DataProvider\ChainCollectionDataProvider" />
+
+        <service id="api_platform.filters" class="ApiPlatform\Core\Api\FilterCollection" public="false" />
+    </services>
+
+</container>

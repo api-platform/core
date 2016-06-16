@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -33,22 +33,19 @@ class ItemDataProvider implements ItemDataProviderInterface
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $itemExtensions;
-    private $decorated;
 
     /**
      * @param ManagerRegistry                        $managerRegistry
      * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
      * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
      * @param QueryItemExtensionInterface[]          $itemExtensions
-     * @param ItemDataProviderInterface|null         $decorated
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [], ItemDataProviderInterface $decorated = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -56,14 +53,6 @@ class ItemDataProvider implements ItemDataProviderInterface
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
     {
-        if ($this->decorated) {
-            try {
-                return $this->decorated->getItem($resourceClass, $id, $operationName, $fetchData);
-            } catch (ResourceClassNotSupportedException $resourceClassNotSupportedException) {
-                // Ignore it
-            }
-        }
-
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $manager) {
             throw new ResourceClassNotSupportedException();

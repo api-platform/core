@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
