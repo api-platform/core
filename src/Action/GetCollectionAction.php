@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Core\Api\CollectionDataProviderInterface;
-use ApiPlatform\Core\Api\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 

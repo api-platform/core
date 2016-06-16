@@ -9,9 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Api;
+namespace ApiPlatform\Core\DataProvider;
 
-use ApiPlatform\Core\Exception\ExceptionInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
@@ -19,18 +18,19 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface CollectionDataProviderInterface
+interface ItemDataProviderInterface
 {
     /**
-     * Retrieves a collection.
+     * Retrieves an item.
      *
      * @param string      $resourceClass
      * @param string|null $operationName
+     * @param int|string  $id
+     * @param bool        $fetchData
      *
      * @throws ResourceClassNotSupportedException
-     * @throws ExceptionInterface
      *
-     * @return array|PaginatorInterface|\Traversable
+     * @return object|null
      */
-    public function getCollection(string $resourceClass, string $operationName = null);
+    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false);
 }

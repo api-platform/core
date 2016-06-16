@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
 use ApiPlatform\Core\Action\ActionUtilTrait;
-use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

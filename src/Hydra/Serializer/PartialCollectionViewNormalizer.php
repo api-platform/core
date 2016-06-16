@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
-use ApiPlatform\Core\Api\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\RequestParser;

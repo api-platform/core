@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
-use ApiPlatform\Core\Api\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

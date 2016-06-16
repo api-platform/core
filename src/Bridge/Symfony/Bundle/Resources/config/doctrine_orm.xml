@@ -5,9 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.item_data_provider" alias="api_platform.doctrine.orm.default.item_data_provider" />
-        <service id="api_platform.collection_data_provider" alias="api_platform.doctrine.orm.default.collection_data_provider" />
-
         <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
@@ -24,8 +21,13 @@
             <argument type="collection"></argument> <!-- extensions -->
         </service>
 
-        <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider" />
-        <service id="api_platform.doctrine.orm.default.item_data_provider" parent="api_platform.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider" />
+        <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider">
+            <tag name="api_platform.collection_data_provider" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.default.item_data_provider" parent="api_platform.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider">
+            <tag name="api_platform.item_data_provider" />
+        </service>
 
         <!-- Filter -->
 
