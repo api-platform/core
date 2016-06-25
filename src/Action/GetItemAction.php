@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Action;
 
+use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +24,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class GetItemAction
 {
-    use ActionUtilTrait;
-
     private $itemDataProvider;
 
     public function __construct(ItemDataProviderInterface $itemDataProvider)
@@ -45,8 +44,13 @@ final class GetItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceClass, , $operationName) = $this->extractAttributes($request);
+        list($resourceClass, , $operationName) = RequestAttributesExtractor::extractAttributes($request);
 
-        return $this->getItem($this->itemDataProvider, $resourceClass, $operationName, $id);
+        $data = $this->itemDataProvider->getItem($resourceClass, $id, $operationName, true);
+        if (!$data) {
+            throw new NotFoundHttpException('Not Found');
+        }
+
+        return $data;
     }
 }

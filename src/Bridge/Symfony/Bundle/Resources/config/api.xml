@@ -58,6 +58,12 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>
 
+        <service id="api_platform.listener.view.deserializer" class="ApiPlatform\Core\EventListener\DeserializerViewListener">
+            <argument type="service" id="api_platform.serializer" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="30" />
+        </service>
+
         <service id="api_platform.listener.view.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ViewListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="validator" />
@@ -71,18 +77,13 @@
             <argument type="service" id="api_platform.collection_data_provider" />
         </service>
 
-        <service id="api_platform.action.post_collection" class="ApiPlatform\Core\Action\PostCollectionAction">
-            <argument type="service" id="api_platform.serializer" />
-        </service>
+        <service id="api_platform.action.post_collection" class="ApiPlatform\Core\Action\NullAction" />
 
         <service id="api_platform.action.get_item" class="ApiPlatform\Core\Action\GetItemAction">
             <argument type="service" id="api_platform.item_data_provider" />
         </service>
 
-        <service id="api_platform.action.put_item" class="ApiPlatform\Core\Action\PutItemAction">
-            <argument type="service" id="api_platform.item_data_provider" />
-            <argument type="service" id="api_platform.serializer" />
-        </service>
+        <service id="api_platform.action.put_item" alias="api_platform.action.get_item" />
 
         <service id="api_platform.action.delete_item" alias="api_platform.action.get_item" />
     </services>
