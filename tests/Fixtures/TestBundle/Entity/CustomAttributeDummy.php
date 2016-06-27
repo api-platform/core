@@ -31,10 +31,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "normalization_context"={"groups"={"custom_attr_dummy_get"}},
  *     "denormalization_context"={"groups"={"custom_attr_dummy_get"}}
  *     },
- *          "post"={"method"="POST",
- *      "normalization_context"={"groups"={"custom_attr_dummy_post"}},
- *      "denormalization_context"={"groups"={"custom_attr_dummy_post"}}
- *     },
  *          "put"={"method"="PUT",
  *      "normalization_context"={"groups"={"custom_attr_dummy_put"}},
  *      "denormalization_context"={"groups"={"custom_attr_dummy_put"}}
@@ -60,7 +56,7 @@ class CustomAttributeDummy
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Groups({"custom_attr_dummy_read", "custom_attr_dummy_write", "custom_attr_dummy_post", "custom_attr_dummy_get"})
+     * @Groups({"custom_attr_dummy_read", "custom_attr_dummy_write", "custom_attr_dummy_get"})
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;

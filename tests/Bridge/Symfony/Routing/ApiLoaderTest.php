@@ -19,11 +19,13 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>s
  */
 class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -113,6 +115,10 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+
+        $kernelProphecy->getContainer()->willReturn($containerBuilderProphecy);
+        $containerBuilderProphecy->has(Argument::any())->willReturn(true);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
