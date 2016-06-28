@@ -19,13 +19,13 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Prophecy\Argument;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>s
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -102,6 +102,25 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     */
+    public function testWrongMethodApiLoader()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withShortName('dummy');
+
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+            'post' => ['method' => 'POST'],
+        ]);
+
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([
+            'get' => ['method' => 'GET'],
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+    }
+
+    /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidResourceException
      */
     public function testNoShortNameApiLoader()
@@ -115,10 +134,24 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $possibleArguments = [
+            'api_platform.action.get_collection',
+            'api_platform.action.post_collection',
+            'api_platform.action.get_item',
+            'api_platform.action.put_item',
+            'api_platform.action.delete_item',
+        ];
 
-        $kernelProphecy->getContainer()->willReturn($containerBuilderProphecy);
-        $containerBuilderProphecy->has(Argument::any())->willReturn(true);
+        $containerInterfaceProphecy = $this->prophesize(ContainerInterface::class);
+        $containerInterfaceProphecy->reveal();
+
+        $kernelProphecy->getContainer()->willReturn($containerInterfaceProphecy);
+
+        foreach ($possibleArguments as $possibleArgument) {
+            $containerInterfaceProphecy->has($possibleArgument)->willReturn(true);
+        }
+
+        $containerInterfaceProphecy->has(Argument::type('string'))->willReturn(false);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
