@@ -31,12 +31,6 @@ final class ApiPlatformParser implements ParserInterface
 {
     const IN_PREFIX = 'api_platform_in';
     const OUT_PREFIX = 'api_platform_out';
-
-    const OVERRIDABLE_METHOD = [
-        'put',
-        'get',
-        'delete',
-    ];
     const TYPE_IRI = 'IRI';
     const TYPE_MAP = [
         Type::BUILTIN_TYPE_BOOL => DataTypes::BOOLEAN,
@@ -107,28 +101,38 @@ final class ApiPlatformParser implements ParserInterface
 
         $data = [];
         $options = [];
-        $attributes = $resourceMetadata->getAttributes();
 
-        if (isset($attributes['normalization_context']['groups'])) {
-            $options['serializer_groups'] = $attributes['normalization_context']['groups'];
+        foreach ($resourceMetadata->getCollectionOperations() as $operation) {
+            $options['serializer_groups'] = isset($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [];
+            $options['serializer_groups'] = array_merge(
+                $options['serializer_groups'],
+                isset($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
+            );
         }
-        if (isset($attributes['denormalization_context']['groups'])) {
-            $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $attributes['denormalization_context']['groups']) : $options['serializer_groups'];
+
+        if (isset($options['serializer_groups']) && 0 === count($options['serializer_groups'])) {
+            foreach ($resourceMetadata->getItemOperations() as $operation) {
+                $options['serializer_groups'] = array_merge(
+                    $options['serializer_groups'],
+                    isset($operation['normalization_context']) ? $operation['normalization_context']['groups'] : []
+                );
+                $options['serializer_groups'] = array_merge(
+                    $options['serializer_groups'],
+                    isset($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
+                );
+            }
         }
 
-        foreach (self::OVERRIDABLE_METHOD as $operation) {
-            $itemOperationNormalizationContext = $resourceMetadata->getItemOperationAttribute($operation, 'normalization_context', ['groups' => []], false);
-            $itemOperationDenormalizationContext = $resourceMetadata->getItemOperationAttribute($operation, 'denormalization_context', ['groups' => []], false);
-            $collectionOperationNormalizationContext = $resourceMetadata->getCollectionOperationAttribute($operation, 'normalization_context', ['groups' => []], false);
-            $collectionOperationDenormalizationContext = $resourceMetadata->getCollectionOperationAttribute($operation, 'denormalization_context', ['groups' => []], false);
+        if (isset($options['serializer_groups']) && 0 === count($options['serializer_groups'])) {
+            $options['serializer_groups'] = $resourceMetadata->getAttribute(
+                'normalization_context',
+                ['groups' => []]
+            )['groups'];
 
-            if (isset($itemOperationNormalizationContext['groups']) || isset($collectionOperationNormalizationContext['groups'])) {
-                $options['serializer_groups'] = 0 != count($options) && isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $itemOperationNormalizationContext['groups'], $collectionOperationNormalizationContext['groups']) : [];
-            }
-
-            if (isset($itemOperationDenormalizationContext['groups']) || isset($collectionOperationDenormalizationContext['groups'])) {
-                $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $itemOperationDenormalizationContext['groups'], $collectionOperationDenormalizationContext['groups']) : $options['serializer_groups'];
-            }
+            $options['serializer_groups'] = array_merge(
+                $options['serializer_groups'],
+                $resourceMetadata->getAttribute('denormalization_context', ['groups' => []])
+            )['groups'];
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
