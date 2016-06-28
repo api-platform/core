@@ -249,16 +249,15 @@ Feature: Relations support
       }
       """
 
-  @wip
   Scenario: Create an existing relation
     When I send a "POST" request to "/relation_embedders" with body:
     """
-      {
-        "anotherRelated": {
-          "symfony": "laravel"
-        }
+    {
+      "anotherRelated": {
+        "symfony": "laravel"
       }
-      """
+    }
+    """
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -279,16 +278,31 @@ Feature: Relations support
     }
     """
 
+  Scenario: Post a wrong relation
+    When I send a "POST" request to "/relation_embedders" with body:
+    """
+    {
+      "anotherRelated": {
+        "@id": "/related_dummies/123",
+        "@type": "https://schema.org/Product",
+        "symfony": "phalcon"
+      }
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+
   Scenario: Update an embedded relation
     When I send a "PUT" request to "/relation_embedders/2" with body:
     """
-      {
-        "anotherRelated": {
-          "@id": "/related_dummies/2",
-          "symfony": "API Platform"
-        }
+    {
+      "anotherRelated": {
+        "@id": "/related_dummies/2",
+        "symfony": "API Platform"
       }
-      """
+    }
+    """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
@@ -313,14 +327,14 @@ Feature: Relations support
   Scenario: Update an existing relation
     When I send a "POST" request to "/relation_embedders" with body:
     """
-      {
-        "anotherRelated": {
-          "@id": "/related_dummies/2",
-          "@type": "https://schema.org/Product",
-          "symfony": "phalcon"
-        }
+    {
+    "anotherRelated": {
+        "@id": "/related_dummies/2",
+        "@type": "https://schema.org/Product",
+        "symfony": "phalcon"
       }
-      """
+    }
+    """
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
