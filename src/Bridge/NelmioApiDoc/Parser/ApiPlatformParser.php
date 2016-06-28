@@ -31,6 +31,12 @@ final class ApiPlatformParser implements ParserInterface
 {
     const IN_PREFIX = 'api_platform_in';
     const OUT_PREFIX = 'api_platform_out';
+
+    const OVERRIDABLE_METHOD = [
+        'put',
+        'get',
+        'delete',
+    ];
     const TYPE_IRI = 'IRI';
     const TYPE_MAP = [
         Type::BUILTIN_TYPE_BOOL => DataTypes::BOOLEAN,
@@ -100,8 +106,10 @@ final class ApiPlatformParser implements ParserInterface
         $visited[] = $resourceClass;
 
         $attributes = $resourceMetadata->getAttributes();
+        $itemOperations = $resourceMetadata->getItemOperations() ?? [];
         $options = [];
         $data = [];
+        $serelizationGroupsItemOperation = [];
 
         if (isset($attributes['normalization_context']['groups'])) {
             $options['serializer_groups'] = $attributes['normalization_context']['groups'];
@@ -109,6 +117,19 @@ final class ApiPlatformParser implements ParserInterface
 
         if (isset($attributes['denormalization_context']['groups'])) {
             $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $attributes['denormalization_context']['groups']) : $options['serializer_groups'];
+        }
+
+        foreach ($itemOperations as $key => $itemOperation) {
+            if (isset($itemOperation['normalization_context']['groups'])) {
+                $serelizationGroupsItemOperation = isset($serelizationGroupsItemOperation) ? array_merge($serelizationGroupsItemOperation, $itemOperation['normalization_context']['groups']) : $itemOperation['normalization_context']['groups'];
+            }
+
+            if (isset($itemOperations['denormalization_context']['groups'])) {
+                $serelizationGroupsItemOperation = isset($serelizationGroupsItemOperation) ? array_merge($serelizationGroupsItemOperation, $itemOperation['denormalization_context']['groups']) : $serelizationGroupsItemOperation;
+            }
+            if (in_array($key, self::OVERRIDABLE_METHOD)) {
+                $options['serializer_groups'] = $serelizationGroupsItemOperation;
+            }
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {

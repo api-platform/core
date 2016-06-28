@@ -67,6 +67,65 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    public function testSupportsAttributeNormalization()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata->withItemOperations([
+            'get' => ['method' => 'GET', 'normalization_context' => ['groups' => 'custom_attr_dummy_get']],
+            'put' => ['method' => 'PUT', 'denormalization_context' => ['groups' => 'custom_attr_dummy_put']],
+            'delete' => ['method' => 'DELETE'],
+        ]);
+        $resourceMetadataFactoryProphecy->create(CustomAttributeDummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(CustomAttributeDummy::class, Argument::cetera())->willReturn(new PropertyNameCollection([
+            'id',
+            'name',
+        ]))->shouldBeCalled();
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $idPropertyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_INT, false))
+            ->withDescription('The id.')
+            ->withReadable(true)
+            ->withWritable(false)
+            ->withRequired(true);
+        $propertyMetadataFactoryProphecy->create(CustomAttributeDummy::class, 'id')->willReturn($idPropertyMetadata)->shouldBeCalled();
+        $namePropertyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_STRING, false))
+            ->withDescription('The dummy name.')
+            ->withReadable(true)
+            ->withWritable(true)
+            ->withRequired(true);
+        $propertyMetadataFactoryProphecy->create(CustomAttributeDummy::class, 'name')->willReturn($namePropertyMetadata)->shouldBeCalled();
+
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
+
+        $actual = $apiPlatformParser->parse([
+            'class' => sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, CustomAttributeDummy::class),
+        ]);
+
+        $this->assertEquals([
+            'id' => [
+                'dataType' => DataTypes::INTEGER,
+                'required' => true,
+                'description' => 'The id.',
+                'readonly' => true,
+            ],
+            'name' => [
+                'dataType' => DataTypes::STRING,
+                'required' => true,
+                'description' => 'The dummy name.',
+                'readonly' => false,
+            ],
+        ], $actual);
+    }
+
     public function testSupportsUnknownResource()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
