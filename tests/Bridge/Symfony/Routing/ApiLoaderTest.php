@@ -141,17 +141,13 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             'api_platform.action.put_item',
             'api_platform.action.delete_item',
         ];
-
-        $containerInterfaceProphecy = $this->prophesize(ContainerInterface::class);
-        $containerInterfaceProphecy->reveal();
-
-        $kernelProphecy->getContainer()->willReturn($containerInterfaceProphecy);
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
 
         foreach ($possibleArguments as $possibleArgument) {
-            $containerInterfaceProphecy->has($possibleArgument)->willReturn(true);
+            $containerProphecy->has($possibleArgument)->willReturn(true);
         }
 
-        $containerInterfaceProphecy->has(Argument::type('string'))->willReturn(false);
+        $containerProphecy->has(Argument::type('string'))->willReturn(false);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
@@ -162,7 +158,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathGeneratorInterface::class);
         $resourcePathGeneratorProphecy->generateResourceBasePath('dummy')->willReturn('dummies');
 
-        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal());
+        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal(), $containerProphecy->reveal());
 
         return $apiLoader;
     }

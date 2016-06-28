@@ -25,6 +25,8 @@
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.routing.resource_path_generator" />
+            <argument type="service" id="service_container" />
+
 
             <tag name="routing.loader" />
         </service>
