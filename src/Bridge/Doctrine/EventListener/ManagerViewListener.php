@@ -65,7 +65,6 @@ final class ManagerViewListener
                 $event->setControllerResult(null);
             break;
         }
-
         $objectManager->flush();
     }
 
