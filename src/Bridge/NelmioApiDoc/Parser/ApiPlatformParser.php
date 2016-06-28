@@ -105,30 +105,29 @@ final class ApiPlatformParser implements ParserInterface
     {
         $visited[] = $resourceClass;
 
-        $attributes = $resourceMetadata->getAttributes();
-        $itemOperations = $resourceMetadata->getItemOperations() ?? [];
-        $options = [];
         $data = [];
-        $serelizationGroupsItemOperation = [];
+        $options = [];
+        $attributes = $resourceMetadata->getAttributes();
 
         if (isset($attributes['normalization_context']['groups'])) {
             $options['serializer_groups'] = $attributes['normalization_context']['groups'];
         }
-
         if (isset($attributes['denormalization_context']['groups'])) {
             $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $attributes['denormalization_context']['groups']) : $options['serializer_groups'];
         }
 
-        foreach ($itemOperations as $key => $itemOperation) {
-            if (isset($itemOperation['normalization_context']['groups'])) {
-                $serelizationGroupsItemOperation = isset($serelizationGroupsItemOperation) ? array_merge($serelizationGroupsItemOperation, $itemOperation['normalization_context']['groups']) : $itemOperation['normalization_context']['groups'];
+        foreach (self::OVERRIDABLE_METHOD as $operation) {
+            $itemOperationNormalizationContext = $resourceMetadata->getItemOperationAttribute($operation, 'normalization_context', ['groups' => []], false);
+            $itemOperationDenormalizationContext = $resourceMetadata->getItemOperationAttribute($operation, 'denormalization_context', ['groups' => []], false);
+            $collectionOperationNormalizationContext = $resourceMetadata->getCollectionOperationAttribute($operation, 'normalization_context', ['groups' => []], false);
+            $collectionOperationDenormalizationContext = $resourceMetadata->getCollectionOperationAttribute($operation, 'denormalization_context', ['groups' => []], false);
+
+            if (isset($itemOperationNormalizationContext['groups']) || isset($collectionOperationNormalizationContext['groups'])) {
+                $options['serializer_groups'] = 0 != count($options) && isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $itemOperationNormalizationContext['groups'], $collectionOperationNormalizationContext['groups']) : [];
             }
 
-            if (isset($itemOperations['denormalization_context']['groups'])) {
-                $serelizationGroupsItemOperation = isset($serelizationGroupsItemOperation) ? array_merge($serelizationGroupsItemOperation, $itemOperation['denormalization_context']['groups']) : $serelizationGroupsItemOperation;
-            }
-            if (in_array($key, self::OVERRIDABLE_METHOD)) {
-                $options['serializer_groups'] = $serelizationGroupsItemOperation;
+            if (isset($itemOperationDenormalizationContext['groups']) || isset($collectionOperationDenormalizationContext['groups'])) {
+                $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $itemOperationDenormalizationContext['groups'], $collectionOperationDenormalizationContext['groups']) : $options['serializer_groups'];
             }
         }
 
