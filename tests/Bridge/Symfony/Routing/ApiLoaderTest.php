@@ -19,11 +19,13 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -100,6 +102,25 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     */
+    public function testWrongMethodApiLoader()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withShortName('dummy');
+
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+            'post' => ['method' => 'POST'],
+        ]);
+
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([
+            'get' => ['method' => 'GET'],
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+    }
+
+    /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidResourceException
      */
     public function testNoShortNameApiLoader()
@@ -113,6 +134,20 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);
+        $possibleArguments = [
+            'api_platform.action.get_collection',
+            'api_platform.action.post_collection',
+            'api_platform.action.get_item',
+            'api_platform.action.put_item',
+            'api_platform.action.delete_item',
+        ];
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+
+        foreach ($possibleArguments as $possibleArgument) {
+            $containerProphecy->has($possibleArgument)->willReturn(true);
+        }
+
+        $containerProphecy->has(Argument::type('string'))->willReturn(false);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
@@ -123,7 +158,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathGeneratorInterface::class);
         $resourcePathGeneratorProphecy->generateResourceBasePath('dummy')->willReturn('dummies');
 
-        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal());
+        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal(), $containerProphecy->reveal());
 
         return $apiLoader;
     }
