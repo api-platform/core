@@ -19,6 +19,7 @@ use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Route;
@@ -34,13 +35,16 @@ final class ApiLoader extends Loader
     const ROUTE_NAME_PREFIX = 'api_';
     const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
+    private $kernel;
     private $fileLoader;
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $resourcePathGenerator;
+    private $container;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourcePathGeneratorInterface $resourcePathGenerator)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourcePathGeneratorInterface $resourcePathGenerator, ContainerInterface $container)
     {
+        $this->container = $container;
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -108,10 +112,15 @@ final class ApiLoader extends Loader
         }
 
         $controller = $operation['controller'] ?? null;
-        $actionName = sprintf('%s_%s', strtolower($operation['method']), $collection ? 'collection' : 'item');
+        $collectionType = $collection ? 'collection' : 'item';
+        $actionName = sprintf('%s_%s', strtolower($operation['method']), $collectionType);
 
         if (null === $controller) {
             $controller = self::DEFAULT_ACTION_PATTERN.$actionName;
+
+            if (!$this->container->has($controller)) {
+                throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', $collectionType, $operation['method']));
+            }
         }
 
         if ($operationName !== strtolower($operation['method'])) {
