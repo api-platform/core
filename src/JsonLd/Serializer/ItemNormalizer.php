@@ -298,7 +298,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
             try {
                 return $this->iriConverter->getItemFromIri($value);
             } catch (InvalidArgumentException $e) {
-                // Give a change to other normalizers (e.g.: DateTimeNormalizer)
+                // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
             }
         }
 
