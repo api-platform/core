@@ -194,6 +194,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.resource.metadata_factory',
             'api_platform.metadata.property.name_collection_factory',
             'api_platform.metadata.property.metadata_factory',
+            'api_platform.action.put_item',
             'api_platform.action.delete_item',
         ];
         foreach ($aliases as $alias) {
@@ -259,11 +260,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.routing.resource_path_generator.dash',
             'api_platform.listener.request.format',
             'api_platform.listener.view.validation',
-            'api_platform.listener.request.format',
+            'api_platform.listener.view.deserializer',
             'api_platform.action.get_collection',
             'api_platform.action.post_collection',
             'api_platform.action.get_item',
-            'api_platform.action.put_item',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.collection_data_provider',
             'api_platform.doctrine.orm.item_data_provider',

@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
-use ApiPlatform\Core\Action\ActionUtilTrait;
+use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConfigCustomController
 {
-    use ActionUtilTrait;
-
     /**
      * @var DataProviderInterface
      */
@@ -36,7 +34,7 @@ class ConfigCustomController
 
     public function __invoke(Request $request, $id)
     {
-        list($resourceType) = $this->extractAttributes($request);
+        list($resourceType) = RequestAttributesExtractor::extractAttributes($request);
 
         return $this->dataProvider->getItem($resourceType, $id);
     }

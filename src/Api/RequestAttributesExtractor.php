@@ -9,44 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Action;
+namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Checks if the request is properly configured.
+ * Extracts data used by the library form a Request instance.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-trait ActionUtilTrait
+final class RequestAttributesExtractor
 {
     /**
-     * Gets an item using the data provider. Throws a 404 error if not found.
-     *
-     * @param ItemDataProviderInterface $itemDataProvider
-     * @param string                    $resourceClass
-     * @param string                    $operationName
-     * @param string|int                $id
-     *
-     * @throws NotFoundHttpException
-     *
-     * @return object
-     */
-    private function getItem(ItemDataProviderInterface $itemDataProvider, string $resourceClass, string $operationName, $id)
-    {
-        $data = $itemDataProvider->getItem($resourceClass, $id, $operationName, true);
-        if (!$data) {
-            throw new NotFoundHttpException('Not Found');
-        }
-
-        return $data;
-    }
-
-    /**
-     * Extract resource class, operation name and format request attributes. Throws an exception if the request does not contain required
+     * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not contain required
      * attributes.
      *
      * @param Request $request
@@ -55,7 +31,7 @@ trait ActionUtilTrait
      *
      * @return array
      */
-    private function extractAttributes(Request $request)
+    public static function extractAttributes(Request $request)
     {
         $resourceClass = $request->attributes->get('_resource_class');
 
