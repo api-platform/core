@@ -82,7 +82,18 @@ final class ApiPlatformParser implements ParserInterface
         list($io, $resourceClass) = explode(':', $item['class'], 2);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->parseClass($resourceMetadata, $resourceClass, $io);
+        if (0 !== count($this->parseClassItemOperation($resourceMetadata, $resourceClass, $io)) &&  0 !== count($this->parseClassItemOperation($resourceMetadata, $resourceClass, $io))) {
+            return array_merge(
+                $this->parseClassItemOperation($resourceMetadata, $resourceClass, $io),
+                $this->parseClassCollectionOperation($resourceMetadata, $resourceClass, $io)
+            );
+        }
+
+        return array_merge(
+            $this->parseResource($resourceMetadata, $resourceClass, $io),
+            $this->parseClassItemOperation($resourceMetadata, $resourceClass, $io),
+            $this->parseClassCollectionOperation($resourceMetadata, $resourceClass, $io)
+        );
     }
 
     /**
@@ -95,11 +106,37 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function parseClass(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []) : array
+    private function parseResource(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []) : array
     {
         $visited[] = $resourceClass;
 
-        $data = [];
+        $options = [];
+
+        $options['serializer_groups'] = $resourceMetadata->getAttribute(
+                'normalization_context',
+                ['groups' => []]
+            )['groups'];
+
+        $options['serializer_groups'] = array_merge(
+                $options['serializer_groups'],
+                $resourceMetadata->getAttribute('denormalization_context', ['groups' => []])
+            )['groups'];
+
+        return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
+    }
+
+    /**
+     * Parses a CollectionOperation.
+     *
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $resourceClass
+     * @param string           $io
+     * @param string[]         $visited
+     *
+     * @return array
+     */
+    private function parseClassCollectionOperation(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []) : array
+    {
         $options = [];
 
         foreach ($resourceMetadata->getCollectionOperations() as $operation) {
@@ -110,30 +147,48 @@ final class ApiPlatformParser implements ParserInterface
             );
         }
 
-        if (isset($options['serializer_groups']) && 0 === count($options['serializer_groups'])) {
-            foreach ($resourceMetadata->getItemOperations() as $operation) {
-                $options['serializer_groups'] = array_merge(
-                    $options['serializer_groups'],
-                    isset($operation['normalization_context']) ? $operation['normalization_context']['groups'] : []
-                );
-                $options['serializer_groups'] = array_merge(
+        return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
+    }
+
+    /**
+     * Parses an ItemOperation.
+     *
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $resourceClass
+     * @param string           $io
+     * @param string[]         $visited
+     *
+     * @return array
+     */
+    private function parseClassItemOperation(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []) : array
+    {
+        $options = [];
+
+        foreach ($resourceMetadata->getItemOperations() as $operation) {
+            $options['serializer_groups'] = isset($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [];
+            $options['serializer_groups'] = array_merge(
                     $options['serializer_groups'],
                     isset($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
                 );
-            }
         }
 
-        if (isset($options['serializer_groups']) && 0 === count($options['serializer_groups'])) {
-            $options['serializer_groups'] = $resourceMetadata->getAttribute(
-                'normalization_context',
-                ['groups' => []]
-            )['groups'];
+        return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
+    }
 
-            $options['serializer_groups'] = array_merge(
-                $options['serializer_groups'],
-                $resourceMetadata->getAttribute('denormalization_context', ['groups' => []])
-            )['groups'];
-        }
+    /**
+     * Returns a property metadata.
+     *
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $resourceClass
+     * @param string           $io
+     * @param string[]         $visited
+     * @param string[]         $options
+     *
+     * @return array
+     */
+    private function getPropertyMetadata(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited, array $options) : array
+    {
+        $data = [];
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
@@ -233,7 +288,7 @@ final class ApiPlatformParser implements ParserInterface
 
             $data['actualType'] = DataTypes::MODEL;
             $data['subType'] = $className;
-            $data['children'] = in_array($className, $visited) ? [] : $this->parseClass($resourceMetadata, $className, $io, $visited);
+            $data['children'] = in_array($className, $visited) ? [] : $this->parseResource($resourceMetadata, $className, $io);
 
             return $data;
         }
