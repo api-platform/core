@@ -12,8 +12,8 @@
 namespace ApiPlatform\Core\Hydra\Action;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\JsonLd\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -32,27 +32,21 @@ final class ExceptionAction
     }
 
     /**
-     * Converts a {@see \Symfony\Component\Debug\Exception\FlattenException}
-     * to a {@see \ApiPlatform\Core\JsonLd\Response}.
-     *
-     * @param FlattenException $exception
-     *
-     * @return Response
+     * Converts a an exception to a JSON response.
      */
-    public function __invoke(FlattenException $exception)
+    public function __invoke(FlattenException $exception) : JsonResponse
     {
         $exceptionClass = $exception->getClass();
         if (
             is_a($exceptionClass, ExceptionInterface::class, true) ||
             is_a($exceptionClass, InvalidArgumentException::class, true)
         ) {
-            $exception->setStatusCode(Response::HTTP_BAD_REQUEST);
+            $exception->setStatusCode(JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return new Response(
-            $this->normalizer->normalize($exception, 'hydra-error'),
-            $exception->getStatusCode(),
-            $exception->getHeaders()
-        );
+        $headers = $exception->getHeaders();
+        $headers['Content-Type'] = 'application/ld+json';
+
+        return new JsonResponse($this->normalizer->normalize($exception, 'hydra-error'), $exception->getStatusCode(), $headers);
     }
 }

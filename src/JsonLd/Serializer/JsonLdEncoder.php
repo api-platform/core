@@ -11,6 +11,9 @@
 
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
@@ -21,6 +24,13 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 final class JsonLdEncoder extends JsonEncoder
 {
     const FORMAT = 'jsonld';
+
+    public function __construct(JsonEncode $encodingImpl = null, JsonDecode $decodingImpl = null)
+    {
+        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
+        $this->encodingImpl = $encodingImpl ?: new JsonEncode(JsonResponse::DEFAULT_ENCODING_OPTIONS);
+        $this->decodingImpl = $decodingImpl ?: new JsonDecode(true);
+    }
 
     /**
      * {@inheritdoc}

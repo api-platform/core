@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Core\JsonLd\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -40,9 +40,10 @@ final class ValidationExceptionListener
         $exception = $event->getException();
 
         if ($exception instanceof ValidationException) {
-            $event->setResponse(new Response(
+            $event->setResponse(new JsonResponse(
                 $this->normalizer->normalize($exception->getConstraintViolationList(), 'hydra-error'),
-                Response::HTTP_BAD_REQUEST
+                JsonResponse::HTTP_BAD_REQUEST,
+                ['Content-Type' => 'application/ld+json']
             ));
         }
     }
