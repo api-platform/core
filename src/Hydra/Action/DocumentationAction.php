@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Hydra\Action;
 
 use ApiPlatform\Core\Hydra\ApiDocumentationBuilderInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -30,15 +31,9 @@ final class DocumentationAction
 
     /**
      * Gets API doc.
-     *
-     * @param Request $request
-     *
-     * @return array
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request) : JsonResponse
     {
-        $request->attributes->set('_api_format', 'jsonld');
-
-        return $this->apiDocumentationBuilder->getApiDocumentation();
+        return new JsonResponse($this->apiDocumentationBuilder->getApiDocumentation(), 200, ['Content-Type' => 'application/ld+json']);
     }
 }

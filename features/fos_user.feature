@@ -10,6 +10,7 @@ Feature: Create-Retrieve-Update-Delete
     """
     {
       "fullname": "Dummy User",
+      "username": "dummy.user",
       "email": "dummy.user@example.com",
       "plainPassword": "azerty"
     }

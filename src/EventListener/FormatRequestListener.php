@@ -53,6 +53,17 @@ final class FormatRequestListener
             }
         }
 
-        $request->attributes->set('_api_format', $mimeType ? $this->supportedFormats[$mimeType] : reset($this->supportedFormats));
+        if ($mimeType) {
+            $request->attributes->set('_api_mime_type', $mimeType);
+            $request->attributes->set('_api_format', $this->supportedFormats[$mimeType]);
+
+            return;
+        }
+
+        reset($this->supportedFormats);
+        $format = each($this->supportedFormats);
+
+        $request->attributes->set('_api_mime_type', $format['key']);
+        $request->attributes->set('_api_format', $format['value']);
     }
 }
