@@ -32,8 +32,8 @@ final class DocumentationAction
     /**
      * Gets API doc.
      */
-    public function __invoke(Request $request) : JsonResponse
+    public function __invoke() : JsonResponse
     {
-        return new JsonResponse($this->apiDocumentationBuilder->getApiDocumentation(), 200, ['Content-Type' => 'application/ld+json']);
+        return new json_encode($this->apiDocumentationBuilder->getApiDocumentation(), JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
     }
 }

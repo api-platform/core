@@ -15,7 +15,6 @@ use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -46,21 +45,21 @@ final class ContextAction
      *
      * @throws NotFoundHttpException
      */
-    public function __invoke(Request $request, string $shortName) : JsonResponse
+    public function __invoke(string $shortName) : JsonResponse
     {
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
         }
 
         if (isset(self::RESERVED_SHORT_NAMES[$shortName])) {
-            return new JsonResponse(['@context' => $this->contextBuilder->getBaseContext()], 200, ['Content-Type' => 'application/ld+json']);
+            return new JsonResponse(['@context' => $this->contextBuilder->getBaseContext()], JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if ($shortName === $resourceMetadata->getShortName()) {
-                return new JsonResponse(['@context' => $this->contextBuilder->getResourceContext($resourceClass)], 200, ['Content-Type' => 'application/ld+json']);
+                return new JsonResponse(['@context' => $this->contextBuilder->getResourceContext($resourceClass)], JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
             }
         }
 
