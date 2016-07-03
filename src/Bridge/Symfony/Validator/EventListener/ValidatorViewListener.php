@@ -22,15 +22,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ViewListener
+final class ValidatorViewListener
 {
-    private $resourceMetadataFactory;
     private $validator;
+    private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->validator = $validator;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**

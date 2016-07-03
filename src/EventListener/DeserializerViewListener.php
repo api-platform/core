@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -26,10 +27,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class DeserializerViewListener
 {
     private $serializer;
+    private $resourceMetadataFactory;
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->serializer = $serializer;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     public function onKernelView(GetResponseForControllerResultEvent $event)
@@ -42,17 +45,23 @@ final class DeserializerViewListener
         }
 
         try {
-            list($resourceClass, $collectionOperation, $itemOperation, $format) = RequestAttributesExtractor::extractAttributes($request);
+            list($resourceClass, $collectionOperationName, $itemOperationName, $format) = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             return;
         }
 
-        $context = ['resource_class' => $resourceClass];
-        if ($collectionOperation) {
-            $context['collection_operation_name'] = $collectionOperation;
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if ($collectionOperationName) {
+            $context = $resourceMetadata->getCollectionOperationAttribute($collectionOperationName, 'denormalization_context', [], true);
+            $context['collection_operation_name'] = $collectionOperationName;
         } else {
-            $context['item_operation_name'] = $itemOperation;
+            $context = $resourceMetadata->getItemOperationAttribute($itemOperationName, 'denormalization_context', [], true);
+            $context['item_operation_name'] = $itemOperationName;
         }
+
+        $context['resource_class'] = $resourceClass;
+        $context['request_uri'] = $request->getRequestUri();
 
         if (null !== $data) {
             $context['object_to_populate'] = $data;
