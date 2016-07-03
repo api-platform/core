@@ -105,7 +105,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $actual = $apiPlatformParser->parse([
-            'class' => sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, CustomAttributeDummy::class),
+            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, CustomAttributeDummy::class, 'get'),
         ]);
 
         $this->assertEquals([
@@ -123,7 +123,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
             ],
         ], $actual);
     }
-
+  
     public function testSupportsUnknownResource()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -168,6 +168,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
             'get' => ['method' => 'GET', 'normalization_context' => ['groups' => ['custom_attr_dummy_get']]],
             'put' => ['method' => 'PUT', 'denormalization_context' => ['groups' => ['custom_attr_dummy_put']]],
+            'gerard' => ['method' => 'get', 'path' => '/gerard', 'denormalization_context' => ['groups' => ['custom_attr_dummy_put']]],
             'delete' => ['method' => 'DELETE'],
         ], []))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -207,7 +208,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $actual = $apiPlatformParser->parse([
-            'class' => sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class),
+            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'gerard'),
         ]);
 
         $this->assertEquals([
@@ -257,7 +258,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $actual = $apiPlatformParser->parse([
-            'class' => sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class),
+            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'),
         ]);
 
         $this->assertEquals([
@@ -323,7 +324,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $actual = $apiPlatformParser->parse([
-            'class' => sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class),
+            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'),
         ]);
 
         $this->assertEquals([
