@@ -11,6 +11,8 @@
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Api\RequestAttributesExtractor;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -22,10 +24,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class SerializerViewListener
 {
     private $serializer;
+    private $resourceMetadataFactory;
 
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(SerializerInterface $serializer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->serializer = $serializer;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -41,20 +45,24 @@ class SerializerViewListener
             return;
         }
 
-        $resourceClass = $request->attributes->get('_resource_class');
-        $collectionOperationName = $request->attributes->get('_collection_operation_name');
-        $itemOperationName = $request->attributes->get('_item_operation_name');
-
-        if (!$resourceClass || (!$collectionOperationName && !$itemOperationName)) {
+        try {
+            list($resourceClass, $collectionOperationName, $itemOperationName, $format) = RequestAttributesExtractor::extractAttributes($request);
+        } catch (RuntimeException $e) {
             return;
         }
 
-        $context = ['request_uri' => $request->getRequestUri(), 'resource_class' => $resourceClass];
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
         if ($collectionOperationName) {
+            $context = $resourceMetadata->getCollectionOperationAttribute($collectionOperationName, 'normalization_context', [], true);
             $context['collection_operation_name'] = $collectionOperationName;
         } else {
+            $context = $resourceMetadata->getItemOperationAttribute($itemOperationName, 'normalization_context', [], true);
             $context['item_operation_name'] = $itemOperationName;
         }
+
+        $context['resource_class'] = $resourceClass;
+        $context['request_uri'] = $request->getRequestUri();
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $format, $context));
     }

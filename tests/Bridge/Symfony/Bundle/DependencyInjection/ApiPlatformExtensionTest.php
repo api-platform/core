@@ -261,7 +261,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.request.format',
             'api_platform.listener.view.serializer',
             'api_platform.listener.view.deserializer',
-            'api_platform.listener.view.validation',
+            'api_platform.listener.view.validator',
             'api_platform.listener.view.responder',
             'api_platform.action.get_collection',
             'api_platform.action.post_collection',
