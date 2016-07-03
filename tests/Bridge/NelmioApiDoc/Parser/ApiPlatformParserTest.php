@@ -123,7 +123,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
             ],
         ], $actual);
     }
-  
+
     public function testSupportsUnknownResource()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
