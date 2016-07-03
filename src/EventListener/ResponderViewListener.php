@@ -23,8 +23,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 final class ResponderViewListener
 {
     const METHOD_TO_CODE = [
-        Request::METHOD_POST => 201,
-        Request::METHOD_DELETE => 204,
+        Request::METHOD_POST => Response::HTTP_CREATED,
+        Request::METHOD_DELETE => Response::HTTP_NO_CONTENT,
     ];
 
     /**
@@ -42,7 +42,7 @@ final class ResponderViewListener
 
         $event->setResponse(new Response(
             $controllerResult,
-            self::METHOD_TO_CODE[$request->getMethod()] ?? 200,
+            self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
             ['Content-Type' => $request->attributes->get('_api_mime_type')]
         ));
     }
