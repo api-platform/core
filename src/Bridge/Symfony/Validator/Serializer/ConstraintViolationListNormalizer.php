@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\Serializer;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 final class ConstraintViolationListNormalizer implements NormalizerInterface
 {
-    const FORMAT = 'hydra-error';
+    const FORMAT = ['swagger-error', 'hydra-error'];
 
     /**
      * @var UrlGeneratorInterface
@@ -41,12 +41,11 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
     {
         $violations = [];
         $messages = [];
-
         foreach ($object as $violation) {
             $violations[] = [
-                'propertyPath' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
+                    'propertyPath' => $violation->getPropertyPath(),
+                    'message' => $violation->getMessage(),
+                ];
 
             $propertyPath = $violation->getPropertyPath();
             $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
@@ -55,12 +54,15 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         }
 
         return [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
-            '@type' => 'ConstraintViolationList',
-            'hydra:title' => $context['title'] ?? 'An error occurred',
-            'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,
-            'violations' => $violations,
-        ];
+                '@context' => $this->urlGenerator->generate(
+                    'api_jsonld_context',
+                    ['shortName' => 'ConstraintViolationList']
+                ),
+                '@type' => 'ConstraintViolationList',
+                'hydra:title' => $context['title'] ?? 'An error occurred',
+                'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,
+                'violations' => $violations,
+            ];
     }
 
     /**
@@ -68,6 +70,6 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
+        return in_array($format, self::FORMAT)  && $data instanceof ConstraintViolationListInterface;
     }
 }
