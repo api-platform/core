@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener;
+namespace ApiPlatform\Core\Bridge\Symfony\Validator\Swagger\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use ApiPlatform\Core\JsonLd\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ValidationExceptionListener
+final class SwaggerValidationExceptionListener
 {
     private $normalizer;
 
@@ -40,10 +40,9 @@ final class ValidationExceptionListener
         $exception = $event->getException();
 
         if ($exception instanceof ValidationException) {
-            $event->setResponse(new JsonResponse(
-                $this->normalizer->normalize($exception->getConstraintViolationList(), 'hydra-error'),
-                JsonResponse::HTTP_BAD_REQUEST,
-                ['Content-Type' => 'application/ld+json']
+            $event->setResponse(new Response(
+                $this->normalizer->normalize($exception->getConstraintViolationList(), 'swagger-error'),
+                Response::HTTP_BAD_REQUEST
             ));
         }
     }

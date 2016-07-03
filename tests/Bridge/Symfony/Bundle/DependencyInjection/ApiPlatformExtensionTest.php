@@ -291,6 +291,16 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.action.context',
             'api_platform.jsonld.action.entrypoint',
+            'api_platform.swagger.documentation_builder',
+            'api_platform.swagger.listener.link_header_response',
+            'api_platform.swagger.listener.request_exception',
+            'api_platform.swagger.normalizer.collection',
+            'api_platform.swagger.normalizer.partial_collection_view',
+            'api_platform.swagger.normalizer.collection_filters',
+            'api_platform.swagger.normalizer.constraint_violation_list',
+            'api_platform.swagger.normalizer.error',
+            'api_platform.swagger.action.documentation',
+            'api_platform.swagger.action.exception',
             'api_platform.hydra.documentation_builder',
             'api_platform.hydra.listener.validation_exception',
             'api_platform.hydra.listener.link_header_response',
@@ -302,6 +312,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.normalizer.error',
             'api_platform.hydra.action.documentation',
             'api_platform.hydra.action.exception',
+
         ];
 
         foreach ($definitions as $definition) {

@@ -97,8 +97,10 @@ final class ItemNormalizer extends AbstractObjectNormalizer
             return $rawData;
         }
 
-        $data['@id'] = $this->iriConverter->getIriFromItem($object);
-        $data['@type'] = ($iri = $resourceMetadata->getIri()) ? $iri : $resourceMetadata->getShortName();
+        if ($format === self::FORMAT) {
+            $data['@id'] = $this->iriConverter->getIriFromItem($object);
+            $data['@type'] = ($iri = $resourceMetadata->getIri()) ? $iri : $resourceMetadata->getShortName();
+        }
 
         return array_merge($data, $rawData);
     }
@@ -125,7 +127,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         $overrideClass = isset($data['@id']) && !isset($context['object_to_populate']);
 
         if ($overrideClass) {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id']);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'] ?? $data['id']);
         }
 
         return parent::denormalize($data, $class, $format, $context);

@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="api_platform.hydra.documentation_builder" class="ApiPlatform\Core\Hydra\ApiDocumentationBuilder" public="false">
+        <service id="api_platform.swagger.documentation_builder" class="ApiPlatform\Core\Swagger\ApiDocumentationBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -15,25 +15,26 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.iri_converter" />
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
         </service>
 
         <!-- Event listeners -->
 
-        <service id="api_platform.hydra.listener.link_header_response" class="ApiPlatform\Core\Hydra\EventListener\LinkHeaderResponseListener">
+        <service id="api_platform.swagger.listener.link_header_response" class="ApiPlatform\Core\Swagger\EventListener\SwaggerLinkHeaderResponseListener">
             <argument type="service" id="api_platform.router" />
 
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
-        <service id="api_platform.hydra.listener.validation_exception" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener\HydraExceptionListener">
+        <service id="api_platform.hydra.listener.validation_exception" class="ApiPlatform\Core\Bridge\Symfony\Validator\Swagger\EventListener\SwaggerValidationExceptionListener">
             <argument type="service" id="api_platform.hydra.normalizer.constraint_violation_list" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
 
-        <service id="api_platform.hydra.listener.request_exception" class="ApiPlatform\Core\Hydra\EventListener\RequestExceptionListener">
+        <service id="api_platform.swagger.listener.request_exception" class="ApiPlatform\Core\Swagger\EventListener\RequestExceptionListener">
             <argument>api_platform.hydra.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
 
@@ -43,7 +44,8 @@
 
         <!-- Serializer -->
 
-        <service id="api_platform.hydra.normalizer.collection" class="ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer" public="false">
+        <service id="api_platform.swagger.normalizer.collection" class="ApiPlatform\Core\Swagger\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -51,27 +53,27 @@
             <tag name="serializer.normalizer" priority="50" />
         </service>
 
-        <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Serializer\ConstraintViolationListNormalizer" public="false">
+        <service id="api_platform.swagger.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
 
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api_platform.hydra.normalizer.error" class="ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer" public="false">
+        <service id="api_platform.swagger.normalizer.error" class="ApiPlatform\Core\Swagger\Serializer\SwaggerErrorNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
             <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api_platform.hydra.normalizer.partial_collection_view" class="ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
-            <argument type="service" id="api_platform.hydra.normalizer.partial_collection_view.inner" />
+        <service id="api_platform.swagger.normalizer.partial_collection_view" class="ApiPlatform\Core\Swagger\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
+            <argument type="service" id="api_platform.swagger.normalizer.partial_collection_view.inner" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
         </service>
 
-        <service id="api_platform.hydra.normalizer.collection_filters" class="ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
-            <argument type="service" id="api_platform.hydra.normalizer.collection_filters.inner" />
+        <service id="api_platform.swagger.normalizer.collection_filters" class="ApiPlatform\Core\Swagger\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
+            <argument type="service" id="api_platform.swagger.normalizer.collection_filters.inner" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.filters" />
@@ -79,12 +81,12 @@
 
         <!-- Action -->
 
-        <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Hydra\Action\DocumentationAction">
-            <argument type="service" id="api_platform.hydra.documentation_builder" />
+        <service id="api_platform.swagger.action.documentation" class="ApiPlatform\Core\Swagger\Action\DocumentationAction">
+            <argument type="service" id="api_platform.swagger.documentation_builder" />
         </service>
 
-        <service id="api_platform.hydra.action.exception" class="ApiPlatform\Core\Hydra\Action\ExceptionAction">
-            <argument type="service" id="api_platform.hydra.normalizer.error" />
+        <service id="api_platform.swagger.action.exception" class="ApiPlatform\Core\Swagger\Action\ExceptionAction">
+            <argument type="service" id="api_platform.swagger.normalizer.error" />
        </service>
 
     </services>

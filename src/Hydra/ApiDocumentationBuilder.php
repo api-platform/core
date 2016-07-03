@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Util\ApiDocumentationBuilderInterface;
 
 /**
  * Creates a machine readable Hydra API documentation.

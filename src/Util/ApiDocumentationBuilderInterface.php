@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra;
+namespace ApiPlatform\Core\Util;
 
 /**
- * Hydra's ApiDocumentation builder.
+ * ApiDocumentation builder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface ApiDocumentationBuilderInterface
 {
     /**
-     * Gets the Hydra API documentation.
+     * Gets the API documentation.
      *
      * @return array
      */
