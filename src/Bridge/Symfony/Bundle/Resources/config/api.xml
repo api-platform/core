@@ -53,7 +53,7 @@
 
         <service id="api_platform.listener.request.format" class="ApiPlatform\Core\EventListener\FormatRequestListener">
             <argument type="service" id="api_platform.negotiator" />
-            <argument>%api_platform.supported_formats%</argument>
+            <argument>%api_platform.formats%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>

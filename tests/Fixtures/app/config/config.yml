@@ -29,7 +29,7 @@ doctrine:
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'
-    supported_formats:
+    formats:
         jsonld:                        ['application/ld+json']
         xml:                           ['application/xml', 'text/xml']
     name_converter:                    'app.name_converter'
