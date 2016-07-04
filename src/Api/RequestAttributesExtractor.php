@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
  * Extracts data used by the library form a Request instance.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
 final class RequestAttributesExtractor
 {
@@ -29,19 +31,17 @@ final class RequestAttributesExtractor
      *
      * @throws RuntimeException
      *
-     * @return array
+     * @return array [$resourceClass, $collectionOperation, $itemOperation, $format]
      */
     public static function extractAttributes(Request $request)
     {
         $resourceClass = $request->attributes->get('_resource_class');
-
         if (!$resourceClass) {
             throw new RuntimeException('The request attribute "_resource_class" must be defined.');
         }
 
         $collectionOperation = $request->attributes->get('_collection_operation_name');
         $itemOperation = $request->attributes->get('_item_operation_name');
-
         if (!$itemOperation && !$collectionOperation) {
             throw new RuntimeException('One of the request attribute "_item_operation_name" or "_collection_operation_name" must be defined.');
         }

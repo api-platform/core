@@ -64,7 +64,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
             return $data;
         }
 
-        $resourceClass = $this->getResourceClass($this->resourceClassResolver, $object, $context);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $operationName = $context['collection_operation_name'] ?? null;
