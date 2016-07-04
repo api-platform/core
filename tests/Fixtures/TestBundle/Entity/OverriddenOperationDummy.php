@@ -18,32 +18,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Overrode Operation Dummy.
+ * Overridden Operation Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  *
  * @ApiResource(
  *     attributes={
- *         "normalization_context"={"groups"={"overrode_operation_dummy_read"}},
- *         "denormalization_context"={"groups"={"overrode_operation_dummy_write"}}
+ *         "normalization_context"={"groups"={"overridden_operation_dummy_read"}},
+ *         "denormalization_context"={"groups"={"overridden_operation_dummy_write"}}
  *     },
  *     itemOperations={
  *         "get"={
  *             "method"="GET",
- *             "normalization_context"={"groups"={"overrode_operation_dummy_get"}},
- *             "denormalization_context"={"groups"={"overrode_operation_dummy_get"}}
+ *             "normalization_context"={"groups"={"overridden_operation_dummy_get"}},
+ *             "denormalization_context"={"groups"={"overridden_operation_dummy_get"}}
  *         },
  *         "put"={
  *             "method"="PUT",
- *             "normalization_context"={"groups"={"overrode_operation_dummy_put"}},
- *             "denormalization_context"={"groups"={"overrode_operation_dummy_put"}}
+ *             "normalization_context"={"groups"={"overridden_operation_dummy_put"}},
+ *             "denormalization_context"={"groups"={"overridden_operation_dummy_put"}}
  *          },
  *          "delete"={"method"="DELETE"}
  *     }
  * )
  * @ORM\Entity
  */
-class OverrodeOperationDummy
+class OverriddenOperationDummy
 {
     /**
      * @var int The id.
@@ -59,7 +59,7 @@ class OverrodeOperationDummy
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Groups({"overrode_operation_dummy_read", "overrode_operation_dummy_write", "overrode_operation_dummy_get"})
+     * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_write", "overridden_operation_dummy_get"})
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
@@ -68,7 +68,7 @@ class OverrodeOperationDummy
      * @var string The dummy name alias.
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"overrode_operation_dummy_read", "overrode_operation_dummy_put", "overrode_operation_dummy_get"})
+     * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_put", "overridden_operation_dummy_get"})
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
@@ -77,14 +77,14 @@ class OverrodeOperationDummy
      * @var string A short description of the item.
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"overrode_operation_dummy_read" ,"overrode_operation_dummy_write", "overrode_operation_dummy_get", "overrode_operation_dummy_put"})
+     * @Groups({"overridden_operation_dummy_read" ,"overridden_operation_dummy_write", "overridden_operation_dummy_get", "overridden_operation_dummy_put"})
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
 
     /**
      * @ORM\Column(nullable=true)
-     * @Groups({"overrode_operation_dummy_write"})
+     * @Groups({"overridden_operation_dummy_write"})
      */
     public $notGettable;
 
