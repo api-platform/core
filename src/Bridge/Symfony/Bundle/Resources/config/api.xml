@@ -24,7 +24,7 @@
             <argument type="service" id="kernel" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.routing.resource_path_generator" />
+            <argument type="service" id="api_platform.naming.resource_path_naming_strategy" />
             <argument type="service" id="service_container" />
             <tag name="routing.loader" />
         </service>
@@ -49,11 +49,10 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
-        <!-- Resource path generators -->
+        <!-- Resource path naming strategies -->
 
-        <service id="api_platform.routing.resource_path_generator.underscore" class="ApiPlatform\Core\Routing\UnderscoreResourcePathGenerator" public="false" />
-
-        <service id="api_platform.routing.resource_path_generator.dash" class="ApiPlatform\Core\Routing\DashResourcePathGenerator" public="false" />
+        <service id="api_platform.naming.resource_path_naming_strategy.underscore" class="ApiPlatform\Core\Naming\UnderscoreResourcePathNamingStrategy" public="false" />
+        <service id="api_platform.naming.resource_path_naming_strategy.dash" class="ApiPlatform\Core\Routing\DashResourcePathNamingStrategy" public="false" />
 
         <!-- Event listeners -->
 

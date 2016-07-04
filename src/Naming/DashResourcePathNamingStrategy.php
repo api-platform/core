@@ -9,19 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Routing;
+namespace ApiPlatform\Core\Naming;
 
 use Doctrine\Common\Inflector\Inflector;
 
 /**
+ * Generates a path with words separated by dashes.
+ *
  * @author Paul Le Corre <paul@lecorre.me>
  */
-class DashResourcePathGenerator implements ResourcePathGeneratorInterface
+final class DashResourcePathNamingStrategy implements ResourcePathNamingStrategyInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function generateResourceBasePath(string $resourceShortName) : string
     {
-        $pathName = strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $resourceShortName));
-
-        return Inflector::pluralize($pathName);
+        return Inflector::pluralize(strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $resourceShortName)));
     }
 }
