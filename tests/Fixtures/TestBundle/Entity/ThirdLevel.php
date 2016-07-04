@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * ThirdLevel.
+ * Third Level.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *

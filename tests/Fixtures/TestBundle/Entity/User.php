@@ -18,6 +18,8 @@ use FOS\UserBundle\Model\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * A User.
+ *
  * @ORM\Entity
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"user", "user-read"}},

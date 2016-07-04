@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Custom normalized dummy.
+ * Custom Normalized Dummy.
  *
  * @author Mikaël Labrut <labrut@gmail.com>
  *

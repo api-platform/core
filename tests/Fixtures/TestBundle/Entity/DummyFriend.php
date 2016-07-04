@@ -18,11 +18,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * DummyFriend.
+ * Dummy Friend.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource()
+ * @ApiResource
  * @ORM\Entity
  */
 class DummyFriend
