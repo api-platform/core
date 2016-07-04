@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -27,46 +27,41 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class DeserializerViewListener
 {
     private $serializer;
-    private $resourceMetadataFactory;
+    private $serializerContextBuilder;
 
-    public function __construct(SerializerInterface $serializer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder)
     {
         $this->serializer = $serializer;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
+    /**
+     * Deserializes the data sent in the requested format.
+     *
+     * @param GetResponseForControllerResultEvent $event
+     */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        $data = $event->getControllerResult();
+        $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($data instanceof Response || !in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT], true)) {
+        if ($controllerResult instanceof Response || !in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT], true)) {
             return;
         }
 
         try {
-            list($resourceClass, $collectionOperationName, $itemOperationName, $format) = RequestAttributesExtractor::extractAttributes($request);
+            $extractedAttributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             return;
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if ($collectionOperationName) {
-            $context = $resourceMetadata->getCollectionOperationAttribute($collectionOperationName, 'denormalization_context', [], true);
-            $context['collection_operation_name'] = $collectionOperationName;
-        } else {
-            $context = $resourceMetadata->getItemOperationAttribute($itemOperationName, 'denormalization_context', [], true);
-            $context['item_operation_name'] = $itemOperationName;
+        $context = $this->serializerContextBuilder->createFromRequest($request, false, $extractedAttributes);
+        if (null !== $controllerResult) {
+            $context['object_to_populate'] = $controllerResult;
         }
 
-        $context['resource_class'] = $resourceClass;
-        $context['request_uri'] = $request->getRequestUri();
-
-        if (null !== $data) {
-            $context['object_to_populate'] = $data;
-        }
-
-        $event->setControllerResult($this->serializer->deserialize($request->getContent(), $resourceClass, $format, $context));
+        $event->setControllerResult(
+            $this->serializer->deserialize($request->getContent(), $extractedAttributes[0], $extractedAttributes[3], $context)
+        );
     }
 }

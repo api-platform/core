@@ -43,6 +43,12 @@
 
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
+        <!-- Serializer -->
+
+        <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        </service>
+
         <!-- Resource path generators -->
 
         <service id="api_platform.routing.resource_path_generator.underscore" class="ApiPlatform\Core\Routing\UnderscoreResourcePathGenerator" public="false" />
@@ -60,14 +66,14 @@
 
         <service id="api_platform.listener.view.serializer" class="ApiPlatform\Core\EventListener\SerializerViewListener">
             <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
         </service>
 
         <service id="api_platform.listener.view.deserializer" class="ApiPlatform\Core\EventListener\DeserializerViewListener">
             <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="30" />
         </service>

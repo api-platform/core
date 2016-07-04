@@ -11,101 +11,49 @@
 
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
  * Creates and manipulates the Serializer context.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
 trait ContextTrait
 {
     /**
      * Import the context defined in metadata and set some default values.
      *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $context
-     *
-     * @return array
-     */
-    private function createContext(string $resourceClass, ResourceMetadata $resourceMetadata, array $context, bool $normalization) : array
-    {
-        if (isset($context['jsonld_has_context'])) {
-            return $context;
-        }
-
-        $key = $normalization ? 'normalization_context' : 'denormalization_context';
-        $context = array_merge($context, $this->getContextValue($resourceMetadata, $context, $key, []));
-        $context['resource_class'] = $resourceClass;
-
-        return array_merge($context, [
-            'jsonld_has_context' => true,
-            // Don't use hydra:Collection in sub levels
-            'jsonld_sub_level' => true,
-        ]);
-    }
-
-    /**
-     * Updates the resource class and remove the object_to_populate key.
-     *
      * @param string $resourceClass
      * @param array  $context
      *
      * @return array
      */
-    private function createRelationContext(string $resourceClass, array $context) : array
+    private function createContext(string $resourceClass, array $context) : array
     {
-        $context['resource_class'] = $resourceClass;
-        unset($context['item_operation_name']);
-        unset($context['collection_operation_name']);
+        if (isset($context['jsonld_has_context'])) {
+            return $context;
+        }
 
-        return $context;
+        return array_merge($context, [
+            'jsonld_has_context' => true,
+            // Don't use hydra:Collection in sub levels
+            'jsonld_sub_level' => true,
+            'resource_class' => $resourceClass,
+        ]);
     }
 
     /**
-     * Gets a context value.
+     * Updates the given JSON-LD document to add its @context key.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $context
-     * @param string           $key
-     * @param mixed            $defaultValue
+     * @param ContextBuilderInterface $contextBuilder
+     * @param string                  $resourceClass
+     * @param array                   $context
+     * @param array                   $data
      *
-     * @return mixed
+     * @return array
      */
-    private function getContextValue(ResourceMetadata $resourceMetadata, array $context, string $key, $defaultValue = null)
-    {
-        if (isset($context[$key])) {
-            return $context[$key];
-        }
-
-        if (isset($context['collection_operation_name'])) {
-            return $resourceMetadata->getCollectionOperationAttribute($context['collection_operation_name'], $key, $defaultValue, true);
-        }
-
-        if (isset($context['item_operation_name'])) {
-            return $resourceMetadata->getItemOperationAttribute($context['item_operation_name'], $key, $defaultValue, true);
-        }
-
-        return $resourceMetadata->getAttribute($key, $defaultValue);
-    }
-
-    /**
-     * Gets the resource class to use depending of the current data and context.
-     *
-     * @param ResourceClassResolverInterface $resourceClassResolver
-     * @param mixed                          $data
-     * @param array                          $context
-     *
-     * @return string
-     */
-    private function getResourceClass(ResourceClassResolverInterface $resourceClassResolver, $data, array $context) : string
-    {
-        return $resourceClassResolver->getResourceClass($data, $context['resource_class'] ?? null, true);
-    }
-
     private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array $context, array $data = []) : array
     {
         if (isset($context['jsonld_has_context'])) {

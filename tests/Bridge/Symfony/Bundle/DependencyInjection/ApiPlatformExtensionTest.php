@@ -266,6 +266,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.action.get_collection',
             'api_platform.action.post_collection',
             'api_platform.action.get_item',
+            'api_platform.serializer.context_builder',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.collection_data_provider',
             'api_platform.doctrine.orm.item_data_provider',
@@ -302,6 +303,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.action.documentation',
             'api_platform.hydra.action.exception',
         ];
+
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
         }

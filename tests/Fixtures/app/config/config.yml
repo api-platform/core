@@ -32,6 +32,7 @@ api_platform:
     formats:
         jsonld:                        ['application/ld+json']
         xml:                           ['application/xml', 'text/xml']
+        json:                          ['application/json']
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:
