@@ -20,63 +20,9 @@
             <argument>%api_platform.description%</argument>
         </service>
 
-        <!-- Event listeners -->
-
-        <service id="api_platform.swagger.listener.link_header_response" class="ApiPlatform\Core\Swagger\EventListener\SwaggerLinkHeaderResponseListener">
-            <argument type="service" id="api_platform.router" />
-
-            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
-        </service>
-
-        <service id="api_platform.hydra.listener.validation_exception" class="ApiPlatform\Core\Bridge\Symfony\Validator\Swagger\EventListener\SwaggerValidationExceptionListener">
-            <argument type="service" id="api_platform.hydra.normalizer.constraint_violation_list" />
-
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
-        </service>
-
-        <service id="api_platform.swagger.listener.request_exception" class="ApiPlatform\Core\Swagger\EventListener\RequestExceptionListener">
-            <argument>api_platform.hydra.action.exception</argument>
-            <argument type="service" id="logger" on-invalid="null" />
-
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
-            <tag name="monolog.logger" channel="request" />
-        </service>
-
-        <!-- Serializer -->
-
-        <service id="api_platform.swagger.normalizer.collection" class="ApiPlatform\Core\Swagger\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.jsonld.context_builder" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.iri_converter" />
-
-            <tag name="serializer.normalizer" priority="50" />
-        </service>
-
-        <service id="api_platform.swagger.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument type="service" id="api_platform.router" />
-
-            <tag name="serializer.normalizer" />
-        </service>
-
-        <service id="api_platform.swagger.normalizer.error" class="ApiPlatform\Core\Swagger\Serializer\SwaggerErrorNormalizer" public="false">
-            <argument type="service" id="api_platform.router" />
-            <argument>%kernel.debug%</argument>
-
-            <tag name="serializer.normalizer" />
-        </service>
-
-        <service id="api_platform.swagger.normalizer.partial_collection_view" class="ApiPlatform\Core\Swagger\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
-            <argument type="service" id="api_platform.swagger.normalizer.partial_collection_view.inner" />
-            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
-            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
-        </service>
-
-        <service id="api_platform.swagger.normalizer.collection_filters" class="ApiPlatform\Core\Swagger\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
-            <argument type="service" id="api_platform.swagger.normalizer.collection_filters.inner" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.filters" />
+        <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">
+            <argument type="service" id="api_platform.swagger.documentation_builder" />
+            <tag name="console.command" />
         </service>
 
         <!-- Action -->
@@ -84,10 +30,6 @@
         <service id="api_platform.swagger.action.documentation" class="ApiPlatform\Core\Swagger\Action\DocumentationAction">
             <argument type="service" id="api_platform.swagger.documentation_builder" />
         </service>
-
-        <service id="api_platform.swagger.action.exception" class="ApiPlatform\Core\Swagger\Action\ExceptionAction">
-            <argument type="service" id="api_platform.swagger.normalizer.error" />
-       </service>
 
     </services>
 

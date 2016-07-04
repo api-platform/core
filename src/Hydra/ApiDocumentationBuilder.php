@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\ApiDocumentationBuilderInterface;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Creates a machine readable Hydra API documentation.
@@ -366,32 +367,32 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         }
 
         switch ($type->getBuiltinType()) {
-            case 'string':
-                return 'xmls:string';
+            case Type::BUILTIN_TYPE_STRING:
+                return 'string';
 
-            case 'int':
-                return 'xmls:integer';
+            case Type::BUILTIN_TYPE_INT:
+                return 'integer';
 
-            case 'float':
-                return 'xmls:double';
+            case Type::BUILTIN_TYPE_FLOAT:
+                return 'number';
 
-            case 'bool':
-                return 'xmls:boolean';
+            case Type::BUILTIN_TYPE_BOOL:
+                return 'boolean';
 
-            case 'object':
+            case Type::BUILTIN_TYPE_OBJECT:
                 $className = $type->getClassName();
 
                 if ($className) {
-                    if ('DateTime' === $className) {
-                        return 'xmls:dateTime';
+                    if (is_subclass_of($className, \DateTimeInterface::class)) {
+                        return 'string';
                     }
 
                     $className = $type->getClassName();
                     if ($this->resourceClassResolver->isResourceClass($className)) {
-                        return sprintf('#%s', $this->resourceMetadataFactory->create($className)->getShortName());
+                        return ['$ref' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
                     }
                 }
-            break;
+           break;
         }
     }
 

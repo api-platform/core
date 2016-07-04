@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class HydraValidationExceptionListener
+final class ValidationExceptionListener
 {
     private $normalizer;
 

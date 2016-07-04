@@ -27,7 +27,7 @@
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
-        <service id="api_platform.hydra.listener.validation_exception" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener\HydraExceptionListener">
+        <service id="api_platform.hydra.listener.validation_exception" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener\ValidationExceptionListener">
             <argument type="service" id="api_platform.hydra.normalizer.constraint_violation_list" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
