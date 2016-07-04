@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Routing;
+namespace ApiPlatform\Core\Tests\Naming;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\Router;
 use Prophecy\Argument;
