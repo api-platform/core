@@ -15,7 +15,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * No collection dummy.
+ * No Collection Dummy.
  *
  * @ApiResource(collectionOperations={})
  * @ORM\Entity

@@ -16,8 +16,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity
+ * Composite Label.
+ *
  * @ApiResource
+ * @ORM\Entity
  */
 class CompositeLabel
 {

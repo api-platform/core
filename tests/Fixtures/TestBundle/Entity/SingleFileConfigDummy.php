@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * FileConfigDummy.
+ * File Config Dummy.
  *
  * @ORM\Entity
  */

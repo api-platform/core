@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Overrode Operation Dummy.
  *
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ *
  * @ApiResource(
  *     attributes={
  *         "normalization_context"={"groups"={"overrode_operation_dummy_read"}},
@@ -40,8 +42,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     }
  * )
  * @ORM\Entity
- *
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class OverrodeOperationDummy
 {
