@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Hydra;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -21,7 +22,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Util\ApiDocumentationBuilderInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -368,28 +368,29 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_STRING:
-                return 'string';
+                return 'xmls:string';
 
             case Type::BUILTIN_TYPE_INT:
-                return 'integer';
+                return 'xmls:integer';
 
             case Type::BUILTIN_TYPE_FLOAT:
-                return 'number';
+                return 'xmls:number';
 
             case Type::BUILTIN_TYPE_BOOL:
-                return 'boolean';
+                return 'xmls:boolean';
 
             case Type::BUILTIN_TYPE_OBJECT:
                 $className = $type->getClassName();
 
-                if ($className) {
-                    if (is_subclass_of($className, \DateTimeInterface::class)) {
-                        return 'string';
+                if (null !== $className) {
+                    $reflection = new \ReflectionClass($className);
+                    if ($reflection->implementsInterface(\DateTimeInterface::class)) {
+                        return 'xmls:dateTime';
                     }
 
                     $className = $type->getClassName();
                     if ($this->resourceClassResolver->isResourceClass($className)) {
-                        return ['$ref' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
+                        return sprintf('#%s', $this->resourceMetadataFactory->create($className)->getShortName());
                     }
                 }
            break;

@@ -51,7 +51,7 @@
             <tag name="serializer.normalizer" priority="50" />
         </service>
 
-        <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Serializer\ConstraintViolationListNormalizer" public="false">
+        <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
 
             <tag name="serializer.normalizer" />
@@ -79,7 +79,7 @@
 
         <!-- Action -->
 
-        <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Hydra\Action\DocumentationAction">
+        <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
             <argument type="service" id="api_platform.hydra.documentation_builder" />
         </service>
 

@@ -59,8 +59,9 @@ final class ApiLoader extends Loader
 
         $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));
         $routeCollection->addCollection($this->fileLoader->load('hydra.xml'));
-        $routeCollection->addCollection($this->fileLoader->load('swagger.xml'));
-
+        if ($this->container->getParameter('api_platform.enable_swagger')) {
+            $routeCollection->addCollection($this->fileLoader->load('swagger.xml'));
+        }
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $resourceShortName = $resourceMetadata->getShortName();

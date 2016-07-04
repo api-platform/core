@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Swagger\Action;
+namespace ApiPlatform\Core\Documentation\Action;
 
-use ApiPlatform\Core\Util\ApiDocumentationBuilderInterface;
-use Symfony\Component\HttpFoundation\Request;
+use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Generates the Swagger API documentation.
+ * Generates the Hydra API documentation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -30,15 +30,9 @@ final class DocumentationAction
 
     /**
      * Gets API doc.
-     *
-     * @param Request $request
-     *
-     * @return array
      */
-    public function __invoke(Request $request)
+    public function __invoke() : JsonResponse
     {
-        $request->attributes->set('_api_format', 'jsonld');
-
-        return $this->apiDocumentationBuilder->getApiDocumentation();
+        return new JsonResponse($this->apiDocumentationBuilder->getApiDocumentation(), JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
     }
 }

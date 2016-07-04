@@ -82,7 +82,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.xml');
         $loader->load('metadata.xml');
         $loader->load('data_provider.xml');
-        $loader->load('swagger.xml');
+
+        if ($config['enable_swagger']) {
+            $loader->load('swagger.xml');
+            $container->setParameter('api_platform.enable_swagger', (string) $config['enable_swagger']);
+        }
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
