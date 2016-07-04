@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\ApiDocumentationBuilderInterface;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Creates a machine readable Swagger API documentation.
@@ -144,7 +145,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         if ('' !== $this->description) {
             $doc['info']['description'] = $this->description;
         }
-        $doc['host'] = $_SERVER['HTTP_HOST'];
+        $doc['host'] = $this->urlGenerator->generate('api_jsonld_entrypoint');
         $doc['basePath'] = $this->urlGenerator->generate('api_jsonld_entrypoint');
         $doc['definitions'] = $properties;
         $doc['externalDocs'] = ['description' => 'Find more about api-platform', 'url' => 'docs'];
@@ -256,26 +257,23 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         }
 
         switch ($type->getBuiltinType()) {
-            case 'string':
+            case Type::BUILTIN_TYPE_STRING:
                 return 'string';
 
-            case 'int':
+            case Type::BUILTIN_TYPE_INT:
                 return 'integer';
 
-            case 'float':
+            case Type::BUILTIN_TYPE_FLOAT:
                 return 'number';
 
-            case 'double':
-                return 'number';
-
-            case 'bool':
+            case Type::BUILTIN_TYPE_BOOL:
                 return 'boolean';
 
-            case 'object':
+            case Type::BUILTIN_TYPE_OBJECT:
                 $className = $type->getClassName();
 
                 if ($className) {
-                    if ('DateTime' === $className) {
+                    if (is_subclass_of($className, \DateTimeInterface::class)) {
                         return 'string';
                     }
 

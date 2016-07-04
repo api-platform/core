@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 final class ConstraintViolationListNormalizer implements NormalizerInterface
 {
-    const FORMAT = ['swagger-error', 'hydra-error'];
+    const FORMAT = ['hydra-error'];
 
     /**
      * @var UrlGeneratorInterface

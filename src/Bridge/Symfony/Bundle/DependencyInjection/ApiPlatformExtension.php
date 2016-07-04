@@ -82,6 +82,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.xml');
         $loader->load('metadata.xml');
         $loader->load('data_provider.xml');
+        $loader->load('swagger.xml');
 
         $this->enableJsonLd($loader);
         $this->registerAnnotationLoaders($container);
@@ -110,7 +111,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Enables JSON-LD and Hydra and Swagger support.
+     * Enables JSON-LD and Hydra support.
      *
      * @param XmlFileLoader $loader
      */
@@ -118,7 +119,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
-        $loader->load('swagger.xml');
     }
 
     /**
