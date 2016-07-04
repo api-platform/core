@@ -146,6 +146,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         foreach ($possibleArguments as $possibleArgument) {
             $containerProphecy->has($possibleArgument)->willReturn(true);
         }
+        $containerProphecy->getParameter('api_platform.enable_swagger')->willReturn(true);
 
         $containerProphecy->has(Argument::type('string'))->willReturn(false);
 

@@ -21,27 +21,29 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class SwaggerCommand extends Command
+final class SwaggerCommand extends Command
 {
-    /**
-     * @var ApiDocumentationBuilder
-     */
-    protected $apiDocumentationBuilder;
+    private $apiDocumentationBuilder;
 
     public function __construct(ApiDocumentationBuilder $apiDocumentationBuilder)
     {
-        $this->apiDocumentationBuilder = $apiDocumentationBuilder;
-
         parent::__construct();
+        $this->apiDocumentationBuilder = $apiDocumentationBuilder;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
             ->setName('api:swagger:export')
-            ->setDescription('Export a beautiful json of swagger api');
+            ->setDescription('Dump the Swagger 2.0 (OpenAPI) documentation');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $data = $this->apiDocumentationBuilder->getApiDocumentation();
