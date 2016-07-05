@@ -11,13 +11,13 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
 
 /**
  * Applies pagination on the Doctrine query for resource collection when enabled.
@@ -74,8 +74,7 @@ class PaginationExtension implements QueryResultExtensionInterface
 
         $queryBuilder
             ->skip(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
-            ->limit($itemsPerPage)
-        ;
+            ->limit($itemsPerPage);
     }
 
     /**

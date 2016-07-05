@@ -37,7 +37,7 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
 
         if ($container->hasDefinition('api_platform.doctrine.orm.collection_data_provider')) {
             $this->handleOrm($container);
-        } elseif($container->hasDefinition('api_platform.doctrine.mongodb.collection_data_provider')) {
+        } elseif ($container->hasDefinition('api_platform.doctrine.mongodb.collection_data_provider')) {
             $this->handleMongoDB($container);
         }
     }

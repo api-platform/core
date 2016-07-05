@@ -13,7 +13,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
 use Doctrine\ODM\MongoDB\Query\Builder;
 
-
 /**
  * Interface of Doctrine ORM query extensions that supports result production
  * for specific cases such as pagination.

@@ -18,7 +18,6 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 
 /**
  * Use Doctrine metadata to populate the identifier property.
- *
  */
 final class DoctrineMongoDBPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {

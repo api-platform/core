@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
 use ApiPlatform\Core\Api\ItemDataProviderInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -19,7 +20,6 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
 
 /**
  * Item data provider for the Doctrine MongoDB ODM.
@@ -95,10 +95,8 @@ class ItemDataProvider implements ItemDataProviderInterface
         $queryBuilder = $repository->createQueryBuilder();
 
         foreach ($identifiers as $propertyName => $value) {
-
             $queryBuilder
-                ->field($propertyName)->equals($value)
-            ;
+                ->field($propertyName)->equals($value);
         }
 
         foreach ($this->itemExtensions as $extension) {
