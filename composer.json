@@ -43,7 +43,8 @@
     "symfony/phpunit-bridge": "^3.1",
     "symfony/security": "^2.7 || ^3.0",
     "symfony/validator": "^2.5 || ^3.0",
-    "symfony/finder": "^2.8 || ^3.1"
+    "symfony/finder": "^2.8 || ^3.1",
+    "simplethings/entity-audit-bundle": "^0.9.1"
   },
   "suggest": {
     "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",

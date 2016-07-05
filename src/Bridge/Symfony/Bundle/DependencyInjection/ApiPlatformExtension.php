@@ -122,6 +122,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
             $loader->load('nelmio_api_doc.xml');
         }
+        // SimpleThingsEntityAudit support
+        if (isset($bundles['SimpleThingsEntityAuditBundle'])) {
+            $loader->load('samplethings_entity_audit.xml');
+            $container->getDefinition('api_platform.jsonld.entrypoint_builder')->replaceArgument(1, $container->getDefinition('api_platform.samplethings_entity_audit.metadata.resource.metadata_factory'));
+            $container->getDefinition('api_platform.jsonld.entrypoint_builder')->replaceArgument(0, $container->getDefinition('api_platform.samplethings_entity_audit.resource.name_collection_factory'));
+            $container->getDefinition('api_platform.route_loader')->replaceArgument(2, $container->getDefinition('api_platform.samplethings_entity_audit.metadata.resource.metadata_factory'));
+            $container->getDefinition('api_platform.route_loader')->replaceArgument(1, $container->getDefinition('api_platform.samplethings_entity_audit.resource.name_collection_factory'));
+            $container->getDefinition('api_platform.action.get_collection')->replaceArgument(0, $container->getDefinition('api_platform.samplethings_entity_audit.doctrine.orm.collection_data_provider'));
+            $container->getDefinition('api_platform.action.get_item')->replaceArgument(0, $container->getDefinition('api_platform.samplethings_entity_audit.doctrine.orm.item_data_provider'));
+        }
     }
 
     /**
