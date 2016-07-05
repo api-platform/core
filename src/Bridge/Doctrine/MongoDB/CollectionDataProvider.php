@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
-use ApiPlatform\Core\Api\CollectionDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryResultExtensionInterface;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentRepository;

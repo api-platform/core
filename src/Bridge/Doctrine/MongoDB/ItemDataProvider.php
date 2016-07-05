@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
-use ApiPlatform\Core\Api\ItemDataProviderInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
