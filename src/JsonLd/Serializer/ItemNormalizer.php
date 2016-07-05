@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -296,14 +297,18 @@ final class ItemNormalizer extends AbstractObjectNormalizer
     {
         if (is_string($value)) {
             try {
-                return $this->iriConverter->getItemFromIri($value);
+                return $this->iriConverter->getItemFromIri($value, true);
             } catch (InvalidArgumentException $e) {
                 // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
             }
         }
 
         if (!$this->resourceClassResolver->isResourceClass($className) || $propertyMetadata->isWritableLink()) {
-            return $this->serializer->denormalize($value, $className, self::FORMAT, $this->createRelationContext($className, $context));
+            try {
+                return $this->serializer->denormalize($value, $className, self::FORMAT, $this->createRelationContext($className, $context));
+            } catch (EntityNotFoundException $e) {
+                throw new InvalidArgumentException($e->getMessage());
+            }
         }
 
         if (!is_array($value)) {

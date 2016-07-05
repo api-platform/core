@@ -279,6 +279,21 @@ Feature: Relations support
     }
     """
 
+  Scenario: Post a wrong relation
+    When I send a "POST" request to "/relation_embedders" with body:
+      """
+       {
+        "anotherRelated": {
+          "@id": "/related_dummies/123",
+          "@type": "https://schema.org/Product",
+          "symfony": "phalcon"
+        }
+      }
+      """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+
   Scenario: Update an embedded relation
     When I send a "PUT" request to "/relation_embedders/2" with body:
     """
@@ -340,3 +355,6 @@ Feature: Relations support
       "related": null
     }
     """
+
+
+
