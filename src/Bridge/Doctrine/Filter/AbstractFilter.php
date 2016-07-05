@@ -230,6 +230,7 @@ abstract class AbstractFilter
     {
         $propertyParts = $this->splitPropertyParts($property);
         $parentAlias = $rootAlias;
+        $alias = null;
 
         foreach ($propertyParts['associations'] as $association) {
             $alias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
