@@ -98,7 +98,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             'get' => ['method' => 'GET'],
         ]);
 
-        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+        $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
     /**
@@ -117,7 +117,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             'get' => ['method' => 'GET'],
         ]);
 
-        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
+        $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
     /**
@@ -163,24 +163,14 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         return $apiLoader;
     }
 
-    /**
-     * get a Route instance with params.
-     *
-     * @param string path
-     * @param string controller
-     * @param string ressourceClass
-     * @param string operationName
-     * @param array methods
-     * @param bool collection - whether it's a collection or not
-     */
-    private function getRoute($path, $controller, $resourceClass, $operationName, array $methods, $collection = false): Route
+    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false): Route
     {
         return new Route(
             $path,
             [
                 '_controller' => $controller,
-                '_resource_class' => $resourceClass,
-                sprintf('_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
+                '_api_resource_class' => $resourceClass,
+                sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ],
             [],
             [],

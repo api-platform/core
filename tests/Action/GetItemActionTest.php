@@ -27,7 +27,7 @@ class GetItemActionTest extends \PHPUnit_Framework_TestCase
         $dataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $dataProviderProphecy->getItem('Foo', 22, 'get', true)->willReturn($result);
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_item_operation_name' => 'get', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
 
         $action = new GetItemAction($dataProviderProphecy->reveal());
         $this->assertSame($result, $action($request, 22));
@@ -42,7 +42,7 @@ class GetItemActionTest extends \PHPUnit_Framework_TestCase
         $dataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $dataProviderProphecy->getItem('Foo', 1312, 'get', true)->willReturn(null);
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_item_operation_name' => 'get', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
 
         $action = new GetItemAction($dataProviderProphecy->reveal());
         $action($request, 1312);

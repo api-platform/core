@@ -94,7 +94,7 @@ class DeserializerViewListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getControllerResult()->willReturn($result);
         $eventProphecy->setControllerResult($result)->shouldBeCalled();
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_collection_operation_name' => 'post', '_api_format' => 'json'], [], [], [], '{}');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], [], '{}');
         $request->setMethod($method);
         $eventProphecy->getRequest()->willReturn($request);
 

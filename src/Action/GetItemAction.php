@@ -44,9 +44,9 @@ final class GetItemAction
      */
     public function __invoke(Request $request, $id)
     {
-        list($resourceClass, , $operationName) = RequestAttributesExtractor::extractAttributes($request);
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        $data = $this->itemDataProvider->getItem($resourceClass, $id, $operationName, true);
+        $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name'], true);
         if (!$data) {
             throw new NotFoundHttpException('Not Found');
         }

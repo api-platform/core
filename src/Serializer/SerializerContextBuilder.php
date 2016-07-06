@@ -32,26 +32,24 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     /**
      * {@inheritdoc}
      */
-    public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null) : array
+    public function createFromRequest(Request $request, bool $normalization, array $attributes = null) : array
     {
-        if (null === $extractedAttributes) {
-            $extractedAttributes = RequestAttributesExtractor::extractAttributes($request);
+        if (null === $attributes) {
+            $attributes = RequestAttributesExtractor::extractAttributes($request);
         }
 
-        list($resourceClass, $collectionOperationName, $itemOperationName) = $extractedAttributes;
-
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
 
-        if ($collectionOperationName) {
-            $context = $resourceMetadata->getCollectionOperationAttribute($collectionOperationName, $key, [], true);
-            $context['collection_operation_name'] = $collectionOperationName;
+        if (isset($attributes['collection_operation_name'])) {
+            $context = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], $key, [], true);
+            $context['collection_operation_name'] = $attributes['collection_operation_name'];
         } else {
-            $context = $resourceMetadata->getItemOperationAttribute($itemOperationName, $key, [], true);
-            $context['item_operation_name'] = $itemOperationName;
+            $context = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], $key, [], true);
+            $context['item_operation_name'] = $attributes['item_operation_name'];
         }
 
-        $context['resource_class'] = $resourceClass;
+        $context['resource_class'] = $attributes['resource_class'];
         $context['request_uri'] = $request->getRequestUri();
 
         return $context;

@@ -45,19 +45,19 @@ class SerializerContextBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromRequest()
     {
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_item_operation_name' => 'get', '_api_format' => 'xml']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['foo' => 'bar', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => ''];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_collection_operation_name' => 'pot', '_api_format' => 'xml']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'pot', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['foo' => 'bar', 'collection_operation_name' => 'pot',  'resource_class' => 'Foo', 'request_uri' => ''];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_item_operation_name' => 'get', '_api_format' => 'xml']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['bar' => 'baz', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => ''];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_collection_operation_name' => 'post', '_api_format' => 'xml']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['bar' => 'baz', 'collection_operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => ''];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
@@ -73,6 +73,6 @@ class SerializerContextBuilderTest extends \PHPUnit_Framework_TestCase
     public function testReuseExistingAttributes()
     {
         $expected = ['bar' => 'baz', 'item_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => ''];
-        $this->assertEquals($expected, $this->builder->createFromRequest(new Request(), false, ['Foo', null, 'get']));
+        $this->assertEquals($expected, $this->builder->createFromRequest(new Request(), false, ['resource_class' => 'Foo', 'item_operation_name' => 'get']));
     }
 }

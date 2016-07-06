@@ -27,7 +27,7 @@ class GetCollectionActionTest extends \PHPUnit_Framework_TestCase
         $dataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
         $dataProviderProphecy->getCollection('Foo', 'get')->willReturn($result);
 
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_collection_operation_name' => 'get', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
 
         $action = new GetCollectionAction($dataProviderProphecy->reveal());
         $this->assertSame($result, $action($request));

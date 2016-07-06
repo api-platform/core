@@ -80,7 +80,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerMock = $this->prophesize(RouterInterface::class);
 
         $routerMock->match('/users/3')->willReturn([
-            '_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => 'AppBundle\Entity\User',
             'id' => 3,
         ])->shouldBeCalledTimes(1);
         $itemDataProviderMock->getItem('AppBundle\Entity\User', 3, null, false)->shouldBeCalledTimes(1);
@@ -102,7 +102,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerMock = $this->prophesize(RouterInterface::class);
 
         $routerMock->match('/users/3')->willReturn([
-            '_resource_class' => 'AppBundle\Entity\User',
+            '_api_resource_class' => 'AppBundle\Entity\User',
             'id' => 3,
         ])->shouldBeCalledTimes(1);
         $itemDataProviderMock->getItem('AppBundle\Entity\User', 3, null, true)
