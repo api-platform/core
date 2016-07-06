@@ -57,7 +57,7 @@
             <argument type="service" id="api_platform.negotiator" />
             <argument>%api_platform.formats%</argument>
 
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="30" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
         </service>
 
         <!-- kernel.request piorities must be >8 to be executed after the firewall -->
@@ -65,14 +65,14 @@
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.item_data_provider" />
 
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
 
         <service id="api_platform.listener.request.deserializer" class="ApiPlatform\Core\EventListener\DeserializerListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
 
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="3" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
 
         <service id="api_platform.listener.view.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorListener">
