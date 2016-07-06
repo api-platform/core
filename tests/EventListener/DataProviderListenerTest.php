@@ -43,7 +43,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
     {
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
-        
+
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
@@ -52,7 +52,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
-        
+
         $listener = new DataProviderListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
