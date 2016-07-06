@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
-use ApiPlatform\Core\JsonLd\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Custom Controller.
@@ -21,11 +21,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
  */
 class CustomController extends Controller
 {
-    /**
-     * @return \ApiPlatform\Core\JsonLd\Response
-     */
-    public function customAction($id)
+    public function customAction(int $id) : JsonResponse
     {
-        return new Response(sprintf('This is a custom action for %d.', $id));
+        return new JsonResponse(sprintf('This is a custom action for %d.', $id), 200, ['Content-Type' => 'application/ld+json']);
     }
 }

@@ -58,11 +58,11 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $exception->getCode(), $exception);
         }
 
-        if (!isset($parameters['_resource_class']) || !isset($parameters['id'])) {
+        if (!isset($parameters['_api_resource_class']) || !isset($parameters['id'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        if ($item = $this->itemDataProvider->getItem($parameters['_resource_class'], $parameters['id'], null, $fetchData)) {
+        if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $parameters['id'], null, $fetchData)) {
             return $item;
         }
 
@@ -175,8 +175,8 @@ final class IriConverter implements IriConverterInterface
         $operationType = $collection ? 'collection' : 'item';
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
-            $currentResourceClass = $route->getDefault('_resource_class');
-            $operation = $route->getDefault(sprintf('_%s_operation_name', $operationType));
+            $currentResourceClass = $route->getDefault('_api_resource_class');
+            $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
             $methods = $route->getMethods();
 
             if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods))) {

@@ -40,17 +40,16 @@ final class ManagerViewListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_DELETE])) {
+        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_DELETE], true)) {
             return;
         }
 
-        $resourceClass = $request->attributes->get('_resource_class');
-        if (!$resourceClass) {
+        $resourceClass = $request->attributes->get('_api_resource_class');
+        if (null === $resourceClass) {
             return;
         }
 
         $controllerResult = $event->getControllerResult();
-
         if (null === $objectManager = $this->getManager($resourceClass, $controllerResult)) {
             return $controllerResult;
         }

@@ -18,12 +18,16 @@ use Symfony\Component\HttpFoundation\Request;
  * Extracts data used by the library form a Request instance.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
 final class RequestAttributesExtractor
 {
+    const API_ATTRIBUTES = ['resource_class', 'format', 'mime_type'];
+
     /**
-     * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not contain required
-     * attributes.
+     * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not
+     * contain required attributes.
      *
      * @param Request $request
      *
@@ -33,24 +37,30 @@ final class RequestAttributesExtractor
      */
     public static function extractAttributes(Request $request)
     {
-        $resourceClass = $request->attributes->get('_resource_class');
+        $result = [];
 
-        if (!$resourceClass) {
-            throw new RuntimeException('The request attribute "_resource_class" must be defined.');
+        foreach (self::API_ATTRIBUTES as $key) {
+            $attributeKey = '_api_'.$key;
+            $attributeValue = $request->attributes->get($attributeKey);
+
+            if (null === $attributeValue) {
+                throw new RuntimeException(sprintf('The request attribute "%s" must be defined.', $attributeKey));
+            }
+
+            $result[$key] = $attributeValue;
         }
 
-        $collectionOperation = $request->attributes->get('_collection_operation_name');
-        $itemOperation = $request->attributes->get('_item_operation_name');
+        $collectionOperationName = $request->attributes->get('_api_collection_operation_name');
+        $itemOperationName = $request->attributes->get('_api_item_operation_name');
 
-        if (!$itemOperation && !$collectionOperation) {
-            throw new RuntimeException('One of the request attribute "_item_operation_name" or "_collection_operation_name" must be defined.');
+        if ($collectionOperationName) {
+            $result['collection_operation_name'] = $collectionOperationName;
+        } elseif ($itemOperationName) {
+            $result['item_operation_name'] = $itemOperationName;
+        } else {
+            throw new RuntimeException('One of the request attribute "_api_collection_operation_name" or "_api_item_operation_name" must be defined.');
         }
 
-        $format = $request->attributes->get('_api_format');
-        if (!$format) {
-            throw new RuntimeException('The request attribute "_api_format" must be defined.');
-        }
-
-        return [$resourceClass, $collectionOperation, $itemOperation, $format];
+        return $result;
     }
 }

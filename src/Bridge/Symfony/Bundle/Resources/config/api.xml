@@ -43,6 +43,12 @@
 
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
+        <!-- Serializer -->
+
+        <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        </service>
+
         <!-- Resource path generators -->
 
         <service id="api_platform.routing.resource_path_generator.underscore" class="ApiPlatform\Core\Routing\UnderscoreResourcePathGenerator" public="false" />
@@ -53,22 +59,34 @@
 
         <service id="api_platform.listener.request.format" class="ApiPlatform\Core\EventListener\FormatRequestListener">
             <argument type="service" id="api_platform.negotiator" />
-            <argument>%api_platform.supported_formats%</argument>
+            <argument>%api_platform.formats%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>
 
+        <service id="api_platform.listener.view.serializer" class="ApiPlatform\Core\EventListener\SerializerViewListener">
+            <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
+        </service>
+
         <service id="api_platform.listener.view.deserializer" class="ApiPlatform\Core\EventListener\DeserializerViewListener">
             <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="30" />
         </service>
 
-        <service id="api_platform.listener.view.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ViewListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        <service id="api_platform.listener.view.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorViewListener">
             <argument type="service" id="validator" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="20" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="30" />
+        </service>
+
+        <service id="api_platform.listener.view.responder" class="ApiPlatform\Core\EventListener\ResponderViewListener">
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" />
         </service>
 
         <!-- Action -->

@@ -22,12 +22,12 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 final class FormatRequestListener
 {
     private $negotiator;
-    private $supportedFormats;
+    private $formats;
 
-    public function __construct(Negotiator $negotiator, array $supportedFormats)
+    public function __construct(Negotiator $negotiator, array $formats)
     {
         $this->negotiator = $negotiator;
-        $this->supportedFormats = $supportedFormats;
+        $this->formats = $formats;
     }
 
     /**
@@ -36,23 +36,34 @@ final class FormatRequestListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->attributes->get('_resource_class')) {
+        if (null === $request->attributes->get('_api_resource_class')) {
             return;
         }
 
         // Use the Symfony request format if available and applicable
         $requestFormat = $request->getRequestFormat(null);
         $mimeType = $requestFormat ? $request->getMimeType($requestFormat) : null;
-        if (null === $mimeType || !in_array($mimeType, $this->supportedFormats)) {
+        if (null === $mimeType || !in_array($mimeType, $this->formats)) {
             if (null === $accept = $request->headers->get('Accept')) {
                 $mimeType = null;
             } else {
                 // Try to guess the best format to use
-                $acceptHeader = $this->negotiator->getBest($accept, array_keys($this->supportedFormats));
+                $acceptHeader = $this->negotiator->getBest($accept, array_keys($this->formats));
                 $mimeType = $acceptHeader ? $acceptHeader->getType() : null;
             }
         }
 
-        $request->attributes->set('_api_format', $mimeType ? $this->supportedFormats[$mimeType] : reset($this->supportedFormats));
+        if ($mimeType) {
+            $request->attributes->set('_api_mime_type', $mimeType);
+            $request->attributes->set('_api_format', $this->formats[$mimeType]);
+
+            return;
+        }
+
+        reset($this->formats);
+        $format = each($this->formats);
+
+        $request->attributes->set('_api_mime_type', $format['key']);
+        $request->attributes->set('_api_format', $format['value']);
     }
 }

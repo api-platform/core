@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Parent dummy.
+ * Parent Dummy.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *

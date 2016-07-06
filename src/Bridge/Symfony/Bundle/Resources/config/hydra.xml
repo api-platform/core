@@ -44,7 +44,6 @@
         <!-- Serializer -->
 
         <service id="api_platform.hydra.normalizer.collection" class="ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />

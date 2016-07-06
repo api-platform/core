@@ -33,12 +33,13 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertFalse($request->attributes->has('_api_format'));
+        $this->assertFalse($request->attributes->has('_api_mime_type'));
     }
 
     public function testSupportedRequestFormat()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -49,12 +50,13 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertSame('xml', $request->attributes->get('_api_format'));
+        $this->assertSame('text/xml', $request->attributes->get('_api_mime_type'));
     }
 
     public function testUnsupportedRequestFormat()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -65,12 +67,13 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->attributes->get('_api_format'));
+        $this->assertSame('application/json', $request->attributes->get('_api_mime_type'));
     }
 
     public function testSupportedAcceptHeader()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml, application/json;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -81,12 +84,13 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->attributes->get('_api_format'));
+        $this->assertSame('application/json', $request->attributes->get('_api_mime_type'));
     }
 
     public function testUnsupportedAcceptHeader()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -97,5 +101,6 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertSame('binary', $request->attributes->get('_api_format'));
+        $this->assertSame('application/octet-stream', $request->attributes->get('_api_mime_type'));
     }
 }

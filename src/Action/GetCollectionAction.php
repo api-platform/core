@@ -42,8 +42,8 @@ final class GetCollectionAction
      */
     public function __invoke(Request $request)
     {
-        list($resourceClass, $operationName) = RequestAttributesExtractor::extractAttributes($request);
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        return $this->collectionDataProvider->getCollection($resourceClass, $operationName);
+        return $this->collectionDataProvider->getCollection($attributes['resource_class'], $attributes['collection_operation_name']);
     }
 }

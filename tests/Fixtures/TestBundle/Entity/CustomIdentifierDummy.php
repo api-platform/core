@@ -15,7 +15,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Custom identifier dummy.
+ * Custom Identifier Dummy.
  *
  * @ApiResource
  * @ORM\Entity

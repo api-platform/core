@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\JsonLd\Action;
 
 use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Generates the JSON-LD API entrypoint.
@@ -28,17 +28,8 @@ final class EntrypointAction
         $this->entrypointBuilder = $entrypointBuilder;
     }
 
-    /**
-     * Builds the entrypoint.
-     *
-     * @param Request $request
-     *
-     * @return array
-     */
-    public function __invoke(Request $request) : array
+    public function __invoke() : JsonResponse
     {
-        $request->attributes->set('_api_format', 'jsonld');
-
-        return $this->entrypointBuilder->getEntrypoint();
+        return new JsonResponse($this->entrypointBuilder->getEntrypoint(), JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
     }
 }

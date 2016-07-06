@@ -22,9 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConfigCustomController
 {
-    /**
-     * @var DataProviderInterface
-     */
     private $dataProvider;
 
     public function __construct(ItemDataProviderInterface $dataProvider)
@@ -34,8 +31,8 @@ class ConfigCustomController
 
     public function __invoke(Request $request, $id)
     {
-        list($resourceType) = RequestAttributesExtractor::extractAttributes($request);
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        return $this->dataProvider->getItem($resourceType, $id);
+        return $this->dataProvider->getItem($attributes['resource_class'], $id);
     }
 }

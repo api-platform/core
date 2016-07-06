@@ -168,7 +168,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $parameters = [
             'api_platform.title' => 'title',
             'api_platform.description' => 'description',
-            'api_platform.supported_formats' => ['application/ld+json' => 'jsonld'],
+            'api_platform.formats' => ['application/ld+json' => 'jsonld'],
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.enabled' => true,
@@ -259,11 +259,14 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.routing.resource_path_generator.underscore',
             'api_platform.routing.resource_path_generator.dash',
             'api_platform.listener.request.format',
-            'api_platform.listener.view.validation',
+            'api_platform.listener.view.serializer',
             'api_platform.listener.view.deserializer',
+            'api_platform.listener.view.validator',
+            'api_platform.listener.view.responder',
             'api_platform.action.get_collection',
             'api_platform.action.post_collection',
             'api_platform.action.get_item',
+            'api_platform.serializer.context_builder',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.collection_data_provider',
             'api_platform.doctrine.orm.item_data_provider',
@@ -284,10 +287,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.listener.view.manager',
             'api_platform.jsonld.entrypoint_builder',
             'api_platform.jsonld.context_builder',
-            'api_platform.jsonld.listener.view.responder',
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
-            'api_platform.jsonld.listener.view.responder',
             'api_platform.jsonld.action.context',
             'api_platform.jsonld.action.entrypoint',
             'api_platform.hydra.documentation_builder',
@@ -302,6 +303,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.action.documentation',
             'api_platform.hydra.action.exception',
         ];
+
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
         }
