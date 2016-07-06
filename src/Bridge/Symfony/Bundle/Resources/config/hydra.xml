@@ -21,19 +21,19 @@
 
         <!-- Event listeners -->
 
-        <service id="api_platform.hydra.listener.link_header_response" class="ApiPlatform\Core\Hydra\EventListener\LinkHeaderResponseListener">
+        <service id="api_platform.hydra.listener.response.link_header" class="ApiPlatform\Core\Hydra\EventListener\LinkHeaderListener">
             <argument type="service" id="api_platform.router" />
 
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
-        <service id="api_platform.hydra.listener.validation_exception" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener\ValidationExceptionListener">
+        <service id="api_platform.hydra.listener.exception.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener\ValidationExceptionListener">
             <argument type="service" id="api_platform.hydra.normalizer.constraint_violation_list" />
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
 
-        <service id="api_platform.hydra.listener.request_exception" class="ApiPlatform\Core\Hydra\EventListener\RequestExceptionListener">
+        <service id="api_platform.hydra.listener.exception" class="ApiPlatform\Core\Hydra\EventListener\ExceptionListener">
             <argument>api_platform.hydra.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
 

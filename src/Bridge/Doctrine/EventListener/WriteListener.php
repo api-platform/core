@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ManagerViewListener
+final class WriteListener
 {
     private $managerRegistry;
 

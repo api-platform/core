@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorViewListener;
+use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class ValidatorViewListenerTest extends \PHPUnit_Framework_TestCase
+class ValidatorListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidatorIsCalled()
     {
@@ -37,7 +37,7 @@ class ValidatorViewListenerTest extends \PHPUnit_Framework_TestCase
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ValidatorViewListener($validator, $resourceMetadataFactory);
+        $validationViewListener = new ValidatorListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
     }
 
@@ -50,16 +50,16 @@ class ValidatorViewListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $violationsProphecy = $this->prophesize(ConstraintViolationListInterface::class);
-        $violationsProphecy->count()->willReturn(1);
+        $violationsProphecy->count()->willReturn(1)->shouldBeCalled();
         $violations = $violationsProphecy->reveal();
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled()->willReturn($violations);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled()->willReturn($violations)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ValidatorViewListener($validator, $resourceMetadataFactory);
+        $validationViewListener = new ValidatorListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
     }
 
@@ -78,7 +78,7 @@ class ValidatorViewListenerTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $kernel = $this->prophesize(HttpKernelInterface::class)->reveal();
