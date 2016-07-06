@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB;
 
-use ApiPlatform\Core\Api\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use Doctrine\ODM\MongoDB\Cursor;
 
 /**
