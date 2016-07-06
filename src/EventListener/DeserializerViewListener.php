@@ -50,18 +50,18 @@ final class DeserializerViewListener
         }
 
         try {
-            $extractedAttributes = RequestAttributesExtractor::extractAttributes($request);
+            $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             return;
         }
 
-        $context = $this->serializerContextBuilder->createFromRequest($request, false, $extractedAttributes);
+        $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
         if (null !== $controllerResult) {
             $context['object_to_populate'] = $controllerResult;
         }
 
         $event->setControllerResult(
-            $this->serializer->deserialize($request->getContent(), $extractedAttributes[0], $extractedAttributes[3], $context)
+            $this->serializer->deserialize($request->getContent(), $attributes['resource_class'], $attributes['format'], $context)
         );
     }
 }

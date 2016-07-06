@@ -25,7 +25,7 @@ final class RequestExceptionListener extends ExceptionListener
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         // Normalize exceptions with hydra errors only for resources
-        if (!$event->getRequest()->attributes->has('_resource_class')) {
+        if (!$event->getRequest()->attributes->has('_api_resource_class')) {
             return;
         }
 

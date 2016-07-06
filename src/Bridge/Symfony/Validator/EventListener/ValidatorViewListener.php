@@ -11,7 +11,9 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
+use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -44,26 +46,24 @@ final class ValidatorViewListener
     {
         $request = $event->getRequest();
 
-        $resourceClass = $request->attributes->get('_resource_class');
-        $itemOperationName = $request->attributes->get('_item_operation_name');
-        $collectionOperationName = $request->attributes->get('_collection_operation_name');
+        try {
+            $attributes = RequestAttributesExtractor::extractAttributes($request);
+        } catch (RuntimeException $e) {
+            return;
+        }
 
-        $method = $request->getMethod();
-        if (
-            !$resourceClass || (!$itemOperationName && !$collectionOperationName) ||
-            (Request::METHOD_POST !== $method && Request::METHOD_PUT !== $method && Request::METHOD_PATCH !== $method)
-        ) {
+        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH], true)) {
             return;
         }
 
         $data = $event->getControllerResult();
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
-        if ($collectionOperationName) {
-            $validationGroups = $resourceMetadata->getCollectionOperationAttribute($collectionOperationName, 'validation_groups');
+        if (isset($attributes['collection_operation_name'])) {
+            $validationGroups = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], 'validation_groups');
         } else {
-            $validationGroups = $resourceMetadata->getItemOperationAttribute($itemOperationName, 'validation_groups');
+            $validationGroups = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], 'validation_groups');
         }
 
         if (!$validationGroups) {

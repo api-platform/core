@@ -39,7 +39,7 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
     public function testSupportedRequestFormat()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -56,7 +56,7 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
     public function testUnsupportedRequestFormat()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -73,7 +73,7 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
     public function testSupportedAcceptHeader()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml, application/json;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -90,7 +90,7 @@ class FormatRequestListenerTest extends \PHPUnit_Framework_TestCase
     public function testUnsupportedAcceptHeader()
     {
         $request = new Request();
-        $request->attributes->set('_resource_class', 'Foo');
+        $request->attributes->set('_api_resource_class', 'Foo');
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);

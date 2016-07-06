@@ -83,8 +83,10 @@ class ValidatorViewListenerTest extends \PHPUnit_Framework_TestCase
 
         $kernel = $this->prophesize(HttpKernelInterface::class)->reveal();
         $request = new Request([], [], [
-            '_resource_class' => DummyEntity::class,
-            '_item_operation_name' => 'create',
+            '_api_resource_class' => DummyEntity::class,
+            '_api_item_operation_name' => 'create',
+            '_api_format' => 'json',
+            '_api_mime_type' => 'application/json',
         ]);
 
         $request->setMethod(Request::METHOD_POST);

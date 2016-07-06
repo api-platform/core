@@ -63,7 +63,7 @@ class SerializerViewListenerTest extends \PHPUnit_Framework_TestCase
 
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass());
-        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_collection_operation_name' => 'get']));
+        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_collection_operation_name' => 'get']));
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
@@ -79,7 +79,7 @@ class SerializerViewListenerTest extends \PHPUnit_Framework_TestCase
 
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass());
-        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_resource_class' => 'Foo']));
+        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_resource_class' => 'Foo']));
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
@@ -96,7 +96,7 @@ class SerializerViewListenerTest extends \PHPUnit_Framework_TestCase
 
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass());
-        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_resource_class' => 'Foo', '_collection_operation_name' => 'get']));
+        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']));
         $eventProphecy->setControllerResult('bar')->shouldBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
@@ -114,7 +114,7 @@ class SerializerViewListenerTest extends \PHPUnit_Framework_TestCase
 
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new \stdClass());
-        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_resource_class' => 'Foo', '_item_operation_name' => 'get']));
+        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']));
         $eventProphecy->setControllerResult('bar')->shouldBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);

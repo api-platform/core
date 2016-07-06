@@ -127,10 +127,10 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     private function getOperationRoute(string $resourceClass, string $operationName, bool $collection) : Route
     {
-        $operationNameKey = sprintf('_%s_operation_name', $collection ? 'collection' : 'item');
+        $operationNameKey = sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item');
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
-            $currentResourceClass = $route->getDefault('_resource_class');
+            $currentResourceClass = $route->getDefault('_api_resource_class');
             $currentOperationName = $route->getDefault($operationNameKey);
 
             if ($resourceClass === $currentResourceClass && $operationName === $currentOperationName) {

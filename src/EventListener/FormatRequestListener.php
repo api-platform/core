@@ -36,7 +36,7 @@ final class FormatRequestListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->attributes->get('_resource_class')) {
+        if (null === $request->attributes->get('_api_resource_class')) {
             return;
         }
 

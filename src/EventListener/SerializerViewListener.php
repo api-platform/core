@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -48,12 +49,12 @@ final class SerializerViewListener
         }
 
         try {
-            $extractedAttributes = RequestAttributesExtractor::extractAttributes($request);
+            $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             return;
         }
 
-        $context = $this->serializerContextBuilder->createFromRequest($request, true, $extractedAttributes);
-        $event->setControllerResult($this->serializer->serialize($controllerResult, $extractedAttributes[3], $context));
+        $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        $event->setControllerResult($this->serializer->serialize($controllerResult, $attributes['format'], $context));
     }
 }
