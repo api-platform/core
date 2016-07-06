@@ -6,10 +6,9 @@
 
     <services>
         <service id="api_platform.serializer" alias="serializer" />
-
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
-
         <service id="api_platform.property_info" alias="property_info" public="false" />
+        <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Core\Api\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -41,8 +40,6 @@
             <argument type="service" id="api_platform.property_accessor" />
         </service>
 
-        <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
-
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
@@ -56,53 +53,54 @@
 
         <!-- Event listeners -->
 
-        <service id="api_platform.listener.request.format" class="ApiPlatform\Core\EventListener\FormatRequestListener">
+        <service id="api_platform.listener.request.format" class="ApiPlatform\Core\EventListener\FormatListener">
             <argument type="service" id="api_platform.negotiator" />
             <argument>%api_platform.formats%</argument>
 
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="30" />
         </service>
 
-        <service id="api_platform.listener.view.serializer" class="ApiPlatform\Core\EventListener\SerializerViewListener">
+        <!-- kernel.request piorities must be >8 to be executed after the firewall -->
+        <service id="api_platform.listener.request.data_provider" class="ApiPlatform\Core\EventListener\DataProviderListener">
+            <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.item_data_provider" />
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
+        </service>
+
+        <service id="api_platform.listener.request.deserializer" class="ApiPlatform\Core\EventListener\DeserializerListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
 
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="3" />
         </service>
 
-        <service id="api_platform.listener.view.deserializer" class="ApiPlatform\Core\EventListener\DeserializerViewListener">
-            <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.serializer.context_builder" />
-
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="30" />
-        </service>
-
-        <service id="api_platform.listener.view.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorViewListener">
+        <service id="api_platform.listener.view.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorListener">
             <argument type="service" id="validator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="30" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
         </service>
 
-        <service id="api_platform.listener.view.responder" class="ApiPlatform\Core\EventListener\ResponderViewListener">
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" />
+        <service id="api_platform.listener.view.serializer" class="ApiPlatform\Core\EventListener\SerializerListener">
+            <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
+        </service>
+
+        <service id="api_platform.listener.view.responder" class="ApiPlatform\Core\EventListener\ResponderListener">
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
         <!-- Action -->
 
-        <service id="api_platform.action.get_collection" class="ApiPlatform\Core\Action\GetCollectionAction">
-            <argument type="service" id="api_platform.collection_data_provider" />
-        </service>
-
-        <service id="api_platform.action.post_collection" class="ApiPlatform\Core\Action\NullAction" />
-
-        <service id="api_platform.action.get_item" class="ApiPlatform\Core\Action\GetItemAction">
-            <argument type="service" id="api_platform.item_data_provider" />
-        </service>
-
-        <service id="api_platform.action.put_item" alias="api_platform.action.get_item" />
-
-        <service id="api_platform.action.delete_item" alias="api_platform.action.get_item" />
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" />
+        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
     </services>
 
 </container>

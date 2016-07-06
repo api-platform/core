@@ -11,16 +11,18 @@
 
 namespace ApiPlatform\Core\Tests\Action;
 
-use ApiPlatform\Core\Action\NullAction;
+use ApiPlatform\Core\Action\PlaceholderAction;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NullActionTest extends \PHPUnit_Framework_TestCase
+class PlaceholderActionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testNullAction()
+    public function testAction()
     {
-        $action = new NullAction();
-        $this->assertNull($action());
+        $action = new PlaceholderAction();
+
+        $expected = new \stdClass();
+        $this->assertEquals($expected, $action($expected));
     }
 }
