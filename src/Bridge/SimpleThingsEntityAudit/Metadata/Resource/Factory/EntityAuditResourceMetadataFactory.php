@@ -36,15 +36,15 @@ final class EntityAuditResourceMetadataFactory implements ResourceMetadataFactor
      */
     public function create(string $resourceClass) : ResourceMetadata
     {
-        $auditClassName = str_replace('Audit', '', $resourceClass);
-        $resourceClassMetadata = $this->resourceMetadataFactory->create($auditClassName);
-        if (true === $this->auditManager->getMetadataFactory()->isAudited($auditClassName)) {
+        $resourceClassMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (true === $this->auditManager->getMetadataFactory()->isAudited($resourceClass)) {
             $resourceAuditedMetadata = new ResourceMetadata(
-                    $resourceClassMetadata->getShortName().'Audit',
-                    $resourceClassMetadata->getDescription().' Audited',
+                    $resourceClassMetadata->getShortName(),
+                    $resourceClassMetadata->getDescription(),
                     $resourceClassMetadata->getIri(),
-                    ['get' => ['method' => 'GET']],
-                    ['get' => ['method' => 'GET']],
+                    array_merge(is_array($resourceClassMetadata->getItemOperations()) ? $resourceClassMetadata->getItemOperations() : ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT'], 'delete' => ['method' => 'DELETE']], ['audits' => ['method' => 'GET', 'path' => '/audits/'.strtolower($resourceClassMetadata->getShortName()).'_audits/{id}']]),
+                    array_merge(is_array($resourceClassMetadata->getCollectionOperations()) ? $resourceClassMetadata->getCollectionOperations() : ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], ['audits' => ['method' => 'GET', 'path' => '/audits/'.strtolower($resourceClassMetadata->getShortName()).'_audits']]),
                     array_merge(['rev'], $resourceClassMetadata->getAttributes())
                 );
 

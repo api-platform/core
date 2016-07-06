@@ -11,9 +11,8 @@
 
 namespace ApiPlatform\Core\Bridge\SimpleThingsEntityAudit\Doctrine\Orm;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use SimpleThings\EntityAudit\AuditManager;
 use SimpleThings\EntityAudit\AuditReader;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,20 +22,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class AuditCollectionDataProvider extends CollectionDataProvider
+class AuditCollectionDataProvider implements CollectionDataProviderInterface
 {
     private $auditManager;
     private $auditReader;
 
     /**
-     * @param ManagerRegistry                     $managerRegistry
-     * @param QueryCollectionExtensionInterface[] $collectionExtensions
-     * @param AuditReader                         $auditReader
-     * @param AuditManager                        $auditManager
+     * @param AuditReader  $auditReader
+     * @param AuditManager $auditManager
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions, AuditReader $auditReader, AuditManager $auditManager)
+    public function __construct(AuditReader $auditReader, AuditManager $auditManager)
     {
-        parent::__construct($managerRegistry, $collectionExtensions);
         $this->auditManager = $auditManager;
         $this->auditReader = $auditReader;
     }
@@ -46,12 +42,10 @@ class AuditCollectionDataProvider extends CollectionDataProvider
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {
-        $resourceClass = str_replace('Audit', '', $resourceClass);
-        if (true === $this->auditManager->getMetadataFactory()->isAudited($resourceClass)
-        ) {
+        if ('audits' === $operationName && true === $this->auditManager->getMetadataFactory()->isAudited($resourceClass)) {
             throw new NotFoundHttpException(sprintf('Please add an {id} to get the revisions of %s', $resourceClass));
+            // or delete this ? and use the itemDataProvider as an collection providers too since we need an id to get the revision
         }
-
-        return parent::getCollection($resourceClass, $operationName);
+        throw new ResourceClassNotSupportedException(sprintf('Resource class %s is not Audited', $resourceClass));
     }
 }

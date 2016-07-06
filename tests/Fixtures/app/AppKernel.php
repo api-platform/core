@@ -13,6 +13,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
+use SimpleThings\EntityAudit\SimpleThingsEntityAuditBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -33,6 +34,7 @@ class AppKernel extends Kernel
             new DoctrineBundle(),
             new ApiPlatformBundle(),
             new SecurityBundle(),
+            new SimpleThingsEntityAuditBundle(),
             new TestBundle(),
         ];
     }
