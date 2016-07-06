@@ -61,6 +61,10 @@
             <argument type="service" id="api_platform.negotiator" />
             <argument>%api_platform.formats%</argument>
 
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="10" />
+        </service>
+
+        <service id="api_platform.listener.request.item_data_provider" class="ApiPlatform\Core\EventListener\ItemDataProviderListener">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>
 

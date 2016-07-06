@@ -42,7 +42,7 @@ final class GetItemAction
      *
      * @return mixed
      */
-    public function __invoke(Request $request, $id)
+    public function __invoke(Request $request, $id, $data = null)
     {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
