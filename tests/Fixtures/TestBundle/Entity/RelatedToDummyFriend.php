@@ -61,9 +61,9 @@ class RelatedToDummyFriend
     }
 
     /**
-     * Get dummyFriend.
+     * Gets dummyFriend.
      *
-     * @return dummyFriend.
+     * @return DummyFriend
      */
     public function getDummyFriend()
     {
@@ -71,9 +71,9 @@ class RelatedToDummyFriend
     }
 
     /**
-     * Set dummyFriend.
+     * Sets dummyFriend.
      *
-     * @param dummyFriend the value to set.
+     * @param $dummyFriend the value to set.
      */
     public function setDummyFriend($dummyFriend)
     {
@@ -81,9 +81,9 @@ class RelatedToDummyFriend
     }
 
     /**
-     * Get relatedDummy.
+     * Gets relatedDummy.
      *
-     * @return relatedDummy.
+     * @return RelatedDummy
      */
     public function getRelatedDummy()
     {
@@ -91,9 +91,9 @@ class RelatedToDummyFriend
     }
 
     /**
-     * Set relatedDummy.
+     * Sets relatedDummy.
      *
-     * @param relatedDummy the value to set.
+     * @param $relatedDummy the value to set.
      */
     public function setRelatedDummy($relatedDummy)
     {

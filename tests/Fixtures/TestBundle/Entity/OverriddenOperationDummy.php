@@ -18,29 +18,32 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Custom Attribute Dummy.
+ * Overridden Operation Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"custom_attr_dummy_read"}},
- *     "denormalization_context"={"groups"={"custom_attr_dummy_write"}}
- * },
- * itemOperations={
- *          "get"={"method"="GET",
- *     "normalization_context"={"groups"={"custom_attr_dummy_get"}},
- *     "denormalization_context"={"groups"={"custom_attr_dummy_get"}}
+ * @ApiResource(
+ *     attributes={
+ *         "normalization_context"={"groups"={"overridden_operation_dummy_read"}},
+ *         "denormalization_context"={"groups"={"overridden_operation_dummy_write"}}
  *     },
- *          "put"={"method"="PUT",
- *      "normalization_context"={"groups"={"custom_attr_dummy_put"}},
- *      "denormalization_context"={"groups"={"custom_attr_dummy_put"}}
- *     },
+ *     itemOperations={
+ *         "get"={
+ *             "method"="GET",
+ *             "normalization_context"={"groups"={"overridden_operation_dummy_get"}},
+ *             "denormalization_context"={"groups"={"overridden_operation_dummy_get"}}
+ *         },
+ *         "put"={
+ *             "method"="PUT",
+ *             "normalization_context"={"groups"={"overridden_operation_dummy_put"}},
+ *             "denormalization_context"={"groups"={"overridden_operation_dummy_put"}}
+ *          },
  *          "delete"={"method"="DELETE"}
- *     },
+ *     }
  * )
  * @ORM\Entity
  */
-class CustomAttributeDummy
+class OverriddenOperationDummy
 {
     /**
      * @var int The id.
@@ -56,7 +59,7 @@ class CustomAttributeDummy
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @Groups({"custom_attr_dummy_read", "custom_attr_dummy_write", "custom_attr_dummy_get"})
+     * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_write", "overridden_operation_dummy_get"})
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
@@ -65,7 +68,7 @@ class CustomAttributeDummy
      * @var string The dummy name alias.
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"custom_attr_dummy_read", "custom_attr_dummy_put", "custom_attr_dummy_get"})
+     * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_put", "overridden_operation_dummy_get"})
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
@@ -74,17 +77,14 @@ class CustomAttributeDummy
      * @var string A short description of the item.
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"custom_attr_dummy_read" ,"custom_attr_dummy_write", "custom_attr_dummy_get", "custom_attr_dummy_put"})
+     * @Groups({"overridden_operation_dummy_read" ,"overridden_operation_dummy_write", "overridden_operation_dummy_get", "overridden_operation_dummy_put"})
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
 
     /**
-     * @var string A short description of the item.
-     *
      * @ORM\Column(nullable=true)
-     * @Groups({"custom_attr_dummy_write"})
-     * @ApiProperty(iri="https://schema.org/description")
+     * @Groups({"overridden_operation_dummy_write"})
      */
     public $notGettable;
 

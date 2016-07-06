@@ -29,9 +29,10 @@ doctrine:
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'
-    supported_formats:
+    formats:
         jsonld:                        ['application/ld+json']
         xml:                           ['application/xml', 'text/xml']
+        json:                          ['application/json']
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:
@@ -64,15 +65,6 @@ services:
 
     app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
-
-    app.xml_responder_view_listener:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\EventListener\XmlResponderViewListener'
-        arguments:
-            - '@api_platform.serializer'
-
-            - '@api_platform.metadata.resource.metadata_factory'
-        tags:
-            - { name: 'kernel.event_listener', event: 'kernel.view', method: 'onKernelView' }
 
     app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'

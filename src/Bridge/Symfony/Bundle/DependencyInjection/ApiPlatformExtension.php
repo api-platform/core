@@ -52,10 +52,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $supportedFormats = [];
-        foreach ($config['supported_formats'] as $format => $value) {
+        $formats = [];
+        foreach ($config['formats'] as $format => $value) {
             foreach ($value['mime_types'] as $mimeType) {
-                $supportedFormats[$mimeType] = $format;
+                $formats[$mimeType] = $format;
             }
         }
 
@@ -67,7 +67,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
-        $container->setParameter('api_platform.supported_formats', $supportedFormats);
+        $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
         $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);

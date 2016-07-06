@@ -21,38 +21,44 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
 {
     public function testExtractCollectionAttributes()
     {
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_collection_operation_name' => 'post', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $extactor = new RequestAttributesExtractor();
 
-        $this->assertEquals(['Foo', 'post', null, 'json'], $extactor->extractAttributes($request));
+        $this->assertEquals(
+            ['resource_class' => 'Foo', 'format' => 'json', 'mime_type' => 'application/json', 'collection_operation_name' => 'post'],
+            $extactor->extractAttributes($request)
+        );
     }
 
     public function testExtractItemAttributes()
     {
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_item_operation_name' => 'get', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $extactor = new RequestAttributesExtractor();
 
-        $this->assertEquals(['Foo', null, 'get', 'json'], $extactor->extractAttributes($request));
+        $this->assertEquals(
+            ['resource_class' => 'Foo', 'format' => 'json', 'mime_type' => 'application/json', 'item_operation_name' => 'get'],
+            $extactor->extractAttributes($request)
+        );
     }
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The request attribute "_resource_class" must be defined.
+     * @expectedExceptionMessage The request attribute "_api_resource_class" must be defined.
      */
     public function testResourceClassNotSet()
     {
-        $request = new Request([], [], ['_item_operation_name' => 'get', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $extactor = new RequestAttributesExtractor();
         $extactor->extractAttributes($request);
     }
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage One of the request attribute "_item_operation_name" or "_collection_operation_name" must be defined.
+     * @expectedExceptionMessage One of the request attribute "_api_collection_operation_name" or "_api_item_operation_name" must be defined.
      */
     public function testOperationNotSet()
     {
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_api_format' => 'json']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $extactor = new RequestAttributesExtractor();
         $extactor->extractAttributes($request);
     }
@@ -63,7 +69,18 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatNotSet()
     {
-        $request = new Request([], [], ['_resource_class' => 'Foo', '_collection_operation_name' => 'op']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'op']);
+        $extactor = new RequestAttributesExtractor();
+        $extactor->extractAttributes($request);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedExceptionMessage The request attribute "_api_mime_type" must be defined.
+     */
+    public function testMimeTypeNotSet()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'op', '_api_format' => 'json']);
         $extactor = new RequestAttributesExtractor();
         $extactor->extractAttributes($request);
     }

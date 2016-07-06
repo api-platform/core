@@ -14,17 +14,16 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Updates the entity retrieved by the data provider with data contained in the request body.
+ * Serializes data.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DeserializerViewListener
+final class SerializerViewListener
 {
     private $serializer;
     private $serializerContextBuilder;
@@ -36,7 +35,7 @@ final class DeserializerViewListener
     }
 
     /**
-     * Deserializes the data sent in the requested format.
+     * Serializes the data to the requested format.
      *
      * @param GetResponseForControllerResultEvent $event
      */
@@ -45,7 +44,7 @@ final class DeserializerViewListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response || !in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT], true)) {
+        if ($controllerResult instanceof Response) {
             return;
         }
 
@@ -55,13 +54,7 @@ final class DeserializerViewListener
             return;
         }
 
-        $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
-        if (null !== $controllerResult) {
-            $context['object_to_populate'] = $controllerResult;
-        }
-
-        $event->setControllerResult(
-            $this->serializer->deserialize($request->getContent(), $attributes['resource_class'], $attributes['format'], $context)
-        );
+        $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        $event->setControllerResult($this->serializer->serialize($controllerResult, $attributes['format'], $context));
     }
 }

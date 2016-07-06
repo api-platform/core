@@ -39,14 +39,6 @@
             <tag name="serializer.encoder" />
         </service>
 
-        <!-- Event listeners -->
-
-        <service id="api_platform.jsonld.listener.view.responder" class="ApiPlatform\Core\JsonLd\EventListener\ResponderViewListener">
-            <argument type="service" id="api_platform.serializer" />
-
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" />
-        </service>
-
         <!-- Action -->
 
         <service id="api_platform.jsonld.action.context" class="ApiPlatform\Core\JsonLd\Action\ContextAction">

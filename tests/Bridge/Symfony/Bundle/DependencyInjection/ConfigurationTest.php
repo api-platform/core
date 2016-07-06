@@ -33,7 +33,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',
-            'supported_formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
+            'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
             'routing' => [
                 'resource_path_generator' => 'api_platform.routing.resource_path_generator.underscore',
             ],

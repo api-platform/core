@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * AbstractDummy.
+ * Abstract Dummy.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  *
