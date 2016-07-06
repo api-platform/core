@@ -73,24 +73,24 @@
 
         <!-- Event listener -->
 
-        <service id="api_platform.doctrine.listener.view.manager" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\ManagerViewListener">
+        <service id="api_platform.doctrine.listener.view.write" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener">
             <argument type="service" id="doctrine" />
 
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="20" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
 
         <!-- Doctrine Query extensions -->
 
         <service id="api_platform.doctrine.orm.query_extension.eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" public="false">
-            <tag name="api_platform.doctrine.orm.query_extension.item" priority="20" />
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="20" />
+            <tag name="api_platform.doctrine.orm.query_extension.item" priority="64" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="64" />
         </service>
 
         <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filters" />
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="10" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="32" />
         </service>
 
         <service id="api_platform.doctrine.orm.query_extension.pagination" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" public="false">
@@ -105,13 +105,13 @@
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.items_per_page_parameter_name%</argument>
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-20" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="16" />
         </service>
 
         <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-10" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="8" />
         </service>
     </services>
 

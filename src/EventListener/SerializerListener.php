@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class SerializerViewListener
+final class SerializerListener
 {
     private $serializer;
     private $serializerContextBuilder;

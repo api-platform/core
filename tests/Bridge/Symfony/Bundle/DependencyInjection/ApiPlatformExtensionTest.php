@@ -13,9 +13,9 @@ namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
 use Symfony\Component\Config\Resource\ResourceInterface;
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -70,7 +70,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => ['enabled' => false]])->shouldBeCalled();
-        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null);
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('serializer', $config);
         }))->shouldNotBeCalled();
@@ -83,7 +83,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['property_info' => ['enabled' => false]])->shouldBeCalled();
-        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null);
+        $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('property_info', $config);
         }))->shouldNotBeCalled();
@@ -147,8 +147,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
-            'DoctrineBundle' => 'Doctrine\Bundle\DoctrineBundle\DoctrineBundle',
-            'NelmioApiDocBundle' => 'Nelmio\ApiDocBundle\NelmioApiDocBundle',
+            'DoctrineBundle' => DoctrineBundle::class,
+            'NelmioApiDocBundle' => NelmioApiDocBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
@@ -190,47 +190,33 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
-        $aliases = [
-            'api_platform.serializer',
-            'api_platform.property_accessor',
-            'api_platform.property_info',
-            'api_platform.metadata.resource.name_collection_factory',
-            'api_platform.metadata.resource.metadata_factory',
-            'api_platform.metadata.property.name_collection_factory',
-            'api_platform.metadata.property.metadata_factory',
-            'api_platform.action.put_item',
-            'api_platform.action.delete_item',
-        ];
-        foreach ($aliases as $alias) {
-            $containerBuilderProphecy->setAlias($alias, Argument::type(Alias::class))->shouldBeCalled();
-        }
-
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->addArgument([])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definition)->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->willReturn($definition)->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->willReturn($definition)->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->willReturn($definition)->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->willReturn($definition);
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->willReturn($definition)->shouldBeCalled();
 
         $definitions = [
+            'api_platform.action.placeholder',
             'api_platform.item_data_provider',
             'api_platform.collection_data_provider',
             'api_platform.filters',
@@ -263,13 +249,11 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.naming.resource_path_naming_strategy.underscore',
             'api_platform.naming.resource_path_naming_strategy.dash',
             'api_platform.listener.request.format',
+            'api_platform.listener.request.data_provider',
+            'api_platform.listener.request.deserializer',
             'api_platform.listener.view.serializer',
-            'api_platform.listener.view.deserializer',
             'api_platform.listener.view.validator',
             'api_platform.listener.view.responder',
-            'api_platform.action.get_collection',
-            'api_platform.action.post_collection',
-            'api_platform.action.get_item',
             'api_platform.serializer.context_builder',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.collection_data_provider',
@@ -288,7 +272,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.query_extension.filter',
             'api_platform.doctrine.orm.query_extension.pagination',
             'api_platform.doctrine.orm.query_extension.order',
-            'api_platform.doctrine.listener.view.manager',
+            'api_platform.doctrine.listener.view.write',
             'api_platform.jsonld.entrypoint_builder',
             'api_platform.jsonld.context_builder',
             'api_platform.jsonld.normalizer.item',
@@ -299,9 +283,9 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.action.documentation',
             'api_platform.hydra.documentation_builder',
-            'api_platform.hydra.listener.validation_exception',
-            'api_platform.hydra.listener.link_header_response',
-            'api_platform.hydra.listener.request_exception',
+            'api_platform.hydra.listener.exception.validation',
+            'api_platform.hydra.listener.response.link_header',
+            'api_platform.hydra.listener.exception',
             'api_platform.hydra.normalizer.collection',
             'api_platform.hydra.normalizer.partial_collection_view',
             'api_platform.hydra.normalizer.collection_filters',
@@ -318,6 +302,19 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $aliases = [
             'api_platform.naming.resource_path_naming_strategy' => 'api_platform.naming.resource_path_naming_strategy.underscore',
+            'api_platform.serializer' => 'serializer',
+            'api_platform.property_accessor' => 'property_accessor',
+            'api_platform.property_info' => 'property_info',
+            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory' => 'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.property.name_collection_factory' => 'api_platform.metadata.property.name_collection_factory.property_info',
+            'api_platform.metadata.property.metadata_factory' => 'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.action.put_item' => 'api_platform.action.placeholder',
+            'api_platform.action.get_collection' => 'api_platform.action.placeholder',
+            'api_platform.action.post_collection' => 'api_platform.action.placeholder',
+            'api_platform.action.get_item' => 'api_platform.action.placeholder',
+            'api_platform.action.put_item' => 'api_platform.action.placeholder',
+            'api_platform.action.delete_item' => 'api_platform.action.placeholder',
             'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
         ];
 
