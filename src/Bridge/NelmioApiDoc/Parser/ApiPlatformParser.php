@@ -105,16 +105,15 @@ final class ApiPlatformParser implements ParserInterface
         $visited[] = $resourceClass;
 
         $options = [];
+        $attributes = $resourceMetadata->getAttributes();
 
-        $options['serializer_groups'] = $resourceMetadata->getAttribute(
-                'normalization_context',
-                ['groups' => []]
-            )['groups'];
+        if (isset($attributes['normalization_context']['groups'])) {
+            $options['serializer_groups'] = $attributes['normalization_context']['groups'];
+        }
 
-        $options['serializer_groups'] = array_merge(
-                $options['serializer_groups'],
-                $resourceMetadata->getAttribute('denormalization_context', ['groups' => []])
-            )['groups'];
+        if (isset($attributes['denormalization_context']['groups'])) {
+            $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $attributes['denormalization_context']['groups']) : $options['serializer_groups'];
+        }
 
         return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
     }
