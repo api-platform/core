@@ -315,7 +315,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
      *
      * @param PropertyMetadata $propertyMetadata
      *
-     * @return array
+     * @return array|null
      */
     private function getRange(PropertyMetadata $propertyMetadata) : array
     {
@@ -335,29 +335,35 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
             case Type::BUILTIN_TYPE_INT:
                 return ['complex' => false, 'value' => 'integer'];
+            
             case Type::BUILTIN_TYPE_FLOAT:
                 return ['complex' => false, 'value' => 'number'];
+            
             case Type::BUILTIN_TYPE_BOOL:
                 return ['complex' => false, 'value' => 'boolean'];
 
             case Type::BUILTIN_TYPE_OBJECT:
                 $className = $type->getClassName();
-
-                if (null !== $className) {
-                    $reflection = new \ReflectionClass($className);
-                    if ($reflection->implementsInterface(\DateTimeInterface::class)) {
-                        return ['complex' => false, 'value' => 'string'];
-                    }
-
-                    $className = $type->getClassName();
-                    if ($this->resourceClassResolver->isResourceClass($className)) {
-                        return ['complex' => true, 'value' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
-                    }
+                if (null === $className) {
+                    return;
                 }
-            break;
+
+                if (is_subclass_of($className, \DateTimeInterface::class)) {
+                    return ['complex' => false, 'value' => 'string'];
+                }
+
+                if (!$this->resourceClassResolver->isResourceClass($className)) {
+                    return;
+                }
+
+                if ($propertyMetadata->isReadableLink()) {
+                    return ['complex' => true, 'value' =>  sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
+                }
+
+                return ['complex' => false, 'value' => 'string'];
+
             default:
                 return ['complex' => false, 'value' => 'null'];
-            break;
         }
     }
 }
