@@ -282,6 +282,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.documentation_builder',
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.action.documentation',
+            'api_platform.swagger.action.ui',
             'api_platform.hydra.entrypoint_builder',
             'api_platform.hydra.documentation_builder',
             'api_platform.hydra.listener.response.add_link_header',
