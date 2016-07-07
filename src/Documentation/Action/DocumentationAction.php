@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Action;
+namespace ApiPlatform\Core\Documentation\Action;
 
-use ApiPlatform\Core\Hydra\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**

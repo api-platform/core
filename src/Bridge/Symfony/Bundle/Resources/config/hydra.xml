@@ -79,7 +79,7 @@
 
         <!-- Action -->
 
-        <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Hydra\Action\DocumentationAction">
+        <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
             <argument type="service" id="api_platform.hydra.documentation_builder" />
         </service>
 

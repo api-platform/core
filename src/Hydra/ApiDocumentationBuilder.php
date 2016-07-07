@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Hydra;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -21,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Creates a machine readable Hydra API documentation.
@@ -365,23 +367,24 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         }
 
         switch ($type->getBuiltinType()) {
-            case 'string':
+            case Type::BUILTIN_TYPE_STRING:
                 return 'xmls:string';
 
-            case 'int':
+            case Type::BUILTIN_TYPE_INT:
                 return 'xmls:integer';
 
-            case 'float':
-                return 'xmls:double';
+            case Type::BUILTIN_TYPE_FLOAT:
+                return 'xmls:number';
 
-            case 'bool':
+            case Type::BUILTIN_TYPE_BOOL:
                 return 'xmls:boolean';
 
-            case 'object':
+            case Type::BUILTIN_TYPE_OBJECT:
                 $className = $type->getClassName();
 
-                if ($className) {
-                    if ('DateTime' === $className) {
+                if (null !== $className) {
+                    $reflection = new \ReflectionClass($className);
+                    if ($reflection->implementsInterface(\DateTimeInterface::class)) {
                         return 'xmls:dateTime';
                     }
 
@@ -390,7 +393,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         return sprintf('#%s', $this->resourceMetadataFactory->create($className)->getShortName());
                     }
                 }
-            break;
+           break;
         }
     }
 
