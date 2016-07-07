@@ -166,7 +166,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
                 $itemOperationsDocs[$resourceClassIri] = $operation['item'];
             } catch (InvalidArgumentException $e) {
-
             }
 
             $classes[] = $class;
@@ -208,19 +207,19 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $swaggerOperation[$methodSwagger]['tags'] = [$shortName];
         $swaggerOperation[$methodSwagger]['produces'] = $this->formats;
         $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'];
-     
+
         switch ($method) {
             case 'GET':
                 if ($collection) {
                     if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                         $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves the collection of %s resources.', $shortName);
                     }
-                    if($this->resourceClassResolver->isResourceClass($resourceClass)) {
+                    if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
                         $swaggerOperation[$methodSwagger]['parameters'][] = [
-                            'in'          => 'body',
-                            'name'        => 'body',
+                            'in' => 'body',
+                            'name' => 'body',
                             'description' => sprintf('%s resource to be added', $shortName),
-                            'schema'      => [
+                            'schema' => [
                                 '$ref' => sprintf('#/definitions/%s', $shortName),
                             ],
                         ];
@@ -236,7 +235,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         'required' => true,
                         'type' => 'integer',
                     ];
-
                 }
                 $swaggerOperation[$methodSwagger]['responses'] = [
                     '200' => ['description' => 'Valid ID'],
@@ -248,12 +246,12 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Creates a %s resource.', $shortName);
                 }
 
-                if($this->resourceClassResolver->isResourceClass($resourceClass)) {
+                if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
                     $swaggerOperation[$methodSwagger]['parameters'][] = [
-                        'in'          => 'body',
-                        'name'        => 'body',
+                        'in' => 'body',
+                        'name' => 'body',
                         'description' => sprintf('%s resource to be added', $shortName),
-                        'schema'      => [
+                        'schema' => [
                             '$ref' => sprintf('#/definitions/%s', $shortName),
                         ],
                     ];
@@ -269,26 +267,24 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Replaces the %s resource.', $shortName);
                 }
-                
-                if($this->resourceClassResolver->isResourceClass($resourceClass)) {
 
+                if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
                     $swaggerOperation[$methodSwagger]['parameters'] = [
                         [
-                            'name'     => 'id',
-                            'in'       => 'path',
+                            'name' => 'id',
+                            'in' => 'path',
                             'required' => true,
-                            'type'     => 'integer',
+                            'type' => 'integer',
                         ],
                         [
-                            'in'          => 'body',
-                            'name'        => 'body',
+                            'in' => 'body',
+                            'name' => 'body',
                             'description' => sprintf('%s resource to be added', $shortName),
-                            'schema'      => [
+                            'schema' => [
                                 '$ref' => sprintf('#/definitions/%s', $shortName),
                             ],
                         ],
                     ];
-
                 }
                 $swaggerOperation[$methodSwagger]['responses'] = [
                     '200' => ['description' => 'Valid ID'],
@@ -321,7 +317,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
      */
     private function getRange(PropertyMetadata $propertyMetadata) : array
     {
-
         $type = $propertyMetadata->getType();
         if (!$type) {
             return;
@@ -337,10 +332,10 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
             case Type::BUILTIN_TYPE_INT:
                 return ['complex' => false, 'value' => 'integer'];
-            
+
             case Type::BUILTIN_TYPE_FLOAT:
                 return ['complex' => false, 'value' => 'number'];
-            
+
             case Type::BUILTIN_TYPE_BOOL:
                 return ['complex' => false, 'value' => 'boolean'];
 
@@ -359,7 +354,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 if ($propertyMetadata->isReadableLink()) {
-                    return ['complex' => true, 'value' =>  sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
+                    return ['complex' => true, 'value' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
                 }
 
                 return ['complex' => false, 'value' => 'string'];
