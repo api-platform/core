@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ResponderListener
+final class RespondListener
 {
     const METHOD_TO_CODE = [
         Request::METHOD_POST => Response::HTTP_CREATED,

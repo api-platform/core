@@ -14,16 +14,16 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Updates the entity retrieved by the data provider with data contained in the request body.
+ * Serializes data.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DeserializerListener
+final class SerializeListener
 {
     private $serializer;
     private $serializerContextBuilder;
@@ -35,14 +35,16 @@ final class DeserializerListener
     }
 
     /**
-     * Deserializes the data sent in the requested format.
+     * Serializes the data to the requested format.
      *
-     * @param GetResponseEvent $event
+     * @param GetResponseForControllerResultEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelView(GetResponseForControllerResultEvent $event)
     {
+        $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
-        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT], true)) {
+
+        if ($controllerResult instanceof Response) {
             return;
         }
 
@@ -52,18 +54,7 @@ final class DeserializerListener
             return;
         }
 
-        $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
-
-        $data = $request->attributes->get('data');
-        if (null !== $data) {
-            $context['object_to_populate'] = $data;
-        }
-
-        $request->attributes->set(
-            'data',
-            $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $attributes['format'], $context
-            )
-        );
+        $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        $event->setControllerResult($this->serializer->serialize($controllerResult, $attributes['format'], $context));
     }
 }

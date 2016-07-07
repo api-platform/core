@@ -53,7 +53,7 @@
 
         <!-- Event listeners -->
 
-        <service id="api_platform.listener.request.format" class="ApiPlatform\Core\EventListener\FormatListener">
+        <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
             <argument>%api_platform.formats%</argument>
 
@@ -61,35 +61,36 @@
         </service>
 
         <!-- kernel.request piorities must be >8 to be executed after the firewall -->
-        <service id="api_platform.listener.request.data_provider" class="ApiPlatform\Core\EventListener\DataProviderListener">
+        <service id="api_platform.listener.request.read" class="ApiPlatform\Core\EventListener\ReadListener">
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.item_data_provider" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
 
-        <service id="api_platform.listener.request.deserializer" class="ApiPlatform\Core\EventListener\DeserializerListener">
+        <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
 
-        <service id="api_platform.listener.view.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorListener">
+        <service id="api_platform.listener.view.validate" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener">
             <argument type="service" id="validator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
         </service>
 
-        <service id="api_platform.listener.view.serializer" class="ApiPlatform\Core\EventListener\SerializerListener">
+        <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
         </service>
 
-        <service id="api_platform.listener.view.responder" class="ApiPlatform\Core\EventListener\ResponderListener">
+        <service id="api_platform.listener.view.respond" class="ApiPlatform\Core\EventListener\RespondListener">
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
