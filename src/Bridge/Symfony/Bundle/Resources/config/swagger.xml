@@ -33,6 +33,12 @@
             <argument type="service" id="api_platform.swagger.documentation_builder" />
         </service>
 
+        <service id="api_platform.swagger.action.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction">
+            <argument type="service" id="twig" on-invalid="ignore" />
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+        </service>
+
     </services>
 
 </container>
