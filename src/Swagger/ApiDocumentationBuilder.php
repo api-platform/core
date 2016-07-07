@@ -126,11 +126,14 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     $definitions[$shortName]['required'][] = $propertyName;
                 }
 
+
                 $range = $this->getRange($propertyMetadata);
+                if (null === $range) {
+                    continue;
+                }
+
                 $definitions[$shortName]['properties'][$propertyName]['description'] = $propertyMetadata->getDescription() ?:  '';
 
-               
-                
                 if ($range['complex']) {
                     $definitions[$shortName]['properties'][$propertyName] = ['$ref' => $range['value']];
                 } else {
@@ -138,7 +141,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         'type' => $range['value'],
                     ];
                 }
-                
             }
 
             if ($operations = $resourceMetadata->getItemOperations()) {
