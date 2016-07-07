@@ -48,6 +48,7 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $version = '1.0.0';
         $host = 'http://exemple.com';
         $schema = 'http';
+        $formats = ['application/ld+json' => 'ld+json'];
         $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummy' => 'dummy']))->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
@@ -58,13 +59,12 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('get');
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('post');
         $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
-        $apiDocumentationBuilder = new ApiDocumentationBuilder($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $urlGeneratorProphecy->reveal(), $iriConverter->reveal(), $titre, $desc, $version, $host, $schema);
+        $apiDocumentationBuilder = new ApiDocumentationBuilder($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $urlGeneratorProphecy->reveal(), $iriConverter->reveal(), $formats, $titre, $desc);
 
         $swaggerDocumentation = $apiDocumentationBuilder->getApiDocumentation();
         $this->assertEquals($swaggerDocumentation['swagger'], 2.0);
         $this->assertEquals($swaggerDocumentation['info']['title'], $titre);
         $this->assertEquals($swaggerDocumentation['info']['description'], $desc);
-        $this->assertEquals($swaggerDocumentation['host'], $host);
         $this->assertEquals($swaggerDocumentation['definitions'], ['dummy' => ['type' => 'object', 'properties' => ['name' => ['type' => 'string']]]]);
         $this->assertEquals($swaggerDocumentation['externalDocs'
          ], ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com']);
