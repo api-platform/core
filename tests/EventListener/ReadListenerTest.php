@@ -13,14 +13,14 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\EventListener\DataProviderListener;
+use ApiPlatform\Core\EventListener\ReadListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
+class ReadListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNotAnApiPlatformRequest()
     {
@@ -35,7 +35,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new DataProviderListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
@@ -53,7 +53,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new DataProviderListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertTrue($request->attributes->has('data'));
@@ -74,7 +74,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new DataProviderListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame([], $request->attributes->get('data'));
@@ -95,7 +95,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new DataProviderListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
@@ -117,7 +117,7 @@ class DataProviderListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new DataProviderListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 }

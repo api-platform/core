@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\EventListener;
 
-use ApiPlatform\Core\EventListener\ResponderListener;
+use ApiPlatform\Core\EventListener\RespondListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResponderListenerTest extends \PHPUnit_Framework_TestCase
+class RespondListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testDoNotHandleResponse()
     {
@@ -28,7 +28,7 @@ class ResponderListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getControllerResult()->willReturn(new Response())->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_mime_type' => 'text/xml']))->shouldBeCalled();
 
-        $listener = new ResponderListener();
+        $listener = new RespondListener();
         $listener->onKernelView($eventProphecy->reveal());
     }
 
@@ -38,7 +38,7 @@ class ResponderListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getControllerResult()->willReturn('foo')->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
 
-        $listener = new ResponderListener();
+        $listener = new RespondListener();
         $listener->onKernelView($eventProphecy->reveal());
     }
 
@@ -52,7 +52,7 @@ class ResponderListenerTest extends \PHPUnit_Framework_TestCase
             'foo'
         );
 
-        $listener = new ResponderListener();
+        $listener = new RespondListener();
         $listener->onKernelView($event);
 
         $response = $event->getResponse();
@@ -75,7 +75,7 @@ class ResponderListenerTest extends \PHPUnit_Framework_TestCase
             'foo'
         );
 
-        $listener = new ResponderListener();
+        $listener = new RespondListener();
         $listener->onKernelView($event);
 
         $response = $event->getResponse();
@@ -98,7 +98,7 @@ class ResponderListenerTest extends \PHPUnit_Framework_TestCase
             'foo'
         );
 
-        $listener = new ResponderListener();
+        $listener = new RespondListener();
         $listener->onKernelView($event);
 
         $response = $event->getResponse();
