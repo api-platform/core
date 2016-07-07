@@ -16,7 +16,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\Routing\ResourcePathGeneratorInterface;
+use ApiPlatform\Core\Naming\ResourcePathNamingStrategyInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -156,7 +156,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class]));
 
-        $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathGeneratorInterface::class);
+        $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathNamingStrategyInterface::class);
         $resourcePathGeneratorProphecy->generateResourceBasePath('dummy')->willReturn('dummies');
 
         $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal(), $containerProphecy->reveal());
