@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class LinkHeaderResponseListener
+final class LinkHeaderListener
 {
     private $urlGenerator;
 

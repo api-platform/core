@@ -12,7 +12,7 @@
 namespace ApiPlatform\Core\Hydra\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
+use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
 
 /**
  * Handle requests errors.
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\EventListener\ExceptionListener;
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class RequestExceptionListener extends ExceptionListener
+final class ExceptionListener extends BaseExceptionListener
 {
     public function onKernelException(GetResponseForExceptionEvent $event)
     {

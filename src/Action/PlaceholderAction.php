@@ -12,14 +12,19 @@
 namespace ApiPlatform\Core\Action;
 
 /**
- * Empty action. Useful to trigger the kernel.view event without doing anything specific in the action
- * (e.g. the POST action).
+ * Placeholder returning the data passed in parameter.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class NullAction
+final class PlaceholderAction
 {
-    public function __invoke()
+    /**
+     * @param object $data
+     *
+     * @return object
+     */
+    public function __invoke($data)
     {
+        return $data;
     }
 }

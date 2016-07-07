@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -92,7 +93,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerAnnotationLoaders($container);
         $this->registerFileLoaders($container);
 
-        if (!interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
+        if (!interface_exists(DocBlockFactoryInterface::class)) {
             $container->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc');
         }
 

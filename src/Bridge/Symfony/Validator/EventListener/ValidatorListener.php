@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ValidatorViewListener
+final class ValidatorListener
 {
     private $validator;
     private $resourceMetadataFactory;
