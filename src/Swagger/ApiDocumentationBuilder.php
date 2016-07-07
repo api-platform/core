@@ -46,11 +46,10 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $description;
     private $iriConverter;
     private $version;
-    private $host;
-    private $schema;
+    private $formats;
     const SWAGGER_VERSION = '2.0';
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, IriConverterInterface $iriConverter, string $title, string $description, string $version = null, string $host, string $schema)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, IriConverterInterface $iriConverter, array $formats, string $title, string $description, string $version = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -60,12 +59,11 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
+        $this->formats = array_values($formats);
         $this->title = $title;
         $this->description = $description;
         $this->iriConverter = $iriConverter;
         $this->version = $version;
-        $this->host = $host;
-        $this->schema[] = $schema;
     }
 
     /**
@@ -125,7 +123,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
                 $property[$propertyName] = [
                     'type' => $range,
-                    'description' => $propertyMetadata->getDescription()
+                    'description' => $propertyMetadata->getDescription() ?:  ''
                 ];
 
                 if (is_array($range)) {
@@ -183,12 +181,10 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             $doc['info']['description'] = $this->description;
         }
         $doc['info']['version'] = $this->version ?? '0.0.0';
-        $doc['host'] = $this->host;
         $doc['basePath'] = $this->urlGenerator->generate('api_jsonld_entrypoint');
         $doc['definitions'] = $properties;
         $doc['externalDocs'] = ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com'];
         $doc['tags'] = $classes;
-        $doc['schemes'] = $this->schema; // more schema ?
         $doc['paths'] = $itemOperationsDocs;
 
         return $doc;
@@ -197,7 +193,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     /**
      * Gets and populates if applicable a Swagger operation.
      */
-    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection) : array
+    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection, array $properties) : array
     {
         if ($collection) {
             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
@@ -210,7 +206,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $swaggerOperation[$methodSwagger] = [];
         $swaggerOperation[$methodSwagger]['tags'] = [$shortName];
-        $swaggerOperation[$methodSwagger]['produces'] = ['application/ld+json'];
+        $swaggerOperation[$methodSwagger]['produces'] = $this->formats;
         $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'];
         switch ($method) {
             case 'GET':
@@ -228,6 +224,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         'required' => true,
                         'type' => 'integer',
                     ];
+                    $swaggerOperation[$methodSwagger]['parameters'][] =
                 }
                 $swaggerOperation[$methodSwagger]['responses'] = [
                     '200' => ['description' => 'Valid ID'],
