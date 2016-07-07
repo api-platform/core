@@ -125,7 +125,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         $overrideClass = isset($data['@id']) && !isset($context['object_to_populate']);
 
         if ($overrideClass) {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id']);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], true);
         }
 
         return parent::denormalize($data, $class, $format, $context);
@@ -295,7 +295,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
     {
         if (is_string($value)) {
             try {
-                return $this->iriConverter->getItemFromIri($value);
+                return $this->iriConverter->getItemFromIri($value, true);
             } catch (InvalidArgumentException $e) {
                 // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
             }
