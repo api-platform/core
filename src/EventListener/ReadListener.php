@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DataProviderListener
+final class ReadListener
 {
     private $collectionDataProvider;
     private $itemDataProvider;

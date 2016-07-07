@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\EventListener;
 
-use ApiPlatform\Core\EventListener\FormatListener;
+use ApiPlatform\Core\EventListener\AddFormatListener;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class FormatListenerTest extends \PHPUnit_Framework_TestCase
+class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNoResourceClass()
     {
@@ -29,7 +29,7 @@ class FormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new FormatListener(new Negotiator(), []);
+        $listener = new AddFormatListener(new Negotiator(), []);
         $listener->onKernelRequest($event);
 
         $this->assertFalse($request->attributes->has('_api_format'));
@@ -46,7 +46,7 @@ class FormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new FormatListener(new Negotiator(), ['text/xml' => 'xml']);
+        $listener = new AddFormatListener(new Negotiator(), ['text/xml' => 'xml']);
         $listener->onKernelRequest($event);
 
         $this->assertSame('xml', $request->attributes->get('_api_format'));
@@ -63,7 +63,7 @@ class FormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new FormatListener(new Negotiator(), ['application/json' => 'json']);
+        $listener = new AddFormatListener(new Negotiator(), ['application/json' => 'json']);
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->attributes->get('_api_format'));
@@ -80,7 +80,7 @@ class FormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new FormatListener(new Negotiator(), ['application/octet-stream' => 'binary', 'application/json' => 'json']);
+        $listener = new AddFormatListener(new Negotiator(), ['application/octet-stream' => 'binary', 'application/json' => 'json']);
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->attributes->get('_api_format'));
@@ -97,7 +97,7 @@ class FormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new FormatListener(new Negotiator(), ['application/octet-stream' => 'binary', 'application/json' => 'json']);
+        $listener = new AddFormatListener(new Negotiator(), ['application/octet-stream' => 'binary', 'application/json' => 'json']);
         $listener->onKernelRequest($event);
 
         $this->assertSame('binary', $request->attributes->get('_api_format'));

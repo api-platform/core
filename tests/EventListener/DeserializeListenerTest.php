@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\EventListener;
 
-use ApiPlatform\Core\EventListener\DeserializerListener;
+use ApiPlatform\Core\EventListener\DeserializeListener;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DeserializerListenerTest extends \PHPUnit_Framework_TestCase
+class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testDoNotCallWhenRequestMethodIsSafe()
     {
@@ -37,7 +37,7 @@ class DeserializerListenerTest extends \PHPUnit_Framework_TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
 
-        $listener = new DeserializerListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -55,7 +55,7 @@ class DeserializerListenerTest extends \PHPUnit_Framework_TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
 
-        $listener = new DeserializerListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -78,7 +78,7 @@ class DeserializerListenerTest extends \PHPUnit_Framework_TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
-        $listener = new DeserializerListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
