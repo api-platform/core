@@ -132,7 +132,7 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Retrieves the collection of Dummy resources.', $actual[0]->getDescription());
         $this->assertEquals('Dummy', $actual[0]->getResourceDescription());
         $this->assertEquals('Dummy', $actual[0]->getSection());
-        $this->assertEquals(sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class), $actual[0]->getOutput());
+        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'), $actual[0]->getOutput());
         $this->assertEquals([
             'name' => [
                 'property' => 'name',
@@ -150,8 +150,8 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Creates a Dummy resource.', $actual[1]->getDescription());
         $this->assertEquals('Dummy', $actual[1]->getResourceDescription());
         $this->assertEquals('Dummy', $actual[1]->getSection());
-        $this->assertEquals(sprintf('%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class), $actual[1]->getInput());
-        $this->assertEquals(sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class), $actual[1]->getOutput());
+        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class, 'post'), $actual[1]->getInput());
+        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'post'), $actual[1]->getOutput());
         $this->assertInstanceOf(Route::class, $actual[1]->getRoute());
         $this->assertEquals('/dummies', $actual[1]->getRoute()->getPath());
         $this->assertEquals(['POST'], $actual[1]->getRoute()->getMethods());
@@ -161,7 +161,7 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Retrieves Dummy resource.', $actual[2]->getDescription());
         $this->assertEquals('Dummy', $actual[2]->getResourceDescription());
         $this->assertEquals('Dummy', $actual[2]->getSection());
-        $this->assertEquals(sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class), $actual[2]->getOutput());
+        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'), $actual[2]->getOutput());
         $this->assertInstanceOf(Route::class, $actual[2]->getRoute());
         $this->assertEquals('/dummies/{id}', $actual[2]->getRoute()->getPath());
         $this->assertEquals(['GET'], $actual[2]->getRoute()->getMethods());
@@ -171,8 +171,8 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Replaces the Dummy resource.', $actual[3]->getDescription());
         $this->assertEquals('Dummy', $actual[3]->getResourceDescription());
         $this->assertEquals('Dummy', $actual[3]->getSection());
-        $this->assertEquals(sprintf('%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class), $actual[3]->getInput());
-        $this->assertEquals(sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class), $actual[3]->getOutput());
+        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class, 'put'), $actual[3]->getInput());
+        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'put'), $actual[3]->getOutput());
         $this->assertInstanceOf(Route::class, $actual[3]->getRoute());
         $this->assertEquals('/dummies/{id}', $actual[3]->getRoute()->getPath());
         $this->assertEquals(['PUT'], $actual[3]->getRoute()->getMethods());
