@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
-use ApiPlatform\Core\Hydra\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;

@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="api_platform.swagger.documentation_builder" class="ApiPlatform\Core\Swagger\ApiDocumentationBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.jsonld.context_builder" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.operation_method_resolver" />
+            <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+            <argument>2.0</argument>
+            <argument>%router.request_context.host%</argument>
+            <argument>%router.request_context.scheme%</argument>
+        </service>
+
+        <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">
+            <argument type="service" id="api_platform.swagger.documentation_builder" />
+            <tag name="console.command" />
+        </service>
+
+        <!-- Action -->
+
+        <service id="api_platform.swagger.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
+            <argument type="service" id="api_platform.swagger.documentation_builder" />
+        </service>
+
+    </services>
+
+</container>
