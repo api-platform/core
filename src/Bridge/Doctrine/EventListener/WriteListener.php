@@ -40,7 +40,7 @@ final class WriteListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_DELETE], true)) {
+        if ($request->isMethodSafe()) {
             return;
         }
 

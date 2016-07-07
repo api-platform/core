@@ -46,7 +46,6 @@ final class ReadListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-
         try {
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
