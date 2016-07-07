@@ -45,19 +45,17 @@ final class ValidateListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-
         try {
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             return;
         }
 
-        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH], true)) {
+        if ($request->isMethodSafe() || $request->isMethod(Request::METHOD_DELETE)) {
             return;
         }
 
         $data = $event->getControllerResult();
-
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
         if (isset($attributes['collection_operation_name'])) {

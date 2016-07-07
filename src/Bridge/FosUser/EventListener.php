@@ -39,19 +39,20 @@ final class EventListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $user = $event->getControllerResult();
-        if (!$user instanceof UserInterface) {
+        $request = $event->getRequest();
+
+        if (!$user instanceof UserInterface || $request->isMethodSafe()) {
             return;
         }
 
         switch ($event->getRequest()->getMethod()) {
-            case Request::METHOD_POST:
-            case Request::METHOD_PUT:
-                $this->userManager->updateUser($user, false);
-                break;
-
             case Request::METHOD_DELETE:
                 $this->userManager->deleteUser($user);
                 $event->setControllerResult(null);
+                break;
+
+            default:
+                $this->userManager->updateUser($user, false);
                 break;
         }
     }
