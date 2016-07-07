@@ -125,6 +125,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
                 $property[$propertyName] = [
                     'type' => $range,
+                    'description' => $propertyMetadata->getDescription()
                 ];
 
                 if (is_array($range)) {
