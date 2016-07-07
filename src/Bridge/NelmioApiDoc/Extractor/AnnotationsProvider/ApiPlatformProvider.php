@@ -106,11 +106,11 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
         ];
 
         if (isset($operationHydraDoc['expects']) && 'owl:Nothing' !== $operationHydraDoc['expects']) {
-            $data['input'] = sprintf('%s:%s', ApiPlatformParser::IN_PREFIX, $resourceClass);
+            $data['input'] = sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, $resourceClass, $operationName);
         }
 
         if (isset($operationHydraDoc['returns']) && 'owl:Nothing' !== $operationHydraDoc['returns']) {
-            $data['output'] = sprintf('%s:%s', ApiPlatformParser::OUT_PREFIX, $resourceClass);
+            $data['output'] = sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, $resourceClass, $operationName);
         }
 
         if ($collection && Request::METHOD_GET === $method) {
