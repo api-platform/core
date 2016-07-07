@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidatorListener;
+use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class ValidatorListenerTest extends \PHPUnit_Framework_TestCase
+class ValidateListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidatorIsCalled()
     {
@@ -37,7 +37,7 @@ class ValidatorListenerTest extends \PHPUnit_Framework_TestCase
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ValidatorListener($validator, $resourceMetadataFactory);
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
     }
 
@@ -59,7 +59,7 @@ class ValidatorListenerTest extends \PHPUnit_Framework_TestCase
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ValidatorListener($validator, $resourceMetadataFactory);
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
     }
 
