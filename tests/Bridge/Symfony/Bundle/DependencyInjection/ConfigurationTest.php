@@ -34,8 +34,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'title' => 'title',
             'description' => 'description',
             'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
-            'routing' => [
-                'resource_path_generator' => 'api_platform.routing.resource_path_generator.underscore',
+            'naming' => [
+                'resource_path_naming_strategy' => 'api_platform.naming.resource_path_naming_strategy.underscore',
             ],
             'name_converter' => null,
             'enable_fos_user' => false,

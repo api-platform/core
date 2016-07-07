@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Routing;
+namespace ApiPlatform\Core\Tests\Naming;
 
-use ApiPlatform\Core\Routing\UnderscoreResourcePathGenerator;
+use ApiPlatform\Core\Naming\UnderscoreResourcePathNamingStrategy;
 
-class UnderscoreResourcePathGeneratorTest extends \PHPUnit_Framework_TestCase
+class UnderscoreResourcePathNamingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     public function testGenerateResourceBasePath()
     {
-        $underscoreResourcePathGenerator = new UnderscoreResourcePathGenerator();
+        $underscoreResourcePathGenerator = new UnderscoreResourcePathNamingStrategy();
 
         $this->assertSame('short_names', $underscoreResourcePathGenerator->generateResourceBasePath('ShortName'));
     }

@@ -9,19 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Routing;
+namespace ApiPlatform\Core\Naming;
 
 use Doctrine\Common\Inflector\Inflector;
 
 /**
+ * Generates a path with words separated by underscores.
+ *
  * @author Paul Le Corre <paul@lecorre.me>
  */
-class UnderscoreResourcePathGenerator implements ResourcePathGeneratorInterface
+final class UnderscoreResourcePathNamingStrategy implements ResourcePathNamingStrategyInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function generateResourceBasePath(string $resourceShortName) : string
     {
-        $pathName = Inflector::tableize($resourceShortName);
-
-        return Inflector::pluralize($pathName);
+        return Inflector::pluralize(Inflector::tableize($resourceShortName));
     }
 }

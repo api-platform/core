@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Routing;
+namespace ApiPlatform\Core\Tests\Naming;
 
-use ApiPlatform\Core\Routing\DashResourcePathGenerator;
+use ApiPlatform\Core\Naming\DashResourcePathNamingStrategy;
 
-class DashResourcePathGeneratorTest extends \PHPUnit_Framework_TestCase
+class DashResourcePathNamingStrategyTest extends \PHPUnit_Framework_TestCase
 {
     public function testGenerateResourceBasePath()
     {
-        $dashResourcePathGenerator = new DashResourcePathGenerator();
+        $dashResourcePathGenerator = new DashResourcePathNamingStrategy();
 
         $this->assertSame('short-names', $dashResourcePathGenerator->generateResourceBasePath('ShortName'));
     }
