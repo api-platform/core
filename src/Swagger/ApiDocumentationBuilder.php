@@ -74,8 +74,9 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     public function getApiDocumentation()
     {
         $classes = [];
-        $itemOperations = [];
-        $itemOperations['operation'] = [];
+        $operation = [];
+        $operation['item'] = [];
+        $operation['collection'] = [];
 
         $itemOperationsDocs = [];
         $properties = [];
@@ -147,18 +148,28 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             if ($operations = $resourceMetadata->getItemOperations()) {
                 foreach ($operations as $operationName => $itemOperation) {
                     $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false);
-                    $itemOperations['operation'] = array_merge($itemOperations['operation'], $swaggerOperation);
+                    $operation['item'] = array_merge($operation['item'], $swaggerOperation);
                 }
             }
+
+            if ($operations = $resourceMetadata->getCollectionOperations()) {
+                foreach ($operations as $operationName => $collectionOperation) {
+                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true);
+                    $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
+                }
+            }
+
 
             try {
                 $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
             } catch (InvalidArgumentException $e) {
                 $resourceClassIri = '/nopaths';
             }
+            $itemOperationsDocs[$resourceClassIri] = $operation['collection'];
+
             $resourceClassIri .= '/{id}';
 
-            $itemOperationsDocs[$resourceClassIri] = $itemOperations['operation'];
+            $itemOperationsDocs[$resourceClassIri] = $operation['item'];
             $classes[] = $class;
         }
 
@@ -192,6 +203,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         } else {
             $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
         }
+
         $methodSwagger = strtolower($method);
         $swaggerOperation = $operation['swagger_context'] ?? [];
         $shortName = $resourceMetadata->getShortName();
@@ -226,7 +238,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Creates a %s resource.', $shortName);
                 }
                 if ($this->resourceClassResolver->isResourceClass($shortName)) {
-                    $swaggerOperation[$methodSwagger]['parameters'] = [
+                    $swaggerOperation[$methodSwagger]['parameters'][] = [
                         'in' => 'body',
                         'name' => 'body',
                         'description' => sprintf('%s resource to be added', $shortName),
