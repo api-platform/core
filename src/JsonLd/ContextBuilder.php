@@ -52,7 +52,7 @@ final class ContextBuilder implements ContextBuilderInterface
     public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL) : array
     {
         return [
-            '@vocab' => $this->urlGenerator->generate('api_hydra_vocab', [], UrlGeneratorInterface::ABS_URL).'#',
+            '@vocab' => $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL).'#',
             'hydra' => self::HYDRA_NS,
         ];
     }

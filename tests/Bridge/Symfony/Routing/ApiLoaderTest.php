@@ -53,27 +53,27 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $routeCollection->get('api_dummies_get_item'),
-            $this->getRoute('/dummies/{id}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'])
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'])
         );
 
         $this->assertEquals(
             $routeCollection->get('api_dummies_delete_item'),
-            $this->getRoute('/dummies/{id}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE'])
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE'])
         );
 
         $this->assertEquals(
             $routeCollection->get('api_dummies_put_item'),
-            $this->getRoute('/dummies/{id}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT'])
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT'])
         );
 
         $this->assertEquals(
             $routeCollection->get('api_dummies_my_op_collection'),
-            $this->getRoute('/dummies', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true)
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true)
         );
 
         $this->assertEquals(
             $routeCollection->get('api_dummies_my_second_op_collection'),
-            $this->getRoute('/dummies', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true)
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true)
         );
 
         $this->assertEquals(
@@ -170,6 +170,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             $path,
             [
                 '_controller' => $controller,
+                '_format' => null,
                 '_api_resource_class' => $resourceClass,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ],

@@ -5,12 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.jsonld.entrypoint_builder" class="ApiPlatform\Core\JsonLd\EntrypointBuilder" public="false">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.router" />
-        </service>
 
         <service id="api_platform.jsonld.context_builder" class="ApiPlatform\Core\JsonLd\ContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
