@@ -24,19 +24,12 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testDoNotHandleResponse()
     {
+        $request = new Request();
+        $request->setRequestFormat('xml');
+
         $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
         $eventProphecy->getControllerResult()->willReturn(new Response())->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn(new Request([], [], ['_api_mime_type' => 'text/xml']))->shouldBeCalled();
-
-        $listener = new RespondListener();
-        $listener->onKernelView($eventProphecy->reveal());
-    }
-
-    public function testDoNotHandleWhenMimeTypeNotSet()
-    {
-        $eventProphecy = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $eventProphecy->getControllerResult()->willReturn('foo')->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $listener = new RespondListener();
         $listener->onKernelView($eventProphecy->reveal());
@@ -44,10 +37,13 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreate200Response()
     {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request->setRequestFormat('xml');
+
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $event = new GetResponseForControllerResultEvent(
             $kernelProphecy->reveal(),
-            new Request([], [], ['_api_mime_type' => 'text/xml']),
+            $request,
             HttpKernelInterface::MASTER_REQUEST,
             'foo'
         );
@@ -65,8 +61,9 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
-        $request = new Request([], [], ['_api_mime_type' => 'text/xml']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
         $request->setMethod(Request::METHOD_POST);
+        $request->setRequestFormat('xml');
 
         $event = new GetResponseForControllerResultEvent(
             $kernelProphecy->reveal(),
@@ -88,7 +85,8 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
-        $request = new Request([], [], ['_api_mime_type' => 'text/xml']);
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request->setRequestFormat('xml');
         $request->setMethod(Request::METHOD_DELETE);
 
         $event = new GetResponseForControllerResultEvent(

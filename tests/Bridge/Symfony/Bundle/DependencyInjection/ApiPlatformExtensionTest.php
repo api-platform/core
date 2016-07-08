@@ -174,7 +174,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.title' => 'title',
             'api_platform.description' => 'description',
             'api_platform.version' => 'version',
-            'api_platform.formats' => ['application/ld+json' => 'jsonld'],
+            'api_platform.formats' => ['jsonld' => ['application/ld+json']],
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.enabled' => true,
