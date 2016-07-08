@@ -9,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd;
+namespace ApiPlatform\Core\Hydra;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 
@@ -44,7 +45,7 @@ final class EntrypointBuilder implements EntrypointBuilderInterface
     {
         $entrypoint = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint'], $referenceType),
-            '@id' => $this->urlGenerator->generate('api_jsonld_entrypoint', [], $referenceType),
+            '@id' => $this->urlGenerator->generate('api_hydra_entrypoint', [], $referenceType),
             '@type' => 'Entrypoint',
         ];
 

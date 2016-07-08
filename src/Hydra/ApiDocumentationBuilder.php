@@ -238,7 +238,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             ],
         ];
 
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_hydra_vocab')];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_hydra_doc')];
 
         if ('' !== $this->title) {
             $doc['hydra:title'] = $this->title;
@@ -248,7 +248,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             $doc['hydra:description'] = $this->description;
         }
 
-        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_jsonld_entrypoint');
+        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_hydra_entrypoint');
         $doc['hydra:supportedClass'] = $classes;
 
         return $doc;

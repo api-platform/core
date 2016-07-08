@@ -48,7 +48,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $description;
     private $iriConverter;
     private $version;
-    private $formats;
+    private $mimeTypes = [];
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, IriConverterInterface $iriConverter, array $formats, string $title, string $description, string $version = null)
     {
@@ -60,11 +60,16 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
-        $this->formats = array_keys($formats);
         $this->title = $title;
         $this->description = $description;
         $this->iriConverter = $iriConverter;
         $this->version = $version;
+
+        foreach ($formats as $format => $mimeTypes) {
+            foreach ($mimeTypes as $mimeType) {
+                $this->mimeTypes[] = $mimeType;
+            }
+        }
     }
 
     /**
@@ -181,7 +186,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             $doc['info']['description'] = $this->description;
         }
         $doc['info']['version'] = $this->version ?? '0.0.0';
-        $doc['basePath'] = $this->urlGenerator->generate('api_jsonld_entrypoint');
+        $doc['basePath'] = $this->urlGenerator->generate('api_hydra_entrypoint');
         $doc['definitions'] = $definitions;
         $doc['externalDocs'] = ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com'];
         $doc['tags'] = $classes;
@@ -206,7 +211,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $swaggerOperation[$methodSwagger] = [];
         $swaggerOperation[$methodSwagger]['tags'] = [$shortName];
-        $swaggerOperation[$methodSwagger]['produces'] = $this->formats;
+        $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
         $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'];
 
         switch ($method) {
