@@ -24,7 +24,7 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "text/xml"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "text/xml; charset=UTF-8"
+    And the header "Content-Type" should be equal to "application/xml"
     And the response should be equal to
     """
 <?xml version="1.0"?>

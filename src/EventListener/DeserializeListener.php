@@ -62,7 +62,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $attributes['format'], $context
+                $request->getContent(), $attributes['resource_class'], $request->getRequestFormat(), $context
             )
         );
     }
