@@ -32,6 +32,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         'api_platform' => [
             'title' => 'title',
             'description' => 'description',
+            'version' => 'version',
         ],
     ];
 
@@ -172,6 +173,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $parameters = [
             'api_platform.title' => 'title',
             'api_platform.description' => 'description',
+            'api_platform.version' => 'version',
             'api_platform.formats' => ['application/ld+json' => 'jsonld'],
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',

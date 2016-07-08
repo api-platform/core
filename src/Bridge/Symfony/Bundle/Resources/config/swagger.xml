@@ -19,7 +19,7 @@
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
-            <argument>2.0</argument>
+            <argument>%api_platform.version%</argument>
         </service>
 
         <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">

@@ -34,6 +34,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 {
+    const SWAGGER_VERSION = '2.0';
+
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -47,7 +49,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $iriConverter;
     private $version;
     private $formats;
-    const SWAGGER_VERSION = '2.0';
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, IriConverterInterface $iriConverter, array $formats, string $title, string $description, string $version = null)
     {
@@ -113,9 +114,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 $context['serializer_groups'] = isset($context['serializer_groups']) ? array_merge($context['serializer_groups'], $attributes['denormalization_context']['groups']) : $context['serializer_groups'];
             }
 
-            $definitions[$shortName] = [
-                'type' => 'object',
-            ];
+            $definitions[$shortName] = ['type' => 'object'];
             foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
                 if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
@@ -132,7 +131,9 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     continue;
                 }
 
-                $definitions[$shortName]['properties'][$propertyName]['description'] = $propertyMetadata->getDescription() ?:  '';
+                if ($propertyMetadata->getDescription()) {
+                    $definitions[$shortName]['properties'][$propertyName]['description'] = $propertyMetadata->getDescription();
+                }
 
                 if ($range['complex']) {
                     $definitions[$shortName]['properties'][$propertyName] = ['$ref' => $range['value']];
