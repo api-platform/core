@@ -49,7 +49,7 @@
         <!-- Resource path naming strategies -->
 
         <service id="api_platform.naming.resource_path_naming_strategy.underscore" class="ApiPlatform\Core\Naming\UnderscoreResourcePathNamingStrategy" public="false" />
-        <service id="api_platform.naming.resource_path_naming_strategy.dash" class="ApiPlatform\Core\Routing\DashResourcePathNamingStrategy" public="false" />
+        <service id="api_platform.naming.resource_path_naming_strategy.dash" class="ApiPlatform\Core\Naming\DashResourcePathNamingStrategy" public="false" />
 
         <!-- Event listeners -->
 
