@@ -47,9 +47,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
-        <service id="api_platform.jsonld.action.entrypoint" class="ApiPlatform\Core\JsonLd\Action\EntrypointAction">
-            <argument type="service" id="api_platform.jsonld.entrypoint_builder" />
-        </service>
     </services>
 
 </container>

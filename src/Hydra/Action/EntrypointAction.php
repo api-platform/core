@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd\Action;
+namespace ApiPlatform\Core\Hydra\Action;
 
 use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Generates the JSON-LD API entrypoint.
@@ -28,8 +27,8 @@ final class EntrypointAction
         $this->entrypointBuilder = $entrypointBuilder;
     }
 
-    public function __invoke() : JsonResponse
+    public function __invoke() : array
     {
-        return new JsonResponse($this->entrypointBuilder->getEntrypoint(), JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
+        return $this->entrypointBuilder->getEntrypoint();
     }
 }

@@ -7,7 +7,7 @@ Feature: Documentation support
     Given I send a "GET" request to "/swagger"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/json"
     # Context
     And the JSON node "swagger" should be equal to "2.0"
     # Root properties

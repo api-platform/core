@@ -37,7 +37,7 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreate200Response()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
@@ -61,7 +61,7 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_respond' => true]);
         $request->setMethod(Request::METHOD_POST);
         $request->setRequestFormat('xml');
 
@@ -85,7 +85,7 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
     {
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
         $request->setMethod(Request::METHOD_DELETE);
 

@@ -38,7 +38,7 @@ final class AddFormatListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (null === $request->attributes->get('_api_resource_class')) {
+        if (null === $request->attributes->get('_api_resource_class') && !$request->attributes->get('_api_respond')) {
             return;
         }
 

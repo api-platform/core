@@ -52,6 +52,23 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
+    public function testRespondFlag()
+    {
+        $request = new Request();
+        $request->attributes->set('_api_respond', true);
+        $request->setRequestFormat('xml');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('xml', $request->getRequestFormat());
+        $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
+    }
+
     public function testUnsupportedRequestFormat()
     {
         $request = new Request();

@@ -16,6 +16,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -48,6 +49,14 @@ final class SerializeListener
             return;
         }
 
+        if ($request->attributes->get('_api_respond') && !is_object($controllerResult)) {
+            if (!$this->serializer instanceof EncoderInterface) {
+                throw new RuntimeException('The serializer instance must implements the "%s" interface.', EncoderInterface::class);
+            }
+
+            $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));
+        }
+
         try {
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
@@ -55,6 +64,8 @@ final class SerializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        $request->attributes->set('_api_respond', true);
+
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
     }
 }
