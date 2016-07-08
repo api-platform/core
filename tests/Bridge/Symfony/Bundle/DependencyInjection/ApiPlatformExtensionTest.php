@@ -280,7 +280,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.action.context',
-            'api_platform.jsonld.action.entrypoint',
             'api_platform.swagger.documentation_builder',
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.action.documentation',
@@ -293,6 +292,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.normalizer.collection_filters',
             'api_platform.hydra.normalizer.constraint_violation_list',
             'api_platform.hydra.normalizer.error',
+            'api_platform.hydra.action.entrypoint',
             'api_platform.hydra.action.documentation',
             'api_platform.hydra.action.exception',
 

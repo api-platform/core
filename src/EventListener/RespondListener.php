@@ -11,8 +11,6 @@
 
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
-use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -37,13 +35,7 @@ final class RespondListener
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
 
-        if ($controllerResult instanceof Response) {
-            return;
-        }
-
-        try {
-            RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if ($controllerResult instanceof Response || !$request->attributes->get('_api_respond')) {
             return;
         }
 

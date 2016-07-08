@@ -79,6 +79,10 @@
 
         <!-- Action -->
 
+        <service id="api_platform.hydra.action.entrypoint" class="ApiPlatform\Core\Hydra\Action\EntrypointAction">
+            <argument type="service" id="api_platform.jsonld.entrypoint_builder" />
+        </service>
+
         <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
             <argument type="service" id="api_platform.hydra.documentation_builder" />
         </service>
