@@ -26,13 +26,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration();
         $treeBuilder = $configuration->getConfigTreeBuilder();
         $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, ['api_platform' => ['title' => 'title', 'description' => 'description']]);
+        $config = $processor->processConfiguration($configuration, ['api_platform' => ['title' => 'title', 'description' => 'description', 'version' => '1.0.0']]);
 
         $this->assertInstanceOf(ConfigurationInterface::class, $configuration);
         $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',
+            'version' => '1.0.0',
             'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
             'naming' => [
                 'resource_path_naming_strategy' => 'api_platform.naming.resource_path_naming_strategy.underscore',

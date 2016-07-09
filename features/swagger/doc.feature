@@ -13,7 +13,6 @@ Feature: Documentation support
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
     And the JSON node "info.description" should be equal to "This is a test API."
-    #And the JSON node "host" should be equal to "exemple.com"
     And the JSON node "basePath" should be equal to "/"
     # Supported classes
     And the Swagger class "CircularReference" exist
