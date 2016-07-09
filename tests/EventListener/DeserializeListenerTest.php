@@ -67,8 +67,9 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $result = $populateObject ? new \stdClass() : null;
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
-        $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], [], '{}');
+        $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod($method);
+        $request->setRequestFormat('json');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);

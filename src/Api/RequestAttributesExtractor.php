@@ -23,8 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class RequestAttributesExtractor
 {
-    const API_ATTRIBUTES = ['resource_class', 'format', 'mime_type'];
-
     /**
      * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not
      * contain required attributes.
@@ -37,17 +35,10 @@ final class RequestAttributesExtractor
      */
     public static function extractAttributes(Request $request)
     {
-        $result = [];
+        $result = ['resource_class' => $request->attributes->get('_api_resource_class')];
 
-        foreach (self::API_ATTRIBUTES as $key) {
-            $attributeKey = '_api_'.$key;
-            $attributeValue = $request->attributes->get($attributeKey);
-
-            if (null === $attributeValue) {
-                throw new RuntimeException(sprintf('The request attribute "%s" must be defined.', $attributeKey));
-            }
-
-            $result[$key] = $attributeValue;
+        if (null === $result['resource_class']) {
+            throw new RuntimeException('The request attribute "_api_resource_class" must be defined.');
         }
 
         $collectionOperationName = $request->attributes->get('_api_collection_operation_name');

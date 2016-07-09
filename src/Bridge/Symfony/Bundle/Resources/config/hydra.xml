@@ -5,6 +5,12 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.hydra.entrypoint_builder" class="ApiPlatform\Core\Hydra\EntrypointBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.router" />
+        </service>
 
         <service id="api_platform.hydra.documentation_builder" class="ApiPlatform\Core\Hydra\ApiDocumentationBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -78,6 +84,10 @@
         </service>
 
         <!-- Action -->
+
+        <service id="api_platform.hydra.action.entrypoint" class="ApiPlatform\Core\Hydra\Action\EntrypointAction">
+            <argument type="service" id="api_platform.hydra.entrypoint_builder" />
+        </service>
 
         <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
             <argument type="service" id="api_platform.hydra.documentation_builder" />

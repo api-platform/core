@@ -24,7 +24,17 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "text/xml"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "text/xml; charset=UTF-8"
+    And the header "Content-Type" should be equal to "application/xml"
+    And the response should be equal to
+    """
+<?xml version="1.0"?>
+<response><item key="0"><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></item></response>
+    """
+
+  Scenario:  Retrieve a collection in XML using the .xml URL
+    When I send a "GET" request to "/dummies.xml"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/xml"
     And the response should be equal to
     """
 <?xml version="1.0"?>

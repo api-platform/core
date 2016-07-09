@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Documentation\Action;
 
 use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Generates the Hydra API documentation.
@@ -31,8 +30,8 @@ final class DocumentationAction
     /**
      * Gets API doc.
      */
-    public function __invoke() : JsonResponse
+    public function __invoke() : array
     {
-        return new JsonResponse($this->apiDocumentationBuilder->getApiDocumentation(), JsonResponse::HTTP_OK, ['Content-Type' => 'application/ld+json']);
+        return $this->apiDocumentationBuilder->getApiDocumentation();
     }
 }
