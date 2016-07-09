@@ -42,7 +42,7 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT], true)) {
+        if ($request->isMethodSafe() || $request->isMethod(Request::METHOD_DELETE)) {
             return;
         }
 
