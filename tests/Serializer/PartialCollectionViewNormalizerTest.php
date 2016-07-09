@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Hydra\Serializer;
+namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
@@ -66,7 +66,10 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
                     'hydra:last' => '/?_page=20',
                     'hydra:previous' => '/?_page=2',
                     'hydra:next' => '/?_page=4',
+
+
                 ],
+
             ],
             $normalizer->normalize($paginator)
         );

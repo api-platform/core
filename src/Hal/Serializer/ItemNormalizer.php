@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd\Serializer;
+namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -34,8 +35,6 @@ final class ItemNormalizer extends AbstractObjectNormalizer
 {
     use ContextTrait;
 
-    const FORMAT = 'jsonld';
-
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
@@ -43,8 +42,9 @@ final class ItemNormalizer extends AbstractObjectNormalizer
     private $resourceClassResolver;
     private $contextBuilder;
     private $propertyAccessor;
+    private $formats;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, array $formats)
     {
         parent::__construct(null, $nameConverter);
 
@@ -55,6 +55,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         $this->resourceClassResolver = $resourceClassResolver;
         $this->contextBuilder = $contextBuilder;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->formats = $formats;
 
         $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
@@ -66,7 +67,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        if (self::FORMAT !== $format || !is_object($data)) {
+        if (!isset($this->formats[$format]) || !is_object($data)) {
             return false;
         }
 
@@ -85,20 +86,19 @@ final class ItemNormalizer extends AbstractObjectNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $data = $this->addContext($this->contextBuilder, $resourceClass, $context, [], $format);
+        $context = $this->createContext($resourceClass, $context, $format);
 
-        $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        $context['jsonld_normalize'] = true;
-        $context = $this->createContext($resourceClass, $context);
+        $data['_links']['self']['href'] = $this->iriConverter->getIriFromItem($object);
+        $context['jsonhal_normalize'] = true;
+
 
         $rawData = parent::normalize($object, $format, $context);
+
         if (!is_array($rawData)) {
             return $rawData;
         }
-
-        $data['@id'] = $this->iriConverter->getIriFromItem($object);
-        $data['@type'] = ($iri = $resourceMetadata->getIri()) ? $iri : $resourceMetadata->getShortName();
 
         return array_merge($data, $rawData);
     }
@@ -108,7 +108,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return self::FORMAT === $format && $this->resourceClassResolver->isResourceClass($type);
+        return isset($this->formats[$format]) && $this->resourceClassResolver->isResourceClass($type);
     }
 
     /**
@@ -119,13 +119,14 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         $resourceClass = $this->resourceClassResolver->getResourceClass($data, $context['resource_class']);
 
         $context['jsonld_denormalize'] = true;
-        $context = $this->createContext($resourceClass, $context);
 
+        $context = $this->createContext($resourceClass, $context, $format);
         // Avoid issues with proxies if we populated the object
-        $overrideClass = isset($data['@id']) && !isset($context['object_to_populate']);
+
+        $overrideClass = (isset($data['_links']['self']['href'])) && !isset($context['object_to_populate']);
 
         if ($overrideClass) {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], true);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['_links']['self']['href'], true);
         }
 
         return parent::denormalize($data, $class, $format, $context);
@@ -161,7 +162,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         ) {
             $value = [];
             foreach ($attributeValue as $index => $obj) {
-                $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $className, $context);
+                $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $className, $context, $format);
             }
 
             return $value;
@@ -173,10 +174,10 @@ final class ItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $context);
+            return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $context, $format);
         }
 
-        return $this->serializer->normalize($attributeValue, self::FORMAT, $context);
+        return $this->serializer->normalize($attributeValue, $format, $context);
     }
 
     /**
@@ -190,10 +191,9 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
-
             if (
-                (isset($context['jsonld_normalize']) && $propertyMetadata->isReadable()) ||
-                (isset($context['jsonld_denormalize']) && $propertyMetadata->isWritable())
+                ((isset($context['jsonhal_normalize'])) && $propertyMetadata->isReadable()) ||
+                ((isset($context['jsonhal_denormalize']))  && $propertyMetadata->isWritable())
             ) {
                 $allowedAttributes[] = $propertyName;
             }
@@ -228,7 +228,8 @@ final class ItemNormalizer extends AbstractObjectNormalizer
                         $propertyMetadata,
                         $className,
                         $obj,
-                        $context
+                        $context,
+                        $format
                     );
                 }
 
@@ -247,7 +248,8 @@ final class ItemNormalizer extends AbstractObjectNormalizer
                         $propertyMetadata,
                         $className,
                         $value,
-                        $context
+                        $context,
+                        $format
                     )
                 );
 
@@ -268,10 +270,10 @@ final class ItemNormalizer extends AbstractObjectNormalizer
      *
      * @return string|array
      */
-    private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, array $context)
+    private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, array $context, string $format)
     {
         if ($propertyMetadata->isReadableLink()) {
-            return $this->serializer->normalize($relatedObject, self::FORMAT, $this->createRelationSerializationContext($resourceClass, $context));
+            return $this->serializer->normalize($relatedObject, $format, $this->createRelationSerializationContext($resourceClass, $context));
         }
 
         return $this->iriConverter->getIriFromItem($relatedObject);
@@ -291,7 +293,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
      *
      * @return object|null
      */
-    private function denormalizeRelation(string $resourceClass, string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, array $context)
+    private function denormalizeRelation(string $resourceClass, string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, array $context, $format)
     {
         if (is_string($value)) {
             try {
@@ -302,7 +304,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!$this->resourceClassResolver->isResourceClass($className) || $propertyMetadata->isWritableLink()) {
-            return $this->serializer->denormalize($value, $className, self::FORMAT, $this->createRelationSerializationContext($className, $context));
+            return $this->serializer->denormalize($value, $className, $format, $this->createRelationSerializationContext($className, $context));
         }
 
         if (!is_array($value)) {

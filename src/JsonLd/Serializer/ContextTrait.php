@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
-use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
 
 /**
  * Creates and manipulates the Serializer context.

@@ -91,6 +91,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $this->enableJsonLd($loader);
+        if (isset($formats['jsonhal'])) {
+            $loader->load('hal.xml');
+        }
         $this->registerAnnotationLoaders($container);
         $this->registerFileLoaders($container);
 
@@ -117,7 +120,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Enables JSON-LD and Hydra support.
+     * Enables JSON-LD, HAL and Hydra support.
      *
      * @param XmlFileLoader $loader
      */
