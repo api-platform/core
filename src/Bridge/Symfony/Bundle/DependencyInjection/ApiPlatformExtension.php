@@ -90,7 +90,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setParameter('api_platform.enable_swagger', (string) $config['enable_swagger']);
         }
 
-        $this->enableJsonLd($loader);
+        if (isset($formats['jsonld'])) {
+            $loader->load('jsonld.xml');
+            $loader->load('hydra.xml');
+        }
+
+        if (isset($formats['jsonhal'])) {
+            $loader->load('hal.xml');
+        }
+
         $this->registerAnnotationLoaders($container);
         $this->registerFileLoaders($container);
 
@@ -114,17 +122,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
             $loader->load('nelmio_api_doc.xml');
         }
-    }
-
-    /**
-     * Enables JSON-LD and Hydra support.
-     *
-     * @param XmlFileLoader $loader
-     */
-    private function enableJsonLd(XmlFileLoader $loader)
-    {
-        $loader->load('jsonld.xml');
-        $loader->load('hydra.xml');
     }
 
     /**
