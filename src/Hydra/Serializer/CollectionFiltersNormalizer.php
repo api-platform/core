@@ -14,24 +14,19 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
+use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerAwareTrait;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Enhance the result of collection by adding the filters applied on collection.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class CollectionFiltersNormalizer implements NormalizerInterface, SerializerAwareInterface
+final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
-    use ContextTrait;
-    use SerializerAwareTrait {
-        setSerializer as baseSetSerializer;
-    }
+    use JsonLdContextTrait;
 
     private $collectionNormalizer;
     private $resourceMetadataFactory;
@@ -60,7 +55,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['jsonld_sub_level'])) {
+        if (isset($context['api_sub_level'])) {
             return $data;
         }
 
@@ -101,12 +96,10 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
     /**
      * {@inheritdoc}
      */
-    public function setSerializer(SerializerInterface $serializer)
+    public function setNormalizer(NormalizerInterface $normalizer)
     {
-        $this->baseSetSerializer($serializer);
-
-        if ($this->collectionNormalizer instanceof SerializerAwareInterface) {
-            $this->collectionNormalizer->setSerializer($serializer);
+        if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
+            $this->collectionNormalizer->setNormalizer($normalizer);
         }
     }
 
