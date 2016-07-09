@@ -16,11 +16,10 @@
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.iri_converter" />
+            <argument>%api_platform.formats%</argument>
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
-            <argument>2.0</argument>
-            <argument>%router.request_context.host%</argument>
-            <argument>%router.request_context.scheme%</argument>
+            <argument>%api_platform.version%</argument>
         </service>
 
         <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">
