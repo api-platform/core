@@ -5,12 +5,11 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_jsonld_entrypoint" path="/">
-        <default key="_controller">api_platform.jsonld.action.entrypoint</default>
-    </route>
-
-    <route id="api_jsonld_context" path="/contexts/{shortName}">
+    <route id="api_jsonld_context" path="/contexts/{shortName}.{_format}">
         <default key="_controller">api_platform.jsonld.action.context</default>
+        <default key="_api_respond">1</default>
+        <default key="_format">jsonld</default>
+
         <requirement key="shortName">.+</requirement>
     </route>
 

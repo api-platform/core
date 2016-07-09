@@ -29,11 +29,10 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), []);
+        $listener = new AddFormatListener(new Negotiator(), ['jsonld' => 'application/ld+json']);
         $listener->onKernelRequest($event);
 
-        $this->assertFalse($request->attributes->has('_api_format'));
-        $this->assertFalse($request->attributes->has('_api_mime_type'));
+        $this->assertNull($request->getFormat('application/ld+json'));
     }
 
     public function testSupportedRequestFormat()
@@ -46,11 +45,28 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['text/xml' => 'xml']);
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
         $listener->onKernelRequest($event);
 
-        $this->assertSame('xml', $request->attributes->get('_api_format'));
-        $this->assertSame('text/xml', $request->attributes->get('_api_mime_type'));
+        $this->assertSame('xml', $request->getRequestFormat());
+        $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
+    }
+
+    public function testRespondFlag()
+    {
+        $request = new Request();
+        $request->attributes->set('_api_respond', true);
+        $request->setRequestFormat('xml');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('xml', $request->getRequestFormat());
+        $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
     public function testUnsupportedRequestFormat()
@@ -63,11 +79,10 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['application/json' => 'json']);
+        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
         $listener->onKernelRequest($event);
 
-        $this->assertSame('json', $request->attributes->get('_api_format'));
-        $this->assertSame('application/json', $request->attributes->get('_api_mime_type'));
+        $this->assertSame('json', $request->getRequestFormat());
     }
 
     public function testSupportedAcceptHeader()
@@ -80,11 +95,10 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['application/octet-stream' => 'binary', 'application/json' => 'json']);
+        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
         $listener->onKernelRequest($event);
 
-        $this->assertSame('json', $request->attributes->get('_api_format'));
-        $this->assertSame('application/json', $request->attributes->get('_api_mime_type'));
+        $this->assertSame('json', $request->getRequestFormat());
     }
 
     public function testUnsupportedAcceptHeader()
@@ -97,10 +111,10 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['application/octet-stream' => 'binary', 'application/json' => 'json']);
+        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
         $listener->onKernelRequest($event);
 
-        $this->assertSame('binary', $request->attributes->get('_api_format'));
-        $this->assertSame('application/octet-stream', $request->attributes->get('_api_mime_type'));
+        $this->assertSame('binary', $request->getRequestFormat());
+        $this->assertSame('application/octet-stream', $request->getMimeType($request->getRequestFormat()));
     }
 }

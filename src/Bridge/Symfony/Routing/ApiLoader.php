@@ -136,6 +136,8 @@ final class ApiLoader extends Loader
             if (!$collection) {
                 $path .= '/{id}';
             }
+
+            $path .= '.{_format}';
         }
 
         $resourceRouteName = Inflector::pluralize(Inflector::tableize($resourceShortName));
@@ -145,6 +147,7 @@ final class ApiLoader extends Loader
             $path,
             [
                 '_controller' => $controller,
+                '_format' => null,
                 '_api_resource_class' => $resourceClass,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ],

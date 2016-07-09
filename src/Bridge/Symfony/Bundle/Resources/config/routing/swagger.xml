@@ -5,7 +5,9 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_swagger_vocab" path="/swagger">
+    <route id="api_swagger_vocab" path="/swagger.{_format}">
         <default key="_controller">api_platform.swagger.action.documentation</default>
+        <default key="_api_respond">1</default>
+        <default key="_format">json</default>
     </route>
 </routes>

@@ -56,7 +56,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $formats = [];
         foreach ($config['formats'] as $format => $value) {
             foreach ($value['mime_types'] as $mimeType) {
-                $formats[$mimeType] = $format;
+                $formats[$format][] = $mimeType;
             }
         }
 

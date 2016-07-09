@@ -34,16 +34,15 @@ final class RespondListener
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
-        $mimeType = $request->attributes->get('_api_mime_type');
 
-        if ($controllerResult instanceof Response || !$mimeType) {
+        if ($controllerResult instanceof Response || !$request->attributes->get('_api_respond')) {
             return;
         }
 
         $event->setResponse(new Response(
             $controllerResult,
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
-            ['Content-Type' => $request->attributes->get('_api_mime_type')]
+            ['Content-Type' => $request->getMimeType($request->getRequestFormat())]
         ));
     }
 }

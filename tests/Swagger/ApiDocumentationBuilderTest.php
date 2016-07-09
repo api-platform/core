@@ -45,10 +45,7 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $titre = 'Test Api';
         $desc = 'test ApiGerard';
         $iriConverter = $this->prophesize(IriConverterInterface::class);
-        $version = '1.0.0';
-        $host = 'http://exemple.com';
-        $schema = 'http';
-        $formats = ['application/ld+json' => 'ld+json'];
+        $formats = ['jsonld' => ['application/ld+json']];
         $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummy' => 'dummy']))->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
