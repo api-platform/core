@@ -130,7 +130,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     $definitions[$shortName]['required'][] = $propertyName;
                 }
 
-
                 $range = $this->getRange($propertyMetadata);
                 if (null === $range) {
                     continue;
@@ -162,7 +161,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
                 }
             }
-
 
             try {
                 $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
@@ -211,43 +209,53 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $swaggerOperation[$methodSwagger] = [];
         $swaggerOperation[$methodSwagger]['tags'] = [$shortName];
-        $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
-        $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'];
 
         switch ($method) {
             case 'GET':
+                $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+
                 if ($collection) {
                     if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                         $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves the collection of %s resources.', $shortName);
                     }
-                    if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
-                        $swaggerOperation[$methodSwagger]['parameters'][] = [
-                            'in' => 'body',
-                            'name' => 'body',
-                            'description' => sprintf('%s resource to be added', $shortName),
-                            'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $shortName),
-                            ],
-                        ];
-                    }
-                } else {
-                    if (!isset($swaggerOperation[$methodSwagger]['title'])) {
-                        $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves %s resource.', $shortName);
-                    }
 
-                    $swaggerOperation[$methodSwagger]['parameters'][] = [
-                        'name' => 'id',
-                        'in' => 'path',
-                        'required' => true,
-                        'type' => 'integer',
+                    $swaggerOperation[$methodSwagger]['responses'] = [
+                        '200' => [
+                            'description' => 'Successful operation',
+                            /* Do not match the Hydra collection structure...
+                             * 'schema' => [
+                             *  'type' => 'array',
+                             *   'items' => ['$ref' => sprintf('#/definitions/%s', $shortName)]
+                             * ],
+                             */
+                        ],
                     ];
+                    break;
                 }
+
+                if (!isset($swaggerOperation[$methodSwagger]['title'])) {
+                    $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves %s resource.', $shortName);
+                }
+
+                $swaggerOperation[$methodSwagger]['parameters'][] = [
+                    'name' => 'id',
+                    'in' => 'path',
+                    'required' => true,
+                    'type' => 'integer',
+                ];
+
                 $swaggerOperation[$methodSwagger]['responses'] = [
-                    '200' => ['description' => 'Valid ID'],
+                    '200' => [
+                        'description' => 'Successful operation',
+                        'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                    ],
+                    '404' => ['description' => 'Resource not found'],
                 ];
                 break;
 
             case 'POST':
+                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Creates a %s resource.', $shortName);
                 }
@@ -264,12 +272,18 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 $swaggerOperation[$methodSwagger]['responses'] = [
-                        '201' => ['description' => 'Valid ID'],
-                    ];
-
+                        '201' => [
+                            'description' => 'Successful operation',
+                            'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                        ],
+                        '400' => ['description' => 'Invalid input'],
+                        '404' => ['description' => 'Resource not found'],
+                ];
             break;
 
             case 'PUT':
+                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Replaces the %s resource.', $shortName);
                 }
@@ -292,15 +306,23 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         ],
                     ];
                 }
+
                 $swaggerOperation[$methodSwagger]['responses'] = [
-                    '200' => ['description' => 'Valid ID'],
+                    '200' => [
+                        'description' => 'Successful operation',
+                        'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                    ],
+                    '400' => ['description' => 'Invalid input'],
+                    '404' => ['description' => 'Resource not found'],
                 ];
             break;
 
             case 'DELETE':
                 $swaggerOperation[$methodSwagger]['responses'] = [
                     '204' => ['description' => 'Deleted'],
+                    '404' => ['description' => 'Resource not found'],
                 ];
+
                 $swaggerOperation[$methodSwagger]['parameters'] = [[
                     'name' => 'id',
                     'in' => 'path',

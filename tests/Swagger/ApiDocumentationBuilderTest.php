@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Swagger\ApiDocumentationBuilder;
+use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -39,7 +40,10 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $titre = 'Test Api';
@@ -51,10 +55,10 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
         $propertyMetadataFactoryProphecy->create('dummy', 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'name', true, true, true, true, false, false, null, []));
-        $operationMethodResolverProphecy->getItemOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('get');
-        $operationMethodResolverProphecy->getItemOperationMethod('dummy', 'put')->shouldBeCalled()->willReturn('put');
-        $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('get');
-        $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('post');
+        $operationMethodResolverProphecy->getItemOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getItemOperationMethod('dummy', 'put')->shouldBeCalled()->willReturn('PUT');
+        $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
         $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
         $apiDocumentationBuilder = new ApiDocumentationBuilder($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $urlGeneratorProphecy->reveal(), $iriConverter->reveal(), $formats, $titre, $desc);
 
@@ -67,29 +71,121 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
          ], ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com']);
 
         $this->assertEquals($swaggerDocumentation['paths']['/dummies']['get'], [
-            'tags' => [0 => 'dummy'],
+                'tags' => ['dummy'],
                 'produces' => ['application/ld+json'],
-                'consumes' => ['application/ld+json'],
-    ]
-                       );
+                'summary' => 'Retrieves the collection of dummy resources.',
+                'responses' => [
+                        200 => ['description' => 'Successful operation'],
+                    ],
+        ]);
 
         $this->assertEquals($swaggerDocumentation['paths']['/dummies']['post'], [
-                'tags' => [0 => 'dummy'],
-                'produces' => ['application/ld+json'],
-                'consumes' => ['application/ld+json'],
-            ]
-        );
+                'tags' => array(
+                        0 => 'dummy',
+                    ),
+                'produces' => array(
+                        0 => 'application/ld+json',
+                    ),
+                'consumes' => array(
+                        0 => 'application/ld+json',
+                    ),
+                'summary' => 'Creates a dummy resource.',
+                'parameters' => array(
+                        0 => array(
+                                'in' => 'body',
+                                'name' => 'body',
+                                'description' => 'dummy resource to be added',
+                                'schema' => array(
+                                        '$ref' => '#/definitions/dummy',
+                                    ),
+                            ),
+                    ),
+                'responses' => array(
+                        201 => array(
+                                'description' => 'Successful operation',
+                                'schema' => array(
+                                        '$ref' => '#/definitions/dummy',
+                                    ),
+                            ),
+                        400 => array(
+                                'description' => 'Invalid input',
+                            ),
+                        404 => array(
+                                'description' => 'Resource not found',
+                            ),
+                    ),
+        ]);
+
         $this->assertEquals($swaggerDocumentation['paths']['/dummies/{id}']['get'], [
-                'tags' => [0 => 'dummy'],
-                'produces' => ['application/ld+json'],
-                'consumes' => ['application/ld+json'],
-            ]
-        );
+                'tags' => array(
+                        0 => 'dummy',
+                    ),
+                'produces' => array(
+                        0 => 'application/ld+json',
+                    ),
+                'summary' => 'Retrieves dummy resource.',
+                'parameters' => array(
+                        0 => array(
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'type' => 'integer',
+                            ),
+                    ),
+                'responses' => array(
+                        200 => array(
+                                'description' => 'Successful operation',
+                                'schema' => array(
+                                        '$ref' => '#/definitions/dummy',
+                                    ),
+                            ),
+                        404 => array(
+                                'description' => 'Resource not found',
+                            ),
+                    ),
+        ]);
+
         $this->assertEquals($swaggerDocumentation['paths']['/dummies/{id}']['put'], [
-                'tags' => [0 => 'dummy'],
-                'produces' => ['application/ld+json'],
-                'consumes' => ['application/ld+json'],
-            ]
-        );
+            'tags' => [
+                    0 => 'dummy',
+                ],
+            'produces' => [
+                    0 => 'application/ld+json',
+                ],
+            'consumes' => array(
+                    0 => 'application/ld+json',
+                ),
+            'summary' => 'Replaces the dummy resource.',
+            'parameters' => array(
+                    0 => array(
+                            'name' => 'id',
+                            'in' => 'path',
+                            'required' => true,
+                            'type' => 'integer',
+                        ),
+                    1 => array(
+                            'in' => 'body',
+                            'name' => 'body',
+                            'description' => 'dummy resource to be added',
+                            'schema' => array(
+                                    '$ref' => '#/definitions/dummy',
+                                ),
+                        ),
+                ),
+            'responses' => array(
+                    200 => array(
+                            'description' => 'Successful operation',
+                            'schema' => array(
+                                    '$ref' => '#/definitions/dummy',
+                                ),
+                        ),
+                    400 => array(
+                            'description' => 'Invalid input',
+                        ),
+                    404 => array(
+                            'description' => 'Resource not found',
+                        ),
+                ),
+        ]);
     }
 }
