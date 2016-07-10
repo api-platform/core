@@ -23,5 +23,5 @@ interface ApiDocumentationBuilderInterface
      *
      * @return array
      */
-    public function getApiDocumentation();
+    public function getApiDocumentation() : array;
 }
