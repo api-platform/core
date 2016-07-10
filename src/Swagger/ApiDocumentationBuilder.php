@@ -226,7 +226,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                             'description' => 'Successful operation',
                              'schema' => [
                                 'type' => 'array',
-                                'items' => ['$ref' => sprintf('#/definitions/%s', $shortName)]
+                                'items' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
                              ],
                         ],
                     ];
