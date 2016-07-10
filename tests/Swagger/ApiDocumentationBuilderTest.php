@@ -80,69 +80,69 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         ]);
 
         $this->assertEquals($swaggerDocumentation['paths']['/dummies']['post'], [
-                'tags' => array(
+                'tags' => [
                         0 => 'dummy',
-                    ),
-                'produces' => array(
+                    ],
+                'produces' => [
                         0 => 'application/ld+json',
-                    ),
-                'consumes' => array(
+                    ],
+                'consumes' => [
                         0 => 'application/ld+json',
-                    ),
+                    ],
                 'summary' => 'Creates a dummy resource.',
-                'parameters' => array(
-                        0 => array(
+                'parameters' => [
+                        0 => [
                                 'in' => 'body',
                                 'name' => 'body',
                                 'description' => 'dummy resource to be added',
-                                'schema' => array(
+                                'schema' => [
                                         '$ref' => '#/definitions/dummy',
-                                    ),
-                            ),
-                    ),
-                'responses' => array(
-                        201 => array(
+                                    ],
+                            ],
+                    ],
+                'responses' => [
+                        201 => [
                                 'description' => 'Successful operation',
-                                'schema' => array(
+                                'schema' => [
                                         '$ref' => '#/definitions/dummy',
-                                    ),
-                            ),
-                        400 => array(
+                                    ],
+                            ],
+                        400 => [
                                 'description' => 'Invalid input',
-                            ),
-                        404 => array(
+                            ],
+                        404 => [
                                 'description' => 'Resource not found',
-                            ),
-                    ),
+                            ],
+                    ],
         ]);
 
         $this->assertEquals($swaggerDocumentation['paths']['/dummies/{id}']['get'], [
-                'tags' => array(
+                'tags' => [
                         0 => 'dummy',
-                    ),
-                'produces' => array(
+                    ],
+                'produces' => [
                         0 => 'application/ld+json',
-                    ),
+                    ],
                 'summary' => 'Retrieves dummy resource.',
-                'parameters' => array(
-                        0 => array(
+                'parameters' => [
+                        0 => [
                                 'name' => 'id',
                                 'in' => 'path',
                                 'required' => true,
                                 'type' => 'integer',
-                            ),
-                    ),
-                'responses' => array(
-                        200 => array(
+                            ],
+                    ],
+                'responses' => [
+                        200 => [
                                 'description' => 'Successful operation',
-                                'schema' => array(
+                                'schema' => [
                                         '$ref' => '#/definitions/dummy',
-                                    ),
-                            ),
-                        404 => array(
+                                    ],
+                            ],
+                        404 => [
                                 'description' => 'Resource not found',
-                            ),
-                    ),
+                            ],
+                    ],
         ]);
 
         $this->assertEquals($swaggerDocumentation['paths']['/dummies/{id}']['put'], [
@@ -152,40 +152,40 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
             'produces' => [
                     0 => 'application/ld+json',
                 ],
-            'consumes' => array(
+            'consumes' => [
                     0 => 'application/ld+json',
-                ),
+                ],
             'summary' => 'Replaces the dummy resource.',
-            'parameters' => array(
-                    0 => array(
+            'parameters' => [
+                    0 => [
                             'name' => 'id',
                             'in' => 'path',
                             'required' => true,
                             'type' => 'integer',
-                        ),
-                    1 => array(
+                        ],
+                    1 => [
                             'in' => 'body',
                             'name' => 'body',
                             'description' => 'dummy resource to be added',
-                            'schema' => array(
+                            'schema' => [
                                     '$ref' => '#/definitions/dummy',
-                                ),
-                        ),
-                ),
-            'responses' => array(
-                    200 => array(
+                                ],
+                        ],
+                ],
+            'responses' => [
+                    200 => [
                             'description' => 'Successful operation',
-                            'schema' => array(
+                            'schema' => [
                                     '$ref' => '#/definitions/dummy',
-                                ),
-                        ),
-                    400 => array(
+                                ],
+                        ],
+                    400 => [
                             'description' => 'Invalid input',
-                        ),
-                    404 => array(
+                        ],
+                    404 => [
                             'description' => 'Resource not found',
-                        ),
-                ),
+                        ],
+                ],
         ]);
     }
 }
