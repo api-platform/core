@@ -122,9 +122,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
             foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-                if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
-                    continue;
-                }
 
                 if ($propertyMetadata->isRequired()) {
                     $definitions[$shortName]['required'][] = $propertyName;
