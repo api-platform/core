@@ -66,8 +66,6 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
         }
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
 
-        $data = $this->addContext($this->contextBuilder, $resourceClass, $context, [], $format);
-
         if (isset($context['jsonhal_sub_level'])) {
             $data = [];
             foreach ($object as $index => $obj) {

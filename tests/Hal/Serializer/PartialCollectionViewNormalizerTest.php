@@ -11,19 +11,11 @@
 
 namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use ApiPlatform\Core\Hal\ContextBuilder;
 use ApiPlatform\Core\Hal\Serializer\CollectionNormalizer;
 use ApiPlatform\Core\Hal\Serializer\PartialCollectionViewNormalizer;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
