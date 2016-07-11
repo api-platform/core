@@ -59,7 +59,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getApiDocumentation()
+    public function getApiDocumentation() : array
     {
         $classes = [];
         $entrypointProperties = [];
