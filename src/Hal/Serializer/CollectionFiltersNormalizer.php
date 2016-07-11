@@ -96,10 +96,6 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
         $context = $this->createContext($resourceClass, $context, $format);
 
         if ([] !== $currentFilters) {
-            if (isset($context['jsonld_has_context'])) {
-                $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $context);
-            }
-
             if (isset($context['jsonhal_has_context'])) {
                 $data['_links']['self'] = array_merge($data['_links']['self'], $this->getSearch($resourceClass, $requestParts, $currentFilters, $context));
             }
@@ -139,7 +135,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
 
             if (isset($context['jsonhal_has_context'])) {
                 return [
-                    'search' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)),
+                    'find' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)),
                 ];
             }
         }

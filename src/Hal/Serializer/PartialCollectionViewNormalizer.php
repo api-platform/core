@@ -68,6 +68,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Seri
         }
 
         if ('jsonhal' === $format) {
+            if ($currentPage !== $lastPage) {
+                $data['_links']['self']['next'] = $this->getId($parts, $parameters, $currentPage + 1.);
+            }
             return $data;
         }
 

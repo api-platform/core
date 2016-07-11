@@ -17,7 +17,7 @@ use ApiPlatform\Core\Hal\Serializer\JsonHalEncoder;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class JsonLdEncoderTest extends \PHPUnit_Framework_TestCase
+class JsonHalEncoderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var JsonHalEncoder
