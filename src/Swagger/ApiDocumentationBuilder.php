@@ -75,7 +75,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getApiDocumentation()
+    public function getApiDocumentation() : array
     {
         $classes = [];
         $operation = [];
@@ -93,18 +93,14 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
             $class = [
                 'name' => $shortName,
-                'externalDocs' => [
-                    'url' => $prefixedShortName,
-                ],
+                'externalDocs' => ['url' => $prefixedShortName],
             ];
 
             if ($description = $resourceMetadata->getDescription()) {
                 $class = [
                     'name' => $shortName,
                     'description' => $description,
-                    'externalDocs' => [
-                        'url' => $prefixedShortName,
-                    ],
+                    'externalDocs' => ['url' => $prefixedShortName],
                 ];
             }
 
@@ -119,17 +115,17 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 $context['serializer_groups'] = isset($context['serializer_groups']) ? array_merge($context['serializer_groups'], $attributes['denormalization_context']['groups']) : $context['serializer_groups'];
             }
 
-            $definitions[$shortName] = ['type' => 'object'];
+            $definitions[$shortName] = [
+                'type' => 'object',
+                'xml' => ['name' => 'response'],
+            ];
+
             foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-                if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
-                    continue;
-                }
 
                 if ($propertyMetadata->isRequired()) {
                     $definitions[$shortName]['required'][] = $propertyName;
                 }
-
 
                 $range = $this->getRange($propertyMetadata);
                 if (null === $range) {
@@ -143,9 +139,11 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 if ($range['complex']) {
                     $definitions[$shortName]['properties'][$propertyName] = ['$ref' => $range['value']];
                 } else {
-                    $definitions[$shortName]['properties'][$propertyName] = [
-                        'type' => $range['value'],
-                    ];
+                    $definitions[$shortName]['properties'][$propertyName] = ['type' => $range['value']];
+
+                    if (isset($range['example'])) {
+                        $definitions[$shortName]['properties'][$propertyName]['example'] = $range['example'];
+                    }
                 }
             }
 
@@ -162,7 +160,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
                 }
             }
-
 
             try {
                 $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
@@ -211,43 +208,51 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $shortName = $resourceMetadata->getShortName();
         $swaggerOperation[$methodSwagger] = [];
         $swaggerOperation[$methodSwagger]['tags'] = [$shortName];
-        $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
-        $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'];
 
         switch ($method) {
             case 'GET':
+                $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+
                 if ($collection) {
                     if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                         $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves the collection of %s resources.', $shortName);
                     }
-                    if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
-                        $swaggerOperation[$methodSwagger]['parameters'][] = [
-                            'in' => 'body',
-                            'name' => 'body',
-                            'description' => sprintf('%s resource to be added', $shortName),
-                            'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $shortName),
-                            ],
-                        ];
-                    }
-                } else {
-                    if (!isset($swaggerOperation[$methodSwagger]['title'])) {
-                        $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves %s resource.', $shortName);
-                    }
 
-                    $swaggerOperation[$methodSwagger]['parameters'][] = [
-                        'name' => 'id',
-                        'in' => 'path',
-                        'required' => true,
-                        'type' => 'integer',
+                    $swaggerOperation[$methodSwagger]['responses'] = [
+                        '200' => [
+                            'description' => 'Successful operation',
+                             'schema' => [
+                                'type' => 'array',
+                                'items' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                             ],
+                        ],
                     ];
+                    break;
                 }
+
+                if (!isset($swaggerOperation[$methodSwagger]['title'])) {
+                    $swaggerOperation[$methodSwagger]['summary'] = sprintf('Retrieves %s resource.', $shortName);
+                }
+
+                $swaggerOperation[$methodSwagger]['parameters'][] = [
+                    'name' => 'id',
+                    'in' => 'path',
+                    'required' => true,
+                    'type' => 'integer',
+                ];
+
                 $swaggerOperation[$methodSwagger]['responses'] = [
-                    '200' => ['description' => 'Valid ID'],
+                    '200' => [
+                        'description' => 'Successful operation',
+                        'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                    ],
+                    '404' => ['description' => 'Resource not found'],
                 ];
                 break;
 
             case 'POST':
+                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Creates a %s resource.', $shortName);
                 }
@@ -264,12 +269,18 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 $swaggerOperation[$methodSwagger]['responses'] = [
-                        '201' => ['description' => 'Valid ID'],
-                    ];
-
+                        '201' => [
+                            'description' => 'Successful operation',
+                            'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                        ],
+                        '400' => ['description' => 'Invalid input'],
+                        '404' => ['description' => 'Resource not found'],
+                ];
             break;
 
             case 'PUT':
+                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Replaces the %s resource.', $shortName);
                 }
@@ -292,15 +303,23 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         ],
                     ];
                 }
+
                 $swaggerOperation[$methodSwagger]['responses'] = [
-                    '200' => ['description' => 'Valid ID'],
+                    '200' => [
+                        'description' => 'Successful operation',
+                        'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
+                    ],
+                    '400' => ['description' => 'Invalid input'],
+                    '404' => ['description' => 'Resource not found'],
                 ];
             break;
 
             case 'DELETE':
                 $swaggerOperation[$methodSwagger]['responses'] = [
                     '204' => ['description' => 'Deleted'],
+                    '404' => ['description' => 'Resource not found'],
                 ];
+
                 $swaggerOperation[$methodSwagger]['parameters'] = [[
                     'name' => 'id',
                     'in' => 'path',
@@ -352,7 +371,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 if (is_subclass_of($className, \DateTimeInterface::class)) {
-                    return ['complex' => false, 'value' => 'string'];
+                    return ['complex' => false, 'value' => 'string', 'example' => '1988-01-21T00:00:00+00:00'];
                 }
 
                 if (!$this->resourceClassResolver->isResourceClass($className)) {
@@ -363,7 +382,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     return ['complex' => true, 'value' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
                 }
 
-                return ['complex' => false, 'value' => 'string'];
+                return ['complex' => false, 'value' => 'string', 'example' => '/my/iri'];
 
             default:
                 return ['complex' => false, 'value' => 'null'];
