@@ -52,7 +52,7 @@ final class EventListener
                 break;
 
             default:
-                $this->userManager->updateUser($user, false);
+                $this->userManager->updateUser($user);
                 break;
         }
     }

@@ -116,8 +116,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
-                if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
+                if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
                     continue;
                 }
 

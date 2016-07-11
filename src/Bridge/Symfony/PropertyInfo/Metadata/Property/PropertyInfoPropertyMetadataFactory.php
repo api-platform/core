@@ -37,13 +37,16 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
      */
     public function create(string $resourceClass, string $name, array $options = []) : PropertyMetadata
     {
-        if (null !== $this->decorated) {
+        if (null === $this->decorated) {
+            $propertyMetadata = new PropertyMetadata();
+        } else {
             try {
                 $propertyMetadata = $this->decorated->create($resourceClass, $name, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
                 $propertyMetadata = new PropertyMetadata();
             }
         }
+
         if (null === $propertyMetadata->getType()) {
             $types = $this->propertyInfo->getTypes($resourceClass, $name, $options);
             if (isset($types[0])) {

@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * Use Doctrine metadata to populate the identifier property.
@@ -56,7 +57,13 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         foreach ($identifiers as $identifier) {
             if ($identifier === $property) {
                 $propertyMetadata = $propertyMetadata->withIdentifier(true);
-                $propertyMetadata = $propertyMetadata->withWritable($doctrineClassMetadata->isIdentifierNatural());
+                if ($doctrineClassMetadata instanceof ClassMetadataInfo) {
+                    $writable = $doctrineClassMetadata->isIdentifierNatural();
+                } else {
+                    $writable = false;
+                }
+
+                $propertyMetadata = $propertyMetadata->withWritable($writable);
 
                 break;
             }

@@ -32,7 +32,7 @@ abstract class QueryNameGenerator
      *
      * @return string
      */
-    public static function generateJoinAlias($association)
+    public static function generateJoinAlias(string $association) : string
     {
         return sprintf('%s_%s', $association, uniqid());
     }
@@ -44,7 +44,7 @@ abstract class QueryNameGenerator
      *
      * @return string
      */
-    public static function generateParameterName($name)
+    public static function generateParameterName(string $name) : string
     {
         return sprintf('%s_%s', $name, uniqid());
     }
@@ -58,11 +58,8 @@ abstract class QueryNameGenerator
      *
      * @return ClassMetadata
      */
-    public static function getClassMetadataFromJoinAlias(
-        $alias,
-        QueryBuilder $queryBuilder,
-        ManagerRegistry $managerRegistry
-    ) {
+    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : ClassMetadata
+    {
         $rootEntities = $queryBuilder->getRootEntities();
         $rootAliases = $queryBuilder->getRootAliases();
 
@@ -127,7 +124,7 @@ abstract class QueryNameGenerator
      *
      * @return string
      */
-    public static function getJoinRelationship(Join $join)
+    public static function getJoinRelationship(Join $join) : string
     {
         static $relationshipProperty = null;
         static $initialized = false;
@@ -149,7 +146,7 @@ abstract class QueryNameGenerator
      *
      * @return string
      */
-    public static function getJoinAlias(Join $join)
+    public static function getJoinAlias(Join $join) : string
     {
         static $aliasProperty = null;
         static $initialized = false;
@@ -171,7 +168,7 @@ abstract class QueryNameGenerator
      *
      * @return string[]
      */
-    public static function getOrderByParts(OrderBy $orderBy)
+    public static function getOrderByParts(OrderBy $orderBy) : array
     {
         static $partsProperty = null;
         static $initialized = false;
