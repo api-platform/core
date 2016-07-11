@@ -9,30 +9,31 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd\Serializer;
+namespace ApiPlatform\Core\Serializer;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder as BaseJsonEncoder;
 
 /**
  * JSON-LD Encoder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class JsonLdEncoder implements EncoderInterface, DecoderInterface
+final class JsonEncoder implements EncoderInterface, DecoderInterface
 {
-    const FORMAT = 'jsonld';
-
+    private $format;
     private $jsonEncoder;
 
-    public function __construct(JsonEncoder $jsonEncoder = null)
+    public function __construct(string $format, BaseJsonEncoder $jsonEncoder = null)
     {
+        $this->format = $format;
+
         // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
-        $this->jsonEncoder = $jsonEncoder ?: new JsonEncoder(
+        $this->jsonEncoder = $jsonEncoder ?: new BaseJsonEncoder(
             new JsonEncode(JsonResponse::DEFAULT_ENCODING_OPTIONS), new JsonDecode(true)
         );
     }
@@ -42,7 +43,7 @@ final class JsonLdEncoder implements EncoderInterface, DecoderInterface
      */
     public function supportsEncoding($format)
     {
-        return self::FORMAT === $format;
+        return $this->format === $format;
     }
 
     /**
@@ -58,7 +59,7 @@ final class JsonLdEncoder implements EncoderInterface, DecoderInterface
      */
     public function supportsDecoding($format)
     {
-        return self::FORMAT === $format;
+        return $this->format === $format;
     }
 
     /**

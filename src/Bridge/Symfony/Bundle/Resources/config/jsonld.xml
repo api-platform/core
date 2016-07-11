@@ -29,7 +29,9 @@
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\JsonLd\Serializer\JsonLdEncoder" public="false">
+        <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+            <argument>jsonld</argument>
+
             <tag name="serializer.encoder" />
         </service>
 
