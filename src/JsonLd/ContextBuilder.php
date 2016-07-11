@@ -85,7 +85,7 @@ final class ContextBuilder implements ContextBuilderInterface
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : array
     {
-        $context = $this->getBaseContext($referenceType, $referenceType);
+        $context = $this->getBaseContext($referenceType);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $prefixedShortName = sprintf('#%s', $resourceMetadata->getShortName());
 

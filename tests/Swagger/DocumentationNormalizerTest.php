@@ -64,7 +64,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
 
-        $apiDocumentationBuilder = new DocumentationNormalizer($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $iriConverter->reveal());
+        $normalizer = new DocumentationNormalizer($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $iriConverter->reveal());
 
         $expected = [
             'swagger' => '2.0',
@@ -185,6 +185,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
             ],
         ];
 
-        $this->assertEquals($expected, $apiDocumentationBuilder->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 }

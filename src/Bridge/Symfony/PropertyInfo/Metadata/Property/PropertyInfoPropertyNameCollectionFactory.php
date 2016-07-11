@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -36,6 +37,11 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
      */
     public function create(string $resourceClass, array $options = []) : PropertyNameCollection
     {
-        return new PropertyNameCollection($this->propertyInfo->getProperties($resourceClass, $options));
+        $properties = $this->propertyInfo->getProperties($resourceClass, $options);
+        if (null === $properties) {
+            throw new RuntimeException(sprintf('There is no PropertyInfo extractor supporting the class "%s".', $resourceClass));
+        }
+
+        return new PropertyNameCollection($properties);
     }
 }
