@@ -43,7 +43,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $serializer->willImplement(NormalizerInterface::class);
         $serializer->normalize($dummy1,
                               'jsonhal',
-            ["jsonhal_has_context" => true, "jsonhal_sub_level" => true, "resource_class" => "dummy"])
+            ['jsonhal_has_context' => true, 'jsonhal_sub_level' => true, 'resource_class' => 'dummy'])
             ->willReturn(['name' => 'dummy1']);
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $formats = ['jsonhal' => ['mime_types' => ['application/hal+json']]];
