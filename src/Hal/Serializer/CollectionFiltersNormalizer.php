@@ -93,7 +93,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
                 $currentFilters[] = $filter;
             }
         }
-        $context = $this->createContext($resourceClass, $context, $format);
+        $context = $this->initContext($resourceClass, $context, $format);
 
         if ([] !== $currentFilters) {
             if (isset($context['jsonhal_has_context'])) {

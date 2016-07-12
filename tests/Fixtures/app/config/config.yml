@@ -31,6 +31,7 @@ api_platform:
     description:                       'This is a test API.'
     formats:
         jsonld:                        ['application/ld+json']
+        jsonhal:                       ['application/hal+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
     name_converter:                    'app.name_converter'
