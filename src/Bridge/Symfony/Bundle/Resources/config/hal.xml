@@ -67,7 +67,6 @@
             <argument type="service" id="api_platform.hal.context_builder" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-            <argument>%api_platform.formats%</argument>
 
             <tag name="serializer.normalizer" />
         </service>

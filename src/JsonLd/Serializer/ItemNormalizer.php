@@ -60,7 +60,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
         $rawData = parent::normalize($object, $format, $context);
