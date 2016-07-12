@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
+use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    use ContextTrait;
+    use JsonLdContextTrait;
     use SerializerAwareTrait {
         setSerializer as baseSetSerializer;
     }
@@ -60,7 +60,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['jsonld_sub_level'])) {
+        if (isset($context['api_sub_level'])) {
             return $data;
         }
 

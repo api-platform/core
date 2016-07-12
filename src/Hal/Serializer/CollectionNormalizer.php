@@ -74,7 +74,7 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
 
             return $data;
         }
-        $context = $this->createContext($resourceClass, $context, $format);
+        $context = $this->initContext($resourceClass, $context, $format);
 
         if (isset($context['jsonhal_has_context'])) {
             $data = $this->contextBuilder->getBaseContext(0, $this->iriConverter->getIriFromResourceClass($resourceClass));
