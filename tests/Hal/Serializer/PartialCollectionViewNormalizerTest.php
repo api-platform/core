@@ -32,16 +32,15 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-       $this->collectionNormalizer = $this->prophesize(NormalizerInterface::class);
-       $pageParameterName = 'page';
-       $enableParameterName = 'pagination_enabled';
-       $formats = ['jsonhal' => ['mime_types' => ['application/hal+json']]];
-       $this->partialCollectionView = new PartialCollectionViewNormalizer($this->collectionNormalizer->reveal(), $pageParameterName, $enableParameterName, $formats);
-
+        $this->collectionNormalizer = $this->prophesize(NormalizerInterface::class);
+        $pageParameterName = 'page';
+        $enableParameterName = 'pagination_enabled';
+        $formats = ['jsonhal' => ['mime_types' => ['application/hal+json']]];
+        $this->partialCollectionView = new PartialCollectionViewNormalizer($this->collectionNormalizer->reveal(), $pageParameterName, $enableParameterName, $formats);
     }
+
     public function testNormalize()
     {
-
         $paginatorInteface = $this->prophesize(PaginatorInterface::class);
 
         $paginatorInteface->getCurrentPage()->willReturn(1);
@@ -58,12 +57,12 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
                          ],
             ],
             '_embedded' => ['_links' => ['self' => ['href' => '/dummies/1']]],
-            'name' => 'dummy'
+            'name' => 'dummy',
         ];
         $this->collectionNormalizer->normalize($paginatorInteface, 'jsonhal', [])->willReturn($halCollection);
 
         $halCollection['_links']['self']['next'] = '/?page=2';
 
-        $this->assertEquals($halCollection, $this->partialCollectionView->normalize($paginatorInteface->reveal(),'jsonhal', []));
+        $this->assertEquals($halCollection, $this->partialCollectionView->normalize($paginatorInteface->reveal(), 'jsonhal', []));
     }
 }

@@ -15,9 +15,9 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Hal\Serializer\CollectionNormalizer;
 use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
-
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -32,39 +32,38 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-    $this->halCollection = [
-        ['name' => 'dummy1'],
-        ['name' => 'dummy2']
-    ];
+        $dummy1 = new Dummy();
+        $dummy1->setName('dummy1');
+
+        $this->halCollection = ['dummy' => $dummy1];
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
 
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
         $serializer = $this->prophesize(SerializerInterface::class);
+        $serializer->willImplement(NormalizerInterface::class);
+        $serializer->normalize($dummy1,
+                              'jsonhal',
+            ["jsonhal_has_context" => true, "jsonhal_sub_level" => true, "resource_class" => "dummy"])
+            ->willReturn(['name' => 'dummy1']);
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $formats = ['jsonhal' => ['mime_types' => ['application/hal+json']]];
+        $iriConverter->getIriFromResourceClass('dummy')->willReturn('/dummies');
         $this->collectionNormalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolver->reveal(), $iriConverter->reveal(), $formats);
-        $contextBuilder->getBaseContext(0, '/dummies')->willReturn('/dummies');
-        $resourceClassResolver->getResourceClass($this->halCollection , null, true)->willReturn('dummy');
         $this->collectionNormalizer->setSerializer($serializer->reveal());
+        $contextBuilder->getBaseContext(0, '/dummies')->willReturn([]);
+        $resourceClassResolver->getResourceClass($this->halCollection, null, true)->willReturn('dummy');
     }
 
-    public function testSupportsNormalization() {
+    public function testSupportsNormalization()
+    {
         $this->assertEquals(true, $this->collectionNormalizer->supportsNormalization($this->halCollection, 'jsonhal'));
     }
 
-    public function testNormalize() {
+    public function testNormalize()
+    {
         $expected = [
-            '_links' => ['self' => ['href' => '/dummies'],
-                         'curies' => [
-                             ['name' => 'ap',
-                              'href' => '/doc#section-{rel}',
-                              'templated' => true,
-                             ],
-                         ],
-            ],
-            '_embedded' => ['_links' => ['self' => ['href' => '/dummies/1']]],
+            '_embedded' => [0 => ['name' => 'dummy1']],
         ];
         $this->assertEquals($expected, $this->collectionNormalizer->normalize($this->halCollection, 'jsonhal'));
     }
-
 }

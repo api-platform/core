@@ -88,7 +88,7 @@ final class ItemNormalizer extends AbstractObjectNormalizer
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $data = $this->addContext($this->contextBuilder, $resourceClass, $context, [], $format);
         $context = $this->createContext($resourceClass, $context, $format);
-        
+
         $data['_links']['self']['href'] = $this->iriConverter->getIriFromItem($object);
         $context['jsonhal_normalize'] = true;
 
