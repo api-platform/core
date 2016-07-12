@@ -9,29 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Hal\Serializer;
+namespace ApiPlatform\Core\Tests\Serializer;
 
-use ApiPlatform\Core\Hal\Serializer\JsonHalEncoder;
+use ApiPlatform\Core\Serializer\JsonEncoder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class JsonHalEncoderTest extends \PHPUnit_Framework_TestCase
+class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var JsonHalEncoder
+     * @var JsonEncoder
      */
     private $encoder;
 
     public function setUp()
     {
-        $this->encoder = new JsonHalEncoder();
+        $this->encoder = new JsonEncoder('json');
     }
 
     public function testSupportEncoding()
     {
-        $this->assertTrue($this->encoder->supportsEncoding(JsonHalEncoder::FORMAT));
+        $this->assertTrue($this->encoder->supportsEncoding('json'));
         $this->assertFalse($this->encoder->supportsEncoding('csv'));
     }
 
@@ -39,17 +38,17 @@ class JsonHalEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, JsonHalEncoder::FORMAT));
+        $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
     }
 
     public function testSupportDecoding()
     {
-        $this->assertTrue($this->encoder->supportsDecoding(JsonHalEncoder::FORMAT));
+        $this->assertTrue($this->encoder->supportsDecoding('json'));
         $this->assertFalse($this->encoder->supportsDecoding('csv'));
     }
 
     public function testDecode()
     {
-        $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', JsonHalEncoder::FORMAT));
+        $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', 'json'));
     }
 }

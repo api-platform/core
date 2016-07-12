@@ -52,7 +52,9 @@
             <tag name="serializer.normalizer" />
         </service>
 
-        <service id="api_platform.hal.encoder" class="ApiPlatform\Core\Hal\Serializer\JsonHalEncoder" public="false">
+        <service id="api_platform.hal.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+            <argument>jsonhal</argument>
+
             <tag name="serializer.encoder" />
         </service>
 
