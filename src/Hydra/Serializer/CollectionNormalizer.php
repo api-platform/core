@@ -16,7 +16,8 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
-use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
+use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
+use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -30,6 +31,7 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 final class CollectionNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use ContextTrait;
+    use JsonLdContextTrait;
     use SerializerAwareTrait;
 
     const FORMAT = 'jsonld';
@@ -66,7 +68,7 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
             throw new RuntimeException('The serializer must implement the NormalizerInterface.');
         }
 
-        if (isset($context['jsonld_sub_level'])) {
+        if (isset($context['api_sub_level'])) {
             $data = [];
             foreach ($object as $index => $obj) {
                 $data[$index] = $this->serializer->normalize($obj, $format, $context);
@@ -77,7 +79,7 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-        $context = $this->createContext($resourceClass, $context);
+        $context = $this->initContext($resourceClass, $context);
 
         $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
         $data['@type'] = 'hydra:Collection';

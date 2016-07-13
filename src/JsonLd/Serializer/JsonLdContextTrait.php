@@ -20,30 +20,8 @@ use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
  *
  * @internal
  */
-trait ContextTrait
+trait JsonLdContextTrait
 {
-    /**
-     * Import the context defined in metadata and set some default values.
-     *
-     * @param string $resourceClass
-     * @param array  $context
-     *
-     * @return array
-     */
-    private function createContext(string $resourceClass, array $context) : array
-    {
-        if (isset($context['jsonld_has_context'])) {
-            return $context;
-        }
-
-        return array_merge($context, [
-            'jsonld_has_context' => true,
-            // Don't use hydra:Collection in sub levels
-            'jsonld_sub_level' => true,
-            'resource_class' => $resourceClass,
-        ]);
-    }
-
     /**
      * Updates the given JSON-LD document to add its @context key.
      *
@@ -54,11 +32,13 @@ trait ContextTrait
      *
      * @return array
      */
-    private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array $context, array $data = []) : array
+    private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []) : array
     {
         if (isset($context['jsonld_has_context'])) {
             return $data;
         }
+
+        $context['jsonld_has_context'] = true;
 
         if (isset($context['jsonld_embed_context'])) {
             $data['@context'] = $contextBuilder->getResourceContext($resourceClass);

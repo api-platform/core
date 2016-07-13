@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\JsonLd\Serializer\ContextTrait;
+use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PartialCollectionViewNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    use ContextTrait;
+    use JsonLdContextTrait;
 
     private $collectionNormalizer;
     private $pageParameterName;
@@ -46,7 +46,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Seri
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['jsonld_sub_level'])) {
+        if (isset($context['api_sub_level'])) {
             return $data;
         }
 
