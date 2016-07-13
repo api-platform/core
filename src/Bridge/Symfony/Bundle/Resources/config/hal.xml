@@ -1,0 +1,113 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.hal.entrypoint_builder" class="ApiPlatform\Core\Hal\EntrypointBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.context_builder" />
+        </service>
+
+        <service id="api_platform.hal.context_builder" class="ApiPlatform\Core\Hal\ContextBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.router" />
+        </service>
+
+        <!-- Event listeners -->
+
+        <service id="api_platform.hal.listener.exception.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hal\EventListener\ValidationExceptionListener">
+            <argument type="service" id="api_platform.hal.normalizer.constraint_violation_list" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+
+        <service id="api_platform.hal.listener.exception" class="ApiPlatform\Core\EventListener\ExceptionListener">
+            <argument>api_platform.hal.action.exception</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
+            <tag name="monolog.logger" channel="request" />
+        </service>
+
+        <!-- Serializer -->
+
+        <service id="api_platform.hal.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hal\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument type="service" id="api_platform.router" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api_platform.hal.normalizer.error" class="ApiPlatform\Core\Hal\Serializer\ErrorNormalizer" public="false">
+            <argument type="service" id="api_platform.router" />
+            <argument>%kernel.debug%</argument>
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api_platform.hal.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+            <argument>jsonhal</argument>
+
+            <tag name="serializer.encoder" />
+        </service>
+
+        <service id="api_platform.hal.normalizer.item" class="ApiPlatform\Core\Hal\Serializer\ItemNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.hal.context_builder" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
+        <service id="api_platform.hal.normalizer.collection" class="ApiPlatform\Core\Hal\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="api_platform.hal.context_builder" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument>%api_platform.formats%</argument>
+
+
+            <tag name="serializer.normalizer" priority="50" />
+        </service>
+
+        <service id="api_platform.hal.normalizer.partial_collection_view" class="ApiPlatform\Core\Hal\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hal.normalizer.collection" public="false">
+            <argument type="service" id="api_platform.hal.normalizer.partial_collection_view.inner" />
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+            <argument>%api_platform.formats%</argument>
+
+        </service>
+
+        <service id="api_platform.hal.normalizer.collection_filters" class="ApiPlatform\Core\Hal\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hal.normalizer.collection" public="false">
+            <argument type="service" id="api_platform.hal.normalizer.collection_filters.inner" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.filters" />
+            <argument>%api_platform.formats%</argument>
+
+        </service>
+
+        <!-- Action -->
+
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
+            <argument type="service" id="api_platform.hal.entrypoint_builder" />
+        </service>
+
+        <service id="api_platform.hal.action.exception" class="ApiPlatform\Core\Hal\Action\ExceptionAction">
+            <argument type="service" id="api_platform.hal.normalizer.error" />
+       </service>
+
+    </services>
+
+</container>

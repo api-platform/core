@@ -33,6 +33,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'title' => 'title',
             'description' => 'description',
             'version' => 'version',
+            'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']], 'jsonhal' => ['mime_types' => ['application/hal+json']]],
+
         ],
     ];
 
@@ -174,7 +176,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.title' => 'title',
             'api_platform.description' => 'description',
             'api_platform.version' => 'version',
-            'api_platform.formats' => ['jsonld' => ['application/ld+json']],
+            'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.enabled' => true,
@@ -219,8 +221,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitions = [
             'api_platform.action.placeholder',
+            'api_platform.action.entrypoint',
             'api_platform.item_data_provider',
             'api_platform.collection_data_provider',
+            'api_platform.context_builder',
             'api_platform.filters',
             'api_platform.resource_class_resolver',
             'api_platform.operation_method_resolver',
@@ -279,12 +283,28 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.action.context',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.normalizer.item',
             'api_platform.swagger.documentation_builder',
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.action.documentation',
             'api_platform.swagger.action.ui',
-            'api_platform.hydra.entrypoint_builder',
+            'api_platform.hal.entrypoint_builder',
+            'api_platform.hal.encoder',
+            'api_platform.hal.listener.exception.validation',
+            'api_platform.hal.listener.exception',
+            'api_platform.hal.normalizer.constraint_violation_list',
+            'api_platform.hal.normalizer.error',
+            'api_platform.hal.action.exception',
+            'api_platform.hal.context_builder',
+            'api_platform.hal.normalizer.item',
+            'api_platform.hal.normalizer.collection',
+            'api_platform.hal.normalizer.partial_collection_view',
+            'api_platform.hal.normalizer.collection_filters',
+            'api_platform.hydra.action.documentation',
+            'api_platform.hydra.action.exception',
             'api_platform.hydra.documentation_builder',
+            'api_platform.hydra.entrypoint_builder',
             'api_platform.hydra.listener.response.add_link_header',
             'api_platform.hydra.listener.exception.validation',
             'api_platform.hydra.listener.exception',
@@ -293,9 +313,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.normalizer.collection_filters',
             'api_platform.hydra.normalizer.constraint_violation_list',
             'api_platform.hydra.normalizer.error',
-            'api_platform.hydra.action.entrypoint',
-            'api_platform.hydra.action.documentation',
-            'api_platform.hydra.action.exception',
 
         ];
 

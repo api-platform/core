@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd;
+namespace ApiPlatform\Core\Hypermedia;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -34,7 +34,7 @@ interface ContextBuilderInterface
      *
      * @return array
      */
-    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_PATH) : array;
+    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
 
     /**
      * Builds the JSON-LD context for the entrypoint.

@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd;
+namespace ApiPlatform\Core\Hypermedia;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -57,6 +56,23 @@ final class ContextBuilder implements ContextBuilderInterface
         return [
             '@vocab' => $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL).'#',
             'hydra' => self::HYDRA_NS,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHalContext(string $selfLink) : array
+    {
+        return [
+            '_links' => ['self' => ['href' => $selfLink],
+                 'curies' => [
+                     ['name' => 'ap',
+                      'href' => $this->urlGenerator->generate('api_hal_entrypoint').$this->docUri.'#section-{rel}',
+                      'templated' => true,
+                     ],
+                 ],
+                ],
         ];
     }
 

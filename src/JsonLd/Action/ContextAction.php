@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\JsonLd\Action;
 
-use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd;
+namespace ApiPlatform\Core\Hal;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
@@ -52,11 +52,17 @@ final class ContextBuilder implements ContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL) : array
+    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL, string $linkUrl = '/') : array
     {
         return [
-            '@vocab' => $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL).'#',
-            'hydra' => self::HYDRA_NS,
+            '_links' => ['self' => ['href' => $referenceType ? $this->urlGenerator->generate('api_hal_entrypoint') : $linkUrl],
+                         'curies' => [
+                             ['name' => 'ap',
+                              'href' => $this->urlGenerator->generate('api_hal_entrypoint').$this->docUri.'#section-{rel}',
+                              'templated' => true,
+                             ],
+                         ],
+            ],
         ];
     }
 
@@ -65,20 +71,7 @@ final class ContextBuilder implements ContextBuilderInterface
      */
     public function getEntrypointContext(int $referenceType = UrlGeneratorInterface::ABS_PATH) : array
     {
-        $context = $this->getBaseContext($referenceType);
-
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-            $resourceName = lcfirst($resourceMetadata->getShortName());
-
-            $context[$resourceName] = [
-                '@id' => 'Entrypoint/'.$resourceName,
-                '@type' => '@id',
-            ];
-        }
-
-        return $context;
+        return [];
     }
 
     /**
@@ -86,40 +79,13 @@ final class ContextBuilder implements ContextBuilderInterface
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : array
     {
-        $context = $this->getBaseContext($referenceType, $referenceType);
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $prefixedShortName = sprintf('#%s', $resourceMetadata->getShortName());
-
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
-            if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
-                continue;
-            }
-
-            $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
-
-            if (!$id = $propertyMetadata->getIri()) {
-                $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
-            }
-
-            if (!$propertyMetadata->isReadableLink()) {
-                $context[$convertedName] = [
-                    '@id' => $id,
-                    '@type' => '@id',
-                ];
-            } else {
-                $context[$convertedName] = $id;
-            }
-        }
-
-        return $context;
+        return [];
     }
 
     public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()]);
+        return $this->urlGenerator->generate('api_jsonhal_context', ['shortName' => $resourceMetadata->getShortName()]);
     }
 }

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Serializer;
+namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    use JsonLdContextTrait;
+    use ContextTrait;
     use SerializerAwareTrait {
         setSerializer as baseSetSerializer;
     }
@@ -37,13 +37,15 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
     private $resourceMetadataFactory;
     private $resourceClassResolver;
     private $filters;
+    private $formats;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, FilterCollection $filters)
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, FilterCollection $filters, array $formats)
     {
         $this->collectionNormalizer = $collectionNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->filters = $filters;
+        $this->formats = $formats;
     }
 
     /**
@@ -60,11 +62,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['api_sub_level'])) {
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+
+        if (isset($context['jsonld_sub_level'])) {
             return $data;
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $operationName = $context['collection_operation_name'] ?? null;
@@ -90,9 +93,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
                 $currentFilters[] = $filter;
             }
         }
+        $context = $this->initContext($resourceClass, $context, $format);
 
         if ([] !== $currentFilters) {
-            $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters);
+            if (isset($context['jsonhal_has_context'])) {
+                $data['_links']['self'] = array_merge($data['_links']['self'], $this->getSearch($resourceClass, $requestParts, $currentFilters, $context));
+            }
         }
 
         return $data;
@@ -119,27 +125,19 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Serializ
      *
      * @return array
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters) : array
+    private function getSearch(string $resourceClass, array $parts, array $filters, array $context) : array
     {
         $variables = [];
-        $mapping = [];
         foreach ($filters as $filter) {
             foreach ($filter->getDescription($resourceClass) as $variable => $data) {
                 $variables[] = $variable;
-                $mapping[] = [
-                    '@type' => 'IriTemplateMapping',
-                    'variable' => $variable,
-                    'property' => $data['property'],
-                    'required' => $data['required'],
+            }
+
+            if (isset($context['jsonhal_has_context'])) {
+                return [
+                    'find' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)),
                 ];
             }
         }
-
-        return [
-            '@type' => 'hydra:IriTemplate',
-            'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)),
-            'hydra:variableRepresentation' => 'BasicRepresentation',
-            'hydra:mapping' => $mapping,
-        ];
     }
 }

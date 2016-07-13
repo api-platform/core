@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Serializer;
+namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
-use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -31,20 +29,19 @@ use Symfony\Component\Serializer\SerializerAwareTrait;
 final class CollectionNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     use ContextTrait;
-    use JsonLdContextTrait;
     use SerializerAwareTrait;
-
-    const FORMAT = 'jsonld';
 
     private $contextBuilder;
     private $resourceClassResolver;
     private $iriConverter;
+    private $formats;
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter)
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, array $formats = [])
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
+        $this->formats = $formats;
     }
 
     /**
@@ -52,7 +49,7 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        if (self::FORMAT !== $format) {
+        if (!isset($this->formats[$format])) {
             return false;
         }
 
@@ -67,8 +64,9 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
         if (!$this->serializer instanceof NormalizerInterface) {
             throw new RuntimeException('The serializer must implement the NormalizerInterface.');
         }
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
 
-        if (isset($context['api_sub_level'])) {
+        if (isset($context['jsonhal_sub_level'])) {
             $data = [];
             foreach ($object as $index => $obj) {
                 $data[$index] = $this->serializer->normalize($obj, $format, $context);
@@ -76,20 +74,22 @@ final class CollectionNormalizer implements NormalizerInterface, SerializerAware
 
             return $data;
         }
+        $context = $this->initContext($resourceClass, $context, $format);
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-        $context = $this->initContext($resourceClass, $context);
+        if (isset($context['jsonhal_has_context'])) {
+            $data = $this->contextBuilder->getBaseContext(0, $this->iriConverter->getIriFromResourceClass($resourceClass));
+            $data['_embedded'] = [];
+            foreach ($object as $obj) {
+                $data['_embedded'][] = $this->serializer->normalize($obj, $format, $context);
+            }
+        } else {
+            $data = [];
+            foreach ($object as $index => $obj) {
+                $data[$index] = $this->serializer->normalize($obj, $format, $context);
+            }
 
-        $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
-        $data['@type'] = 'hydra:Collection';
-
-        $data['hydra:member'] = [];
-        foreach ($object as $obj) {
-            $data['hydra:member'][] = $this->serializer->normalize($obj, $format, $context);
+            return $data;
         }
-
-        $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
 
         return $data;
     }

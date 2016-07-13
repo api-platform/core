@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Serializer;
+namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
+use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
@@ -27,17 +27,19 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PartialCollectionViewNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    use JsonLdContextTrait;
+    use ContextTrait;
 
     private $collectionNormalizer;
     private $pageParameterName;
     private $enabledParameterName;
+    private $formats;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination')
+    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName, string $enabledParameterName, array $formats)
     {
         $this->collectionNormalizer = $collectionNormalizer;
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
+        $this->formats = $formats;
     }
 
     /**
@@ -46,9 +48,6 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Seri
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (isset($context['api_sub_level'])) {
-            return $data;
-        }
 
         if ($paginated = $object instanceof PaginatorInterface) {
             $currentPage = $object->getCurrentPage();
@@ -68,23 +67,14 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Seri
             return $data;
         }
 
-        $data['hydra:view'] = [
-            '@id' => $this->getId($parts, $parameters, $paginated ? $currentPage : null),
-            '@type' => 'hydra:PartialCollectionView',
-        ];
-
-        if ($paginated) {
-            $data['hydra:view']['hydra:first'] = $this->getId($parts, $parameters, 1.);
-            $data['hydra:view']['hydra:last'] = $this->getId($parts, $parameters, $lastPage);
-
-            if (1. !== $currentPage) {
-                $data['hydra:view']['hydra:previous'] = $this->getId($parts, $parameters, $currentPage - 1.);
-            }
-
+        if ('jsonhal' === $format) {
             if ($currentPage !== $lastPage) {
-                $data['hydra:view']['hydra:next'] = $this->getId($parts, $parameters, $currentPage + 1.);
+                $data['_links']['self']['next'] = $this->getId($parts, $parameters, $currentPage + 1.);
             }
+
+            return $data;
         }
+
 
         return $data;
     }

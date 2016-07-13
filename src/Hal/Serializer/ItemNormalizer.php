@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\JsonLd\Serializer;
+namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -23,16 +23,15 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Converts between objects and array including JSON-LD and Hydra metadata.
+ * Converts between objects and array including HAL metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ContextTrait;
-    use JsonLdContextTrait;
 
-    const FORMAT = 'jsonld';
+    const FORMAT = 'jsonhal';
 
     private $resourceMetadataFactory;
     private $contextBuilder;
@@ -58,17 +57,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-
         $rawData = parent::normalize($object, $format, $context);
         if (!is_array($rawData)) {
             return $rawData;
         }
 
-        $data['@id'] = $this->iriConverter->getIriFromItem($object);
-        $data['@type'] = ($iri = $resourceMetadata->getIri()) ? $iri : $resourceMetadata->getShortName();
+        $data['_links']['self']['href'] = $this->iriConverter->getIriFromItem($object);
 
         return array_merge($data, $rawData);
     }
@@ -87,8 +81,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['@id']) && !isset($context['object_to_populate'])) {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], true);
+        if (isset($data['_links']['self']['href']) && !isset($context['object_to_populate'])) {
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['_links']['self']['href'], true);
         }
 
         return parent::denormalize($data, $class, $format, $context);
