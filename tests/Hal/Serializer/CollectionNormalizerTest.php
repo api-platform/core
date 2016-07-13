@@ -54,8 +54,6 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->collectionNormalizer = new CollectionNormalizer($contextBuilder->reveal(), $this->resourceClassResolver->reveal(), $iriConverter->reveal(), $formats);
         $this->collectionNormalizer->setSerializer($serializer->reveal());
         $contextBuilder->getBaseContext(0, '/dummies')->willReturn([]);
-
-
     }
 
     public function testSupportsNormalization()
@@ -65,7 +63,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalize()
     {
-        $this->resourceClassResolver->getResourceClass($this->halCollection, null, true)->willReturn('dummy')->shouldBeCalled();;
+        $this->resourceClassResolver->getResourceClass($this->halCollection, null, true)->willReturn('dummy')->shouldBeCalled();
 
         $expected = [
             '_embedded' => [0 => ['name' => 'dummy1']],

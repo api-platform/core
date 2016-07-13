@@ -12,24 +12,14 @@
 namespace ApiPlatform\Core\tests\Hal;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hal\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Hypermedia\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\Swagger\ApiDocumentationBuilder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Prophecy\Argument;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -61,7 +51,6 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyAccess = $this->prophesize(PropertyAccessorInterface::class);
         $nameConverter = $this->prophesize(NameConverterInterface::class);
         $this->itemNormalizer = new ItemNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverter->reveal(), $resourceClassResolverProphecy->reveal(), $contextBuilderProphecy->reveal(), $propertyAccess->reveal(), $nameConverter->reveal(), ['jsonhal' => ['mime_types' => ['application/hal+json']]]);
-
     }
 
     public function testSupportsNormalization()
