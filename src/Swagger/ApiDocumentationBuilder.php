@@ -14,7 +14,6 @@ namespace ApiPlatform\Core\Swagger;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -43,14 +42,13 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $contextBuilder;
     private $resourceClassResolver;
     private $operationMethodResolver;
-    private $urlGenerator;
     private $title;
     private $description;
     private $iriConverter;
     private $version;
     private $mimeTypes = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, IriConverterInterface $iriConverter, array $formats, string $title, string $description, string $version = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, IriConverterInterface $iriConverter, array $formats, string $title, string $description, string $version = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -59,7 +57,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
-        $this->urlGenerator = $urlGenerator;
         $this->title = $title;
         $this->description = $description;
         $this->iriConverter = $iriConverter;
@@ -79,13 +76,13 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     {
         $classes = [];
         $operation = [];
-        $operation['item'] = [];
-        $operation['collection'] = [];
 
         $itemOperationsDocs = [];
         $definitions = [];
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            $operation['item'] = [];
+            $operation['collection'] = [];
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $shortName = $resourceMetadata->getShortName();
@@ -128,7 +125,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 $range = $this->getRange($propertyMetadata);
-                if (null === $range) {
+                if (empty($range)) {
                     continue;
                 }
 
@@ -183,7 +180,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             $doc['info']['description'] = $this->description;
         }
         $doc['info']['version'] = $this->version ?? '0.0.0';
-        $doc['basePath'] = $this->urlGenerator->generate('api_hydra_entrypoint');
         $doc['definitions'] = $definitions;
         $doc['externalDocs'] = ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com'];
         $doc['tags'] = $classes;
@@ -344,7 +340,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     {
         $type = $propertyMetadata->getType();
         if (!$type) {
-            return;
+            return [];
         }
 
         if ($type->isCollection() && $collectionType = $type->getCollectionValueType()) {
@@ -367,7 +363,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             case Type::BUILTIN_TYPE_OBJECT:
                 $className = $type->getClassName();
                 if (null === $className) {
-                    return;
+                    return [];
                 }
 
                 if (is_subclass_of($className, \DateTimeInterface::class)) {
@@ -375,7 +371,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 if (!$this->resourceClassResolver->isResourceClass($className)) {
-                    return;
+                    return [];
                 }
 
                 if ($propertyMetadata->isReadableLink()) {

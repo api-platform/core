@@ -14,7 +14,6 @@ namespace ApiPlatform\Core\tests\Swagger;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -63,12 +62,10 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
 
-        $apiDocumentationBuilder = new ApiDocumentationBuilder($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $urlGeneratorProphecy->reveal(), $iriConverter->reveal(), $formats, $title, $desc);
+        $apiDocumentationBuilder = new ApiDocumentationBuilder($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $iriConverter->reveal(), $formats, $title, $desc);
 
         $expected = [
             'swagger' => '2.0',
@@ -77,7 +74,6 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
                 'description' => 'test ApiGerard',
                 'version' => '0.0.0',
             ],
-            'basePath' => null,
             'definitions' => [
                 'dummy' => [
                     'type' => 'object',
