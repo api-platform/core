@@ -29,6 +29,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     private $collectionNormalizer;
     private $halCollection;
+    private $resourceClassResolver;
 
     public function setUp()
     {
@@ -38,9 +39,11 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->halCollection = ['dummy' => $dummy1];
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
 
-        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->willImplement(NormalizerInterface::class);
+        $this->resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+
         $serializer->normalize($dummy1,
                               'jsonhal',
             ['jsonhal_has_context' => true, 'jsonhal_sub_level' => true, 'resource_class' => 'dummy'])
@@ -48,10 +51,11 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $formats = ['jsonhal' => ['mime_types' => ['application/hal+json']]];
         $iriConverter->getIriFromResourceClass('dummy')->willReturn('/dummies');
-        $this->collectionNormalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolver->reveal(), $iriConverter->reveal(), $formats);
+        $this->collectionNormalizer = new CollectionNormalizer($contextBuilder->reveal(), $this->resourceClassResolver->reveal(), $iriConverter->reveal(), $formats);
         $this->collectionNormalizer->setSerializer($serializer->reveal());
         $contextBuilder->getBaseContext(0, '/dummies')->willReturn([]);
-        $resourceClassResolver->getResourceClass($this->halCollection, null, true)->willReturn('dummy');
+
+
     }
 
     public function testSupportsNormalization()
@@ -61,6 +65,8 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalize()
     {
+        $this->resourceClassResolver->getResourceClass($this->halCollection, null, true)->willReturn('dummy')->shouldBeCalled();;
+
         $expected = [
             '_embedded' => [0 => ['name' => 'dummy1']],
         ];
