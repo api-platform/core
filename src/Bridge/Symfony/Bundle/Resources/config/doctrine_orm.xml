@@ -105,13 +105,13 @@
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.items_per_page_parameter_name%</argument>
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="16" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="8" />
         </service>
 
         <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="8" />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="16" />
         </service>
     </services>
 

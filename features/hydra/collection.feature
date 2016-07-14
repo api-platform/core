@@ -215,6 +215,22 @@ Feature: Collections support
     }
     """
 
+  Scenario: Test presence of next
+    When I send a "GET" request to "/dummies?page=3"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be valid according to this schema:
+  """
+  {
+    "@id":"\/dummies?page=3",
+    "@type":"hydra:PartialCollectionView",
+    "hydra:first":"\/dummies?page=1",
+    "hydra:last":"\/dummies?page=10",
+    "hydra:previous":"\/dummies?page=2",
+    "hydra:next":"\/dummies?page=4"
+  }
+  """
   Scenario: Filter with exact match
     When I send a "GET" request to "/dummies?id=8"
     Then the response status code should be 200
