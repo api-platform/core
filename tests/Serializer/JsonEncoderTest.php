@@ -9,28 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\JsonLd\Serializer;
+namespace ApiPlatform\Core\Tests\Serializer;
 
-use ApiPlatform\Core\JsonLd\Serializer\JsonLdEncoder;
+use ApiPlatform\Core\Serializer\JsonEncoder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class JsonLdEncoderTest extends \PHPUnit_Framework_TestCase
+class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var JsonLdEncoder
+     * @var JsonEncoder
      */
     private $encoder;
 
     public function setUp()
     {
-        $this->encoder = new JsonLdEncoder();
+        $this->encoder = new JsonEncoder('json');
     }
 
     public function testSupportEncoding()
     {
-        $this->assertTrue($this->encoder->supportsEncoding(JsonLdEncoder::FORMAT));
+        $this->assertTrue($this->encoder->supportsEncoding('json'));
         $this->assertFalse($this->encoder->supportsEncoding('csv'));
     }
 
@@ -38,17 +38,17 @@ class JsonLdEncoderTest extends \PHPUnit_Framework_TestCase
     {
         $data = ['foo' => 'bar'];
 
-        $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, JsonLdEncoder::FORMAT));
+        $this->assertEquals('{"foo":"bar"}', $this->encoder->encode($data, 'json'));
     }
 
     public function testSupportDecoding()
     {
-        $this->assertTrue($this->encoder->supportsDecoding(JsonLdEncoder::FORMAT));
+        $this->assertTrue($this->encoder->supportsDecoding('json'));
         $this->assertFalse($this->encoder->supportsDecoding('csv'));
     }
 
     public function testDecode()
     {
-        $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', JsonLdEncoder::FORMAT));
+        $this->assertEquals(['foo' => 'bar'], $this->encoder->decode('{"foo":"bar"}', 'json'));
     }
 }

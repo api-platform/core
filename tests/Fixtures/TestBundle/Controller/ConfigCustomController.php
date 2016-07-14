@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

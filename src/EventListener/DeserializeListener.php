@@ -11,9 +11,9 @@
 
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Serializer\SerializerInterface;
