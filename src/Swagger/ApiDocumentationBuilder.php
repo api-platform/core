@@ -76,13 +76,15 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     {
         $classes = [];
         $operation = [];
-
+        $customOperations = [];
         $itemOperationsDocs = [];
         $definitions = [];
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $operation['item'] = [];
             $operation['collection'] = [];
+            $customOperations['item'] = [];
+            $customOperations['collection'] = [];
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $shortName = $resourceMetadata->getShortName();
@@ -146,25 +148,57 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
             if ($operations = $resourceMetadata->getItemOperations()) {
                 foreach ($operations as $operationName => $itemOperation) {
-                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions);
+                    $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method);
                     $operation['item'] = array_merge($operation['item'], $swaggerOperation);
+                    if ($operationName !== strtolower($method)) {
+                        $customOperations['item'][] = $operationName;
+                    }
                 }
             }
 
             if ($operations = $resourceMetadata->getCollectionOperations()) {
                 foreach ($operations as $operationName => $collectionOperation) {
-                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions);
+                    $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
+                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method);
                     $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
+                    if ($operationName !== strtolower($method)) {
+                        $customOperations['collection'][] = $operationName;
+                    }
                 }
             }
-
             try {
                 $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
                 $itemOperationsDocs[$resourceClassIri] = $operation['collection'];
 
+                if (!empty($customOperations['collection'])) {
+                    foreach ($customOperations['collection'] as $customOperation) {
+                        $path = $resourceMetadata->getCollectionOperationAttribute($customOperation, 'path');
+                        if (null !== $path) {
+                            $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $customOperation);
+                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method);
+
+                            $itemOperationsDocs[$path] = $customSwaggerOperation;
+                        }
+                    }
+                }
+
+
                 $resourceClassIri .= '/{id}';
 
                 $itemOperationsDocs[$resourceClassIri] = $operation['item'];
+
+                if (!empty($customOperations['item'])) {
+                    foreach ($customOperations['item'] as $customOperation) {
+                        $path = $resourceMetadata->getItemOperationAttribute($customOperation, 'path');
+                        if (null !== $path) {
+                            $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $customOperation);
+                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method);
+
+                            $itemOperationsDocs[$path] = $customSwaggerOperation;
+                        }
+                    }
+                }
             } catch (InvalidArgumentException $e) {
             }
 
@@ -191,14 +225,8 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     /**
      * Gets and populates if applicable a Swagger operation.
      */
-    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection, array $properties) : array
+    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection, array $properties, string $method) : array
     {
-        if ($collection) {
-            $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-        } else {
-            $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
-        }
-
         $methodSwagger = strtolower($method);
         $swaggerOperation = $operation['swagger_context'] ?? [];
         $shortName = $resourceMetadata->getShortName();

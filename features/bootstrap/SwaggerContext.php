@@ -61,6 +61,20 @@ final class SwaggerContext implements Context
     }
 
     /**
+     * @Then the Swagger path ":arg1" exist
+     */
+    public function assertThePathExist($path)
+    {
+        try {
+            \PHPUnit_Framework_Assert::assertTrue($this->assertSwaggerPath($path));
+
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The path "%s" exist.', $path));
+        } catch (\Exception $exception) {
+            // an exception must be catched
+        }
+    }
+
+    /**
      * @Then the value of the node ":node" of the Swagger class ":class" is ":value"
      */
     public function assertNodeValueIs($nodeName, $className, $value)
@@ -189,6 +203,21 @@ final class SwaggerContext implements Context
         $classInfos = $this->getClassInfos($className);
 
         return empty($classInfos->{'properties'}) ? $classInfos->{'properties'} : new stdClass();
+    }
+
+    private function assertSwaggerPath(string $expectedPath, bool $getOperation = false): bool
+    {
+        $json = $this->getLastJsonResponse();
+        $validPath = false;
+        if (isset($json->{'paths'}) && $getOperation) {
+            foreach ($json->{'paths'} as $classTitle => $classPath) {
+                if ($expectedPath === $classPath) {
+                    return true;
+                }
+            }
+        }
+
+        return $validPath;
     }
 
     private function getClassInfos(string $className, bool $getOperation = false) : stdClass
