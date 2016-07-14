@@ -27,11 +27,13 @@ final class DeserializeListener
 {
     private $serializer;
     private $serializerContextBuilder;
+    private $formats;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, array $formats)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->formats = $formats;
     }
 
     /**
@@ -62,8 +64,32 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $request->getRequestFormat(), $context
+                $request->getContent(), $attributes['resource_class'], $this->getFormat($request), $context
             )
         );
+    }
+
+    /**
+     * Extracts the format form the Content-Type header and fallback to the format of the response.
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    private function getFormat(Request $request) : string
+    {
+        $format = $request->getContentType();
+        if (null !== $format && isset($this->formats[$format])) {
+            return $format;
+        }
+
+        $requestFormat = $request->getRequestFormat();
+        if (isset($this->formats[$requestFormat])) {
+            return $requestFormat;
+        }
+
+        reset($this->formats);
+
+        return each($this->formats)['key'];
     }
 }
