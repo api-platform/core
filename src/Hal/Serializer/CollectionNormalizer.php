@@ -13,8 +13,8 @@ namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use ApiPlatform\Core\Routing\CollectionRoutingHelper;
 use ApiPlatform\Core\Serializer\ContextTrait;
+use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -65,7 +65,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context, $format);
-        list($parts, $parameters) = CollectionRoutingHelper::parseRequestUri($context['request_uri'] ?? '/', $this->pageParameterName);
+        $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
         $paginated = $isPaginator = $object instanceof PaginatorInterface;
 
         if ($isPaginator) {
@@ -78,20 +78,20 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $data = [
             '_links' => [
-                'self' => CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $paginated ? $currentPage : null),
+                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             ],
         ];
 
         if ($paginated) {
-            $data['_links']['first'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, 1.);
-            $data['_links']['last'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $lastPage);
+            $data['_links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+            $data['_links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
 
             if (1. !== $currentPage) {
-                $data['_links']['prev'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $currentPage - 1.);
+                $data['_links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
             if ($currentPage !== $lastPage) {
-                $data['_links']['next'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $currentPage + 1.);
+                $data['_links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
 

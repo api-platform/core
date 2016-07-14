@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Api;
+namespace ApiPlatform\Core\Util;
 
 use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @internal
  */
-final class RequestAttributesExtractor
+abstract class RequestAttributesExtractor
 {
     /**
      * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not
