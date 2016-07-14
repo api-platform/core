@@ -40,7 +40,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ],
             'name_converter' => null,
             'enable_fos_user' => false,
-            'enable_nelmio_api_doc' => true,
+            'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'collection' => [
                 'order' => null,
