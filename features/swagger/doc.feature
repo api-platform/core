@@ -24,6 +24,7 @@ Feature: Documentation support
     And the Swagger class "ThirdLevel" exist
     And the Swagger class "ParentDummy" not exist
     And the Swagger class "UnknownDummy" not exist
+    And the Swagger path "/override/swagger" exist
     # Properties
     And "id" property doesn't exist for the Swagger class "Dummy"
     And "name" property is required for Swagger class "Dummy"
