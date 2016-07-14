@@ -27,7 +27,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "normalization_context"={"groups"={"overridden_operation_dummy_read"}},
  *         "denormalization_context"={"groups"={"overridden_operation_dummy_write"}}
  *     },
+ *     collectionOperations={
+ *
+ *       "get"={"method"="GET"},
+ *       "post"={"method"="POST"},
+ *       "swagger"= {
+ *          "path"="/override/swagger",
+ *          "method"="GET",
+ *          }
+ *     },
  *     itemOperations={
+ *         "swagger"= {
+ *          "method"="GET",
+ *          },
  *         "get"={
  *             "method"="GET",
  *             "normalization_context"={"groups"={"overridden_operation_dummy_get"}},
