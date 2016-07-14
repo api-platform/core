@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Action;
+namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
 
 /**
- * Generates the JSON-LD API entrypoint.
+ * Generates the API entrypoint.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

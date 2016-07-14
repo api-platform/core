@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Serializer;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Api;
+namespace ApiPlatform\Core\Tests\Util;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,22 +22,20 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
     public function testExtractCollectionAttributes()
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post']);
-        $extactor = new RequestAttributesExtractor();
 
         $this->assertEquals(
             ['resource_class' => 'Foo', 'collection_operation_name' => 'post'],
-            $extactor->extractAttributes($request)
+            RequestAttributesExtractor::extractAttributes($request)
         );
     }
 
     public function testExtractItemAttributes()
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
-        $extactor = new RequestAttributesExtractor();
 
         $this->assertEquals(
             ['resource_class' => 'Foo', 'item_operation_name' => 'get'],
-            $extactor->extractAttributes($request)
+            RequestAttributesExtractor::extractAttributes($request)
         );
     }
 
@@ -47,9 +45,7 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
      */
     public function testResourceClassNotSet()
     {
-        $request = new Request([], [], ['_api_item_operation_name' => 'get']);
-        $extactor = new RequestAttributesExtractor();
-        $extactor->extractAttributes($request);
+        RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_item_operation_name' => 'get']));
     }
 
     /**
@@ -58,8 +54,6 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
      */
     public function testOperationNotSet()
     {
-        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
-        $extactor = new RequestAttributesExtractor();
-        $extactor->extractAttributes($request);
+        RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_resource_class' => 'Foo']));
     }
 }

@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
