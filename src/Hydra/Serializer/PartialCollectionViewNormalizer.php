@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
-use ApiPlatform\Core\Routing\CollectionRoutingHelper;
+use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -58,8 +58,8 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             }
         }
 
-        list($parts, $parameters) = CollectionRoutingHelper::parseRequestUri($context['request_uri'] ?? '/', $this->pageParameterName);
-        $appliedFilters = $parameters;
+        $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
+        $appliedFilters = $parsed['parameters'];
         unset($appliedFilters[$this->enabledParameterName]);
 
         if ([] === $appliedFilters && !$paginated) {
@@ -67,20 +67,20 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         $data['hydra:view'] = [
-            '@id' => CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $paginated ? $currentPage : null),
+            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             '@type' => 'hydra:PartialCollectionView',
         ];
 
         if ($paginated) {
-            $data['hydra:view']['hydra:first'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, 1.);
-            $data['hydra:view']['hydra:last'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $lastPage);
+            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
 
             if (1. !== $currentPage) {
-                $data['hydra:view']['hydra:previous'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $currentPage - 1.);
+                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
             if ($currentPage !== $lastPage) {
-                $data['hydra:view']['hydra:next'] = CollectionRoutingHelper::generateUrl($parts, $parameters, $this->pageParameterName, $currentPage + 1.);
+                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
 

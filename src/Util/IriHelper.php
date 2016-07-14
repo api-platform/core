@@ -9,28 +9,32 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Routing;
+namespace ApiPlatform\Core\Util;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Util\RequestParser;
 
 /**
- * URL generator for collections.
+ * Parses and creates IRIs.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @internal
  */
-final class CollectionRoutingHelper
+abstract class IriHelper
 {
     /**
-     * Parses and standardizes the request URI.
+     * Parses and standardizes the request IRI.
      *
-     * @throws InvalidArgumentException
+     * @param string $iri
+     * @param string $pageParameterName
+     *
+     * @return array
      */
-    public static function parseRequestUri(string $requestUri, string $pageParameterName) : array
+    public static function parseIri(string $iri, string $pageParameterName) : array
     {
-        $parts = parse_url($requestUri);
+        $parts = parse_url($iri);
         if (false === $parts) {
-            throw new InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $requestUri));
+            throw new InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $iri));
         }
 
         $parameters = [];
@@ -41,13 +45,20 @@ final class CollectionRoutingHelper
             unset($parameters[$pageParameterName]);
         }
 
-        return [$parts, $parameters];
+        return ['parts' => $parts, 'parameters' => $parameters];
     }
 
     /**
      * Gets a collection IRI for the given parameters.
+     *
+     * @param array  $parts
+     * @param array  $parameters
+     * @param string $pageParameterName
+     * @param float  $page
+     *
+     * @return string
      */
-    public static function generateUrl(array $parts, array $parameters, string $pageParameterName, float $page = null) : string
+    public static function createIri(array $parts, array $parameters, string $pageParameterName, float $page = null) : string
     {
         if (null !== $page) {
             $parameters[$pageParameterName] = $page;
