@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
@@ -49,17 +50,10 @@ final class SerializeListener
             return;
         }
 
-        if ($request->attributes->get('_api_respond') && !is_object($controllerResult)) {
-            if (!$this->serializer instanceof EncoderInterface) {
-                throw new RuntimeException('The serializer instance must implements the "%s" interface.', EncoderInterface::class);
-            }
-
-            $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));
-        }
-
         try {
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
+            $this->serializeRawData($event, $request, $controllerResult);
             return;
         }
 
@@ -67,5 +61,31 @@ final class SerializeListener
         $request->attributes->set('_api_respond', true);
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
+    }
+
+    /**
+     * Tries to serialize data that are not API resources (e.g. the entrypoint or data returned by a custom controller).
+     *
+     * @param GetResponseForControllerResultEvent $event
+     * @param Request                             $request
+     * @param object                              $controllerResult
+     */
+    private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
+    {
+        if (!$request->attributes->get('_api_respond')) {
+            return;
+        }
+
+        if (is_object($controllerResult)) {
+            $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat()));
+
+            return;
+        }
+
+        if (!$this->serializer instanceof EncoderInterface) {
+            throw new RuntimeException('The serializer instance must implements the "%s" interface.', EncoderInterface::class);
+        }
+
+        $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));
     }
 }

@@ -11,7 +11,8 @@
 
 namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 
 /**
  * Generates the API entrypoint.
@@ -20,15 +21,15 @@ use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
  */
 final class EntrypointAction
 {
-    private $entrypointBuilder;
+    private $resourceNameCollectionFactory;
 
-    public function __construct(EntrypointBuilderInterface $entrypointBuilder)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollection)
     {
-        $this->entrypointBuilder = $entrypointBuilder;
+        $this->resourceNameCollectionFactory = $resourceNameCollection;
     }
 
-    public function __invoke() : array
+    public function __invoke() : ResourceNameCollection
     {
-        return $this->entrypointBuilder->getEntrypoint();
+        return $this->resourceNameCollectionFactory->create();
     }
 }
