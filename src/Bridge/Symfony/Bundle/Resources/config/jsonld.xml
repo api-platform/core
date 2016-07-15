@@ -25,7 +25,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
-            <tag name="serializer.normalizer" />
+            <tag name="serializer.normalizer" priority="8" />
         </service>
 
         <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">

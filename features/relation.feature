@@ -5,7 +5,8 @@ Feature: Relations support
 
   @createSchema
   Scenario: Create a third level
-    When I send a "POST" request to "/third_levels" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/third_levels" with body:
     """
     {"level": 3}
     """
