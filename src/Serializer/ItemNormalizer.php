@@ -18,6 +18,9 @@ namespace ApiPlatform\Core\Serializer;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
+    /**
+     * {@inheritdoc}
+     */
     public function normalize($object, $format = null, array $context = [])
     {
         $rawData = parent::normalize($object, $format, $context);
@@ -32,6 +35,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return array_merge($data, $rawData);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
