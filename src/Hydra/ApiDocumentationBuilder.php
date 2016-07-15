@@ -35,20 +35,18 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
-    private $contextBuilder;
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $urlGenerator;
     private $title;
     private $description;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '')
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '')
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
@@ -404,9 +402,10 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
      */
     private function getContext() : array
     {
-        return array_merge(
-            $this->contextBuilder->getBaseContext(UrlGeneratorInterface::ABS_URL),
+        return
             [
+                '@vocab' => $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL).'#',
+                'hydra' => ContextBuilderInterface::HYDRA_NS,
                 'rdf' => ContextBuilderInterface::RDF_NS,
                 'rdfs' => ContextBuilderInterface::RDFS_NS,
                 'xmls' => ContextBuilderInterface::XML_NS,
@@ -416,7 +415,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
                 'expects' => ['@id' => 'hydra:expects', '@type' => '@id'],
                 'returns' => ['@id' => 'hydra:returns', '@type' => '@id'],
-            ]
-        );
+            ];
     }
 }

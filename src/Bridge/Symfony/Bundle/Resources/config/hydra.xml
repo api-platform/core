@@ -17,7 +17,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.router" />
