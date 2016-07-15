@@ -52,8 +52,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     And the header "Content-Type" should be equal to "application/xml"
     And the response should be equal to
     """
-<?xml version="1.0"?>
-<response><name>My Overridden Operation Dummy</name><alias/><description>Gerard</description></response>
+    <?xml version="1.0"?>
+    <response><id>/overridden_operation_dummies/1</id><name>My Overridden Operation Dummy</name><alias/><description>Gerard</description></response>
     """
 
   Scenario: Get a not found exception
@@ -69,11 +69,11 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
     {
      "@context": "/contexts/OverriddenOperationDummy",
-     "@id": "\/overridden_operation_dummies",
+     "@id": "/overridden_operation_dummies",
      "@type": "hydra:Collection",
      "hydra:member": [
           {
-             "@id": "\/overridden_operation_dummies\/1",
+             "@id": "/overridden_operation_dummies/1",
              "@type": "OverriddenOperationDummy",
              "name": "My Overridden Operation Dummy",
              "alias": null,
