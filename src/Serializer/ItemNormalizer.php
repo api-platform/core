@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Serializer;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemNormalizer extends AbstractItemNormalizer
+final class ItemNormalizer extends AbstractItemNormalizer
 {
     public function normalize($object, $format = null, array $context = [])
     {
