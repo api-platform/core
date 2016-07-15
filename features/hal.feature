@@ -5,21 +5,24 @@ Feature: HAL support
 
   @createSchema
   Scenario: Create a third level
-    When I send a "POST" request to "/third_levels" with body:
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/third_levels" with body:
     """
     {"level": 3}
     """
     Then the response status code should be 201
 
   Scenario: Create a related dummy
-    When I send a "POST" request to "/related_dummies" with body:
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/related_dummies" with body:
     """
     {"thirdLevel": "/third_levels/1"}
     """
     Then the response status code should be 201
 
   Scenario: Create a dummy with relations
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Dummy with relations",
@@ -68,12 +71,11 @@ Feature: HAL support
 
   Scenario: Update a resource
     When I add "Accept" header equal to "application/hal+json"
+    And I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/dummies/1" with body:
-      """
-      {
-        "name": "A nice dummy"
-      }
-      """
+    """
+    {"name": "A nice dummy"}
+    """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/hal+json"
@@ -106,7 +108,8 @@ Feature: HAL support
     """
 
   Scenario: Embed a relation in a parent object
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/relation_embedders" with body:
       """
       {
         "related": "/related_dummies/1"

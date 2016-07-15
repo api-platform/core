@@ -46,6 +46,17 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
+        <service id="api_platform.serializer.normalizer.item" class="ApiPlatform\Core\Serializer\ItemNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" />
+        </service>
+
         <!-- Resource path naming strategies -->
 
         <service id="api_platform.naming.resource_path_naming_strategy.underscore" class="ApiPlatform\Core\Naming\UnderscoreResourcePathNamingStrategy" public="false" />
