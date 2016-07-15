@@ -289,6 +289,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.action.documentation',
             'api_platform.swagger.action.ui',
             'api_platform.hal.encoder',
+            'api_platform.hal.normalizer.resource_name_collection',
             'api_platform.hal.normalizer.item',
             'api_platform.hal.normalizer.collection',
             'api_platform.hydra.action.documentation',

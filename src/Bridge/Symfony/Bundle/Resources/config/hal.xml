@@ -5,11 +5,25 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <!-- Serializer -->
         <service id="api_platform.hal.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
             <argument>jsonhal</argument>
 
             <tag name="serializer.encoder" />
+        </service>
+
+        <service id="api_platform.hal.normalizer.resource_name_collection" class="ApiPlatform\Core\Hal\Serializer\ResourceNameCollectionNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.router" />
+
+            <tag name="serializer.normalizer" priority="32" />
+        </service>
+
+        <service id="api_platform.hal.normalizer.collection" class="ApiPlatform\Core\Hal\Serializer\CollectionNormalizer" public="false">
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+
+            <tag name="serializer.normalizer" priority="16" />
         </service>
 
         <service id="api_platform.hal.normalizer.item" class="ApiPlatform\Core\Hal\Serializer\ItemNormalizer" public="false">
@@ -22,13 +36,6 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="8" />
-        </service>
-
-        <service id="api_platform.hal.normalizer.collection" class="ApiPlatform\Core\Hal\Serializer\CollectionNormalizer" public="false">
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
-
-            <tag name="serializer.normalizer" priority="50" />
         </service>
     </services>
 
