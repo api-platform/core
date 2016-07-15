@@ -259,6 +259,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
             'api_platform.listener.view.respond',
+            'api_platform.serializer.normalizer.item',
             'api_platform.serializer.context_builder',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.collection_data_provider',

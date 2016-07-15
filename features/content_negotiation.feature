@@ -17,7 +17,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></response>
+    <response><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></response>
     """
 
   Scenario:  Retrieve a collection in XML
@@ -28,7 +28,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><item key="0"><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></item></response>
+    <response><item key="0"><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></item></response>
     """
 
   Scenario:  Retrieve a collection in XML using the .xml URL
@@ -38,7 +38,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><item key="0"><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></item></response>
+    <response><item key="0"><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></item></response>
     """
 
   Scenario:  Retrieve a collection in JSON
@@ -51,18 +51,18 @@ Feature: Content Negotiation support
     """
     [
       {
-        "id": 1,
-        "name": "XML!",
-        "alias": null,
+        "id": "/dummies/1",
         "description": null,
+        "dummy": null,
+        "dummyBoolean": null,
         "dummyDate": null,
         "dummyPrice": null,
-        "jsonData": [],
         "relatedDummy": null,
-        "dummyBoolean": null,
-        "dummy": null,
         "relatedDummies": [],
-        "nameConverted": null
+        "jsonData": [],
+        "name_converted": null,
+        "name": "XML!",
+        "alias": null
       }
     ]
     """
@@ -79,7 +79,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><id>2</id><name>Sent in JSON</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></response>
+    <response><id>/dummies/2</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>Sent in JSON</name><alias/></response>
     """
 
   @dropSchema
