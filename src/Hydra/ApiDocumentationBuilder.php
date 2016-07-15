@@ -248,7 +248,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             $doc['hydra:description'] = $this->description;
         }
 
-        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_hydra_entrypoint');
+        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
         $doc['hydra:supportedClass'] = $classes;
 
         return $doc;

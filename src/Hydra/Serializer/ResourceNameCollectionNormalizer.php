@@ -9,22 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra;
+namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * {@inheritdoc}
+ * Normalizes the API entrypoint.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class EntrypointBuilder implements EntrypointBuilderInterface
+final class ResourceNameCollectionNormalizer implements NormalizerInterface
 {
+    const FORMAT = 'jsonld';
+
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $iriConverter;
@@ -41,11 +44,11 @@ final class EntrypointBuilder implements EntrypointBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntrypoint(string $referenceType = UrlGeneratorInterface::ABS_PATH) : array
+    public function normalize($object, $format = null, array $context = array())
     {
         $entrypoint = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint'], $referenceType),
-            '@id' => $this->urlGenerator->generate('api_hydra_entrypoint', [], $referenceType),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
+            '@id' => $this->urlGenerator->generate('api_entrypoint'),
             '@type' => 'Entrypoint',
         ];
 
@@ -63,5 +66,13 @@ final class EntrypointBuilder implements EntrypointBuilderInterface
         }
 
         return $entrypoint;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return self::FORMAT === $format && $data instanceof ResourceNameCollection;
     }
 }
