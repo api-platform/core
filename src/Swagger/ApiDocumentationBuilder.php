@@ -180,7 +180,6 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                     }
                 }
 
-
                 $resourceClassIri .= '/{id}';
 
                 $itemOperationsDocs[$resourceClassIri] = $operation['item'];

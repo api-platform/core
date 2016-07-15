@@ -4,6 +4,15 @@ Feature: HAL support
   I need to be able to retrieve valid HAL responses.
 
   @createSchema
+  Scenario: Retrieve the API entrypoint
+    When I add "Accept" header equal to "application/hal+json"
+    And I send a "GET" request to "/"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/hal+json"
+    And the JSON node "_links.self.href" should be equal to "/"
+    And the JSON node "_links.dummy.href" should be equal to "/dummies"
+
   Scenario: Create a third level
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/third_levels" with body:

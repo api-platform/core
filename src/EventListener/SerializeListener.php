@@ -54,6 +54,7 @@ final class SerializeListener
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             $this->serializeRawData($event, $request, $controllerResult);
+
             return;
         }
 

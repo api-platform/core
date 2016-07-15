@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Serializer;
+namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ResourceNameCollectionNormalizer implements NormalizerInterface
 {
-    const FORMAT = 'jsonld';
+    const FORMAT = 'jsonhal';
 
     private $resourceMetadataFactory;
     private $iriConverter;
@@ -43,11 +43,7 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $entrypoint = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
-            '@id' => $this->urlGenerator->generate('api_entrypoint'),
-            '@type' => 'Entrypoint',
-        ];
+        $entrypoint = ['_links' => ['self' => ['href' => $this->urlGenerator->generate('api_entrypoint')]]];
 
         foreach ($object as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -56,7 +52,7 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
                 continue;
             }
             try {
-                $entrypoint[lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+                $entrypoint['_links'][lcfirst($resourceMetadata->getShortName())]['href'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
             } catch (InvalidArgumentException $ex) {
                 // Ignore resources without GET operations
             }
