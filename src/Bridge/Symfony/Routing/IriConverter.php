@@ -119,7 +119,8 @@ final class IriConverter implements IriConverterInterface
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            if (!$propertyMetadata->isIdentifier()) {
+            $identifier = $propertyMetadata->isIdentifier();
+            if (null === $identifier || false === $identifier) {
                 continue;
             }
 
@@ -180,15 +181,10 @@ final class IriConverter implements IriConverterInterface
             $methods = $route->getMethods();
 
             if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods))) {
-                $found = true;
-                break;
+                return $routeName;
             }
         }
 
-        if (!isset($found)) {
-            throw new InvalidArgumentException(sprintf('No route associated with the type "%s".', $resourceClass));
-        }
-
-        return $routeName;
+        throw new InvalidArgumentException(sprintf('No route associated with the type "%s".', $resourceClass));
     }
 }

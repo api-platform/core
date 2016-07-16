@@ -82,7 +82,7 @@ final class ApiPlatformParser implements ParserInterface
         list($io, $resourceClass, $operationName) = explode(':', $item['class'], 3);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $resourceClass, $io, $operationName);
+        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $resourceClass, $operationName);
         if (!empty($classOperations['serializer_groups'])) {
             return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, [], $classOperations);
         }
@@ -123,26 +123,27 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @param ResourceMetadata $resourceMetadata
      * @param string           $resourceClass
-     * @param string           $io
      * @param string[]         $visited
      *
      * @return array
      */
-    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, string $operationName, array $visited = []) : array
+    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationName, array $visited = []) : array
     {
         $visited[] = $resourceClass;
 
-        $options = [];
+        $operation = [
+            'denormalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', [])),
+            'normalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', [])),
+        ];
 
-        $operation['denormalization_context'] = array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', []));
-        $operation['normalization_context'] = array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', []));
-
-        $options['serializer_groups'] = !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [];
+        $options = [
+            'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
+        ];
 
         $options['serializer_groups'] = array_merge(
-                $options['serializer_groups'],
-                !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
-            );
+            $options['serializer_groups'],
+            !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
+        );
 
         return $options;
     }

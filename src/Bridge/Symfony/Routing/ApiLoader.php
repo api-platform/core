@@ -69,12 +69,16 @@ final class ApiLoader extends Loader
                 throw new InvalidResourceException(sprintf('Resource %s has no short name defined.', $resourceClass));
             }
 
-            foreach ($resourceMetadata->getCollectionOperations() as $operationName => $operation) {
-                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, true);
+            if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
+                foreach ($collectionOperations as $operationName => $operation) {
+                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, true);
+                }
             }
 
-            foreach ($resourceMetadata->getItemOperations() as $operationName => $operation) {
-                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, false);
+            if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
+                foreach ($itemOperations as $operationName => $operation) {
+                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, false);
+                }
             }
         }
 

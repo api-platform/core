@@ -16,6 +16,7 @@ use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
+use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -55,16 +56,12 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetAnnotations()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([
-            Dummy::class,
-        ]))->shouldBeCalled();
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
         $resourceNameCollectionFactory = $resourceNameCollectionFactoryProphecy->reveal();
 
         $apiDocumentationBuilderProphecy = $this->prophesize(NormalizerInterface::class);
         $hydraDoc = $this->getHydraDoc();
-        $apiDocumentationBuilderProphecy->normalize(new ResourceNameCollection([
-            Dummy::class,
-        ]))->willReturn($hydraDoc)->shouldBeCalled();
+        $apiDocumentationBuilderProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
         $apiDocumentationBuilder = $apiDocumentationBuilderProphecy->reveal();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
