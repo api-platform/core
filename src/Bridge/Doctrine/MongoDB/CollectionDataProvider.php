@@ -52,8 +52,7 @@ class CollectionDataProvider implements CollectionDataProviderInterface
             }
         }
 
-        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-        if (null === $manager) {
+        if (null === ($manager = $this->managerRegistry->getManagerForClass($resourceClass))) {
             throw new ResourceClassNotSupportedException();
         }
 

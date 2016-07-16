@@ -122,6 +122,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc')->shouldBeCalled();
+
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -134,6 +136,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc')->shouldBeCalled();
+
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['name_converter' => $nameConverterId]]), $containerBuilder);
@@ -148,6 +152,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc')->shouldBeCalled();
+
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
@@ -163,6 +169,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc')->shouldBeCalled();
+
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
