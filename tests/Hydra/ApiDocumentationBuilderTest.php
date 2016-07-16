@@ -61,7 +61,7 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $urlGenerator->generate('api_hydra_doc')->willReturn('/doc')->shouldBeCalled(1);
-        $urlGenerator->generate('api_hydra_entrypoint')->willReturn('/')->shouldBeCalled(1);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
 
         $urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL)->willReturn('/doc')->shouldBeCalled(1);
 
