@@ -53,23 +53,20 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $formats = [];
-        foreach ($config['formats'] as $format => $value) {
-            foreach ($value['mime_types'] as $mimeType) {
-                $formats[$format][] = $mimeType;
-            }
-        }
-
         $container->setAlias('api_platform.naming.resource_path_naming_strategy', $config['naming']['resource_path_naming_strategy']);
 
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
 
+        $formats = $this->getFormats($config['formats']);
+        $errorFormats = $this->getFormats($config['error_formats']);
+
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
         $container->setParameter('api_platform.formats', $formats);
+        $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
         $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
@@ -97,6 +94,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (isset($formats['jsonhal'])) {
             $loader->load('hal.xml');
+        }
+
+        if (isset($errorFormats['jsonproblem'])) {
+            $loader->load('problem.xml');
         }
 
         $this->registerAnnotationLoaders($container);
@@ -178,5 +179,24 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->replaceArgument(0, $xmlResources);
+    }
+
+    /**
+     * Normalizes the format from config to the one accepted by Symfony HttpFoundation.
+     *
+     * @param array $configFormats
+     *
+     * @return array
+     */
+    private function getFormats(array $configFormats) : array
+    {
+        $formats = [];
+        foreach ($configFormats as $format => $value) {
+            foreach ($value['mime_types'] as $mimeType) {
+                $formats[$format][] = $mimeType;
+            }
+        }
+
+        return $formats;
     }
 }

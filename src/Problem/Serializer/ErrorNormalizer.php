@@ -9,28 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\Serializer;
+namespace ApiPlatform\Core\Problem\Serializer;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Converts {@see \Exception} or {@see \Symfony\Component\Debug\Exception\FlattenException} to a Hydra error representation.
+ * Normalizes errors according to the API Problem spec (RFC 7807).
+ *
+ * @see https://tools.ietf.org/html/rfc7807
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Samuel ROZE <samuel.roze@gmail.com>
  */
 final class ErrorNormalizer implements NormalizerInterface
 {
-    const FORMAT = 'jsonld';
+    const FORMAT = 'jsonproblem';
 
-    private $urlGenerator;
     private $debug;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false)
+    public function __construct(bool $debug = false)
     {
-        $this->urlGenerator = $urlGenerator;
         $this->debug = $debug;
     }
 
@@ -45,10 +43,9 @@ final class ErrorNormalizer implements NormalizerInterface
         }
 
         $data = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
-            '@type' => 'Error',
-            'hydra:title' => $context['title'] ?? 'An error occurred',
-            'hydra:description' => $message ?? (string) $object,
+            'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => $context['title'] ?? 'An error occurred',
+            'detail' => $message ?? (string) $object,
         ];
 
         if (isset($trace)) {

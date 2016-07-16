@@ -35,7 +35,6 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
     {
         $title = 'Test Api';
         $desc = 'test ApiGerard';
-        $formats = ['jsonld' => ['application/ld+json']];
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummy' => 'dummy']))->shouldBeCalled();
@@ -60,8 +59,8 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
         $urlGenerator->generate('api_hydra_doc')->willReturn('/doc')->shouldBeCalled(1);
-        $urlGenerator->generate('api_hydra_entrypoint')->willReturn('/')->shouldBeCalled(1);
 
         $urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL)->willReturn('/doc')->shouldBeCalled(1);
 
