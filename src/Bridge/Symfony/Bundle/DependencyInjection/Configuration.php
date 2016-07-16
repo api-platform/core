@@ -68,7 +68,10 @@ final class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        $this->addFormatSection($rootNode, 'formats', ['jsonld' => ['mime_types' => ['application/ld+json']]]);
+        $this->addFormatSection($rootNode, 'formats', [
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+            'json' => ['mime_types' => ['application/json']], // Enabled by default to have Swagger support
+        ]);
         $this->addFormatSection($rootNode, 'error_formats', [
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
