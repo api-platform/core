@@ -11,11 +11,11 @@
 
 namespace ApiPlatform\Core\Hal\Serializer;
 
+use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ResourceNameCollectionNormalizer implements NormalizerInterface
+final class EntrypointNormalizer implements NormalizerInterface
 {
     const FORMAT = 'jsonhal';
 
@@ -45,7 +45,7 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
     {
         $entrypoint = ['_links' => ['self' => ['href' => $this->urlGenerator->generate('api_entrypoint')]]];
 
-        foreach ($object as $resourceClass) {
+        foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if (empty($resourceMetadata->getCollectionOperations())) {
@@ -66,6 +66,6 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && $data instanceof ResourceNameCollection;
+        return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 }

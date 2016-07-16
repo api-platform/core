@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Swagger;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Creates a machine readable Swagger API documentation.
@@ -30,9 +31,10 @@ use Symfony\Component\PropertyInfo\Type;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
+final class DocumentationNormalizer implements NormalizerInterface
 {
     const SWAGGER_VERSION = '2.0';
+    const FORMAT = 'json';
 
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
@@ -40,13 +42,9 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $propertyMetadataFactory;
     private $resourceClassResolver;
     private $operationMethodResolver;
-    private $title;
-    private $description;
     private $iriConverter;
-    private $version;
-    private $mimeTypes = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, IriConverterInterface $iriConverter, array $formats, string $title, string $description, string $version = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, IriConverterInterface $iriConverter)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -54,22 +52,13 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
-        $this->title = $title;
-        $this->description = $description;
         $this->iriConverter = $iriConverter;
-        $this->version = $version;
-
-        foreach ($formats as $format => $mimeTypes) {
-            foreach ($mimeTypes as $mimeType) {
-                $this->mimeTypes[] = $mimeType;
-            }
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getApiDocumentation() : array
+    public function normalize($object, $format = null, array $context = [])
     {
         $classes = [];
         $operation = [];
@@ -77,7 +66,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $itemOperationsDocs = [];
         $definitions = [];
 
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+        foreach ($object->getResourceNameCollection() as $resourceClass) {
             $operation['item'] = [];
             $operation['collection'] = [];
             $customOperations['item'] = [];
@@ -146,7 +135,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             if ($operations = $resourceMetadata->getItemOperations()) {
                 foreach ($operations as $operationName => $itemOperation) {
                     $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
-                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method);
+                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method, $object->getMimeTypes());
                     $operation['item'] = array_merge($operation['item'], $swaggerOperation);
                     if ($operationName !== strtolower($method)) {
                         $customOperations['item'][] = $operationName;
@@ -157,7 +146,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             if ($operations = $resourceMetadata->getCollectionOperations()) {
                 foreach ($operations as $operationName => $collectionOperation) {
                     $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method);
+                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
                     $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
                     if ($operationName !== strtolower($method)) {
                         $customOperations['collection'][] = $operationName;
@@ -173,7 +162,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         $path = $resourceMetadata->getCollectionOperationAttribute($customOperation, 'path');
                         if (null !== $path) {
                             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $customOperation);
-                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method);
+                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
 
                             $itemOperationsDocs[$path] = $customSwaggerOperation;
                         }
@@ -189,7 +178,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                         $path = $resourceMetadata->getItemOperationAttribute($customOperation, 'path');
                         if (null !== $path) {
                             $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $customOperation);
-                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method);
+                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
 
                             $itemOperationsDocs[$path] = $customSwaggerOperation;
                         }
@@ -202,14 +191,14 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         }
 
         $doc['swagger'] = self::SWAGGER_VERSION;
-        if ('' !== $this->title) {
-            $doc['info']['title'] = $this->title;
+        if ('' !== $object->getTitle()) {
+            $doc['info']['title'] = $object->getTitle();
         }
 
-        if ('' !== $this->description) {
-            $doc['info']['description'] = $this->description;
+        if ('' !== $object->getDescription()) {
+            $doc['info']['description'] = $object->getDescription();
         }
-        $doc['info']['version'] = $this->version ?? '0.0.0';
+        $doc['info']['version'] = $object->getVersion() ?? '0.0.0';
         $doc['definitions'] = $definitions;
         $doc['externalDocs'] = ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com'];
         $doc['tags'] = $classes;
@@ -221,7 +210,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     /**
      * Gets and populates if applicable a Swagger operation.
      */
-    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection, array $properties, string $method) : array
+    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection, array $properties, string $method, array $mimeTypes) : array
     {
         $methodSwagger = strtolower($method);
         $swaggerOperation = $operation['swagger_context'] ?? [];
@@ -231,7 +220,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
 
         switch ($method) {
             case 'GET':
-                $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+                $swaggerOperation[$methodSwagger]['produces'] = $mimeTypes;
 
                 if ($collection) {
                     if (!isset($swaggerOperation[$methodSwagger]['title'])) {
@@ -271,7 +260,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 break;
 
             case 'POST':
-                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $mimeTypes;
 
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Creates a %s resource.', $shortName);
@@ -299,7 +288,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             break;
 
             case 'PUT':
-                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $this->mimeTypes;
+                $swaggerOperation[$methodSwagger]['consumes'] = $swaggerOperation[$methodSwagger]['produces'] = $mimeTypes;
 
                 if (!isset($swaggerOperation[$methodSwagger]['title'])) {
                     $swaggerOperation[$methodSwagger]['summary'] = sprintf('Replaces the %s resource.', $shortName);
@@ -407,5 +396,13 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             default:
                 return ['complex' => false, 'value' => 'null'];
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return self::FORMAT === $format && $data instanceof Documentation;
     }
 }

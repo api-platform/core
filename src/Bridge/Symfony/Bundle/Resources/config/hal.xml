@@ -11,7 +11,7 @@
             <tag name="serializer.encoder" />
         </service>
 
-        <service id="api_platform.hal.normalizer.resource_name_collection" class="ApiPlatform\Core\Hal\Serializer\ResourceNameCollectionNormalizer" public="false">
+        <service id="api_platform.hal.normalizer.entrypoint" class="ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />

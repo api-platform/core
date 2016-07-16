@@ -4,7 +4,7 @@ Feature: Documentation support
   I need to know Swagger specifications of objects I send and receive
 
   Scenario: Retrieve the API vocabulary
-    Given I send a "GET" request to "/swagger"
+    Given I send a "GET" request to "/apidoc.json"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
