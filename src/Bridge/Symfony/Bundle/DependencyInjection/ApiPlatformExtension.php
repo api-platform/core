@@ -60,12 +60,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $formats = $this->getFormats($config['formats']);
+        $errorFormats = $this->getFormats($config['error_formats']);
 
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
         $container->setParameter('api_platform.formats', $formats);
-        $container->setParameter('api_platform.error_formats', $this->getFormats($config['error_formats']));
+        $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
         $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
@@ -93,6 +94,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (isset($formats['jsonhal'])) {
             $loader->load('hal.xml');
+        }
+
+        if (isset($errorFormats['jsonproblem'])) {
+            $loader->load('problem.xml');
         }
 
         $this->registerAnnotationLoaders($container);
