@@ -69,7 +69,10 @@ final class Configuration implements ConfigurationInterface
             ->end();
 
         $this->addFormatSection($rootNode, 'formats', ['jsonld' => ['mime_types' => ['application/ld+json']]]);
-        $this->addFormatSection($rootNode, 'error_formats', ['jsonld' => ['mime_types' => ['application/ld+json']]]);
+        $this->addFormatSection($rootNode, 'error_formats', [
+            'jsonproblem' => ['mime_types' => ['application/problem+json']],
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+        ]);
 
         return $treeBuilder;
     }

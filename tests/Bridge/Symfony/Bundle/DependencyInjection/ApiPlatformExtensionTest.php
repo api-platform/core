@@ -177,7 +177,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.description' => 'description',
             'api_platform.version' => 'version',
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
-            'api_platform.error_formats' => ['jsonld' => ['application/ld+json']],
+            'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.enabled' => true,
@@ -305,7 +305,9 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hydra.normalizer.collection_filters',
             'api_platform.hydra.normalizer.constraint_violation_list',
             'api_platform.hydra.normalizer.error',
-
+            'api_platform.problem.encoder',
+            'api_platform.problem.normalizer.constraint_violation_list',
+            'api_platform.problem.normalizer.error',
         ];
 
         foreach ($definitions as $definition) {
