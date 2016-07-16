@@ -38,7 +38,7 @@ final class AddLinkHeaderListener
     {
         $event->getResponse()->headers->set('Link', sprintf(
             '<%s>; rel="%sapiDocumentation"',
-            $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL), ContextBuilder::HYDRA_NS)
+            $this->urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL), ContextBuilder::HYDRA_NS)
         );
     }
 }

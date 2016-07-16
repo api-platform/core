@@ -5,15 +5,15 @@ Feature: Documentation support
 
   Scenario: Checks that the Link pointing to the Hydra documentation is set
     Given I send a "GET" request to "/"
-    Then the header "Link" should be equal to '<http://example.com/apidoc>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
+    Then the header "Link" should be equal to '<http://example.com/apidoc.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
 
   Scenario: Retrieve the API vocabulary
-    Given I send a "GET" request to "/apidoc"
+    Given I send a "GET" request to "/apidoc.jsonld"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     # Context
-    And the JSON node "@context.@vocab" should be equal to "http://example.com/apidoc#"
+    And the JSON node "@context.@vocab" should be equal to "http://example.com/apidoc.jsonld#"
     And the JSON node "@context.hydra" should be equal to "http://www.w3.org/ns/hydra/core#"
     And the JSON node "@context.rdf" should be equal to "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     And the JSON node "@context.rdfs" should be equal to "http://www.w3.org/2000/01/rdf-schema#"
@@ -30,7 +30,7 @@ Feature: Documentation support
     And the JSON node "@context.returns.@id" should be equal to "hydra:returns"
     And the JSON node "@context.returns.@type" should be equal to "@id"
     # Root properties
-    And the JSON node "@id" should be equal to "/apidoc"
+    And the JSON node "@id" should be equal to "/apidoc.jsonld"
     And the JSON node "hydra:title" should be equal to "My Dummy API"
     And the JSON node "hydra:description" should be equal to "This is a test API."
     And the JSON node "hydra:entrypoint" should be equal to "/"

@@ -14,7 +14,8 @@ namespace ApiPlatform\Core\Tests\Hydra;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Hydra\ApiDocumentationBuilder;
+use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Hydra\DocumentationNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -29,15 +30,16 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
+class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
 {
-    public function testGetApiDocumention()
+    public function testNormalize()
     {
         $title = 'Test Api';
         $desc = 'test ApiGerard';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version, []);
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummy' => 'dummy']))->shouldBeCalled();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -60,20 +62,18 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalled(1);
-        $urlGenerator->generate('api_hydra_doc')->willReturn('/doc')->shouldBeCalled(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalled(1);
 
-        $urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL)->willReturn('/doc')->shouldBeCalled(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalled(1);
 
-        $apiDocumentationBuilder = new ApiDocumentationBuilder(
+        $apiDocumentationBuilder = new DocumentationNormalizer(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $urlGenerator->reveal(),
-            $title,
-            $desc);
+            $urlGenerator->reveal());
 
         $expected = [
             '@context' => [
@@ -246,6 +246,6 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
             'hydra:entrypoint' => '/',
 
         ];
-        $this->assertEquals($expected, $apiDocumentationBuilder->getApiDocumentation());
+        $this->assertEquals($expected, $apiDocumentationBuilder->normalize($documentation));
     }
 }
