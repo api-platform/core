@@ -26,8 +26,9 @@ final class Documentation
     private $version;
     private $mimeTypes = [];
 
-    public function __construct(string $title = '', string $description = '', string $version = '', array $formats = [])
+    public function __construct(ResourceNameCollection $resourceNameCollection, string $title = '', string $description = '', string $version = '', array $formats = [])
     {
+        $this->resourceNameCollection = $resourceNameCollection;
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
@@ -36,13 +37,6 @@ final class Documentation
                 $this->mimeTypes[] = $mimeType;
             }
         }
-    }
-
-    public function create($resourceNameCollection): Documentation
-    {
-        $this->resourceNameCollection = $resourceNameCollection;
-
-        return $this;
     }
 
     public function getMimeTypes(): array

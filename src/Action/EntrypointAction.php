@@ -21,17 +21,15 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
  */
 final class EntrypointAction
 {
-    private $entrypoint;
     private $resourceNameCollectionFactory;
 
-    public function __construct(Entrypoint $entrypoint, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
-        $this->entrypoint = $entrypoint;
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
     public function __invoke() : Entrypoint
     {
-        return $this->entrypoint->create($this->resourceNameCollectionFactory->create());
+        return new Entrypoint($this->resourceNameCollectionFactory->create());
     }
 }

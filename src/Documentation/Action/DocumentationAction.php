@@ -21,17 +21,23 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
  */
 final class DocumentationAction
 {
-    private $documentation;
     private $resourceNameCollectionFactory;
+    private $title;
+    private $description;
+    private $version;
+    private $formats = [];
 
-    public function __construct(Documentation $documentation, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', array $formats = [])
     {
-        $this->documentation = $documentation;
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        $this->title = $title;
+        $this->description = $description;
+        $this->version = $version;
+        $this->formats = $formats;
     }
 
     public function __invoke() : Documentation
     {
-        return $this->documentation->create($this->resourceNameCollectionFactory->create());
+        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
     }
 }

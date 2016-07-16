@@ -21,7 +21,10 @@
         <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">
             <argument type="service" id="api_platform.swagger.normalizer.documentation" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.documentation" />
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+            <argument>%api_platform.version%</argument>
+            <argument>%api_platform.formats%</argument>
             <tag name="console.command" />
         </service>
 

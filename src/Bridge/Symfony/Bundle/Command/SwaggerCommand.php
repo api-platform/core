@@ -27,14 +27,20 @@ final class SwaggerCommand extends Command
 {
     private $documentationNormalizer;
     private $resourceNameCollectionFactory;
-    private $documentation;
+    private $title;
+    private $description;
+    private $version;
+    private $formats;
 
-    public function __construct(DocumentationNormalizer $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, Documentation $documentation)
+    public function __construct(DocumentationNormalizer $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $title, string $description, string $version, array $formats)
     {
         parent::__construct();
         $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceNameCollectionFactory = $resourceNameCollection;
-        $this->documentation = $documentation;
+        $this->title = $title;
+        $this->description = $description;
+        $this->version = $version;
+        $this->formats = $formats;
     }
 
     /**
@@ -52,7 +58,7 @@ final class SwaggerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $documentation = $this->documentation->create($this->resourceNameCollectionFactory->create());
+        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
         $data = $this->documentationNormalizer->normalize($documentation);
         $content = json_encode($data, JSON_PRETTY_PRINT);
         $output->writeln($content);

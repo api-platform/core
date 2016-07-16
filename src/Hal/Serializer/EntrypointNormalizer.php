@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ResourceNameCollectionNormalizer implements NormalizerInterface
+final class EntrypointNormalizer implements NormalizerInterface
 {
     const FORMAT = 'jsonhal';
 

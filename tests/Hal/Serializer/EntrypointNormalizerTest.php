@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Tests\Hal\Serializer;
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Hal\Serializer\ResourceNameCollectionNormalizer;
+use ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
@@ -23,30 +23,28 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResourceNameCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
+class EntrypointNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportNormalization()
     {
         $collection = new ResourceNameCollection();
-        $entrypoint = new Entrypoint();
-        $entrypoint = $entrypoint->create($collection);
+        $entrypoint = new Entrypoint($collection);
 
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
-        $normalizer = new ResourceNameCollectionNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
+        $normalizer = new EntrypointNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization($entrypoint, ResourceNameCollectionNormalizer::FORMAT));
+        $this->assertTrue($normalizer->supportsNormalization($entrypoint, EntrypointNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization($entrypoint, 'json'));
-        $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ResourceNameCollectionNormalizer::FORMAT));
+        $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), EntrypointNormalizer::FORMAT));
     }
 
     public function testNormalize()
     {
         $collection = new ResourceNameCollection([Dummy::class]);
-        $entrypoint = new Entrypoint();
-        $entrypoint = $entrypoint->create($collection);
+        $entrypoint = new Entrypoint($collection);
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
 
@@ -56,7 +54,7 @@ class ResourceNameCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/api')->shouldBeCalled();
 
-        $normalizer = new ResourceNameCollectionNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
+        $normalizer = new EntrypointNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
 
         $expected = [
             '_links' => [
@@ -68,6 +66,6 @@ class ResourceNameCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($entrypoint, ResourceNameCollectionNormalizer::FORMAT));
+        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }
 }

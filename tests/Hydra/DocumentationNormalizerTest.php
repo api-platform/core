@@ -37,8 +37,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
         $title = 'Test Api';
         $desc = 'test ApiGerard';
         $version = '0.0.0';
-        $documentation = new Documentation($title, $desc, $version, []);
-        $documentation = $documentation->create(new ResourceNameCollection(['dummy' => 'dummy']));
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version, []);
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);

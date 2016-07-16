@@ -22,11 +22,9 @@ final class Entrypoint
 {
     private $resourceNameCollection;
 
-    public function create($resourceNameCollection): Entrypoint
+    public function __construct(ResourceNameCollection $resourceNameCollection)
     {
         $this->resourceNameCollection = $resourceNameCollection;
-
-        return $this;
     }
 
     public function getResourceNameCollection(): ResourceNameCollection

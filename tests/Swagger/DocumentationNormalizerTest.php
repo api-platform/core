@@ -38,8 +38,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
         $desc = 'test ApiGerard';
         $formats = ['jsonld' => ['application/ld+json']];
         $version = '0.0.0';
-        $documentation = new Documentation($title, $desc, $version, $formats);
-        $documentation = $documentation->create(new ResourceNameCollection(['dummy' => 'dummy']));
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version, $formats);
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
