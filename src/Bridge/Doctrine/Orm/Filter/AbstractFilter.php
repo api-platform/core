@@ -192,11 +192,6 @@ abstract class AbstractFilter implements FilterInterface
     protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder) : array
     {
         $propertyParts = $this->splitPropertyParts($property);
-
-        if (0 === count($propertyParts['associations'])) {
-            throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
-        }
-
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
@@ -205,8 +200,10 @@ abstract class AbstractFilter implements FilterInterface
             $parentAlias = $alias;
         }
 
-        $field = $propertyParts['field'];
+        if (!isset($alias)) {
+            throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
+        }
 
-        return [$alias, $field];
+        return [$alias, $propertyParts['field']];
     }
 }
