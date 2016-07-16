@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\Swagger;
+namespace ApiPlatform\Core\Tests\Swagger;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
