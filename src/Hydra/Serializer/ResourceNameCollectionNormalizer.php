@@ -11,11 +11,11 @@
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
+use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -49,7 +49,7 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
             '@type' => 'Entrypoint',
         ];
 
-        foreach ($object as $resourceClass) {
+        foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if (empty($resourceMetadata->getCollectionOperations())) {
@@ -70,6 +70,6 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null, array $context = [])
     {
-        return self::FORMAT === $format && $data instanceof ResourceNameCollection;
+        return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 }

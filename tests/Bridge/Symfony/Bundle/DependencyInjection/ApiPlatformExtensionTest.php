@@ -222,6 +222,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitions = [
             'api_platform.documentation',
+            'api_platform.entrypoint',
             'api_platform.action.placeholder',
             'api_platform.action.entrypoint',
             'api_platform.action.exception',

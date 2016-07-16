@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
+use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hal\Serializer\ResourceNameCollectionNormalizer;
@@ -27,6 +28,8 @@ class ResourceNameCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testSupportNormalization()
     {
         $collection = new ResourceNameCollection();
+        $entrypoint = new Entrypoint();
+        $entrypoint = $entrypoint->create($collection);
 
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -34,15 +37,16 @@ class ResourceNameCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $normalizer = new ResourceNameCollectionNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization($collection, ResourceNameCollectionNormalizer::FORMAT));
-        $this->assertFalse($normalizer->supportsNormalization($collection, 'json'));
+        $this->assertTrue($normalizer->supportsNormalization($entrypoint, ResourceNameCollectionNormalizer::FORMAT));
+        $this->assertFalse($normalizer->supportsNormalization($entrypoint, 'json'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ResourceNameCollectionNormalizer::FORMAT));
     }
 
     public function testNormalize()
     {
         $collection = new ResourceNameCollection([Dummy::class]);
-
+        $entrypoint = new Entrypoint();
+        $entrypoint = $entrypoint->create($collection);
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
 
@@ -64,6 +68,6 @@ class ResourceNameCollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $normalizer->normalize($collection, ResourceNameCollectionNormalizer::FORMAT));
+        $this->assertEquals($expected, $normalizer->normalize($entrypoint, ResourceNameCollectionNormalizer::FORMAT));
     }
 }
