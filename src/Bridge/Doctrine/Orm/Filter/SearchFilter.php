@@ -294,11 +294,11 @@ class SearchFilter extends AbstractFilter
                     ];
                 }
             } elseif ($metadata->hasAssociation($field)) {
-                $association = $field;
                 $filterParameterNames = [
                     $property,
                     $property.'[]',
                 ];
+
                 foreach ($filterParameterNames as $filterParameterName) {
                     $description[$filterParameterName] = [
                         'property' => $property,

@@ -185,6 +185,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     }
                 }
             } catch (InvalidArgumentException $e) {
+                continue;
             }
 
             $classes[] = $class;
