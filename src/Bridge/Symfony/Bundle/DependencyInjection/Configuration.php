@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -34,31 +35,6 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
                 ->scalarNode('description')->defaultValue('')->info('The description of the API.')->end()
                 ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
-                ->arrayNode('formats')
-                    ->defaultValue(['jsonld' => ['mime_types' => ['application/ld+json']]])
-                    ->info('The list of enabled formats. The first one will be the default.')
-                    ->normalizeKeys(false)
-                    ->useAttributeAsKey('format')
-                    ->beforeNormalization()
-                        ->ifArray()
-                        ->then(function ($v) {
-                            foreach ($v as $format => $value) {
-                                if (isset($value['mime_types'])) {
-                                    continue;
-                                }
-
-                                $v[$format] = ['mime_types' => $value];
-                            }
-
-                            return $v;
-                        })
-                    ->end()
-                    ->prototype('array')
-                        ->children()
-                            ->arrayNode('mime_types')->prototype('scalar')->end()->end()
-                        ->end()
-                    ->end()
-                ->end()
                 ->arrayNode('naming')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -92,6 +68,51 @@ final class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $this->addFormatSection($rootNode, 'formats', ['jsonld' => ['mime_types' => ['application/ld+json']]]);
+        $this->addFormatSection($rootNode, 'error_formats', [
+            'jsonproblem' => ['mime_types' => ['application/problem+json']],
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+        ]);
+
         return $treeBuilder;
+    }
+
+    /**
+     * Adds a format section.
+     *
+     * @param ArrayNodeDefinition $rootNode
+     * @param string              $key
+     * @param array               $defaultValue
+     */
+    private function addFormatSection(ArrayNodeDefinition $rootNode, string $key, array $defaultValue)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode($key)
+                    ->defaultValue($defaultValue)
+                    ->info('The list of enabled formats. The first one will be the default.')
+                    ->normalizeKeys(false)
+                    ->useAttributeAsKey('format')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function ($v) {
+                            foreach ($v as $format => $value) {
+                                if (isset($value['mime_types'])) {
+                                    continue;
+                                }
+
+                                $v[$format] = ['mime_types' => $value];
+                            }
+
+                            return $v;
+                        })
+                    ->end()
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('mime_types')->prototype('scalar')->end()->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 }
