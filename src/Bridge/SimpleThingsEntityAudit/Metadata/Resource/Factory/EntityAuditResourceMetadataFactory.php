@@ -25,7 +25,7 @@ final class EntityAuditResourceMetadataFactory implements ResourceMetadataFactor
     private $resourceMetadataFactory;
     private $auditManager;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null, AuditManager $auditManager)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, AuditManager $auditManager)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->auditManager = $auditManager;
@@ -50,7 +50,6 @@ final class EntityAuditResourceMetadataFactory implements ResourceMetadataFactor
 
             return $resourceAuditedMetadata;
         }
-
 
         return $resourceClassMetadata;
     }
