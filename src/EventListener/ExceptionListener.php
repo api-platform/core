@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra\EventListener;
+namespace ApiPlatform\Core\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
@@ -24,8 +24,9 @@ final class ExceptionListener extends BaseExceptionListener
 {
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
-        // Normalize exceptions with hydra errors only for resources
-        if (!$event->getRequest()->attributes->has('_api_resource_class')) {
+        $request = $event->getRequest();
+        // Normalize exceptions only for routes managed by API Platform
+        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond')) {
             return;
         }
 
