@@ -40,14 +40,16 @@ final class ApiLoader extends Loader
     private $resourceMetadataFactory;
     private $resourcePathGenerator;
     private $container;
+    private $formats;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourcePathNamingStrategyInterface $resourcePathGenerator, ContainerInterface $container)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourcePathNamingStrategyInterface $resourcePathGenerator, ContainerInterface $container, array $formats)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourcePathGenerator = $resourcePathGenerator;
         $this->container = $container;
+        $this->formats = $formats;
     }
 
     /**
@@ -57,9 +59,7 @@ final class ApiLoader extends Loader
     {
         $routeCollection = new RouteCollection();
 
-        $routeCollection->addCollection($this->fileLoader->load('hal.xml'));
-        $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));
-        $routeCollection->addCollection($this->fileLoader->load('hydra.xml'));
+        $this->loadExternalFiles($routeCollection);
 
         if ($this->container->getParameter('api_platform.enable_swagger')) {
             $routeCollection->addCollection($this->fileLoader->load('swagger.xml'));
@@ -90,6 +90,21 @@ final class ApiLoader extends Loader
     public function supports($resource, $type = null)
     {
         return 'api_platform' === $type;
+    }
+
+    /**
+     * Load external files.
+     *
+     * @param RouteCollection $routeCollection
+     */
+    private function loadExternalFiles(RouteCollection $routeCollection)
+    {
+        $routeCollection->addCollection($this->fileLoader->load('api.xml'));
+
+        if (isset($this->formats['jsonld'])) {
+            $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));
+            $routeCollection->addCollection($this->fileLoader->load('hydra.xml'));
+        }
     }
 
     /**

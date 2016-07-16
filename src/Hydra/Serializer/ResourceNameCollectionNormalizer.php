@@ -9,30 +9,30 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Hydra;
+namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\JsonLd\EntrypointBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * {@inheritdoc}
+ * Normalizes the API entrypoint.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class EntrypointBuilder implements EntrypointBuilderInterface
+final class ResourceNameCollectionNormalizer implements NormalizerInterface
 {
-    private $resourceNameCollectionFactory;
+    const FORMAT = 'jsonld';
+
     private $resourceMetadataFactory;
     private $iriConverter;
     private $urlGenerator;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;
@@ -41,15 +41,15 @@ final class EntrypointBuilder implements EntrypointBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntrypoint(string $referenceType = UrlGeneratorInterface::ABS_PATH) : array
+    public function normalize($object, $format = null, array $context = [])
     {
         $entrypoint = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint'], $referenceType),
-            '@id' => $this->urlGenerator->generate('api_hydra_entrypoint', [], $referenceType),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
+            '@id' => $this->urlGenerator->generate('api_entrypoint'),
             '@type' => 'Entrypoint',
         ];
 
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+        foreach ($object as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if (empty($resourceMetadata->getCollectionOperations())) {
@@ -63,5 +63,13 @@ final class EntrypointBuilder implements EntrypointBuilderInterface
         }
 
         return $entrypoint;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return self::FORMAT === $format && $data instanceof ResourceNameCollection;
     }
 }

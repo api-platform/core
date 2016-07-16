@@ -32,16 +32,13 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
     public function testApiLoader()
     {
         $resourceMetadata = new ResourceMetadata();
-
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
-
         //default operation based on OperationResourceMetadataFactory
         $resourceMetadata = $resourceMetadata->withItemOperations([
             'get' => ['method' => 'GET'],
             'put' => ['method' => 'PUT'],
             'delete' => ['method' => 'DELETE'],
         ]);
-
         //custom operations
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
             'my_op' => ['method' => 'GET', 'controller' => 'some.service.name'], //with controller
@@ -159,7 +156,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathNamingStrategyInterface::class);
         $resourcePathGeneratorProphecy->generateResourceBasePath('dummy')->willReturn('dummies');
 
-        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal(), $containerProphecy->reveal());
+        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal(), $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
 
         return $apiLoader;
     }

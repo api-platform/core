@@ -25,6 +25,8 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.naming.resource_path_naming_strategy" />
             <argument type="service" id="service_container" />
+            <argument>%api_platform.formats%</argument>
+
             <tag name="routing.loader" />
         </service>
 
@@ -114,6 +116,10 @@
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
+
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+        </service>
     </services>
 
 </container>
