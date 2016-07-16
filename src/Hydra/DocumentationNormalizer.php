@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Hydra;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -23,14 +23,17 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Creates a machine readable Hydra API documentation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
+final class DocumentationNormalizer implements NormalizerInterface
 {
+    const FORMAT = 'jsonld';
+
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -38,10 +41,8 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $urlGenerator;
-    private $title;
-    private $description;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '')
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -50,19 +51,17 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
-        $this->title = $title;
-        $this->description = $description;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getApiDocumentation() : array
+    public function normalize($object, $format = null, array $context = [])
     {
         $classes = [];
         $entrypointProperties = [];
 
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+        foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $shortName = $resourceMetadata->getShortName();
@@ -236,14 +235,14 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
             ],
         ];
 
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_hydra_doc')];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
 
-        if ('' !== $this->title) {
-            $doc['hydra:title'] = $this->title;
+        if ('' !== $object->getTitle()) {
+            $doc['hydra:title'] = $object->getTitle();
         }
 
-        if ('' !== $this->description) {
-            $doc['hydra:description'] = $this->description;
+        if ('' !== $object->getDescription()) {
+            $doc['hydra:description'] = $object->getDescription();
         }
 
         $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
@@ -404,7 +403,7 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
     {
         return
             [
-                '@vocab' => $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL).'#',
+                '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
                 'hydra' => ContextBuilderInterface::HYDRA_NS,
                 'rdf' => ContextBuilderInterface::RDF_NS,
                 'rdfs' => ContextBuilderInterface::RDFS_NS,
@@ -416,5 +415,13 @@ final class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 'expects' => ['@id' => 'hydra:expects', '@type' => '@id'],
                 'returns' => ['@id' => 'hydra:returns', '@type' => '@id'],
             ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null, array $context = [])
+    {
+        return self::FORMAT === $format && $data instanceof Documentation;
     }
 }

@@ -27,7 +27,7 @@
     <script>
         $(function () {
             window.swaggerUi = new SwaggerUi({
-                url: '{{ path('api_swagger_doc') }}',
+                url: '{{ path('api_doc') }}',
                 dom_id: 'swagger-ui-container',
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
                 onComplete: function(swaggerApi, swaggerUi){

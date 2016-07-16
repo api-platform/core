@@ -11,7 +11,9 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
-use ApiPlatform\Core\Swagger\ApiDocumentationBuilder;
+use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Swagger\DocumentationNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,12 +25,16 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class SwaggerCommand extends Command
 {
-    private $apiDocumentationBuilder;
+    private $documentationNormalizer;
+    private $resourceNameCollectionFactory;
+    private $documentation;
 
-    public function __construct(ApiDocumentationBuilder $apiDocumentationBuilder)
+    public function __construct(DocumentationNormalizer $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, Documentation $documentation)
     {
         parent::__construct();
-        $this->apiDocumentationBuilder = $apiDocumentationBuilder;
+        $this->documentationNormalizer = $documentationNormalizer;
+        $this->resourceNameCollectionFactory = $resourceNameCollection;
+        $this->documentation = $documentation;
     }
 
     /**
@@ -46,7 +52,8 @@ final class SwaggerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $data = $this->apiDocumentationBuilder->getApiDocumentation();
+        $documentation = $this->documentation->create($this->resourceNameCollectionFactory->create());
+        $data = $this->documentationNormalizer->normalize($documentation);
         $content = json_encode($data, JSON_PRETTY_PRINT);
         $output->writeln($content);
     }

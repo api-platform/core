@@ -25,6 +25,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ContextBuilder implements ContextBuilderInterface
 {
+    const FORMAT = 'jsonld';
+
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -52,7 +54,7 @@ final class ContextBuilder implements ContextBuilderInterface
     public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL) : array
     {
         return [
-            '@vocab' => $this->urlGenerator->generate('api_hydra_doc', [], UrlGeneratorInterface::ABS_URL).'#',
+            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
             'hydra' => self::HYDRA_NS,
         ];
     }

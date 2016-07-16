@@ -41,6 +41,12 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
         </service>
+        <service id="api_platform.documentation" class="ApiPlatform\Core\Documentation\Documentation" public="false">
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+            <argument>%api_platform.version%</argument>
+            <argument>%api_platform.formats%</argument>
+        </service>
 
         <!-- Serializer -->
 
@@ -133,6 +139,11 @@
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+        </service>
+
+        <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
+            <argument type="service" id="api_platform.documentation" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
 

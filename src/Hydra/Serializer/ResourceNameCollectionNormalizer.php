@@ -68,7 +68,7 @@ final class ResourceNameCollectionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
         return self::FORMAT === $format && $data instanceof ResourceNameCollection;
     }

@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Swagger;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -22,23 +23,25 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\Swagger\ApiDocumentationBuilder;
+use ApiPlatform\Core\Swagger\DocumentationNormalizer;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
+class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
 {
-    public function testGetApiDocumention()
+    public function testNormalize()
     {
         $title = 'Test Api';
         $desc = 'test ApiGerard';
         $formats = ['jsonld' => ['application/ld+json']];
+        $version = '0.0.0';
+        $documentation = new Documentation($title, $desc, $version, $formats);
+        $documentation = $documentation->create(new ResourceNameCollection(['dummy' => 'dummy']));
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummy' => 'dummy']))->shouldBeCalled();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -62,7 +65,7 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
 
-        $apiDocumentationBuilder = new ApiDocumentationBuilder($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $iriConverter->reveal(), $formats, $title, $desc);
+        $apiDocumentationBuilder = new DocumentationNormalizer($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $iriConverter->reveal());
 
         $expected = [
             'swagger' => '2.0',
@@ -183,6 +186,6 @@ class ApiDocumentationBuilderTest extends \PHPUnit_Framework_TestCase /**/
             ],
         ];
 
-        $this->assertEquals($expected, $apiDocumentationBuilder->getApiDocumentation());
+        $this->assertEquals($expected, $apiDocumentationBuilder->normalize($documentation));
     }
 }

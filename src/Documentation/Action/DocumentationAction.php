@@ -11,27 +11,27 @@
 
 namespace ApiPlatform\Core\Documentation\Action;
 
-use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 
 /**
- * Generates the Hydra API documentation.
+ * Generates the API documentation.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 final class DocumentationAction
 {
-    private $apiDocumentationBuilder;
+    private $documentation;
+    private $resourceNameCollectionFactory;
 
-    public function __construct(ApiDocumentationBuilderInterface $apiDocumentationBuilder)
+    public function __construct(Documentation $documentation, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
-        $this->apiDocumentationBuilder = $apiDocumentationBuilder;
+        $this->documentation = $documentation;
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
-    /**
-     * Gets API doc.
-     */
-    public function __invoke() : array
+    public function __invoke() : Documentation
     {
-        return $this->apiDocumentationBuilder->getApiDocumentation();
+        return $this->documentation->create($this->resourceNameCollectionFactory->create());
     }
 }

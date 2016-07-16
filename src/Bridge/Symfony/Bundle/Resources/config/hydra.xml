@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.hydra.documentation_builder" class="ApiPlatform\Core\Hydra\ApiDocumentationBuilder" public="false">
+        <service id="api_platform.hydra.normalizer.documentation" class="ApiPlatform\Core\Hydra\DocumentationNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -15,7 +15,10 @@
             <argument type="service" id="api_platform.router" />
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
+
+            <tag name="serializer.normalizer" priority="32" />
         </service>
+
 
         <!-- Event listeners -->
 
@@ -71,9 +74,10 @@
 
         <!-- Action -->
 
-        <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
-            <argument type="service" id="api_platform.hydra.documentation_builder" />
-        </service>
+        <service id="api_platform.hydra.action.exception" class="ApiPlatform\Core\Hydra\Action\ExceptionAction">
+            <argument type="service" id="api_platform.hydra.normalizer.error" />
+       </service>
+
     </services>
 
 </container>
