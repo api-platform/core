@@ -5,13 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.hydra.entrypoint_builder" class="ApiPlatform\Core\Hydra\EntrypointBuilder" public="false">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.router" />
-        </service>
-
         <service id="api_platform.hydra.documentation_builder" class="ApiPlatform\Core\Hydra\ApiDocumentationBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -48,12 +41,20 @@
 
         <!-- Serializer -->
 
+        <service id="api_platform.hydra.normalizer.resource_name_collection" class="ApiPlatform\Core\Hydra\Serializer\ResourceNameCollectionNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.router" />
+
+            <tag name="serializer.normalizer" priority="32" />
+        </service>
+
         <service id="api_platform.hydra.normalizer.collection" class="ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
 
-            <tag name="serializer.normalizer" priority="50" />
+            <tag name="serializer.normalizer" priority="16" />
         </service>
 
         <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
@@ -81,11 +82,8 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.filters" />
         </service>
-        <!-- Action -->
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
-            <argument type="service" id="api_platform.hydra.entrypoint_builder" />
-        </service>
+        <!-- Action -->
 
         <service id="api_platform.hydra.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
             <argument type="service" id="api_platform.hydra.documentation_builder" />
