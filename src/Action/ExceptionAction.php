@@ -46,12 +46,12 @@ final class ExceptionAction
     /**
      * Converts a an exception to a JSON response.
      *
-     * @param \Exception|FlattenException $exception
-     * @param Request                     $request
+     * @param FlattenException $exception
+     * @param Request          $request
      *
      * @return Response
      */
-    public function __invoke($exception, Request $request) : Response
+    public function __invoke(FlattenException $exception, Request $request) : Response
     {
         $exceptionClass = $exception->getClass();
         foreach ($this->exceptionToStatus as $class => $status) {

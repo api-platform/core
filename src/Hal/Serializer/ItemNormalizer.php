@@ -56,7 +56,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $context['cache_key'] = $this->getCacheKey($format, $context);
+        $context['cache_key'] = $this->getHalCacheKey($format, $context);
 
         $rawData = parent::normalize($object, $format, $context);
         if (!is_array($rawData)) {
@@ -217,7 +217,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return bool|string
      */
-    private function getCacheKey(string $format = null, array $context)
+    private function getHalCacheKey(string $format = null, array $context)
     {
         try {
             return md5($format.serialize($context));
