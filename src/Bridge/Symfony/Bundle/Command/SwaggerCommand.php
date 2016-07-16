@@ -27,20 +27,21 @@ final class SwaggerCommand extends Command
 {
     private $documentationNormalizer;
     private $resourceNameCollectionFactory;
-    private $title;
-    private $description;
-    private $version;
-    private $formats;
+    private $apiTitle;
+    private $apiDescription;
+    private $apiVersion;
+    private $apiFormats;
 
-    public function __construct(DocumentationNormalizer $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $title, string $description, string $version, array $formats)
+    public function __construct(DocumentationNormalizer $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats)
     {
         parent::__construct();
+
         $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceNameCollectionFactory = $resourceNameCollection;
-        $this->title = $title;
-        $this->description = $description;
-        $this->version = $version;
-        $this->formats = $formats;
+        $this->apiTitle = $apiTitle;
+        $this->apiDescription = $apiDescription;
+        $this->apiVersion = $apiVersion;
+        $this->apiFormats = $apiFormats;
     }
 
     /**
@@ -58,7 +59,7 @@ final class SwaggerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+        $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
         $data = $this->documentationNormalizer->normalize($documentation);
         $content = json_encode($data, JSON_PRETTY_PRINT);
         $output->writeln($content);
