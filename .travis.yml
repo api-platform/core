@@ -4,24 +4,14 @@ sudo: false
 
 cache:
   directories:
-    - $HOME/.composer/cache
+      - $HOME/.composer/cache
 
-matrix:
-    fast_finish: true
-    include:
-        - php: '7.0'
-        - php: '7.0'
-          env: SYMFONY_VERSION=3.0.*
-        - php: hhvm
-
-    allow_failures:
-        - env: SYMFONY_VERSION=3.0.*
-        - php: hhvm
+php:
+    - '7.0'
 
 before_install:
-    - if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then phpenv config-rm xdebug.ini; fi;
+    - phpenv config-rm xdebug.ini
     - phpunit --self-update
-    - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
     - npm install -g swagger-cli
 
 install:
@@ -31,4 +21,3 @@ script:
     - vendor/bin/phpunit
     - vendor/bin/behat
     - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
-
