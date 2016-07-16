@@ -108,6 +108,13 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
+        <service id="api_platform.listener.exception.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener">
+            <argument type="service" id="api_platform.serializer" />
+            <argument>%api_platform.error_formats%</argument>
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+
         <service id="api_platform.listener.exception" class="ApiPlatform\Core\EventListener\ExceptionListener">
             <argument>api_platform.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
