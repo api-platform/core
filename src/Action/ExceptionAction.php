@@ -12,12 +12,11 @@
 namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Util\ErrorFormatGuesser;
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -34,25 +33,25 @@ final class ExceptionAction
     ];
 
     private $serializer;
-    private $exceptionFormats;
+    private $errorFormats;
     private $exceptionToStatus;
 
-    public function __construct(SerializerInterface $serializer, array $exceptionFormats, $exceptionToStatus = [])
+    public function __construct(SerializerInterface $serializer, array $errorFormats, $exceptionToStatus = [])
     {
         $this->serializer = $serializer;
-        $this->exceptionFormats = $exceptionFormats;
+        $this->errorFormats = $errorFormats;
         $this->exceptionToStatus = array_merge(self::DEFAULT_EXCEPTION_TO_STATUS, $exceptionToStatus);
     }
 
     /**
      * Converts a an exception to a JSON response.
      *
-     * @param FlattenException $exception
-     * @param Request          $request
+     * @param \Exception|FlattenException $exception
+     * @param Request                     $request
      *
      * @return Response
      */
-    public function __invoke(FlattenException $exception, Request $request) : Response
+    public function __invoke($exception, Request $request) : Response
     {
         $exceptionClass = $exception->getClass();
         foreach ($this->exceptionToStatus as $class => $status) {
@@ -64,29 +63,9 @@ final class ExceptionAction
         }
 
         $headers = $exception->getHeaders();
-
-        $format = $this->getErrorFormat($request);
+        $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
         $headers['Content-Type'] = $format['value'][0];
 
         return new Response($this->serializer->serialize($exception, $format['key']), $exception->getStatusCode(), $headers);
-    }
-
-    /**
-     * Get the error format and its associated MIME type.
-     *
-     * @param Request $request
-     *
-     * @return array
-     */
-    private function getErrorFormat(Request $request)
-    {
-        $requestFormat = $request->getRequestFormat(null);
-        if (null === $requestFormat || !isset($this->exceptionFormats[$requestFormat])) {
-            return ['key' => $requestFormat, 'value' => $this->exceptionFormats[$requestFormat]];
-        }
-        
-        reset($this->exceptionFormats);
-
-        return each($this->exceptionFormats);
     }
 }

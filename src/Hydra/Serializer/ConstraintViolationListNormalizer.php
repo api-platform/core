@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\Serializer;
+namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 final class ConstraintViolationListNormalizer implements NormalizerInterface
 {
-    const FORMAT = 'hydra-error';
+    const FORMAT = 'jsonld';
 
     /**
      * @var UrlGeneratorInterface

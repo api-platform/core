@@ -25,13 +25,13 @@
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" />
         </service>
 
-        <service id="api_platform.hydra.listener.exception.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\EventListener\ValidationExceptionListener">
-            <argument type="service" id="api_platform.hydra.normalizer.constraint_violation_list" />
-
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
-        </service>
-
         <!-- Serializer -->
+
+        <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument type="service" id="api_platform.router" />
+
+            <tag name="serializer.normalizer" priority="64" />
+        </service>
 
         <service id="api_platform.hydra.normalizer.resource_name_collection" class="ApiPlatform\Core\Hydra\Serializer\ResourceNameCollectionNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -54,12 +54,6 @@
             <argument type="service" id="api_platform.iri_converter" />
 
             <tag name="serializer.normalizer" priority="16" />
-        </service>
-
-        <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Bridge\Symfony\Validator\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument type="service" id="api_platform.router" />
-
-            <tag name="serializer.normalizer" />
         </service>
 
         <service id="api_platform.hydra.normalizer.partial_collection_view" class="ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
