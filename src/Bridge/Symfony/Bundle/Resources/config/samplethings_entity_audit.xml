@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.samplethings_entity_audit.metadata.resource.metadata_factory" decorates="api_platform.metadata.resource.metadata_factory" class="ApiPlatform\Core\Bridge\SimpleThingsEntityAudit\Metadata\Resource\Factory\EntityAuditResourceMetadataFactory" decoration-priority="10" >
+            <argument type="service" id="api_platform.samplethings_entity_audit.metadata.resource.metadata_factory.inner" />
+            <argument type="service" id="simplethings_entityaudit.manager" />
+        </service>
+
+        <service id="api_platform.samplethings_entity_audit.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\SimpleThingsEntityAudit\Doctrine\Orm\AuditCollectionDataProvider">
+            <argument type="service" id="simplethings_entityaudit.reader" />
+            <argument type="service" id="simplethings_entityaudit.manager" />
+            <tag name="api_platform.collection_data_provider" priority="1" />
+        </service>
+
+        <service id="api_platform.samplethings_entity_audit.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\SimpleThingsEntityAudit\Doctrine\Orm\AuditItemDataProvider">
+            <argument type="service" id="simplethings_entityaudit.reader" />
+            <argument type="service" id="simplethings_entityaudit.manager" />
+            <tag name="api_platform.item_data_provider" priority="2" />
+        </service>
+
+    </services>
+
+</container>

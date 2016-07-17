@@ -51,6 +51,10 @@ fos_user:
         user_manager: 'app.user_manager'
     user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
 
+simple_things_entity_audit:
+    audited_entities:
+        - ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy
+
 services:
     app.user_manager:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'

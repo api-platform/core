@@ -123,6 +123,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
             $loader->load('nelmio_api_doc.xml');
         }
+        // SimpleThingsEntityAudit support
+        if (isset($bundles['SimpleThingsEntityAuditBundle'])) {
+            $loader->load('samplethings_entity_audit.xml');
+        }
     }
 
     /**
