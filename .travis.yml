@@ -4,20 +4,20 @@ sudo: false
 
 cache:
   directories:
-      - $HOME/.composer/cache
+    - $HOME/.composer/cache
 
 php:
-    - '7.0'
+  - '7.0'
 
 before_install:
-    - phpenv config-rm xdebug.ini
-    - phpunit --self-update
-    - npm install -g swagger-cli
+  - phpenv config-rm xdebug.ini
+  - phpunit --self-update
+  - npm install -g swagger-cli
 
 install:
-    - composer update --no-interaction --prefer-dist
+  - composer update --no-interaction --prefer-dist
 
 script:
-    - vendor/bin/phpunit
-    - vendor/bin/behat
-    - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
+  - vendor/bin/phpunit
+  - vendor/bin/behat
+  - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
