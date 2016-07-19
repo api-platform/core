@@ -163,7 +163,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                         if (null !== $path) {
                             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $customOperation);
                             $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
-
+                            if (!isset($operation['collection'][strtolower($method)])) {
+                                var_dump($operation['collection'][strtolower($method)]);
+                                unset($itemOperationsDocs[$resourceClassIri]);
+                            }
                             $itemOperationsDocs[$path] = $customSwaggerOperation;
                         }
                     }
@@ -179,7 +182,11 @@ final class DocumentationNormalizer implements NormalizerInterface
                         if (null !== $path) {
                             $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $customOperation);
                             $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
-
+                            var_dump($resourceMetadata->getItemOperationAttribute($customOperation, $method));
+                            if (!isset($operation['item'][strtolower($method)])) {
+                                var_dump($operation['item'][strtolower($method)]);
+                                unset($itemOperationsDocs[$resourceClassIri]);
+                            }
                             $itemOperationsDocs[$path] = $customSwaggerOperation;
                         }
                     }
