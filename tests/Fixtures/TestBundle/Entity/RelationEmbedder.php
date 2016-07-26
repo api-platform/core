@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * }, itemOperations={
  *     "get"={"method"="GET"},
  *     "put"={"method"="PUT"},
- *     "custom_get"={"route_name"="relation_embedded.custom_get"}
+ *     "custom_get"={"method"="GET", "route_name"="relation_embedded.custom_get"}
  * })
  * @ORM\Entity
  */
