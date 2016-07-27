@@ -5,7 +5,8 @@ Feature: Relations support
 
   @createSchema
   Scenario: Create a third level
-    When I send a "POST" request to "/third_levels" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/third_levels" with body:
     """
     {"level": 3}
     """
@@ -44,9 +45,7 @@ Feature: Relations support
   Scenario: Create a related dummy
     When I send a "POST" request to "/related_dummies" with body:
     """
-    {
-      "thirdLevel": "/third_levels/1"
-    }
+    {"thirdLevel": "/third_levels/1"}
     """
     Then the response status code should be 201
     And the response should be in JSON
@@ -113,7 +112,6 @@ Feature: Relations support
       }
     }
     """
-
 
   Scenario: Create a dummy with relations
     When I send a "POST" request to "/dummies" with body:

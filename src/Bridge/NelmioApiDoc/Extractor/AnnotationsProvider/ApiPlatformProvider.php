@@ -14,13 +14,14 @@ namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
-use ApiPlatform\Core\Documentation\ApiDocumentationBuilderInterface;
+use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Creates Nelmio ApiDoc annotations for the api platform.
@@ -31,15 +32,15 @@ use Symfony\Component\HttpFoundation\Request;
 final class ApiPlatformProvider implements AnnotationsProviderInterface
 {
     private $resourceNameCollectionFactory;
-    private $apiDocumentationBuilder;
+    private $documentationNormalizer;
     private $resourceMetadataFactory;
     private $filters;
     private $operationMethodResolver;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ApiDocumentationBuilderInterface $apiDocumentationBuilder, ResourceMetadataFactoryInterface $resourceMetadataFactory, FilterCollection $filters, OperationMethodResolverInterface $operationMethodResolver)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, NormalizerInterface $documentationNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, FilterCollection $filters, OperationMethodResolverInterface $operationMethodResolver)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->apiDocumentationBuilder = $apiDocumentationBuilder;
+        $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->filters = $filters;
         $this->operationMethodResolver = $operationMethodResolver;
@@ -50,22 +51,31 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     public function getAnnotations() : array
     {
-        $annotations = [];
-        $hydraDoc = $this->apiDocumentationBuilder->getApiDocumentation();
+        $hydraDoc = $this->documentationNormalizer->normalize(new Documentation($this->resourceNameCollectionFactory->create()));
         $entrypointHydraDoc = $this->getResourceHydraDoc($hydraDoc, '#Entrypoint');
 
+        if (empty($hydraDoc) || null === $entrypointHydraDoc) {
+            return [];
+        }
+
+        $annotations = [];
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $prefixedShortName = ($iri = $resourceMetadata->getIri()) ? $iri : '#'.$resourceMetadata->getShortName();
             $resourceHydraDoc = $this->getResourceHydraDoc($hydraDoc, $prefixedShortName);
+            if (null === $resourceHydraDoc) {
+                continue;
+            }
 
-            if ($hydraDoc) {
-                foreach ($resourceMetadata->getCollectionOperations() as $operationName => $operation) {
+            if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
+                foreach ($collectionOperations as $operationName => $operation) {
                     $annotations[] = $this->getApiDoc(true, $resourceClass, $resourceMetadata, $operationName, $resourceHydraDoc, $entrypointHydraDoc);
                 }
+            }
 
-                foreach ($resourceMetadata->getItemOperations() as $operationName => $operation) {
+            if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
+                foreach ($itemOperations as $operationName => $operation) {
                     $annotations[] = $this->getApiDoc(false, $resourceClass, $resourceMetadata, $operationName, $resourceHydraDoc);
                 }
             }

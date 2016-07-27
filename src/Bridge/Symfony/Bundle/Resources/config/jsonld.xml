@@ -5,7 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-
         <service id="api_platform.jsonld.context_builder" class="ApiPlatform\Core\JsonLd\ContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -26,10 +25,12 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
-            <tag name="serializer.normalizer" />
+            <tag name="serializer.normalizer" priority="8" />
         </service>
 
-        <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\JsonLd\Serializer\JsonLdEncoder" public="false">
+        <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+            <argument>jsonld</argument>
+
             <tag name="serializer.encoder" />
         </service>
 
@@ -40,7 +41,6 @@
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
-
     </services>
 
 </container>

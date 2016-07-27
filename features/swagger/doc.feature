@@ -4,7 +4,7 @@ Feature: Documentation support
   I need to know Swagger specifications of objects I send and receive
 
   Scenario: Retrieve the API vocabulary
-    Given I send a "GET" request to "/swagger"
+    Given I send a "GET" request to "/apidoc.json"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
@@ -13,7 +13,6 @@ Feature: Documentation support
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
     And the JSON node "info.description" should be equal to "This is a test API."
-    And the JSON node "basePath" should be equal to "/"
     # Supported classes
     And the Swagger class "CircularReference" exist
     And the Swagger class "CustomIdentifierDummy" exist
@@ -25,6 +24,7 @@ Feature: Documentation support
     And the Swagger class "ThirdLevel" exist
     And the Swagger class "ParentDummy" not exist
     And the Swagger class "UnknownDummy" not exist
+    And the Swagger path "/override/swagger" exist
     # Properties
     And "id" property doesn't exist for the Swagger class "Dummy"
     And "name" property is required for Swagger class "Dummy"

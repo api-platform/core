@@ -16,20 +16,19 @@ use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Converts {@see \Exception} or {@see \Symfony\Component\Debug\Exception\FlattenException}
- * to a Hydra error representation.
+ * Converts {@see \Exception} or {@see \Symfony\Component\Debug\Exception\FlattenException} to a Hydra error representation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
 final class ErrorNormalizer implements NormalizerInterface
 {
-    const FORMAT = 'hydra-error';
+    const FORMAT = 'jsonld';
 
     private $urlGenerator;
     private $debug;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug)
+    public function __construct(UrlGeneratorInterface $urlGenerator, bool $debug = false)
     {
         $this->urlGenerator = $urlGenerator;
         $this->debug = $debug;
@@ -41,7 +40,6 @@ final class ErrorNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $message = $object->getMessage();
-
         if ($this->debug) {
             $trace = $object->getTrace();
         }

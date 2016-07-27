@@ -6,32 +6,29 @@
 
     <services>
 
-        <service id="api_platform.swagger.documentation_builder" class="ApiPlatform\Core\Swagger\ApiDocumentationBuilder" public="false">
+        <service id="api_platform.swagger.normalizer.documentation" class="ApiPlatform\Core\Swagger\DocumentationNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
-            <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument>%api_platform.formats%</argument>
-            <argument>%api_platform.title%</argument>
-            <argument>%api_platform.description%</argument>
-            <argument>%api_platform.version%</argument>
+
+            <tag name="serializer.normalizer" priority="16" />
         </service>
 
         <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">
-            <argument type="service" id="api_platform.swagger.documentation_builder" />
+            <argument type="service" id="api_platform.swagger.normalizer.documentation" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+            <argument>%api_platform.version%</argument>
+            <argument>%api_platform.formats%</argument>
             <tag name="console.command" />
         </service>
 
         <!-- Action -->
-
-        <service id="api_platform.swagger.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
-            <argument type="service" id="api_platform.swagger.documentation_builder" />
-        </service>
 
         <service id="api_platform.swagger.action.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction">
             <argument type="service" id="twig" on-invalid="ignore" />

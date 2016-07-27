@@ -25,6 +25,8 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.naming.resource_path_naming_strategy" />
             <argument type="service" id="service_container" />
+            <argument>%api_platform.formats%</argument>
+
             <tag name="routing.loader" />
         </service>
 
@@ -39,11 +41,23 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
         </service>
-
+        <service id="api_platform.documentation" class="ApiPlatform\Core\Documentation\Documentation" public="false"/>
+        <service id="api_platform.entrypoint" class="ApiPlatform\Core\Api\Entrypoint" public="false" />
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        </service>
+
+        <service id="api_platform.serializer.normalizer.item" class="ApiPlatform\Core\Serializer\ItemNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" />
         </service>
 
         <!-- Resource path naming strategies -->
@@ -71,6 +85,7 @@
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument>%api_platform.formats%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
@@ -94,6 +109,21 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
+        <service id="api_platform.listener.exception.validation" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener">
+            <argument type="service" id="api_platform.serializer" />
+            <argument>%api_platform.error_formats%</argument>
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
+        </service>
+
+        <service id="api_platform.listener.exception" class="ApiPlatform\Core\EventListener\ExceptionListener">
+            <argument>api_platform.action.exception</argument>
+            <argument type="service" id="logger" on-invalid="null" />
+
+            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
+            <tag name="monolog.logger" channel="request" />
+        </service>
+
         <!-- Action -->
 
         <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" />
@@ -102,6 +132,23 @@
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
+
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+        </service>
+
+        <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+            <argument>%api_platform.version%</argument>
+            <argument>%api_platform.formats%</argument>
+        </service>
+
+        <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction">
+            <argument type="service" id="api_platform.serializer" />
+            <argument>%api_platform.error_formats%</argument>
+        </service>
     </services>
 
 </container>

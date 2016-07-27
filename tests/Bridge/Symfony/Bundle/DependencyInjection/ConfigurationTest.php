@@ -34,13 +34,20 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'title' => 'title',
             'description' => 'description',
             'version' => '1.0.0',
-            'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']]],
+            'formats' => [
+                'jsonld' => ['mime_types' => ['application/ld+json']],
+                'json' => ['mime_types' => ['application/json']],
+            ],
+            'error_formats' => [
+                'jsonproblem' => ['mime_types' => ['application/problem+json']],
+                'jsonld' => ['mime_types' => ['application/ld+json']],
+            ],
             'naming' => [
                 'resource_path_naming_strategy' => 'api_platform.naming.resource_path_naming_strategy.underscore',
             ],
             'name_converter' => null,
             'enable_fos_user' => false,
-            'enable_nelmio_api_doc' => true,
+            'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'collection' => [
                 'order' => null,

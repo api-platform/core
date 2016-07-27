@@ -44,17 +44,7 @@ abstract class QueryChecker
      */
     public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
     {
-        foreach ($queryBuilder->getRootEntities() as $rootEntity) {
-            $rootMetadata = $managerRegistry
-                ->getManagerForClass($rootEntity)
-                ->getClassMetadata($rootEntity);
-
-            if ($rootMetadata->containsForeignIdentifier) {
-                return true;
-            }
-        }
-
-        return false;
+        return self::hasRootEntityWithIdentifier($queryBuilder, $managerRegistry, true);
     }
 
     /**
@@ -67,12 +57,26 @@ abstract class QueryChecker
      */
     public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
     {
+        return self::hasRootEntityWithIdentifier($queryBuilder, $managerRegistry, false);
+    }
+
+    /**
+     * Detects if the root entity has the given identifier.
+     *
+     * @param QueryBuilder    $queryBuilder
+     * @param ManagerRegistry $managerRegistry
+     * @param bool            $isForeign
+     *
+     * @return bool
+     */
+    private static function hasRootEntityWithIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry, bool $isForeign) : bool
+    {
         foreach ($queryBuilder->getRootEntities() as $rootEntity) {
             $rootMetadata = $managerRegistry
                 ->getManagerForClass($rootEntity)
                 ->getClassMetadata($rootEntity);
 
-            if ($rootMetadata->isIdentifierComposite) {
+            if ($isForeign ? $rootMetadata->isIdentifierComposite : $rootMetadata->containsForeignIdentifier) {
                 return true;
             }
         }

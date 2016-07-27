@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORMATS = ['json' => ['application/json']];
+
     public function testDoNotCallWhenRequestMethodIsSafe()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -37,7 +39,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -55,7 +57,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -69,7 +71,6 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod($method);
-        $request->setRequestFormat('json');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -79,12 +80,82 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
     public function methodProvider()
     {
         return [[Request::METHOD_POST, false], [Request::METHOD_PUT, true]];
+    }
+
+    public function testContentNegotiation()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
+        $request->setMethod(Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'text/xml');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize('{}', 'Foo', 'xml', [])->willReturn(new \stdClass())->shouldBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
+
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]
+        );
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
+    public function testContentNegotiationFallback()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
+        $request->setMethod(Request::METHOD_POST);
+        $request->headers->set('Content-Type', 'text/csv');
+        $request->setRequestFormat('xml');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize('{}', 'Foo', 'xml', [])->willReturn(new \stdClass())->shouldBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
+
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]
+        );
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
+    public function testContentNegotiationDefault()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
+        $request->setMethod(Request::METHOD_POST);
+        $request->setRequestFormat('unknown');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize('{}', 'Foo', 'jsonld', [])->willReturn(new \stdClass())->shouldBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
+
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]
+        );
+        $listener->onKernelRequest($eventProphecy->reveal());
     }
 }

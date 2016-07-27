@@ -36,7 +36,7 @@ Feature: JSON-LD contexts generation
     """
       {
           "@context": {
-              "@vocab": "http://example.com/apidoc#",
+              "@vocab": "http://example.com/apidoc.jsonld#",
               "hydra": "http://www.w3.org/ns/hydra/core#",
               "description": "https://schema.org/description",
               "dummy": "#Dummy/dummy",
@@ -69,7 +69,7 @@ Feature: JSON-LD contexts generation
       """
       {
         "@context": {
-          "@vocab": "http://example.com/apidoc#",
+          "@vocab": "http://example.com/apidoc.jsonld#",
           "hydra": "http://www.w3.org/ns/hydra/core#",
           "paris": "#RelationEmbedder/paris",
           "krondstadt": "#RelationEmbedder/krondstadt",

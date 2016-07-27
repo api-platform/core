@@ -16,8 +16,8 @@ Feature: Content Negotiation support
     And the header "Content-Type" should be equal to "application/xml"
     And the response should be equal to
     """
-<?xml version="1.0"?>
-<response><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></response>
+    <?xml version="1.0"?>
+    <response><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></response>
     """
 
   Scenario:  Retrieve a collection in XML
@@ -27,8 +27,8 @@ Feature: Content Negotiation support
     And the header "Content-Type" should be equal to "application/xml"
     And the response should be equal to
     """
-<?xml version="1.0"?>
-<response><item key="0"><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></item></response>
+    <?xml version="1.0"?>
+    <response><item key="0"><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></item></response>
     """
 
   Scenario:  Retrieve a collection in XML using the .xml URL
@@ -37,8 +37,8 @@ Feature: Content Negotiation support
     And the header "Content-Type" should be equal to "application/xml"
     And the response should be equal to
     """
-<?xml version="1.0"?>
-<response><item key="0"><id>1</id><name>XML!</name><alias/><description/><dummyDate/><dummyPrice/><jsonData/><relatedDummy/><dummyBoolean/><dummy/><relatedDummies/><nameConverted/></item></response>
+    <?xml version="1.0"?>
+    <response><item key="0"><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></item></response>
     """
 
   Scenario:  Retrieve a collection in JSON
@@ -49,22 +49,37 @@ Feature: Content Negotiation support
     And the response should be in JSON
     And the JSON should be equal to:
     """
-[
-  {
-    "id": 1,
-    "name": "XML!",
-    "alias": null,
-    "description": null,
-    "dummyDate": null,
-    "dummyPrice": null,
-    "jsonData": [],
-    "relatedDummy": null,
-    "dummyBoolean": null,
-    "dummy": null,
-    "relatedDummies": [],
-    "nameConverted": null
-  }
-]
+    [
+      {
+        "id": "/dummies/1",
+        "description": null,
+        "dummy": null,
+        "dummyBoolean": null,
+        "dummyDate": null,
+        "dummyPrice": null,
+        "relatedDummy": null,
+        "relatedDummies": [],
+        "jsonData": [],
+        "name_converted": null,
+        "name": "XML!",
+        "alias": null
+      }
+    ]
+    """
+
+  Scenario: Post a JSON document and retrieve an XML body
+    When I add "Accept" header equal to "application/xml"
+    And I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {"name": "Sent in JSON"}
+    """
+    Then the response status code should be 201
+    And the header "Content-Type" should be equal to "application/xml"
+    And the response should be equal to
+    """
+    <?xml version="1.0"?>
+    <response><id>/dummies/2</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>Sent in JSON</name><alias/></response>
     """
 
   @dropSchema

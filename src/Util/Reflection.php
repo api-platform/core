@@ -18,7 +18,7 @@ namespace ApiPlatform\Core\Util;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Reflection
+final class Reflection
 {
     const ACCESSOR_PREFIXES = ['get', 'is', 'has', 'can'];
     const MUTATOR_PREFIXES = ['set', 'add', 'remove'];
@@ -36,25 +36,6 @@ class Reflection
 
         if (preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
             return $matches[2];
-        }
-    }
-
-    /**
-     * Gets the {@see \ReflectionProperty} from the class or its parent.
-     *
-     * @param \ReflectionClass $reflectionClass
-     * @param string           $attributeName
-     *
-     * @return \ReflectionProperty
-     */
-    private function getReflectionProperty(\ReflectionClass $reflectionClass, $attributeName)
-    {
-        if ($reflectionClass->hasProperty($attributeName)) {
-            return $reflectionClass->getProperty($attributeName);
-        }
-
-        if ($parent = $reflectionClass->getParentClass()) {
-            return $this->getReflectionProperty($parent, $attributeName);
         }
     }
 }

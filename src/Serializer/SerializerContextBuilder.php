@@ -11,8 +11,8 @@
 
 namespace ApiPlatform\Core\Serializer;
 
-use ApiPlatform\Core\Api\RequestAttributesExtractor;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -51,6 +51,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         $context['resource_class'] = $attributes['resource_class'];
         $context['request_uri'] = $request->getRequestUri();
+
 
         return $context;
     }

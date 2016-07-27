@@ -14,9 +14,8 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
 use Prophecy\Argument;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -27,9 +26,8 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, ['jsonld_sub_level' => true])->willReturn(['foo' => 'bar'])->shouldBeCalled();
-        $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizer);
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['jsonld_sub_level' => true]));
     }
 
@@ -37,9 +35,8 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, Argument::type('array'))->willReturn(['foo' => 'bar'])->shouldBeCalled();
-        $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizer);
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
     }
 
@@ -48,13 +45,11 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
         $paginatorProphecy->getLastPage()->willReturn(20)->shouldBeCalled();
-        $paginator = $paginatorProphecy->reveal();
 
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::type(PaginatorInterface::class), null, Argument::type('array'))->willReturn(['hydra:totalItems' => 40, 'foo' => 'bar'])->shouldBeCalled();
-        $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizer, '_page');
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), '_page');
         $this->assertEquals(
             [
                 'hydra:totalItems' => 40,
@@ -68,7 +63,7 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
                     'hydra:next' => '/?_page=4',
                 ],
             ],
-            $normalizer->normalize($paginator)
+            $normalizer->normalize($paginatorProphecy->reveal())
         );
     }
 
@@ -76,23 +71,20 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null)->willReturn(true)->shouldBeCalled();
-        $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizer);
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testSetSerializer()
+    public function testSetNormalizer()
     {
-        $serializer = $this->prophesize(SerializerInterface::class)->reveal();
+        $injectedNormalizer = $this->prophesize(NormalizerInterface::class)->reveal();
 
-        $decoratedNormalizerProphecy = $this
-            ->prophesize(NormalizerInterface::class)
-            ->willImplement(SerializerAwareInterface::class);
-        $decoratedNormalizerProphecy->setSerializer(Argument::type(SerializerInterface::class))->shouldBeCalled();
-        $decoratedNormalizer = $decoratedNormalizerProphecy->reveal();
+        $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedNormalizerProphecy->willImplement(NormalizerAwareInterface::class);
+        $decoratedNormalizerProphecy->setNormalizer(Argument::type(NormalizerInterface::class))->shouldBeCalled();
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizer);
-        $normalizer->setSerializer($serializer);
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
+        $normalizer->setNormalizer($injectedNormalizer);
     }
 }
