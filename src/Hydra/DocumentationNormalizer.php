@@ -120,31 +120,9 @@ final class DocumentationNormalizer implements NormalizerInterface
                     continue;
                 }
 
-                $type = $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'Hydra:Link';
-                $property = [
-                    '@type' => 'hydra:SupportedProperty',
-                    'hydra:property' => [
-                        '@id' => ($iri = $propertyMetadata->getIri()) ? $iri : sprintf('#%s/%s', $shortName, $propertyName),
-                        '@type' => $type,
-                        'rdfs:label' => $propertyName,
-                        'domain' => $prefixedShortName,
-                    ],
-                    'hydra:title' => $propertyName,
-                    'hydra:required' => $propertyMetadata->isRequired(),
-                    'hydra:readable' => $propertyMetadata->isReadable(),
-                    'hydra:writable' => $propertyMetadata->isWritable(),
-                ];
-
-                if ($range = $this->getRange($propertyMetadata)) {
-                    $property['hydra:property']['range'] = $range;
-                }
-
-                if ($description = $propertyMetadata->getDescription()) {
-                    $property['hydra:description'] = $description;
-                }
-
-                $properties[] = $property;
+                $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
             }
+
             $class['hydra:supportedProperty'] = $properties;
 
             $itemOperations = [];
@@ -159,95 +137,9 @@ final class DocumentationNormalizer implements NormalizerInterface
             $classes[] = $class;
         }
 
-        // Entrypoint
-        $classes[] = [
-            '@id' => '#Entrypoint',
-            '@type' => 'hydra:Class',
-            'hydra:title' => 'The API entrypoint',
-            'hydra:supportedProperty' => $entrypointProperties,
-            'hydra:supportedOperation' => [
-                '@type' => 'hydra:Operation',
-                'hydra:method' => 'GET',
-                'rdfs:label' => 'The API entrypoint.',
-                'returns' => '#EntryPoint',
-            ],
-        ];
+        $classes = $this->getClasses($entrypointProperties, $classes);
 
-        // Constraint violation
-        $classes[] = [
-            '@id' => '#ConstraintViolation',
-            '@type' => 'hydra:Class',
-            'hydra:title' => 'A constraint violation',
-            'hydra:supportedProperty' => [
-                [
-                    '@type' => 'hydra:SupportedProperty',
-                    'hydra:property' => [
-                        '@id' => '#ConstraintViolation/propertyPath',
-                        '@type' => 'rdf:Property',
-                        'rdfs:label' => 'propertyPath',
-                        'domain' => '#ConstraintViolation',
-                        'range' => 'xmls:string',
-                    ],
-                    'hydra:title' => 'propertyPath',
-                    'hydra:description' => 'The property path of the violation',
-                    'hydra:readable' => true,
-                    'hydra:writable' => false,
-                ],
-                [
-                    '@type' => 'hydra:SupportedProperty',
-                    'hydra:property' => [
-                        '@id' => '#ConstraintViolation/message',
-                        '@type' => 'rdf:Property',
-                        'rdfs:label' => 'message',
-                        'domain' => '#ConstraintViolation',
-                        'range' => 'xmls:string',
-                    ],
-                    'hydra:title' => 'message',
-                    'hydra:description' => 'The message associated with the violation',
-                    'hydra:readable' => true,
-                    'hydra:writable' => false,
-                ],
-            ],
-        ];
-
-        // Constraint violation list
-        $classes[] = [
-            '@id' => '#ConstraintViolationList',
-            '@type' => 'hydra:Class',
-            'subClassOf' => 'hydra:Error',
-            'hydra:title' => 'A constraint violation list',
-            'hydra:supportedProperty' => [
-                [
-                    '@type' => 'hydra:SupportedProperty',
-                    'hydra:property' => [
-                        '@id' => '#ConstraintViolationList/violation',
-                        '@type' => 'rdf:Property',
-                        'rdfs:label' => 'violation',
-                        'domain' => '#ConstraintViolationList',
-                        'range' => '#ConstraintViolation',
-                    ],
-                    'hydra:title' => 'violation',
-                    'hydra:description' => 'The violations',
-                    'hydra:readable' => true,
-                    'hydra:writable' => false,
-                ],
-            ],
-        ];
-
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
-
-        if ('' !== $object->getTitle()) {
-            $doc['hydra:title'] = $object->getTitle();
-        }
-
-        if ('' !== $object->getDescription()) {
-            $doc['hydra:description'] = $object->getDescription();
-        }
-
-        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
-        $doc['hydra:supportedClass'] = $classes;
-
-        return $doc;
+        return $this->computeDoc($object, $classes);
     }
 
     /**
@@ -391,6 +283,134 @@ final class DocumentationNormalizer implements NormalizerInterface
                 }
            break;
         }
+    }
+
+    /*
+     * Builds the classes array.
+     */
+    private function getClasses(array $entrypointProperties, array $classes) : array
+    {
+        $classes[] = [
+                '@id' => '#Entrypoint',
+                '@type' => 'hydra:Class',
+                'hydra:title' => 'The API entrypoint',
+                'hydra:supportedProperty' => $entrypointProperties,
+                'hydra:supportedOperation' => [
+                    '@type' => 'hydra:Operation',
+                    'hydra:method' => 'GET',
+                    'rdfs:label' => 'The API entrypoint.',
+                    'returns' => '#EntryPoint',
+                ],
+            ];
+
+        // Constraint violation
+        $classes[] = [
+            '@id' => '#ConstraintViolation',
+            '@type' => 'hydra:Class',
+            'hydra:title' => 'A constraint violation',
+            'hydra:supportedProperty' => [
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#ConstraintViolation/propertyPath',
+                        '@type' => 'rdf:Property',
+                        'rdfs:label' => 'propertyPath',
+                        'domain' => '#ConstraintViolation',
+                        'range' => 'xmls:string',
+                    ],
+                    'hydra:title' => 'propertyPath',
+                    'hydra:description' => 'The property path of the violation',
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ],
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#ConstraintViolation/message',
+                        '@type' => 'rdf:Property',
+                        'rdfs:label' => 'message',
+                        'domain' => '#ConstraintViolation',
+                        'range' => 'xmls:string',
+                    ],
+                    'hydra:title' => 'message',
+                    'hydra:description' => 'The message associated with the violation',
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ],
+            ],
+        ];
+
+        // Constraint violation list
+        $classes[] = [
+            '@id' => '#ConstraintViolationList',
+            '@type' => 'hydra:Class',
+            'subClassOf' => 'hydra:Error',
+            'hydra:title' => 'A constraint violation list',
+            'hydra:supportedProperty' => [
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#ConstraintViolationList/violation',
+                        '@type' => 'rdf:Property',
+                        'rdfs:label' => 'violation',
+                        'domain' => '#ConstraintViolationList',
+                        'range' => '#ConstraintViolation',
+                    ],
+                    'hydra:title' => 'violation',
+                    'hydra:description' => 'The violations',
+                    'hydra:readable' => true,
+                    'hydra:writable' => false,
+                ],
+            ],
+        ];
+
+        return $classes;
+    }
+
+    private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
+    {
+        $type = $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'Hydra:Link';
+        $property = [
+            '@type' => 'hydra:SupportedProperty',
+            'hydra:property' => [
+                '@id' => ($iri = $propertyMetadata->getIri()) ? $iri : sprintf('#%s/%s', $shortName, $propertyName),
+                '@type' => $type,
+                'rdfs:label' => $propertyName,
+                'domain' => $prefixedShortName,
+            ],
+            'hydra:title' => $propertyName,
+            'hydra:required' => $propertyMetadata->isRequired(),
+            'hydra:readable' => $propertyMetadata->isReadable(),
+            'hydra:writable' => $propertyMetadata->isWritable(),
+        ];
+
+        if ($range = $this->getRange($propertyMetadata)) {
+            $property['hydra:property']['range'] = $range;
+        }
+
+        if ($description = $propertyMetadata->getDescription()) {
+            $property['hydra:description'] = $description;
+        }
+
+        return $property;
+    }
+
+    private function computeDoc($object, array $classes): array
+    {
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
+
+        if ('' !== $object->getTitle()) {
+            $doc['hydra:title'] = $object->getTitle();
+        }
+
+        if ('' !== $object->getDescription()) {
+            $doc['hydra:description'] = $object->getDescription();
+        }
+
+        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        $doc['hydra:supportedClass'] = $classes;
+
+        return $doc;
     }
 
     /**
