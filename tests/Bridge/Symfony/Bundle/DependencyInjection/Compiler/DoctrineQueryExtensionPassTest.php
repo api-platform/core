@@ -37,6 +37,7 @@ class DoctrineQueryExtensionPassTest extends \PHPUnit_Framework_TestCase
         $itemDataProviderDefinition = $itemDataProviderDefinitionProphecy->reveal();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->hasDefinition('api_platform.doctrine.metadata_factory')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.doctrine.orm.query_extension.collection')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.doctrine.orm.query_extension.item')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.collection_data_provider')->willReturn($collectionDataProviderDefinition)->shouldBeCalled();

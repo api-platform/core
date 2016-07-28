@@ -30,6 +30,11 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        // if doctrine not loaded
+        if (!$container->hasDefinition('api_platform.doctrine.metadata_factory')) {
+            return;
+        }
+
         $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
         $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
 
