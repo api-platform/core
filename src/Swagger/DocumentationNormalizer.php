@@ -44,7 +44,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $operationMethodResolver;
     private $iriConverter;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, IriConverterInterface $iriConverter)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, IriConverterInterface $iriConverter = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -132,27 +132,26 @@ final class DocumentationNormalizer implements NormalizerInterface
                 }
             }
 
-            try {
-                $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
-            } catch (InvalidArgumentException $e) {
-                continue;
-            }
-
-            $operations = $resourceMetadata->getCollectionOperations() ?? null;
+            $operations = $resourceMetadata->getCollectionOperations() ?? [];
             foreach ($operations as $operationName => $collectionOperation) {
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-                $path = $resourceMetadata->getCollectionOperationAttribute($operationName, 'path', $resourceClassIri);
+                $path = $this->getPath($resourceClass, $resourceMetadata, $operationName, true);
+                if (null === $path) {
+                    continue;
+                }
 
                 $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
                 $itemOperationsDocs[$path] = array_merge($itemOperationsDocs[$path] ?? [], $swaggerOperation);
             }
 
-            $resourceClassIri .= '/{id}';
             $operations = $resourceMetadata->getItemOperations() ?? [];
             foreach ($operations as $operationName => $itemOperation) {
                 $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
 
-                $path = $resourceMetadata->getItemOperationAttribute($operationName, 'path', $resourceClassIri);
+                $path = $this->getPath($resourceClass, $resourceMetadata, $operationName, false);
+                if (null === $path) {
+                    continue;
+                }
                 $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method, $object->getMimeTypes());
                 $itemOperationsDocs[$path] = array_merge($itemOperationsDocs[$path] ?? [], $swaggerOperation);
             }
@@ -175,6 +174,33 @@ final class DocumentationNormalizer implements NormalizerInterface
         $doc['paths'] = $itemOperationsDocs;
 
         return $doc;
+    }
+
+    private function getPath(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, bool $collection)
+    {
+        // Check if the operation has a custom path
+        $method = $collection ? 'getCollectionOperationAttribute' : 'getItemOperationAttribute';
+        $path = $resourceMetadata->{$method}($operationName, 'path');
+        if (null !== $path) {
+            return $path;
+        }
+
+        if (null === $this->iriConverter) {
+            throw new InvalidArgumentException(sprintf('%s can\'t manage the %s %s operation of the resource "%s" because it needs an instance of %s to manage standard operations (path not defined manually).', __CLASS__, $collection ? 'collection' : 'item', $resourceClass, IriConverterInterface::class));
+        }
+
+        // @todo Fix the limitation of the IriConverter when a resource
+        // has no collection operations
+        try {
+            $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
+            if (!$collection) {
+                $resourceClassIri .= '/{id}';
+            }
+        } catch (InvalidArgumentException $e) {
+            return;
+        }
+
+        return $resourceClassIri;
     }
 
     /**
