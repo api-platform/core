@@ -7,5 +7,6 @@ $finder = Symfony\CS\Finder\DefaultFinder::create()
 
 return Symfony\CS\Config\Config::create()
     ->setUsingCache(true)
+    ->fixers(['-psr0'])
     ->finder($finder)
 ;

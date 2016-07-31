@@ -18,7 +18,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
-
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class ConstraintViolationListNormalizer implements NormalizerInterface

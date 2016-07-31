@@ -275,7 +275,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $item->setField1('foobar');
         $this->manager->persist($item);
 
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; ++$i) {
             $label = new CompositeLabel();
             $label->setValue('foo-'.$i);
 
