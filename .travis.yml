@@ -26,10 +26,6 @@ before_install:
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
   - if [[ $lint = 1 ]]; then wget http://get.sensiolabs.org/php-cs-fixer.phar; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
-  - if [ ! `php -r 'echo extension_loaded("mongodb");'` ]; then
-    pecl install mongodb || /bin/true;
-    echo 'extension=mongodb.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini;
-    fi
 
 install:
   - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi

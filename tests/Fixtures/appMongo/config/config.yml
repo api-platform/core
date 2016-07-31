@@ -17,6 +17,11 @@ framework:
     form:                              ~ # For FOSUser
 
 doctrine:
+    dbal:
+        driver:                        'pdo_sqlite'
+        path:                          '%kernel.cache_dir%/db.sqlite'
+        charset:                       'UTF8'
+
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
@@ -24,9 +29,9 @@ doctrine:
 doctrine_mongodb:
     connections:
         default:
-            server: mongodb://127.0.0.1:27017
+            server: mongodb://localhost:27017
             options: {}
-    default_database: admin
+    default_database: apiplatform
     document_managers:
         default:
             auto_mapping: true
@@ -50,7 +55,7 @@ api_platform:
             items_per_page:            3
 
 fos_user:
-    db_driver:        'orm'
+    db_driver:        'mongodb'
     firewall_name:    'api'
     service:
         user_manager: 'app.user_manager'

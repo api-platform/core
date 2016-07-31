@@ -51,11 +51,11 @@ class ItemDataProvider implements ItemDataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         if ($this->decorated) {
             try {
-                return $this->decorated->getItem($resourceClass, $id, $operationName, $fetchData);
+                return $this->decorated->getItem($resourceClass, $id, $operationName, $context);
             } catch (ResourceClassNotSupportedException $resourceClassNotSupportedException) {
                 // Ignore it
             }
@@ -86,7 +86,7 @@ class ItemDataProvider implements ItemDataProviderInterface
             ++$i;
         }
 
-        if (!$fetchData || $manager instanceof DocumentManager) {
+        if (!$context['fetch_data'] || $manager instanceof DocumentManager) {
             return $manager->getReference($resourceClass, reset($identifiers));
         }
 

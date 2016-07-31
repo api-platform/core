@@ -34,6 +34,7 @@
         "doctrine/doctrine-bundle": "^1.6.3",
         "doctrine/orm": "^2.5",
         "doctrine/mongodb-odm": "1.1.0",
+        "doctrine/mongodb-odm-bundle": "~3.0",
         "ext-mongo": "*",
         "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0@dev",
