@@ -123,6 +123,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
             $loader->load('nelmio_api_doc.xml');
         }
+
+        // Disable the cache when in dev mode
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('api_platform.metadata.resource.name_collection_factory.cached');
+            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.cached');
+            $container->removeDefinition('api_platform.metadata.property.name_collection_factory.cached');
+            $container->removeDefinition('api_platform.metadata.property.metadata_factory.cached');
+        }
     }
 
     /**
