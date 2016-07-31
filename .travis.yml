@@ -14,6 +14,9 @@ matrix:
     - php: '7.1'
       env: deps='low'
 
+service:
+  - mongodb
+
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - phpunit --self-update
@@ -37,6 +40,7 @@ script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr -dmemory_limit=-1 "$(phpenv which phpunit)" --coverage-php build/cov/coverage-phpunit.cov; else phpunit; fi
   - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/behat --profile coverage; else vendor/bin/behat; fi
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
+  - vendor/bin/behat -c behat.mongo.yml
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff; fi
 

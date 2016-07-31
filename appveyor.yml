@@ -28,6 +28,9 @@ install:
   - php -r "readfile('http://getcomposer.org/installer');" | php
   - php composer.phar install --no-interaction --no-progress --ignore-platform-reqs
 
+services:
+  - mongodb
+
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - php vendor\behat\behat\bin\behat

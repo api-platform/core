@@ -1,0 +1,108 @@
+imports:
+    - { resource: security.yml }
+
+framework:
+    secret:                           'dunglas.fr'
+    router:
+        resource:                     '%kernel.root_dir%/config/routing.yml'
+        strict_requirements:          '%kernel.debug%'
+    validation:
+        enable_annotations:            true
+    serializer:
+        enable_annotations:            true
+    trusted_proxies:                   ~
+    test:                              ~
+    session:
+        storage_id:                    'session.storage.mock_file'
+    form:                              ~ # For FOSUser
+
+doctrine:
+    orm:
+        auto_generate_proxy_classes:   '%kernel.debug%'
+        auto_mapping:                  true
+
+doctrine_mongodb:
+    connections:
+        default:
+            server: mongodb://127.0.0.1:27017
+            options: {}
+    default_database: admin
+    document_managers:
+        default:
+            auto_mapping: true
+
+api_platform:
+    title:                             'My Dummy API'
+    description:                       'This is a test API.'
+    formats:
+        jsonld:                        ['application/ld+json']
+        jsonhal:                       ['application/hal+json']
+        xml:                           ['application/xml', 'text/xml']
+        json:                          ['application/json']
+    name_converter:                    'app.name_converter'
+    enable_fos_user:                   true
+    collection:
+        order_parameter_name:          'order'
+        order:                         'ASC'
+        pagination:
+            client_enabled:            true
+            client_items_per_page:     true
+            items_per_page:            3
+
+fos_user:
+    db_driver:        'orm'
+    firewall_name:    'api'
+    service:
+        user_manager: 'app.user_manager'
+    user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
+
+services:
+    app.user_manager:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
+        arguments:
+            -  '@security.encoder_factory'
+            -  '@fos_user.util.username_canonicalizer'
+            -  '@fos_user.util.email_canonicalizer'
+            -  '@fos_user.object_manager'
+            -  '%fos_user.model.user.class%'
+
+    fos_user.mailer.default:
+        class: 'ApiPlatform\Core\Bridge\Symfony\Bundle\Tests\Mock\MailerMock'
+
+    app.name_converter:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
+
+    app.my_dummy_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
+
+    app.my_dummy_resource.order_filter:
+        parent:    'api_platform.doctrine.orm.order_filter'
+        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
+
+    app.my_dummy_resource.date_filter:
+        parent:    'api_platform.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
+
+    app.my_dummy_resource.range_filter:
+        parent:    'api_platform.doctrine.orm.range_filter'
+        arguments: [ { 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
+
+    app.my_dummy_resource.boolean_filter:
+        parent:    'api_platform.doctrine.orm.boolean_filter'
+        arguments: [ { 'dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
+
+    app.my_dummy_resource.numeric_filter:
+        parent:    'api_platform.doctrine.orm.numeric_filter'
+        arguments: [ { 'dummyPrice': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
+
+    app.config_dummy_resource.controller:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\ConfigCustomController'
+        arguments: ['@api_platform.item_data_provider']
+
