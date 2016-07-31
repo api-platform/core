@@ -132,58 +132,39 @@ final class DocumentationNormalizer implements NormalizerInterface
                 }
             }
 
-            if ($operations = $resourceMetadata->getItemOperations()) {
-                foreach ($operations as $operationName => $itemOperation) {
-                    $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
-                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method, $object->getMimeTypes());
-                    $operation['item'] = array_merge($operation['item'], $swaggerOperation);
-                    if ($operationName !== strtolower($method)) {
-                        $customOperations['item'][] = $operationName;
-                    }
-                }
-            }
-
-            if ($operations = $resourceMetadata->getCollectionOperations()) {
-                foreach ($operations as $operationName => $collectionOperation) {
-                    $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-                    $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
-                    $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
-                    if ($operationName !== strtolower($method)) {
-                        $customOperations['collection'][] = $operationName;
-                    }
-                }
-            }
             try {
                 $resourceClassIri = $this->iriConverter->getIriFromResourceClass($resourceClass);
-                $itemOperationsDocs[$resourceClassIri] = $operation['collection'];
 
-                if (!empty($customOperations['collection'])) {
-                    foreach ($customOperations['collection'] as $customOperation) {
-                        $path = $resourceMetadata->getCollectionOperationAttribute($customOperation, 'path');
-                        if (null !== $path) {
-                            $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $customOperation);
-                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
-
-                            $itemOperationsDocs[$path] = $customSwaggerOperation;
+                if ($operations = $resourceMetadata->getItemOperations()) {
+                    foreach ($operations as $operationName => $itemOperation) {
+                        $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+                        if ($operationName !== strtolower($method)) {
+                            $resourceClassIri = $resourceMetadata->getItemOperationAttribute($operationName, 'path') ?? $resourceClassIri;
+                            $itemOperation = [$this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName)];
                         }
+                        $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method, $object->getMimeTypes());
+                        $operation['item'] = array_merge($operation['item'], $swaggerOperation);
                     }
                 }
+
+                if ($operations = $resourceMetadata->getCollectionOperations()) {
+                    foreach ($operations as $operationName => $collectionOperation) {
+                        $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
+                        if ($operationName !== strtolower($method)) {
+                            $resourceClassIri = $resourceMetadata->getCollectionOperationAttribute($operationName, 'path') ?? $resourceClassIri;
+                            $collectionOperation = [$this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName)];
+                        }
+                        $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
+                        $operation['collection'] = array_merge($operation['collection'], $swaggerOperation);
+                    }
+                }
+
+                $itemOperationsDocs[$resourceClassIri] = $operation['collection'];
+
 
                 $resourceClassIri .= '/{id}';
 
                 $itemOperationsDocs[$resourceClassIri] = $operation['item'];
-
-                if (!empty($customOperations['item'])) {
-                    foreach ($customOperations['item'] as $customOperation) {
-                        $path = $resourceMetadata->getItemOperationAttribute($customOperation, 'path');
-                        if (null !== $path) {
-                            $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $customOperation);
-                            $customSwaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $customOperation, [$method], $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
-
-                            $itemOperationsDocs[$path] = $customSwaggerOperation;
-                        }
-                    }
-                }
             } catch (InvalidArgumentException $e) {
                 continue;
             }

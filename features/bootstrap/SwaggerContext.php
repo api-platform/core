@@ -43,7 +43,7 @@ final class SwaggerContext implements Context
      */
     public function assertTheSwaggerClassExist($className)
     {
-        $this->getClassInfos($className);
+        \PHPUnit_Framework_Assert::assertTrue($this->getClassInfos($className) instanceof stdClass);
     }
 
     /**
@@ -51,27 +51,15 @@ final class SwaggerContext implements Context
      */
     public function assertTheSwaggerClassNotExist($className)
     {
-        try {
-            $this->getClassInfos($className);
-
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exist.', $className));
-        } catch (\Exception $exception) {
-            // an exception must be catched
-        }
+        \PHPUnit_Framework_Assert::assertTrue($this->getClassInfos($className) === null);
     }
 
     /**
-     * @Then the Swagger path ":arg1" exist
+     * @Then the Swagger path ":path" exist
      */
     public function assertThePathExist($path)
     {
-        try {
-            \PHPUnit_Framework_Assert::assertTrue($this->assertSwaggerPath($path));
-
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The path "%s" exist.', $path));
-        } catch (\Exception $exception) {
-            // an exception must be catched
-        }
+        \PHPUnit_Framework_Assert::assertTrue($this->assertSwaggerPath($path));
     }
 
     /**
@@ -209,8 +197,8 @@ final class SwaggerContext implements Context
     {
         $json = $this->getLastJsonResponse();
         $validPath = false;
-        if (isset($json->{'paths'}) && $getOperation) {
-            foreach ($json->{'paths'} as $classTitle => $classPath) {
+        if (isset($json->{'paths'})) {
+            foreach ($json->{'paths'} as $classPath => $class) {
                 if ($expectedPath === $classPath) {
                     return true;
                 }
@@ -220,7 +208,7 @@ final class SwaggerContext implements Context
         return $validPath;
     }
 
-    private function getClassInfos(string $className, bool $getOperation = false) : stdClass
+    private function getClassInfos(string $className, bool $getOperation = false)
     {
         $json = $this->getLastJsonResponse();
         $classInfos = null;
@@ -245,8 +233,8 @@ final class SwaggerContext implements Context
             }
         }
 
-        if (empty($classInfos)) {
-            throw new \Exception(sprintf('Class %s cannot be found in the vocabulary', $className));
+        if (!empty($classInfos)) {
+            return $classInfos;
         }
 
         return $classInfos;
