@@ -13,8 +13,6 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\Operation;
-use ApiPlatform\Core\Metadata\Resource\PaginationMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Annotations\Reader;
 
@@ -99,47 +97,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
             $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
         }
 
-        $resourceMetadata = $this->createWith($resourceMetadata, 'collectionOperations', $this->createOperations($annotation->collectionOperations));
-        $resourceMetadata = $this->createWith($resourceMetadata, 'itemOperations', $this->createOperations($annotation->itemOperations));
-
         return $resourceMetadata;
-    }
-
-    /**
-     * Creates operation and pagination metadata from annotations.
-     *
-     * @param array|null $operationAnnotations
-     *
-     * @return array|null
-     */
-    private function createOperations(array $operationAnnotations = null)
-    {
-        if (null === $operationAnnotations) {
-            return;
-        }
-
-        $operations = [];
-        foreach ($operationAnnotations as $operationName => $operationAnnotation) {
-            if ($paginationAnnotation = $operationAnnotation->pagination) {
-                $paginationMetadata = new PaginationMetadata(
-                    $paginationAnnotation->enabled,
-                    (float) $paginationAnnotation->itemsPerPage,
-                    $paginationAnnotation->clientControlEnabled
-                );
-            } else {
-                $paginationMetadata = null;
-            }
-
-            $operation = new Operation(
-                $operationAnnotation->filters,
-                $paginationMetadata,
-                $operationAnnotation->attributes
-            );
-
-            $operations[$operationName] = $operation;
-        }
-
-        return $operations;
     }
 
     /**
