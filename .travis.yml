@@ -30,8 +30,8 @@ before_install:
 
 install:
   - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi
-  - if [[ ! $deps ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
-  - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
+  - if [[ ! $deps ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi --ignore-platform-reqs; fi
+  - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi --ignore-platform-reqs; fi
 
 script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr -dmemory_limit=-1 "$(phpenv which phpunit)" --coverage-php build/cov/coverage-phpunit.cov; else phpunit; fi
