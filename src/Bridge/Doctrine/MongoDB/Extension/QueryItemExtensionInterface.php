@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 use Doctrine\ODM\MongoDB\Query\Builder;
 
 /**
- * Interface of Doctrine Doctrine ODM query extensions for item queries.
+ * Interface of Doctrine ODM query extensions for item queries.
  *
  * @author Maxime STEINHAUSSER <maxime.steinhausser@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
