@@ -28,8 +28,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "get"={"method"="GET"},
  *     "put"={"method"="PUT"},
  *     "custom_get"={"route_name"="relation_embedded.custom_get"},
- *     "custom1"={"path"="/api/custom-call", "method"="GET"},
- *     "custom2"={"path"="/api/custom-call", "method"="PUT"},
+ *     "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
+ *     "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
  * })
  * @ORM\Entity
  */
