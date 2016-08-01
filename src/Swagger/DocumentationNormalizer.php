@@ -107,29 +107,11 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
-                if ($propertyMetadata->isRequired()) {
-                    $definitions[$shortName]['required'][] = $propertyName;
-                }
-
                 $range = $this->getRange($propertyMetadata);
                 if (empty($range)) {
                     continue;
                 }
-
-                if ($propertyMetadata->getDescription()) {
-                    $definitions[$shortName]['properties'][$propertyName]['description'] = $propertyMetadata->getDescription();
-                }
-
-                if ($range['complex']) {
-                    $definitions[$shortName]['properties'][$propertyName] = ['$ref' => $range['value']];
-                } else {
-                    $definitions[$shortName]['properties'][$propertyName] = ['type' => $range['value']];
-
-                    if (isset($range['example'])) {
-                        $definitions[$shortName]['properties'][$propertyName]['example'] = $range['example'];
-                    }
-                }
+                $definitions = $this->getDefinitions($propertyMetadata, $propertyName, $shortName, $definitions, $range);
             }
 
             $operations = $resourceMetadata->getCollectionOperations() ?? [];
@@ -159,21 +141,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $classes[] = $class;
         }
 
-        $doc['swagger'] = self::SWAGGER_VERSION;
-        if ('' !== $object->getTitle()) {
-            $doc['info']['title'] = $object->getTitle();
-        }
-
-        if ('' !== $object->getDescription()) {
-            $doc['info']['description'] = $object->getDescription();
-        }
-        $doc['info']['version'] = $object->getVersion() ?? '0.0.0';
-        $doc['definitions'] = $definitions;
-        $doc['externalDocs'] = ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com'];
-        $doc['tags'] = $classes;
-        $doc['paths'] = $itemOperationsDocs;
-
-        return $doc;
+        return $this->computeDoc($object, $definitions, $classes, $itemOperationsDocs);
     }
 
     private function getPath(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, bool $collection)
@@ -343,7 +311,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @param PropertyMetadata $propertyMetadata
      *
-     * @return array|null
+     * @return array
      */
     private function getRange(PropertyMetadata $propertyMetadata) : array
     {
@@ -392,6 +360,48 @@ final class DocumentationNormalizer implements NormalizerInterface
             default:
                 return ['complex' => false, 'value' => 'null'];
         }
+    }
+
+    private function getDefinitions(PropertyMetadata $propertyMetadata, string $propertyName, string $shortName, array $definitions, array $range): array
+    {
+        if ($propertyMetadata->isRequired()) {
+            $definitions[$shortName]['required'][] = $propertyName;
+        }
+
+        if ($propertyMetadata->getDescription()) {
+            $definitions[$shortName]['properties'][$propertyName]['description'] = $propertyMetadata->getDescription();
+        }
+
+        if ($range['complex']) {
+            $definitions[$shortName]['properties'][$propertyName] = ['$ref' => $range['value']];
+        } else {
+            $definitions[$shortName]['properties'][$propertyName] = ['type' => $range['value']];
+
+            if (isset($range['example'])) {
+                $definitions[$shortName]['properties'][$propertyName]['example'] = $range['example'];
+            }
+        }
+
+        return $definitions;
+    }
+
+    public function computeDoc(Documentation $object, array $definitions, array $classes, array $itemOperationsDocs): array
+    {
+        $doc['swagger'] = self::SWAGGER_VERSION;
+        if ('' !== $object->getTitle()) {
+            $doc['info']['title'] = $object->getTitle();
+        }
+
+        if ('' !== $object->getDescription()) {
+            $doc['info']['description'] = $object->getDescription();
+        }
+        $doc['info']['version'] = $object->getVersion() ?? '0.0.0';
+        $doc['definitions'] = $definitions;
+        $doc['externalDocs'] = ['description' => 'Find more about API Platform', 'url' => 'https://api-platform.com'];
+        $doc['tags'] = $classes;
+        $doc['paths'] = $itemOperationsDocs;
+
+        return $doc;
     }
 
     /**
