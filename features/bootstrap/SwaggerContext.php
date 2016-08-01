@@ -39,7 +39,7 @@ final class SwaggerContext implements Context
     }
 
     /**
-     * @Then the Swagger class ":class" exist
+     * @Then the Swagger class ":class" exists
      */
     public function assertTheSwaggerClassExist($className)
     {
@@ -47,31 +47,27 @@ final class SwaggerContext implements Context
     }
 
     /**
-     * @Then the Swagger class ":class" not exist
+     * @Then the Swagger class ":class" doesn't exist
      */
     public function assertTheSwaggerClassNotExist($className)
     {
         try {
             $this->getClassInfos($className);
-
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exist.', $className));
         } catch (\Exception $exception) {
-            // an exception must be catched
+            // the class doesn't exist
+            return;
         }
+
+        throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exist.', $className));
     }
 
     /**
-     * @Then the Swagger path ":arg1" exist
+     * @Then the Swagger path ":arg1" exists
      */
     public function assertThePathExist($path)
     {
-        try {
-            \PHPUnit_Framework_Assert::assertTrue($this->assertSwaggerPath($path));
-
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The path "%s" exist.', $path));
-        } catch (\Exception $exception) {
-            // an exception must be catched
-        }
+        $json = $this->getLastJsonResponse();
+        \PHPUnit_Framework_Assert::assertTrue(isset($json->paths) && isset($json->paths->{$path}));
     }
 
     /**
@@ -89,11 +85,6 @@ final class SwaggerContext implements Context
     public function assertPropertyNodeValueIs($nodeName, $propertyName, $className, $value)
     {
         $property = $this->getProperty($propertyName, $className);
-        if (empty($property)) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
-                sprintf('The property "%s" for the class "%s" exist.', $propertyName, $className)
-            );
-        }
         \PHPUnit_Framework_Assert::assertEquals($this->propertyAccessor->getValue($property, $nodeName), $value);
     }
 
@@ -128,16 +119,11 @@ final class SwaggerContext implements Context
     }
 
     /**
-     * @Then ":prop" property doesn't exist for the Swagger class ":class"
+     * @Then ":prop" property exists for the Swagger class ":class"
      */
-    public function assertPropertyNotExist($propertyName, $className)
+    public function assertPropertyExist($propertyName, $className)
     {
-        $property = $this->getProperty($propertyName, $className);
-        if (empty($property)) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
-                    sprintf('The property "%s" for the class "%s" exist.', $propertyName, $className)
-                );
-        }
+        $this->getProperty($propertyName, $className);
     }
 
     /**
@@ -146,8 +132,8 @@ final class SwaggerContext implements Context
     public function assertPropertyIsRequired(string $propertyName, string $className)
     {
         $classInfo = $this->getClassInfos($className);
-        if (!in_array($propertyName, $classInfo->{'required'})) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+        if (!in_array($propertyName, $classInfo->required)) {
+            throw new \Exception(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
 
@@ -161,7 +147,7 @@ final class SwaggerContext implements Context
             }
         }
 
-        return new stdClass();
+        throw new \InvalidArgumentException(sprintf('The property "%s" for the class "%s" doesn\'t exist.', $propertyName, $className));
     }
 
     /**
@@ -202,46 +188,17 @@ final class SwaggerContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return empty($classInfos->{'properties'}) ? $classInfos->{'properties'} : new stdClass();
+        return $classInfos->{'properties'} ?? new stdClass();
     }
 
-    private function assertSwaggerPath(string $expectedPath, bool $getOperation = false): bool
-    {
-        $json = $this->getLastJsonResponse();
-        $validPath = false;
-        if (isset($json->{'paths'}) && $getOperation) {
-            foreach ($json->{'paths'} as $classTitle => $classPath) {
-                if ($expectedPath === $classPath) {
-                    return true;
-                }
-            }
-        }
-
-        return $validPath;
-    }
-
-    private function getClassInfos(string $className, bool $getOperation = false) : stdClass
+    private function getClassInfos(string $className) : stdClass
     {
         $json = $this->getLastJsonResponse();
         $classInfos = null;
 
-        if (isset($json->{'definitions'}) && !$getOperation) {
-            foreach ($json->{'definitions'} as $classTitle => $classData) {
-                if ($classTitle === $className) {
-                    $classInfos = $classData;
-                }
-            }
-        }
-
-        if (isset($json->{'paths'}) && $getOperation) {
-            foreach ($json->{'paths'} as $classTitle => $classPath) {
-                foreach ($classPath as $classOperations) {
-                    foreach ($classOperations as $classOperation) {
-                        if (in_array($className, $classOperation['tags'])) {
-                            $classInfos = $classOperations;
-                        }
-                    }
-                }
+        foreach ($json->{'definitions'} as $classTitle => $classData) {
+            if ($classTitle === $className) {
+                $classInfos = $classData;
             }
         }
 
