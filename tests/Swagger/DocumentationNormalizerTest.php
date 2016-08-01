@@ -45,7 +45,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
-        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
+        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], []);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -60,6 +60,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
         $operationMethodResolverProphecy->getItemOperationMethod('dummy', 'put')->shouldBeCalled()->willReturn('PUT');
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'post')->shouldBeCalled()->willReturn('POST');
+        $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'custom')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'custom2')->shouldBeCalled()->willReturn('POST');
 
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
@@ -174,6 +176,44 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
                         ],
                         'responses' => [
                             200 => [
+                                'description' => 'Successful operation',
+                                'schema' => ['$ref' => '#/definitions/dummy'],
+                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ],
+                ],
+                '/foo' => [
+                    'get' => [
+                        'tags' => ['dummy'],
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves the collection of dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Successful operation',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/dummy'],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'post' => [
+                        'tags' => ['dummy'],
+                        'produces' => ['application/ld+json'],
+                        'consumes' => ['application/ld+json'],
+                        'summary' => 'Creates a dummy resource.',
+                        'parameters' => [
+                            [
+                                'in' => 'body',
+                                'name' => 'body',
+                                'description' => 'dummy resource to be added',
+                                'schema' => ['$ref' => '#/definitions/dummy'],
+                            ],
+                        ],
+                        'responses' => [
+                            201 => [
                                 'description' => 'Successful operation',
                                 'schema' => ['$ref' => '#/definitions/dummy'],
                             ],
