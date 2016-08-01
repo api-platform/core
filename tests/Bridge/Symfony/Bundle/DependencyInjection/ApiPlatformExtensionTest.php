@@ -232,6 +232,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.filters',
             'api_platform.resource_class_resolver',
             'api_platform.operation_method_resolver',
+            'api_platform.cache',
             'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.cached',
             'api_platform.metadata.resource.name_collection_factory.yaml',

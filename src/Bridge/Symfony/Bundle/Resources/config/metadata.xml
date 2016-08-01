@@ -116,13 +116,11 @@
 
         <!-- Cache -->
 
-        <service id="api_platform.metadata.resource.cache" parent="cache.system" public="false">
-            <tag name="cache.pool" />
-        </service>
+        <service id="api_platform.metadata.resource.cache" parent="api_platform.cache" public="false" />
 
-        <service id="api_platform.metadata.property.cache" parent="cache.system" public="false">
-            <tag name="cache.pool" />
-        </service>
+        <service id="api_platform.metadata.property.cache" parent="api_platform.cache" public="false" />
+
+        <service id="api_platform.cache" parent="cache.system" public="false" />
 
     </services>
 
