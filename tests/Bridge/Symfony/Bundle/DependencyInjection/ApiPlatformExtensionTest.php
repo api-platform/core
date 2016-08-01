@@ -338,8 +338,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
-        $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false)->shouldBeCalled();
-
         return $containerBuilderProphecy;
     }
 }
