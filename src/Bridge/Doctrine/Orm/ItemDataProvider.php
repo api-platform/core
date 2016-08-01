@@ -112,8 +112,8 @@ class ItemDataProvider implements ItemDataProviderInterface
      */
     private function normalizeIdentifiers($id, $manager, $resourceClass) : array
     {
-        $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
         $identifierValues = [$id];
+        $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
 
         if (count($doctrineMetadataIdentifier) >= 2) {
             $identifiers = explode(';', $id);
@@ -124,15 +124,6 @@ class ItemDataProvider implements ItemDataProviderInterface
                 $keyValue = explode('=', $identifier);
                 $identifiersMap[$keyValue[0]] = $keyValue[1];
             }
-
-            $identifierValuesArray = [];
-
-            // then, loop through doctrine metadata identifiers to keep the same identifiers order
-            foreach ($doctrineMetadataIdentifier as $metadataIdentifierKey) {
-                $identifierValuesArray[] = $identifiersMap[$metadataIdentifierKey];
-            }
-
-            $identifierValues = $identifierValuesArray;
         }
 
         $identifiers = [];
@@ -146,11 +137,13 @@ class ItemDataProvider implements ItemDataProviderInterface
                 continue;
             }
 
-            if (!isset($identifierValues[$i])) {
+            $identifier = $identifiersMap[$propertyName] ?? $identifierValues[$i] ?? null;
+
+            if (null === $identifier) {
                 throw new InvalidArgumentException(sprintf('Invalid identifier "%s".', $id));
             }
 
-            $identifiers[$propertyName] = $identifierValues[$i];
+            $identifiers[$propertyName] = $identifier;
             ++$i;
         }
 
