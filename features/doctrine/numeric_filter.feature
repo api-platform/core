@@ -11,7 +11,7 @@ Feature: Numeric filter on collections
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be valid according to this schema:
- """
+    """
     {
       "type": "object",
       "properties": {

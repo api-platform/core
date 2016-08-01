@@ -68,20 +68,20 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     And the JSON should be equal to:
     """
     {
-     "@context": "/contexts/OverriddenOperationDummy",
-     "@id": "/overridden_operation_dummies",
-     "@type": "hydra:Collection",
-     "hydra:member": [
-          {
-             "@id": "/overridden_operation_dummies/1",
-             "@type": "OverriddenOperationDummy",
-             "name": "My Overridden Operation Dummy",
-             "alias": null,
-             "description": "Gerard"
-           }
-        ],
-       "hydra:totalItems": 1
-      }
+      "@context": "/contexts/OverriddenOperationDummy",
+      "@id": "/overridden_operation_dummies",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/overridden_operation_dummies/1",
+          "@type": "OverriddenOperationDummy",
+          "name": "My Overridden Operation Dummy",
+          "alias": null,
+          "description": "Gerard"
+        }
+      ],
+      "hydra:totalItems": 1
+    }
     """
 
   Scenario: Update a resource
