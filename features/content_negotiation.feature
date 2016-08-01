@@ -89,7 +89,7 @@ Feature: Content Negotiation support
     Then the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:
     """
-    {        
+    {
       "@context": "/contexts/Dummy",
       "@id": "/dummies/1",
       "@type": "Dummy",

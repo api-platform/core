@@ -14,23 +14,23 @@ Feature: Retrieve data with Composite identifiers
     And the JSON should be equal to:
     """
     {
-        "@context": "/contexts/CompositeItem",
-        "@id": "/composite_items",
-        "@type": "hydra:Collection",
-        "hydra:member": [
-            {
-                "@id": "/composite_items/1",
-                "@type": "CompositeItem",
-                "field1": "foobar",
-                "compositeValues": [
-                    "/composite_relations/compositeItem=1;compositeLabel=1",
-                    "/composite_relations/compositeItem=1;compositeLabel=2",
-                    "/composite_relations/compositeItem=1;compositeLabel=3",
-                    "/composite_relations/compositeItem=1;compositeLabel=4"
-                ]
-            }
-        ],
-        "hydra:totalItems": 1
+      "@context": "/contexts/CompositeItem",
+      "@id": "/composite_items",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/composite_items/1",
+          "@type": "CompositeItem",
+          "field1": "foobar",
+          "compositeValues": [
+            "/composite_relations/compositeItem=1;compositeLabel=1",
+            "/composite_relations/compositeItem=1;compositeLabel=2",
+            "/composite_relations/compositeItem=1;compositeLabel=3",
+            "/composite_relations/compositeItem=1;compositeLabel=4"
+          ]
+        }
+      ],
+      "hydra:totalItems": 1
     }
     """
 
@@ -45,35 +45,35 @@ Feature: Retrieve data with Composite identifiers
     And the JSON should be equal to:
     """
     {
-        "@context": "/contexts/CompositeRelation",
-        "@id": "/composite_relations",
-        "@type": "hydra:Collection",
-        "hydra:member": [
-            {
-                "@id": "/composite_relations/compositeItem=1;compositeLabel=1",
-                "@type": "CompositeRelation",
-                "value": "somefoobardummy"
-            },
-            {
-                "@id": "/composite_relations/compositeItem=1;compositeLabel=2",
-                "@type": "CompositeRelation",
-                "value": "somefoobardummy"
-            },
-            {
-                "@id": "/composite_relations/compositeItem=1;compositeLabel=3",
-                "@type": "CompositeRelation",
-                "value": "somefoobardummy"
-            }
-        ],
-        "hydra:totalItems": 4,
-        "hydra:view": {
-            "@id": "/composite_relations?page=1",
-            "@type": "hydra:PartialCollectionView",
-            "hydra:first": "/composite_relations?page=1",
-            "hydra:last": "/composite_relations?page=2",
-            "hydra:next": "/composite_relations?page=2"
+      "@context": "/contexts/CompositeRelation",
+      "@id": "/composite_relations",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/composite_relations/compositeItem=1;compositeLabel=1",
+          "@type": "CompositeRelation",
+          "value": "somefoobardummy"
+        },
+        {
+          "@id": "/composite_relations/compositeItem=1;compositeLabel=2",
+          "@type": "CompositeRelation",
+          "value": "somefoobardummy"
+        },
+        {
+          "@id": "/composite_relations/compositeItem=1;compositeLabel=3",
+          "@type": "CompositeRelation",
+          "value": "somefoobardummy"
         }
-     }
+      ],
+      "hydra:totalItems": 4,
+      "hydra:view": {
+        "@id": "/composite_relations?page=1",
+        "@type": "hydra:PartialCollectionView",
+        "hydra:first": "/composite_relations?page=1",
+        "hydra:last": "/composite_relations?page=2",
+        "hydra:next": "/composite_relations?page=2"
+      }
+    }
     """
 
   @createSchema
@@ -86,10 +86,10 @@ Feature: Retrieve data with Composite identifiers
     And the JSON should be equal to:
     """
     {
-        "@context": "\/contexts\/CompositeRelation",
-        "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
-        "@type": "CompositeRelation",
-        "value": "somefoobardummy"
+      "@context": "\/contexts\/CompositeRelation",
+      "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
+      "@type": "CompositeRelation",
+      "value": "somefoobardummy"
     }
     """
 
@@ -102,10 +102,10 @@ Feature: Retrieve data with Composite identifiers
     And the JSON should be equal to:
     """
     {
-        "@context": "\/contexts\/CompositeRelation",
-        "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
-        "@type": "CompositeRelation",
-        "value": "somefoobardummy"
+      "@context": "\/contexts\/CompositeRelation",
+      "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
+      "@type": "CompositeRelation",
+      "value": "somefoobardummy"
     }
     """
 

@@ -52,29 +52,29 @@ Feature: HAL support
     And the header "Content-Type" should be equal to "application/hal+json"
     And the JSON should be equal to:
     """
-     {
-        "_links": {
-            "self": {
-                "href": "/dummies/1"
-            },
-            "relatedDummy": {
-                "href": "/related_dummies/1"
-            },
-            "relatedDummies": [
-                {
-                    "href": "/related_dummies/1"
-                }
-            ]
+    {
+      "_links": {
+        "self": {
+          "href": "/dummies/1"
         },
-        "description": null,
-        "dummy": null,
-        "dummyBoolean": null,
-        "dummyDate": "2015-03-01T10:00:00+00:00",
-        "dummyPrice": null,
-        "jsonData": [],
-        "name_converted": null,
-        "name": "Dummy with relations",
-        "alias": null
+        "relatedDummy": {
+          "href": "/related_dummies/1"
+        },
+        "relatedDummies": [
+          {
+            "href": "/related_dummies/1"
+          }
+        ]
+      },
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyPrice": null,
+      "jsonData": [],
+      "name_converted": null,
+      "name": "Dummy with relations",
+      "alias": null
     }
     """
 
@@ -90,40 +90,40 @@ Feature: HAL support
     And the header "Content-Type" should be equal to "application/hal+json"
     And the JSON should be equal to:
     """
-     {
-        "_links": {
-            "self": {
-                "href": "/dummies/1"
-            },
-            "relatedDummy": {
-                "href": "/related_dummies/1"
-            },
-            "relatedDummies": [
-                {
-                    "href": "/related_dummies/1"
-                }
-            ]
+    {
+      "_links": {
+        "self": {
+          "href": "/dummies/1"
         },
-        "description": null,
-        "dummy": null,
-        "dummyBoolean": null,
-        "dummyDate": "2015-03-01T10:00:00+00:00",
-        "dummyPrice": null,
-        "jsonData": [],
-        "name_converted": null,
-        "name": "A nice dummy",
-        "alias": null
+        "relatedDummy": {
+          "href": "/related_dummies/1"
+        },
+        "relatedDummies": [
+          {
+            "href": "/related_dummies/1"
+          }
+        ]
+      },
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyPrice": null,
+      "jsonData": [],
+      "name_converted": null,
+      "name": "A nice dummy",
+      "alias": null
     }
     """
 
   Scenario: Embed a relation in a parent object
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/relation_embedders" with body:
-      """
-      {
-        "related": "/related_dummies/1"
-      }
-      """
+    """
+    {
+      "related": "/related_dummies/1"
+    }
+    """
     Then the response status code should be 201
 
   Scenario: Get the object with the embedded relation
@@ -135,38 +135,38 @@ Feature: HAL support
     And the JSON should be equal to:
     """
     {
-        "_links": {
+      "_links": {
+        "self": {
+          "href": "/relation_embedders/1"
+        },
+        "related": {
+          "href": "/related_dummies/1"
+        }
+      },
+      "_embedded": {
+        "related": {
+          "_links": {
             "self": {
-                "href": "/relation_embedders/1"
+              "href": "/related_dummies/1"
             },
-            "related": {
-                "href": "/related_dummies/1"
+            "thirdLevel": {
+              "href": "/third_levels/1"
             }
-        },
-        "_embedded": {
-            "related": {
-                "_links": {
-                    "self": {
-                        "href": "/related_dummies/1"
-                    },
-                    "thirdLevel": {
-                        "href": "/third_levels/1"
-                    }
-                },
-                "_embedded": {
-                    "thirdLevel": {
-                        "_links": {
-                            "self": {
-                                "href": "/third_levels/1"
-                            }
-                        },
-                        "level": 3
-                    }
-                },
-                "symfony": "symfony"
+          },
+          "_embedded": {
+            "thirdLevel": {
+              "_links": {
+                "self": {
+                  "href": "/third_levels/1"
+                }
+              },
+              "level": 3
             }
-        },
-        "krondstadt": "Krondstadt"
+          },
+          "symfony": "symfony"
+        }
+      },
+      "krondstadt": "Krondstadt"
     }
     """
 
@@ -180,43 +180,43 @@ Feature: HAL support
     And the JSON should be equal to:
     """
     {
-        "_links": {
-            "self": "/dummies",
-            "item": [
+      "_links": {
+        "self": "/dummies",
+        "item": [
+          {
+            "href": "/dummies/1"
+          }
+        ]
+      },
+      "_embedded": {
+        "item": [
+          {
+            "_links": {
+              "self": {
+                "href": "/dummies/1"
+              },
+              "relatedDummy": {
+                "href": "/related_dummies/1"
+              },
+              "relatedDummies": [
                 {
-                    "href": "/dummies/1"
+                  "href": "/related_dummies/1"
                 }
-            ]
-        },
-        "_embedded": {
-            "item": [
-                {
-                    "_links": {
-                        "self": {
-                            "href": "/dummies/1"
-                        },
-                        "relatedDummy": {
-                            "href": "/related_dummies/1"
-                        },
-                        "relatedDummies": [
-                            {
-                                "href": "/related_dummies/1"
-                            }
-                        ]
-                    },
-                    "description": null,
-                    "dummy": null,
-                    "dummyBoolean": null,
-                    "dummyDate": "2015-03-01T10:00:00+00:00",
-                    "dummyPrice": null,
-                    "jsonData": [],
-                    "name_converted": null,
-                    "name": "A nice dummy",
-                    "alias": null
-                }
-            ]
-        },
-        "totalItems": 1,
-        "itemsPerPage": 3
+              ]
+            },
+            "description": null,
+            "dummy": null,
+            "dummyBoolean": null,
+            "dummyDate": "2015-03-01T10:00:00+00:00",
+            "dummyPrice": null,
+            "jsonData": [],
+            "name_converted": null,
+            "name": "A nice dummy",
+            "alias": null
+          }
+        ]
+      },
+      "totalItems": 1,
+      "itemsPerPage": 3
     }
     """

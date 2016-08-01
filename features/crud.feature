@@ -37,10 +37,10 @@ Feature: Create-Retrieve-Update-Delete
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": {
-          "key": [
-              "value1",
-              "value2"
-          ]
+        "key": [
+          "value1",
+          "value2"
+        ]
       },
       "name_converted": null,
       "name": "My Dummy",
@@ -67,10 +67,10 @@ Feature: Create-Retrieve-Update-Delete
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": {
-          "key": [
-              "value1",
-              "value2"
-          ]
+        "key": [
+          "value1",
+          "value2"
+        ]
       },
       "name_converted": null,
       "name": "My Dummy",
@@ -94,226 +94,226 @@ Feature: Create-Retrieve-Update-Delete
       "@id": "/dummies",
       "@type": "hydra:Collection",
       "hydra:member": [
-          {
-              "@id": "/dummies/1",
-              "@type": "Dummy",
-              "description": null,
-              "dummy": null,
-              "dummyBoolean": null,
-              "dummyDate": "2015-03-01T10:00:00+00:00",
-              "dummyPrice": null,
-              "relatedDummy": null,
-              "relatedDummies": [],
-              "jsonData": {
-                  "key": [
-                      "value1",
-                      "value2"
-                  ]
-              },
-              "name_converted": null,
-              "name": "My Dummy",
-              "alias": null
-          }
+        {
+          "@id": "/dummies/1",
+          "@type": "Dummy",
+          "description": null,
+          "dummy": null,
+          "dummyBoolean": null,
+          "dummyDate": "2015-03-01T10:00:00+00:00",
+          "dummyPrice": null,
+          "relatedDummy": null,
+          "relatedDummies": [],
+          "jsonData": {
+            "key": [
+              "value1",
+              "value2"
+            ]
+          },
+          "name_converted": null,
+          "name": "My Dummy",
+          "alias": null
+        }
       ],
       "hydra:totalItems": 1,
       "hydra:search": {
-          "@type": "hydra:IriTemplate",
-          "hydra:template": "/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyPrice}",
-          "hydra:variableRepresentation": "BasicRepresentation",
-          "hydra:mapping": [
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "id[]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "name",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "alias",
-                  "property": "alias",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "description",
-                  "property": "description",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummy.name",
-                  "property": "relatedDummy.name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummy.name[]",
-                  "property": "relatedDummy.name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummies[]",
-                  "property": "relatedDummies",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummy",
-                  "property": "dummy",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[id]",
-                  "property": "id",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[name]",
-                  "property": "name",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "order[relatedDummy.symfony]",
-                  "property": "relatedDummy.symfony",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[before]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyDate[after]",
-                  "property": "dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummy.dummyDate[before]",
-                  "property": "relatedDummy.dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "relatedDummy.dummyDate[after]",
-                  "property": "relatedDummy.dummyDate",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyPrice[between]",
-                  "property": "dummyPrice",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyPrice[gt]",
-                  "property": "dummyPrice",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyPrice[gte]",
-                  "property": "dummyPrice",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyPrice[lt]",
-                  "property": "dummyPrice",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyPrice[lte]",
-                  "property": "dummyPrice",
-                  "required": false
-              },
-              {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyBoolean",
-                  "property": "dummyBoolean",
-                  "required": false
-               },
-               {
-                  "@type": "IriTemplateMapping",
-                  "variable": "dummyPrice",
-                   "property": "dummyPrice",
-                   "required": false
-               }
-          ]
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyPrice}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "id[]",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "name",
+            "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "alias",
+            "property": "alias",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "description",
+            "property": "description",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.name",
+            "property": "relatedDummy.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.name[]",
+            "property": "relatedDummy.name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummies",
+            "property": "relatedDummies",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummies[]",
+            "property": "relatedDummies",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummy",
+            "property": "dummy",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[id]",
+            "property": "id",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[name]",
+            "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "order[relatedDummy.symfony]",
+            "property": "relatedDummy.symfony",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[before]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyDate[after]",
+            "property": "dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[before]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy.dummyDate[after]",
+            "property": "relatedDummy.dummyDate",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[between]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[gt]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[gte]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[lt]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice[lte]",
+            "property": "dummyPrice",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyBoolean",
+            "property": "dummyBoolean",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "dummyPrice",
+            "property": "dummyPrice",
+            "required": false
+          }
+        ]
       }
     }
     """
 
   Scenario: Update a resource
     When I send a "PUT" request to "/dummies/1" with body:
-      """
-      {
-        "@id": "/dummies/1",
-        "name": "A nice dummy",
-        "jsonData": [{
-            "key": "value1"
-          },
-          {
-            "key": "value2"
-          }
-        ]
-      }
-      """
+    """
+    {
+      "@id": "/dummies/1",
+      "name": "A nice dummy",
+      "jsonData": [{
+          "key": "value1"
+        },
+        {
+          "key": "value2"
+        }
+      ]
+    }
+    """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:
-      """
-      {
-        "@context": "/contexts/Dummy",
-        "@id": "/dummies/1",
-        "@type": "Dummy",
-        "description": null,
-        "dummy": null,
-        "dummyBoolean": null,
-        "dummyDate": "2015-03-01T10:00:00+00:00",
-        "dummyPrice": null,
-        "relatedDummy": null,
-        "relatedDummies": [],
-        "jsonData": [
-            {
-                "key": "value1"
-            },
-            {
-                "key": "value2"
-            }
-        ],
-        "name_converted": null,
-        "name": "A nice dummy",
-        "alias": null
-      }
-      """
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyPrice": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "jsonData": [
+        {
+          "key": "value1"
+        },
+        {
+          "key": "value2"
+        }
+      ],
+      "name_converted": null,
+      "name": "A nice dummy",
+      "alias": null
+    }
+    """
 
   @dropSchema
   Scenario: Delete a resource

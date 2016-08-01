@@ -30,7 +30,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
+class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNormalize()
     {
