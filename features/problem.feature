@@ -15,16 +15,16 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     And the JSON should be equal to:
     """
     {
-       "type": "https://tools.ietf.org/html/rfc2616#section-10",
-       "title": "An error occurred",
-       "detail": "name: This value should not be blank.",
-       "violations": [
-           {
-               "propertyPath": "name",
-               "message": "This value should not be blank."
-           }
-       ]
-   }
+      "type": "https://tools.ietf.org/html/rfc2616#section-10",
+      "title": "An error occurred",
+      "detail": "name: This value should not be blank.",
+      "violations": [
+        {
+          "propertyPath": "name",
+          "message": "This value should not be blank."
+        }
+      ]
+    }
     """
 
   Scenario: Get an error during deserialization of simple relation

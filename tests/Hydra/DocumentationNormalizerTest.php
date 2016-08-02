@@ -30,7 +30,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
+class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNormalize()
     {
@@ -114,21 +114,23 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
                     'rdfs:label' => 'dummy',
                     'hydra:title' => 'dummy',
                     'hydra:description' => 'dummy',
-                    'hydra:supportedProperty' => [0 => [
-                        '@type' => 'hydra:SupportedProperty',
-                        'hydra:property' => [
-                            '@id' => '#dummy/name',
-                            '@type' => 'rdf:Property',
-                            'rdfs:label' => 'name',
-                            'domain' => '#dummy',
-                            'range' => 'xmls:string',
+                    'hydra:supportedProperty' => [
+                        0 => [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#dummy/name',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'name',
+                                'domain' => '#dummy',
+                                'range' => 'xmls:string',
+                            ],
+                            'hydra:title' => 'name',
+                            'hydra:required' => false,
+                            'hydra:readable' => true,
+                            'hydra:writable' => true,
+                            'hydra:description' => 'name',
                         ],
-                        'hydra:title' => 'name',
-                        'hydra:required' => false,
-                        'hydra:readable' => true,
-                        'hydra:writable' => true,
-                        'hydra:description' => 'name',
-                    ]],
+                    ],
                     'hydra:supportedOperation' => [
                         0 => [
                             '@type' => 'hydra:Operation',
@@ -151,36 +153,38 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
                     '@id' => '#Entrypoint',
                     '@type' => 'hydra:Class',
                     'hydra:title' => 'The API entrypoint',
-                    'hydra:supportedProperty' => [0 => [
-                        '@type' => 'hydra:SupportedProperty',
-                        'hydra:property' => [
-                            '@id' => '#Entrypoint/dummy',
-                            '@type' => 'hydra:Link',
-                            'rdfs:label' => 'The collection of dummy resources',
-                            'domain' => '#Entrypoint',
-                            'range' => 'hydra:PagedCollection',
-                            'hydra:supportedOperation' => [
-                                0 => [
-                                    '@type' => 'hydra:Operation',
-                                    'hydra:method' => 'GET',
-                                    'hydra:title' => 'Retrieves the collection of dummy resources.',
-                                    'rdfs:label' => 'Retrieves the collection of dummy resources.',
-                                    'returns' => 'hydra:PagedCollection',
-                                ],
-                                1 => [
-                                    '@type' => 'hydra:CreateResourceOperation',
-                                    'expects' => '#dummy',
-                                    'hydra:method' => 'POST',
-                                    'hydra:title' => 'Creates a dummy resource.',
-                                    'rdfs:label' => 'Creates a dummy resource.',
-                                    'returns' => '#dummy',
+                    'hydra:supportedProperty' => [
+                        0 => [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#Entrypoint/dummy',
+                                '@type' => 'hydra:Link',
+                                'rdfs:label' => 'The collection of dummy resources',
+                                'domain' => '#Entrypoint',
+                                'range' => 'hydra:PagedCollection',
+                                'hydra:supportedOperation' => [
+                                    0 => [
+                                        '@type' => 'hydra:Operation',
+                                        'hydra:method' => 'GET',
+                                        'hydra:title' => 'Retrieves the collection of dummy resources.',
+                                        'rdfs:label' => 'Retrieves the collection of dummy resources.',
+                                        'returns' => 'hydra:PagedCollection',
+                                    ],
+                                    1 => [
+                                        '@type' => 'hydra:CreateResourceOperation',
+                                        'expects' => '#dummy',
+                                        'hydra:method' => 'POST',
+                                        'hydra:title' => 'Creates a dummy resource.',
+                                        'rdfs:label' => 'Creates a dummy resource.',
+                                        'returns' => '#dummy',
+                                    ],
                                 ],
                             ],
+                            'hydra:title' => 'The collection of dummy resources',
+                            'hydra:readable' => true,
+                            'hydra:writable' => false,
                         ],
-                        'hydra:title' => 'The collection of dummy resources',
-                        'hydra:readable' => true,
-                        'hydra:writable' => false,
-                    ]],
+                    ],
                     'hydra:supportedOperation' => [
                         '@type' => 'hydra:Operation',
                         'hydra:method' => 'GET',
@@ -193,33 +197,34 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
                     '@type' => 'hydra:Class',
                     'hydra:title' => 'A constraint violation',
                     'hydra:supportedProperty' => [
-                        0 => ['@type' => 'hydra:SupportedProperty',
-                             'hydra:property' => [
-                            '@id' => '#ConstraintViolation/propertyPath',
-                            '@type' => 'rdf:Property',
-                            'rdfs:label' => 'propertyPath',
-                            'domain' => '#ConstraintViolation',
-                            'range' => 'xmls:string',
+                        0 => [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#ConstraintViolation/propertyPath',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'propertyPath',
+                                'domain' => '#ConstraintViolation',
+                                'range' => 'xmls:string',
+                            ],
+                            'hydra:title' => 'propertyPath',
+                            'hydra:description' => 'The property path of the violation',
+                            'hydra:readable' => true,
+                            'hydra:writable' => false,
                         ],
-                        'hydra:title' => 'propertyPath',
-                        'hydra:description' => 'The property path of the violation',
-                        'hydra:readable' => true,
-                        'hydra:writable' => false,
-                    ],
-                      1 => [
-                          '@type' => 'hydra:SupportedProperty',
-                          'hydra:property' => [
-                              '@id' => '#ConstraintViolation/message',
-                              '@type' => 'rdf:Property',
-                              'rdfs:label' => 'message',
-                              'domain' => '#ConstraintViolation',
-                              'range' => 'xmls:string',
-                          ],
-                          'hydra:title' => 'message',
-                          'hydra:description' => 'The message associated with the violation',
-                          'hydra:readable' => true,
-                          'hydra:writable' => false,
-                      ],
+                        1 => [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#ConstraintViolation/message',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'message',
+                                'domain' => '#ConstraintViolation',
+                                'range' => 'xmls:string',
+                            ],
+                            'hydra:title' => 'message',
+                            'hydra:description' => 'The message associated with the violation',
+                            'hydra:readable' => true,
+                            'hydra:writable' => false,
+                        ],
                     ],
                 ],
                 3 => [
@@ -227,24 +232,25 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase /**/
                     '@type' => 'hydra:Class',
                     'subClassOf' => 'hydra:Error',
                     'hydra:title' => 'A constraint violation list',
-                    'hydra:supportedProperty' => [0 => [
-                        '@type' => 'hydra:SupportedProperty',
-                        'hydra:property' => [
-                            '@id' => '#ConstraintViolationList/violation',
-                            '@type' => 'rdf:Property',
-                            'rdfs:label' => 'violation',
-                            'domain' => '#ConstraintViolationList',
-                            'range' => '#ConstraintViolation',
+                    'hydra:supportedProperty' => [
+                        0 => [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#ConstraintViolationList/violation',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'violation',
+                                'domain' => '#ConstraintViolationList',
+                                'range' => '#ConstraintViolation',
+                            ],
+                            'hydra:title' => 'violation',
+                            'hydra:description' => 'The violations',
+                            'hydra:readable' => true,
+                            'hydra:writable' => false,
                         ],
-                        'hydra:title' => 'violation',
-                        'hydra:description' => 'The violations',
-                        'hydra:readable' => true,
-                        'hydra:writable' => false,
-                    ]],
+                    ],
                 ],
             ],
             'hydra:entrypoint' => '/',
-
         ];
         $this->assertEquals($expected, $apiDocumentationBuilder->normalize($documentation));
     }

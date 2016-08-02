@@ -57,12 +57,12 @@ final class WriteListener
         switch ($request->getMethod()) {
             case Request::METHOD_POST:
                 $objectManager->persist($controllerResult);
-            break;
+                break;
 
             case Request::METHOD_DELETE:
                 $objectManager->remove($controllerResult);
                 $event->setControllerResult(null);
-            break;
+                break;
         }
 
         $objectManager->flush();
