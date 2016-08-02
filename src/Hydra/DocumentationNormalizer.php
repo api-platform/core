@@ -281,7 +281,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                         return sprintf('#%s', $this->resourceMetadataFactory->create($className)->getShortName());
                     }
                 }
-           break;
+                break;
         }
     }
 
@@ -420,20 +420,19 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getContext() : array
     {
-        return
-            [
-                '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
-                'hydra' => ContextBuilderInterface::HYDRA_NS,
-                'rdf' => ContextBuilderInterface::RDF_NS,
-                'rdfs' => ContextBuilderInterface::RDFS_NS,
-                'xmls' => ContextBuilderInterface::XML_NS,
-                'owl' => ContextBuilderInterface::OWL_NS,
-                'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
-                'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
-                'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
-                'expects' => ['@id' => 'hydra:expects', '@type' => '@id'],
-                'returns' => ['@id' => 'hydra:returns', '@type' => '@id'],
-            ];
+        return [
+            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
+            'hydra' => ContextBuilderInterface::HYDRA_NS,
+            'rdf' => ContextBuilderInterface::RDF_NS,
+            'rdfs' => ContextBuilderInterface::RDFS_NS,
+            'xmls' => ContextBuilderInterface::XML_NS,
+            'owl' => ContextBuilderInterface::OWL_NS,
+            'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
+            'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
+            'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
+            'expects' => ['@id' => 'hydra:expects', '@type' => '@id'],
+            'returns' => ['@id' => 'hydra:returns', '@type' => '@id'],
+        ];
     }
 
     /**

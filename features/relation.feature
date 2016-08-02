@@ -70,9 +70,9 @@ Feature: Relations support
     When I send a "POST" request to "/related_to_dummy_friends" with body:
     """
     {
-        "name": "Friends relation",
-        "dummyFriend": "/dummy_friends/1",
-        "relatedDummy": "/related_dummies/1"
+      "name": "Friends relation",
+      "dummyFriend": "/dummy_friends/1",
+      "relatedDummy": "/related_dummies/1"
     }
     """
     Then the response status code should be 201
@@ -92,7 +92,7 @@ Feature: Relations support
       }
     }
     """
-  
+
   Scenario: Get the relationship
     When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200
@@ -141,7 +141,7 @@ Feature: Relations support
       "dummyPrice": null,
       "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
-          "/related_dummies/1"
+        "/related_dummies/1"
       ],
       "jsonData": [],
       "name_converted": null,
@@ -235,14 +235,14 @@ Feature: Relations support
         "krondstadt": "Krondstadt",
         "anotherRelated": null,
         "related": {
-            "@id": "/related_dummies/1",
-            "@type": "https://schema.org/Product",
-            "symfony": "symfony",
-                "thirdLevel": {
-                    "@id": "/third_levels/1",
-                    "@type": "ThirdLevel",
-                    "level": 3
-                }
+          "@id": "/related_dummies/1",
+          "@type": "https://schema.org/Product",
+          "symfony": "symfony",
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "level": 3
+          }
         }
       }
       """
@@ -326,7 +326,7 @@ Feature: Relations support
     When I send a "POST" request to "/relation_embedders" with body:
     """
     {
-    "anotherRelated": {
+      "anotherRelated": {
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
         "symfony": "phalcon"
