@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -124,12 +125,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('nelmio_api_doc.xml');
         }
 
-        // Disable the cache when in dev mode
+        // Don't use system cache pool in dev
         if ($container->getParameter('kernel.debug')) {
-            $container->removeDefinition('api_platform.metadata.resource.name_collection_factory.cached');
-            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.cached');
-            $container->removeDefinition('api_platform.metadata.property.name_collection_factory.cached');
-            $container->removeDefinition('api_platform.metadata.property.metadata_factory.cached');
+            $container->register('api_platform.metadata.resource.cache', ArrayAdapter::class);
+            $container->register('api_platform.metadata.property.cache', ArrayAdapter::class);
         }
     }
 
