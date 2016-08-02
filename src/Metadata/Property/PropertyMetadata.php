@@ -30,6 +30,7 @@ final class PropertyMetadata
     private $iri;
     private $identifier;
     private $attributes;
+    private $inheritance;
 
     public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, array $attributes = [])
     {
@@ -43,6 +44,7 @@ final class PropertyMetadata
         $this->identifier = $identifier;
         $this->iri = $iri;
         $this->attributes = $attributes;
+        $this->inheritance = null; //internally handled
     }
 
     /**
@@ -291,6 +293,31 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->attributes = $attributes;
+
+        return $metadata;
+    }
+
+    /**
+     * Gets Inheritance.
+     *
+     * @return string|null
+     */
+    public function getInheritance()
+    {
+        return $this->inheritance;
+    }
+
+    /**
+     * Returns a new instance with the given inheritance.
+     *
+     * @param string $inheritance
+     *
+     * @return self
+     */
+    public function withInheritance(string $inheritance) : self
+    {
+        $metadata = clone $this;
+        $metadata->inheritance = $inheritance;
 
         return $metadata;
     }

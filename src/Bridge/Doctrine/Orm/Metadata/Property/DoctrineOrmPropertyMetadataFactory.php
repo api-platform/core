@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property;
 
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -53,6 +54,30 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
             return $propertyMetadata;
         }
 
+        if ($doctrineClassMetadata->isInheritanceTypeSingleTable() || $doctrineClassMetadata->isInheritanceTypeJoined()) {
+            // Keep a reference to the processed discriminatorMap to avoid infinite looping over joined tables
+            // the ClassMetadata discriminatorMap property for joined inheritance entities holds every class even for the child entity
+            // in case of the single table inheritance, it might hold the current ResourceClass, we don't need to parse it twice
+            if (!isset($options['discriminatorMap'])) {
+                $options['discriminatorMap'] = [$resourceClass];
+            }
+
+            foreach ($doctrineClassMetadata->discriminatorMap as $childEntity) {
+                if (in_array($childEntity, $options['discriminatorMap']) || !$this->classHasProperty($childEntity, $property)) {
+                    continue;
+                }
+
+                try {
+                    $options['discriminatorMap'][] = $childEntity;
+                    $propertyMetadata = $this->create($childEntity, $property, $options);
+                    $propertyMetadata = $propertyMetadata->withInheritance($childEntity);
+                    break;
+                } catch (PropertyNotFoundException $resourceClassNotFoundException) {
+                    // Ignore not found exceptions
+                }
+            }
+        }
+
         $identifiers = $doctrineClassMetadata->getIdentifier();
         foreach ($identifiers as $identifier) {
             if ($identifier === $property) {
@@ -74,5 +99,17 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         }
 
         return $propertyMetadata;
+    }
+
+    private function classHasProperty($resourceClass, $property)
+    {
+        try {
+            $refl = new \ReflectionClass($resourceClass);
+            $refl->getProperty($property);
+        } catch (\ReflectionException $e) {
+            return false;
+        }
+
+        return true;
     }
 }

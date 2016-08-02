@@ -60,6 +60,10 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
               "@type": {
                 "type": "string",
                 "pattern": "^ConcreteDummy$"
+              },
+              "instance": {
+                "type": "string",
+                "required": "true"
               }
             }
           },

@@ -305,7 +305,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
-        $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+        try {
+            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+        } catch (NoSuchPropertyException $e) {
+            //if this is not a doctrine inheritance, the property might not exist, if not we throw the original error
+            if (null === $propertyMetadata->getInheritance()) {
+                throw $e;
+            }
+
+            //if the attribute is inherited, assume it's null if it doesn't exist
+            $attributeValue = null;
+        }
+
         $type = $propertyMetadata->getType();
 
         if (

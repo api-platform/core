@@ -281,6 +281,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.default.collection_data_provider',
             'api_platform.doctrine.orm.default.item_data_provider',
             'api_platform.doctrine.orm.metadata.property.metadata_factory',
+            'api_platform.doctrine.orm.metadata.property.name_collection_factory',
             'api_platform.doctrine.orm.query_extension.eager_loading',
             'api_platform.doctrine.orm.query_extension.filter',
             'api_platform.doctrine.orm.query_extension.pagination',
