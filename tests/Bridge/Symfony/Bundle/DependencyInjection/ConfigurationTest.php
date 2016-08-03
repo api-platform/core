@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -42,9 +42,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'jsonproblem' => ['mime_types' => ['application/problem+json']],
                 'jsonld' => ['mime_types' => ['application/ld+json']],
             ],
-            'naming' => [
-                'resource_path_naming_strategy' => 'api_platform.naming.resource_path_naming_strategy.underscore',
-            ],
+            'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'name_converter' => null,
             'enable_fos_user' => false,
             'enable_nelmio_api_doc' => false,

@@ -54,7 +54,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setAlias('api_platform.naming.resource_path_naming_strategy', $config['naming']['resource_path_naming_strategy']);
+        $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
 
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);

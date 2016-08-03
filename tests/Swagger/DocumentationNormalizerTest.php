@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\Tests\Swagger;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Documentation\Documentation;
@@ -23,6 +22,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
+use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\DocumentationNormalizer;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
@@ -63,10 +64,9 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'custom')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod('dummy', 'custom2')->shouldBeCalled()->willReturn('POST');
 
-        $iriConverter = $this->prophesize(IriConverterInterface::class);
-        $iriConverter->getIriFromResourceClass('dummy')->shouldBeCalled()->willReturn('/dummies');
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
-        $normalizer = new DocumentationNormalizer($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $iriConverter->reveal());
+        $normalizer = new DocumentationNormalizer($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $operationPathResolver);
 
         $expected = [
             'swagger' => '2.0',

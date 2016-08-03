@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection\Compiler;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use Prophecy\Argument;

@@ -24,13 +24,11 @@ Feature: Documentation support
     And the Swagger class "ThirdLevel" exists
     And the Swagger class "ParentDummy" doesn't exist
     And the Swagger class "UnknownDummy" doesn't exist
+    And the Swagger path "/relation_embedders/{id}/custom" exists
     And the Swagger path "/override/swagger" exists
     And the Swagger path "/api/custom-call/{id}" exists
     And the JSON node "paths./api/custom-call/{id}.get" should exist
     And the JSON node "paths./api/custom-call/{id}.put" should exist
-
-    # Must be fixed (custom operations with routes)
-    # And the Swagger path "/relation_embedders/{id}/custom" exists
 
     # Properties
     And "id" property exists for the Swagger class "Dummy"
