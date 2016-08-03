@@ -9,14 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\Naming\ResourcePathNamingStrategyInterface;
+use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
+use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,33 +50,33 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $routeCollection->get('api_dummies_get_item'),
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'])
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET']),
+            $routeCollection->get('api_dummies_get_item')
         );
 
         $this->assertEquals(
-            $routeCollection->get('api_dummies_delete_item'),
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE'])
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
+            $routeCollection->get('api_dummies_delete_item')
         );
 
         $this->assertEquals(
-            $routeCollection->get('api_dummies_put_item'),
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT'])
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
+            $routeCollection->get('api_dummies_put_item')
         );
 
         $this->assertEquals(
-            $routeCollection->get('api_dummies_my_op_collection'),
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true)
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true),
+            $routeCollection->get('api_dummies_my_op_collection')
         );
 
         $this->assertEquals(
-            $routeCollection->get('api_dummies_my_second_op_collection'),
-            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true)
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true),
+            $routeCollection->get('api_dummies_my_second_op_collection')
         );
 
         $this->assertEquals(
-            $routeCollection->get('api_dummies_my_path_op_collection'),
-            $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, 'my_path_op', ['GET'], true)
+            $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, 'my_path_op', ['GET'], true),
+            $routeCollection->get('api_dummies_my_path_op_collection')
         );
     }
 
@@ -153,10 +154,9 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class]));
 
-        $resourcePathGeneratorProphecy = $this->prophesize(ResourcePathNamingStrategyInterface::class);
-        $resourcePathGeneratorProphecy->generateResourceBasePath('dummy')->willReturn('dummies');
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
-        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourcePathGeneratorProphecy->reveal(), $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
+        $apiLoader = new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']]);
 
         return $apiLoader;
     }

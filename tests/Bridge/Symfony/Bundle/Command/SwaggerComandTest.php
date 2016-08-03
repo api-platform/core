@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Command;
 
 use Nelmio\ApiDocBundle\Tests\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
