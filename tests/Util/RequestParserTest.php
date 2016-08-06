@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace ApiPlatform\Core\Tests\Util;
 
 use ApiPlatform\Core\Util\RequestParser;
@@ -27,9 +26,28 @@ class RequestParserTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($value);
     }
 
-    public function testParseRequestParams()
+    /**
+     * @dataProvider parseRequestParamsProvider
+     */
+    public function testParseRequestParams($source, $expected)
     {
-        $value = RequestParser::parseRequestParams('gerard.name=dargent');
-        $this->assertEquals($value, ['gerard.name' => 'dargent']);
+        $actual = RequestParser::parseRequestParams($source);
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function parseRequestParamsProvider()
+    {
+        return [
+            ['gerard.name=dargent', ['gerard.name' => 'dargent']],
+
+            // urlencoded + (plus) in query string.
+            ['date=2000-01-01T00%3A00%3A00%2B00%3A00', ['date' => '2000-01-01T00:00:00+00:00']],
+
+            // urlencoded % (percent sign) in query string.
+            ['%2525=%2525', ['%25' => '%25']],
+
+            // urlencoded [] (square brackets) in query string.
+            ['a%5B1%5D=%2525', ['a' => ['1' => '%25']]],
+        ];
     }
 }

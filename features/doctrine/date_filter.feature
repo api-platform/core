@@ -29,13 +29,16 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/29$"}
                 ]
               }
-            },
-            "hydra:view": {
-              "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-28$"},
-              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 2
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-28$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -65,13 +68,93 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/3$"}
                 ]
               }
-            },
-            "hydra:view": {
-              "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05$"},
-              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05\\&page=1$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+    When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28T00:00:00%2B00:00"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/28$"},
+                  {"pattern": "^/dummies/29$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 2
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-28T00%3A00%3A00%2B00%3A00$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+    When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05Z"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05Z\\&page=1$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -101,13 +184,16 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/5$"}
                 ]
               }
-            },
-            "hydra:view": {
-              "@id": {"pattern": "^/dummies\\?dummyDate\\[before\\]=2015-04-05\\&dummyDate\\[after\\]=2015-04-05$"},
-              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05\\&dummyDate%5Bafter%5D=2015-04-05$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -135,13 +221,16 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/5$"}
                 ]
               }
-            },
-            "hydra:view": {
-              "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-05\\&dummyDate\\[before\\]=2015-04-05$"},
-              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 1
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-05&dummyDate%5Bbefore%5D=2015-04-05$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -165,8 +254,11 @@ Feature: Date filter on collections
           "maxItems": 0
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyDate\\[after\\]=2015-04-06\\&dummyDate\\[before\\]=2015-04-04$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-06\\&dummyDate%5Bbefore%5D=2015-04-04$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -199,13 +291,13 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/60$"}
                 ]
               }
-            },
-            "hydra:view": {
-              "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28$"},
-              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 3
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -235,13 +327,52 @@ Feature: Date filter on collections
                   {"pattern": "^/dummies/60$"}
                 ]
               }
-            },
-            "hydra:view": {
-              "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate\\[after\\]=2015-04-28\\&relatedDummy_dummyDate\\[after\\]=2015-04-28$"},
-              "@type": {"pattern": "^hydra:PartialCollectionView$"}
             }
           },
           "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28\\&relatedDummy_dummyDate%5Bafter%5D=2015-04-28$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+    When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28T00:00:00%2B00:00"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/58$"},
+                  {"pattern": "^/dummies/59$"},
+                  {"pattern": "^/dummies/60$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
+        },
+        "hydra:view": {
+          "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28T00%3A00%3A00%2B00%3A00$"},
+          "@type": {"pattern": "^hydra:PartialCollectionView$"}
         }
       }
     }
@@ -420,4 +551,3 @@ Feature: Date filter on collections
           }
       }
     """
-    

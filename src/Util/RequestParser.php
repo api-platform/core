@@ -51,7 +51,9 @@ abstract class RequestParser
      */
     public static function parseRequestParams(string $source) : array
     {
-        $source = urldecode($source);
+        // '[' is urlencoded in the input, but we must urldecode it in order
+        // to find it when replacing names with the regexp below.
+        $source = str_replace(urlencode('['), '[', $source);
 
         $source = preg_replace_callback(
             '/(^|(?<=&))[^=[&]+/',
@@ -61,6 +63,7 @@ abstract class RequestParser
             $source
         );
 
+        // parse_str urldecodes both keys and values in resulting array.
         parse_str($source, $params);
 
         return array_combine(array_map('hex2bin', array_keys($params)), $params);
