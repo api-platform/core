@@ -123,7 +123,7 @@ class SearchFilter extends AbstractFilter
 
             if ($metadata->hasField($field)) {
                 if ('id' === $field) {
-                    $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+                    $values = array_map([$this, 'getIdFromValue'], $values);
                 }
 
                 $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
@@ -156,7 +156,7 @@ class SearchFilter extends AbstractFilter
                 continue;
             }
 
-            $values = array_map([$this, 'getFilterValueFromUrl'], $values);
+            $values = array_map([$this, 'getIdFromValue'], $values);
 
             $association = $field;
             $associationAlias = QueryNameGenerator::generateJoinAlias($association);
@@ -318,9 +318,9 @@ class SearchFilter extends AbstractFilter
      *
      * @param string $value
      *
-     * @return string
+     * @return mixed
      */
-    private function getFilterValueFromUrl(string $value) : string
+    private function getIdFromValue(string $value)
     {
         if (null === $this->iriConverter) {
             return $value;
