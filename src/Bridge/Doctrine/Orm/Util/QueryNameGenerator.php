@@ -34,7 +34,7 @@ abstract class QueryNameGenerator
      */
     public static function generateJoinAlias(string $association) : string
     {
-        return sprintf('%s_%s', $association, uniqid());
+        return sprintf('%s_%s', $association, str_replace('.', '', uniqid('', true)));
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class QueryNameGenerator
      */
     public static function generateParameterName(string $name) : string
     {
-        return sprintf('%s_%s', $name, uniqid());
+        return sprintf('%s_%s', $name, str_replace('.', '', uniqid('', true)));
     }
 
     /**
