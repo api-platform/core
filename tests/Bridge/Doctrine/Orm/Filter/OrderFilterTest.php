@@ -73,9 +73,6 @@ class OrderFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
-        $uniqid->expects($this->any())->willReturn('123456abcdefg');
-
         $filter->apply($queryBuilder, $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
@@ -296,7 +293,7 @@ class OrderFilterTest extends KernelTestCase
                         'relatedDummy.symfony' => 'desc',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_123456abcdefg ORDER BY o.id ASC, o.name DESC, relatedDummy_123456abcdefg.symfony DESC', Dummy::class),
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_relatedDummy37 ORDER BY o.id ASC, o.name DESC, relatedDummy_relatedDummy37.symfony DESC', Dummy::class),
             ],
             // Properties enabled with empty request (default values)
             [

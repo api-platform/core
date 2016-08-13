@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of the API Platform project.
  *
@@ -18,29 +17,25 @@ use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Utility functions for working with Doctrine ORM query.
- *
- * @author Teoh Han Hui <teohhanhui@gmail.com>
- * @author Vincent Chalamon <vincentchalamon@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
-
  */
-final class QueryNameGenerator implements QueryNameGeneratorInterface
+interface QueryNameGeneratorInterface
 {
+    /**
+     * Generates a cacheable alias for DQL join.
+     *
+     * @param string $association
+     *
+     * @return string
+     */
+    public function generateJoinAlias(string $association) : string;
 
     /**
-     * @inheritdoc
+     * Generates a cacheable parameter name for DQL query.
+     *
+     * @param string $name
+     *
+     * @return string
      */
-    public function generateJoinAlias(string $association) : string
-    {
-        return sprintf('%s_%s', $association, $association);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function generateParameterName(string $name) : string
-    {
-        return sprintf('%s_%s', $name, $name);
-    }
+    public function generateParameterName(string $name) : string;
 }

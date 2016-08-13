@@ -71,9 +71,6 @@ class RangeFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
-        $uniqid->expects($this->any())->willReturn('123456abcdefg');
-
         try {
             $filter->apply($queryBuilder, $this->resourceClass);
         } catch (InvalidArgumentException $e) {
@@ -367,7 +364,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '9.99..15.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice BETWEEN :dummyprice_between_123456abcdefg_1 AND :dummyPrice_between_123456abcdefg_2',
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyprice_between_dummyprice_between38_1 AND :dummyPrice_between_dummyprice_between38_2', Dummy::class),
             ],
             // Invalid value
             [
@@ -379,7 +376,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '9.99..15.99..99.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
             [
                 [
@@ -390,7 +387,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '15.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o',
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
             [
                 [
@@ -401,7 +398,7 @@ class RangeFilterTest extends KernelTestCase
                         'lt' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice < :dummyPrice_lt_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_lt_dummyPrice_lt41', Dummy::class),
             ],
             [
                 [
@@ -412,7 +409,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice <= :dummyPrice_lte_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte42', Dummy::class),
             ],
             [
                 [
@@ -423,7 +420,7 @@ class RangeFilterTest extends KernelTestCase
                         'gt' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice > :dummyPrice_gt_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_gt_dummyPrice_gt43', Dummy::class),
             ],
             [
                 [
@@ -434,7 +431,7 @@ class RangeFilterTest extends KernelTestCase
                         'gte' => '9.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice >= :dummyPrice_gte_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte44', Dummy::class),
             ],
             [
                 [
@@ -446,7 +443,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '19.99',
                     ],
                 ],
-                'SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o WHERE o.dummyPrice >= :dummyPrice_gte_123456abcdefg AND o.dummyPrice <= :dummyPrice_lte_123456abcdefg',
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte45 AND o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte46', Dummy::class),
             ],
         ];
     }

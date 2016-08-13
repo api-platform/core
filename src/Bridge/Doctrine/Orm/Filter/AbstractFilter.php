@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -31,11 +32,13 @@ abstract class AbstractFilter implements FilterInterface
 {
     protected $managerRegistry;
     protected $properties;
+    protected $queryNameGenerator;
 
-    public function __construct(ManagerRegistry $managerRegistry, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->properties = $properties;
+        $this->queryNameGenerator = $queryNameGenerator;
     }
 
     /**

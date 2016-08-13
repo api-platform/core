@@ -70,9 +70,6 @@ class BooleanFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
-        $uniqid->expects($this->any())->willReturn('123456abcdefg');
-
         $filter->apply($queryBuilder, $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
@@ -134,7 +131,7 @@ class BooleanFilterTest extends KernelTestCase
                     'dummyBoolean' => 'true',
 
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyBoolean1', Dummy::class),
             ],
             // test with false value
             [
@@ -144,7 +141,7 @@ class BooleanFilterTest extends KernelTestCase
                 [
                     'dummyBoolean' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyBoolean2', Dummy::class),
             ],
             // test with non-boolean value
             [
@@ -164,7 +161,7 @@ class BooleanFilterTest extends KernelTestCase
                 [
                     'dummyBoolean' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyBoolean3', Dummy::class),
             ],
             // test with 1 value
             [
@@ -174,7 +171,7 @@ class BooleanFilterTest extends KernelTestCase
                 [
                     'dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyBoolean4', Dummy::class),
             ],
             // test with nested properties.
             [
@@ -184,7 +181,7 @@ class BooleanFilterTest extends KernelTestCase
                 [
                     'relatedDummy.dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_123456abcdefg where relateddummy_123456abcdefg.dummyboolean = :dummyboolean_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_relateddummy5 where relateddummy_relateddummy5.dummyboolean = :dummyboolean_dummyboolean6', Dummy::class),
             ],
             // test with multiple 1 value
             [
@@ -195,7 +192,7 @@ class BooleanFilterTest extends KernelTestCase
                    'dummyBoolean' => '1',
                    'name' => '1',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg and o.name = :name_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyboolean7 and o.name = :name_name8', Dummy::class),
             ],
             // test with multiple 0 value
             [
@@ -206,7 +203,7 @@ class BooleanFilterTest extends KernelTestCase
                     'dummyBoolean' => '0',
                     'name' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg and o.name = :name_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyboolean9 and o.name = :name_name10', Dummy::class),
             ],
             // test with multiple true value
             [
@@ -219,7 +216,7 @@ class BooleanFilterTest extends KernelTestCase
                     'name' => '1',
 
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg and o.name = :name_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyboolean11 and o.name = :name_name12', Dummy::class),
             ],
             // test with multiple false value
             [
@@ -230,7 +227,7 @@ class BooleanFilterTest extends KernelTestCase
                     'dummyBoolean' => 'false',
                     'name' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg and o.name = :name_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyboolean13 and o.name = :name_name14', Dummy::class),
             ],
             // test with both boolean, non-boolean and 0 value
             [
@@ -243,7 +240,7 @@ class BooleanFilterTest extends KernelTestCase
                     'name' => 'true',
                     'id' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_123456abcdefg and o.name = :name_123456abcdefg and o.id = :id_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_dummyboolean15 and o.name = :name_name16 and o.id = :id_id17', Dummy::class),
             ],
         ];
     }
