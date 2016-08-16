@@ -15,7 +15,7 @@ use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Naming\ResourcePathNamingStrategyInterface;
+use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -38,16 +38,16 @@ final class ApiLoader extends Loader
     private $fileLoader;
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
-    private $resourcePathGenerator;
+    private $operationPathResolver;
     private $container;
     private $formats;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourcePathNamingStrategyInterface $resourcePathGenerator, ContainerInterface $container, array $formats)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->resourcePathGenerator = $resourcePathGenerator;
+        $this->operationPathResolver = $operationPathResolver;
         $this->container = $container;
         $this->formats = $formats;
     }
@@ -145,17 +145,7 @@ final class ApiLoader extends Loader
             $actionName = sprintf('%s_%s', $operationName, $collection ? 'collection' : 'item');
         }
 
-        $path = $operation['path'] ?? null;
-
-        if (null === $path) {
-            $path = '/'.$this->resourcePathGenerator->generateResourceBasePath($resourceShortName);
-
-            if (!$collection) {
-                $path .= '/{id}';
-            }
-
-            $path .= '.{_format}';
-        }
+        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $collection);
 
         $resourceRouteName = Inflector::pluralize(Inflector::tableize($resourceShortName));
         $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $resourceRouteName, $actionName);

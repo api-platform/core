@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Symfony\Bridge\Bundle\DependencyInjection;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -256,8 +256,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.route_loader',
             'api_platform.router',
             'api_platform.iri_converter',
-            'api_platform.naming.resource_path_naming_strategy.underscore',
-            'api_platform.naming.resource_path_naming_strategy.dash',
+            'api_platform.operation_path_resolver.router',
+            'api_platform.operation_path_resolver.custom',
+            'api_platform.operation_path_resolver.underscore',
+            'api_platform.operation_path_resolver.dash',
             'api_platform.listener.request.add_format',
             'api_platform.listener.request.read',
             'api_platform.listener.request.deserialize',
@@ -317,7 +319,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $aliases = [
-            'api_platform.naming.resource_path_naming_strategy' => 'api_platform.naming.resource_path_naming_strategy.underscore',
+            'api_platform.operation_path_resolver' => 'api_platform.operation_path_resolver.router',
+            'api_platform.operation_path_resolver.default' => 'api_platform.operation_path_resolver.underscore',
             'api_platform.serializer' => 'serializer',
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
