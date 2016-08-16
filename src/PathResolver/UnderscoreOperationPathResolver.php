@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Naming;
+namespace ApiPlatform\Core\PathResolver;
 
 use Doctrine\Common\Inflector\Inflector;
 
@@ -18,13 +18,21 @@ use Doctrine\Common\Inflector\Inflector;
  *
  * @author Paul Le Corre <paul@lecorre.me>
  */
-final class UnderscoreResourcePathNamingStrategy implements ResourcePathNamingStrategyInterface
+final class UnderscoreOperationPathResolver implements OperationPathResolverInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function generateResourceBasePath(string $resourceShortName) : string
+    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
     {
-        return Inflector::pluralize(Inflector::tableize($resourceShortName));
+        $path = '/'.Inflector::pluralize(Inflector::tableize($resourceShortName));
+
+        if (!$collection) {
+            $path .= '/{id}';
+        }
+
+        $path .= '.{_format}';
+
+        return $path;
     }
 }

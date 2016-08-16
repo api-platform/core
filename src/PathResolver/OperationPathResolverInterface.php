@@ -9,21 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Naming;
+namespace ApiPlatform\Core\PathResolver;
 
 /**
- * Generates a path from a resource name.
+ * Resolves the path of a resource operation.
  *
  * @author Paul Le Corre <paul@lecorre.me>
  */
-interface ResourcePathNamingStrategyInterface
+interface OperationPathResolverInterface
 {
     /**
-     * Generates the base path.
+     * Resolves the operation path.
      *
      * @param string $resourceShortName
+     * @param array  $operation         The operation metadata
+     * @param bool   $collection
      *
      * @return string
      */
-    public function generateResourceBasePath(string $resourceShortName) : string;
+    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string;
 }

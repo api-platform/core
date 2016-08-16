@@ -23,7 +23,7 @@
             <argument type="service" id="kernel" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.naming.resource_path_naming_strategy" />
+            <argument type="service" id="api_platform.operation_path_resolver.custom" />
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
 
@@ -43,6 +43,7 @@
         </service>
         <service id="api_platform.documentation" class="ApiPlatform\Core\Documentation\Documentation" public="false"/>
         <service id="api_platform.entrypoint" class="ApiPlatform\Core\Api\Entrypoint" public="false" />
+
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
@@ -60,10 +61,21 @@
             <tag name="serializer.normalizer" />
         </service>
 
-        <!-- Resource path naming strategies -->
+        <!-- Resources Operations path resolver -->
 
-        <service id="api_platform.naming.resource_path_naming_strategy.underscore" class="ApiPlatform\Core\Naming\UnderscoreResourcePathNamingStrategy" public="false" />
-        <service id="api_platform.naming.resource_path_naming_strategy.dash" class="ApiPlatform\Core\Naming\DashResourcePathNamingStrategy" public="false" />
+        <service id="api_platform.operation_path_resolver" alias="api_platform.operation_path_resolver.router" public="false" />
+
+        <service id="api_platform.operation_path_resolver.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver" public="false">
+            <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.operation_path_resolver.custom" />
+        </service>
+
+        <service id="api_platform.operation_path_resolver.custom" class="ApiPlatform\Core\PathResolver\CustomOperationPathResolver" public="false">
+            <argument type="service" id="api_platform.operation_path_resolver.default" />
+        </service>
+
+        <service id="api_platform.operation_path_resolver.underscore" class="ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver" public="false" />
+        <service id="api_platform.operation_path_resolver.dash" class="ApiPlatform\Core\PathResolver\DashOperationPathResolver" public="false" />
 
         <!-- Event listeners -->
 
