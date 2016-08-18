@@ -43,5 +43,5 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     And the header "Content-Type" should be equal to "application/problem+json"
     And the JSON node "type" should be equal to "https://tools.ietf.org/html/rfc2616#section-10"
     And the JSON node "title" should be equal to "An error occurred"
-    And the JSON node "detail" should be equal to 'Nested objects for attribute "relatedDummy" of "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" are not enabled. Use serialization groups to change that behavior.'
+    And the JSON node "detail" should be equal to 'Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.'
     And the JSON node "trace" should exist

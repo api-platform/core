@@ -1,7 +1,7 @@
 Feature: Handle properly invalid data submitted to the API
   In order to have robust API
   As a client software developer
-  I can send unsupported attributes that will be ignored
+  The API must enforce strong typing
 
   @createSchema
   Scenario: Create a resource
@@ -49,7 +49,7 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'Expected IRI or nested object for attribute "relatedDummy" of "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy", "string" given.'
+    And the JSON node "hydra:description" should be equal to 'Expected IRI or nested document for attribute "relatedDummy", "string" given.'
     And the JSON node "trace" should exist
 
   Scenario: Ignore invalid dates
@@ -64,33 +64,51 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
 
-  @dropSchema
   Scenario: Send non-array data when an array is expected
     When I send a "POST" request to "/dummies" with body:
-        """
+    """
     {
       "name": "Invalid",
       "relatedDummies": "hello"
     }
     """
-    Then the response status code should be 201
+    Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'The type of the "relatedDummies" attribute must be "array", "string" given.'
+    And the JSON node "trace" should exist
+
+  Scenario: Send an object where an array is expected
+    When I send a "POST" request to "/dummies" with body:
     """
-    And the JSON should be equal to:
     {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies/2",
-      "@type": "Dummy",
       "name": "Invalid",
-      "alias": null,
-      "description": null,
-      "dummyDate": null,
-      "dummyPrice": null,
-      "jsonData": [],
-      "relatedDummy": null,
-      "dummy": null,
-      "relatedDummies": [],
-      "name_converted": null
+      "relatedDummies": {"a": {}, "b": {}}
     }
     """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'The type of the key "a" must be "int", "string" given.'
+
+  @dropSchema
+  Scenario: Send a scalar having the bad type
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": 42
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON node "@context" should be equal to "/contexts/Error"
+    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
+    And the JSON node "hydra:description" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
