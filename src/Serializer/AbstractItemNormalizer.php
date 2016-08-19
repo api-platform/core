@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
@@ -97,6 +98,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $context['api_denormalize'] = true;
+        if (!isset($context['resource_class'])) {
+            $context['resource_class'] = $class;
+        }
 
         return parent::denormalize($data, $class, $format, $context);
     }
@@ -142,60 +146,89 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
         $type = $propertyMetadata->getType();
 
-        if ($type && $value) {
-            if (
-                $type->isCollection() &&
-                ($collectionType = $type->getCollectionValueType()) &&
-                ($className = $collectionType->getClassName())
-            ) {
-                if (!is_array($value)) {
-                    return;
-                }
+        if (null === $type) {
+            // No type provided, blindly set the value
+            $this->setValue($object, $attribute, $value);
 
-                $values = [];
-                foreach ($value as $index => $obj) {
-                    $values[$index] = $this->denormalizeRelation(
-                        $context['resource_class'],
-                        $attribute,
-                        $propertyMetadata,
-                        $className,
-                        $obj,
-                        $format,
-                        $context
-                    );
-                }
+            return;
+        }
 
-                $this->setValue($object, $attribute, $values);
+        if (
+            $type->isCollection() &&
+            null !== ($collectionValueType = $type->getCollectionValueType()) &&
+            null !== $className = $collectionValueType->getClassName()
+        ) {
+            $this->setValue(
+                $object,
+                $attribute,
+                $this->denormalizeCollection($attribute, $propertyMetadata, $type, $className, $value, $format, $context)
+            );
 
-                return;
-            }
+            return;
+        }
 
-            if ($className = $type->getClassName()) {
-                $this->setValue(
-                    $object,
-                    $attribute,
-                    $this->denormalizeRelation(
-                        $context['resource_class'],
-                        $attribute,
-                        $propertyMetadata,
-                        $className,
-                        $value,
-                        $format,
-                        $context
-                    )
-                );
+        if (null !== $className = $type->getClassName()) {
+            $this->setValue(
+                $object,
+                $attribute,
+                $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $context)
+            );
 
-                return;
-            }
+            return;
+        }
+
+        $builtinType = $type->getBuiltinType();
+        if (!call_user_func('is_'.$builtinType, $value)) {
+            throw new InvalidArgumentException(sprintf(
+                'The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, gettype($value)
+            ));
         }
 
         $this->setValue($object, $attribute, $value);
     }
 
     /**
+     * Denormalizes a collection of objects.
+     *
+     * @param string           $attribute
+     * @param PropertyMetadata $propertyMetadata
+     * @param Type             $type
+     * @param string           $className
+     * @param mixed            $value
+     * @param string|null      $format
+     * @param array            $context
+     *
+     * @return array
+     */
+    private function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context) : array
+    {
+        if (!is_array($value)) {
+            throw new InvalidArgumentException(sprintf(
+                'The type of the "%s" attribute must be "array", "%s" given.', $attribute, gettype($value)
+            ));
+        }
+
+        $collectionKeyType = $type->getCollectionKeyType();
+        $collectionKeyBuiltinType = null === $collectionKeyType ? null : $collectionKeyType->getBuiltinType();
+
+        $values = [];
+        foreach ($value as $index => $obj) {
+            if (null !== $collectionKeyBuiltinType && !call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
+                throw new InvalidArgumentException(sprintf(
+                        'The type of the key "%s" must be "%s", "%s" given.',
+                        $index, $collectionKeyBuiltinType, gettype($index))
+                );
+            }
+
+            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $context);
+        }
+
+        return $values;
+    }
+
+    /**
      * Denormalizes a relation.
      *
-     * @param string           $resourceClass
      * @param string           $attributeName
      * @param PropertyMetadata $propertyMetadata
      * @param string           $className
@@ -207,7 +240,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return object|null
      */
-    private function denormalizeRelation(string $resourceClass, string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
+    private function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
     {
         if (is_string($value)) {
             try {
@@ -223,18 +256,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (!is_array($value)) {
             throw new InvalidArgumentException(sprintf(
-                'Expected IRI or nested object for attribute "%s" of "%s", "%s" given.',
-                $attributeName,
-                $resourceClass,
-                is_object($value) ? get_class($value) : gettype($value)
+                'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, gettype($value)
             ));
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'Nested objects for attribute "%s" of "%s" are not enabled. Use serialization groups to change that behavior.',
-            $attributeName,
-            $resourceClass
-        ));
+        throw new InvalidArgumentException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
     }
 
     /**
