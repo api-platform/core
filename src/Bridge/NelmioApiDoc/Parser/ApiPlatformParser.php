@@ -197,7 +197,7 @@ final class ApiPlatformParser implements ParserInterface
             'readonly' => !$propertyMetadata->isWritable(),
         ];
 
-        if (null == $type) {
+        if (null === $type) {
             $type = $propertyMetadata->getType();
 
             if (null === $type) {
