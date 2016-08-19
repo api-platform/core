@@ -6,18 +6,21 @@ cache:
   directories:
     - $HOME/.composer/cache
 
-php:
-  - '7.0'
+matrix:
+  include:
+    - php: '7.0'
+    - php: '7.0'
+      env: deps="low"
 
 before_install:
-  - phpenv config-rm xdebug.ini
   - phpunit --self-update
   - npm install -g swagger-cli
 
 install:
-  - composer update --no-interaction --prefer-dist
+  - if [[ ! $deps ]]; then composer update --no-progress --ansi; fi
+  - if [[ $deps = low ]]; then composer update --no-progress --ansi --prefer-lowest --prefer-stable; fi
 
 script:
-  - vendor/bin/phpunit
+  - phpunit
   - vendor/bin/behat
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
