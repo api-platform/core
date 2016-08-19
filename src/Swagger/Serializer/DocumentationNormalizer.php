@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Swagger;
+namespace ApiPlatform\Core\Swagger\Serializer;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -18,7 +18,6 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -35,7 +34,6 @@ final class DocumentationNormalizer implements NormalizerInterface
     const SWAGGER_VERSION = '2.0';
     const FORMAT = 'json';
 
-    private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
@@ -43,9 +41,8 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $operationMethodResolver;
     private $operationPathResolver;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver)
     {
-        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -60,16 +57,10 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $classes = [];
-        $operation = [];
-        $customOperations = [];
         $itemOperationsDocs = [];
         $definitions = [];
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
-            $operation['item'] = [];
-            $operation['collection'] = [];
-            $customOperations['item'] = [];
-            $customOperations['collection'] = [];
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $shortName = $resourceMetadata->getShortName();
@@ -118,7 +109,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
                 $path = $this->getPath($shortName, $collectionOperation, true);
 
-                $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true, $definitions, $method, $object->getMimeTypes());
+                $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $collectionOperation, true, $method, $object->getMimeTypes());
                 $itemOperationsDocs[$path] = array_merge($itemOperationsDocs[$path] ?? [], $swaggerOperation);
             }
 
@@ -127,7 +118,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
                 $path = $this->getPath($shortName, $itemOperation, false);
 
-                $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false, $definitions, $method, $object->getMimeTypes());
+                $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $itemOperation, false, $method, $object->getMimeTypes());
                 $itemOperationsDocs[$path] = array_merge($itemOperationsDocs[$path] ?? [], $swaggerOperation);
             }
 
@@ -150,7 +141,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets and populates if applicable a Swagger operation.
      */
-    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection, array $properties, string $method, array $mimeTypes) : array
+    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, array $operation, bool $collection, string $method, array $mimeTypes) : array
     {
         $methodSwagger = strtolower($method);
         $swaggerOperation = $operation['swagger_context'] ?? [];
