@@ -56,7 +56,7 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal()
+            $propertyAccessorProphecy->reveal(),
         ]);
 
         $this->assertTrue($normalizer->supportsNormalization($dummy));
