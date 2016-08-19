@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Swagger\DocumentationNormalizer;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
