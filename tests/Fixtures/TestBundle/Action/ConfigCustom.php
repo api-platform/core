@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Action;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ConfigCustomController
+class ConfigCustom
 {
     private $dataProvider;
 

@@ -97,7 +97,6 @@ services:
         arguments: [ { 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
 
-    app.config_dummy_resource.controller:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\ConfigCustomController'
+    app.config_dummy_resource.action:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
-
