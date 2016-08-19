@@ -10,4 +10,3 @@
 | Doc PR        | api-platform/doc#1234
 
 *Please update this template with something that matches your PR*
-

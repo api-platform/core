@@ -8,7 +8,7 @@ To have your code integrated in the API Platform project, there is some rules to
 
 If you happen to find a bug, we kindly request you to report it. However, before submitting it, please:
 
-* Check the [project documentation available online](https://api-platform.com/doc/)
+* Check the [project documentation available online](https://api-platform.com/docs/)
 
 Then, if it appears that it's a real bug, you may report it using Github by following these 3 points:
 
@@ -17,6 +17,11 @@ Then, if it appears that it's a real bug, you may report it using Github by foll
 * A description of the workflow needed to reproduce the bug
 
 > _NOTE:_ Don’t hesitate giving as much information as you can (OS, PHP version extensions...)
+
+### Security issues
+
+If you find a security issue, send a mail to Kévin Dunglas <dunglas@gmail.com>. **Please do not report security problems
+publicly**. We will disclose details of the issue and credit you after having released a new version including a fix.
 
 ## Pull requests
 
@@ -88,4 +93,3 @@ and to transfer the copyright on the submitted code to Kévin Dunglas.
 Be sure to you have the right to do that (if you are a professional, ask your company)!
 
 If you include code from another project, please mention it in the Pull Request description and credit the original author.
-
