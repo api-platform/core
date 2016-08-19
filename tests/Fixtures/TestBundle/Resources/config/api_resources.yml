@@ -6,4 +6,4 @@ resources:
         itemOperations:
             custom_operation:  
                 method: 'GET'
-                controller: 'app.config_dummy_resource.controller'
+                controller: 'app.config_dummy_resource.action'
