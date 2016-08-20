@@ -82,7 +82,7 @@ final class ApiPlatformParser implements ParserInterface
         list($io, $resourceClass, $operationName) = explode(':', $item['class'], 3);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $resourceClass, $operationName);
+        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $operationName);
         if (!empty($classOperations['serializer_groups'])) {
             return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, [], $classOperations);
         }
@@ -122,15 +122,12 @@ final class ApiPlatformParser implements ParserInterface
      * Returns groups of item & collection.
      *
      * @param ResourceMetadata $resourceMetadata
-     * @param string           $resourceClass
-     * @param string[]         $visited
+     * @param string           $operationName
      *
      * @return array
      */
-    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationName, array $visited = []) : array
+    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName) : array
     {
-        $visited[] = $resourceClass;
-
         $operation = [
             'denormalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', [])),
             'normalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', [])),
@@ -197,7 +194,7 @@ final class ApiPlatformParser implements ParserInterface
             'readonly' => !$propertyMetadata->isWritable(),
         ];
 
-        if (null == $type) {
+        if (null === $type) {
             $type = $propertyMetadata->getType();
 
             if (null === $type) {
