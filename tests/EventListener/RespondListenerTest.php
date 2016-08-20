@@ -54,7 +54,7 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
         $response = $event->getResponse();
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertEquals('text/xml', $response->headers->get('Content-Type'));
+        $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
     }
 
     public function testCreate201Response()
@@ -78,7 +78,7 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
         $response = $event->getResponse();
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
-        $this->assertEquals('text/xml', $response->headers->get('Content-Type'));
+        $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
     }
 
     public function testCreate204Response()
@@ -102,6 +102,6 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
         $response = $event->getResponse();
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
-        $this->assertEquals('text/xml', $response->headers->get('Content-Type'));
+        $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
     }
 }

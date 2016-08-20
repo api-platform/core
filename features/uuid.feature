@@ -15,13 +15,13 @@ Feature: Using uuid identifier on resource
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Get a resource
     When I send a "GET" request to "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -36,7 +36,7 @@ Feature: Using uuid identifier on resource
     When I send a "GET" request to "/uuid_identifier_dummies"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -64,7 +64,7 @@ Feature: Using uuid identifier on resource
     """
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

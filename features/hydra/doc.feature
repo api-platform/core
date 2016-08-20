@@ -11,7 +11,7 @@ Feature: Documentation support
     Given I send a "GET" request to "/apidoc.jsonld"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     # Context
     And the JSON node "@context.@vocab" should be equal to "http://example.com/apidoc.jsonld#"
     And the JSON node "@context.hydra" should be equal to "http://www.w3.org/ns/hydra/core#"

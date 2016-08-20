@@ -10,7 +10,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[between]=12.99..15.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -59,7 +59,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[lt]=12.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -101,7 +101,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[lte]=12.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -151,7 +151,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[gt]=15.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -192,7 +192,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[gte]=15.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -240,7 +240,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[gt]=12.99&dummyPrice[lt]=19.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -282,7 +282,7 @@ Feature: Range filter on collections
     When I send a "GET" request to "/dummies?dummyPrice[gt]=19.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {

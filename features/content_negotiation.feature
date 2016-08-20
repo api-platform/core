@@ -14,7 +14,7 @@ Feature: Content Negotiation support
     </root>
     """
     Then the response status code should be 201
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -25,7 +25,7 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "text/xml"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -35,7 +35,7 @@ Feature: Content Negotiation support
   Scenario:  Retrieve a collection in XML using the .xml URL
     When I send a "GET" request to "/dummies.xml"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -46,7 +46,7 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "application/json"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/json"
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
     And the response should be in JSON
     And the JSON should be equal to:
     """
@@ -76,7 +76,7 @@ Feature: Content Negotiation support
     {"name": "Sent in JSON"}
     """
     Then the response status code should be 201
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -88,4 +88,4 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "text/plain"
     And I send a "GET" request to "/dummies/1"
     Then the response status code should be 406
-    And the header "Content-Type" should be equal to "application/problem+json"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
