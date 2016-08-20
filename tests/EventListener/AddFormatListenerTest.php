@@ -69,6 +69,10 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+     * @expectedExceptionMessage Requested format "unknown" is not supported. Supported MIME types are "application/json".
+     */
     public function testUnsupportedRequestFormat()
     {
         $request = new Request();
@@ -101,7 +105,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-    public function testUnsupportedAcceptHeader()
+    public function testAcceptAllHeader()
     {
         $request = new Request();
         $request->attributes->set('_api_resource_class', 'Foo');
@@ -116,5 +120,23 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('binary', $request->getRequestFormat());
         $this->assertSame('application/octet-stream', $request->getMimeType($request->getRequestFormat()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+     * @expectedExceptionMessage Requested format "text/html, application/xhtml+xml, application/xml;q=0.9" is not supported. Supported MIME types are "application/octet-stream", "application/json".
+     */
+    public function testUnsupportedAcceptHeader()
+    {
+        $request = new Request();
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $listener->onKernelRequest($event);
     }
 }
