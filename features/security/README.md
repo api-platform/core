@@ -29,9 +29,15 @@ This component has its own test suite.
 
 ### Strong typing
 
-Strong typing is ensured by [our strong typing functional test suite](strong_typing.md) and [the unit tests of the `AbstractItemNormalizer`
+Strong typing is ensured by [our "strong typing" functional test suite](strong_typing.md) and [the unit tests of the `AbstractItemNormalizer`
 class](../../tests/Serializer/AbstractItemNormalizerTest.php).
 
-You might also be interested to see how extra attributes are ignored: [unknown_attributes.feature
+You might also be interested to see how extra attributes are ignored: [unknown_attributes.feature]
+
+### Validate incoming content-types
+
+Incoming content-types validation is ensured by [our "validate incoming content-types" functional test suite](validate_incoming_content-types.md) and [the unit tests of the `DeserializeListener`
+class](../../tests/EventListener/DeserializeListenerTest.php).
+
 
 To be continued.

@@ -6,7 +6,8 @@ Feature: Ignore unknown attributes
   @createSchema
   @dropSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Not existing",

@@ -5,7 +5,8 @@ Feature: Using custom identifier on resource
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/custom_identifier_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/custom_identifier_dummies" with body:
     """
     {
       "name": "My Dummy"
@@ -62,7 +63,8 @@ Feature: Using custom identifier on resource
     """
 
   Scenario: Update a resource
-      When I send a "PUT" request to "/custom_identifier_dummies/1" with body:
+      When I add "Content-Type" header equal to "application/ld+json"
+      And I send a "PUT" request to "/custom_identifier_dummies/1" with body:
       """
       {
         "name": "My Dummy modified"

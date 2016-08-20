@@ -4,7 +4,8 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
   I need to retrieve an RFC 7807 compliant serialization of errors
 
   Scenario: Get an error
-    When I add "Accept" header equal to "application/json"
+    When I add "Content-Type" header equal to "application/json"
+    And I add "Accept" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:
     """
     {}
@@ -28,7 +29,8 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     """
 
   Scenario: Get an error during deserialization of simple relation
-    When I add "Accept" header equal to "application/json"
+    When I add "Content-Type" header equal to "application/json"
+    And I add "Accept" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:
     """
     {

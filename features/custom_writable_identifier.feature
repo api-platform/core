@@ -5,7 +5,8 @@ Feature: Using custom writable identifier on resource
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/custom_writable_identifier_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/custom_writable_identifier_dummies" with body:
     """
     {
       "name": "My Dummy",
@@ -63,25 +64,26 @@ Feature: Using custom writable identifier on resource
     """
 
   Scenario: Update a resource
-      When I send a "PUT" request to "/custom_writable_identifier_dummies/my_slug" with body:
-      """
-      {
-        "name": "My Dummy modified",
-        "slug": "slug_modified"
-      }
-      """
-      Then the response status code should be 200
-      And the response should be in JSON
-      And the header "Content-Type" should be equal to "application/ld+json"
-      And the JSON should be equal to:
-      """
-      {
-        "@context": "/contexts/CustomWritableIdentifierDummy",
-        "@id": "/custom_writable_identifier_dummies/slug_modified",
-        "@type": "CustomWritableIdentifierDummy",
-        "name": "My Dummy modified"
-      }
-      """
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/custom_writable_identifier_dummies/my_slug" with body:
+    """
+    {
+      "name": "My Dummy modified",
+      "slug": "slug_modified"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/CustomWritableIdentifierDummy",
+      "@id": "/custom_writable_identifier_dummies/slug_modified",
+      "@type": "CustomWritableIdentifierDummy",
+      "name": "My Dummy modified"
+    }
+    """
 
   Scenario: API doc is correctly generated
     When I send a "GET" request to "/apidoc.jsonld"

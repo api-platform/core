@@ -25,7 +25,8 @@ Feature: Relations support
     """
 
   Scenario: Create a dummy friend
-    When I send a "POST" request to "/dummy_friends" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummy_friends" with body:
     """
     {"name": "Zoidberg"}
     """
@@ -43,7 +44,8 @@ Feature: Relations support
     """
 
   Scenario: Create a related dummy
-    When I send a "POST" request to "/related_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/related_dummies" with body:
     """
     {"thirdLevel": "/third_levels/1"}
     """
@@ -67,7 +69,8 @@ Feature: Relations support
     """
 
   Scenario: Create a friend relationship
-    When I send a "POST" request to "/related_to_dummy_friends" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/related_to_dummy_friends" with body:
     """
     {
       "name": "Friends relation",
@@ -114,7 +117,8 @@ Feature: Relations support
     """
 
   Scenario: Create a dummy with relations
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Dummy with relations",
@@ -217,7 +221,8 @@ Feature: Relations support
     """
 
   Scenario: Embed a relation in the parent object
-      When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
       """
       {
         "related": "/related_dummies/1"
@@ -248,7 +253,8 @@ Feature: Relations support
       """
 
   Scenario: Create an existing relation
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
     """
     {
       "anotherRelated": {
@@ -277,7 +283,8 @@ Feature: Relations support
     """
 
   Scenario: Post a wrong relation
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
     """
     {
       "anotherRelated": {
@@ -292,7 +299,8 @@ Feature: Relations support
     And the header "Content-Type" should be equal to "application/ld+json"
 
   Scenario: Update an embedded relation
-    When I send a "PUT" request to "/relation_embedders/2" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/relation_embedders/2" with body:
     """
     {
       "anotherRelated": {
@@ -323,7 +331,8 @@ Feature: Relations support
 
   @dropSchema
   Scenario: Update an existing relation
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
     """
     {
       "anotherRelated": {

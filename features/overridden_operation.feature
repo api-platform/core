@@ -5,7 +5,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/overridden_operation_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/overridden_operation_dummies" with body:
     """
     {
       "name": "My Overridden Operation Dummy",
@@ -85,7 +86,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
 
   Scenario: Update a resource
-    When I send a "PUT" request to "/overridden_operation_dummies/1" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/overridden_operation_dummies/1" with body:
       """
       {
         "@id": "/overridden_operation_dummies/1",
