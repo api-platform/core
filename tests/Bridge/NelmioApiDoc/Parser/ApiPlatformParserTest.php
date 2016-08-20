@@ -70,7 +70,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
     public function testSupportsAttributeNormalization()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(CustomAttributeDummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
+        $resourceMetadataFactoryProphecy->create('Acme\CustomAttributeDummy')->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
             'get' => ['method' => 'GET', 'normalization_context' => ['groups' => ['custom_attr_dummy_get']]],
             'put' => ['method' => 'PUT', 'denormalization_context' => ['groups' => ['custom_attr_dummy_put']]],
             'delete' => ['method' => 'DELETE'],
@@ -78,7 +78,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(CustomAttributeDummy::class, Argument::cetera())->willReturn(new PropertyNameCollection([
+        $propertyNameCollectionFactoryProphecy->create('Acme\CustomAttributeDummy', Argument::cetera())->willReturn(new PropertyNameCollection([
             'id',
             'name',
         ]))->shouldBeCalled();
@@ -91,21 +91,21 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
             ->withReadable(true)
             ->withWritable(false)
             ->withRequired(true);
-        $propertyMetadataFactoryProphecy->create(CustomAttributeDummy::class, 'id')->willReturn($idPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create('Acme\CustomAttributeDummy', 'id')->willReturn($idPropertyMetadata)->shouldBeCalled();
         $namePropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_STRING, false))
             ->withDescription('The dummy name.')
             ->withReadable(true)
             ->withWritable(true)
             ->withRequired(true);
-        $propertyMetadataFactoryProphecy->create(CustomAttributeDummy::class, 'name')->willReturn($namePropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create('Acme\CustomAttributeDummy', 'name')->willReturn($namePropertyMetadata)->shouldBeCalled();
 
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
         $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $actual = $apiPlatformParser->parse([
-            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, CustomAttributeDummy::class, 'get'),
+            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, 'Acme\CustomAttributeDummy', 'get'),
         ]);
 
         $this->assertEquals([

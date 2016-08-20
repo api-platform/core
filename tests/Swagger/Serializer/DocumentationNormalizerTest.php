@@ -19,12 +19,11 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
-use ApiPlatform\Core\Swagger\DocumentationNormalizer;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -40,8 +39,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $formats = ['jsonld' => ['application/ld+json']];
         $version = '0.0.0';
         $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version, $formats);
-
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -66,7 +63,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
-        $normalizer = new DocumentationNormalizer($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolverProphecy->reveal(), $operationPathResolver);
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver);
 
         $expected = [
             'swagger' => '2.0',
