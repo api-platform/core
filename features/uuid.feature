@@ -5,7 +5,8 @@ Feature: Using uuid identifier on resource
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/uuid_identifier_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/uuid_identifier_dummies" with body:
     """
     {
       "name": "My Dummy",
@@ -54,24 +55,25 @@ Feature: Using uuid identifier on resource
     """
 
   Scenario: Update a resource
-    When I send a "PUT" request to "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78" with body:
-      """
-      {
-        "name": "My Dummy modified"
-      }
-      """
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78" with body:
+    """
+    {
+      "name": "My Dummy modified"
+    }
+    """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json"
     And the JSON should be equal to:
-      """
-      {
-      "@context": "/contexts/UuidIdentifierDummy",
-      "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
-      "@type": "UuidIdentifierDummy",
-      "name": "My Dummy modified"
-      }
-      """
+    """
+    {
+    "@context": "/contexts/UuidIdentifierDummy",
+    "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
+    "@type": "UuidIdentifierDummy",
+    "name": "My Dummy modified"
+    }
+    """
 
 
   @dropSchema

@@ -71,6 +71,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
 
         $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod($method);
+        $request->headers->set('Content-Type', 'application/json');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -112,21 +113,25 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testContentNegotiationFallback()
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+     * @expectedExceptionMessage The content-type "application/rdf+xml" is not supported. Supported MIME types are "application/ld+json", "text/xml".
+     */
+    public function testNotSupportedContentType()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod(Request::METHOD_POST);
-        $request->headers->set('Content-Type', 'text/csv');
+        $request->headers->set('Content-Type', 'application/rdf+xml');
         $request->setRequestFormat('xml');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->deserialize('{}', 'Foo', 'xml', [])->willReturn(new \stdClass())->shouldBeCalled();
+        $serializerProphecy->deserialize()->shouldNotBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
+        $serializerContextBuilderProphecy->createFromRequest()->shouldNotBeCalled();
 
         $listener = new DeserializeListener(
             $serializerProphecy->reveal(),
@@ -136,7 +141,11 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testContentNegotiationDefault()
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+     * @expectedExceptionMessage The "Content-Type" header must exist.
+     */
+    public function testNoContentType()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -146,10 +155,10 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->deserialize('{}', 'Foo', 'jsonld', [])->willReturn(new \stdClass())->shouldBeCalled();
+        $serializerProphecy->deserialize()->shouldNotBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
+        $serializerContextBuilderProphecy->createFromRequest()->shouldNotBeCalled();
 
         $listener = new DeserializeListener(
             $serializerProphecy->reveal(),

@@ -5,7 +5,8 @@ Feature: Handle properly invalid data submitted to the API
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Not existing",
@@ -36,7 +37,8 @@ Feature: Handle properly invalid data submitted to the API
     """
 
   Scenario: Create a resource with wrong value type for relation
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",
@@ -53,7 +55,8 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "trace" should exist
 
   Scenario: Ignore invalid dates
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Invalid date",
@@ -65,7 +68,8 @@ Feature: Handle properly invalid data submitted to the API
     And the header "Content-Type" should be equal to "application/ld+json"
 
   Scenario: Send non-array data when an array is expected
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Invalid",
@@ -82,7 +86,8 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "trace" should exist
 
   Scenario: Send an object where an array is expected
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Invalid",
@@ -99,7 +104,8 @@ Feature: Handle properly invalid data submitted to the API
 
   @dropSchema
   Scenario: Send a scalar having the bad type
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": 42

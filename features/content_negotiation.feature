@@ -6,6 +6,7 @@ Feature: Content Negotiation support
   @createSchema
   Scenario: Post an XML body
     When I add "Accept" header equal to "application/xml"
+    And I add "Content-Type" header equal to "application/xml"
     And I send a "POST" request to "/dummies" with body:
     """
     <root>

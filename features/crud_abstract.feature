@@ -5,7 +5,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
 
   @createSchema
   Scenario: Create a concrete resource
-    When I send a "POST" request to "/concrete_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/concrete_dummies" with body:
     """
     {
       "instance": "Concrete",
@@ -71,7 +72,8 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
     """
 
   Scenario: Update a concrete resource
-      When I send a "PUT" request to "/concrete_dummies/1" with body:
+      When I add "Content-Type" header equal to "application/ld+json"
+      And I send a "PUT" request to "/concrete_dummies/1" with body:
       """
       {
         "@id": "/concrete_dummies/1",
