@@ -7,5 +7,5 @@ Feature: Validate response types
     When I add "Accept" header equal to "text/plain"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 406
-    And the header "Content-Type" should be equal to "application/problem+json"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "detail" should be equal to 'Requested format "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/xml", "text/xml", "application/json".'

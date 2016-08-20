@@ -44,5 +44,31 @@ class](../../tests/EventListener/DeserializeListenerTest.php).
 Response type validation is ensured by [our "validate response types" functional test suite](validate_response_types.md) and [the unit tests of the `AddFormatListener`
 class](../../tests/EventListener/AddFormatListenerTest.php).
 
+### XML input validation
+
+XML parsing is delegated to the [Symfony Serializer component](http://symfony.com/doc/current/components/serializer.html).
+This component has its own test suite.
+
+### Framework-Provided validation
+
+API Platform is shipped with the [Symfony Validator component](http://symfony.com/doc/current/components/validator.html),
+one of the most popular framework validation in the world.
+
+## Output encoding
+
+### Send security headers
+
+### JSON encoding
+
+API Platform relies on the [Symfony Serializer component](http://symfony.com/doc/current/components/serializer.html), to
+encode JSON.
+This component has its own test suite.
+
+### XML encoding
+
+API Platform relies on the [Symfony Serializer component](http://symfony.com/doc/current/components/serializer.html), to
+encode XML.
+This component has its own test suite.
+
 
 To be continued.

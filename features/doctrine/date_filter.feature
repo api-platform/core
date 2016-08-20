@@ -9,7 +9,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -47,7 +47,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -86,7 +86,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28T00:00:00%2B00:00"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -124,7 +124,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05Z"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -165,7 +165,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[before]=2015-04-05&dummyDate[after]=2015-04-05"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -202,7 +202,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-05&dummyDate[before]=2015-04-05"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -240,7 +240,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-06&dummyDate[before]=2015-04-04"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -270,7 +270,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -306,7 +306,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28&relatedDummy_dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -345,7 +345,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28T00:00:00%2B00:00"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -385,7 +385,7 @@ Feature: Date filter on collections
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

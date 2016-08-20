@@ -42,7 +42,7 @@ final class RespondListener
         $event->setResponse(new Response(
             $controllerResult,
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
-            ['Content-Type' => $request->getMimeType($request->getRequestFormat())]
+            ['Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat()))]
         ));
     }
 }

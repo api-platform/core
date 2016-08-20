@@ -8,7 +8,7 @@ Feature: Configurable resource CRUD
     When I send a "GET" request to "/fileconfigdummies"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -30,7 +30,7 @@ Feature: Configurable resource CRUD
     When I send a "GET" request to "/single_file_configs"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -47,7 +47,7 @@ Feature: Configurable resource CRUD
     When I send a "GET" request to "/fileconfigdummies/1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

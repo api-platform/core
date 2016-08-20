@@ -12,7 +12,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -32,7 +32,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -51,7 +51,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -80,7 +80,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -100,7 +100,7 @@ Feature: Relations support
     When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -131,7 +131,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -158,7 +158,7 @@ Feature: Relations support
     When I send a "GET" request to "/dummies?relatedDummy=%2Frelated_dummies%2F1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -191,7 +191,7 @@ Feature: Relations support
     When I send a "GET" request to "/dummies?relatedDummies[]=%2Frelated_dummies%2F1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -230,7 +230,7 @@ Feature: Relations support
       """
       Then the response status code should be 201
       And the response should be in JSON
-      And the header "Content-Type" should be equal to "application/ld+json"
+      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
       And the JSON should be equal to:
       """
       {
@@ -264,7 +264,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -296,7 +296,7 @@ Feature: Relations support
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
@@ -311,7 +311,7 @@ Feature: Relations support
     """
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -344,7 +344,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

@@ -9,7 +9,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[id]=asc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -65,7 +65,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[id]=desc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -121,7 +121,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[name]=asc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -177,7 +177,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[name]=desc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -233,7 +233,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[name]"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -290,7 +290,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[relatedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -347,7 +347,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[alias]=asc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -402,7 +402,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[alias]=desc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -457,7 +457,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[unknown]=asc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -512,7 +512,7 @@ Feature: Order filter on collections
     When I send a "GET" request to "/dummies?order[unknown]=desc"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {

@@ -64,7 +64,7 @@ final class ExceptionAction
 
         $headers = $exception->getHeaders();
         $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
-        $headers['Content-Type'] = $format['value'][0];
+        $headers['Content-Type'] = sprintf('%s; charset=utf-8', $format['value'][0]);
 
         return new Response($this->serializer->serialize($exception, $format['key']), $exception->getStatusCode(), $headers);
     }

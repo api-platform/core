@@ -95,7 +95,7 @@ final class DeserializeListener
                     $supportedMimeTypes[] = $mimeType;
                 }
             }
-            
+
             throw new NotAcceptableHttpException(sprintf(
                 'The content-type "%s" is not supported. Supported MIME types are "%s".',
                 $contentType,
