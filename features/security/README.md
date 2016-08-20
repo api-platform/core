@@ -39,5 +39,10 @@ You might also be interested to see how extra attributes are ignored: [unknown_a
 Incoming content-types validation is ensured by [our "validate incoming content-types" functional test suite](validate_incoming_content-types.md) and [the unit tests of the `DeserializeListener`
 class](../../tests/EventListener/DeserializeListenerTest.php).
 
+### Validate response types
+
+Response type validation is ensured by [our "validate response types" functional test suite](validate_response_types.md) and [the unit tests of the `AddFormatListener`
+class](../../tests/EventListener/AddFormatListenerTest.php).
+
 
 To be continued.

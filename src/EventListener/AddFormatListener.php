@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\EventListener;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 /**
  * Chooses the format to user according to the Accept header and supported formats.
@@ -34,6 +35,8 @@ final class AddFormatListener
 
     /**
      * Sets the applicable format to the HttpFoundation Request.
+     *
+     * @param $event GetResponseEvent
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -50,11 +53,18 @@ final class AddFormatListener
         $mimeType = $requestFormat ? $request->getMimeType($requestFormat) : null;
         if (null === $mimeType || !isset($this->mimeTypes[$mimeType])) {
             if (null === $accept = $request->headers->get('Accept')) {
+                if (null !== $requestFormat) {
+                    throw $this->getNotAcceptableHttpException(null === $accept ? 'unknown' : $accept);
+                }
+
                 $mimeType = null;
             } else {
                 // Try to guess the best format to use
-                $acceptHeader = $this->negotiator->getBest($accept, array_keys($this->mimeTypes));
-                $mimeType = $acceptHeader ? $acceptHeader->getType() : null;
+                if (null === $acceptHeader = $this->negotiator->getBest($accept, array_keys($this->mimeTypes))) {
+                    throw $this->getNotAcceptableHttpException($accept);
+                }
+
+                $mimeType = $acceptHeader->getType();
             }
         }
 
@@ -99,5 +109,14 @@ final class AddFormatListener
                 $this->mimeTypes[$mimeType] = $format;
             }
         }
+    }
+
+    private function getNotAcceptableHttpException(string $accept)
+    {
+        return new NotAcceptableHttpException(sprintf(
+            'Requested format "%s" is not supported. Supported MIME types are "%s".',
+            $accept,
+            implode('", "', array_keys($this->mimeTypes))
+        ));
     }
 }
