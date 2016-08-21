@@ -29,6 +29,8 @@ final class RespondListener
 
     /**
      * Creates a Response to send to the client according to the requested format.
+     *
+     * @param GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
@@ -42,7 +44,11 @@ final class RespondListener
         $event->setResponse(new Response(
             $controllerResult,
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
-            ['Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat()))]
+            [
+                'Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
+                'X-Content-Type-Options' => 'nosniff',
+                'X-Frame-Options' => 'deny',
+            ]
         ));
     }
 }

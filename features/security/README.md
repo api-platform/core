@@ -41,8 +41,8 @@ class](../../tests/EventListener/DeserializeListenerTest.php).
 
 ### Validate response types
 
-Response type validation is ensured by [our "validate response types" functional test suite](validate_response_types.md) and [the unit tests of the `AddFormatListener`
-class](../../tests/EventListener/AddFormatListenerTest.php).
+Response type validation is ensured by [our "validate response types" functional test suite](validate_response_types.md)
+and [the unit tests of the `AddFormatListener` class](../../tests/EventListener/AddFormatListenerTest.php).
 
 ### XML input validation
 
@@ -57,6 +57,10 @@ one of the most popular framework validation in the world.
 ## Output encoding
 
 ### Send security headers
+
+The sending of security headers is ensured by [our "send security headers" functional test suite](send_security_headers.md)
+and the unit tests of the [`RespondListener`](../../tests/EventListener/RespondListenerTest.php), [`ExceptionAction`](../../tests/Action/ExceptionActionTest.php)
+and [`ValidationExceptionListener`](../../tests/Bridge/Symfony/Validation/EventListener/ValidationExceptionListenerTest.php).
 
 ### JSON encoding
 
