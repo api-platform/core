@@ -55,6 +55,8 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
     public function testCreate201Response()
@@ -79,6 +81,8 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 
     public function testCreate204Response()
@@ -103,5 +107,7 @@ class RespondListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $response->getContent());
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
         $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
     }
 }

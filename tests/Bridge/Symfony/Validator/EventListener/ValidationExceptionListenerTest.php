@@ -32,7 +32,7 @@ class ValidationExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
-        $listener =new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
+        $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
         $listener->onKernelException($eventProphecy->reveal());
     }
 
@@ -43,7 +43,11 @@ class ValidationExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy = $this->prophesize(GetResponseForExceptionEvent::class);
         $eventProphecy->getException()->willReturn(new ValidationException($list))->shouldBeCalled();
         $eventProphecy->getRequest()->willReturn(new Request())->shouldBeCalled();
-        $eventProphecy->setResponse(new Response('{"foo": "bar"}', Response::HTTP_BAD_REQUEST, ['Content-Type' => 'application/ld+json; charset=utf-8']))->shouldBeCalled();
+        $eventProphecy->setResponse(new Response('{"foo": "bar"}', Response::HTTP_BAD_REQUEST, [
+            'Content-Type' => 'application/ld+json; charset=utf-8',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'deny',
+        ]))->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($list, 'hydra')->willReturn('{"foo": "bar"}')->shouldBeCalled();
