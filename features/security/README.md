@@ -74,5 +74,19 @@ API Platform relies on the [Symfony Serializer component](http://symfony.com/doc
 encode XML.
 This component has its own test suite.
 
+## Cryptography
 
-To be continued.
+Cryptography for transit and storage should be enabled and properly configured on your servers depending of the nature of
+you application.
+API Platform natively supports both HTTPS (always recommended) and HTTP (for read-only public data only).
+
+## Message Integrity
+
+API Platform relies on the [LexikJWTAuthenticationBundle](https://github.com/lexik/LexikJWTAuthenticationBundle),
+for JWT support.
+This bundle and the underlying [JSON Object Signing and Encryption library for PHP](https://github.com/namshi/jose) library have their own test suites.
+
+## HTTP Return Code
+
+Setting proper HTTP return codes is delegated to the [Symfony Security component](http://symfony.com/doc/current/components/security.html).
+This component has its own test suite.
