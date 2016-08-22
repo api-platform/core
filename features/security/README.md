@@ -29,7 +29,7 @@ This component has its own test suite.
 
 ### Strong typing
 
-Strong typing is ensured by [our "strong typing" functional test suite](strong_typing.md) and [the unit tests of the `AbstractItemNormalizer`
+Strong typing is ensured by [our "strong typing" functional test suite](strong_typing.feature) and [the unit tests of the `AbstractItemNormalizer`
 class](../../tests/Serializer/AbstractItemNormalizerTest.php).
 
 You might also be interested to see how extra attributes are ignored: [unknown_attributes.feature]
