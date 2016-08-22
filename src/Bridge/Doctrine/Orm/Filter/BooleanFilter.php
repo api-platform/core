@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
@@ -24,14 +25,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class BooleanFilter extends AbstractFilter
 {
-    /*
-     * @var RequestStack
-     */
     private $requestStack;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -74,7 +72,7 @@ class BooleanFilter extends AbstractFilter
             if ($this->isPropertyNested($property)) {
                 list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
             }
-            $valueParameter = QueryNameGenerator::generateParameterName($field);
+            $valueParameter = $this->queryNameGenerator->generateParameterName($field);
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))

@@ -11,12 +11,6 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\Expr\OrderBy;
-use Doctrine\ORM\QueryBuilder;
-
 /**
  * Utility functions for working with Doctrine ORM query.
  *
@@ -27,20 +21,21 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class QueryNameGenerator implements QueryNameGeneratorInterface
 {
+    protected $incrementedQuery = 1;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function generateJoinAlias(string $association) : string
     {
-        return sprintf('%s_%s', $association, $association);
+        return sprintf('%s_%s', $association, $association.$this->incrementedQuery++);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function generateParameterName(string $name) : string
     {
-        return sprintf('%s_%s', $name, $name);
+        return sprintf('%s_%s', $name, $name.$this->incrementedQuery++);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the API Platform project.
  *
@@ -10,11 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\Expr\OrderBy;
-use Doctrine\ORM\QueryBuilder;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>

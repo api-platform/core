@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -33,13 +33,14 @@ class RangeFilter extends AbstractFilter
     private $requestStack;
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     * @param RequestStack    $requestStack
-     * @param array|null      $properties
+     * @param ManagerRegistry             $managerRegistry
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param RequestStack                $requestStack
+     * @param array|null                  $properties
      */
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -93,7 +94,7 @@ class RangeFilter extends AbstractFilter
      */
     private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value)
     {
-        $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $this->queryNameGenerator->generateParameterName(sprintf('%s_%s', $field, $operator));
 
         switch ($operator) {
             case self::PARAMETER_BETWEEN:

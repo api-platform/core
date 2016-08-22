@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -67,6 +68,7 @@ class RangeFilterTest extends KernelTestCase
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new RangeFilter(
             $this->managerRegistry,
+            new QueryNameGenerator(),
             $requestStack,
             $filterParameters['properties']
         );
@@ -88,7 +90,9 @@ class RangeFilterTest extends KernelTestCase
 
     public function testGetDescription()
     {
-        $filter = new RangeFilter($this->managerRegistry, new RequestStack());
+        $filter = new RangeFilter($this->managerRegistry,
+            new QueryNameGenerator(),
+            new RequestStack());
         $this->assertEquals([
             'id[between]' => [
                 'property' => 'id',
@@ -364,7 +368,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '9.99..15.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyprice_between_dummyprice_between38_1 AND :dummyPrice_between_dummyprice_between38_2', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyprice_between_dummyprice_between1_1 AND :dummyPrice_between_dummyprice_between1_2', Dummy::class),
             ],
             // Invalid value
             [
@@ -398,7 +402,7 @@ class RangeFilterTest extends KernelTestCase
                         'lt' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_lt_dummyPrice_lt41', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_lt_dummyPrice_lt1', Dummy::class),
             ],
             [
                 [
@@ -409,7 +413,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte42', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte1', Dummy::class),
             ],
             [
                 [
@@ -420,7 +424,7 @@ class RangeFilterTest extends KernelTestCase
                         'gt' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_gt_dummyPrice_gt43', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_gt_dummyPrice_gt1', Dummy::class),
             ],
             [
                 [
@@ -431,7 +435,7 @@ class RangeFilterTest extends KernelTestCase
                         'gte' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte44', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte1', Dummy::class),
             ],
             [
                 [
@@ -443,7 +447,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '19.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte45 AND o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte46', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte1 AND o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte2', Dummy::class),
             ],
         ];
     }

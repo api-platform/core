@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -58,15 +59,16 @@ class SearchFilter extends AbstractFilter
     private $caseSensitive;
 
     /**
-     * @param ManagerRegistry           $managerRegistry
-     * @param RequestStack              $requestStack
-     * @param IriConverterInterface     $iriConverter
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param array|null                $properties       Null to allow filtering on all properties with the exact strategy or a map of property name with strategy.
+     * @param ManagerRegistry                $managerRegistry
+     * @param QueryNameGeneratorInterface    $queryNameGenerator
+     * @param RequestStack                   $requestStack
+     * @param IriConverterInterface          $iriConverter
+     * @param PropertyAccessorInterface|null $propertyAccessor
+     * @param array|null                     $properties
      */
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
 
         $this->requestStack = $requestStack;
         $this->iriConverter = $iriConverter;
@@ -101,7 +103,7 @@ class SearchFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryNameGenerator::generateJoinAlias($association);
+                    $alias = $this->queryNameGenerator->generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -144,7 +146,7 @@ class SearchFilter extends AbstractFilter
                     continue;
                 }
 
-                $valueParameter = QueryNameGenerator::generateParameterName($field);
+                $valueParameter = $this->queryNameGenerator->generateParameterName($field);
 
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
@@ -159,8 +161,8 @@ class SearchFilter extends AbstractFilter
             $values = array_map([$this, 'getIdFromValue'], $values);
 
             $association = $field;
-            $associationAlias = QueryNameGenerator::generateJoinAlias($association);
-            $valueParameter = QueryNameGenerator::generateParameterName($association);
+            $associationAlias = $this->queryNameGenerator->generateJoinAlias($association);
+            $valueParameter = $this->queryNameGenerator->generateParameterName($association);
 
             $queryBuilder
                 ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
@@ -190,7 +192,7 @@ class SearchFilter extends AbstractFilter
      */
     private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, string $alias, string $field, string $value)
     {
-        $valueParameter = QueryNameGenerator::generateParameterName($field);
+        $valueParameter = $this->queryNameGenerator->generateParameterName($field);
 
         switch ($strategy) {
             case null:

@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,9 +35,9 @@ class OrderFilter extends AbstractFilter
      */
     private $requestStack;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, string $orderParameterName, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, string $orderParameterName, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
 
         $this->orderParameterName = $orderParameterName;
         $this->requestStack = $requestStack;

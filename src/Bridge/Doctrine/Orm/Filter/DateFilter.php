@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,13 +39,14 @@ class DateFilter extends AbstractFilter
     private $requestStack;
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     * @param RequestStack    $requestStack
-     * @param array|null      $properties
+     * @param ManagerRegistry             $managerRegistry
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param RequestStack                $requestStack
+     * @param array|null                  $properties
      */
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -79,7 +80,7 @@ class DateFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryNameGenerator::generateJoinAlias($association);
+                    $alias = $this->queryNameGenerator->generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -129,7 +130,7 @@ class DateFilter extends AbstractFilter
      */
     private function addWhere(QueryBuilder $queryBuilder, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
     {
-        $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $this->queryNameGenerator->generateParameterName(sprintf('%s_%s', $field, $operator));
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
