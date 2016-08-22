@@ -71,7 +71,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Requested format "unknown" is not supported. Supported MIME types are "application/json".
+     * @expectedExceptionMessage Requested format "text/xml" is not supported. Supported MIME types are "application/json".
      */
     public function testUnsupportedRequestFormat()
     {
@@ -138,5 +138,22 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
         $listener->onKernelRequest($event);
+    }
+
+    public function testAcceptHeaderTakePrecedenceOverRequestFormat()
+    {
+        $request = new Request();
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->headers->set('Accept', 'application/json');
+        $request->setRequestFormat('xml');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['application/xml'], 'json' => ['application/json']]);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('json', $request->getRequestFormat());
     }
 }

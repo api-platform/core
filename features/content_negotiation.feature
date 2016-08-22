@@ -83,6 +83,12 @@ Feature: Content Negotiation support
     <response><id>/dummies/2</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>Sent in JSON</name><alias/></response>
     """
 
+  Scenario: Requesting a the same format in the Accept header and in the URL should work
+    When I add "Accept" header equal to "text/xml"
+    And I send a "GET" request to "/dummies/1.xml"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
+
   @dropSchema
   Scenario: Requesting an unknown format should throw an error
     When I add "Accept" header equal to "text/plain"
