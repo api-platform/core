@@ -10,7 +10,7 @@ Feature: Search filter on collections
     When I send a "GET" request to "/dummies?name=my"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -47,7 +47,7 @@ Feature: Search filter on collections
     When I send a "GET" request to "/dummies?dummy=somedummytest1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -75,7 +75,7 @@ Feature: Search filter on collections
     When I send a "GET" request to "/dummies?alias=Ali"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -111,7 +111,7 @@ Feature: Search filter on collections
     When I send a "GET" request to "/dummies?description=smart"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -148,7 +148,7 @@ Feature: Search filter on collections
     When I send a "GET" request to "/dummies?name=MuYm"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {

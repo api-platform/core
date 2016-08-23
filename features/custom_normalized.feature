@@ -5,7 +5,8 @@ Feature: Using custom normalized entity
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/custom_normalized_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/custom_normalized_dummies" with body:
     """
     {
       "name": "My Dummy",
@@ -14,7 +15,7 @@ Feature: Using custom normalized entity
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -30,7 +31,7 @@ Feature: Using custom normalized entity
     When I send a "GET" request to "/custom_normalized_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -46,7 +47,7 @@ Feature: Using custom normalized entity
     When I send a "GET" request to "/custom_normalized_dummies"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -66,25 +67,26 @@ Feature: Using custom normalized entity
     """
 
   Scenario: Update a resource
-      When I send a "PUT" request to "/custom_normalized_dummies/1" with body:
-      """
-      {
-        "name": "My Dummy modified"
-      }
-      """
-      Then the response status code should be 200
-      And the response should be in JSON
-      And the header "Content-Type" should be equal to "application/ld+json"
-      And the JSON should be equal to:
-      """
-      {
-        "@context": "/contexts/CustomNormalizedDummy",
-        "@id": "/custom_normalized_dummies/1",
-        "@type": "CustomNormalizedDummy",
-        "name": "My Dummy modified",
-        "alias": "My alias"
-      }
-      """
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/custom_normalized_dummies/1" with body:
+    """
+    {
+      "name": "My Dummy modified"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/CustomNormalizedDummy",
+      "@id": "/custom_normalized_dummies/1",
+      "@type": "CustomNormalizedDummy",
+      "name": "My Dummy modified",
+      "alias": "My alias"
+    }
+    """
 
   Scenario: API doc is correctly generated
     When I send a "GET" request to "/apidoc.jsonld"

@@ -5,7 +5,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
 
   @createSchema
   Scenario: Create a resource
-    When I send a "POST" request to "/overridden_operation_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/overridden_operation_dummies" with body:
     """
     {
       "name": "My Overridden Operation Dummy",
@@ -15,7 +16,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -32,7 +33,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     When I send a "GET" request to "/overridden_operation_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -49,7 +50,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     When I add "Accept" header equal to "application/xml"
     And I send a "GET" request to "/overridden_operation_dummies/1"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -64,7 +65,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     When I send a "GET" request to "/overridden_operation_dummies"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -85,7 +86,8 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     """
 
   Scenario: Update a resource
-    When I send a "PUT" request to "/overridden_operation_dummies/1" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/overridden_operation_dummies/1" with body:
       """
       {
         "@id": "/overridden_operation_dummies/1",
@@ -95,7 +97,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
       """
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
       """
       {
@@ -111,7 +113,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     When I send a "GET" request to "/overridden_operation_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

@@ -6,10 +6,12 @@ Feature: Circular references handling
   @createSchema
   @dropSchema
   Scenario: Create a circular reference
-    When I send a "POST" request to "/circular_references" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/circular_references" with body:
     """
     {}
     """
+    And I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/circular_references/1" with body:
     """
     {
@@ -18,7 +20,7 @@ Feature: Circular references handling
     """
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

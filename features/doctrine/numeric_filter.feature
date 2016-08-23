@@ -9,7 +9,7 @@ Feature: Numeric filter on collections
     When I send a "GET" request to "/dummies?id=9.99"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -34,7 +34,7 @@ Feature: Numeric filter on collections
     When I send a "GET" request to "/dummies?id=10"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -70,7 +70,7 @@ Feature: Numeric filter on collections
     When I send a "GET" request to "/dummies?unknown=0"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -105,7 +105,7 @@ Feature: Numeric filter on collections
     When I send a "GET" request to "/dummies?unknown=1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
