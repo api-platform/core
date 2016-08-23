@@ -140,6 +140,24 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+     * @expectedExceptionMessage The "invalid" MIME type is invalid.
+     */
+    public function testInvalidAcceptHeader()
+    {
+        $request = new Request();
+        $request->attributes->set('_api_resource_class', 'Foo');
+        $request->headers->set('Accept', 'invalid');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $listener->onKernelRequest($event);
+    }
+
     public function testAcceptHeaderTakePrecedenceOverRequestFormat()
     {
         $request = new Request();

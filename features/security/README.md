@@ -36,12 +36,12 @@ You might also be interested to see how extra attributes are ignored: [unknown_a
 
 ### Validate incoming content-types
 
-Incoming content-types validation is ensured by [our "validate incoming content-types" functional test suite](validate_incoming_content-types.md) and [the unit tests of the `DeserializeListener`
+Incoming content-types validation is ensured by [our "validate incoming content-types" functional test suite](validate_incoming_content-types.feature) and [the unit tests of the `DeserializeListener`
 class](../../tests/EventListener/DeserializeListenerTest.php).
 
 ### Validate response types
 
-Response type validation is ensured by [our "validate response types" functional test suite](validate_response_types.md)
+Response type validation is ensured by [our "validate response types" functional test suite](validate_response_types.feature)
 and [the unit tests of the `AddFormatListener` class](../../tests/EventListener/AddFormatListenerTest.php).
 
 ### XML input validation
@@ -58,7 +58,7 @@ one of the most popular framework validation in the world.
 
 ### Send security headers
 
-The sending of security headers is ensured by [our "send security headers" functional test suite](send_security_headers.md)
+The sending of security headers is ensured by [our "send security headers" functional test suite](send_security_headers.feature)
 and the unit tests of the [`RespondListener`](../../tests/EventListener/RespondListenerTest.php), [`ExceptionAction`](../../tests/Action/ExceptionActionTest.php)
 and [`ValidationExceptionListener`](../../tests/Bridge/Symfony/Validation/EventListener/ValidationExceptionListenerTest.php).
 

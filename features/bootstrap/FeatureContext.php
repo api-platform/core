@@ -64,7 +64,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      *
      * @BeforeScenario
      */
-    public function acceptJsonLd()
+    public function removeAcceptHeader()
     {
         $this->request->setHttpHeader('Accept', null);
     }
