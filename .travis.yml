@@ -9,6 +9,7 @@ cache:
 matrix:
   include:
     - php: '7.0'
+      env: coverage=1
     - php: '7.0'
       env: deps="low"
 
@@ -23,9 +24,9 @@ install:
   - if [[ $deps = low ]]; then composer update --no-progress --ansi --prefer-lowest --prefer-stable; fi
 
 script:
-  - phpunit --coverage-clover clover-phpunit.xml
-  - vendor/bin/behat --profile coverage
+  - if [[ $coverage = 1 ]]; then phpunit --coverage-clover clover-phpunit.xml; else phpunit; fi
+  - if [[ $coverage = 1 ]]; then vendor/bin/behat --profile coverage; else vendor/bin/behat; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
 
 after_success:
-  - travis_retry php coveralls.phar --coverage_clover=clover-*.xml
+  - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar --coverage_clover=clover-*.xml; fi
