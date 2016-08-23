@@ -97,6 +97,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
         $request->setMethod(Request::METHOD_POST);
         $request->headers->set('Content-Type', 'text/xml');
+        $request->setFormat('xml', 'text/xml'); // Workaround to avoid weird behaviors
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
