@@ -45,7 +45,7 @@ class CoverageContext implements Context
     public static function tearDown()
     {
         $writer = new Clover();
-        $writer->process(self::$coverage, __DIR__.'/../../clover-behat.xml');
+        $writer->process(self::$coverage, __DIR__.'/../../build/logs/clover-behat.xml');
     }
 
     private function getCoverageKeyFromScope(BeforeScenarioScope $scope) : string
