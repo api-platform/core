@@ -21,3 +21,16 @@ default:
         default:
           symfony2: ~
     'Sanpi\Behatch\Extension': ~
+
+coverage:
+  suites:
+    default:
+      contexts:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'CoverageContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Sanpi\Behatch\Context\RestContext'
+        - 'Sanpi\Behatch\Context\JsonContext'

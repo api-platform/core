@@ -15,12 +15,17 @@ matrix:
 before_install:
   - phpunit --self-update
   - npm install -g swagger-cli
+  - wget https://phar.phpunit.de/phpcov.phar
+  - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
 
 install:
   - if [[ ! $deps ]]; then composer update --no-progress --ansi; fi
   - if [[ $deps = low ]]; then composer update --no-progress --ansi --prefer-lowest --prefer-stable; fi
 
 script:
-  - phpunit
-  - vendor/bin/behat
+  - phpunit --coverage-clover clover-phpunit.xml
+  - vendor/bin/behat --profile coverage
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
+
+after_success:
+  - travis_retry php coveralls.phar --coverage_clover=clover-*.xml
