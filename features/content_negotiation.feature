@@ -6,6 +6,7 @@ Feature: Content Negotiation support
   @createSchema
   Scenario: Post an XML body
     When I add "Accept" header equal to "application/xml"
+    And I add "Content-Type" header equal to "application/xml"
     And I send a "POST" request to "/dummies" with body:
     """
     <root>
@@ -13,7 +14,7 @@ Feature: Content Negotiation support
     </root>
     """
     Then the response status code should be 201
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -24,7 +25,7 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "text/xml"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -34,7 +35,7 @@ Feature: Content Negotiation support
   Scenario:  Retrieve a collection in XML using the .xml URL
     When I send a "GET" request to "/dummies.xml"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
@@ -45,7 +46,7 @@ Feature: Content Negotiation support
     When I add "Accept" header equal to "application/json"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/json"
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
     And the response should be in JSON
     And the JSON should be equal to:
     """
@@ -75,34 +76,28 @@ Feature: Content Negotiation support
     {"name": "Sent in JSON"}
     """
     Then the response status code should be 201
-    And the header "Content-Type" should be equal to "application/xml"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
     And the response should be equal to
     """
     <?xml version="1.0"?>
     <response><id>/dummies/2</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>Sent in JSON</name><alias/></response>
     """
 
+  Scenario: Requesting the same format in the Accept header and in the URL should work
+    When I add "Accept" header equal to "text/xml"
+    And I send a "GET" request to "/dummies/1.xml"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
+
+  Scenario: Requesting any format in the Accept header should default to the first configured format
+    When I add "Accept" header equal to "*/*"
+    And I send a "GET" request to "/dummies/1"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
   @dropSchema
-  Scenario: Requesting an unknown format should return JSON-LD
+  Scenario: Requesting an unknown format should throw an error
     When I add "Accept" header equal to "text/plain"
     And I send a "GET" request to "/dummies/1"
-    Then the header "Content-Type" should be equal to "application/ld+json"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies/1",
-      "@type": "Dummy",
-      "description": null,
-      "dummy": null,
-      "dummyBoolean": null,
-      "dummyDate": null,
-      "dummyPrice": null,
-      "relatedDummy": null,
-      "relatedDummies": [],
-      "jsonData": [],
-      "name_converted": null,
-      "name": "XML!",
-      "alias": null
-    }
-    """
+    Then the response status code should be 406
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"

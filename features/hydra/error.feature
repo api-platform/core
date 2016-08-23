@@ -4,13 +4,14 @@ Feature: Error handling
   I need to retrieve an Hydra serialization of errors
 
   Scenario: Get an error
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {}
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -28,7 +29,8 @@ Feature: Error handling
     """
 
   Scenario: Get an error during deserialization of simple relation
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",
@@ -39,7 +41,7 @@ Feature: Error handling
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
@@ -47,7 +49,8 @@ Feature: Error handling
     And the JSON node "trace" should exist
 
   Scenario: Get an error during deserialization of collection
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",
@@ -58,7 +61,7 @@ Feature: Error handling
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
@@ -66,7 +69,8 @@ Feature: Error handling
     And the JSON node "trace" should exist
 
   Scenario: Get an error because of an invalid JSON
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Foo",
@@ -74,7 +78,7 @@ Feature: Error handling
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"

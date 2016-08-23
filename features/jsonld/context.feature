@@ -7,7 +7,7 @@ Feature: JSON-LD contexts generation
     When I send a "GET" request to "/"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Entrypoint"
     And the JSON node "@id" should be equal to "/"
     And the JSON node "@type" should be equal to "Entrypoint"
@@ -31,7 +31,7 @@ Feature: JSON-LD contexts generation
     When I send a "GET" request to "/contexts/Dummy"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
       {
@@ -64,7 +64,7 @@ Feature: JSON-LD contexts generation
       When I send a "GET" request to "/contexts/RelationEmbedder"
       Then the response status code should be 200
       And the response should be in JSON
-      And the header "Content-Type" should be equal to "application/ld+json"
+      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
       And the JSON should be equal to:
       """
       {

@@ -36,7 +36,11 @@ class ExceptionActionTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->setFormat('jsonproblem', 'application/problem+json');
         $serializer->serialize($flattenException, 'jsonproblem')->willReturn();
-        $expected = new Response('', Response::HTTP_BAD_REQUEST, ['Content-Type' => 'application/problem+json']);
+        $expected = new Response('', Response::HTTP_BAD_REQUEST, [
+            'Content-Type' => 'application/problem+json; charset=utf-8',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'deny',
+        ]);
 
         $this->assertEquals($expected, $exceptionAction($flattenException->reveal(), $request));
     }

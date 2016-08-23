@@ -60,13 +60,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * Sets the default Accept HTTP header to the JSON-LD mime type.
+     * Sets the default Accept HTTP header to null (workaround to artificially remove it).
      *
      * @BeforeScenario
      */
-    public function acceptJsonLd()
+    public function removeAcceptHeader()
     {
-        $this->request->setHttpHeader('Accept', 'application/ld+json');
+        $this->request->setHttpHeader('Accept', null);
     }
 
     /**

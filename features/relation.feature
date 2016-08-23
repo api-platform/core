@@ -12,7 +12,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -25,13 +25,14 @@ Feature: Relations support
     """
 
   Scenario: Create a dummy friend
-    When I send a "POST" request to "/dummy_friends" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummy_friends" with body:
     """
     {"name": "Zoidberg"}
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -43,13 +44,14 @@ Feature: Relations support
     """
 
   Scenario: Create a related dummy
-    When I send a "POST" request to "/related_dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/related_dummies" with body:
     """
     {"thirdLevel": "/third_levels/1"}
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -67,7 +69,8 @@ Feature: Relations support
     """
 
   Scenario: Create a friend relationship
-    When I send a "POST" request to "/related_to_dummy_friends" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/related_to_dummy_friends" with body:
     """
     {
       "name": "Friends relation",
@@ -77,7 +80,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -97,7 +100,7 @@ Feature: Relations support
     When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -114,7 +117,8 @@ Feature: Relations support
     """
 
   Scenario: Create a dummy with relations
-    When I send a "POST" request to "/dummies" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
     """
     {
       "name": "Dummy with relations",
@@ -127,7 +131,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -154,7 +158,7 @@ Feature: Relations support
     When I send a "GET" request to "/dummies?relatedDummy=%2Frelated_dummies%2F1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -187,7 +191,7 @@ Feature: Relations support
     When I send a "GET" request to "/dummies?relatedDummies[]=%2Frelated_dummies%2F1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """
     {
@@ -217,7 +221,8 @@ Feature: Relations support
     """
 
   Scenario: Embed a relation in the parent object
-      When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
       """
       {
         "related": "/related_dummies/1"
@@ -225,7 +230,7 @@ Feature: Relations support
       """
       Then the response status code should be 201
       And the response should be in JSON
-      And the header "Content-Type" should be equal to "application/ld+json"
+      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
       And the JSON should be equal to:
       """
       {
@@ -248,7 +253,8 @@ Feature: Relations support
       """
 
   Scenario: Create an existing relation
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
     """
     {
       "anotherRelated": {
@@ -258,7 +264,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -277,7 +283,8 @@ Feature: Relations support
     """
 
   Scenario: Post a wrong relation
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
     """
     {
       "anotherRelated": {
@@ -289,10 +296,11 @@ Feature: Relations support
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Update an embedded relation
-    When I send a "PUT" request to "/relation_embedders/2" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/relation_embedders/2" with body:
     """
     {
       "anotherRelated": {
@@ -303,7 +311,7 @@ Feature: Relations support
     """
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -323,7 +331,8 @@ Feature: Relations support
 
   @dropSchema
   Scenario: Update an existing relation
-    When I send a "POST" request to "/relation_embedders" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
     """
     {
       "anotherRelated": {
@@ -335,7 +344,7 @@ Feature: Relations support
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {

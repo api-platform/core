@@ -5,7 +5,6 @@ Feature: Create-Retrieve-Update-Delete
 
   @createSchema
   Scenario: Create a resource
-    # Workaround: Behatch doesn't reset the previously sent Content-Type
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
     """
@@ -22,7 +21,7 @@ Feature: Create-Retrieve-Update-Delete
     """
     Then the response status code should be 201
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -52,7 +51,7 @@ Feature: Create-Retrieve-Update-Delete
     When I send a "GET" request to "/dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -86,7 +85,7 @@ Feature: Create-Retrieve-Update-Delete
     When I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
@@ -271,7 +270,8 @@ Feature: Create-Retrieve-Update-Delete
     """
 
   Scenario: Update a resource
-    When I send a "PUT" request to "/dummies/1" with body:
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/dummies/1" with body:
     """
     {
       "@id": "/dummies/1",
@@ -287,7 +287,7 @@ Feature: Create-Retrieve-Update-Delete
     """
     Then the response status code should be 200
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json"
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
