@@ -68,12 +68,11 @@ class DateFilterTest extends KernelTestCase
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new DateFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             $requestStack,
             $filterParameters['properties']
         );
 
-        $filter->apply($queryBuilder, $this->resourceClass);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -87,7 +86,6 @@ class DateFilterTest extends KernelTestCase
     public function testGetDescription()
     {
         $filter = new DateFilter($this->managerRegistry,
-           new QueryNameGenerator(),
             new RequestStack());
         $this->assertEquals([
             'dummyDate[before]' => [
@@ -218,7 +216,7 @@ class DateFilterTest extends KernelTestCase
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_relatedDummy1 WHERE relatedDummy_relatedDummy1.dummydate >= :dummydate_after_dummydate_after2 AND relatedDummy_relatedDummy1.dummydate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_relatedDummy1 WHERE relatedDummy_relatedDummy1.dummydate >= :dummydate_after_dummydate_after1 AND relatedDummy_relatedDummy1.dummydate IS NOT NULL', Dummy::class),
             ],
             // Test with exclude_null
             [

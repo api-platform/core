@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -60,15 +59,14 @@ class SearchFilter extends AbstractFilter
 
     /**
      * @param ManagerRegistry                $managerRegistry
-     * @param QueryNameGeneratorInterface    $queryNameGenerator
      * @param RequestStack                   $requestStack
      * @param IriConverterInterface          $iriConverter
      * @param PropertyAccessorInterface|null $propertyAccessor
      * @param array|null                     $properties
      */
-    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
+        parent::__construct($managerRegistry, $properties);
 
         $this->requestStack = $requestStack;
         $this->iriConverter = $iriConverter;
@@ -78,7 +76,7 @@ class SearchFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -103,7 +101,7 @@ class SearchFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = $this->queryNameGenerator->generateJoinAlias($association);
+                    $alias = $queryNameGenerator->generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -137,7 +135,7 @@ class SearchFilter extends AbstractFilter
                 }
 
                 if (1 === count($values)) {
-                    $this->addWhereByStrategy($strategy, $queryBuilder, $alias, $field, $values[0]);
+                    $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0]);
                     continue;
                 }
 
@@ -146,7 +144,7 @@ class SearchFilter extends AbstractFilter
                     continue;
                 }
 
-                $valueParameter = $this->queryNameGenerator->generateParameterName($field);
+                $valueParameter = $queryNameGenerator->generateParameterName($field);
 
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
@@ -161,8 +159,8 @@ class SearchFilter extends AbstractFilter
             $values = array_map([$this, 'getIdFromValue'], $values);
 
             $association = $field;
-            $associationAlias = $this->queryNameGenerator->generateJoinAlias($association);
-            $valueParameter = $this->queryNameGenerator->generateParameterName($association);
+            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+            $valueParameter = $queryNameGenerator->generateParameterName($association);
 
             $queryBuilder
                 ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
@@ -190,9 +188,9 @@ class SearchFilter extends AbstractFilter
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, string $alias, string $field, string $value)
+    private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $value)
     {
-        $valueParameter = $this->queryNameGenerator->generateParameterName($field);
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         switch ($strategy) {
             case null:

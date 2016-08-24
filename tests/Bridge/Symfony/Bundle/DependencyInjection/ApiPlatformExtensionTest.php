@@ -271,7 +271,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.serializer.normalizer.item',
             'api_platform.serializer.context_builder',
             'api_platform.doctrine.metadata_factory',
-            'api_platform.doctrine.query_name_generator',
             'api_platform.doctrine.orm.collection_data_provider',
             'api_platform.doctrine.orm.item_data_provider',
             'api_platform.doctrine.orm.default.item_data_provider',

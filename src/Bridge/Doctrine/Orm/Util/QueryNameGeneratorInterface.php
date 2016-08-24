@@ -11,8 +11,6 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
-use Doctrine\ORM\Query\Expr\Join;
-
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */

@@ -39,14 +39,13 @@ class DateFilter extends AbstractFilter
     private $requestStack;
 
     /**
-     * @param ManagerRegistry             $managerRegistry
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param RequestStack                $requestStack
-     * @param array|null                  $properties
+     * @param ManagerRegistry $managerRegistry
+     * @param RequestStack    $requestStack
+     * @param array|null      $properties
      */
-    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
     {
-        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
+        parent::__construct($managerRegistry, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -54,7 +53,7 @@ class DateFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (null === ($request = $this->requestStack->getCurrentRequest())) {
             return;
@@ -80,7 +79,7 @@ class DateFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = $this->queryNameGenerator->generateJoinAlias($association);
+                    $alias = $queryNameGenerator->generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -97,6 +96,7 @@ class DateFilter extends AbstractFilter
             if (isset($values[self::PARAMETER_BEFORE])) {
                 $this->addWhere(
                     $queryBuilder,
+                    $queryNameGenerator,
                     $alias,
                     $field,
                     self::PARAMETER_BEFORE,
@@ -108,6 +108,7 @@ class DateFilter extends AbstractFilter
             if (isset($values[self::PARAMETER_AFTER])) {
                 $this->addWhere(
                     $queryBuilder,
+                    $queryNameGenerator,
                     $alias,
                     $field,
                     self::PARAMETER_AFTER,
@@ -121,16 +122,17 @@ class DateFilter extends AbstractFilter
     /**
      * Adds the where clause according to the chosen null management.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $field
-     * @param string       $operator
-     * @param string       $value
-     * @param string|null  $nullManagement
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $alias
+     * @param string                      $field
+     * @param string                      $operator
+     * @param string                      $value
+     * @param string|null                 $nullManagement
      */
-    private function addWhere(QueryBuilder $queryBuilder, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
+    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
     {
-        $valueParameter = $this->queryNameGenerator->generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $queryNameGenerator->generateParameterName(sprintf('%s_%s', $field, $operator));
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {

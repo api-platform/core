@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Doctrine\Orm\Extension;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -35,9 +36,9 @@ class FilterExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $filterProphecy = $this->prophesize(FilterInterface::class);
-        $filterProphecy->apply($queryBuilder, Dummy::class, 'get')->shouldBeCalled();
+        $filterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get')->shouldBeCalled();
 
         $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), new FilterCollection(['dummyFilter' => $filterProphecy->reveal()]));
-        $orderExtensionTest->applyToCollection($queryBuilder, Dummy::class, 'get');
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get');
     }
 }

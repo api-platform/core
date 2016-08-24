@@ -5,8 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.doctrine.query_name_generator" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator" public="false" />
-
         <service id="api_platform.doctrine.metadata_factory" class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
@@ -35,7 +33,6 @@
 
         <service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.query_name_generator" />
             <argument type="service" id="request_stack" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.property_accessor" />
@@ -43,32 +40,27 @@
 
         <service id="api_platform.doctrine.orm.order_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.query_name_generator" />
             <argument type="service" id="request_stack" />
             <argument>%api_platform.collection.order_parameter_name%</argument>
         </service>
 
         <service id="api_platform.doctrine.orm.range_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.query_name_generator" />
             <argument type="service" id="request_stack" />
         </service>
 
         <service id="api_platform.doctrine.orm.date_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.query_name_generator" />
             <argument type="service" id="request_stack" />
         </service>
 
         <service id="api_platform.doctrine.orm.boolean_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.query_name_generator" />
             <argument type="service" id="request_stack" />
         </service>
 
         <service id="api_platform.doctrine.orm.numeric_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.query_name_generator" />
             <argument type="service" id="request_stack" />
         </service>
 

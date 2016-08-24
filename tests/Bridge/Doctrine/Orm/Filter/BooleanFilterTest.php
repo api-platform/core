@@ -67,12 +67,11 @@ class BooleanFilterTest extends KernelTestCase
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new BooleanFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             $requestStack,
             $filterParameters['properties']
         );
 
-        $filter->apply($queryBuilder, $this->resourceClass);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -86,7 +85,6 @@ class BooleanFilterTest extends KernelTestCase
     public function testGetDescription()
     {
         $filter = new BooleanFilter($this->managerRegistry,
-            new QueryNameGenerator(),
             new RequestStack(), [
             'id' => null,
             'name' => null,
@@ -105,7 +103,6 @@ class BooleanFilterTest extends KernelTestCase
     public function testGetDescriptionDefaultFields()
     {
         $filter = new BooleanFilter($this->managerRegistry,
-            new QueryNameGenerator(),
             new RequestStack());
         $this->assertEquals([
             'dummyBoolean' => [
@@ -187,7 +184,7 @@ class BooleanFilterTest extends KernelTestCase
                 [
                     'relatedDummy.dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_relateddummy1 where relateddummy_relateddummy1.dummyboolean = :dummyboolean_dummyboolean2', Dummy::class),
+                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_relateddummy1 where relateddummy_relateddummy1.dummyboolean = :dummyboolean_dummyboolean1', Dummy::class),
             ],
             // test with multiple 1 value
             [

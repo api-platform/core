@@ -82,14 +82,13 @@ class SearchFilterTest extends KernelTestCase
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new SearchFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             $requestStack,
             $this->iriConverter,
             $this->propertyAccessor,
             $filterParameters['properties']
         );
 
-        $filter->apply($queryBuilder, $this->resourceClass, 'op');
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expectedDql = strtolower($expected['dql']);
 
@@ -116,7 +115,6 @@ class SearchFilterTest extends KernelTestCase
     {
         $filter = new SearchFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             new RequestStack(),
             $this->iriConverter,
             $this->propertyAccessor
@@ -246,7 +244,6 @@ class SearchFilterTest extends KernelTestCase
 
         $filter = new SearchFilter(
             $this->managerRegistry,
-           new QueryNameGenerator(),
             new RequestStack(),
             $this->iriConverter,
             $this->propertyAccessor,
@@ -440,9 +437,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relateddummy relateddummy_relateddummy2 WHERE o.name = :name_name1 AND relateddummy_relateddummy2.id = :relateddummy_relateddummy3', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relateddummy relateddummy_relateddummy1 WHERE o.name = :name_name1 AND relateddummy_relateddummy1.id = :relateddummy_relateddummy2', Dummy::class),
                     'parameters' => [
-                        'relatedDummy_relatedDummy3' => 'foo',
+                        'relatedDummy_relatedDummy2' => 'foo',
                     ],
                 ],
             ],
@@ -573,9 +570,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_relatedDummy1 WHERE relatedDummy_relatedDummy1.id = :relatedDummy_relatedDummy2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_relatedDummy1 WHERE relatedDummy_relatedDummy1.id = :relatedDummy_relatedDummy1', Dummy::class),
                     'parameters' => [
-                        'relatedDummy_relatedDummy2' => 'exact',
+                        'relatedDummy_relatedDummy1' => 'exact',
                     ],
                 ],
             ],
@@ -587,9 +584,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.id' => '/related_dummies/1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_relatedDummy1 WHERE relatedDummy_relatedDummy1.id = :id_id2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_relatedDummy1 WHERE relatedDummy_relatedDummy1.id = :id_id1', Dummy::class),
                     'parameters' => [
-                        'id_id2' => 1,
+                        'id_id1' => 1,
                     ],
                 ],
             ],
@@ -602,10 +599,10 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_relatedDummy1 inner join o.relatedDummies relatedDummies_relatedDummies3 WHERE relatedDummy_relatedDummy1.id IN (:relatedDummy_relatedDummy2) AND relatedDummies_relatedDummies3.id = :relatedDummies_relatedDummies4', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_relatedDummy1 inner join o.relatedDummies relatedDummies_relatedDummies2 WHERE relatedDummy_relatedDummy1.id IN (:relatedDummy_relatedDummy1) AND relatedDummies_relatedDummies2.id = :relatedDummies_relatedDummies2', Dummy::class),
                     'parameters' => [
-                        'relatedDummy_relatedDummy2' => [1, 2],
-                        'relatedDummies_relatedDummies4' => 1,
+                        'relatedDummy_relatedDummy1' => [1, 2],
+                        'relatedDummies_relatedDummies2' => 1,
                     ],
                 ],
             ],
@@ -618,10 +615,10 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.symfony' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_relateddummy2 WHERE o.name = :name_name1 AND relateddummy_relateddummy2.symfony = :symfony_symfony3', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_relateddummy1 WHERE o.name = :name_name1 AND relateddummy_relateddummy1.symfony = :symfony_symfony2', Dummy::class),
                     'parameters' => [
                         'name_name1' => 'exact',
-                        'symfony_symfony3' => 'exact',
+                        'symfony_symfony2' => 'exact',
                     ],
                 ],
             ],

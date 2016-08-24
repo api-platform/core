@@ -67,12 +67,11 @@ class NumericFilterTest extends KernelTestCase
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new NumericFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             $requestStack,
             $filterParameters['properties']
         );
 
-        $filter->apply($queryBuilder, $this->resourceClass);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -86,7 +85,6 @@ class NumericFilterTest extends KernelTestCase
     public function testGetDescription()
     {
         $filter = new NumericFilter($this->managerRegistry,
-           new QueryNameGenerator(),
             new RequestStack(), [
             'id' => null,
             'name' => null,
@@ -105,7 +103,6 @@ class NumericFilterTest extends KernelTestCase
     public function testGetDescriptionDefaultFields()
     {
         $filter = new NumericFilter($this->managerRegistry,
-           new QueryNameGenerator(),
             new RequestStack());
         $this->assertEquals([
             'id' => [
@@ -182,7 +179,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'relatedDummy.id' => 0,
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_relateddummy1 where relateddummy_relateddummy1.id = :id_id2', Dummy::class),
+                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_relateddummy1 where relateddummy_relateddummy1.id = :id_id1', Dummy::class),
             ],
             // test with one correct and one wrong value
             [

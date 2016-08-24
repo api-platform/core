@@ -21,14 +21,15 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
  */
 final class QueryNameGenerator implements QueryNameGeneratorInterface
 {
-    protected $incrementedQuery = 1;
+    private $incrementedAssociation = 1;
+    private $incrementedName = 1;
 
     /**
      * {@inheritdoc}
      */
     public function generateJoinAlias(string $association) : string
     {
-        return sprintf('%s_%s', $association, $association.$this->incrementedQuery++);
+        return sprintf('%s_%s', $association, $association.$this->incrementedAssociation++);
     }
 
     /**
@@ -36,6 +37,6 @@ final class QueryNameGenerator implements QueryNameGeneratorInterface
      */
     public function generateParameterName(string $name) : string
     {
-        return sprintf('%s_%s', $name, $name.$this->incrementedQuery++);
+        return sprintf('%s_%s', $name, $name.$this->incrementedName++);
     }
 }

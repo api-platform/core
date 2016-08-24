@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -52,7 +53,7 @@ class CollectionDataProvider implements CollectionDataProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($queryBuilder, $resourceClass, $operationName);
+            $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), $resourceClass, $operationName);
 
             if ($extension instanceof QueryResultExtensionInterface) {
                 if ($extension->supportsResult($resourceClass, $operationName)) {

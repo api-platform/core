@@ -69,13 +69,12 @@ class OrderFilterTest extends KernelTestCase
         $parameter = array_key_exists('parameter', $filterParameters) ? $filterParameters['parameter'] : 'order';
         $filter = new OrderFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             $requestStack,
             $parameter,
             $filterParameters['properties']
         );
 
-        $filter->apply($queryBuilder, $this->resourceClass);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -89,7 +88,6 @@ class OrderFilterTest extends KernelTestCase
     public function testGetDescription()
     {
         $filter = new OrderFilter($this->managerRegistry,
-            new QueryNameGenerator(),
             new RequestStack(),
             'order',
             [
@@ -114,7 +112,6 @@ class OrderFilterTest extends KernelTestCase
     public function testGetDescriptionDefaultFields()
     {
         $filter = new OrderFilter($this->managerRegistry,
-            new QueryNameGenerator(),
             new RequestStack(),
             'order');
         $this->assertEquals([

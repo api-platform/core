@@ -39,9 +39,9 @@ class NumericFilter extends AbstractFilter
 
     private $requestStack;
 
-    public function __construct(ManagerRegistry $managerRegistry, QueryNameGeneratorInterface $queryNameGenerator, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
     {
-        parent::__construct($managerRegistry, $queryNameGenerator, $properties);
+        parent::__construct($managerRegistry, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -53,7 +53,7 @@ class NumericFilter extends AbstractFilter
      *
      * For each property passed, if the resource does not have such property or if the  value is not numerical the property is ignored.
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -78,9 +78,9 @@ class NumericFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
             }
-            $valueParameter = $this->queryNameGenerator->generateParameterName($field);
+            $valueParameter = $queryNameGenerator->generateParameterName($field);
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))

@@ -68,13 +68,12 @@ class RangeFilterTest extends KernelTestCase
         $queryBuilder = $this->repository->createQueryBuilder('o');
         $filter = new RangeFilter(
             $this->managerRegistry,
-            new QueryNameGenerator(),
             $requestStack,
             $filterParameters['properties']
         );
 
         try {
-            $filter->apply($queryBuilder, $this->resourceClass);
+            $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         } catch (InvalidArgumentException $e) {
         }
 
@@ -91,7 +90,6 @@ class RangeFilterTest extends KernelTestCase
     public function testGetDescription()
     {
         $filter = new RangeFilter($this->managerRegistry,
-            new QueryNameGenerator(),
             new RequestStack());
         $this->assertEquals([
             'id[between]' => [

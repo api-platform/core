@@ -13,6 +13,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -36,7 +38,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
@@ -47,7 +49,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
 
         foreach ($this->filters as $filterName => $filter) {
             if (in_array($filterName, $resourceFilters) && $filter instanceof FilterInterface) {
-                $filter->apply($queryBuilder, $resourceClass, $operationName);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
             }
         }
     }
