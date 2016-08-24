@@ -123,7 +123,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
      */
     public function testYamlDoesNotExistMetadataFactory()
     {
@@ -137,7 +137,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
      */
     public function testXmlDoesNotExistMetadataFactory()
     {
@@ -160,7 +160,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
 
         foreach ($xmlResourceNameCollectionFactory->create() as $resourceName) {
-            $resourceMetadata = $resourceMetadataFactory->create($resourceName);
+            $resourceMetadataFactory->create($resourceName);
         }
     }
 
@@ -198,9 +198,7 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
 
-        $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([
-            FileConfigDummy::class,
-        ]));
+        $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([FileConfigDummy::class]));
     }
 
     /**

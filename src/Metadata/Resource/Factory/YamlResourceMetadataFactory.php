@@ -89,7 +89,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
                 $metadata['iri'] ?? null,
                 $metadata['itemOperations'] ?? null,
                 $metadata['collectionOperations'] ?? null,
-                $metadata['attributes'] ?? []
+                $metadata['attributes'] ?? null
             );
         }
 

@@ -25,7 +25,7 @@ final class ResourceMetadata
     private $collectionOperations;
     private $attributes;
 
-    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = [])
+    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null)
     {
         $this->shortName = $shortName;
         $this->description = $description;
@@ -217,9 +217,9 @@ final class ResourceMetadata
     /**
      * Gets attributes.
      *
-     * @return array
+     * @return array|null
      */
-    public function getAttributes() : array
+    public function getAttributes()
     {
         return $this->attributes;
     }
