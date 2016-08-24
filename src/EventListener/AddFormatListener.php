@@ -51,34 +51,28 @@ final class AddFormatListener
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
         $routeFormat = $request->attributes->get('_format') ?: null;
-        $originalRequestFormat = $request->getRequestFormat(null) ?: null;
+        $mimeTypes = $routeFormat ? $request->getMimeTypes($routeFormat) : array_keys($this->mimeTypes);
 
         // First, try to guess the format from the Accept header
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
             try {
-                if (null === $acceptHeader = $this->negotiator->getBest($accept, array_keys($this->mimeTypes))) {
-                    throw $this->getNotAcceptableHttpException($accept);
+                if (null === $acceptHeader = $this->negotiator->getBest($accept, $mimeTypes)) {
+                    throw $this->getNotAcceptableHttpException($accept, $mimeTypes);
                 }
             } catch (InvalidMediaType $e) {
                 throw new NotAcceptableHttpException(sprintf('The "%s" MIME type is invalid.', $accept));
             }
 
-            $mimeType = $acceptHeader->getType();
-            $requestFormat = $request->getFormat($mimeType);
-
-            if (null !== $routeFormat && $requestFormat !== $routeFormat) {
-                throw $this->getNotAcceptableHttpException($accept, $request->getMimeTypes($routeFormat));
-            }
-
-            $request->setRequestFormat($requestFormat);
+            $request->setRequestFormat($request->getFormat($acceptHeader->getType()));
 
             return;
         }
 
         // Then use the Symfony request format if available and applicable
-        if (null !== $originalRequestFormat) {
-            $mimeType = $request->getMimeType($originalRequestFormat);
+        $requestFormat = $request->getRequestFormat(null) ?: null;
+        if (null !== $requestFormat) {
+            $mimeType = $request->getMimeType($requestFormat);
 
             if (isset($this->mimeTypes[$mimeType])) {
                 return;

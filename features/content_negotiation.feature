@@ -95,6 +95,12 @@ Feature: Content Negotiation support
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  Scenario: Requesting any format in the Accept header should default to the format passed in the URL
+    When I add "Accept" header equal to "text/plain; charset=utf-8, */*"
+    And I send a "GET" request to "/dummies/1.xml"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
+
   @dropSchema
   Scenario: Requesting an unknown format should throw an error
     When I add "Accept" header equal to "text/plain"
