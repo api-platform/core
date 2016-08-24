@@ -1,67 +1,67 @@
 {
-  "name": "api-platform/core",
-  "type": "library",
-  "description": "JSON-LD / Hydra REST API for Symfony",
-  "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
-  "homepage": "https://api-platform.com",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Kévin Dunglas",
-      "email": "dunglas@gmail.com",
-      "homepage": "https://dunglas.fr"
-    }
-  ],
-  "require": {
-    "php": ">=7.0",
+    "name": "api-platform/core",
+    "type": "library",
+    "description": "JSON-LD / Hydra REST API for Symfony",
+    "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "dunglas@gmail.com",
+            "homepage": "https://dunglas.fr"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
 
-    "doctrine/inflector": "^1.0",
-    "psr/cache": "^1.0",
-    "symfony/http-foundation": "^2.7 || ^3.0",
-    "symfony/http-kernel": "^2.7 || ^3.0",
-    "symfony/property-info": "^3.1",
-    "symfony/serializer": "^3.1",
-    "willdurand/negotiation": "^2.0"
-  },
-  "require-dev": {
-    "behat/behat": "^3.1",
-    "behat/mink": "^1.7",
-    "behat/mink-browserkit-driver": "^1.3.1",
-    "behat/mink-extension": "^2.2",
-    "behat/symfony2-extension": "^2.1",
-    "behatch/contexts": "^2.5",
-    "doctrine/doctrine-bundle": "^1.6.3",
-    "doctrine/orm": "^2.5",
-    "doctrine/annotations": "^1.2",
-    "friendsofsymfony/user-bundle": "^2.0@dev",
-    "nelmio/api-doc-bundle": "^2.11.2",
-    "php-mock/php-mock-phpunit": "^1.1",
-    "phpdocumentor/reflection-docblock": "^3.0",
-    "symfony/cache": "^3.1",
-    "symfony/dependency-injection": "^2.7 || ^3.0",
-    "symfony/framework-bundle": "^3.1",
-    "symfony/doctrine-bridge": "^2.8 || ^3.0",
-    "symfony/phpunit-bridge": "^2.7 || ^3.0",
-    "symfony/security": "^2.7 || ^3.0",
-    "symfony/validator": "^2.7 || ^3.0",
-    "symfony/finder": "^2.7 || ^3.0"
-  },
-  "suggest": {
-    "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
-    "nelmio/api-doc-bundle": "To have the api sandbox & documentation.",
-    "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
-    "psr/cache-implementation": "To use metadata caching.",
-    "symfony/cache": "To have metadata caching when using Symfony integration."
-  },
-  "autoload": {
-    "psr-4": { "ApiPlatform\\Core\\": "src/" }
-  },
-  "autoload-dev": {
-    "psr-4": { "ApiPlatform\\Core\\Tests\\": "tests/" }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "2.0.x-dev"
+        "doctrine/inflector": "^1.0",
+        "psr/cache": "^1.0",
+        "symfony/http-foundation": "^2.7 || ^3.0",
+        "symfony/http-kernel": "^2.7 || ^3.0",
+        "symfony/property-info": "^3.1",
+        "symfony/serializer": "^3.1",
+        "willdurand/negotiation": "^2.0"
+    },
+    "require-dev": {
+        "behat/behat": "^3.1",
+        "behat/mink": "^1.7",
+        "behat/mink-browserkit-driver": "^1.3.1",
+        "behat/mink-extension": "^2.2",
+        "behat/symfony2-extension": "^2.1",
+        "behatch/contexts": "^2.5",
+        "doctrine/doctrine-bundle": "^1.6.3",
+        "doctrine/orm": "^2.5",
+        "doctrine/annotations": "^1.2",
+        "friendsofsymfony/user-bundle": "^2.0@dev",
+        "nelmio/api-doc-bundle": "^2.11.2",
+        "php-mock/php-mock-phpunit": "^1.1",
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "symfony/cache": "^3.1",
+        "symfony/dependency-injection": "^2.7 || ^3.0",
+        "symfony/framework-bundle": "^3.1",
+        "symfony/doctrine-bridge": "^2.8 || ^3.0",
+        "symfony/phpunit-bridge": "^2.7 || ^3.0",
+        "symfony/security": "^2.7 || ^3.0",
+        "symfony/validator": "^2.7 || ^3.0",
+        "symfony/finder": "^2.7 || ^3.0"
+    },
+    "suggest": {
+        "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
+        "nelmio/api-doc-bundle": "To have the api sandbox & documentation.",
+        "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
+        "psr/cache-implementation": "To use metadata caching.",
+        "symfony/cache": "To have metadata caching when using Symfony integration."
+    },
+    "autoload": {
+        "psr-4": { "ApiPlatform\\Core\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "ApiPlatform\\Core\\Tests\\": "tests/" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
     }
-  }
 }
