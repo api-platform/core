@@ -299,7 +299,7 @@ class OrderFilterTest extends KernelTestCase
                         'relatedDummy.symfony' => 'desc',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_relatedDummy1 ORDER BY o.id ASC, o.name DESC, relatedDummy_relatedDummy1.symfony DESC', Dummy::class),
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy a_1 ORDER BY o.id ASC, o.name DESC, a_1.symfony DESC', Dummy::class),
             ],
             // Properties enabled with empty request (default values)
             [

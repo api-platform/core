@@ -67,11 +67,12 @@ class ItemDataProvider implements ItemDataProviderInterface
 
         $repository = $manager->getRepository($resourceClass);
         $queryBuilder = $repository->createQueryBuilder('o');
+        $queryNameGenerator = new QueryNameGenerator();
 
         $this->addWhereForIdentifiers($identifiers, $queryBuilder);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, new QueryNameGenerator(), $resourceClass, $identifiers, $operationName);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName);
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult();

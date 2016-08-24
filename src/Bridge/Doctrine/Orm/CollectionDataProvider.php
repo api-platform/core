@@ -51,9 +51,9 @@ class CollectionDataProvider implements CollectionDataProviderInterface
 
         $repository = $manager->getRepository($resourceClass);
         $queryBuilder = $repository->createQueryBuilder('o');
-
+        $queryNameGenerator = new QueryNameGenerator();
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), $resourceClass, $operationName);
+            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
 
             if ($extension instanceof QueryResultExtensionInterface) {
                 if ($extension->supportsResult($resourceClass, $operationName)) {

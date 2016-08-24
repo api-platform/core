@@ -139,7 +139,7 @@ class NumericFilterTest extends KernelTestCase
                     'dummyPrice' => 21,
 
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_dummyprice1', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with negative value
             [
@@ -149,7 +149,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'dummyPrice' => -21,
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_dummyprice1', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with non-numeric value
             [
@@ -169,7 +169,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'dummyPrice' => 0,
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_dummyprice1', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with nested properties.
             [
@@ -179,7 +179,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'relatedDummy.id' => 0,
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_relateddummy1 where relateddummy_relateddummy1.id = :id_id1', Dummy::class),
+                sprintf('SELECT o FROM %s o left join o.relateddummy a_1 where a_1.id = :p_1', Dummy::class),
             ],
             // test with one correct and one wrong value
             [
@@ -190,7 +190,7 @@ class NumericFilterTest extends KernelTestCase
                    'dummyPrice' => 10,
                    'name' => '15toto',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_dummyprice1', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with numeric, non-numeric and inexisting field
             [
@@ -202,7 +202,7 @@ class NumericFilterTest extends KernelTestCase
                     'name' => 'gerard',
                     'dummyPrice' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_dummyprice1', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
         ];
     }

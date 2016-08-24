@@ -58,7 +58,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder,QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {

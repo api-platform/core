@@ -27,16 +27,16 @@ final class QueryNameGenerator implements QueryNameGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generateJoinAlias(string $association) : string
+    public function generateJoinAlias(string $association = '') : string
     {
-        return sprintf('%s_%s', $association, $association.$this->incrementedAssociation++);
+        return sprintf('a_%d', $this->incrementedAssociation++);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generateParameterName(string $name) : string
+    public function generateParameterName(string $name = '') : string
     {
-        return sprintf('%s_%s', $name, $name.$this->incrementedName++);
+        return sprintf('p_%s', $this->incrementedName++);
     }
 }

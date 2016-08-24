@@ -79,7 +79,7 @@ class DateFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = $queryNameGenerator->generateJoinAlias($association);
+                    $alias = $queryNameGenerator->generateJoinAlias();
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -132,7 +132,7 @@ class DateFilter extends AbstractFilter
      */
     private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
     {
-        $valueParameter = $queryNameGenerator->generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $queryNameGenerator->generateParameterName();
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {

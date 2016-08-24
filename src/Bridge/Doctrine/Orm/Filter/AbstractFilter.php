@@ -31,7 +31,6 @@ abstract class AbstractFilter implements FilterInterface
 {
     protected $managerRegistry;
     protected $properties;
-    protected $queryNameGenerator;
 
     public function __construct(ManagerRegistry $managerRegistry, array $properties = null)
     {
@@ -197,7 +196,7 @@ abstract class AbstractFilter implements FilterInterface
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = $queryNameGenerator->generateJoinAlias($association);
+            $alias = $queryNameGenerator->generateJoinAlias();
             $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
             $parentAlias = $alias;
         }

@@ -95,7 +95,7 @@ class RangeFilter extends AbstractFilter
      */
     private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
     {
-        $valueParameter = $queryNameGenerator->generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $queryNameGenerator->generateParameterName();
 
         switch ($operator) {
             case self::PARAMETER_BETWEEN:

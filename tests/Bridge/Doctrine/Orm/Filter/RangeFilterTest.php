@@ -366,7 +366,7 @@ class RangeFilterTest extends KernelTestCase
                         'between' => '9.99..15.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyprice_between_dummyprice_between1_1 AND :dummyPrice_between_dummyprice_between1_2', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :p_1_1 AND :p_1_2', Dummy::class),
             ],
             // Invalid value
             [
@@ -400,7 +400,7 @@ class RangeFilterTest extends KernelTestCase
                         'lt' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_lt_dummyPrice_lt1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :p_1', Dummy::class),
             ],
             [
                 [
@@ -411,7 +411,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :p_1', Dummy::class),
             ],
             [
                 [
@@ -422,7 +422,7 @@ class RangeFilterTest extends KernelTestCase
                         'gt' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_gt_dummyPrice_gt1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :p_1', Dummy::class),
             ],
             [
                 [
@@ -433,7 +433,7 @@ class RangeFilterTest extends KernelTestCase
                         'gte' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :p_1', Dummy::class),
             ],
             [
                 [
@@ -445,7 +445,7 @@ class RangeFilterTest extends KernelTestCase
                         'lte' => '19.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_gte_dummyPrice_gte1 AND o.dummyPrice <= :dummyPrice_lte_dummyPrice_lte2', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :p_1 AND o.dummyPrice <= :p_2', Dummy::class),
             ],
         ];
     }

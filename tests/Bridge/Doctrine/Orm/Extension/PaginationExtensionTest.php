@@ -71,7 +71,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             new RequestStack(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
         );
-        $extension->applyToCollection($queryBuilder,new QueryNameGenerator(), 'Foo', 'op');
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     public function testApplyToCollectionEmptyRequest()
