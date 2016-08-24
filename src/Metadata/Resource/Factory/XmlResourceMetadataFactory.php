@@ -97,7 +97,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
           'iri' => $metadata->getAttribute('iri') ?: null,
           'itemOperations' => $this->getOperations($xpath->query('./itemOperations/operation', $metadata)) ?: null,
           'collectionOperations' => $this->getOperations($xpath->query('./collectionOperations/operation', $metadata)) ?: null,
-          'attributes' => $this->getAttributes($xpath->query('./attributes/attribute', $metadata)) ?? [],
+          'attributes' => $this->getAttributes($xpath->query('./attributes/attribute', $metadata)),
         ];
 
         if (!$parentResourceMetadata) {
@@ -154,12 +154,11 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @param \DOMNodeList $query
      *
-     * @return array
+     * @return array|null
      */
-    private function getOperations(\DOMNodeList $query):array
+    private function getOperations(\DOMNodeList $query)
     {
         $operations = [];
-
         foreach ($query as $operation) {
             $key = $operation->getAttribute('key');
             $operations[$key] = [
@@ -173,7 +172,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
             }
         }
 
-        return $operations;
+        return $operations ?: null;
     }
 
     /**
@@ -181,18 +180,17 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @param \DOMNodeList $query
      *
-     * @return array
+     * @return array|null
      */
-    private function getAttributes(\DOMNodeList $query):array
+    private function getAttributes(\DOMNodeList $query)
     {
         $attributes = [];
-
         foreach ($query as $attribute) {
             $key = $attribute->getAttribute('key');
             $attributes[$key] = $this->recursiveAttributes($attribute, $attributes[$key]);
         }
 
-        return $attributes;
+        return $attributes ?: null;
     }
 
     /**
