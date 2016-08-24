@@ -1,11 +1,10 @@
-Feature: Create-Retrieve-Update-Delete
-  In order to use an hypermedia API
-  As a client software developer
-  I need to be able to retrieve, create, update and delete JSON-LD encoded resources.
+Feature: FOSUser integration
+  In order to use FOSUserBundle
+  As an API software developer
+  I need to be able manage users
 
   @createSchema
-  @dropSchema
-  Scenario: Create a resource
+  Scenario: Create a user
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/users" with body:
     """
@@ -30,3 +29,8 @@ Feature: Create-Retrieve-Update-Delete
       "username": "dummy.user"
     }
     """
+
+  @dropSchema
+  Scenario: Delete a user
+    When I send a "DELETE" request to "/users/1"
+    Then the response status code should be 204

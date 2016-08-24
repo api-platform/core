@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -88,35 +89,23 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
             return $method;
         }
 
-        if ($collection) {
-            $routeName = $resourceMetadata->getCollectionOperationAttribute($operationName, 'route_name');
-        } else {
-            $routeName = $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
-        }
-
-        if (null === $routeName) {
+        if (null === $routeName = $this->getRouteName($resourceMetadata, $operationName, $collection)) {
             throw new RuntimeException(sprintf('Either a "route_name" or a "method" operation attribute must exist for the operation "%s" of the resource "%s".', $operationName, $resourceClass));
         }
 
-        /*
-         * @var Route
-         */
-        foreach ($this->router->getRouteCollection() as $name => $route) {
-            if ($routeName === $name) {
-                $methods = $route->getMethods();
+        $route = $this->getRoute($routeName);
+        $methods = $route->getMethods();
 
-                if (empty($methods)) {
-                    return 'GET';
-                }
-
-                return $methods[0];
-            }
+        if (empty($methods)) {
+            return 'GET';
         }
 
-        throw new RuntimeException(sprintf('Route "%s" not found for the operation "%s" of the resource "%s".', $routeName, $operationName, $resourceClass));
+        return $methods[0];
     }
 
     /**
+     * Gets the route related to the given operation.
+     *
      * @param string $resourceClass
      * @param string $operationName
      * @param bool   $collection
@@ -127,6 +116,11 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     private function getOperationRoute(string $resourceClass, string $operationName, bool $collection) : Route
     {
+        $routeName = $this->getRouteName($this->resourceMetadataFactory->create($resourceClass), $operationName, $collection);
+        if ($routeName) {
+            return $this->getRoute($routeName);
+        }
+
         $operationNameKey = sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item');
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
@@ -139,5 +133,43 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
         }
 
         throw new RuntimeException(sprintf('No route found for operation "%s" for type "%s".', $operationName, $resourceClass));
+    }
+
+    /**
+     * Gets the route name or null if not defined.
+     *
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $operationName
+     * @param bool             $collection
+     *
+     * @return string|null
+     */
+    private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, bool $collection)
+    {
+        if ($collection) {
+            return $resourceMetadata->getCollectionOperationAttribute($operationName, 'route_name');
+        }
+
+        return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
+    }
+
+    /**
+     * Gets the route with the given name.
+     *
+     * @param string $routeName
+     *
+     * @throws RuntimeException
+     *
+     * @return Route
+     */
+    private function getRoute(string $routeName) : Route
+    {
+        foreach ($this->router->getRouteCollection() as $name => $route) {
+            if ($routeName === $name) {
+                return $route;
+            }
+        }
+
+        throw new RuntimeException(sprintf('The route "%s" does not exist.', $routeName));
     }
 }
