@@ -117,7 +117,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     private function getOperationRoute(string $resourceClass, string $operationName, bool $collection) : Route
     {
         $routeName = $this->getRouteName($this->resourceMetadataFactory->create($resourceClass), $operationName, $collection);
-        if ($routeName) {
+        if (null !== $routeName) {
             return $this->getRoute($routeName);
         }
 
