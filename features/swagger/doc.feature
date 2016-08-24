@@ -3,7 +3,7 @@ Feature: Documentation support
   As a client software developer
   I need to know Swagger specifications of objects I send and receive
 
-  Scenario: Retrieve the API vocabulary
+  Scenario: Retrieve the Swagger/OpenAPI documentation
     Given I send a "GET" request to "/apidoc.json"
     Then the response status code should be 200
     And the response should be in JSON
@@ -33,3 +33,8 @@ Feature: Documentation support
     # Properties
     And "id" property exists for the Swagger class "Dummy"
     And "name" property is required for Swagger class "Dummy"
+
+  Scenario: Swagger UI is enabled
+    Given I send a "GET" request to "/doc"
+    Then the response status code should be 200
+    And I should see text matching "My Dummy API"

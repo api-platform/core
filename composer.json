@@ -39,14 +39,16 @@
         "phpdocumentor/reflection-docblock": "^3.0",
         "symfony/cache": "^3.1",
         "symfony/dependency-injection": "^2.7 || ^3.0",
-        "symfony/framework-bundle": "^3.1",
         "symfony/doctrine-bridge": "^2.8 || ^3.0",
         "symfony/phpunit-bridge": "^2.7 || ^3.0",
         "symfony/security": "^2.7 || ^3.0",
         "symfony/validator": "^2.7 || ^3.0",
-        "symfony/finder": "^2.7 || ^3.0"
+        "symfony/finder": "^2.7 || ^3.0",
+        "symfony/framework-bundle": "^3.1",
+        "symfony/twig-bundle": "^2.8 || ^3.1"
     },
     "suggest": {
+        "symfony/twig-bundle": "To have a human-readable documentation relying on Swagger UI.",
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "nelmio/api-doc-bundle": "To have the api sandbox & documentation.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
