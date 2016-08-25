@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * Creates a machine readable Swagger API documentation.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class DocumentationNormalizer implements NormalizerInterface
@@ -56,42 +57,55 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $itemOperationsDocs = [];
-        $definitions = [];
+        $definitions = new \ArrayObject();
+        $paths = new \ArrayObject();
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            $shortName = $resourceMetadata->getShortName();
+            $resourceShortName = $resourceMetadata->getShortName();
 
-            $definitions[$shortName] = $this->getDefinitionSchema($resourceClass, $resourceMetadata);
+            $definitions[$resourceShortName] = $this->getDefinitionSchema($resourceClass, $resourceMetadata);
 
-            $operations = $resourceMetadata->getCollectionOperations() ?? [];
-            foreach ($operations as $operationName => $collectionOperation) {
+            foreach ($resourceMetadata->getCollectionOperations() ?? [] as $operationName => $operation) {
+                $path = $this->getPath($resourceShortName, $operation, true);
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-                $path = $this->getPath($shortName, $collectionOperation, true);
 
-                $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $collectionOperation, true, $method, $object->getMimeTypes());
-                $itemOperationsDocs[$path] = array_merge($itemOperationsDocs[$path] ?? [], $swaggerOperation);
+                $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, true, $resourceMetadata, $object->getMimeTypes());
             }
 
-            $operations = $resourceMetadata->getItemOperations() ?? [];
-            foreach ($operations as $operationName => $itemOperation) {
+            foreach ($resourceMetadata->getItemOperations() ?? [] as $operationName => $operation) {
+                $path = $this->getPath($resourceShortName, $operation, false);
                 $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
-                $path = $this->getPath($shortName, $itemOperation, false);
 
-                $swaggerOperation = $this->getSwaggerOperation($resourceClass, $resourceMetadata, $itemOperation, false, $method, $object->getMimeTypes());
-                $itemOperationsDocs[$path] = array_merge($itemOperationsDocs[$path] ?? [], $swaggerOperation);
+                $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, false, $resourceMetadata, $object->getMimeTypes());
             }
         }
 
-        return $this->computeDoc($object, $definitions, $itemOperationsDocs);
+        $definitions->ksort();
+        $paths->ksort();
+
+        return $this->computeDoc($object, $definitions, $paths);
     }
 
+    /**
+     * Gets the path for an operation.
+     *
+     * If the path ends with the optional _format parameter, it is removed
+     * as optional path parameters are not yet supported.
+     *
+     * @see https://github.com/OAI/OpenAPI-Specification/issues/93
+     *
+     * @param string $resourceShortName
+     * @param array  $operation
+     * @param bool   $collection
+     *
+     * @return string
+     */
     private function getPath(string $resourceShortName, array $operation, bool $collection) : string
     {
         $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $collection);
-        if (substr($path, -10) === '.{_format}') {
+        if ('.{_format}' === substr($path, -10)) {
             $path = substr($path, 0, -10);
         }
 
@@ -99,142 +113,216 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * Gets and populates if applicable a Swagger operation.
+     * Gets a path Operation Object.
+     *
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
+     *
+     * @param string           $operationName
+     * @param array            $operation
+     * @param string           $method
+     * @param bool             $collection
+     * @param ResourceMetadata $resourceMetadata
+     * @param string[]         $mimeTypes
+     *
+     * @return \ArrayObject
      */
-    private function getSwaggerOperation(string $resourceClass, ResourceMetadata $resourceMetadata, array $operation, bool $collection, string $method, array $mimeTypes) : array
+    private function getPathOperation(string $operationName, array $operation, string $method, bool $collection, ResourceMetadata $resourceMetadata, array $mimeTypes) : \ArrayObject
     {
-        $swaggerMethod = strtolower($method);
-        $swaggerOperation = $operation['swagger_context'] ?? [];
-        $shortName = $resourceMetadata->getShortName();
-        $swaggerOperation[$swaggerMethod] = [];
-        $swaggerOperation[$swaggerMethod]['tags'] = [$shortName];
+        $pathOperation = new \ArrayObject($operation['swagger_context'] ?? []);
+
+        $resourceShortName = $resourceMetadata->getShortName();
+
+        if (!isset($pathOperation['tags'])) {
+            $pathOperation['tags'] = [
+                $resourceShortName,
+            ];
+        }
+
+        if (!isset($pathOperation['operationId'])) {
+            $pathOperation['operationId'] = sprintf('%s%s%s', lcfirst($operationName), ucfirst($resourceShortName), ucfirst($collection ? 'collection' : 'item'));
+        }
 
         switch ($method) {
             case 'GET':
-                $swaggerOperation[$swaggerMethod]['produces'] = $mimeTypes;
+                if (!isset($pathOperation['produces'])) {
+                    $pathOperation['produces'] = $mimeTypes;
+                }
 
                 if ($collection) {
-                    if (!isset($swaggerOperation[$swaggerMethod]['title'])) {
-                        $swaggerOperation[$swaggerMethod]['summary'] = sprintf('Retrieves the collection of %s resources.', $shortName);
+                    if (!isset($pathOperation['summary'])) {
+                        $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
                     }
 
-                    $swaggerOperation[$swaggerMethod]['responses'] = [
-                        '200' => [
-                            'description' => 'Successful operation',
-                             'schema' => [
-                                'type' => 'array',
-                                'items' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
-                             ],
-                        ],
-                    ];
-                    break;
+                    if (!isset($pathOperation['responses'])) {
+                        $pathOperation['responses'] = [
+                            '200' => [
+                                'description' => sprintf('%s collection response', $resourceShortName),
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => sprintf('#/definitions/%s', $resourceShortName),
+                                    ],
+                                ],
+                            ],
+                        ];
+                    }
+                } else {
+                    if (!isset($pathOperation['summary'])) {
+                        $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
+                    }
+
+                    if (!isset($pathOperation['parameters'])) {
+                        $pathOperation['parameters'] = [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'type' => 'integer',
+                            ],
+                        ];
+                    }
+
+                    if (!isset($pathOperation['responses'])) {
+                        $pathOperation['responses'] = [
+                            '200' => [
+                                'description' => sprintf('%s resource response', $resourceShortName),
+                                'schema' => [
+                                    '$ref' => sprintf('#/definitions/%s', $resourceShortName),
+                                ],
+                            ],
+                            '404' => [
+                                'description' => 'Resource not found',
+                            ],
+                        ];
+                    }
                 }
-
-                if (!isset($swaggerOperation[$swaggerMethod]['title'])) {
-                    $swaggerOperation[$swaggerMethod]['summary'] = sprintf('Retrieves a %s resource.', $shortName);
-                }
-
-                $swaggerOperation[$swaggerMethod]['parameters'][] = [
-                    'name' => 'id',
-                    'in' => 'path',
-                    'required' => true,
-                    'type' => 'integer',
-                ];
-
-                $swaggerOperation[$swaggerMethod]['responses'] = [
-                    '200' => [
-                        'description' => 'Successful operation',
-                        'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
-                    ],
-                    '404' => ['description' => 'Resource not found'],
-                ];
                 break;
 
             case 'POST':
-                $swaggerOperation[$swaggerMethod]['consumes'] = $swaggerOperation[$swaggerMethod]['produces'] = $mimeTypes;
-
-                if (!isset($swaggerOperation[$swaggerMethod]['title'])) {
-                    $swaggerOperation[$swaggerMethod]['summary'] = sprintf('Creates a %s resource.', $shortName);
+                if (!isset($pathOperation['consumes'])) {
+                    $pathOperation['consumes'] = $mimeTypes;
+                }
+                if (!isset($pathOperation['produces'])) {
+                    $pathOperation['produces'] = $mimeTypes;
                 }
 
-                if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
-                    $swaggerOperation[$swaggerMethod]['parameters'][] = [
-                        'in' => 'body',
-                        'name' => 'body',
-                        'description' => sprintf('The new %s resource', $shortName),
-                        'schema' => [
-                            '$ref' => sprintf('#/definitions/%s', $shortName),
-                        ],
-                    ];
+                if (!isset($pathOperation['summary'])) {
+                    $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
                 }
 
-                $swaggerOperation[$swaggerMethod]['responses'] = [
-                        '201' => [
-                            'description' => 'Successful operation',
-                            'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
-                        ],
-                        '400' => ['description' => 'Invalid input'],
-                        '404' => ['description' => 'Resource not found'],
-                ];
-                break;
-
-            case 'PUT':
-                $swaggerOperation[$swaggerMethod]['consumes'] = $swaggerOperation[$swaggerMethod]['produces'] = $mimeTypes;
-
-                if (!isset($swaggerOperation[$swaggerMethod]['title'])) {
-                    $swaggerOperation[$swaggerMethod]['summary'] = sprintf('Replaces the %s resource.', $shortName);
-                }
-
-                if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
-                    $swaggerOperation[$swaggerMethod]['parameters'] = [
+                if (!isset($pathOperation['parameters'])) {
+                    $pathOperation['parameters'] = [
                         [
-                            'name' => 'id',
-                            'in' => 'path',
-                            'required' => true,
-                            'type' => 'integer',
-                        ],
-                        [
+                            'name' => lcfirst($resourceShortName),
                             'in' => 'body',
-                            'name' => 'body',
-                            'description' => sprintf('The updated %s resource', $shortName),
+                            'description' => sprintf('The new %s resource', $resourceShortName),
                             'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $shortName),
+                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
                             ],
                         ],
                     ];
                 }
 
-                $swaggerOperation[$swaggerMethod]['responses'] = [
-                    '200' => [
-                        'description' => 'Successful operation',
-                        'schema' => ['$ref' => sprintf('#/definitions/%s', $shortName)],
-                    ],
-                    '400' => ['description' => 'Invalid input'],
-                    '404' => ['description' => 'Resource not found'],
-                ];
+                if (!isset($pathOperation['responses'])) {
+                    $pathOperation['responses'] = [
+                        '201' => [
+                            'description' => sprintf('%s resource created', $resourceShortName),
+                            'schema' => [
+                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
+                            ],
+                        ],
+                        '400' => [
+                            'description' => 'Invalid input',
+                        ],
+                        '404' => [
+                            'description' => 'Resource not found',
+                        ],
+                    ];
+                }
+                break;
+
+            case 'PUT':
+                if (!isset($pathOperation['consumes'])) {
+                    $pathOperation['consumes'] = $mimeTypes;
+                }
+                if (!isset($pathOperation['produces'])) {
+                    $pathOperation['produces'] = $mimeTypes;
+                }
+
+                if (!isset($pathOperation['summary'])) {
+                    $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
+                }
+
+                if (!isset($pathOperation['parameters'])) {
+                    $pathOperation['parameters'] = [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'type' => 'integer',
+                            'required' => true,
+                        ],
+                        [
+                            'name' => lcfirst($resourceShortName),
+                            'in' => 'body',
+                            'description' => sprintf('The updated %s resource', $resourceShortName),
+                            'schema' => [
+                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
+                            ],
+                        ],
+                    ];
+                }
+
+                if (!isset($pathOperation['responses'])) {
+                    $pathOperation['responses'] = [
+                        '200' => [
+                            'description' => sprintf('%s resource updated', $resourceShortName),
+                            'schema' => [
+                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
+                            ],
+                        ],
+                        '400' => [
+                            'description' => 'Invalid input',
+                        ],
+                        '404' => [
+                            'description' => 'Resource not found',
+                        ],
+                    ];
+                }
                 break;
 
             case 'DELETE':
-                if (!isset($swaggerOperation[$swaggerMethod]['title'])) {
-                    $swaggerOperation[$swaggerMethod]['summary'] = sprintf('Removes the %s resource.', $shortName);
+                if (!isset($pathOperation['summary'])) {
+                    $pathOperation['summary'] = sprintf('Removes the %s resource.', $resourceShortName);
                 }
 
-                $swaggerOperation[$swaggerMethod]['responses'] = [
-                    '204' => ['description' => 'Deleted'],
-                    '404' => ['description' => 'Resource not found'],
-                ];
+                if (!isset($pathOperation['responses'])) {
+                    $pathOperation['responses'] = [
+                        '204' => [
+                            'description' => sprintf('%s resource deleted', $resourceShortName),
+                        ],
+                        '404' => [
+                            'description' => 'Resource not found',
+                        ],
+                    ];
+                }
 
-                $swaggerOperation[$swaggerMethod]['parameters'] = [[
-                    'name' => 'id',
-                    'in' => 'path',
-                    'required' => true,
-                    'type' => 'integer',
-                ]];
+                if (!isset($pathOperation['parameters'])) {
+                    $pathOperation['parameters'] = [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'type' => 'integer',
+                            'required' => true,
+                        ],
+                    ];
+                }
+                break;
+
+            default:
                 break;
         }
-        ksort($swaggerOperation);
 
-        return $swaggerOperation;
+        return $pathOperation;
     }
 
     /**
@@ -369,7 +457,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         return $propertySchema;
     }
 
-    private function computeDoc(Documentation $object, array $definitions, array $itemOperationsDocs): array
+    private function computeDoc(Documentation $object, \ArrayObject $definitions, \ArrayObject $paths): array
     {
         $doc['swagger'] = self::SWAGGER_VERSION;
         $doc['info']['title'] = $object->getTitle();
@@ -377,8 +465,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             $doc['info']['description'] = $object->getDescription();
         }
         $doc['info']['version'] = $object->getVersion();
-        $doc['definitions'] = $definitions;
-        $doc['paths'] = $itemOperationsDocs;
+        $doc['paths'] = $paths;
+        if (count($definitions) > 0) {
+            $doc['definitions'] = $definitions;
+        }
 
         return $doc;
     }

@@ -79,7 +79,203 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 'description' => 'This is a test API.',
                 'version' => '1.2.3',
             ],
-            'definitions' => [
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'getDummyCollection',
+                        'produces' => [
+                            'application/ld+json',
+                        ],
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy collection response',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => '#/definitions/Dummy',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                    'post' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'postDummyCollection',
+                        'consumes' => [
+                            'application/ld+json',
+                        ],
+                        'produces' => [
+                            'application/ld+json',
+                        ],
+                        'summary' => 'Creates a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new Dummy resource',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            201 => [
+                                'description' => 'Dummy resource created',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                            400 => [
+                                'description' => 'Invalid input',
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'getDummyItem',
+                        'produces' => [
+                            'application/ld+json',
+                        ],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'integer',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                    ]),
+                    'put' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'putDummyItem',
+                        'consumes' => [
+                            'application/ld+json',
+                        ],
+                        'produces' => [
+                            'application/ld+json',
+                        ],
+                        'summary' => 'Replaces the Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'integer',
+                                'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource updated',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                            400 => [
+                                'description' => 'Invalid input',
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                    ]),
+                ],
+                '/foo' => [
+                    'get' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'customDummyCollection',
+                        'produces' => [
+                            'application/ld+json',
+                        ],
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy collection response',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => '#/definitions/Dummy',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]),
+                    'post' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'custom2DummyCollection',
+                        'produces' => [
+                            'application/ld+json',
+                        ],
+                        'consumes' => [
+                            'application/ld+json',
+                        ],
+                        'summary' => 'Creates a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The new Dummy resource',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            201 => [
+                                'description' => 'Dummy resource created',
+                                'schema' => [
+                                    '$ref' => '#/definitions/Dummy',
+                                ],
+                            ],
+                            400 => [
+                                'description' => 'Invalid input',
+                            ],
+                            404 => [
+                                'description' => 'Resource not found',
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
                 'Dummy' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
@@ -93,135 +289,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         ]),
                     ],
                 ]),
-            ],
-            'paths' => [
-                '/dummies' => [
-                    'get' => [
-                        'tags' => ['Dummy'],
-                        'produces' => ['application/ld+json'],
-                        'summary' => 'Retrieves the collection of Dummy resources.',
-                        'responses' => [
-                            200 => [
-                                'description' => 'Successful operation',
-                                'schema' => [
-                                    'type' => 'array',
-                                    'items' => ['$ref' => '#/definitions/Dummy'],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'post' => [
-                        'tags' => ['Dummy'],
-                        'produces' => ['application/ld+json'],
-                        'consumes' => ['application/ld+json'],
-                        'summary' => 'Creates a Dummy resource.',
-                        'parameters' => [
-                            [
-                                'in' => 'body',
-                                'name' => 'body',
-                                'description' => 'The new Dummy resource',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                        ],
-                        'responses' => [
-                            201 => [
-                                'description' => 'Successful operation',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                            400 => ['description' => 'Invalid input'],
-                            404 => ['description' => 'Resource not found'],
-                        ],
-                    ],
-                ],
-                '/dummies/{id}' => [
-                    'get' => [
-                        'tags' => ['Dummy'],
-                        'produces' => ['application/ld+json'],
-                        'summary' => 'Retrieves a Dummy resource.',
-                        'parameters' => [
-                            [
-                                'name' => 'id',
-                                'in' => 'path',
-                                'required' => true,
-                                'type' => 'integer',
-                            ],
-                        ],
-                        'responses' => [
-                            200 => [
-                                'description' => 'Successful operation',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                            404 => ['description' => 'Resource not found'],
-                        ],
-                    ],
-                    'put' => [
-                        'tags' => ['Dummy'],
-                        'produces' => ['application/ld+json'],
-                        'consumes' => ['application/ld+json'],
-                        'summary' => 'Replaces the Dummy resource.',
-                        'parameters' => [
-                            [
-                                'name' => 'id',
-                                'in' => 'path',
-                                'required' => true,
-                                'type' => 'integer',
-                            ],
-                            [
-                                'in' => 'body',
-                                'name' => 'body',
-                                'description' => 'The updated Dummy resource',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                        ],
-                        'responses' => [
-                            200 => [
-                                'description' => 'Successful operation',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                            400 => ['description' => 'Invalid input'],
-                            404 => ['description' => 'Resource not found'],
-                        ],
-                    ],
-                ],
-                '/foo' => [
-                    'get' => [
-                        'tags' => ['Dummy'],
-                        'produces' => ['application/ld+json'],
-                        'summary' => 'Retrieves the collection of Dummy resources.',
-                        'responses' => [
-                            200 => [
-                                'description' => 'Successful operation',
-                                'schema' => [
-                                    'type' => 'array',
-                                    'items' => ['$ref' => '#/definitions/Dummy'],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'post' => [
-                        'tags' => ['Dummy'],
-                        'produces' => ['application/ld+json'],
-                        'consumes' => ['application/ld+json'],
-                        'summary' => 'Creates a Dummy resource.',
-                        'parameters' => [
-                            [
-                                'in' => 'body',
-                                'name' => 'body',
-                                'description' => 'The new Dummy resource',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                        ],
-                        'responses' => [
-                            201 => [
-                                'description' => 'Successful operation',
-                                'schema' => ['$ref' => '#/definitions/Dummy'],
-                            ],
-                            400 => ['description' => 'Invalid input'],
-                            404 => ['description' => 'Resource not found'],
-                        ],
-                    ],
-                ],
-            ],
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
