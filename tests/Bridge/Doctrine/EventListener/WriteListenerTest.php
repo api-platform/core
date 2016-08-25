@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * Class WriteListenerTest.
- *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class WriteListenerTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +38,7 @@ class WriteListenerTest extends \PHPUnit_Framework_TestCase
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
-        $request->setMethod('POST');
+        $request->setMethod(Request::METHOD_POST);
         $request->attributes->set('_api_resource_class', 'Dummy');
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
@@ -60,14 +58,15 @@ class WriteListenerTest extends \PHPUnit_Framework_TestCase
         $managerRegistryProphecy->getManagerForClass('Dummy')->willReturn($objectManagerProphecy->reveal());
 
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
-        $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
-        $request->setMethod('DELETE');
+        $request->setMethod(Request::METHOD_DELETE);
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
-
-        $this->assertNull($writeListener->onKernelView($event));
-        $this->assertNotEquals($dummy, $writeListener->onKernelView($event));
+        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event->setControllerResult(null)->shouldBeCalled();
+        $event->getRequest()->willReturn($request);
+        $event->getControllerResult()->willReturn($dummy);
+        $this->assertNull($writeListener->onKernelView($event->reveal()));
+        $this->assertNotEquals($dummy, $writeListener->onKernelView($event->reveal()));
     }
 
     public function testOnKernelViewWithSafeMethod()
@@ -80,7 +79,7 @@ class WriteListenerTest extends \PHPUnit_Framework_TestCase
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
-        $request->setMethod('HEAD');
+        $request->setMethod(Request::METHOD_HEAD);
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $this->assertNull($writeListener->onKernelView($event));
@@ -97,7 +96,7 @@ class WriteListenerTest extends \PHPUnit_Framework_TestCase
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
-        $request->setMethod('POST');
+        $request->setMethod(Request::METHOD_POST);
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $this->assertNull($writeListener->onKernelView($event));
@@ -115,11 +114,11 @@ class WriteListenerTest extends \PHPUnit_Framework_TestCase
         $writeListener = new WriteListener($managerRegistryProphecy->reveal());
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
-        $request->setMethod('DELETE');
+        $request->setMethod(Request::METHOD_DELETE);
         $request->attributes->set('_api_resource_class', 'Dummy');
         $event = new GetResponseForControllerResultEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
-        $this->assertNotNull($writeListener->onKernelView($event));
-        $this->assertEquals($dummy, $writeListener->onKernelView($event));
+        $this->assertNull($writeListener->onKernelView($event));
+        $this->assertNotEquals($dummy, $writeListener->onKernelView($event));
     }
 }
