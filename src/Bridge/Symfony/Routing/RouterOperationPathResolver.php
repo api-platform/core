@@ -42,7 +42,7 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
 
         $route = $this->router->getRouteCollection()->get($operation['route_name']);
         if (null === $route) {
-            throw new InvalidArgumentException(sprintf('The route "%s" of the ressource "%s" was not found.', $operation['route_name'], $ressourceShortName));
+            throw new InvalidArgumentException(sprintf('The route "%s" of the resource "%s" was not found.', $operation['route_name'], $resourceShortName));
         }
 
         return $route->getPath();
