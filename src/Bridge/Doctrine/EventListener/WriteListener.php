@@ -51,7 +51,7 @@ final class WriteListener
 
         $controllerResult = $event->getControllerResult();
         if (null === $objectManager = $this->getManager($resourceClass, $controllerResult)) {
-            return $controllerResult;
+            return;
         }
 
         switch ($request->getMethod()) {
