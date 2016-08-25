@@ -82,6 +82,9 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
         }
 
+        $definitions->ksort();
+        $paths->ksort();
+
         return $this->computeDoc($object, $definitions, $paths);
     }
 
