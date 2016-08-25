@@ -13,7 +13,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Filter;
-use SebastianBergmann\CodeCoverage\Report\Clover;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * Behat coverage.
@@ -44,8 +44,8 @@ class CoverageContext implements Context
      */
     public static function tearDown()
     {
-        $writer = new Clover();
-        $writer->process(self::$coverage, __DIR__.'/../../build/logs/clover-behat.xml');
+        $writer = new PHP();
+        $writer->process(self::$coverage, __DIR__.'/../../build/cov/coverage-behat.cov');
     }
 
     private function getCoverageKeyFromScope(BeforeScenarioScope $scope) : string

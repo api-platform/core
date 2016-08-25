@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Enhance the result of collection by adding the filters applied on collection.
+ * Enhances the result of collection by adding the filters applied on collection.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
@@ -64,17 +64,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         $operationName = $context['collection_operation_name'] ?? null;
 
-        if ($operationName) {
-            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-        } else {
+        if (null === $operationName) {
             $resourceFilters = $resourceMetadata->getAttribute('filters', []);
+        } else {
+            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         }
 
         if ([] === $resourceFilters) {
             return $data;
         }
 
-        $requestParts = parse_url($context['request_uri']);
+        $requestParts = parse_url($context['request_uri'] ?? '');
         if (!is_array($requestParts)) {
             return $data;
         }

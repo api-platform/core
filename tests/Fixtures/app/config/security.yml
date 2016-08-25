@@ -17,5 +17,8 @@ security:
             stateless: true
             anonymous: true
 
+        anonymous:
+            anonymous: ~
+
     access_control:
         - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }

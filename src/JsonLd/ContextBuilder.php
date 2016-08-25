@@ -115,6 +115,9 @@ final class ContextBuilder implements ContextBuilderInterface
         return $context;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
