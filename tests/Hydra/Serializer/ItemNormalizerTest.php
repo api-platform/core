@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\Hydra;
+namespace ApiPlatform\Core\tests\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;

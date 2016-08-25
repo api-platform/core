@@ -14,20 +14,21 @@ matrix:
       env: deps="low"
 
 before_install:
-  - mkdir -p build/logs
   - phpunit --self-update
   - npm install -g swagger-cli
-  - wget https://phar.phpunit.de/phpcov.phar
-  - wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar
+  - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
+  - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
+  - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
 
 install:
   - if [[ ! $deps ]]; then composer update --no-progress --ansi; fi
   - if [[ $deps = low ]]; then composer update --no-progress --ansi --prefer-lowest --prefer-stable; fi
 
 script:
-  - if [[ $coverage = 1 ]]; then phpunit --coverage-clover build/logs/clover-phpunit.xml; else phpunit; fi
+  - if [[ $coverage = 1 ]]; then phpunit --coverage-php build/cov/coverage-phpunit.cov; else phpunit; fi
   - if [[ $coverage = 1 ]]; then vendor/bin/behat --profile coverage; else vendor/bin/behat; fi
+  - if [[ $coverage = 1 ]]; then php phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
 
 after_success:
-  - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar --coverage_clover=build/logs/clover-*.xml; fi
+  - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar; fi

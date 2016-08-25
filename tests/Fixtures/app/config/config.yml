@@ -15,6 +15,8 @@ framework:
     session:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
+    templating:
+        engines:                       ['twig'] # For Swagger YU
 
 doctrine:
     dbal:
@@ -43,6 +45,7 @@ api_platform:
             client_enabled:            true
             client_items_per_page:     true
             items_per_page:            3
+    enable_nelmio_api_doc: true
 
 fos_user:
     db_driver:        'orm'
@@ -50,6 +53,16 @@ fos_user:
     service:
         user_manager: 'app.user_manager'
     user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
+
+nelmio_api_doc:
+    sandbox:
+        accept_type:        'application/json'
+        body_format:
+            formats:        [ 'json' ]
+            default_format: 'json'
+        request_format:
+            formats:
+                json:       'application/json'
 
 services:
     app.user_manager:
