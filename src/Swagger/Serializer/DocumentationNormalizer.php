@@ -138,6 +138,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             ];
         }
 
+        if (!isset($pathOperation['operationId'])) {
+            $pathOperation['operationId'] = sprintf('%s%s%s', lcfirst($operationName), ucfirst($resourceShortName), ucfirst($collection ? 'collection' : 'item'));
+        }
+
         switch ($method) {
             case 'GET':
                 if (!isset($pathOperation['produces'])) {

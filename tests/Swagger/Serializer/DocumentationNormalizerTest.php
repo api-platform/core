@@ -85,6 +85,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'tags' => [
                             'Dummy',
                         ],
+                        'operationId' => 'getDummyCollection',
                         'produces' => [
                             'application/ld+json',
                         ],
@@ -105,6 +106,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'tags' => [
                             'Dummy',
                         ],
+                        'operationId' => 'postDummyCollection',
                         'consumes' => [
                             'application/ld+json',
                         ],
@@ -143,6 +145,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'tags' => [
                             'Dummy',
                         ],
+                        'operationId' => 'getDummyItem',
                         'produces' => [
                             'application/ld+json',
                         ],
@@ -171,6 +174,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'tags' => [
                             'Dummy',
                         ],
+                        'operationId' => 'putDummyItem',
                         'consumes' => [
                             'application/ld+json',
                         ],
@@ -215,6 +219,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'tags' => [
                             'Dummy',
                         ],
+                        'operationId' => 'customDummyCollection',
                         'produces' => [
                             'application/ld+json',
                         ],
@@ -235,6 +240,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'tags' => [
                             'Dummy',
                         ],
+                        'operationId' => 'custom2DummyCollection',
                         'produces' => [
                             'application/ld+json',
                         ],
