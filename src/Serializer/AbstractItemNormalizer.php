@@ -153,6 +153,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
+        if ($type->isNullable() && null === $value) {
+            $this->setValue($object, $attribute, $value);
+
+            return;
+        }
+
         if (
             $type->isCollection() &&
             null !== ($collectionValueType = $type->getCollectionValueType()) &&
