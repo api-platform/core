@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -26,5 +27,5 @@ interface QueryCollectionExtensionInterface
      * @param string       $resourceClass
      * @param string       $operationName
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null);
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
 }

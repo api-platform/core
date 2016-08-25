@@ -116,7 +116,7 @@ abstract class QueryChecker
 
         $orderByAliases = [];
         foreach ($orderByParts as $orderBy) {
-            $parts = QueryNameGenerator::getOrderByParts($orderBy);
+            $parts = QueryJoinParser::getOrderByParts($orderBy);
 
             foreach ($parts as $part) {
                 if (false !== ($pos = strpos($part, '.'))) {
@@ -130,16 +130,16 @@ abstract class QueryChecker
         if (!empty($orderByAliases)) {
             foreach ($joinParts as $rootAlias => $joins) {
                 foreach ($joins as $join) {
-                    $alias = QueryNameGenerator::getJoinAlias($join);
+                    $alias = QueryJoinParser::getJoinAlias($join);
 
                     if (isset($orderByAliases[$alias])) {
-                        $relationship = QueryNameGenerator::getJoinRelationship($join);
+                        $relationship = QueryJoinParser::getJoinRelationship($join);
 
                         $relationshipParts = explode('.', $relationship);
                         $parentAlias = $relationshipParts[0];
                         $association = $relationshipParts[1];
 
-                        $parentMetadata = QueryNameGenerator::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
+                        $parentMetadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
 
                         if ($parentMetadata->isCollectionValuedAssociation($association)) {
                             return true;

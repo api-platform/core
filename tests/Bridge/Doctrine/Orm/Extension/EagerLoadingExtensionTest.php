@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -38,7 +39,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new EagerLoadingExtension();
-        $orderExtensionTest->applyToCollection($queryBuilder, Dummy::class);
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
     public function testApplyToItem()
@@ -57,6 +58,6 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new EagerLoadingExtension();
-        $orderExtensionTest->applyToItem($queryBuilder, Dummy::class, []);
+        $orderExtensionTest->applyToItem($queryBuilder, new QueryNameGenerator(), Dummy::class, []);
     }
 }

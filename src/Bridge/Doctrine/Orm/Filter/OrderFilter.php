@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,7 +51,7 @@ class OrderFilter extends AbstractFilter
      * For each property passed, if the resource does not have such property or if the order value is different from
      * `asc` or `desc` (case insensitive), the property is ignored.
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -77,7 +78,7 @@ class OrderFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
             }
 
             $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $order);

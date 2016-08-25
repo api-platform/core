@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -53,7 +53,7 @@ class DateFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (null === ($request = $this->requestStack->getCurrentRequest())) {
             return;
@@ -79,7 +79,7 @@ class DateFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = QueryNameGenerator::generateJoinAlias($association);
+                    $alias = $queryNameGenerator->generateJoinAlias();
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -96,6 +96,7 @@ class DateFilter extends AbstractFilter
             if (isset($values[self::PARAMETER_BEFORE])) {
                 $this->addWhere(
                     $queryBuilder,
+                    $queryNameGenerator,
                     $alias,
                     $field,
                     self::PARAMETER_BEFORE,
@@ -107,6 +108,7 @@ class DateFilter extends AbstractFilter
             if (isset($values[self::PARAMETER_AFTER])) {
                 $this->addWhere(
                     $queryBuilder,
+                    $queryNameGenerator,
                     $alias,
                     $field,
                     self::PARAMETER_AFTER,
@@ -120,16 +122,17 @@ class DateFilter extends AbstractFilter
     /**
      * Adds the where clause according to the chosen null management.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $field
-     * @param string       $operator
-     * @param string       $value
-     * @param string|null  $nullManagement
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $alias
+     * @param string                      $field
+     * @param string                      $operator
+     * @param string                      $value
+     * @param string|null                 $nullManagement
      */
-    private function addWhere(QueryBuilder $queryBuilder, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
+    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
     {
-        $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $queryNameGenerator->generateParameterName();
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, self::PARAMETER_BEFORE === $operator ? '<=' : '>=', $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {

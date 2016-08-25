@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
@@ -73,10 +74,7 @@ class OrderFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
-        $uniqid->expects($this->any())->willReturn('123456abcdefg');
-
-        $filter->apply($queryBuilder, $this->resourceClass);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -89,7 +87,10 @@ class OrderFilterTest extends KernelTestCase
 
     public function testGetDescription()
     {
-        $filter = new OrderFilter($this->managerRegistry, new RequestStack(), 'order', [
+        $filter = new OrderFilter($this->managerRegistry,
+            new RequestStack(),
+            'order',
+            [
             'id' => null,
             'name' => null,
             'foo' => null,
@@ -110,7 +111,9 @@ class OrderFilterTest extends KernelTestCase
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new OrderFilter($this->managerRegistry, new RequestStack(), 'order');
+        $filter = new OrderFilter($this->managerRegistry,
+            new RequestStack(),
+            'order');
         $this->assertEquals([
             'order[id]' => [
                 'property' => 'id',
@@ -296,7 +299,7 @@ class OrderFilterTest extends KernelTestCase
                         'relatedDummy.symfony' => 'desc',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_123456abcdefg ORDER BY o.id ASC, o.name DESC, relatedDummy_123456abcdefg.symfony DESC', Dummy::class),
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy a_1 ORDER BY o.id ASC, o.name DESC, a_1.symfony DESC', Dummy::class),
             ],
             // Properties enabled with empty request (default values)
             [

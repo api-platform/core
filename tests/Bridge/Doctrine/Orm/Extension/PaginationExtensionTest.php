@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -55,7 +56,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             30,
             '_page'
         );
-        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     public function testApplyToCollectionNoRequest()
@@ -70,7 +71,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             new RequestStack(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
         );
-        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     public function testApplyToCollectionEmptyRequest()
@@ -92,7 +93,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             $requestStack,
             $resourceMetadataFactory
         );
-        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     public function testApplyToCollectionPaginationDisabled()
@@ -115,7 +116,7 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             $resourceMetadataFactory,
             false
         );
-        $extension->applyToCollection($queryBuilder, 'Foo', 'op');
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
     public function testSupportsResult()

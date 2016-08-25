@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
@@ -66,11 +67,12 @@ class ItemDataProvider implements ItemDataProviderInterface
 
         $repository = $manager->getRepository($resourceClass);
         $queryBuilder = $repository->createQueryBuilder('o');
+        $queryNameGenerator = new QueryNameGenerator();
 
         $this->addWhereForIdentifiers($identifiers, $queryBuilder);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $resourceClass, $identifiers, $operationName);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName);
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult();

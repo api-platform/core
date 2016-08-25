@@ -11,175 +11,32 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\Expr\OrderBy;
-use Doctrine\ORM\QueryBuilder;
-
 /**
  * Utility functions for working with Doctrine ORM query.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+
  */
-abstract class QueryNameGenerator
+final class QueryNameGenerator implements QueryNameGeneratorInterface
 {
+    private $incrementedAssociation = 1;
+    private $incrementedName = 1;
+
     /**
-     * Generates a unique alias for DQL join.
-     *
-     * @param string $association
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public static function generateJoinAlias(string $association) : string
+    public function generateJoinAlias(string $association = '') : string
     {
-        return sprintf('%s_%s', $association, uniqid());
+        return sprintf('a_%d', $this->incrementedAssociation++);
     }
 
     /**
-     * Generates a unique parameter name for DQL query.
-     *
-     * @param string $name
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public static function generateParameterName(string $name) : string
+    public function generateParameterName(string $name = '') : string
     {
-        return sprintf('%s_%s', $name, uniqid());
-    }
-
-    /**
-     * Gets the class metadata from a given join alias.
-     *
-     * @param string          $alias
-     * @param QueryBuilder    $queryBuilder
-     * @param ManagerRegistry $managerRegistry
-     *
-     * @return ClassMetadata
-     */
-    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : ClassMetadata
-    {
-        $rootEntities = $queryBuilder->getRootEntities();
-        $rootAliases = $queryBuilder->getRootAliases();
-
-        $joinParts = $queryBuilder->getDQLPart('join');
-
-        $aliasMap = [];
-        $targetAlias = $alias;
-
-        foreach ($joinParts as $rootAlias => $joins) {
-            $aliasMap[$rootAlias] = 'root';
-
-            foreach ($joins as $join) {
-                $alias = self::getJoinAlias($join);
-                $relationship = self::getJoinRelationship($join);
-
-                $pos = strpos($relationship, '.');
-
-                $aliasMap[$alias] = [
-                    'parentAlias' => substr($relationship, 0, $pos),
-                    'association' => substr($relationship, $pos + 1),
-                ];
-            }
-        }
-
-        $associationStack = [];
-        $rootAlias = null;
-
-        while (null === $rootAlias) {
-            $mapping = $aliasMap[$targetAlias];
-
-            if ('root' === $mapping) {
-                $rootAlias = $targetAlias;
-            } else {
-                $associationStack[] = $mapping['association'];
-                $targetAlias = $mapping['parentAlias'];
-            }
-        }
-
-        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases)];
-
-        $rootMetadata = $managerRegistry
-            ->getManagerForClass($rootEntity)
-            ->getClassMetadata($rootEntity);
-
-        $metadata = $rootMetadata;
-
-        while (null !== ($association = array_pop($associationStack))) {
-            $associationClass = $metadata->getAssociationTargetClass($association);
-
-            $metadata = $managerRegistry
-                ->getManagerForClass($associationClass)
-                ->getClassMetadata($associationClass);
-        }
-
-        return $metadata;
-    }
-
-    /**
-     * Gets the relationship from a Join expression.
-     *
-     * @param Join $join
-     *
-     * @return string
-     */
-    public static function getJoinRelationship(Join $join) : string
-    {
-        static $relationshipProperty = null;
-        static $initialized = false;
-
-        if (!$initialized && !method_exists(Join::class, 'getJoin')) {
-            $relationshipProperty = new \ReflectionProperty(Join::class, '_join');
-            $relationshipProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $relationshipProperty) ? $join->getJoin() : $relationshipProperty->getValue($join);
-    }
-
-    /**
-     * Gets the alias from a Join expression.
-     *
-     * @param Join $join
-     *
-     * @return string
-     */
-    public static function getJoinAlias(Join $join) : string
-    {
-        static $aliasProperty = null;
-        static $initialized = false;
-
-        if (!$initialized && !method_exists(Join::class, 'getAlias')) {
-            $aliasProperty = new \ReflectionProperty(Join::class, '_alias');
-            $aliasProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $aliasProperty) ? $join->getAlias() : $aliasProperty->getValue($join);
-    }
-
-    /**
-     * Gets the parts from an OrderBy expression.
-     *
-     * @param OrderBy $orderBy
-     *
-     * @return string[]
-     */
-    public static function getOrderByParts(OrderBy $orderBy) : array
-    {
-        static $partsProperty = null;
-        static $initialized = false;
-
-        if (!$initialized && !method_exists(OrderBy::class, 'getParts')) {
-            $partsProperty = new \ReflectionProperty(OrderBy::class, '_parts');
-            $partsProperty->setAccessible(true);
-
-            $initialized = true;
-        }
-
-        return (null === $partsProperty) ? $orderBy->getParts() : $partsProperty->getValue($orderBy);
+        return sprintf('p_%s', $this->incrementedName++);
     }
 }

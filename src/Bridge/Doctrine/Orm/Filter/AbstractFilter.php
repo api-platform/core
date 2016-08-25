@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -180,22 +180,23 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Adds the necessary joins for a nested property.
      *
-     * @param string       $property
-     * @param string       $rootAlias
-     * @param QueryBuilder $queryBuilder
+     * @param string                      $property
+     * @param string                      $rootAlias
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
      *
      * @throws InvalidArgumentException If property is not nested
      *
      * @return array An array where the first element is the join $alias of the leaf entity,
      *               and the second element is the $field name
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder) : array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator) : array
     {
         $propertyParts = $this->splitPropertyParts($property);
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = QueryNameGenerator::generateJoinAlias($association);
+            $alias = $queryNameGenerator->generateJoinAlias();
             $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
             $parentAlias = $alias;
         }

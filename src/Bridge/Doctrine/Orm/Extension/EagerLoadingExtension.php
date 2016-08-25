@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
@@ -25,7 +26,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $this->joinRelations($queryBuilder, $resourceClass);
     }
@@ -33,7 +34,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function applyToItem(QueryBuilder $queryBuilder, string $resourceClass, array $identifiers, string $operationName = null)
+    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null)
     {
         $this->joinRelations($queryBuilder, $resourceClass);
     }
