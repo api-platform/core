@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -38,7 +39,7 @@ class OrderExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
-        $orderExtensionTest->applyToCollection($queryBuilder, Dummy::class);
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
     public function testApplyToCollectionWithWrongOrder()
@@ -57,6 +58,6 @@ class OrderExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension();
-        $orderExtensionTest->applyToCollection($queryBuilder, Dummy::class);
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 }

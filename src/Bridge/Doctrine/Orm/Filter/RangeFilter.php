@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
@@ -47,7 +47,7 @@ class RangeFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -67,12 +67,13 @@ class RangeFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
             }
 
             foreach ($values as $operator => $value) {
                 $this->addWhere(
                     $queryBuilder,
+                    $queryNameGenerator,
                     $alias,
                     $field,
                     $operator,
@@ -85,15 +86,16 @@ class RangeFilter extends AbstractFilter
     /**
      * Adds the where clause according to the operator.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $field
-     * @param string       $operator
-     * @param string       $value
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $alias
+     * @param string                      $field
+     * @param string                      $operator
+     * @param string                      $value
      */
-    private function addWhere(QueryBuilder $queryBuilder, $alias, $field, $operator, $value)
+    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
     {
-        $valueParameter = QueryNameGenerator::generateParameterName(sprintf('%s_%s', $field, $operator));
+        $valueParameter = $queryNameGenerator->generateParameterName();
 
         switch ($operator) {
             case self::PARAMETER_BETWEEN:

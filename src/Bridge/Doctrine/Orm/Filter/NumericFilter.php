@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
@@ -37,9 +37,6 @@ class NumericFilter extends AbstractFilter
         DBALType::SMALLINT => true,
     ];
 
-    /*
-     * @var RequestStack
-     */
     private $requestStack;
 
     public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
@@ -56,7 +53,7 @@ class NumericFilter extends AbstractFilter
      *
      * For each property passed, if the resource does not have such property or if the  value is not numerical the property is ignored.
      */
-    public function apply(QueryBuilder $queryBuilder, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -81,9 +78,9 @@ class NumericFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder);
+                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
             }
-            $valueParameter = QueryNameGenerator::generateParameterName($field);
+            $valueParameter = $queryNameGenerator->generateParameterName();
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))

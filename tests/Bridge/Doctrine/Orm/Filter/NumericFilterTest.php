@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
@@ -70,10 +71,7 @@ class NumericFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
-        $uniqid->expects($this->any())->willReturn('123456abcdefg');
-
-        $filter->apply($queryBuilder, $this->resourceClass);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower($expected);
 
@@ -86,7 +84,8 @@ class NumericFilterTest extends KernelTestCase
 
     public function testGetDescription()
     {
-        $filter = new NumericFilter($this->managerRegistry, new RequestStack(), [
+        $filter = new NumericFilter($this->managerRegistry,
+            new RequestStack(), [
             'id' => null,
             'name' => null,
             'foo' => null,
@@ -103,7 +102,8 @@ class NumericFilterTest extends KernelTestCase
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new NumericFilter($this->managerRegistry, new RequestStack());
+        $filter = new NumericFilter($this->managerRegistry,
+            new RequestStack());
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
@@ -139,7 +139,7 @@ class NumericFilterTest extends KernelTestCase
                     'dummyPrice' => 21,
 
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with negative value
             [
@@ -149,7 +149,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'dummyPrice' => -21,
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with non-numeric value
             [
@@ -169,7 +169,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'dummyPrice' => 0,
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with nested properties.
             [
@@ -179,7 +179,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'relatedDummy.id' => 0,
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_123456abcdefg where relateddummy_123456abcdefg.id = :id_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o left join o.relateddummy a_1 where a_1.id = :p_1', Dummy::class),
             ],
             // test with one correct and one wrong value
             [
@@ -190,7 +190,7 @@ class NumericFilterTest extends KernelTestCase
                    'dummyPrice' => 10,
                    'name' => '15toto',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
             // test with numeric, non-numeric and inexisting field
             [
@@ -202,7 +202,7 @@ class NumericFilterTest extends KernelTestCase
                     'name' => 'gerard',
                     'dummyPrice' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_123456abcdefg', Dummy::class),
+                sprintf('SELECT o FROM %s o where o.dummyPrice = :p_1', Dummy::class),
             ],
         ];
     }

@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
@@ -87,10 +88,7 @@ class SearchFilterTest extends KernelTestCase
             $filterParameters['properties']
         );
 
-        $uniqid = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'uniqid');
-        $uniqid->expects($this->any())->willReturn('123456abcdefg');
-
-        $filter->apply($queryBuilder, $this->resourceClass, 'op');
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expectedDql = strtolower($expected['dql']);
 
@@ -395,9 +393,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :p_1', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => 'exact',
+                        'p_1' => 'exact',
                     ],
                 ],
             ],
@@ -410,9 +408,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) = LOWER(:name_123456abcdefg)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) = LOWER(:p_1)', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => 'exact',
+                        'p_1' => 'exact',
                     ],
                 ],
             ],
@@ -439,9 +437,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relateddummy relateddummy_123456abcdefg WHERE o.name = :name_123456abcdefg AND relateddummy_123456abcdefg.id = :relateddummy_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relateddummy a_1 WHERE o.name = :p_1 AND a_1.id = :p_2', Dummy::class),
                     'parameters' => [
-                        'relatedDummy_123456abcdefg' => 'foo',
+                        'p_2' => 'foo',
                     ],
                 ],
             ],
@@ -454,9 +452,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :p_1', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => '%partial%',
+                        'p_1' => '%partial%',
                     ],
                 ],
             ],
@@ -469,9 +467,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:p_1)', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => '%partial%',
+                        'p_1' => '%partial%',
                     ],
                 ],
             ],
@@ -483,9 +481,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :p_1', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => 'partial%',
+                        'p_1' => 'partial%',
                     ],
                 ],
             ],
@@ -498,9 +496,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:p_1)', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => 'partial%',
+                        'p_1' => 'partial%',
                     ],
                 ],
             ],
@@ -512,9 +510,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :p_1', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => '%partial',
+                        'p_1' => '%partial',
                     ],
                 ],
             ],
@@ -527,9 +525,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:p_1)', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => '%partial',
+                        'p_1' => '%partial',
                     ],
                 ],
             ],
@@ -541,10 +539,10 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_123456abcdefg_1 OR o.name like :name_123456abcdefg_2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :p_1_1 OR o.name like :p_1_2', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg_1' => 'partial%',
-                        'name_123456abcdefg_2' => '% partial%',
+                        'p_1_1' => 'partial%',
+                        'p_1_2' => '% partial%',
                     ],
                 ],
             ],
@@ -556,10 +554,10 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_123456abcdefg_1) OR LOWER(o.name) like LOWER(:name_123456abcdefg_2)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:p_1_1) OR LOWER(o.name) like LOWER(:p_1_2)', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg_1' => 'partial%',
-                        'name_123456abcdefg_2' => '% partial%',
+                        'p_1_1' => 'partial%',
+                        'p_1_2' => '% partial%',
                     ],
                 ],
             ],
@@ -572,9 +570,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :relatedDummy_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy a_1 WHERE a_1.id = :p_1', Dummy::class),
                     'parameters' => [
-                        'relatedDummy_123456abcdefg' => 'exact',
+                        'p_1' => 'exact',
                     ],
                 ],
             ],
@@ -586,9 +584,9 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.id' => '/related_dummies/1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE relatedDummy_123456abcdefg.id = :id_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy a_1 WHERE a_1.id = :p_1', Dummy::class),
                     'parameters' => [
-                        'id_123456abcdefg' => 1,
+                        'p_1' => 1,
                     ],
                 ],
             ],
@@ -601,10 +599,10 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg inner join o.relatedDummies relatedDummies_123456abcdefg WHERE relatedDummy_123456abcdefg.id IN (:relatedDummy_123456abcdefg) AND relatedDummies_123456abcdefg.id = :relatedDummies_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy a_1 inner join o.relatedDummies a_2 WHERE a_1.id IN (:p_1) AND a_2.id = :p_2', Dummy::class),
                     'parameters' => [
-                        'relatedDummy_123456abcdefg' => [1, 2],
-                        'relatedDummies_123456abcdefg' => 1,
+                        'p_1' => [1, 2],
+                        'p_2' => 1,
                     ],
                 ],
             ],
@@ -617,10 +615,10 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.symfony' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relatedDummy_123456abcdefg WHERE o.name = :name_123456abcdefg AND relatedDummy_123456abcdefg.symfony = :symfony_123456abcdefg', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy a_1 WHERE o.name = :p_1 AND a_1.symfony = :p_2', Dummy::class),
                     'parameters' => [
-                        'name_123456abcdefg' => 'exact',
-                        'symfony_123456abcdefg' => 'exact',
+                        'p_1' => 'exact',
+                        'p_2' => 'exact',
                     ],
                 ],
             ],
