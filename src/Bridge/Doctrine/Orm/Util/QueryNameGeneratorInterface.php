@@ -23,7 +23,7 @@ interface QueryNameGeneratorInterface
      *
      * @return string
      */
-    public function generateJoinAlias(string $association) : string;
+    public function generateJoinAlias(string $association = '') : string;
 
     /**
      * Generates a cacheable parameter name for DQL query.
@@ -32,5 +32,5 @@ interface QueryNameGeneratorInterface
      *
      * @return string
      */
-    public function generateParameterName(string $name) : string;
+    public function generateParameterName(string $name = '') : string;
 }
