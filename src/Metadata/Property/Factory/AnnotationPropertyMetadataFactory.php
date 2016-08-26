@@ -63,13 +63,11 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 
         foreach (array_merge(Reflection::ACCESSOR_PREFIXES, Reflection::MUTATOR_PREFIXES) as $prefix) {
             $methodName = $prefix.ucfirst($property);
-
             if (!$reflectionClass->hasMethod($methodName)) {
                 continue;
             }
 
             $reflectionMethod = $reflectionClass->getMethod($methodName);
-
             if (!$reflectionMethod->isPublic()) {
                 continue;
             }
@@ -105,7 +103,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 
     private function createMetadata(ApiProperty $annotation, PropertyMetadata $parentPropertyMetadata = null) : PropertyMetadata
     {
-        if (!$parentPropertyMetadata) {
+        if (null === $parentPropertyMetadata) {
             return new PropertyMetadata(
                 null,
                 $annotation->description,
