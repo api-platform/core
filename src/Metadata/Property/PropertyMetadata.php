@@ -31,7 +31,7 @@ final class PropertyMetadata
     private $identifier;
     private $attributes;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, array $attributes = [])
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, array $attributes = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -273,9 +273,9 @@ final class PropertyMetadata
     /**
      * Gets attributes.
      *
-     * @return array
+     * @return array|null
      */
-    public function getAttributes() : array
+    public function getAttributes()
     {
         return $this->attributes;
     }

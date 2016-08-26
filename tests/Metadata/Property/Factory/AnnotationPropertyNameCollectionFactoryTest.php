@@ -12,9 +12,10 @@
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
-use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyNameCollectionFactory;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
 use Prophecy\Argument;
@@ -26,56 +27,47 @@ use Prophecy\Prophecy\ProphecyInterface;
 class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider getReaders
+     * @dataProvider getDependencies
      */
-    public function testCreateProperty(ProphecyInterface $reader)
+    public function testCreate(ProphecyInterface $decorated = null, array $results)
     {
-        $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decorated->create(Dummy::class, 'name', [])->willThrow(new PropertyNotFoundException())->shouldBeCalled();
+        $reader = $this->prophesize(Reader::class);
+        $reader->getPropertyAnnotation(new \ReflectionProperty(Dummy::class, 'name'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
+        $reader->getMethodAnnotation(new \ReflectionMethod(Dummy::class, 'getName'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getMethodAnnotation(new \ReflectionMethod(Dummy::class, 'getAlias'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
 
-        $factory = new AnnotationPropertyMetadataFactory($reader->reveal(), $decorated->reveal());
-        $metadata = $factory->create(Dummy::class, 'name');
+        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
+        $metadata = $factory->create(Dummy::class, []);
 
-        $this->assertEquals('description', $metadata->getDescription());
-        $this->assertTrue($metadata->isReadable());
-        $this->assertTrue($metadata->isWritable());
-        $this->assertFalse($metadata->isReadableLink());
-        $this->assertFalse($metadata->isWritableLink());
-        $this->assertFalse($metadata->isIdentifier());
-        $this->assertTrue($metadata->isRequired());
-        $this->assertEquals('foo', $metadata->getIri());
-        $this->assertEquals(['foo' => 'bar'], $metadata->getAttributes());
+        $this->assertEquals($results, iterator_to_array($metadata));
     }
 
-    public function getReaders()
+    public function getDependencies()
     {
-        $annotation = new ApiProperty();
-        $annotation->description = 'description';
-        $annotation->readable = true;
-        $annotation->writable = true;
-        $annotation->readableLink = false;
-        $annotation->writableLink = false;
-        $annotation->identifier = false;
-        $annotation->required = true;
-        $annotation->iri = 'foo';
-        $annotation->attributes = ['foo' => 'bar'];
+        $decoratedThrowsNotFound = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $decoratedThrowsNotFound->create(Dummy::class, [])->willThrow(new ResourceClassNotFoundException())->shouldBeCalled();
 
-        $propertyReader = $this->prophesize(Reader::class);
-        $propertyReader->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn($annotation)->shouldBeCalled();
-
-        $getterReader = $this->prophesize(Reader::class);
-        $getterReader->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
-        $getterReader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn($annotation)->shouldBeCalled();
-
-        $setterReader = $this->prophesize(Reader::class);
-        $setterReader->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
-        $setterReader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
-        $setterReader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn($annotation)->shouldBeCalled();
+        $decoratedReturnParent = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $decoratedReturnParent->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['foo']))->shouldBeCalled();
 
         return [
-            [$propertyReader],
-            [$getterReader],
-            [$setterReader],
+            [null, ['name', 'alias']],
+            [$decoratedThrowsNotFound, ['name', 'alias']],
+            [$decoratedReturnParent, ['name', 'alias', 'foo']],
         ];
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     * @expectedExceptionMessage The resource class "\DoNotExist" does not exist.
+     */
+    public function testClassDoesNotExist()
+    {
+        $reader = $this->prophesize(Reader::class);
+
+        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal());
+        $factory->create('\DoNotExist');
     }
 }
