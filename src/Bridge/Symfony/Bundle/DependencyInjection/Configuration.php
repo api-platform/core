@@ -54,6 +54,7 @@ final class Configuration implements ConfigurationInterface
                                 ->booleanNode('client_enabled')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
                                 ->booleanNode('client_items_per_page')->defaultFalse()->info('To allow the client to set the number of items per page.')->end()
                                 ->integerNode('items_per_page')->defaultValue(30)->info('The default number of items per page.')->end()
+                                ->integerNode('maximum_items_per_page')->defaultValue(300)->info('The maximum number of items per page.')->end()
                                 ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The default name of the parameter handling the page number.')->end()
                                 ->scalarNode('enabled_parameter_name')->defaultValue('pagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
                                 ->scalarNode('items_per_page_parameter_name')->defaultValue('itemsPerPage')->cannotBeEmpty()->info('The name of the query parameter to set the number of items per page.')->end()

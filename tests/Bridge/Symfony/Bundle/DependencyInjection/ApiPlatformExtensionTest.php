@@ -187,6 +187,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.collection.pagination.page_parameter_name' => 'page',
             'api_platform.collection.pagination.enabled_parameter_name' => 'pagination',
             'api_platform.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
+            'api_platform.collection.pagination.maximum_items_per_page' => 300,
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();

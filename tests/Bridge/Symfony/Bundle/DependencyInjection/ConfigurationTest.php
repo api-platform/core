@@ -58,6 +58,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
+                    'maximum_items_per_page' => 300,
                 ],
             ],
         ], $config);
