@@ -101,7 +101,7 @@ class SearchFilter extends AbstractFilter
                 $parentAlias = $alias;
 
                 foreach ($propertyParts['associations'] as $association) {
-                    $alias = $queryNameGenerator->generateJoinAlias();
+                    $alias = $queryNameGenerator->generateJoinAlias($association);
                     $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
                     $parentAlias = $alias;
                 }
@@ -144,7 +144,7 @@ class SearchFilter extends AbstractFilter
                     continue;
                 }
 
-                $valueParameter = $queryNameGenerator->generateParameterName();
+                $valueParameter = $queryNameGenerator->generateParameterName($field);
 
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
@@ -159,8 +159,8 @@ class SearchFilter extends AbstractFilter
             $values = array_map([$this, 'getIdFromValue'], $values);
 
             $association = $field;
-            $associationAlias = $queryNameGenerator->generateJoinAlias();
-            $valueParameter = $queryNameGenerator->generateParameterName();
+            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+            $valueParameter = $queryNameGenerator->generateParameterName($association);
 
             $queryBuilder
                 ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
@@ -190,7 +190,7 @@ class SearchFilter extends AbstractFilter
      */
     private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $value)
     {
-        $valueParameter = $queryNameGenerator->generateParameterName();
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         switch ($strategy) {
             case null:
