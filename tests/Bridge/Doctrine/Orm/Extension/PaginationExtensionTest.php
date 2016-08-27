@@ -86,7 +86,10 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             false,
             false,
             30,
-            '_page'
+            '_page',
+            'pagination',
+            'itemsPerPage',
+            300
         );
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
