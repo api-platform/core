@@ -196,7 +196,7 @@ abstract class AbstractFilter implements FilterInterface
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = $queryNameGenerator->generateJoinAlias();
+            $alias = $queryNameGenerator->generateJoinAlias($association);
             $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
             $parentAlias = $alias;
         }
