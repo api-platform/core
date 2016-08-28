@@ -79,6 +79,11 @@
             <argument type="service" id="api_platform.property_info" />
         </service>
 
+        <service id="api_platform.metadata.property.name_collection_factory.inherited" class="ApiPlatform\Core\Metadata\Property\Factory\InheritedPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="10" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory.inherited.inner" />
+        </service>
+
         <service id="api_platform.metadata.property.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.metadata.property.cache" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.cached.inner" />
@@ -96,6 +101,11 @@
         <service id="api_platform.metadata.property.metadata_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.property_info" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.property_info.inner" />
+        </service>
+
+        <service id="api_platform.metadata.property.metadata_factory.inherited" class="ApiPlatform\Core\Metadata\Property\Factory\InheritedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.inherited.inner" />
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.serializer" class="ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="30" public="false">
