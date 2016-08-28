@@ -118,4 +118,30 @@ class SerializerPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($actual[2]->isReadable());
         $this->assertFalse($actual[2]->isWritable());
     }
+
+    public function testCreateInherited()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyTableInheritanceChild::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
+        $dummySerializerClassMetadata = new SerializerClassMetadata(DummyTableInheritanceChild::class);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(DummyTableInheritanceChild::class)->willReturn($dummySerializerClassMetadata)->shouldBeCalled();
+        $serializerClassMetadataFactory = $serializerClassMetadataFactoryProphecy->reveal();
+
+        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $fooPropertyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_ARRAY, true))
+            ->withChildInherited(DummyTableInheritanceChild::class);
+        $decoratedProphecy->create(DummyTableInheritance::class, 'nickname', [])->willReturn($fooPropertyMetadata)->shouldBeCalled();
+        $decorated = $decoratedProphecy->reveal();
+
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory($resourceMetadataFactory, $serializerClassMetadataFactory, $decorated);
+
+        $actual = $serializerPropertyMetadataFactory->create(DummyTableInheritance::class, 'nickname');
+
+        $this->assertInstanceOf(PropertyMetadata::class, $actual);
+        $this->assertEquals($actual->isChildInherited(), DummyTableInheritanceChild::class);
+    }
 }

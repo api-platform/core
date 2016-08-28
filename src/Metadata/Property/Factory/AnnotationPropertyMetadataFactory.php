@@ -114,6 +114,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
                 $annotation->required,
                 $annotation->identifier,
                 $annotation->iri,
+                null,
                 $annotation->attributes
             );
         }
