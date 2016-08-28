@@ -29,9 +29,10 @@ final class PropertyMetadata
     private $required;
     private $iri;
     private $identifier;
+    private $childInherited;
     private $attributes;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, array $attributes = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -42,6 +43,7 @@ final class PropertyMetadata
         $this->required = $required;
         $this->identifier = $identifier;
         $this->iri = $iri;
+        $this->childInherited = $childInherited;
         $this->attributes = $attributes;
     }
 
@@ -291,6 +293,31 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->attributes = $attributes;
+
+        return $metadata;
+    }
+
+    /**
+     * Is the property inherited from a child class?
+     *
+     * @return string|null
+     */
+    public function isChildInherited()
+    {
+        return $this->childInherited;
+    }
+
+    /**
+     * Returns a new instance with the given child inherited class.
+     *
+     * @param string $childInherited
+     *
+     * @return self
+     */
+    public function withChildInherited(string $childInherited) : self
+    {
+        $metadata = clone $this;
+        $metadata->childInherited = $childInherited;
 
         return $metadata;
     }

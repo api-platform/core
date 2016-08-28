@@ -20,9 +20,12 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Collections\ArrayCollection;
 use Prophecy\Argument;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -551,5 +554,52 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize(['name' => null], Dummy::class);
+    }
+
+    public function testChildInheritedProperty()
+    {
+        $dummy = new DummyTableInheritance();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyTableInheritance::class, [])->willReturn(
+            new PropertyNameCollection(['name', 'nickname'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'nickname', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccesorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccesorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
+        $propertyAccesorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class, true)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
+        $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null)->shouldBeCalled();
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccesorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertEquals([
+            'name' => 'foo',
+            'nickname' => null,
+        ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class]));
     }
 }
