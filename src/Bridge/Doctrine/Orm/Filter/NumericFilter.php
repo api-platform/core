@@ -80,7 +80,7 @@ class NumericFilter extends AbstractFilter
             if ($this->isPropertyNested($property)) {
                 list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
             }
-            $valueParameter = $queryNameGenerator->generateParameterName();
+            $valueParameter = $queryNameGenerator->generateParameterName($field);
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))

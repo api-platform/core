@@ -21,12 +21,12 @@ class QueryNameGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testGenerateJoinAlias()
     {
         $queryNameGenerator = new QueryNameGenerator();
-        $this->assertEquals('a_1', $queryNameGenerator->generateJoinAlias());
+        $this->assertEquals('related_a1', $queryNameGenerator->generateJoinAlias('related'));
     }
 
     public function testGenerateParemeterName()
     {
         $queryNameGenerator = new QueryNameGenerator();
-        $this->assertEquals('p_1', $queryNameGenerator->generateParameterName());
+        $this->assertEquals('name_p1', $queryNameGenerator->generateParameterName('name'));
     }
 }
