@@ -16,6 +16,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultExtensionInterface
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
@@ -50,6 +51,10 @@ class CollectionDataProvider implements CollectionDataProviderInterface
         }
 
         $repository = $manager->getRepository($resourceClass);
+        if (!method_exists($repository, 'createQueryBuilder')) {
+            throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
+        }
+
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
         foreach ($this->collectionExtensions as $extension) {
