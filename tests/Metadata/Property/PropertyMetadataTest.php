@@ -22,7 +22,7 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
     public function testValueObject()
     {
         $type = new Type(Type::BUILTIN_TYPE_STRING);
-        $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', ['foo' => 'bar']);
+        $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', null, ['foo' => 'bar']);
         $this->assertEquals($type, $metadata->getType());
         $this->assertEquals('desc', $metadata->getDescription());
         $this->assertTrue($metadata->isReadable());
