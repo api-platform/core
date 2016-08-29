@@ -93,11 +93,11 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     }
 
     /**
-     * @dataProvider resourceMetadataProvider
+     * @dataProvider optionalResourceMetadataProvider
      */
     public function testXmlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
     {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.xml';
 
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
@@ -106,6 +106,23 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
         $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
+
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
+     * @dataProvider resourceMetadataProvider
+     */
+    public function testXmlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
+
+        $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $decorated->create(FileConfigDummy::class)->willReturn($expectedResourceMetadata)->shouldBeCalled();
+
+        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath], $decorated->reveal());
+
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }

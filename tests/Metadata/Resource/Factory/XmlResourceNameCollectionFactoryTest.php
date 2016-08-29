@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -28,6 +29,7 @@ class XmlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
 
         $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([
+            Dummy::class,
             FileConfigDummy::class,
         ]));
     }
