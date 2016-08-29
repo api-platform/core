@@ -19,6 +19,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -106,13 +107,13 @@ class ItemDataProvider implements ItemDataProviderInterface
     /**
      * Transform and check the identifier, composite or not.
      *
-     * @param $id
-     * @param $manager
-     * @param $resourceClass
+     * @param int|string    $id
+     * @param ObjectManager $manager
+     * @param string        $resourceClass
      *
      * @return array
      */
-    private function normalizeIdentifiers($id, $manager, $resourceClass) : array
+    private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass) : array
     {
         $identifierValues = [$id];
         $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
