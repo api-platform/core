@@ -75,7 +75,7 @@ class PaginationExtension implements QueryResultExtensionInterface
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
-            $itemsPerPage = ($this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
+            $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
         }
 
         $queryBuilder
