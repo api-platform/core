@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
@@ -66,7 +67,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
             $internalErrors = libxml_use_internal_errors(true);
 
             if (false === @$resources->schemaValidate(self::RESOURCE_SCHEMA)) {
-                throw new \InvalidArgumentException(sprintf('XML Schema loaded from path %s is not valid! Errors: %s', realpath($path), implode("\n", $this->getXmlErrors($internalErrors))));
+                throw new InvalidArgumentException(sprintf('XML Schema loaded from path %s is not valid! Errors: %s', realpath($path), implode("\n", $this->getXmlErrors($internalErrors))));
             }
 
             libxml_clear_errors();
