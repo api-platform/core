@@ -40,6 +40,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     * @expectedExceptionMessage Resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist" not found.
      */
     public function testYamlDoesNotExistMetadataFactory()
     {
@@ -82,6 +83,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Resource must represent a class, none found!
      */
     public function testNoClassYamlResourceMetadataFactory()
     {

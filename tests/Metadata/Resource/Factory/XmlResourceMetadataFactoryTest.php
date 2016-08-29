@@ -40,6 +40,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     * @expectedExceptionMessage Resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist" not found.
      */
     public function testXmlDoesNotExistMetadataFactory()
     {
@@ -83,6 +84,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /XML Schema loaded from path .+/
      */
     public function testInvalidXmlResourceMetadataFactory()
     {

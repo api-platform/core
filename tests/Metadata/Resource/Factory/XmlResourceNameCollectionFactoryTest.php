@@ -36,6 +36,7 @@ class XmlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /XML Schema loaded from path .+/
      */
     public function testInvalidXmlResourceNameCollectionFactory()
     {
