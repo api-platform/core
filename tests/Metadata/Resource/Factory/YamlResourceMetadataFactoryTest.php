@@ -92,11 +92,11 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     }
 
     /**
-     * @dataProvider resourceMetadataProvider
+     * @dataProvider optionalResourceMetadataProvider
      */
     public function testYamlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
     {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.yml';
 
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
@@ -105,6 +105,23 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
         $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
+
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
+     * @dataProvider resourceMetadataProvider
+     */
+    public function testYamlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
+
+        $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $decorated->create(FileConfigDummy::class)->willReturn($expectedResourceMetadata)->shouldBeCalled();
+
+        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath], $decorated->reveal());
+
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }

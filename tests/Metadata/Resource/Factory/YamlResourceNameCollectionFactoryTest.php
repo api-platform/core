@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -28,6 +29,7 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
 
         $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([
+            Dummy::class,
             FileConfigDummy::class,
         ]));
     }
@@ -40,5 +42,16 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([
             FileConfigDummy::class,
         ]));
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     */
+    public function testNoClassYamlResourceNameCollectionFactory()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
+        $resourceMetadataFactory = new YamlResourceNameCollectionFactory([$configPath]);
+
+        $resourceMetadataFactory->create(FileConfigDummy::class);
     }
 }
