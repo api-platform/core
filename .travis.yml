@@ -5,15 +5,17 @@ sudo: false
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.npm
 
 matrix:
   include:
     - php: '7.0'
       env: coverage=1
     - php: '7.0'
-      env: deps="low"
+      env: deps='low'
 
 before_install:
+  - phpenv config-rm xdebug.ini
   - phpunit --self-update
   - npm install -g swagger-cli
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
@@ -21,13 +23,14 @@ before_install:
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
 
 install:
-  - if [[ ! $deps ]]; then composer update --no-progress --ansi; fi
-  - if [[ $deps = low ]]; then composer update --no-progress --ansi --prefer-lowest --prefer-stable; fi
+  - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi
+  - if [[ ! $deps ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
+  - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
 
 script:
-  - if [[ $coverage = 1 ]]; then phpunit --coverage-php build/cov/coverage-phpunit.cov; else phpunit; fi
-  - if [[ $coverage = 1 ]]; then vendor/bin/behat --profile coverage; else vendor/bin/behat; fi
-  - if [[ $coverage = 1 ]]; then php phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
+  - if [[ $coverage = 1 ]]; then phpdbg -qrr "$(phpenv which phpunit)" --coverage-php build/cov/coverage-phpunit.cov; else phpunit; fi
+  - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/behat --profile coverage; else vendor/bin/behat; fi
+  - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
 
 after_success:
