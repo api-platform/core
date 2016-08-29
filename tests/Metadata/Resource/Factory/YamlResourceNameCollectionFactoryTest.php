@@ -46,6 +46,7 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Resource must represent a class, none found!
      */
     public function testNoClassYamlResourceNameCollectionFactory()
     {
