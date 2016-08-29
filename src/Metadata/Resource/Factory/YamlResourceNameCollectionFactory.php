@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
@@ -56,7 +57,7 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
 
             foreach ($resources as $resource) {
                 if (!isset($resource['class'])) {
-                    throw new \InvalidArgumentException('Resource must represent a class, none found!');
+                    throw new InvalidArgumentException('Resource must represent a class, none found!');
                 }
 
                 $classes[$resource['class']] = true;

@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -66,7 +67,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
 
             foreach ($resources as $resource) {
                 if (!isset($resource['class'])) {
-                    throw new \InvalidArgumentException('Resource must represent a class, none found!');
+                    throw new InvalidArgumentException('Resource must represent a class, none found!');
                 }
 
                 if ($resourceClass !== $resource['class']) {

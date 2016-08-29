@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceMetadataFactory;
@@ -151,17 +152,13 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      */
-    public function testNotValidXml()
+    public function testInvalidXmlResourceNameCollectionFactory()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
-
-        foreach ($xmlResourceNameCollectionFactory->create() as $resourceName) {
-            $resourceMetadataFactory->create($resourceName);
-        }
+        $xmlResourceNameCollectionFactory->create();
     }
 
     /**
@@ -236,6 +233,64 @@ class FileConfigurationMetadataTest extends \PHPUnit_Framework_TestCase
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     */
+    public function testInvalidXmlResourceMetadataFactory()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
+        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
+
+        $resourceMetadataFactory->create(FileConfigDummy::class);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     */
+    public function testNoClassYamlResourceMetadataFactory()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
+        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
+
+        $resourceMetadataFactory->create(FileConfigDummy::class);
+    }
+
+    /**
+     * @dataProvider resourceMetadataProvider
+     */
+    public function testYamlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
+
+        $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
+
+        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath], $decorated->reveal());
+
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+        $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
+
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
+     * @dataProvider resourceMetadataProvider
+     */
+    public function testXmlParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
+
+        $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
+
+        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath], $decorated->reveal());
+
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+        $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
+
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
 }
