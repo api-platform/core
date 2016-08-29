@@ -40,8 +40,9 @@ class PaginationExtension implements QueryResultExtensionInterface
     private $pageParameterName;
     private $enabledParameterName;
     private $itemsPerPageParameterName;
+    private $maximumItemPerPage;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage')
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
@@ -53,6 +54,7 @@ class PaginationExtension implements QueryResultExtensionInterface
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
+        $this->maximumItemPerPage = $maximumItemPerPage;
     }
 
     /**
@@ -73,6 +75,7 @@ class PaginationExtension implements QueryResultExtensionInterface
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
+            $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
         }
 
         $queryBuilder
