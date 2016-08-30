@@ -247,8 +247,8 @@ final class ApiPlatformParser implements ParserInterface
             }
 
             if (
-                (self::OUT_PREFIX === $io && !$propertyMetadata->isReadableLink()) ||
-                (self::IN_PREFIX === $io && !$propertyMetadata->isWritableLink())
+                (self::OUT_PREFIX === $io && true !== $propertyMetadata->isReadableLink()) ||
+                (self::IN_PREFIX === $io && true !== $propertyMetadata->isWritableLink())
             ) {
                 $data['dataType'] = self::TYPE_IRI;
                 $data['actualType'] = DataTypes::STRING;
