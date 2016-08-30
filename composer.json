@@ -21,7 +21,7 @@
         "symfony/http-kernel": "^2.7 || ^3.0",
         "symfony/property-info": "^3.1",
         "symfony/serializer": "^3.1",
-        "willdurand/negotiation": "^2.0"
+        "willdurand/negotiation": "^2.0.3"
     },
     "require-dev": {
         "behat/behat": "^3.1",
