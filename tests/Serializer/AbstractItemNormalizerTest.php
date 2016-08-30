@@ -438,18 +438,18 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type of the "name" attribute must be "string", "integer" given.
+     * @expectedExceptionMessage The type of the "foo" attribute must be "float", "integer" given.
      */
     public function testBadType()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
-            new PropertyNameCollection(['name'])
+            new PropertyNameCollection(['foo'])
         )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
-            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true, false, false)
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT), '', false, true, false, false)
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -468,7 +468,39 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $normalizer->denormalize(['name' => 42], Dummy::class);
+        $normalizer->denormalize(['foo' => 42], Dummy::class);
+    }
+
+    public function testJsonAllowIntAsFloat()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['foo'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT), '', false, true, false, false)
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'foo', 42)->shouldBeCalled();
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->denormalize(['foo' => 42], Dummy::class, 'jsonfoo');
     }
 
     /**
