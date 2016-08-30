@@ -59,13 +59,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $rawData;
         }
 
-        $data['_links']['self']['href'] = $this->iriConverter->getIriFromItem($object);
-
+        $data = ['_links' => ['self' => ['href' => $this->iriConverter->getIriFromItem($object)]]];
         $components = $this->getComponents($object, $format, $context);
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'embedded');
 
-        return array_merge($data, $rawData);
+        return $data + $rawData;
     }
 
     /**

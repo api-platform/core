@@ -459,13 +459,18 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     private function computeDoc(Documentation $object, \ArrayObject $definitions, \ArrayObject $paths): array
     {
-        $doc['swagger'] = self::SWAGGER_VERSION;
-        $doc['info']['title'] = $object->getTitle();
+        $doc = [
+            'swagger' => self::SWAGGER_VERSION,
+            'info' => ['title' => $object->getTitle()],
+        ];
+
         if ('' !== $object->getDescription()) {
             $doc['info']['description'] = $object->getDescription();
         }
+
         $doc['info']['version'] = $object->getVersion();
         $doc['paths'] = $paths;
+
         if (count($definitions) > 0) {
             $doc['definitions'] = $definitions;
         }

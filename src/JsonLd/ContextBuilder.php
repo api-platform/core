@@ -92,7 +92,7 @@ final class ContextBuilder implements ContextBuilderInterface
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            if ($propertyMetadata->isIdentifier() && !$propertyMetadata->isWritable()) {
+            if ($propertyMetadata->isIdentifier() && true !== $propertyMetadata->isWritable()) {
                 continue;
             }
 
@@ -102,7 +102,7 @@ final class ContextBuilder implements ContextBuilderInterface
                 $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
             }
 
-            if (!$propertyMetadata->isReadableLink()) {
+            if (true !== $propertyMetadata->isReadableLink()) {
                 $context[$convertedName] = [
                     '@id' => $id,
                     '@type' => '@id',

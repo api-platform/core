@@ -64,7 +64,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $context = $this->initContext($resourceClass, $context, $format);
+        $context = $this->initContext($resourceClass, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
         $paginated = $isPaginator = $object instanceof PaginatorInterface;
 
