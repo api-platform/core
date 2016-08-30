@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\EventListener;
 
-use Negotiation\Exception\InvalidMediaType;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -56,12 +55,8 @@ final class AddFormatListener
         // First, try to guess the format from the Accept header
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
-            try {
-                if (null === $acceptHeader = $this->negotiator->getBest($accept, $mimeTypes)) {
-                    throw $this->getNotAcceptableHttpException($accept, $mimeTypes);
-                }
-            } catch (InvalidMediaType $e) {
-                throw new NotAcceptableHttpException(sprintf('The "%s" MIME type is invalid.', $accept));
+            if (null === $acceptHeader = $this->negotiator->getBest($accept, $mimeTypes)) {
+                throw $this->getNotAcceptableHttpException($accept, $mimeTypes);
             }
 
             $request->setRequestFormat($request->getFormat($acceptHeader->getType()));
