@@ -142,7 +142,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage The "invalid" MIME type is invalid.
+     * @expectedExceptionMessage Requested format "invalid" is not supported. Supported MIME types are "application/json".
      */
     public function testInvalidAcceptHeader()
     {

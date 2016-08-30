@@ -22,4 +22,4 @@ Feature: Validate response types
     And I send a "GET" request to "/dummies/1"
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "detail" should be equal to 'The "invalid" MIME type is invalid.'
+    And the JSON node "detail" should be equal to 'Requested format "invalid" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/xml", "text/xml", "application/json".'
