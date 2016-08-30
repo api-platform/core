@@ -183,14 +183,33 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
+        $this->validateType($attribute, $type, $value, $format);
+        $this->setValue($object, $attribute, $value);
+    }
+
+    /**
+     * Validates the type of the value. Allows using integers as floats for JSON formats.
+     *
+     * @param string      $attribute
+     * @param Type        $type
+     * @param string|null $format
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateType(string $attribute, Type $type, $value, string $format = null)
+    {
         $builtinType = $type->getBuiltinType();
-        if (!call_user_func('is_'.$builtinType, $value)) {
+        if (false !== strpos($format, 'json') && Type::BUILTIN_TYPE_FLOAT === $builtinType) {
+            $isValid = is_float($value) || is_int($value);
+        } else {
+            $isValid = call_user_func('is_'.$builtinType, $value);
+        }
+
+        if (!$isValid) {
             throw new InvalidArgumentException(sprintf(
                 'The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, gettype($value)
             ));
         }
-
-        $this->setValue($object, $attribute, $value);
     }
 
     /**

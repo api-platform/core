@@ -102,7 +102,6 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'The type of the key "a" must be "int", "string" given.'
 
-  @dropSchema
   Scenario: Send a scalar having the bad type
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
@@ -118,3 +117,17 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "@type" should be equal to "Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
+
+  @dropSchema
+  Scenario: According to the JSON spec, allow numbers without explicit floating point for JSON formats
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "foo",
+      "dummyPrice": 42
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
