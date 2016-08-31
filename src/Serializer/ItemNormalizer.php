@@ -23,16 +23,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $rawData = parent::normalize($object, $format, $context);
-        if (!is_array($rawData)) {
-            return $rawData;
+        $data = parent::normalize($object, $format, $context);
+        if (!is_array($data)) {
+            return $data;
         }
 
         if (!isset($data['id'])) {
-            $data['id'] = $this->iriConverter->getIriFromItem($object);
+            $data = ['id' => $this->iriConverter->getIriFromItem($object)] + $data;
         }
 
-        return array_merge($data, $rawData);
+        return $data;
     }
 
     /**
