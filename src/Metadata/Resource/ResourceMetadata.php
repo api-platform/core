@@ -193,15 +193,15 @@ final class ResourceMetadata
     /**
      * Gets an operation attribute, optionally fallback to a resource attribute.
      *
-     * @param array  $operations
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
+     * @param array|null $operations
+     * @param string     $operationName
+     * @param string     $key
+     * @param mixed      $defaultValue
+     * @param bool       $resourceFallback
      *
      * @return mixed
      */
-    private function getOperationAttribute(array $operations, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
+    private function getOperationAttribute(array $operations = null, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         if (isset($operations[$operationName][$key])) {
             return $operations[$operationName][$key];
