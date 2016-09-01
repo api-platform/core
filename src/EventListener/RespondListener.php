@@ -46,6 +46,7 @@ final class RespondListener
             self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK,
             [
                 'Content-Type' => sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
+                'Vary' => 'Accept',
                 'X-Content-Type-Options' => 'nosniff',
                 'X-Frame-Options' => 'deny',
             ]

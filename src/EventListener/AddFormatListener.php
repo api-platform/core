@@ -36,7 +36,7 @@ final class AddFormatListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     * @param $event GetResponseEvent
+     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
