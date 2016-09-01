@@ -128,7 +128,7 @@ class ApiDocumentationBuilder implements ApiDocumentationBuilderInterface
                 }
 
                 if ($attributeMetadata->isNormalizationLink()) {
-                    $type = 'Hydra:Link';
+                    $type = 'hydra:Link';
                 } else {
                     $type = 'rdf:Property';
                 }
