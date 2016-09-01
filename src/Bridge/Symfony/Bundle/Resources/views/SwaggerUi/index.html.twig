@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }} - API Platform</title>
+    <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
 
     <link rel="icon" type="image/png" href="{{ asset('bundles/apiplatform/swagger-ui/images/favicon-32x32.png') }}" sizes="32x32">
     <link rel="icon" type="image/png" href="{{ asset('bundles/apiplatform/swagger-ui/images/favicon-16x16.png') }}" sizes="16x16">
@@ -31,19 +31,31 @@
         $(function () {
             window.swaggerUi = new SwaggerUi({
                 url: '{{ path('api_doc', {'_format': 'json'} ) }}',
+                spec: JSON.parse('{{ spec|escape('js') }}'),
                 dom_id: 'swagger-ui-container',
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
-                onComplete: function(swaggerApi, swaggerUi){
+                onComplete: function() {
                     $('pre code').each(function(i, e) {
                         hljs.highlightBlock(e)
                     });
+
+                    {% if operationId is defined %}
+                        {% set domId = '#' ~ shortName ~ '_' ~ operationId %}
+                        {% set id = app.request.attributes.get('id') %}
+
+                        {% if id %}
+                            $('{{ domId|escape('js') }} form.sandbox input[name="id"]').val('{{ id|escape('js') }}');
+                        {% endif %}
+
+                        $('{{ domId|escape('js') }} form.sandbox').submit();
+                        document.location.hash = '#!/{{ shortName|escape('js') }}/{{ operationId|escape('js') }}';
+                    {% endif %}
                 },
-                onFailure: function(data) {
+                onFailure: function() {
                     log('Unable to Load SwaggerUI');
                 },
-                docExpansion: 'none',
+                docExpansion: {% if operationId is defined %}'none'{% else %}'list'{% endif %},
                 jsonEditor: false,
-                apisSorter: 'alpha',
                 defaultModelRendering: 'schema',
                 showRequestHeaders: true
             });
@@ -68,5 +80,17 @@
 
 <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
 <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
+
+<div class="swagger-ui-wrap">
+    <div class="container">
+        <div id="formats" class="footer" style="text-align: right">
+            Available formats:
+            {% for format in formats|keys %}
+                <a href="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({'_format': format})) }}">{{ format }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

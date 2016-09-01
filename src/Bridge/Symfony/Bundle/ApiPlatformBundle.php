@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * ApiPlatformBundle.
+ * The Symfony bundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

@@ -17,7 +17,7 @@
         </service>
 
 
-        <!-- Event listeners -->
+        <!-- Event listener -->
 
         <service id="api_platform.hydra.listener.response.add_link_header" class="ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener">
             <argument type="service" id="api_platform.router" />
