@@ -366,7 +366,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
-        $type = $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'Hydra:Link';
+        $type = $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'hydra:Link';
         $property = [
             '@type' => 'hydra:SupportedProperty',
             'hydra:property' => [
