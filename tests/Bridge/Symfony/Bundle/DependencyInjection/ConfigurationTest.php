@@ -37,6 +37,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'formats' => [
                 'jsonld' => ['mime_types' => ['application/ld+json']],
                 'json' => ['mime_types' => ['application/json']],
+                'html' => ['mime_types' => ['text/html']],
             ],
             'error_formats' => [
                 'jsonproblem' => ['mime_types' => ['application/problem+json']],

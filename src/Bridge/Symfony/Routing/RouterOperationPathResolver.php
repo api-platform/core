@@ -16,7 +16,7 @@ use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Resolves the operations path using a symfony route.
+ * Resolves the operations path using a Symfony route.
  *
  * @author Guilhem N. <egetick@gmail.com>
  */

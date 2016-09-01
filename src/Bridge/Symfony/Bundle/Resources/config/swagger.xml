@@ -30,9 +30,22 @@
         <!-- Action -->
 
         <service id="api_platform.swagger.action.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="twig" on-invalid="ignore" />
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
+            <argument>%api_platform.version%</argument>
+            <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
+        </service>
+
+        <!-- Event listener -->
+
+        <service id="api_platform.swagger.listener.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
         </service>
 
     </services>
