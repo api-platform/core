@@ -14,7 +14,7 @@
         </service>
 
         <service id="api_platform.metadata.resource.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceNameCollectionFactory" decorates="api_platform.metadata.resource.name_collection_factory" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.metadata.resource.cache" />
+            <argument type="service" id="api_platform.cache.metadata.resource" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.cached.inner" />
         </service>
 
@@ -59,7 +59,7 @@
         </service>
 
         <service id="api_platform.metadata.resource.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.metadata.resource.cache" />
+            <argument type="service" id="api_platform.cache.metadata.resource" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.cached.inner" />
         </service>
 
@@ -85,7 +85,7 @@
         </service>
 
         <service id="api_platform.metadata.property.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.metadata.property.cache" />
+            <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.cached.inner" />
         </service>
 
@@ -120,17 +120,17 @@
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="-10" public="false">
-            <argument type="service" id="api_platform.metadata.property.cache" />
+            <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.inner" />
         </service>
 
         <!-- Cache -->
 
-        <service id="api_platform.metadata.resource.cache" parent="cache.system" public="false">
+        <service id="api_platform.cache.metadata.resource" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
 
-        <service id="api_platform.metadata.property.cache" parent="cache.system" public="false">
+        <service id="api_platform.cache.metadata.property" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
 

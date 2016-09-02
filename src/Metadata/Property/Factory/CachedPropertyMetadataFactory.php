@@ -52,13 +52,15 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        if (isset($cacheItem)) {
-            try {
-                $cacheItem->set($propertyMetadata);
-                $this->cacheItemPool->save($cacheItem);
-            } catch (CacheException $e) {
-                // do nothing
-            }
+        if (!isset($cacheItem)) {
+            return $propertyMetadata;
+        }
+
+        try {
+            $cacheItem->set($propertyMetadata);
+            $this->cacheItemPool->save($cacheItem);
+        } catch (CacheException $e) {
+            // do nothing
         }
 
         return $propertyMetadata;
