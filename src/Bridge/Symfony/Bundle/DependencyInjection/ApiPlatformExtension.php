@@ -128,8 +128,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         // Don't use system cache pool in dev
         if ($container->getParameter('kernel.debug')) {
-            $container->register('api_platform.metadata.resource.cache', ArrayAdapter::class);
-            $container->register('api_platform.metadata.property.cache', ArrayAdapter::class);
+            $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
+            $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
+            $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
         }
     }
 
