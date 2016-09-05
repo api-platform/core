@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -23,11 +24,13 @@ use Symfony\Component\Routing\RouterInterface;
 final class RouterOperationPathResolver implements OperationPathResolverInterface
 {
     private $router;
+    private $requestContext;
     private $deferred;
 
-    public function __construct(RouterInterface $router, OperationPathResolverInterface $deferred)
+    public function __construct(RouterInterface $router, RequestContext $requestContext, OperationPathResolverInterface $deferred)
     {
         $this->router = $router;
+        $this->requestContext = $requestContext;
         $this->deferred = $deferred;
     }
 
@@ -46,5 +49,10 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
         }
 
         return $route->getPath();
+    }
+
+    public function getContext(): RequestContext
+    {
+        return $this->requestContext;
     }
 }

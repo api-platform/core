@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Swagger\Serializer;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -463,6 +464,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             'swagger' => self::SWAGGER_VERSION,
             'info' => ['title' => $object->getTitle()],
         ];
+
+        if ($this->operationPathResolver instanceof RouterOperationPathResolver) {
+            $doc['basePath'] = '/'.$this->operationPathResolver->getContext()->getBaseUrl();
+        }
 
         if ('' !== $object->getDescription()) {
             $doc['info']['description'] = $object->getDescription();
