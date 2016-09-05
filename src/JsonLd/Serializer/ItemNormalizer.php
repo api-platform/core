@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+class ItemNormalizer extends AbstractItemNormalizer
 {
     use ContextTrait;
     use JsonLdContextTrait;

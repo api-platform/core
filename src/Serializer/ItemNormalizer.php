@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Serializer;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+class ItemNormalizer extends AbstractItemNormalizer
 {
     /**
      * {@inheritdoc}
