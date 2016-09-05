@@ -52,13 +52,15 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
         $propertyNameCollection = $this->decorated->create($resourceClass, $options);
 
-        if (isset($cacheItem)) {
-            try {
-                $cacheItem->set($propertyNameCollection);
-                $this->cacheItemPool->save($cacheItem);
-            } catch (CacheException $e) {
-                // do nothing
-            }
+        if (!isset($cacheItem)) {
+            return $propertyNameCollection;
+        }
+
+        try {
+            $cacheItem->set($propertyNameCollection);
+            $this->cacheItemPool->save($cacheItem);
+        } catch (CacheException $e) {
+            // do nothing
         }
 
         return $propertyNameCollection;

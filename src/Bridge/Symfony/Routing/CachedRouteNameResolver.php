@@ -9,25 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Metadata\Resource\Factory;
+namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Caches resource name collection.
+ * {@inheritdoc}
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-final class CachedResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
+final class CachedRouteNameResolver implements RouteNameResolverInterface
 {
-    const CACHE_KEY = 'resource_name_collection';
+    const CACHE_KEY_PREFIX = 'route_name_';
 
     private $cacheItemPool;
     private $decorated;
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceNameCollectionFactoryInterface $decorated)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, RouteNameResolverInterface $decorated)
     {
         $this->cacheItemPool = $cacheItemPool;
         $this->decorated = $decorated;
@@ -36,10 +35,12 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
     /**
      * {@inheritdoc}
      */
-    public function create() : ResourceNameCollection
+    public function getRouteName(string $resourceClass, bool $collection) : string
     {
+        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $collection]));
+
         try {
-            $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY);
+            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
                 return $cacheItem->get();
@@ -48,19 +49,19 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
             // do nothing
         }
 
-        $resourceNameCollection = $this->decorated->create();
+        $routeName = $this->decorated->getRouteName($resourceClass, $collection);
 
         if (!isset($cacheItem)) {
-            return $resourceNameCollection;
+            return $routeName;
         }
 
         try {
-            $cacheItem->set($resourceNameCollection);
+            $cacheItem->set($routeName);
             $this->cacheItemPool->save($cacheItem);
         } catch (CacheException $e) {
             // do nothing
         }
 
-        return $resourceNameCollection;
+        return $routeName;
     }
 }
