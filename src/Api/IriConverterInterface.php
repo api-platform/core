@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Converts item and resources to IRI and vice versa.
@@ -39,6 +40,7 @@ interface IriConverterInterface
      * @param string $referenceType
      *
      * @throws InvalidArgumentException
+     * @throws RuntimeException
      *
      * @return string
      */
