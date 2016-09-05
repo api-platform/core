@@ -12,23 +12,26 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Filter by a boolean value.
+ * Filters the collection by boolean values.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
 class BooleanFilter extends AbstractFilter
 {
     private $requestStack;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $logger, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -36,10 +39,11 @@ class BooleanFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      *
-     * Check whether a value is equal to 1, 0, true, false, on, off (case insensitive)
+     * Filters collection on equality of boolean properties. The value is specified as one of
+     * ( "true" | "false" | "1" | "0" ) in the query.
      *
-     * For each property passed, if the resource does not have such property or if the order value is different from
-     * 1, 0, true, false, on, off (case insensitive) the property is ignored.
+     * For each property passed, if the resource does not have such property or if the value is not one of
+     * ( "true" | "false" | "1" | "0" ) the property is ignored.
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
@@ -50,18 +54,29 @@ class BooleanFilter extends AbstractFilter
 
         $properties = $this->extractProperties($request);
 
-        foreach ($properties as $property => $boolean) {
-            if (!$this->isPropertyEnabled($property) || !$this->isPropertyMapped($property, $resourceClass)) {
+        foreach ($properties as $property => $value) {
+            if (
+                !$this->isPropertyEnabled($property) ||
+                !$this->isPropertyMapped($property, $resourceClass) ||
+                !$this->isBooleanField($property, $resourceClass)
+            ) {
                 continue;
             }
 
-            if (empty($boolean) && isset($this->properties[$property])) {
-                $boolean = $this->properties[$property];
-            }
+            if (in_array($value, ['true', '1'], true)) {
+                $value = true;
+            } elseif (in_array($value, ['false', '0'], true)) {
+                $value = false;
+            } else {
+                $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
+                        'true',
+                        'false',
+                        '1',
+                        '0',
+                    ]))),
+                ]);
 
-            $filterBoolean = filter_var($boolean, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-            if (is_null($filterBoolean) && !empty($boolean)) {
                 continue;
             }
 
@@ -75,7 +90,7 @@ class BooleanFilter extends AbstractFilter
 
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $filterBoolean);
+                ->setParameter($valueParameter, $value);
         }
     }
 
@@ -91,7 +106,7 @@ class BooleanFilter extends AbstractFilter
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
-        foreach ($properties as $property => $boolean) {
+        foreach ($properties as $property => $unused) {
             if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
                 continue;
             }
@@ -107,7 +122,7 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * Determines whether the given property is a boolean or not.
+     * Determines whether the given property refers to a boolean field.
      *
      * @param string $property
      * @param string $resourceClass

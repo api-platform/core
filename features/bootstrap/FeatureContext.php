@@ -207,7 +207,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function thereIsDummyObjectsWithDummyPrice($nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
-        $prices = [9.99, 12.99, 15.99, 19.99];
+        $prices = ['9.99', '12.99', '15.99', '19.99'];
 
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();

@@ -16,7 +16,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,8 +26,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class BooleanFilterTest extends KernelTestCase
 {
-    use PHPMock;
-
     /**
      * @var ManagerRegistry
      */
@@ -57,40 +54,44 @@ class BooleanFilterTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider filterProvider
+     * @dataProvider provideApplyTestData
      */
-    public function testApply(array $filterParameters, array $query, $expected)
+    public function testApply($properties, array $filterParameters, string $expected)
     {
-        $request = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $filterParameters);
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
         $queryBuilder = $this->repository->createQueryBuilder('o');
+
         $filter = new BooleanFilter(
             $this->managerRegistry,
             $requestStack,
-            $filterParameters['properties']
+            null,
+            $properties
         );
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower($expected);
+        $actual = $queryBuilder->getQuery()->getDQL();
 
-        $this->assertEquals(
-            $expected,
-            $actual,
-            sprintf('Expected `%s` for this `%s %s` request', $expected, 'GET', $request->getUri())
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetDescription()
     {
-        $filter = new BooleanFilter($this->managerRegistry,
-            new RequestStack(), [
-            'id' => null,
-            'name' => null,
-            'foo' => null,
-            'dummyBoolean' => null,
-        ]);
+        $filter = new BooleanFilter(
+            $this->managerRegistry,
+            new RequestStack(),
+            null,
+            [
+                'id' => null,
+                'name' => null,
+                'foo' => null,
+                'dummyBoolean' => null,
+            ]
+        );
+
         $this->assertEquals([
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
@@ -102,8 +103,11 @@ class BooleanFilterTest extends KernelTestCase
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new BooleanFilter($this->managerRegistry,
-            new RequestStack());
+        $filter = new BooleanFilter(
+            $this->managerRegistry,
+            new RequestStack()
+        );
+
         $this->assertEquals([
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
@@ -114,128 +118,134 @@ class BooleanFilterTest extends KernelTestCase
     }
 
     /**
-     * Providers 3 parameters:
-     *  - filter parameters.
-     *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
-     *    otherwise not.
-     *  - expected DQL query.
+     * Provides test data.
+     *
+     * Provides 3 parameters:
+     *  - configuration of filterable properties
+     *  - filter parameters
+     *  - expected DQL query
      *
      * @return array
      */
-    public function filterProvider()
+    public function provideApplyTestData() : array
     {
         return [
-            // test with true value
-            [
+            'string ("true")' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
                     'dummyBoolean' => 'true',
 
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
-            // test with false value
-            [
+            'string ("false")' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
                     'dummyBoolean' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
-            // test with non-boolean value
-            [
+            'non-boolean' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
                     'dummyBoolean' => 'toto',
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // test with 0 value
-            [
+            'numeric string ("0")' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
                     'dummyBoolean' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
-            // test with 1 value
-            [
+            'numeric string ("1")' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
                     'dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
-            // test with nested properties.
-            [
+            'nested properties' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy.dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy.dummyBoolean' => null,
                 ],
                 [
                     'relatedDummy.dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o inner join o.relateddummy relateddummy_a1 where relateddummy_a1.dummyboolean = :dummyboolean_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
-            // test with multiple 1 value
-            [
+            'numeric string ("1") on non-boolean property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
-                   'dummyBoolean' => '1',
                    'name' => '1',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1 and o.name = :name_p2', Dummy::class),
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // test with multiple 0 value
-            [
+            'numeric string ("0") on non-boolean property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
-                    'dummyBoolean' => '0',
                     'name' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1 and o.name = :name_p2', Dummy::class),
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // test with multiple true value
-            [
+            'string ("true") on non-boolean property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
-
-                    'dummyBoolean' => '1',
-                    'name' => '1',
-
+                    'name' => 'true',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1 and o.name = :name_p2', Dummy::class),
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // test with multiple false value
-            [
+            'string ("false") on non-boolean property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
-                    'dummyBoolean' => 'false',
                     'name' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1 and o.name = :name_p2', Dummy::class),
+                sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // test with both boolean, non-boolean and 0 value
-            [
+            'mixed boolean, non-boolean and invalid property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyBoolean' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyBoolean' => null,
                 ],
                 [
                     'dummyBoolean' => 'false',
@@ -243,7 +253,7 @@ class BooleanFilterTest extends KernelTestCase
                     'name' => 'true',
                     'id' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyBoolean = :dummyboolean_p1 and o.name = :name_p2 and o.id = :id_p3', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
         ];
     }
