@@ -309,15 +309,11 @@ class SearchFilter extends AbstractFilter
      */
     private function getIdFromValue(string $value)
     {
-        if (null === $this->iriConverter) {
-            return $value;
-        }
-
         try {
             if ($item = $this->iriConverter->getItemFromIri($value)) {
                 return $this->propertyAccessor->getValue($item, 'id');
             }
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // Do nothing, return the raw value
         }
 
