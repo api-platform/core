@@ -89,7 +89,7 @@ Feature: Using custom normalized entity
     """
 
   Scenario: API doc is correctly generated
-    When I send a "GET" request to "/apidoc.jsonld"
+    When I send a "GET" request to "/doc.jsonld"
     Then the response status code should be 200
     And the response should be in JSON
     And the hydra class "CustomNormalizedDummy" exist

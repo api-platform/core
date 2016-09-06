@@ -51,8 +51,6 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
         </service>
-        <service id="api_platform.documentation" class="ApiPlatform\Core\Documentation\Documentation" public="false"/>
-        <service id="api_platform.entrypoint" class="ApiPlatform\Core\Api\Entrypoint" public="false" />
 
         <!-- Serializer -->
 

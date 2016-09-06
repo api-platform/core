@@ -62,9 +62,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
             $resourceShortName = $resourceMetadata->getShortName();
-
             $definitions[$resourceShortName] = $this->getDefinitionSchema($resourceClass, $resourceMetadata);
 
             foreach ($resourceMetadata->getCollectionOperations() ?? [] as $operationName => $operation) {

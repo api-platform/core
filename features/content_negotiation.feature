@@ -101,9 +101,15 @@ Feature: Content Negotiation support
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
 
-  @dropSchema
   Scenario: Requesting an unknown format should throw an error
     When I add "Accept" header equal to "text/plain"
     And I send a "GET" request to "/dummies/1"
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
+  @dropSchema
+  Scenario: If the request format is HTML, the error should be in HTML
+    When I add "Accept" header equal to "text/html"
+    And I send a "GET" request to "/dummies/666"
+    Then the response status code should be 404
+    And the header "Content-Type" should be equal to "text/html; charset=utf-8"
