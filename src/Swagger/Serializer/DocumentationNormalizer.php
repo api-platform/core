@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Swagger\Serializer;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -41,8 +42,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $operationPathResolver;
+    private $urlGenerator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -50,6 +52,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -455,19 +458,27 @@ final class DocumentationNormalizer implements NormalizerInterface
         return $propertySchema;
     }
 
-    private function computeDoc(Documentation $object, \ArrayObject $definitions, \ArrayObject $paths): array
+    /**
+     * Computes the Swagger documentation.
+     *
+     * @param Documentation $documentation
+     * @param \ArrayObject  $definitions
+     * @param \ArrayObject  $paths
+     *
+     * @return array
+     */
+    private function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths) : array
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
-            'info' => ['title' => $object->getTitle()],
+            'basePath' => $this->urlGenerator->generate('api_entrypoint'),
+            'info' => [
+                'title' => $documentation->getTitle(),
+                'version' => $documentation->getVersion(),
+                'description' => $documentation->getDescription(),
+            ],
+            'paths' => $paths,
         ];
-
-        if ('' !== $object->getDescription()) {
-            $doc['info']['description'] = $object->getDescription();
-        }
-
-        $doc['info']['version'] = $object->getVersion();
-        $doc['paths'] = $paths;
 
         if (count($definitions) > 0) {
             $doc['definitions'] = $definitions;
