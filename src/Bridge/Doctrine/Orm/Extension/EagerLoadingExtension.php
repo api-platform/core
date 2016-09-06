@@ -12,6 +12,8 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
@@ -23,6 +25,15 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
+
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    {
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -39,23 +50,59 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $this->joinRelations($queryBuilder, $resourceClass);
     }
 
+    public function getMetadataProperties(string $resourceClass): array
+    {
+        $properties = [];
+
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            $properties[$property] = $this->propertyMetadataFactory->create($resourceClass, $property);
+        }
+
+        return $properties;
+    }
+
     /**
      * Left joins relations to eager load.
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
      */
-    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass)
+    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, string $originAlias = 'o', string &$relationAlias = 'a')
     {
-        $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
+        $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
+        $j = 0;
 
-        foreach ($classMetaData->getAssociationNames() as $i => $association) {
-            $mapping = $classMetaData->associationMappings[$association];
+        foreach ($classMetadata->getAssociationNames() as $i => $association) {
+            $mapping = $classMetadata->associationMappings[$association];
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association);
 
-            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
-                $queryBuilder->leftJoin('o.'.$association, 'a'.$i);
-                $queryBuilder->addSelect('a'.$i);
+            if (ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'] || false === $propertyMetadata->isReadableLink()) {
+                continue;
             }
+
+            $method = false === $mapping['joinColumns'][0]['nullable'] ? 'innerJoin' : 'leftJoin';
+
+            $associationAlias = $relationAlias.$i;
+            $queryBuilder->{$method}($originAlias.'.'.$association, $associationAlias);
+            $select = [];
+            $targetClassMetadata = $queryBuilder->getEntityManager()->getClassMetadata($mapping['targetEntity']);
+
+            foreach ($this->getMetadataProperties($mapping['targetEntity']) as $property => $propertyMetadata) {
+                if (true === $propertyMetadata->isIdentifier()) {
+                    $select[] = $property;
+                    continue;
+                }
+
+                //the field test allows to add methods to a Resource which do not reflect real database fields
+                if (true === $targetClassMetadata->hasField($property) && true === $propertyMetadata->isReadable()) {
+                    $select[] = $property;
+                }
+            }
+
+            $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+
+            $relationAlias = $relationAlias.++$j;
+            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $associationAlias, $relationAlias);
         }
     }
 }

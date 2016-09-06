@@ -184,7 +184,7 @@ class BooleanFilterTest extends KernelTestCase
                 [
                     'relatedDummy.dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_a1 where relateddummy_a1.dummyboolean = :dummyboolean_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o inner join o.relateddummy relateddummy_a1 where relateddummy_a1.dummyboolean = :dummyboolean_p1', Dummy::class),
             ],
             // test with multiple 1 value
             [

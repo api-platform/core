@@ -41,4 +41,21 @@ class FilterExtensionTest extends \PHPUnit_Framework_TestCase
         $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), new FilterCollection(['dummyFilter' => $filterProphecy->reveal()]));
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get');
     }
+
+    public function testApplyToCollectionWithoutFilters()
+    {
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+
+        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']]);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $filterProphecy = $this->prophesize(FilterInterface::class);
+        $filterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get')->shouldNotBeCalled();
+
+        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), new FilterCollection(['dummyFilter' => $filterProphecy->reveal()]));
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get');
+    }
 }
