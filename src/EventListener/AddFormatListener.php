@@ -55,7 +55,7 @@ final class AddFormatListener
         // First, try to guess the format from the Accept header
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
-            if (null === $acceptHeader = $this->negotiator->getBest($accept, $mimeTypes)) {
+            if (empty($mimeTypes) || null === $acceptHeader = $this->negotiator->getBest($accept, $mimeTypes)) {
                 throw $this->getNotAcceptableHttpException($accept, $mimeTypes);
             }
 
@@ -73,7 +73,7 @@ final class AddFormatListener
                 return;
             }
 
-            throw $this->getNotAcceptableHttpException($mimeType);
+            throw $this->getNotAcceptableHttpException($mimeType ?: '');
         }
 
         // Finally, if no Accept header nor Symfony request format is set, return the default format
