@@ -60,87 +60,163 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
             $shortName = $resourceMetadata->getShortName();
-            $prefixedShortName = ($iri = $resourceMetadata->getIri()) ? $iri : '#'.$shortName;
+            $prefixedShortName = (null === $iri = $resourceMetadata->getIri()) ? '#'.$shortName : $iri;
 
-            $collectionOperations = [];
-            if ($itemOperations = $resourceMetadata->getCollectionOperations()) {
-                foreach ($itemOperations as $operationName => $collectionOperation) {
-                    $collectionOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $collectionOperation, $prefixedShortName, true);
-                }
-            }
-
-            if (!empty($collectionOperations)) {
-                $entrypointProperties[] = [
-                    '@type' => 'hydra:SupportedProperty',
-                    'hydra:property' => [
-                        '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
-                        '@type' => 'hydra:Link',
-                        'domain' => '#Entrypoint',
-                        'rdfs:label' => sprintf('The collection of %s resources', $shortName),
-                        'range' => 'hydra:PagedCollection',
-                        'hydra:supportedOperation' => $collectionOperations,
-                    ],
-                    'hydra:title' => sprintf('The collection of %s resources', $shortName),
-                    'hydra:readable' => true,
-                    'hydra:writable' => false,
-                ];
-            }
-
-            $class = [
-                '@id' => $prefixedShortName,
-                '@type' => 'hydra:Class',
-                'rdfs:label' => $shortName,
-                'hydra:title' => $shortName,
-            ];
-
-            if ($description = $resourceMetadata->getDescription()) {
-                $class['hydra:description'] = $description;
-            }
-
-            $attributes = $resourceMetadata->getAttributes();
-            $context = [];
-            $properties = [];
-
-            if (isset($attributes['normalization_context']['groups'])) {
-                $context['serializer_groups'] = $attributes['normalization_context']['groups'];
-            }
-
-            if (isset($attributes['denormalization_context']['groups'])) {
-                $context['serializer_groups'] = isset($context['serializer_groups']) ? array_merge($context['serializer_groups'], $attributes['denormalization_context']['groups']) : $context['serializer_groups'];
-            }
-
-            foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-                if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
-                    continue;
-                }
-
-                $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
-            }
-
-            $class['hydra:supportedProperty'] = $properties;
-
-            $itemOperations = [];
-
-            if ($operations = $resourceMetadata->getItemOperations()) {
-                foreach ($operations as $operationName => $itemOperation) {
-                    $itemOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $itemOperation, $prefixedShortName, false);
-                }
-            }
-
-            $class['hydra:supportedOperation'] = $itemOperations;
-            $classes[] = $class;
+            $this->populateEntrypointProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties);
+            $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName);
         }
 
-        $classes = $this->getClasses($entrypointProperties, $classes);
+        return $this->computeDoc($object, $this->getClasses($entrypointProperties, $classes));
+    }
 
-        return $this->computeDoc($object, $classes);
+    /**
+     * Populates entrypoint properties.
+     *
+     * @param string           $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $shortName
+     * @param string           $prefixedShortName
+     * @param array            $entrypointProperties
+     */
+    private function populateEntrypointProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties)
+    {
+        $hydraCollectionOperations = $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, true);
+        if (empty($hydraCollectionOperations)) {
+            return;
+        }
+
+        $entrypointProperties[] = [
+            '@type' => 'hydra:SupportedProperty',
+            'hydra:property' => [
+                '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
+                '@type' => 'hydra:Link',
+                'domain' => '#Entrypoint',
+                'rdfs:label' => sprintf('The collection of %s resources', $shortName),
+                'range' => 'hydra:PagedCollection',
+                'hydra:supportedOperation' => $hydraCollectionOperations,
+            ],
+            'hydra:title' => sprintf('The collection of %s resources', $shortName),
+            'hydra:readable' => true,
+            'hydra:writable' => false,
+        ];
+    }
+
+    /**
+     * Gets a Hydra class.
+     *
+     * @param string           $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $shortName
+     * @param string           $prefixedShortName
+     *
+     * @return array
+     */
+    private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName) : array
+    {
+        $class = [
+            '@id' => $prefixedShortName,
+            '@type' => 'hydra:Class',
+            'rdfs:label' => $shortName,
+            'hydra:title' => $shortName,
+            'hydra:supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName),
+            'hydra:supportedOperation' => $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, false),
+        ];
+
+        if (null !== $description = $resourceMetadata->getDescription()) {
+            $class['hydra:description'] = $description;
+        }
+
+        return $class;
+    }
+
+    /**
+     * Gets the context for the property name factory.
+     *
+     * @param ResourceMetadata $resourceMetadata
+     *
+     * @return array
+     */
+    private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata) : array
+    {
+        $attributes = $resourceMetadata->getAttributes();
+        $context = [];
+
+        if (isset($attributes['normalization_context']['groups'])) {
+            $context['serializer_groups'] = $attributes['normalization_context']['groups'];
+        }
+
+        if (isset($attributes['denormalization_context']['groups'])) {
+            if (isset($context['serializer_groups'])) {
+                $context['serializer_groups'] += $attributes['denormalization_context']['groups'];
+            } else {
+                $context['serializer_groups'] = $attributes['denormalization_context']['groups'];
+            }
+        }
+
+        return $context;
+    }
+
+    /**
+     * Gets Hydra properties.
+     *
+     * @param string           $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $shortName
+     * @param string           $prefixedShortName
+     *
+     * @return array
+     */
+    private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName) : array
+    {
+        $properties = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
+                continue;
+            }
+
+            $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
+        }
+
+        return $properties;
+    }
+
+    /**
+     * Gets Hydra operations.
+     *
+     * @param string           $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $prefixedShortName
+     * @param bool             $collection
+     *
+     * @return array
+     */
+    private function getHydraOperations(string $resourceClass, ResourceMetadata $resourceMetadata, string $prefixedShortName, bool $collection) : array
+    {
+        if (null === $operations = $collection ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
+            return [];
+        }
+
+        $hydraOperations = [];
+        foreach ($operations as $operationName => $operation) {
+            $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection);
+        }
+
+        return $hydraOperations;
     }
 
     /**
      * Gets and populates if applicable a Hydra operation.
+     *
+     * @param string           $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $operationName
+     * @param array            $operation
+     * @param string           $prefixedShortName
+     * @param bool             $collection
+     *
+     * @return array
      */
     private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection) : array
     {
@@ -153,76 +229,39 @@ final class DocumentationNormalizer implements NormalizerInterface
         $hydraOperation = $operation['hydra_context'] ?? [];
         $shortName = $resourceMetadata->getShortName();
 
-        switch ($method) {
-            case 'GET':
-                if ($collection) {
-                    if (!isset($hydraOperation['hydra:title'])) {
-                        $hydraOperation['hydra:title'] = sprintf('Retrieves the collection of %s resources.', $shortName);
-                    }
-
-                    if (!isset($hydraOperation['returns'])) {
-                        $hydraOperation['returns'] = 'hydra:PagedCollection';
-                    }
-                } else {
-                    if (!isset($hydraOperation['hydra:title'])) {
-                        $hydraOperation['hydra:title'] = sprintf('Retrieves %s resource.', $shortName);
-                    }
-                }
-            break;
-
-            case 'POST':
-                if (!isset($hydraOperation['@type'])) {
-                    $hydraOperation['@type'] = 'hydra:CreateResourceOperation';
-                }
-
-                if (!isset($hydraOperation['hydra:title'])) {
-                    $hydraOperation['hydra:title'] = sprintf('Creates a %s resource.', $shortName);
-                }
-            break;
-
-            case 'PUT':
-                if (!isset($hydraOperation['@type'])) {
-                    $hydraOperation['@type'] = 'hydra:ReplaceResourceOperation';
-                }
-
-                if (!isset($hydraOperation['hydra:title'])) {
-                    $hydraOperation['hydra:title'] = sprintf('Replaces the %s resource.', $shortName);
-                }
-                break;
-
-            case 'DELETE':
-                if (!isset($hydraOperation['hydra:title'])) {
-                    $hydraOperation['hydra:title'] = sprintf('Deletes the %s resource.', $shortName);
-                }
-
-                if (!isset($hydraOperation['returns'])) {
-                    $hydraOperation['returns'] = 'owl:Nothing';
-                }
-            break;
+        if ('GET' === $method && $collection) {
+            $hydraOperation = [
+                'hydra:title' => sprintf('Retrieves the collection of %s resources.', $shortName),
+                'returns' => 'hydra:PagedCollection',
+            ] + $hydraOperation;
+        } elseif ('GET' === $method) {
+            $hydraOperation = [
+                'hydra:title' => sprintf('Retrieves %s resource.', $shortName),
+                'returns' => $prefixedShortName,
+            ] + $hydraOperation;
+        } elseif ('POST' === $method) {
+            $hydraOperation = [
+                '@type' => 'hydra:CreateResourceOperation',
+                'hydra:title' => sprintf('Creates a %s resource.', $shortName),
+                'returns' => $prefixedShortName,
+                'expects' => $prefixedShortName,
+            ] + $hydraOperation;
+        } elseif ('PUT' === $method) {
+            $hydraOperation = [
+                '@type' => 'hydra:ReplaceResourceOperation',
+                'hydra:title' => sprintf('Replaces the %s resource.', $shortName),
+                'returns' => $prefixedShortName,
+                'expects' => $prefixedShortName,
+            ] + $hydraOperation;
+        } elseif ('DELETE' === $method) {
+            $hydraOperation = [
+                'hydra:title' => sprintf('Deletes the %s resource.', $shortName),
+                'returns' => 'owl:Nothing',
+            ] + $hydraOperation;
         }
 
-        if (!isset($hydraOperation['returns']) &&
-            (
-                ('GET' === $method && !$collection) ||
-                'POST' === $method ||
-                'PUT' === $method
-            )
-        ) {
-            $hydraOperation['returns'] = $prefixedShortName;
-        }
-
-        if (!isset($hydraOperation['expects']) &&
-            ('POST' === $method || 'PUT' === $method)) {
-            $hydraOperation['expects'] = $prefixedShortName;
-        }
-
-        if (!isset($hydraOperation['@type'])) {
-            $hydraOperation['@type'] = 'hydra:Operation';
-        }
-
-        if (!isset($hydraOperation['hydra:method'])) {
-            $hydraOperation['hydra:method'] = $method;
-        }
+        $hydraOperation['@type'] ?? $hydraOperation['@type'] = 'hydra:Operation';
+        $hydraOperation['hydra:method'] ?? $hydraOperation['hydra:method'] = $method;
 
         if (!isset($hydraOperation['rdfs:label']) && isset($hydraOperation['hydra:title'])) {
             $hydraOperation['rdfs:label'] = $hydraOperation['hydra:title'];
@@ -242,12 +281,11 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getRange(PropertyMetadata $propertyMetadata)
     {
-        $type = $propertyMetadata->getType();
-        if (!$type) {
+        if (null === $type = $propertyMetadata->getType()) {
             return;
         }
 
-        if ($type->isCollection() && $collectionType = $type->getCollectionValueType()) {
+        if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueType()) {
             $type = $collectionType;
         }
 
@@ -265,40 +303,43 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return 'xmls:boolean';
 
             case Type::BUILTIN_TYPE_OBJECT:
-                $className = $type->getClassName();
+                if (null === $className = $type->getClassName()) {
+                    return;
+                }
 
-                if (null !== $className) {
-                    $reflection = new \ReflectionClass($className);
-                    if ($reflection->implementsInterface(\DateTimeInterface::class)) {
-                        return 'xmls:dateTime';
-                    }
+                if (is_a($className, \DateTimeInterface::class, true)) {
+                    return 'xmls:dateTime';
+                }
 
-                    $className = $type->getClassName();
-                    if ($this->resourceClassResolver->isResourceClass($className)) {
-                        return sprintf('#%s', $this->resourceMetadataFactory->create($className)->getShortName());
-                    }
+                if ($this->resourceClassResolver->isResourceClass($className)) {
+                    return sprintf('#%s', $this->resourceMetadataFactory->create($className)->getShortName());
                 }
                 break;
         }
     }
 
-    /*
+    /**
      * Builds the classes array.
+     *
+     * @param array $entrypointProperties
+     * @param array $classes
+     *
+     * @return array
      */
     private function getClasses(array $entrypointProperties, array $classes) : array
     {
         $classes[] = [
-                '@id' => '#Entrypoint',
-                '@type' => 'hydra:Class',
-                'hydra:title' => 'The API entrypoint',
-                'hydra:supportedProperty' => $entrypointProperties,
-                'hydra:supportedOperation' => [
-                    '@type' => 'hydra:Operation',
-                    'hydra:method' => 'GET',
-                    'rdfs:label' => 'The API entrypoint.',
-                    'returns' => '#EntryPoint',
-                ],
-            ];
+            '@id' => '#Entrypoint',
+            '@type' => 'hydra:Class',
+            'hydra:title' => 'The API entrypoint',
+            'hydra:supportedProperty' => $entrypointProperties,
+            'hydra:supportedOperation' => [
+                '@type' => 'hydra:Operation',
+                'hydra:method' => 'GET',
+                'rdfs:label' => 'The API entrypoint.',
+                'returns' => '#EntryPoint',
+            ],
+        ];
 
         // Constraint violation
         $classes[] = [
@@ -364,7 +405,17 @@ final class DocumentationNormalizer implements NormalizerInterface
         return $classes;
     }
 
-    private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
+    /**
+     * Gets a property definition.
+     *
+     * @param PropertyMetadata $propertyMetadata
+     * @param string           $propertyName
+     * @param string           $prefixedShortName
+     * @param string           $shortName
+     *
+     * @return array
+     */
+    private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName) : array
     {
         $type = $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'hydra:Link';
         $property = [
@@ -381,17 +432,25 @@ final class DocumentationNormalizer implements NormalizerInterface
             'hydra:writable' => $propertyMetadata->isWritable(),
         ];
 
-        if ($range = $this->getRange($propertyMetadata)) {
+        if (null !== $range = $this->getRange($propertyMetadata)) {
             $property['hydra:property']['range'] = $range;
         }
 
-        if ($description = $propertyMetadata->getDescription()) {
+        if (null !== $description = $propertyMetadata->getDescription()) {
             $property['hydra:description'] = $description;
         }
 
         return $property;
     }
 
+    /**
+     * Computes the documentation.
+     *
+     * @param Documentation $object
+     * @param array         $classes
+     *
+     * @return array
+     */
     private function computeDoc(Documentation $object, array $classes): array
     {
         $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
