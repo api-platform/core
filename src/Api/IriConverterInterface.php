@@ -37,7 +37,7 @@ interface IriConverterInterface
      * Gets the IRI associated with the given item.
      *
      * @param object $item
-     * @param string $referenceType
+     * @param int    $referenceType
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException

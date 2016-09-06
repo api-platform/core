@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -138,6 +139,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     public function testEnableFosUser()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => DoctrineBundle::class,
+            'FOSUserBundle' => FOSUserBundle::class,
+        ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
