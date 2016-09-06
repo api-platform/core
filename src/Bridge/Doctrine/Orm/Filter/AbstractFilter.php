@@ -18,6 +18,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -31,11 +33,13 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractFilter implements FilterInterface
 {
     protected $managerRegistry;
+    protected $logger;
     protected $properties;
 
-    public function __construct(ManagerRegistry $managerRegistry, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger ?? new NullLogger();
         $this->properties = $properties;
     }
 
