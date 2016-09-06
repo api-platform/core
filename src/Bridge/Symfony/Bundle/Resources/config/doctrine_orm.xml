@@ -82,6 +82,9 @@
         <!-- Doctrine Query extensions -->
 
         <service id="api_platform.doctrine.orm.query_extension.eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="64" />
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="64" />
         </service>

@@ -179,7 +179,7 @@ class NumericFilterTest extends KernelTestCase
                 [
                     'relatedDummy.id' => 0,
                 ],
-                sprintf('SELECT o FROM %s o left join o.relateddummy relateddummy_a1 where relateddummy_a1.id = :id_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o inner join o.relateddummy relateddummy_a1 where relateddummy_a1.id = :id_p1', Dummy::class),
             ],
             // test with one correct and one wrong value
             [
