@@ -57,16 +57,9 @@ class SearchFilter extends AbstractFilter
     private $propertyAccessor;
     private $caseSensitive;
 
-    /**
-     * @param ManagerRegistry                $managerRegistry
-     * @param RequestStack                   $requestStack
-     * @param IriConverterInterface          $iriConverter
-     * @param PropertyAccessorInterface|null $propertyAccessor
-     * @param array|null                     $properties
-     */
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $logger, $properties);
 
         $this->requestStack = $requestStack;
         $this->iriConverter = $iriConverter;
@@ -105,6 +98,10 @@ class SearchFilter extends AbstractFilter
             $values = $this->normalizeValues((array) $value);
 
             if (empty($values)) {
+                $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+                ]);
+
                 continue;
             }
 
@@ -128,8 +125,11 @@ class SearchFilter extends AbstractFilter
                     continue;
                 }
 
-                // there are many values, as we translate those to an IN clause, strategy must be exact
                 if (self::STRATEGY_EXACT !== $strategy) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('"%s" strategy selected for "%s" property, but only "%s" strategy supports multiple values', $strategy, $property, self::STRATEGY_EXACT)),
+                    ]);
+
                     continue;
                 }
 
@@ -189,30 +189,26 @@ class SearchFilter extends AbstractFilter
 
             case self::STRATEGY_PARTIAL:
                 $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, sprintf('%%%s%%', $value));
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap('CONCAT(\'%%\', :%s, \'%%\')'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
                 break;
 
             case self::STRATEGY_START:
                 $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, sprintf('%s%%', $value));
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap('CONCAT(:%s, \'%%\')'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
                 break;
 
             case self::STRATEGY_END:
                 $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, sprintf('%%%s', $value));
+                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap('CONCAT(\'%%\', :%s)'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
                 break;
 
             case self::STRATEGY_WORD_START:
-                $andWhere = $this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap(':%3$s_1');
-                $andWhere .= ' OR '.$this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap(':%3$s_2');
-
                 $queryBuilder
-                    ->andWhere(sprintf($andWhere, $alias, $field, $valueParameter))
-                    ->setParameter(sprintf('%s_1', $valueParameter), sprintf('%s%%', $value))
-                    ->setParameter(sprintf('%s_2', $valueParameter), sprintf('%% %s%%', $value));
+                    ->andWhere(sprintf($this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap('CONCAT(:%3$s, \'%%\')').' OR '.$this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap('CONCAT(\'%% \', :%3$s, \'%%\')'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
                 break;
 
             default:

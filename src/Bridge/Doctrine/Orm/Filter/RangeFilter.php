@@ -15,6 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -32,14 +33,9 @@ class RangeFilter extends AbstractFilter
 
     private $requestStack;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param RequestStack    $requestStack
-     * @param array|null      $properties
-     */
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $properties);
+        parent::__construct($managerRegistry, $logger, $properties);
 
         $this->requestStack = $requestStack;
     }
@@ -102,7 +98,19 @@ class RangeFilter extends AbstractFilter
                 $rangeValue = explode('..', $value);
 
                 if (2 !== count($rangeValue)) {
-                    throw new InvalidArgumentException(sprintf('Invalid format for [%s], expected to be <min>..<max>', $operator));
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid format for "[%s]", expected "<min>..<max>"', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                if (!is_numeric($rangeValue[0]) || !is_numeric($rangeValue[1])) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid values for "[%s]" range, expected numbers', $operator)),
+                    ]);
+
+                    return;
                 }
 
                 $queryBuilder
@@ -113,6 +121,14 @@ class RangeFilter extends AbstractFilter
                 break;
 
             case self::PARAMETER_GREATER_THAN:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s > :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
@@ -120,6 +136,14 @@ class RangeFilter extends AbstractFilter
                 break;
 
             case self::PARAMETER_GREATER_THAN_OR_EQUAL:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s >= :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
@@ -127,6 +151,14 @@ class RangeFilter extends AbstractFilter
                 break;
 
             case self::PARAMETER_LESS_THAN:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s < :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
@@ -134,6 +166,14 @@ class RangeFilter extends AbstractFilter
                 break;
 
             case self::PARAMETER_LESS_THAN_OR_EQUAL:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);

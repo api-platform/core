@@ -16,7 +16,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,8 +26,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class NumericFilterTest extends KernelTestCase
 {
-    use PHPMock;
-
     /**
      * @var ManagerRegistry
      */
@@ -57,40 +54,44 @@ class NumericFilterTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider filterProvider
+     * @dataProvider provideApplyTestData
      */
-    public function testApply(array $filterParameters, array $query, $expected)
+    public function testApply($properties, array $filterParameters, string $expected)
     {
-        $request = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $filterParameters);
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
         $queryBuilder = $this->repository->createQueryBuilder('o');
+
         $filter = new NumericFilter(
             $this->managerRegistry,
             $requestStack,
-            $filterParameters['properties']
+            null,
+            $properties
         );
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower($expected);
+        $actual = $queryBuilder->getQuery()->getDQL();
 
-        $this->assertEquals(
-            $expected,
-            $actual,
-            sprintf('Expected `%s` for this `%s %s` request', $expected, 'GET', $request->getUri())
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetDescription()
     {
-        $filter = new NumericFilter($this->managerRegistry,
-            new RequestStack(), [
-            'id' => null,
-            'name' => null,
-            'foo' => null,
-            'dummyBoolean' => null,
-        ]);
+        $filter = new NumericFilter(
+            $this->managerRegistry,
+            new RequestStack(),
+            null,
+            [
+                'id' => null,
+                'name' => null,
+                'foo' => null,
+                'dummyBoolean' => null,
+            ]
+        );
+
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
@@ -102,8 +103,11 @@ class NumericFilterTest extends KernelTestCase
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new NumericFilter($this->managerRegistry,
-            new RequestStack());
+        $filter = new NumericFilter(
+            $this->managerRegistry,
+            new RequestStack()
+        );
+
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
@@ -119,90 +123,96 @@ class NumericFilterTest extends KernelTestCase
     }
 
     /**
-     * Providers 3 parameters:
-     *  - filter parameters.
-     *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
-     *    otherwise not.
-     *  - expected DQL query.
+     * Provides test data.
+     *
+     * Provides 3 parameters:
+     *  - configuration of filterable properties
+     *  - filter parameters
+     *  - expected DQL query
      *
      * @return array
      */
-    public function filterProvider()
+    public function provideApplyTestData() : array
     {
         return [
-            // test with positive value
-            [
+            'numeric string (positive integer)' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
                 ],
                 [
-                    'dummyPrice' => 21,
+                    'dummyPrice' => '21',
 
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],
-            // test with negative value
-            [
+            'numeric string (negative integer)' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
                 ],
                 [
-                    'dummyPrice' => -21,
+                    'dummyPrice' => '-21',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],
-            // test with non-numeric value
-            [
+            'non-numeric' => [
                 [
-                    'properties' => ['id' => null],
+                    'id' => null,
                 ],
                 [
                     'id' => 'toto',
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // test with 0 value
-            [
+            'numeric string ("0")' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
                 ],
                 [
                     'dummyPrice' => 0,
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],
-            // test with nested properties.
-            [
+            'nested property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy.id' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy.id' => null,
                 ],
                 [
                     'relatedDummy.id' => 0,
                 ],
-                sprintf('SELECT o FROM %s o inner join o.relateddummy relateddummy_a1 where relateddummy_a1.id = :id_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
             ],
-            // test with one correct and one wrong value
-            [
+            'mixed numeric and non-numeric' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
                 ],
                 [
                    'dummyPrice' => 10,
                    'name' => '15toto',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],
-            // test with numeric, non-numeric and inexisting field
-            [
+            'mixed numeric, non-numeric and invalid property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'dummyPrice' => null],
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
                 ],
                 [
                     'toto' => 'toto',
                     'name' => 'gerard',
                     'dummyPrice' => '0',
                 ],
-                sprintf('SELECT o FROM %s o where o.dummyPrice = :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],
         ];
     }
