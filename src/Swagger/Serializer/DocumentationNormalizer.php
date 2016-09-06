@@ -357,7 +357,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         if (isset($attributes['denormalization_context']['groups'])) {
-            $context['serializer_groups'] = isset($context['serializer_groups']) ? array_merge($context['serializer_groups'], $attributes['denormalization_context']['groups']) : $context['serializer_groups'];
+            $context['serializer_groups'] = isset($context['serializer_groups']) ? array_merge($context['serializer_groups'], $attributes['denormalization_context']['groups']) : $attributes['denormalization_context']['groups'];
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
