@@ -96,19 +96,8 @@ class SearchFilter extends AbstractFilter
             $field = $property;
 
             if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
-
-                $parentAlias = $alias;
-
-                foreach ($propertyParts['associations'] as $association) {
-                    $alias = $queryNameGenerator->generateJoinAlias($association);
-                    $queryBuilder->join(sprintf('%s.%s', $parentAlias, $association), $alias);
-                    $parentAlias = $alias;
-                }
-
-                $field = $propertyParts['field'];
-
-                $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
+                list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+                $metadata = $this->getNestedMetadata($resourceClass, $associations);
             } else {
                 $metadata = $this->getClassMetadata($resourceClass);
             }
@@ -159,11 +148,9 @@ class SearchFilter extends AbstractFilter
             $values = array_map([$this, 'getIdFromValue'], $values);
 
             $association = $field;
-            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
             $valueParameter = $queryNameGenerator->generateParameterName($association);
 
-            $queryBuilder
-                ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
 
             if (1 === count($values)) {
                 $queryBuilder
@@ -337,21 +324,21 @@ class SearchFilter extends AbstractFilter
         return $value;
     }
 
-   /**
-    * Normalize the values array.
-    *
-    * @param array $values
-    *
-    * @return array
-    */
-   private function normalizeValues(array $values) : array
-   {
-       foreach ($values as $key => $value) {
-           if (!is_int($key) || !is_string($value)) {
-               unset($values[$key]);
-           }
-       }
+    /**
+     * Normalize the values array.
+     *
+     * @param array $values
+     *
+     * @return array
+     */
+    private function normalizeValues(array $values) : array
+    {
+        foreach ($values as $key => $value) {
+            if (!is_int($key) || !is_string($value)) {
+                unset($values[$key]);
+            }
+        }
 
-       return array_values($values);
-   }
+        return array_values($values);
+    }
 }

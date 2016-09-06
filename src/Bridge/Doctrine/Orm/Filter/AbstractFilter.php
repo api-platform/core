@@ -16,6 +16,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -188,7 +189,8 @@ abstract class AbstractFilter implements FilterInterface
      * @throws InvalidArgumentException If property is not nested
      *
      * @return array An array where the first element is the join $alias of the leaf entity,
-     *               and the second element is the $field name
+     *               the second element is the $field name
+     *               the third element is the $associations array
      */
     protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator) : array
     {
@@ -196,8 +198,7 @@ abstract class AbstractFilter implements FilterInterface
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = $queryNameGenerator->generateJoinAlias($association);
-            $queryBuilder->leftJoin(sprintf('%s.%s', $parentAlias, $association), $alias);
+            $alias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
             $parentAlias = $alias;
         }
 
@@ -205,6 +206,55 @@ abstract class AbstractFilter implements FilterInterface
             throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
         }
 
-        return [$alias, $propertyParts['field']];
+        return [$alias, $propertyParts['field'], $propertyParts['associations']];
+    }
+
+    /**
+     * Get the existing join from queryBuilder DQL parts.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param string       $alias
+     * @param string       $association  the association field
+     *
+     * @return Join|null
+     */
+    private function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association)
+    {
+        $parts = $queryBuilder->getDQLPart('join');
+
+        if (!isset($parts[$alias])) {
+            return;
+        }
+
+        foreach ($parts[$alias] as $join) {
+            if (sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
+                return $join;
+            }
+        }
+    }
+
+    /**
+     * Adds a join to the queryBuilder if none exists.
+     *
+     * @param QueryBuilder       $queryBuilder
+     * @param QueryNameGenerator $queryNameGenerator
+     * @param string             $alias
+     * @param string             $association        the association field
+     *
+     * @return string the new association alias
+     */
+    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association): string
+    {
+        $join = $this->getExistingJoin($queryBuilder, $alias, $association);
+
+        if (null === $join) {
+            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+            $queryBuilder
+                ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+        } else {
+            $associationAlias = $join->getAlias();
+        }
+
+        return $associationAlias;
     }
 }
