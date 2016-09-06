@@ -34,7 +34,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'description' => 'description',
             'version' => 'version',
             'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']], 'jsonhal' => ['mime_types' => ['application/hal+json']]],
-
         ],
     ];
 
@@ -223,6 +222,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitions = [
             'api_platform.action.documentation',
+            'api_platform.action.placeholder',
             'api_platform.action.entrypoint',
             'api_platform.action.exception',
             'api_platform.action.placeholder',
@@ -248,9 +248,17 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.query_extension.pagination',
             'api_platform.doctrine.orm.range_filter',
             'api_platform.doctrine.orm.search_filter',
-            'api_platform.documentation',
-            'api_platform.entrypoint',
             'api_platform.filters',
+            'api_platform.doctrine.listener.view.write',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.encoder',
+            'api_platform.jsonld.action.context',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.swagger.normalizer.documentation',
+            'api_platform.swagger.command.swagger_command',
+            'api_platform.swagger.action.ui',
+            'api_platform.swagger.listener.ui',
             'api_platform.hal.encoder',
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',

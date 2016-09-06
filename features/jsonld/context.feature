@@ -8,7 +8,7 @@ Feature: JSON-LD contexts generation
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "@context.@vocab" should be equal to "http://example.com/apidoc.jsonld#"
+    And the JSON node "@context.@vocab" should be equal to "http://example.com/doc.jsonld#"
     And the JSON node "@context.hydra" should be equal to "http://www.w3.org/ns/hydra/core#"
     And the JSON node "@context.dummy.@id" should be equal to "Entrypoint/dummy"
     And the JSON node "@context.dummy.@type" should be equal to "@id"
@@ -22,7 +22,7 @@ Feature: JSON-LD contexts generation
     """
     {
         "@context": {
-            "@vocab": "http://example.com/apidoc.jsonld#",
+            "@vocab": "http://example.com/doc.jsonld#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "description": "https://schema.org/description",
             "dummy": "#Dummy/dummy",
@@ -55,7 +55,7 @@ Feature: JSON-LD contexts generation
       """
       {
         "@context": {
-          "@vocab": "http://example.com/apidoc.jsonld#",
+          "@vocab": "http://example.com/doc.jsonld#",
           "hydra": "http://www.w3.org/ns/hydra/core#",
           "paris": "#RelationEmbedder/paris",
           "krondstadt": "#RelationEmbedder/krondstadt",

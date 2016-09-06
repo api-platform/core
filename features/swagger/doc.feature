@@ -3,8 +3,9 @@ Feature: Documentation support
   As a client software developer
   I need to know Swagger specifications of objects I send and receive
 
+  @createSchema
   Scenario: Retrieve the Swagger/OpenAPI documentation
-    Given I send a "GET" request to "/apidoc.json"
+    Given I send a "GET" request to "/doc.json"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
@@ -34,7 +35,15 @@ Feature: Documentation support
     And "id" property exists for the Swagger class "Dummy"
     And "name" property is required for Swagger class "Dummy"
 
-  Scenario: Swagger UI is enabled
-    Given I send a "GET" request to "/doc"
+  Scenario: Swagger UI is enabled for the doc endpoint
+    Given I add "Accept" header equal to "text/html"
+    And I send a "GET" request to "/doc"
+    Then the response status code should be 200
+    And I should see text matching "My Dummy API"
+
+  @dropSchema
+  Scenario: Swagger UI is enabled for an arbitrary endpoint
+    Given I add "Accept" header equal to "text/html"
+    And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
