@@ -107,6 +107,17 @@ Feature: Content Negotiation support
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
+  Scenario: Requesting an invalid format in the URL should throw an error
+    And I send a "GET" request to "/dummies/1.invalid"
+    Then the response status code should be 406
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
+  Scenario: Requesting an invalid format in the Accept header and in the URL should throw an error
+    When I add "Accept" header equal to "text/invalid"
+    And I send a "GET" request to "/dummies/1.invalid"
+    Then the response status code should be 406
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
   @dropSchema
   Scenario: If the request format is HTML, the error should be in HTML
     When I add "Accept" header equal to "text/html"
