@@ -114,3 +114,6 @@ services:
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
+
+    logger:
+        class: Psr\Log\NullLogger
