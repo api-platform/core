@@ -75,6 +75,7 @@
 
         <service id="api_platform.operation_path_resolver.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver" public="false">
             <argument type="service" id="api_platform.router" />
+            <argument type="service" id="router.request_context" />
             <argument type="service" id="api_platform.operation_path_resolver.custom" />
         </service>
 

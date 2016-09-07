@@ -11,6 +11,7 @@ Feature: Documentation support
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
     # Context
     And the JSON node "swagger" should be equal to "2.0"
+    And the JSON node "basePath" should be equal to "/"
     # Root properties
     And the JSON node "info.title" should be equal to "My Dummy API"
     And the JSON node "info.description" should be equal to "This is a test API."
