@@ -15,12 +15,11 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * Interface of Doctrine ORM query extensions that supports result production
- * for specific cases such as pagination.
+ * for specific cases such as Query alteration.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine BLUCHET <soyuka@gmail.com>
  */
-interface QueryResultExtensionInterface extends QueryCollectionExtensionInterface
+interface QueryResultItemExtensionInterface extends QueryItemExtensionInterface
 {
     /**
      * @param string      $resourceClass

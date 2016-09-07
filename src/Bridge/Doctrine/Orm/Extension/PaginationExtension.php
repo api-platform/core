@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class PaginationExtension implements QueryResultExtensionInterface
+final class PaginationExtension implements QueryResultCollectionExtensionInterface
 {
     private $managerRegistry;
     private $requestStack;
