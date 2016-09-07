@@ -475,10 +475,13 @@ final class DocumentationNormalizer implements NormalizerInterface
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),
-                'description' => $documentation->getDescription(),
             ],
             'paths' => $paths,
         ];
+
+        if ('' !== $description = $documentation->getDescription()) {
+            $doc['info']['description'] = $description;
+        }
 
         if (count($definitions) > 0) {
             $doc['definitions'] = $definitions;
