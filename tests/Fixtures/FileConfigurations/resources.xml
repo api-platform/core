@@ -1,29 +1,38 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" ?>
+
 <resources>
-        <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" />
-        <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy" shortName="thedummyshortname" description="Dummy resource" iri="someirischema">
-                <itemOperations>
-                        <operation key="my_op_name" method="GET" />
-                        <operation key="my_other_op_name" method="POST" />
-                </itemOperations>
-                <collectionOperations>
-                        <operation key="my_collection_op" method="POST" path="the/collection/path"/>
-                </collectionOperations>
-                <attributes>
-			<attribute key="normalization_context">
-				<attribute key="groups">
-					<attribute>default</attribute>
-				</attribute>
-			</attribute>
-			<attribute key="denormalization_context">
-				<attribute key="groups">
-					<attribute>default</attribute>
-				</attribute>
-			</attribute>
-                        <attribute key="hydra_context">
-                                <attribute key="@type">hydra:Operation</attribute>
-                                <attribute key="@hydra:title">File config Dummy</attribute>
-                        </attribute>
-                </attributes>
-        </resource>
+    <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"/>
+    <resource
+            class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy"
+            shortName="thedummyshortname"
+            description="Dummy resource"
+            iri="someirischema"
+    >
+        <itemOperation name="my_op_name">
+            <attribute name="method">GET</attribute>
+        </itemOperation>
+        <itemOperation name="my_other_op_name">
+            <attribute name="method">POST</attribute>
+        </itemOperation>
+
+        <collectionOperation name="my_collection_op">
+            <attribute name="method">POST</attribute>
+            <attribute name="path">the/collection/path</attribute>
+        </collectionOperation>
+
+        <attribute name="normalization_context">
+            <attribute name="groups">
+                <attribute>default</attribute>
+            </attribute>
+        </attribute>
+        <attribute name="denormalization_context">
+            <attribute name="groups">
+                <attribute>default</attribute>
+            </attribute>
+        </attribute>
+        <attribute name="hydra_context">
+            <attribute name="@type">hydra:Operation</attribute>
+            <attribute name="@hydra:title">File config Dummy</attribute>
+        </attribute>
+    </resource>
 </resources>

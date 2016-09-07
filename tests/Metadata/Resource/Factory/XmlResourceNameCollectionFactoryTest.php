@@ -17,7 +17,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
- * Tests xml resource name collection factory.
+ * Tests XML resource name collection factory.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
@@ -36,20 +36,11 @@ class XmlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /XML Schema loaded from path .+/
      */
     public function testInvalidXmlResourceNameCollectionFactory()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
         $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
         $xmlResourceNameCollectionFactory->create();
-    }
-
-    public function testXmlSingleResourceName()
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
-        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
-
-        $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([FileConfigDummy::class]));
     }
 }

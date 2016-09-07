@@ -43,7 +43,6 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
     public function create() : ResourceNameCollection
     {
         $classes = [];
-
         if ($this->decorated) {
             foreach ($this->decorated->create() as $resourceClass) {
                 $classes[$resourceClass] = true;
@@ -52,7 +51,6 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
 
         foreach ($this->paths as $path) {
             $resources = $this->yamlParser->parse(file_get_contents($path));
-
             $resources = $resources['resources'] ?? $resources;
 
             foreach ($resources as $resource) {

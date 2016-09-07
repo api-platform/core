@@ -20,8 +20,12 @@ use Doctrine\ORM\QueryBuilder;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class QueryChecker
+final class QueryChecker
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Determines whether the query builder uses a HAVING clause.
      *
