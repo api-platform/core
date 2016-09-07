@@ -23,8 +23,12 @@ use Doctrine\ORM\QueryBuilder;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class QueryJoinParser
+final class QueryJoinParser
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Gets the class metadata from a given join alias.
      *
