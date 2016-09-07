@@ -37,8 +37,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportedRequestFormat()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -54,8 +53,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testRespondFlag()
     {
-        $request = new Request();
-        $request->attributes->set('_api_respond', true);
+        $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -75,8 +73,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnsupportedRequestFormat()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->setRequestFormat('xml');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -91,8 +88,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportedAcceptHeader()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml, application/json;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -107,8 +103,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcceptAllHeader()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9, */*;q=0.8');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -128,8 +123,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnsupportedAcceptHeader()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -146,8 +140,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidAcceptHeader()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'invalid');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -160,8 +153,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcceptHeaderTakePrecedenceOverRequestFormat()
     {
-        $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Foo');
+        $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'application/json');
         $request->setRequestFormat('xml');
 
@@ -173,5 +165,21 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @expectedExceptionMessage Not Found
+     */
+    public function testInvalidRouteFormat()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_format' => 'invalid']);
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $listener->onKernelRequest($event);
     }
 }
