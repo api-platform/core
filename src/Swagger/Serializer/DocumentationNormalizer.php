@@ -335,8 +335,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 break;
 
             case Type::BUILTIN_TYPE_OBJECT:
-                $className = $valueType->getClassName();
-                if (null === $className) {
+                if (null === $className = $valueType->getClassName()) {
                     break;
                 }
 
@@ -350,7 +349,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     break;
                 }
 
-                if ($propertyMetadata->isReadableLink()) {
+                if (true === $propertyMetadata->isReadableLink()) {
                     $valueSchema['$ref'] = sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName());
                     break;
                 }
@@ -358,16 +357,13 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $valueSchema['type'] = 'string';
                 $valueSchema['format'] = 'uri';
                 break;
-
-            default:
-                break;
         }
 
         if ($type->isCollection()) {
             $propertySchema['type'] = 'array';
             $propertySchema['items'] = $valueSchema;
         } else {
-            $propertySchema = new \ArrayObject(array_merge((array) $propertySchema, (array) $valueSchema));
+            $propertySchema = new \ArrayObject((array) $propertySchema + (array) $valueSchema);
         }
 
         return $propertySchema;

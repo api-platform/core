@@ -40,7 +40,7 @@ final class ExceptionAction
     {
         $this->serializer = $serializer;
         $this->errorFormats = $errorFormats;
-        $this->exceptionToStatus = array_merge(self::DEFAULT_EXCEPTION_TO_STATUS, $exceptionToStatus);
+        $this->exceptionToStatus = self::DEFAULT_EXCEPTION_TO_STATUS + $exceptionToStatus;
     }
 
     /**
