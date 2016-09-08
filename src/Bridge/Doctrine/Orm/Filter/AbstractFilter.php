@@ -247,7 +247,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return string the new association alias
      */
-    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association): string
+    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association) : string
     {
         $join = $this->getExistingJoin($queryBuilder, $alias, $association);
 

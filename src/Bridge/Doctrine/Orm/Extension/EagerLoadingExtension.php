@@ -50,7 +50,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $this->joinRelations($queryBuilder, $resourceClass);
     }
 
-    public function getMetadataProperties(string $resourceClass): array
+    public function getMetadataProperties(string $resourceClass) : array
     {
         $properties = [];
 

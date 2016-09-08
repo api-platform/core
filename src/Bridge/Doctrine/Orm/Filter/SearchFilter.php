@@ -225,7 +225,7 @@ class SearchFilter extends AbstractFilter
      *
      * @return string
      */
-    private function caseWrap(string $string): string
+    private function caseWrap(string $string) : string
     {
         if (false !== $this->caseSensitive) {
             return $string;
