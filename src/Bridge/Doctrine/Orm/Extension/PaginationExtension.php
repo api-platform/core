@@ -130,7 +130,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
      *
      * @return bool
      */
-    private function useFetchJoinCollection(QueryBuilder $queryBuilder): bool
+    private function useFetchJoinCollection(QueryBuilder $queryBuilder) : bool
     {
         return !QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry);
     }
