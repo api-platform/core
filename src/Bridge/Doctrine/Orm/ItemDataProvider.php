@@ -12,9 +12,10 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -74,6 +75,10 @@ class ItemDataProvider implements ItemDataProviderInterface
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName);
+
+            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
+                return $extension->getResult($queryBuilder);
+            }
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
@@ -87,10 +92,6 @@ class ItemDataProvider implements ItemDataProviderInterface
      */
     private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder)
     {
-        if (empty($identifiers)) {
-            return;
-        }
-
         foreach ($identifiers as $identifier => $value) {
             $placeholder = ':id_'.$identifier;
             $expression = $queryBuilder->expr()->eq(
@@ -140,10 +141,10 @@ class ItemDataProvider implements ItemDataProviderInterface
                 continue;
             }
 
-            $identifier = $identifiersMap[$propertyName] ?? $identifierValues[$i] ?? null;
+            $identifier = !isset($identifiersMap) ? $identifierValues[$i] ?? null : $identifiersMap[$propertyName] ?? null;
 
             if (null === $identifier) {
-                throw new InvalidArgumentException(sprintf('Invalid identifier "%s".', $id));
+                throw new PropertyNotFoundException(sprintf('Invalid identifier "%s", "%s" has not been found.', $id, $propertyName));
             }
 
             $identifiers[$propertyName] = $identifier;

@@ -20,7 +20,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class OrderExtension implements QueryCollectionExtensionInterface
+final class OrderExtension implements QueryCollectionExtensionInterface
 {
     private $order;
 
