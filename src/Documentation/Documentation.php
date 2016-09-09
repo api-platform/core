@@ -39,7 +39,7 @@ final class Documentation
         }
     }
 
-    public function getMimeTypes(): array
+    public function getMimeTypes() : array
     {
         return $this->mimeTypes;
     }
@@ -49,17 +49,17 @@ final class Documentation
         return $this->version;
     }
 
-    public function getDescription(): string
+    public function getDescription() : string
     {
         return $this->description;
     }
 
-    public function getTitle(): string
+    public function getTitle() : string
     {
         return $this->title;
     }
 
-    public function getResourceNameCollection(): ResourceNameCollection
+    public function getResourceNameCollection() : ResourceNameCollection
     {
         return $this->resourceNameCollection;
     }
