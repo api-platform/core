@@ -130,197 +130,113 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getPathOperation(string $operationName, array $operation, string $method, bool $collection, ResourceMetadata $resourceMetadata, array $mimeTypes) : \ArrayObject
     {
         $pathOperation = new \ArrayObject($operation['swagger_context'] ?? []);
-
         $resourceShortName = $resourceMetadata->getShortName();
+        $pathOperation['tags'] ?? $pathOperation['tags'] = [$resourceShortName];
+        $pathOperation['operationId'] ?? $pathOperation['operationId'] = sprintf('%s%s%s', lcfirst($operationName), ucfirst($resourceShortName), ucfirst($collection ? 'collection' : 'item'));
 
-        if (!isset($pathOperation['tags'])) {
-            $pathOperation['tags'] = [
-                $resourceShortName,
+        if ('GET' === $method) {
+            $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
+
+            if ($collection) {
+                $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
+                $pathOperation['responses'] ?? $pathOperation['responses'] = [
+                    '200' => [
+                        'description' => sprintf('%s collection response', $resourceShortName),
+                        'schema' => [
+                            'type' => 'array',
+                            'items' => ['$ref' => sprintf('#/definitions/%s', $resourceShortName)],
+                        ],
+                    ],
+                ];
+
+                return $pathOperation;
+            }
+
+            $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
+            $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
+                'name' => 'id',
+                'in' => 'path',
+                'required' => true,
+                'type' => 'integer',
+            ]];
+            $pathOperation['responses'] ?? $pathOperation['responses'] = [
+                '200' => [
+                    'description' => sprintf('%s resource response', $resourceShortName),
+                    'schema' => ['$ref' => sprintf('#/definitions/%s', $resourceShortName)],
+                ],
+                '404' => ['description' => 'Resource not found'],
             ];
+
+            return $pathOperation;
         }
 
-        if (!isset($pathOperation['operationId'])) {
-            $pathOperation['operationId'] = sprintf('%s%s%s', lcfirst($operationName), ucfirst($resourceShortName), ucfirst($collection ? 'collection' : 'item'));
+        if ('POST' === $method) {
+            $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
+            $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
+            $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
+            $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
+                'name' => lcfirst($resourceShortName),
+                'in' => 'body',
+                'description' => sprintf('The new %s resource', $resourceShortName),
+                'schema' => ['$ref' => sprintf('#/definitions/%s', $resourceShortName)],
+            ]];
+            $pathOperation['responses'] ?? $pathOperation['responses'] = [
+                '201' => [
+                    'description' => sprintf('%s resource created', $resourceShortName),
+                    'schema' => ['$ref' => sprintf('#/definitions/%s', $resourceShortName)],
+                ],
+                '400' => ['description' => 'Invalid input'],
+                '404' => ['description' => 'Resource not found'],
+            ];
+
+            return $pathOperation;
         }
 
-        switch ($method) {
-            case 'GET':
-                if (!isset($pathOperation['produces'])) {
-                    $pathOperation['produces'] = $mimeTypes;
-                }
+        if ($method === 'PUT') {
+            $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
+            $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
+            $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
+            $pathOperation['parameters'] ?? $pathOperation['parameters'] = [
+                [
+                    'name' => 'id',
+                    'in' => 'path',
+                    'type' => 'integer',
+                    'required' => true,
+                ],
+                [
+                    'name' => lcfirst($resourceShortName),
+                    'in' => 'body',
+                    'description' => sprintf('The updated %s resource', $resourceShortName),
+                    'schema' => ['$ref' => sprintf('#/definitions/%s', $resourceShortName)],
+                ],
+            ];
+            $pathOperation['responses'] ?? $pathOperation['responses'] = [
+                '200' => [
+                    'description' => sprintf('%s resource updated', $resourceShortName),
+                    'schema' => ['$ref' => sprintf('#/definitions/%s', $resourceShortName)],
+                ],
+                '400' => ['description' => 'Invalid input'],
+                '404' => ['description' => 'Resource not found'],
+            ];
 
-                if ($collection) {
-                    if (!isset($pathOperation['summary'])) {
-                        $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
-                    }
+            return $pathOperation;
+        }
 
-                    if (!isset($pathOperation['responses'])) {
-                        $pathOperation['responses'] = [
-                            '200' => [
-                                'description' => sprintf('%s collection response', $resourceShortName),
-                                'schema' => [
-                                    'type' => 'array',
-                                    'items' => [
-                                        '$ref' => sprintf('#/definitions/%s', $resourceShortName),
-                                    ],
-                                ],
-                            ],
-                        ];
-                    }
-                } else {
-                    if (!isset($pathOperation['summary'])) {
-                        $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
-                    }
+        if ($method === 'DELETE') {
+            $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Removes the %s resource.', $resourceShortName);
+            $pathOperation['responses'] ?? $pathOperation['responses'] = [
+                '204' => ['description' => sprintf('%s resource deleted', $resourceShortName)],
+                '404' => ['description' => 'Resource not found'],
+            ];
 
-                    if (!isset($pathOperation['parameters'])) {
-                        $pathOperation['parameters'] = [
-                            [
-                                'name' => 'id',
-                                'in' => 'path',
-                                'required' => true,
-                                'type' => 'integer',
-                            ],
-                        ];
-                    }
+            $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
+                'name' => 'id',
+                'in' => 'path',
+                'type' => 'integer',
+                'required' => true,
+            ]];
 
-                    if (!isset($pathOperation['responses'])) {
-                        $pathOperation['responses'] = [
-                            '200' => [
-                                'description' => sprintf('%s resource response', $resourceShortName),
-                                'schema' => [
-                                    '$ref' => sprintf('#/definitions/%s', $resourceShortName),
-                                ],
-                            ],
-                            '404' => [
-                                'description' => 'Resource not found',
-                            ],
-                        ];
-                    }
-                }
-                break;
-
-            case 'POST':
-                if (!isset($pathOperation['consumes'])) {
-                    $pathOperation['consumes'] = $mimeTypes;
-                }
-                if (!isset($pathOperation['produces'])) {
-                    $pathOperation['produces'] = $mimeTypes;
-                }
-
-                if (!isset($pathOperation['summary'])) {
-                    $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
-                }
-
-                if (!isset($pathOperation['parameters'])) {
-                    $pathOperation['parameters'] = [
-                        [
-                            'name' => lcfirst($resourceShortName),
-                            'in' => 'body',
-                            'description' => sprintf('The new %s resource', $resourceShortName),
-                            'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
-                            ],
-                        ],
-                    ];
-                }
-
-                if (!isset($pathOperation['responses'])) {
-                    $pathOperation['responses'] = [
-                        '201' => [
-                            'description' => sprintf('%s resource created', $resourceShortName),
-                            'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
-                            ],
-                        ],
-                        '400' => [
-                            'description' => 'Invalid input',
-                        ],
-                        '404' => [
-                            'description' => 'Resource not found',
-                        ],
-                    ];
-                }
-                break;
-
-            case 'PUT':
-                if (!isset($pathOperation['consumes'])) {
-                    $pathOperation['consumes'] = $mimeTypes;
-                }
-                if (!isset($pathOperation['produces'])) {
-                    $pathOperation['produces'] = $mimeTypes;
-                }
-
-                if (!isset($pathOperation['summary'])) {
-                    $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
-                }
-
-                if (!isset($pathOperation['parameters'])) {
-                    $pathOperation['parameters'] = [
-                        [
-                            'name' => 'id',
-                            'in' => 'path',
-                            'type' => 'integer',
-                            'required' => true,
-                        ],
-                        [
-                            'name' => lcfirst($resourceShortName),
-                            'in' => 'body',
-                            'description' => sprintf('The updated %s resource', $resourceShortName),
-                            'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
-                            ],
-                        ],
-                    ];
-                }
-
-                if (!isset($pathOperation['responses'])) {
-                    $pathOperation['responses'] = [
-                        '200' => [
-                            'description' => sprintf('%s resource updated', $resourceShortName),
-                            'schema' => [
-                                '$ref' => sprintf('#/definitions/%s', $resourceShortName),
-                            ],
-                        ],
-                        '400' => [
-                            'description' => 'Invalid input',
-                        ],
-                        '404' => [
-                            'description' => 'Resource not found',
-                        ],
-                    ];
-                }
-                break;
-
-            case 'DELETE':
-                if (!isset($pathOperation['summary'])) {
-                    $pathOperation['summary'] = sprintf('Removes the %s resource.', $resourceShortName);
-                }
-
-                if (!isset($pathOperation['responses'])) {
-                    $pathOperation['responses'] = [
-                        '204' => [
-                            'description' => sprintf('%s resource deleted', $resourceShortName),
-                        ],
-                        '404' => [
-                            'description' => 'Resource not found',
-                        ],
-                    ];
-                }
-
-                if (!isset($pathOperation['parameters'])) {
-                    $pathOperation['parameters'] = [
-                        [
-                            'name' => 'id',
-                            'in' => 'path',
-                            'type' => 'integer',
-                            'required' => true,
-                        ],
-                    ];
-                }
-                break;
-
-            default:
-                break;
+            return $pathOperation;
         }
 
         return $pathOperation;
@@ -338,15 +254,13 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata) : \ArrayObject
     {
-        $definitionSchema = new \ArrayObject([
-            'type' => 'object',
-        ]);
+        $definitionSchema = new \ArrayObject(['type' => 'object']);
 
-        if ($description = $resourceMetadata->getDescription()) {
+        if (null !== $description = $resourceMetadata->getDescription()) {
             $definitionSchema['description'] = $description;
         }
 
-        if ($iri = $resourceMetadata->getIri()) {
+        if (null !== $iri = $resourceMetadata->getIri()) {
             $definitionSchema['externalDocs'] = [
                 'url' => $iri,
             ];
@@ -354,13 +268,16 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $attributes = $resourceMetadata->getAttributes();
         $context = [];
-
         if (isset($attributes['normalization_context']['groups'])) {
             $context['serializer_groups'] = $attributes['normalization_context']['groups'];
         }
 
         if (isset($attributes['denormalization_context']['groups'])) {
-            $context['serializer_groups'] = isset($context['serializer_groups']) ? array_merge($context['serializer_groups'], $attributes['denormalization_context']['groups']) : $attributes['denormalization_context']['groups'];
+            if (isset($context['serializer_groups'])) {
+                $context['serializer_groups'] += $attributes['denormalization_context']['groups'];
+            } else {
+                $context['serializer_groups'] = $attributes['denormalization_context']['groups'];
+            }
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $context) as $propertyName) {
@@ -389,17 +306,15 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $propertySchema = new \ArrayObject();
 
-        if ($description = $propertyMetadata->getDescription()) {
+        if (null !== $description = $propertyMetadata->getDescription()) {
             $propertySchema['description'] = $description;
         }
 
-        $type = $propertyMetadata->getType();
-        if (!$type) {
+        if (null == $type = $propertyMetadata->getType()) {
             return $propertySchema;
         }
 
         $valueSchema = new \ArrayObject();
-
         $valueType = $type->isCollection() ? $type->getCollectionValueType() : $type;
 
         switch ($valueType ? $valueType->getBuiltinType() : null) {
@@ -420,8 +335,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 break;
 
             case Type::BUILTIN_TYPE_OBJECT:
-                $className = $valueType->getClassName();
-                if (null === $className) {
+                if (null === $className = $valueType->getClassName()) {
                     break;
                 }
 
@@ -435,7 +349,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     break;
                 }
 
-                if ($propertyMetadata->isReadableLink()) {
+                if (true === $propertyMetadata->isReadableLink()) {
                     $valueSchema['$ref'] = sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName());
                     break;
                 }
@@ -443,16 +357,13 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $valueSchema['type'] = 'string';
                 $valueSchema['format'] = 'uri';
                 break;
-
-            default:
-                break;
         }
 
         if ($type->isCollection()) {
             $propertySchema['type'] = 'array';
             $propertySchema['items'] = $valueSchema;
         } else {
-            $propertySchema = new \ArrayObject(array_merge((array) $propertySchema, (array) $valueSchema));
+            $propertySchema = new \ArrayObject((array) $propertySchema + (array) $valueSchema);
         }
 
         return $propertySchema;

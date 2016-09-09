@@ -112,7 +112,11 @@ final class ApiPlatformParser implements ParserInterface
         }
 
         if (isset($attributes['denormalization_context']['groups'])) {
-            $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $attributes['denormalization_context']['groups']) : $options['serializer_groups'];
+            if (isset($options['serializer_groups'])) {
+                $options['serializer_groups'] += $attributes['denormalization_context']['groups'];
+            } else {
+                $options['serializer_groups'] = $attributes['denormalization_context']['groups'];
+            }
         }
 
         return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
@@ -129,8 +133,8 @@ final class ApiPlatformParser implements ParserInterface
     private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName) : array
     {
         $operation = [
-            'denormalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', [])),
-            'normalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', [])),
+            'denormalization_context' => $resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []) + $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', []),
+            'normalization_context' => $resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []) + $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', []),
         ];
 
         $options = [
