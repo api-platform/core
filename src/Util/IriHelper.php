@@ -20,8 +20,12 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *
  * @internal
  */
-abstract class IriHelper
+final class IriHelper
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Parses and standardizes the request IRI.
      *

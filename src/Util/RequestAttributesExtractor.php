@@ -21,8 +21,12 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @internal
  */
-abstract class RequestAttributesExtractor
+final class RequestAttributesExtractor
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not
      * contain required attributes.

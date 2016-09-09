@@ -49,7 +49,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
         $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
 
         foreach ($yamlResourceNameCollectionFactory->create() as $resourceName) {
-            $resourceMetadata = $resourceMetadataFactory->create($resourceName);
+            $resourceMetadataFactory->create($resourceName);
         }
     }
 

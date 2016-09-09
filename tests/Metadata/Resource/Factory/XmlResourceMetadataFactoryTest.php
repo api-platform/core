@@ -18,7 +18,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
- * Tests xml resource metadata factory.
+ * Tests XML resource metadata factory.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
@@ -49,7 +49,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
         $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
 
         foreach ($xmlResourceNameCollectionFactory->create() as $resourceName) {
-            $resourceMetadata = $resourceMetadataFactory->create($resourceName);
+            $resourceMetadataFactory->create($resourceName);
         }
     }
 
@@ -69,22 +69,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     }
 
     /**
-     * @dataProvider resourceMetadataProvider
-     */
-    public function testXmlSingleResourceMetadata($expectedResourceMetadata)
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.xml';
-
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
-        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
-
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
-        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
-    }
-
-    /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /XML Schema loaded from path .+/
      */
     public function testInvalidXmlResourceMetadataFactory()
     {

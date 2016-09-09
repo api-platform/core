@@ -1,8 +1,8 @@
 {
     "name": "api-platform/core",
     "type": "library",
-    "description": "JSON-LD / Hydra REST API for Symfony",
-    "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra"],
+    "description": "The ultimate solution to create web APIs.",
+    "keywords": ["REST", "API", "JSON", "JSON-LD", "Hydra", "Swagger", "HAL"],
     "homepage": "https://api-platform.com",
     "license": "MIT",
     "authors": [
@@ -39,6 +39,7 @@
         "phpdocumentor/reflection-docblock": "^3.0",
         "psr/log": "^1.0",
         "symfony/cache": "^3.1",
+        "symfony/config": "^2.7",
         "symfony/dependency-injection": "^2.7 || ^3.0",
         "symfony/doctrine-bridge": "^2.8 || ^3.0",
         "symfony/phpunit-bridge": "^2.7 || ^3.0",
@@ -49,12 +50,12 @@
         "symfony/twig-bundle": "^2.8 || ^3.1"
     },
     "suggest": {
-        "symfony/twig-bundle": "To have a human-readable documentation relying on Swagger UI.",
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
-        "nelmio/api-doc-bundle": "To have the api sandbox & documentation.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
-        "symfony/cache": "To have metadata caching when using Symfony integration."
+        "symfony/cache": "To have metadata caching when using Symfony integration.",
+        "symfony/config": "To load XML configuration files.",
+        "symfony/twig-bundle": "To use the Swagger UI integration."
     },
     "autoload": {
         "psr-4": { "ApiPlatform\\Core\\": "src/" }
