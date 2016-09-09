@@ -14,15 +14,19 @@ namespace ApiPlatform\Core\Util;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Utility functions for working with Symfony HttpFoundation request.
+ * Utility functions for working with Symfony's HttpFoundation request.
  *
  * @internal
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class RequestParser
+final class RequestParser
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Gets a fixed request.
      *

@@ -62,7 +62,6 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
 
         foreach ($this->paths as $path) {
             $resources = $this->yamlParser->parse(file_get_contents($path));
-
             $resources = $resources['resources'] ?? $resources;
 
             foreach ($resources as $resource) {
@@ -79,11 +78,11 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
             }
         }
 
-        if (!$metadata || count($metadata) === 0) {
+        if (empty($metadata)) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
-        if (!$parentResourceMetadata) {
+        if (null === $parentResourceMetadata) {
             return new ResourceMetadata(
                 $metadata['shortName'] ?? null,
                 $metadata['description'] ?? null,
