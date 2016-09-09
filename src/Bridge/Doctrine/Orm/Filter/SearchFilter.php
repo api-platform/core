@@ -53,185 +53,15 @@ class SearchFilter extends AbstractFilter
      */
     const STRATEGY_WORD_START = 'word_start';
 
-    private $requestStack;
-    private $iriConverter;
-    private $propertyAccessor;
-    private $caseSensitive;
+    protected $iriConverter;
+    protected $propertyAccessor;
 
     public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties);
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
-        $this->requestStack = $requestStack;
         $this->iriConverter = $iriConverter;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
-        }
-
-        foreach ($this->extractProperties($request) as $property => $value) {
-            if (
-                !$this->isPropertyEnabled($property) ||
-                !$this->isPropertyMapped($property, $resourceClass, true) ||
-                null === $value
-            ) {
-                continue;
-            }
-
-            $alias = 'o';
-            $field = $property;
-
-            if ($this->isPropertyNested($property)) {
-                list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
-                $metadata = $this->getNestedMetadata($resourceClass, $associations);
-            } else {
-                $metadata = $this->getClassMetadata($resourceClass);
-            }
-
-            $values = $this->normalizeValues((array) $value);
-
-            if (empty($values)) {
-                $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
-                ]);
-
-                continue;
-            }
-
-            $this->caseSensitive = true;
-
-            if ($metadata->hasField($field)) {
-                if ('id' === $field) {
-                    $values = array_map([$this, 'getIdFromValue'], $values);
-                }
-
-                $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
-
-                // prefixing the strategy with i makes it case insensitive
-                if (strpos($strategy, 'i') === 0) {
-                    $strategy = substr($strategy, 1);
-                    $this->caseSensitive = false;
-                }
-
-                if (1 === count($values)) {
-                    $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0]);
-                    continue;
-                }
-
-                if (self::STRATEGY_EXACT !== $strategy) {
-                    $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('"%s" strategy selected for "%s" property, but only "%s" strategy supports multiple values', $strategy, $property, self::STRATEGY_EXACT)),
-                    ]);
-
-                    continue;
-                }
-
-                $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $values);
-            }
-
-            // metadata doesn't have the field, nor an association on the field
-            if (!$metadata->hasAssociation($field)) {
-                continue;
-            }
-
-            $values = array_map([$this, 'getIdFromValue'], $values);
-
-            $association = $field;
-            $valueParameter = $queryNameGenerator->generateParameterName($association);
-
-            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
-
-            if (1 === count($values)) {
-                $queryBuilder
-                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
-                    ->setParameter($valueParameter, $values[0]);
-            } else {
-                $queryBuilder
-                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
-                    ->setParameter($valueParameter, $values);
-            }
-        }
-    }
-
-    /**
-     * Adds where clause according to the strategy.
-     *
-     * @param string       $strategy
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $field
-     * @param string       $value
-     *
-     * @throws InvalidArgumentException If strategy does not exist
-     */
-    private function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $value)
-    {
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-        switch ($strategy) {
-            case null:
-            case self::STRATEGY_EXACT:
-                $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' = '.$this->caseWrap(':%s'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
-
-            case self::STRATEGY_PARTIAL:
-                $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap('CONCAT(\'%%\', :%s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
-
-            case self::STRATEGY_START:
-                $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap('CONCAT(:%s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
-
-            case self::STRATEGY_END:
-                $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%s.%s').' LIKE '.$this->caseWrap('CONCAT(\'%%\', :%s)'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
-
-            case self::STRATEGY_WORD_START:
-                $queryBuilder
-                    ->andWhere(sprintf($this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap('CONCAT(:%3$s, \'%%\')').' OR '.$this->caseWrap('%1$s.%2$s').' LIKE '.$this->caseWrap('CONCAT(\'%% \', :%3$s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-                break;
-
-            default:
-                throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
-        }
-    }
-
-    /**
-     * Wraps a string with a doctrine expression according to the current case status
-     * Example: $this->caseWrap('o.id') becomes LOWER(o.id) when $this->caseSensitive is true.
-     *
-     * @param string $string
-     *
-     * @return string
-     */
-    private function caseWrap(string $string) : string
-    {
-        if (false !== $this->caseSensitive) {
-            return $string;
-        }
-
-        return sprintf('LOWER(%s)', $string);
     }
 
     /**
@@ -298,13 +128,181 @@ class SearchFilter extends AbstractFilter
     }
 
     /**
-     * Gets the ID from an URI or a raw ID.
+     * {@inheritdoc}
+     */
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        if (
+            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyMapped($property, $resourceClass, true) ||
+            null === $value
+        ) {
+            return;
+        }
+
+        $alias = 'o';
+        $field = $property;
+
+        if ($this->isPropertyNested($property)) {
+            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+            $metadata = $this->getNestedMetadata($resourceClass, $associations);
+        } else {
+            $metadata = $this->getClassMetadata($resourceClass);
+        }
+
+        $values = $this->normalizeValues((array) $value);
+
+        if (empty($values)) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+            ]);
+
+            return;
+        }
+
+        $caseSensitive = true;
+
+        if ($metadata->hasField($field)) {
+            if ('id' === $field) {
+                $values = array_map([$this, 'getIdFromValue'], $values);
+            }
+
+            $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
+
+            // prefixing the strategy with i makes it case insensitive
+            if (strpos($strategy, 'i') === 0) {
+                $strategy = substr($strategy, 1);
+                $caseSensitive = false;
+            }
+
+            if (1 === count($values)) {
+                $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0], $caseSensitive);
+
+                return;
+            }
+
+            if (self::STRATEGY_EXACT !== $strategy) {
+                $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('"%s" strategy selected for "%s" property, but only "%s" strategy supports multiple values', $strategy, $property, self::STRATEGY_EXACT)),
+                ]);
+
+                return;
+            }
+
+            $valueParameter = $queryNameGenerator->generateParameterName($field);
+
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $caseSensitive ? array_map('strtolower', $values) : $values);
+        }
+
+        // metadata doesn't have the field, nor an association on the field
+        if (!$metadata->hasAssociation($field)) {
+            return;
+        }
+
+        $values = array_map([$this, 'getIdFromValue'], $values);
+
+        $association = $field;
+        $valueParameter = $queryNameGenerator->generateParameterName($association);
+
+        $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+
+        if (1 === count($values)) {
+            $queryBuilder
+                ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                ->setParameter($valueParameter, $values[0]);
+        } else {
+            $queryBuilder
+                ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                ->setParameter($valueParameter, $values);
+        }
+    }
+
+    /**
+     * Adds where clause according to the strategy.
+     *
+     * @param string       $strategy
+     * @param QueryBuilder $queryBuilder
+     * @param string       $alias
+     * @param string       $field
+     * @param string       $value
+     * @param bool         $caseSensitive
+     *
+     * @throws InvalidArgumentException If strategy does not exist
+     */
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $value, bool $caseSensitive)
+    {
+        $wrapCase = $this->createWrapCase($caseSensitive);
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
+
+        switch ($strategy) {
+            case null:
+            case self::STRATEGY_EXACT:
+                $queryBuilder
+                    ->andWhere(sprintf($wrapCase('%s.%s').' = '.$wrapCase(':%s'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+                break;
+
+            case self::STRATEGY_PARTIAL:
+                $queryBuilder
+                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s, \'%%\')'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+                break;
+
+            case self::STRATEGY_START:
+                $queryBuilder
+                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(:%s, \'%%\')'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+                break;
+
+            case self::STRATEGY_END:
+                $queryBuilder
+                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s)'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+                break;
+
+            case self::STRATEGY_WORD_START:
+                $queryBuilder
+                    ->andWhere(sprintf($wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(:%3$s, \'%%\')').' OR '.$wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(\'%% \', :%3$s, \'%%\')'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+                break;
+
+            default:
+                throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
+        }
+    }
+
+    /**
+     * Creates a function that will wrap a Doctrine expression according to the
+     * specified case sensitivity.
+     *
+     * For example, "o.name" will get wrapped into "LOWER(o.name)" when $caseSensitive
+     * is false.
+     *
+     * @param bool $caseSensitive
+     *
+     * @return \Closure
+     */
+    protected function createWrapCase(bool $caseSensitive) : \Closure
+    {
+        return function (string $expr) use ($caseSensitive) : string {
+            if ($caseSensitive) {
+                return $expr;
+            }
+
+            return sprintf('LOWER(%s)', $expr);
+        };
+    }
+
+    /**
+     * Gets the ID from an IRI or a raw ID.
      *
      * @param string $value
      *
      * @return mixed
      */
-    private function getIdFromValue(string $value)
+    protected function getIdFromValue(string $value)
     {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value)) {
@@ -324,7 +322,7 @@ class SearchFilter extends AbstractFilter
      *
      * @return array
      */
-    private function normalizeValues(array $values) : array
+    protected function normalizeValues(array $values) : array
     {
         foreach ($values as $key => $value) {
             if (!is_int($key) || !is_string($value)) {
