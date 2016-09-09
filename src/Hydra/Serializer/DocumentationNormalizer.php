@@ -451,7 +451,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function computeDoc(Documentation $object, array $classes): array
+    private function computeDoc(Documentation $object, array $classes) : array
     {
         $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
 
