@@ -31,51 +31,67 @@ class RangeFilter extends AbstractFilter
     const PARAMETER_LESS_THAN = 'lt';
     const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
-    private $requestStack;
-
     public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties);
-
-        $this->requestStack = $requestStack;
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public function getDescription(string $resourceClass) : array
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
+        $description = [];
+
+        $properties = $this->properties;
+        if (null === $properties) {
+            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
-        foreach ($this->extractProperties($request) as $property => $values) {
-            if (
-                !is_array($values) ||
-                !$this->isPropertyEnabled($property) ||
-                !$this->isPropertyMapped($property, $resourceClass)
-            ) {
+        foreach ($properties as $property => $unused) {
+            if (!$this->isPropertyMapped($property, $resourceClass)) {
                 continue;
             }
 
-            $alias = 'o';
-            $field = $property;
+            $description += $this->getFilterDescription($property, self::PARAMETER_BETWEEN);
+            $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN);
+            $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN_OR_EQUAL);
+            $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN);
+            $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN_OR_EQUAL);
+        }
 
-            if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
-            }
+        return $description;
+    }
 
-            foreach ($values as $operator => $value) {
-                $this->addWhere(
-                    $queryBuilder,
-                    $queryNameGenerator,
-                    $alias,
-                    $field,
-                    $operator,
-                    $value
-                );
-            }
+    /**
+     * {@inheritdoc}
+     */
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        if (
+            !is_array($values) ||
+            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyMapped($property, $resourceClass)
+        ) {
+            return;
+        }
+
+        $alias = 'o';
+        $field = $property;
+
+        if ($this->isPropertyNested($property)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        }
+
+        foreach ($values as $operator => $value) {
+            $this->addWhere(
+                $queryBuilder,
+                $queryNameGenerator,
+                $alias,
+                $field,
+                $operator,
+                $value
+            );
         }
     }
 
@@ -89,7 +105,7 @@ class RangeFilter extends AbstractFilter
      * @param string                      $operator
      * @param string                      $value
      */
-    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
     {
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
@@ -183,33 +199,6 @@ class RangeFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getDescription(string $resourceClass) : array
-    {
-        $description = [];
-
-        $properties = $this->properties;
-        if (null === $properties) {
-            $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
-        }
-
-        foreach ($properties as $property => $unused) {
-            if (!$this->isPropertyMapped($property, $resourceClass)) {
-                continue;
-            }
-
-            $description += $this->getFilterDescription($property, self::PARAMETER_BETWEEN);
-            $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN);
-            $description += $this->getFilterDescription($property, self::PARAMETER_GREATER_THAN_OR_EQUAL);
-            $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN);
-            $description += $this->getFilterDescription($property, self::PARAMETER_LESS_THAN_OR_EQUAL);
-        }
-
-        return $description;
-    }
-
-    /**
      * Gets filter description.
      *
      * @param string $fieldName
@@ -217,7 +206,7 @@ class RangeFilter extends AbstractFilter
      *
      * @return array
      */
-    private function getFilterDescription(string $fieldName, string $operator) : array
+    protected function getFilterDescription(string $fieldName, string $operator) : array
     {
         return [
             sprintf('%s[%s]', $fieldName, $operator) => [

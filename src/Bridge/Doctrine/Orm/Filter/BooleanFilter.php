@@ -22,76 +22,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Filters the collection by boolean values.
  *
+ * Filters collection on equality of boolean properties. The value is specified
+ * as one of ( "true" | "false" | "1" | "0" ) in the query.
+ *
+ * For each property passed, if the resource does not have such property or if
+ * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
+ *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
 class BooleanFilter extends AbstractFilter
 {
-    private $requestStack;
-
     public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties);
-
-        $this->requestStack = $requestStack;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * Filters collection on equality of boolean properties. The value is specified as one of
-     * ( "true" | "false" | "1" | "0" ) in the query.
-     *
-     * For each property passed, if the resource does not have such property or if the value is not one of
-     * ( "true" | "false" | "1" | "0" ) the property is ignored.
-     */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
-        }
-
-        $properties = $this->extractProperties($request);
-
-        foreach ($properties as $property => $value) {
-            if (
-                !$this->isPropertyEnabled($property) ||
-                !$this->isPropertyMapped($property, $resourceClass) ||
-                !$this->isBooleanField($property, $resourceClass)
-            ) {
-                continue;
-            }
-
-            if (in_array($value, ['true', '1'], true)) {
-                $value = true;
-            } elseif (in_array($value, ['false', '0'], true)) {
-                $value = false;
-            } else {
-                $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
-                        'true',
-                        'false',
-                        '1',
-                        '0',
-                    ]))),
-                ]);
-
-                continue;
-            }
-
-            $alias = 'o';
-            $field = $property;
-
-            if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
-            }
-            $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-            $queryBuilder
-                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $value);
-        }
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
     }
 
     /**
@@ -122,6 +66,49 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        if (
+            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyMapped($property, $resourceClass) ||
+            !$this->isBooleanField($property, $resourceClass)
+        ) {
+            return;
+        }
+
+        if (in_array($value, ['true', '1'], true)) {
+            $value = true;
+        } elseif (in_array($value, ['false', '0'], true)) {
+            $value = false;
+        } else {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
+                    'true',
+                    'false',
+                    '1',
+                    '0',
+                ]))),
+            ]);
+
+            return;
+        }
+
+        $alias = 'o';
+        $field = $property;
+
+        if ($this->isPropertyNested($property)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        }
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
+
+        $queryBuilder
+            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+            ->setParameter($valueParameter, $value);
+    }
+
+    /**
      * Determines whether the given property refers to a boolean field.
      *
      * @param string $property
@@ -129,7 +116,7 @@ class BooleanFilter extends AbstractFilter
      *
      * @return bool
      */
-    private function isBooleanField(string $property, string $resourceClass) : bool
+    protected function isBooleanField(string $property, string $resourceClass) : bool
     {
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);

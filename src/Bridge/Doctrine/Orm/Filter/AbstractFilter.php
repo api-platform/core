@@ -21,6 +21,7 @@ use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * {@inheritdoc}
@@ -33,15 +34,44 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractFilter implements FilterInterface
 {
     protected $managerRegistry;
+    protected $requestStack;
     protected $logger;
     protected $properties;
 
-    public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
     {
         $this->managerRegistry = $managerRegistry;
+        $this->requestStack = $requestStack;
         $this->logger = $logger ?? new NullLogger();
         $this->properties = $properties;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return;
+        }
+
+        foreach ($this->extractProperties($request) as $property => $value) {
+            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+        }
+    }
+
+    /**
+     * Passes a property through the filter.
+     *
+     * @param string                      $property
+     * @param mixed                       $value
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $resourceClass
+     * @param string|null                 $operationName
+     */
+    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
 
     /**
      * Gets class metadata for the given resource.

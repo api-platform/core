@@ -22,6 +22,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Filters the collection by numeric values.
  *
+ * Filters collection by equality of numeric properties.
+ *
+ * For each property passed, if the resource does not have such property or if
+ * the value is not numeric, the property is ignored.
+ *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
@@ -40,61 +45,9 @@ class NumericFilter extends AbstractFilter
         DBALType::SMALLINT => true,
     ];
 
-    private $requestStack;
-
     public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties);
-
-        $this->requestStack = $requestStack;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * Filters collection by equality of numeric properties.
-     *
-     * For each property passed, if the resource does not have such property or if the value is not numeric
-     * the property is ignored.
-     */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
-        }
-
-        $properties = $this->extractProperties($request);
-
-        foreach ($properties as $property => $value) {
-            if (
-                !$this->isPropertyEnabled($property) ||
-                !$this->isPropertyMapped($property, $resourceClass) ||
-                !$this->isNumericField($property, $resourceClass)
-            ) {
-                continue;
-            }
-
-            if (!is_numeric($value)) {
-                $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
-                ]);
-
-                continue;
-            }
-
-            $alias = 'o';
-            $field = $property;
-
-            if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
-            }
-            $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-            $queryBuilder
-                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $value);
-        }
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
     }
 
     /**
@@ -127,6 +80,40 @@ class NumericFilter extends AbstractFilter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        if (
+            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyMapped($property, $resourceClass) ||
+            !$this->isNumericField($property, $resourceClass)
+        ) {
+            return;
+        }
+
+        if (!is_numeric($value)) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
+            ]);
+
+            return;
+        }
+
+        $alias = 'o';
+        $field = $property;
+
+        if ($this->isPropertyNested($property)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        }
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
+
+        $queryBuilder
+            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+            ->setParameter($valueParameter, $value);
+    }
+
+    /**
      * Determines whether the given property refers to a numeric field.
      *
      * @param string $property
@@ -134,7 +121,7 @@ class NumericFilter extends AbstractFilter
      *
      * @return bool
      */
-    private function isNumericField(string $property, string $resourceClass) : bool
+    protected function isNumericField(string $property, string $resourceClass) : bool
     {
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
