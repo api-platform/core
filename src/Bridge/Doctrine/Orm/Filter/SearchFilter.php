@@ -189,11 +189,12 @@ class SearchFilter extends AbstractFilter
                 return;
             }
 
+            $wrapCase = $this->createWrapCase($caseSensitive);
             $valueParameter = $queryNameGenerator->generateParameterName($field);
 
             $queryBuilder
-                ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $caseSensitive ? array_map('strtolower', $values) : $values);
+                ->andWhere(sprintf($wrapCase('%s.%s').' IN (:%s)', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
         }
 
         // metadata doesn't have the field, nor an association on the field
