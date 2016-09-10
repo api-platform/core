@@ -246,8 +246,8 @@ class SearchFilter extends AbstractFilter
 
             case self::STRATEGY_PARTIAL:
                 $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
+                    ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase(':%s'), $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, sprintf('%%%s%%', $value));
                 break;
 
             case self::STRATEGY_START:
@@ -263,9 +263,11 @@ class SearchFilter extends AbstractFilter
                 break;
 
             case self::STRATEGY_WORD_START:
+                $valueParameter2 = sprintf('%s_2', $valueParameter);
                 $queryBuilder
-                    ->andWhere(sprintf($wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(:%3$s, \'%%\')').' OR '.$wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(\'%% \', :%3$s, \'%%\')'), $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
+                    ->andWhere(sprintf($wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(:%3$s, \'%%\')').' OR '.$wrapCase('%1$s.%2$s').' LIKE '.$wrapCase(':%4$s'), $alias, $field, $valueParameter, $valueParameter2))
+                    ->setParameter($valueParameter, $value)
+                    ->setParameter($valueParameter2, sprintf('%%%s%%', $value));
                 break;
 
             default:

@@ -463,9 +463,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE :name_p1', Dummy::class),
                     'parameters' => [
-                        'name_p1' => 'partial',
+                        'name_p1' => '%partial%',
                     ],
                 ],
             ],
@@ -478,9 +478,9 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(:name_p1)', Dummy::class),
                     'parameters' => [
-                        'name_p1' => 'partial',
+                        'name_p1' => '%partial%',
                     ],
                 ],
             ],
@@ -553,9 +553,10 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(:name_p1, \'%%\') OR o.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(:name_p1, \'%%\') OR o.name LIKE :name_p1_2', Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
+                        'name_p1_2' => '%partial%',
                     ],
                 ],
             ],
@@ -568,9 +569,10 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(o.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(o.name) LIKE LOWER(:name_p1_2)', Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
+                        'name_p1_2' => '%partial%',
                     ],
                 ],
             ],
