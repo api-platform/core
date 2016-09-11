@@ -122,6 +122,6 @@ final class ContextBuilder implements ContextBuilderInterface
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()]);
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
     }
 }
