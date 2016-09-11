@@ -422,6 +422,48 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
+            'exact (multiple values)' => [
+                [
+                    'id' => null,
+                    'name' => 'exact',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'SENSitive',
+                    ],
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name IN (:name_p1)', Dummy::class),
+                    'parameters' => [
+                        'name_p1' => [
+                            'CaSE',
+                            'SENSitive',
+                        ],
+                    ],
+                ],
+            ],
+            'exact (multiple values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'iexact',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'inSENSitive',
+                    ],
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) IN (:name_p1)', Dummy::class),
+                    'parameters' => [
+                        'name_p1' => [
+                            'case',
+                            'insensitive',
+                        ],
+                    ],
+                ],
+            ],
             'invalid property' => [
                 [
                     'id' => null,
