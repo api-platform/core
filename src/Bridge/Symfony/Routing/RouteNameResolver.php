@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -22,10 +23,12 @@ use Symfony\Component\Routing\RouterInterface;
 final class RouteNameResolver implements RouteNameResolverInterface
 {
     private $router;
+    private $resourceMetadataFactory;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         $this->router = $router;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -34,13 +37,16 @@ final class RouteNameResolver implements RouteNameResolverInterface
     public function getRouteName(string $resourceClass, bool $collection) : string
     {
         $operationType = $collection ? 'collection' : 'item';
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        //@TODO prefix, inflector etc.
+        $expectedOperation = sprintf('api_%s_get_item', $resourceMetadata->getShortName());
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
             $currentResourceClass = $route->getDefault('_api_resource_class');
             $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
             $methods = $route->getMethods();
 
-            if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods))) {
+            if ($resourceClass === $currentResourceClass && $expectedOperation !== $operation && (empty($methods) || in_array('GET', $methods))) {
                 return $routeName;
             }
         }
