@@ -310,7 +310,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $propertySchema['description'] = $description;
         }
 
-        if (null == $type = $propertyMetadata->getType()) {
+        if (null === $type = $propertyMetadata->getType()) {
             return $propertySchema;
         }
 
