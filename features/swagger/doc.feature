@@ -51,10 +51,14 @@ Feature: Documentation support
     And the Swagger path "/api/custom-call/{id}" exists
     And the JSON node "paths./api/custom-call/{id}.get" should exist
     And the JSON node "paths./api/custom-call/{id}.put" should exist
-
     # Properties
     And "id" property exists for the Swagger class "Dummy"
     And "name" property is required for Swagger class "Dummy"
+    # Filters
+    And the JSON node "paths./dummies.get.parameters[0].name" should be equal to "id"
+    And the JSON node "paths./dummies.get.parameters[0].in" should be equal to "query"
+    And the JSON node "paths./dummies.get.parameters[0].required" should be false
+    And the JSON node "paths./dummies.get.parameters[0].type" should be equal to "integer"
 
   Scenario: Swagger UI is enabled for the doc endpoint
     Given I add "Accept" header equal to "text/html"

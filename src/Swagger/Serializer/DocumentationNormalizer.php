@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Swagger\Serializer;
 
+use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -43,8 +44,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $operationMethodResolver;
     private $operationPathResolver;
     private $urlGenerator;
+    private $filterCollection;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -53,6 +55,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
         $this->urlGenerator = $urlGenerator;
+        $this->filterCollection = $filterCollection;
     }
 
     /**
@@ -195,6 +198,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                     ],
                 ],
             ];
+
+            if (!isset($pathOperation['parameters']) && count($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata)) > 0) {
+                $pathOperation['parameters'] = $parameters;
+            }
 
             return $pathOperation;
         }
@@ -421,7 +428,6 @@ final class DocumentationNormalizer implements NormalizerInterface
      * Gets the Swagger's type corresponding to the given PHP's type.
      *
      * @param string $type
-     *
      * @param bool   $isCollection
      * @param string $className
      * @param bool   $readableLink
@@ -503,22 +509,45 @@ final class DocumentationNormalizer implements NormalizerInterface
         return $doc;
     }
 
+    /**
+     * Gets Swagger parameters corresponding to enabled filters.
+     *
+     * @param string           $resourceClass
+     * @param string           $operationName
+     * @param ResourceMetadata $resourceMetadata
+     *
+     * @return array
+     */
     private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata) : array
     {
-        $parameters = new \ArrayObject();
-        foreach($resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true) as $filter) {
-            foreach ($filter->getDescription($resourceClass) as $variable => $data) {
+        if (null === $this->filterCollection) {
+            return [];
+        }
+
+        $parameters = [];
+        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        foreach ($this->filterCollection as $filterName => $filter) {
+            if (!in_array($filterName, $resourceFilters)) {
+                continue;
+            }
+
+            foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 $parameter = [
-                    'name' => $variable,
+                    'name' => $name,
                     'in' => 'query',
                     'required' => $data['required'],
-                    'type' => $this->getType($data['type'])
                 ];
+                $parameter += $this->getType($data['type'], false);
 
-                $data['swagger'] ?? $parameter = $data['swagger'] + $parameter;
+                if (isset($data['swagger'])) {
+                    $parameter = $data['swagger'] + $parameter;
+                }
+
                 $parameters[] = $parameter;
             }
         }
+
+        return $parameters;
     }
 
     /**

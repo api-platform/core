@@ -63,7 +63,6 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $operationName = $context['collection_operation_name'] ?? null;
-
         if (null === $operationName) {
             $resourceFilters = $resourceMetadata->getAttribute('filters', []);
         } else {
