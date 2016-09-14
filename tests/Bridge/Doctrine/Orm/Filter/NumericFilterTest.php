@@ -95,7 +95,7 @@ class NumericFilterTest extends KernelTestCase
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
-                'type' => 'integer',
+                'type' => 'int',
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));
@@ -111,12 +111,12 @@ class NumericFilterTest extends KernelTestCase
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
-                'type' => 'integer',
+                'type' => 'int',
                 'required' => false,
             ],
             'dummyPrice' => [
                 'property' => 'dummyPrice',
-                'type' => 'decimal',
+                'type' => 'string',
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));
