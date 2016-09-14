@@ -39,9 +39,27 @@
                         hljs.highlightBlock(e)
                     });
 
+                    // Temporary fix for https://github.com/swagger-api/swagger-ui/issues/2381
+                    $('input.parameter').each(function (i, e) {
+                        var $e = $(e);
+                        if ('undefined' === $e.val()) {
+                            $e.val('');
+                        }
+                    });
+
                     {% if operationId is defined %}
                         {% set domId = '#' ~ shortName ~ '_' ~ operationId %}
                         {% set id = app.request.attributes.get('id') %}
+
+                        var queryParameters = JSON.parse('{{ app.request.query.all()|json_encode|escape('js') }}');
+                        $('{{ domId|escape('js') }} form.sandbox input.parameter').each(function (i, e) {
+                            var $e = $(e);
+                            var name = $e.attr('name');
+
+                            if (name in queryParameters) {
+                                $e.val(queryParameters[name]);
+                            }
+                        });
 
                         {% if id %}
                             $('{{ domId|escape('js') }} form.sandbox input[name="id"]').val('{{ id|escape('js') }}');
