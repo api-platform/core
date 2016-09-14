@@ -2,10 +2,22 @@
 
 ## 2.0.0
 
-* The metadata system has been fully rewritten
+* Full refactoring
+* Use PHP 7
+* Add support for content negotiation
+* Add Swagger/OpenAPI support
+* Integrate Swagger UI
+* Add HAL support
+* Add API Problem support
+* Update the Hydra support to be in sync with the last version of the spec
+* Full rewrite of the metadata system (annotations, YAML and XML formats support)
+* Remove the event system in favor of the builtin Symfony kernel's events
 * Use the ADR pattern
-* Remove the event system in favor of builtin Symfony Kernel events
-* Use string values for `Dunglas\ApiBundle\Doctrine\Orm\Filter\DateFilter` null-management constants
+* Fix a ton of issues
+
+## 1.1.1
+
+* Fix a case typo in a namespace alias in the Hydra documentation
 
 ## 1.1.0 beta 2
 
