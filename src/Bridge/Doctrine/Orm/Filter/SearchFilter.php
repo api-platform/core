@@ -15,6 +15,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -91,14 +92,14 @@ class SearchFilter extends AbstractFilter
             }
 
             if ($metadata->hasField($field)) {
-                $typeOfField = $metadata->getTypeOfField($field);
+                $typeOfField = $this->getType($metadata->getTypeOfField($field));
                 $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
-                $filterParameterNames = [
-                    $property,
-                ];
+                $filterParameterNames = [$property];
+
                 if (self::STRATEGY_EXACT === $strategy) {
                     $filterParameterNames[] = $property.'[]';
                 }
+
                 foreach ($filterParameterNames as $filterParameterName) {
                     $description[$filterParameterName] = [
                         'property' => $property,
@@ -116,7 +117,7 @@ class SearchFilter extends AbstractFilter
                 foreach ($filterParameterNames as $filterParameterName) {
                     $description[$filterParameterName] = [
                         'property' => $property,
-                        'type' => 'iri',
+                        'type' => 'string',
                         'required' => false,
                         'strategy' => self::STRATEGY_EXACT,
                     ];
@@ -125,6 +126,40 @@ class SearchFilter extends AbstractFilter
         }
 
         return $description;
+    }
+
+    /**
+     * Converts a Doctrine type in PHP type.
+     *
+     * @param string $doctrineType
+     *
+     * @return string
+     */
+    private function getType(string $doctrineType) : string
+    {
+        switch ($doctrineType) {
+            case Type::TARRAY:
+                return 'array';
+
+            case Type::BIGINT:
+            case Type::INTEGER:
+            case Type::SMALLINT:
+                return 'int';
+
+            case Type::BOOLEAN:
+                return 'bool';
+
+            case Type::DATE:
+            case Type::TIME:
+            case Type::DATETIME:
+            case Type::DATETIMETZ:
+                    return \DateTimeInterface::class;
+
+            case Type::FLOAT:
+                return 'float';
+        }
+
+        return 'string';
     }
 
     /**

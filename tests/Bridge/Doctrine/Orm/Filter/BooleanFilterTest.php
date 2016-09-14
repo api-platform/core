@@ -95,7 +95,7 @@ class BooleanFilterTest extends KernelTestCase
         $this->assertEquals([
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
-                'type' => 'boolean',
+                'type' => 'bool',
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));
@@ -111,7 +111,7 @@ class BooleanFilterTest extends KernelTestCase
         $this->assertEquals([
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
-                'type' => 'boolean',
+                'type' => 'bool',
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));

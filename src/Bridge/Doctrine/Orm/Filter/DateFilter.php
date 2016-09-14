@@ -194,7 +194,7 @@ class DateFilter extends AbstractFilter
         return [
             sprintf('%s[%s]', $property, $period) => [
                 'property' => $property,
-                'type' => '\DateTime',
+                'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
         ];
