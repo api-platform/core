@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+* Fix a case typo in a namespace alias in the Hydra documentation
+
 ## 1.1.0 beta 2
 
 * Allow to configure the default controller to use
