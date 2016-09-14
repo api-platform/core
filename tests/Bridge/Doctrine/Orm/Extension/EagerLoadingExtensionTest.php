@@ -106,6 +106,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2')->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy3')->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy4')->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
         $idPropertyMetadata = new PropertyMetadata();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
@@ -124,10 +126,12 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn([0 => 'relatedDummy', 'relatedDummy2']);
+        $classMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn([0 => 'relatedDummy', 'relatedDummy2', 'relatedDummy3', 'relatedDummy4']);
         $classMetadataProphecy->associationMappings = [
             'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => true]], 'targetEntity' => DummyRelated::class],
             'relatedDummy2' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => DummyRelated::class],
+            'relatedDummy3' => ['fetch' => 3, 'joinTable' => ['joinColumns' => [['nullable' => false]]], 'targetEntity' => DummyRelated::class],
+            'relatedDummy4' => ['fetch' => 3, 'targetEntity' => DummyRelated::class],
         ];
 
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -146,8 +150,12 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'a0')->shouldBeCalled(1);
         $queryBuilderProphecy->innerJoin('o.relatedDummy2', 'a11')->shouldBeCalled(1);
+        $queryBuilderProphecy->innerJoin('o.relatedDummy3', 'a122')->shouldBeCalled(1);
+        $queryBuilderProphecy->leftJoin('o.relatedDummy4', 'a1233')->shouldBeCalled(1);
         $queryBuilderProphecy->addSelect('partial a0.{id,name}')->shouldBeCalled(1);
         $queryBuilderProphecy->addSelect('partial a11.{id,name}')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('partial a122.{id,name}')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('partial a1233.{id,name}')->shouldBeCalled(1);
 
         $em = $queryBuilderProphecy->getEntityManager()->shouldBeCalled(2)->willReturn($emProphecy->reveal());
 
