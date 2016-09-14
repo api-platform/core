@@ -57,7 +57,7 @@ class BooleanFilter extends AbstractFilter
 
             $description[$property] = [
                 'property' => $property,
-                'type' => 'boolean',
+                'type' => 'bool',
                 'required' => false,
             ];
         }

@@ -399,63 +399,76 @@ final class DocumentationNormalizer implements NormalizerInterface
             $propertySchema['description'] = $description;
         }
 
-        if (null == $type = $propertyMetadata->getType()) {
+        if (null === $type = $propertyMetadata->getType()) {
             return $propertySchema;
         }
 
-        $valueSchema = new \ArrayObject();
-        $valueType = $type->isCollection() ? $type->getCollectionValueType() : $type;
-
-        switch ($valueType ? $valueType->getBuiltinType() : null) {
-            case Type::BUILTIN_TYPE_STRING:
-                $valueSchema['type'] = 'string';
-                break;
-
-            case Type::BUILTIN_TYPE_INT:
-                $valueSchema['type'] = 'integer';
-                break;
-
-            case Type::BUILTIN_TYPE_FLOAT:
-                $valueSchema['type'] = 'number';
-                break;
-
-            case Type::BUILTIN_TYPE_BOOL:
-                $valueSchema['type'] = 'boolean';
-                break;
-
-            case Type::BUILTIN_TYPE_OBJECT:
-                if (null === $className = $valueType->getClassName()) {
-                    break;
-                }
-
-                if (is_subclass_of($className, \DateTimeInterface::class)) {
-                    $valueSchema['type'] = 'string';
-                    $valueSchema['format'] = 'date-time';
-                    break;
-                }
-
-                if (!$this->resourceClassResolver->isResourceClass($className)) {
-                    break;
-                }
-
-                if (true === $propertyMetadata->isReadableLink()) {
-                    $valueSchema['$ref'] = sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName());
-                    break;
-                }
-
-                $valueSchema['type'] = 'string';
-                $valueSchema['format'] = 'uri';
-                break;
-        }
-
-        if ($type->isCollection()) {
-            $propertySchema['type'] = 'array';
-            $propertySchema['items'] = $valueSchema;
+        $isCollection = $type->isCollection();
+        if (null === $valueType = $isCollection ? $type->getCollectionValueType() : $type) {
+            $builtinType = 'string';
+            $className = null;
         } else {
-            $propertySchema = new \ArrayObject((array) $propertySchema + (array) $valueSchema);
+            $builtinType = $valueType->getBuiltinType();
+            $className = $valueType->getClassName();
         }
 
-        return $propertySchema;
+        $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink());
+
+        return new \ArrayObject((array) $propertySchema + $valueSchema);
+    }
+
+    /**
+     * Gets the Swagger's type corresponding to the given PHP's type.
+     *
+     * @param string $type
+     *
+     * @param bool   $isCollection
+     * @param string $className
+     * @param bool   $readableLink
+     *
+     * @return array
+     */
+    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null) : array
+    {
+        if ($isCollection) {
+            return ['type' => 'array', 'items' => $this->getType($type, false, $className, $readableLink)];
+        }
+
+        if (Type::BUILTIN_TYPE_STRING === $type) {
+            return ['type' => 'string'];
+        }
+
+        if (Type::BUILTIN_TYPE_INT === $type) {
+            return ['type' => 'integer'];
+        }
+
+        if (Type::BUILTIN_TYPE_FLOAT === $type) {
+            return ['type' => 'number'];
+        }
+
+        if (Type::BUILTIN_TYPE_BOOL === $type) {
+            return ['type' => 'boolean'];
+        }
+
+        if (Type::BUILTIN_TYPE_OBJECT === $type) {
+            if (null === $className) {
+                return ['type' => 'string'];
+            }
+
+            if (is_subclass_of($className, \DateTimeInterface::class)) {
+                return ['type' => 'string', 'format' => 'date-time'];
+            }
+
+            if (!$this->resourceClassResolver->isResourceClass($className)) {
+                return ['type' => 'string'];
+            }
+
+            if (true === $readableLink) {
+                return ['$ref' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
+            }
+        }
+
+        return ['type' => 'string'];
     }
 
     /**
@@ -488,6 +501,24 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $doc;
+    }
+
+    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata) : array
+    {
+        $parameters = new \ArrayObject();
+        foreach($resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true) as $filter) {
+            foreach ($filter->getDescription($resourceClass) as $variable => $data) {
+                $parameter = [
+                    'name' => $variable,
+                    'in' => 'query',
+                    'required' => $data['required'],
+                    'type' => $this->getType($data['type'])
+                ];
+
+                $data['swagger'] ?? $parameter = $data['swagger'] + $parameter;
+                $parameters[] = $parameter;
+            }
+        }
     }
 
     /**
