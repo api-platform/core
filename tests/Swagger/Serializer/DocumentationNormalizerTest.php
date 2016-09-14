@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Swagger;
 
+use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -25,21 +26,19 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
+use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNormalize()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
@@ -87,73 +86,49 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'paths' => new \ArrayObject([
                 '/dummies' => [
                     'get' => new \ArrayObject([
-                        'tags' => [
-                            'Dummy',
-                        ],
+                        'tags' => ['Dummy'],
                         'operationId' => 'getDummyCollection',
-                        'produces' => [
-                            'application/ld+json',
-                        ],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
                                 'schema' => [
                                     'type' => 'array',
-                                    'items' => [
-                                        '$ref' => '#/definitions/Dummy',
-                                    ],
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
                     ]),
                     'post' => new \ArrayObject([
-                        'tags' => [
-                            'Dummy',
-                        ],
+                        'tags' => ['Dummy'],
                         'operationId' => 'postDummyCollection',
-                        'consumes' => [
-                            'application/ld+json',
-                        ],
-                        'produces' => [
-                            'application/ld+json',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'dummy',
                                 'in' => 'body',
                                 'description' => 'The new Dummy resource',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                         ],
                         'responses' => [
                             201 => [
                                 'description' => 'Dummy resource created',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            400 => [
-                                'description' => 'Invalid input',
-                            ],
-                            404 => [
-                                'description' => 'Resource not found',
-                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
                 '/dummies/{id}' => [
                     'get' => new \ArrayObject([
-                        'tags' => [
-                            'Dummy',
-                        ],
+                        'tags' => ['Dummy'],
                         'operationId' => 'getDummyItem',
-                        'produces' => [
-                            'application/ld+json',
-                        ],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Dummy resource.',
                         'parameters' => [
                             [
@@ -166,26 +141,16 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy resource response',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            404 => [
-                                'description' => 'Resource not found',
-                            ],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                     'put' => new \ArrayObject([
-                        'tags' => [
-                            'Dummy',
-                        ],
+                        'tags' => ['Dummy'],
                         'operationId' => 'putDummyItem',
-                        'consumes' => [
-                            'application/ld+json',
-                        ],
-                        'produces' => [
-                            'application/ld+json',
-                        ],
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Replaces the Dummy resource.',
                         'parameters' => [
                             [
@@ -198,84 +163,56 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'dummy',
                                 'in' => 'body',
                                 'description' => 'The updated Dummy resource',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                         ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy resource updated',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            400 => [
-                                'description' => 'Invalid input',
-                            ],
-                            404 => [
-                                'description' => 'Resource not found',
-                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
                 '/foo' => [
                     'get' => new \ArrayObject([
-                        'tags' => [
-                            'Dummy',
-                        ],
+                        'tags' => ['Dummy'],
                         'operationId' => 'customDummyCollection',
-                        'produces' => [
-                            'application/ld+json',
-                        ],
+                        'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
                                 'schema' => [
                                     'type' => 'array',
-                                    'items' => [
-                                        '$ref' => '#/definitions/Dummy',
-                                    ],
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
                                 ],
                             ],
                         ],
                     ]),
                     'post' => new \ArrayObject([
-                        'tags' => [
-                            'Dummy',
-                        ],
+                        'tags' => ['Dummy'],
                         'operationId' => 'custom2DummyCollection',
-                        'produces' => [
-                            'application/ld+json',
-                        ],
-                        'consumes' => [
-                            'application/ld+json',
-                        ],
+                        'produces' => ['application/ld+json'],
+                        'consumes' => ['application/ld+json'],
                         'summary' => 'Creates a Dummy resource.',
                         'parameters' => [
                             [
                                 'name' => 'dummy',
                                 'in' => 'body',
                                 'description' => 'The new Dummy resource',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
                         ],
                         'responses' => [
                             201 => [
                                 'description' => 'Dummy resource created',
-                                'schema' => [
-                                    '$ref' => '#/definitions/Dummy',
-                                ],
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
                             ],
-                            400 => [
-                                'description' => 'Invalid input',
-                            ],
-                            404 => [
-                                'description' => 'Resource not found',
-                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
                         ],
                     ]),
                 ],
@@ -284,9 +221,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 'Dummy' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
-                    'externalDocs' => [
-                        'url' => 'http://schema.example.com/Dummy',
-                    ],
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                     'properties' => [
                         'name' => new \ArrayObject([
                             'type' => 'string',
@@ -856,6 +791,123 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    public function testFilters()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            [],
+            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2']]],
+            []
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $filters = new FilterCollection([
+            'f1' => new DummyFilter(['name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => true,
+                'strategy' => 'exact',
+                'swagger' => ['x-foo' => 'bar'],
+            ]]),
+            'f2' => new DummyFilter(['ha' => [
+                'property' => 'foo',
+                'type' => 'int',
+                'required' => false,
+                'strategy' => 'partial',
+            ]]),
+        ]);
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal(),
+            $filters
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/',
+            'info' => [
+                'title' => '',
+                'version' => '0.0.0',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy collection response',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
+                                ],
+                            ],
+                        ],
+                        'parameters' => [
+                            [
+                                'x-foo' => 'bar',
+                                'name' => 'name',
+                                'in' => 'query',
+                                'required' => true,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'ha',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                    'Dummy' => new \ArrayObject([
+                            'type' => 'object',
+                            'description' => 'This is a dummy.',
+                            'properties' => [
+                                'name' => new \ArrayObject([
+                                    'description' => 'This is a name.',
+                                    'type' => 'string',
+                                ]),
+                            ],
+                        ]),
+                ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
