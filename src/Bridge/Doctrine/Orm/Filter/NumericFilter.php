@@ -71,12 +71,32 @@ class NumericFilter extends AbstractFilter
 
             $description[$property] = [
                 'property' => $property,
-                'type' => $metadata->getTypeOfField($propertyParts['field']),
+                'type' => $this->getType($metadata->getTypeOfField($propertyParts['field'])),
                 'required' => false,
             ];
         }
 
         return $description;
+    }
+
+    /**
+     * Gets the PHP type corresponding to this Doctrine type.
+     *
+     * @param string $doctrineType
+     *
+     * @return string
+     */
+    private function getType(string $doctrineType) : string
+    {
+        if (DBALType::DECIMAL === $doctrineType) {
+            return 'string';
+        }
+
+        if (DBALType::FLOAT === $doctrineType) {
+            return 'float';
+        }
+
+        return 'int';
     }
 
     /**

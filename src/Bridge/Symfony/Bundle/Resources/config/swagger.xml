@@ -14,6 +14,7 @@
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.operation_path_resolver" />
             <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.filters" />
 
             <tag name="serializer.normalizer" priority="16" />
         </service>

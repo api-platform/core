@@ -89,12 +89,12 @@ class DateFilterTest extends KernelTestCase
         $this->assertEquals([
             'dummyDate[before]' => [
                 'property' => 'dummyDate',
-                'type' => '\DateTime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
             ],
             'dummyDate[after]' => [
                 'property' => 'dummyDate',
-                'type' => '\DateTime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));
