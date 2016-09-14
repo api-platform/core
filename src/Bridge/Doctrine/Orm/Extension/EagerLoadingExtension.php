@@ -80,7 +80,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            $method = false === $mapping['joinColumns'][0]['nullable'] ? 'innerJoin' : 'leftJoin';
+            $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
+
+            if (null === $joinColumns) {
+                $method = 'leftJoin';
+            } else {
+                $method = false === $joinColumns[0]['nullable'] ? 'innerJoin' : 'leftJoin';
+            }
 
             $associationAlias = $relationAlias.$i;
             $queryBuilder->{$method}($originAlias.'.'.$association, $associationAlias);
