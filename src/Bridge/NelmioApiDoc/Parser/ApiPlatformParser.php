@@ -86,10 +86,11 @@ final class ApiPlatformParser implements ParserInterface
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $operationName, $io);
-        echo '<pre>';var_dump($classOperations['serializer_groups'], !empty($classOperations['serializer_groups'])); echo '</pre>';
+
         if (!empty($classOperations['serializer_groups'])) {
             return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, [], $classOperations);
         }
+
         return $this->parseResource($resourceMetadata, $resourceClass, $io);
     }
 
@@ -118,11 +119,21 @@ final class ApiPlatformParser implements ParserInterface
             if (isset($options['serializer_groups'])) {
                 $options['serializer_groups'] += $attributes['denormalization_context']['groups'];
             } else {
-                $options['serializer_groups'] += $attributes['denormalization_context']['groups'];
+                $options['serializer_groups'] = $attributes['denormalization_context']['groups'];
             }
         }
 
         return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
+    }
+
+    private function getGroupsContext(ResourceMetadata $resourceMetadata, string $operationName, bool $norm)
+    {
+        $groupsContext = $norm ? 'normalization_context' : 'denormalization_context';
+        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, [], true)['groups'];
+        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, [], true)['groups'];
+        $operation[$groupsContext]['groups'] = array_merge(isset($itemOperationAttribute) ? $itemOperationAttribute : [], isset($collectionOperationAttribute) ? $collectionOperationAttribute : []);
+
+        return $operation;
     }
 
     /**
@@ -135,8 +146,8 @@ final class ApiPlatformParser implements ParserInterface
      */
     private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName, string $io) : array
     {
-        $operation['denormalization_context']['groups'] = array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', [], true)['groups'], $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', [], true)['groups']);
-        $operation['normalization_context']['groups'] = array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', [], true)['groups'], $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', [], true)['groups']);
+        $operation = $this->getGroupsContext($resourceMetadata, $operationName, true);
+        $operation += $this->getGroupsContext($resourceMetadata, $operationName, false);
 
 
         if (self::OUT_PREFIX === $io) {
@@ -179,6 +190,7 @@ final class ApiPlatformParser implements ParserInterface
                 $data[$normalizedPropertyName] = $this->parseProperty($resourceMetadata, $propertyMetadata, $io, null, $visited);
             }
         }
+
         return $data;
     }
 
