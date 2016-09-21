@@ -16,6 +16,7 @@ use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -364,6 +365,8 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param ResourceMetadata $resourceMetadata
      * @param array|null       $serializerContext
      *
+     * @throws RuntimeException
+     *
      * @return \ArrayObject
      */
     private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, array $serializerContext = null) : \ArrayObject
@@ -384,6 +387,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
 
             if ($propertyMetadata->isRequired()) {
+                if (false === $propertyMetadata->isWritable()) {
+                    throw new RuntimeException(sprintf('The property "%s" of the resource "%s" can not be required and read-only at the same time.', $propertyName, $resourceClass));
+                }
+
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 
@@ -405,6 +412,10 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getPropertySchema(PropertyMetadata $propertyMetadata) : \ArrayObject
     {
         $propertySchema = new \ArrayObject();
+
+        if (false === $propertyMetadata->isWritable()) {
+            $propertySchema['readOnly'] = true;
+        }
 
         if (null !== $description = $propertyMetadata->getDescription()) {
             $propertySchema['description'] = $description;
