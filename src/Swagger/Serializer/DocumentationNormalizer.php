@@ -503,9 +503,13 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths) : array
     {
+        /** @var Symfony\Component\Routing\RequestContext $requestContext */
+        $requestContext = $this->urlGenerator->getContext();
+
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
             'basePath' => $this->urlGenerator->generate('api_entrypoint'),
+            'host' => $requestContext->getHost(),
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),
