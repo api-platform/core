@@ -19,6 +19,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="nelmio_api_doc.extractor.parser" />
         </service>
