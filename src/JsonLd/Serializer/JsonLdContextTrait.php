@@ -41,12 +41,12 @@ trait JsonLdContextTrait
         $context['jsonld_has_context'] = true;
 
         if (isset($context['jsonld_embed_context'])) {
-            $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
+            $data['@context'] = $contextBuilder->getResourceContext($resourceClass); //todo config url
 
             return $data;
         }
 
-        $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass);
+        $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass); //todo config url
 
         return $data;
     }

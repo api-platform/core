@@ -11,6 +11,7 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -37,6 +38,28 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
                 ->scalarNode('default_operation_path_resolver')->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('default_reference_type')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($config) {
+                            switch ($config) {
+                                case 'absolute_url':
+                                    $defaultReferenceType = UrlGeneratorInterface::ABS_URL;
+                                    break;
+                                case 'relative_path':
+                                    $defaultReferenceType = UrlGeneratorInterface::REL_PATH;
+                                    break;
+                                case 'network_path':
+                                    $defaultReferenceType = UrlGeneratorInterface::NET_PATH;
+                                    break;
+                                default:
+                                    $defaultReferenceType = UrlGeneratorInterface::ABS_PATH;
+                            }
+
+                            return $defaultReferenceType;
+                        })
+                    ->end()
+                ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()

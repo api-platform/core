@@ -30,12 +30,14 @@ final class EntrypointNormalizer implements NormalizerInterface
     private $resourceMetadataFactory;
     private $iriConverter;
     private $urlGenerator;
+    private $defaultReferenceType;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator, int $defaultReferenceType = UrlGeneratorInterface::ABS_PATH)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;
+        $this->defaultReferenceType = $defaultReferenceType;
     }
 
     /**
@@ -44,8 +46,8 @@ final class EntrypointNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $entrypoint = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint']),
-            '@id' => $this->urlGenerator->generate('api_entrypoint'),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Entrypoint'], $this->defaultReferenceType),
+            '@id' => $this->urlGenerator->generate('api_entrypoint', [], $this->defaultReferenceType),
             '@type' => 'Entrypoint',
         ];
 
@@ -56,7 +58,7 @@ final class EntrypointNormalizer implements NormalizerInterface
                 continue;
             }
             try {
-                $entrypoint[lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+                $entrypoint[lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass, $this->defaultReferenceType);
             } catch (InvalidArgumentException $ex) {
                 // Ignore resources without GET operations
             }

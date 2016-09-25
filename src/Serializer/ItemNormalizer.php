@@ -29,7 +29,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         if (!isset($data['id'])) {
-            $data = ['id' => $this->iriConverter->getIriFromItem($object)] + $data;
+            $data = ['id' => $this->iriConverter->getIriFromItem($object, $this->defaultReferenceType)] + $data;
         }
 
         return $data;

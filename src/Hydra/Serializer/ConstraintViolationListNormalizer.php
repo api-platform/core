@@ -55,7 +55,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         }
 
         return [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']), //todo config url
             '@type' => 'ConstraintViolationList',
             'hydra:title' => $context['title'] ?? 'An error occurred',
             'hydra:description' => $messages ? implode("\n", $messages) : (string) $object,

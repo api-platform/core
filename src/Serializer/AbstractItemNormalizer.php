@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -38,8 +39,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $iriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
+    protected $defaultReferenceType;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, int $defaultReferenceType = UrlGeneratorInterface::ABS_PATH)
     {
         parent::__construct(null, $nameConverter);
 
@@ -48,9 +50,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->defaultReferenceType = $defaultReferenceType;
 
         $this->setCircularReferenceHandler(function ($object) {
-            return $this->iriConverter->getIriFromItem($object);
+            return $this->iriConverter->getIriFromItem($object, $this->defaultReferenceType);
         });
     }
 
@@ -413,6 +416,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->normalize($relatedObject, $format, $this->createRelationSerializationContext($resourceClass, $context));
         }
 
-        return $this->iriConverter->getIriFromItem($relatedObject);
+        return $this->iriConverter->getIriFromItem($relatedObject, $this->defaultReferenceType);
     }
 }

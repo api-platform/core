@@ -453,7 +453,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function computeDoc(Documentation $object, array $classes) : array
     {
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])]; //todo config url
 
         if ('' !== $object->getTitle()) {
             $doc['hydra:title'] = $object->getTitle();
@@ -463,7 +463,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $doc['hydra:description'] = $object->getDescription();
         }
 
-        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint'); //todo config url
         $doc['hydra:supportedClass'] = $classes;
 
         return $doc;
@@ -477,7 +477,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getContext() : array
     {
         return [
-            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
+            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#', //todo config url
             'hydra' => ContextBuilderInterface::HYDRA_NS,
             'rdf' => ContextBuilderInterface::RDF_NS,
             'rdfs' => ContextBuilderInterface::RDFS_NS,

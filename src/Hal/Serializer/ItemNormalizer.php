@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -34,9 +35,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     private $componentsCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, int $defaultReferenceType = UrlGeneratorInterface::ABS_PATH)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $defaultReferenceType);
     }
 
     /**
@@ -59,7 +60,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $rawData;
         }
 
-        $data = ['_links' => ['self' => ['href' => $this->iriConverter->getIriFromItem($object)]]];
+        $data = ['_links' => ['self' => ['href' => $this->iriConverter->getIriFromItem($object, $this->defaultReferenceType)]]];
         $components = $this->getComponents($object, $format, $context);
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'embedded');

@@ -62,7 +62,7 @@ final class ContextAction
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if ($shortName === $resourceMetadata->getShortName()) {
-                return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)];
+                return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)]; //todo config url
             }
         }
 

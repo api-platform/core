@@ -45,7 +45,7 @@ final class ErrorNormalizer implements NormalizerInterface
         }
 
         $data = [
-            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
+            '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']), //todo config url
             '@type' => 'Error',
             'hydra:title' => $context['title'] ?? 'An error occurred',
             'hydra:description' => $message ?? (string) $object,

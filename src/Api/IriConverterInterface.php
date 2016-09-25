@@ -50,7 +50,7 @@ interface IriConverterInterface
      * Gets the IRI associated with the given resource collection.
      *
      * @param string $resourceClass
-     * @param string $referenceType
+     * @param int    $referenceType
      *
      * @throws InvalidArgumentException
      *

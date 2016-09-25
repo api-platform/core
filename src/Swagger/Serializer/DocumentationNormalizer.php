@@ -382,7 +382,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
-            'basePath' => $this->urlGenerator->generate('api_entrypoint'),
+            'basePath' => $this->urlGenerator->generate('api_entrypoint'), //todo config url
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),

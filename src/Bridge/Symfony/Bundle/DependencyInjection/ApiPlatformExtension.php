@@ -87,6 +87,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
+        $container->setParameter('api_platform.default_reference_type', $config['default_reference_type']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
