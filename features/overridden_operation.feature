@@ -54,7 +54,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><id>/overridden_operation_dummies/1</id><name>My Overridden Operation Dummy</name><alias/><description>Gerard</description></response>
+    <response><name>My Overridden Operation Dummy</name><alias/><description>Gerard</description></response>
     """
 
   Scenario: Get a not found exception

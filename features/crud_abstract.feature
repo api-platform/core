@@ -23,6 +23,7 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
       "@id": "/concrete_dummies/1",
       "@type": "ConcreteDummy",
       "instance": "Concrete",
+      "id": 1,
       "name": "My Dummy"
     }
     """
@@ -39,6 +40,7 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
       "@id": "/concrete_dummies/1",
       "@type": "ConcreteDummy",
       "instance": "Concrete",
+      "id": 1,
       "name": "My Dummy"
     }
     """
@@ -95,6 +97,7 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
         "@id": "/concrete_dummies/1",
         "@type": "ConcreteDummy",
         "instance": "Become real",
+        "id": 1,
         "name": "A nice dummy"
       }
       """

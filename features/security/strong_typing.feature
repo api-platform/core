@@ -32,6 +32,7 @@ Feature: Handle properly invalid data submitted to the API
       "relatedDummies": [],
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Not existing",
       "alias": null
     }

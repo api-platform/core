@@ -68,9 +68,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $data['@id'] = $this->iriConverter->getIriFromItem($object);
-        $data['@type'] = ($iri = $resourceMetadata->getIri()) ? $iri : $resourceMetadata->getShortName();
+        $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
 
-        return array_merge($data, $rawData);
+        return $data + $rawData;
     }
 
     /**
