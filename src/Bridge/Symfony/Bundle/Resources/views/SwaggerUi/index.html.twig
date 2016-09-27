@@ -31,7 +31,7 @@
         $(function () {
             window.swaggerUi = new SwaggerUi({
                 url: '{{ path('api_doc', {'_format': 'json'} ) }}',
-                spec: JSON.parse('{{ spec|escape('js') }}'),
+                spec: {{ spec|replace({'<': '\u003c'})|raw }},
                 dom_id: 'swagger-ui-container',
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
                 onComplete: function() {
@@ -48,11 +48,11 @@
                     });
 
                     {% if operationId is not null %}
-                        {% set domId = '#' ~ shortName ~ '_' ~ operationId %}
+                        {% set domId = shortName ~ '_' ~ operationId %}
                         {% set id = app.request.attributes.get('id') %}
 
-                        var queryParameters = JSON.parse('{{ app.request.query.all()|json_encode|escape('js') }}');
-                        $('{{ domId|escape('js') }} form.sandbox input.parameter').each(function (i, e) {
+                        var queryParameters = {{ app.request.query.all()|json_encode|replace({'<': '\u003c'})|raw }};
+                        $('#{{ domId|escape('js') }} form.sandbox input.parameter').each(function (i, e) {
                             var $e = $(e);
                             var name = $e.attr('name');
 
@@ -62,10 +62,10 @@
                         });
 
                         {% if id %}
-                            $('{{ domId|escape('js') }} form.sandbox input[name="id"]').val('{{ id|escape('js') }}');
+                            $('#{{ domId|escape('js') }} form.sandbox input[name="id"]').val('{{ id|escape('js') }}');
                         {% endif %}
 
-                        $('{{ domId|escape('js') }} form.sandbox').submit();
+                        $('#{{ domId|escape('js') }} form.sandbox').submit();
                         document.location.hash = '#!/{{ shortName|escape('js') }}/{{ operationId|escape('js') }}';
                     {% endif %}
                 },
