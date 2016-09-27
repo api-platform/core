@@ -58,7 +58,7 @@ final class SerializeListener
             return;
         }
 
-        $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes, $controllerResult);
         $request->attributes->set('_api_respond', true);
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
