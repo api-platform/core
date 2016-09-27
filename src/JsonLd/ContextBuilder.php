@@ -97,18 +97,25 @@ final class ContextBuilder implements ContextBuilderInterface
             }
 
             $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
+            $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
 
             if (!$id = $propertyMetadata->getIri()) {
                 $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
             }
 
             if (true !== $propertyMetadata->isReadableLink()) {
-                $context[$convertedName] = [
+                $jsonldContext = $jsonldContext + [
                     '@id' => $id,
                     '@type' => '@id',
                 ];
-            } else {
+            }
+
+            if (empty($jsonldContext)) {
                 $context[$convertedName] = $id;
+            } else {
+                $context[$convertedName] = $jsonldContext + [
+                    '@id' => $id,
+                ];
             }
         }
 
