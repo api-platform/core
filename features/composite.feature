@@ -21,6 +21,7 @@ Feature: Retrieve data with Composite identifiers
         {
           "@id": "/composite_items/1",
           "@type": "CompositeItem",
+          "id": 1,
           "field1": "foobar",
           "compositeValues": [
             "/composite_relations/compositeItem=1;compositeLabel=1",
@@ -42,6 +43,7 @@ Feature: Retrieve data with Composite identifiers
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And print last JSON response
     And the JSON should be equal to:
     """
     {
@@ -52,17 +54,23 @@ Feature: Retrieve data with Composite identifiers
         {
           "@id": "/composite_relations/compositeItem=1;compositeLabel=1",
           "@type": "CompositeRelation",
-          "value": "somefoobardummy"
+          "value": "somefoobardummy",
+          "compositeItem": "/composite_items/1",
+          "compositeLabel": "/composite_labels/1"
         },
         {
           "@id": "/composite_relations/compositeItem=1;compositeLabel=2",
           "@type": "CompositeRelation",
-          "value": "somefoobardummy"
+          "value": "somefoobardummy",
+          "compositeItem": "/composite_items/1",
+          "compositeLabel": "/composite_labels/2"
         },
         {
           "@id": "/composite_relations/compositeItem=1;compositeLabel=3",
           "@type": "CompositeRelation",
-          "value": "somefoobardummy"
+          "value": "somefoobardummy",
+          "compositeItem": "/composite_items/1",
+          "compositeLabel": "/composite_labels/3"
         }
       ],
       "hydra:totalItems": 4,
@@ -86,10 +94,12 @@ Feature: Retrieve data with Composite identifiers
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/CompositeRelation",
-      "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
+      "@context": "/contexts/CompositeRelation",
+      "@id": "/composite_relations/compositeItem=1;compositeLabel=1",
       "@type": "CompositeRelation",
-      "value": "somefoobardummy"
+      "value": "somefoobardummy",
+      "compositeItem": "/composite_items/1",
+      "compositeLabel": "/composite_labels/1"
     }
     """
 
@@ -102,10 +112,12 @@ Feature: Retrieve data with Composite identifiers
     And the JSON should be equal to:
     """
     {
-      "@context": "\/contexts\/CompositeRelation",
-      "@id": "\/composite_relations\/compositeItem=1;compositeLabel=1",
+      "@context": "/contexts/CompositeRelation",
+      "@id": "/composite_relations/compositeItem=1;compositeLabel=1",
       "@type": "CompositeRelation",
-      "value": "somefoobardummy"
+      "value": "somefoobardummy",
+      "compositeItem": "/composite_items/1",
+      "compositeLabel": "/composite_labels/1"
     }
     """
 
