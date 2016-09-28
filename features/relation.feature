@@ -303,6 +303,7 @@ Feature: Relations support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  @dropSchema
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
@@ -328,39 +329,6 @@ Feature: Relations support
         "@id": "/related_dummies/2",
         "@type": "https://schema.org/Product",
         "symfony": "API Platform",
-        "thirdLevel": null
-      },
-      "related": null
-    }
-    """
-
-  @dropSchema
-  Scenario: Update an existing relation
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/relation_embedders" with body:
-    """
-    {
-      "anotherRelated": {
-        "@id": "/related_dummies/2",
-        "@type": "https://schema.org/Product",
-        "symfony": "phalcon"
-      }
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/RelationEmbedder",
-      "@id": "/relation_embedders/3",
-      "@type": "RelationEmbedder",
-      "krondstadt": "Krondstadt",
-      "anotherRelated": {
-        "@id": "/related_dummies/2",
-        "@type": "https://schema.org/Product",
-        "symfony": "phalcon",
         "thirdLevel": null
       },
       "related": null

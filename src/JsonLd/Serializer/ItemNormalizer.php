@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\DenormalizationException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -83,11 +84,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws DenormalizationException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context['object_to_populate'])) {
+            if (!$context['allow_update']) {
+                throw new DenormalizationException('Update is not allowed for this operation.');
+            }
+
             $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], true);
         }
 
