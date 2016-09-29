@@ -126,7 +126,8 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \ApiPlatform\Core\Exception\DenormalizationException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Update is not allowed for this operation.
      */
     public function testDenormalizeWithIdAndUpdateNotAllowed()
     {

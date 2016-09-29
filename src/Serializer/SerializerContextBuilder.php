@@ -49,7 +49,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['item_operation_name'] = $attributes['item_operation_name'];
         }
 
-        if (!$normalization && (!isset($context['allow_update']) || !is_bool($context['allow_update']))) {
+        if (!$normalization && !isset($context['allow_update'])) {
             $context['allow_update'] = Request::METHOD_PUT === $request->getMethod();
         }
 

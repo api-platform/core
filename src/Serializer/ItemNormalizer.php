@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Serializer;
 
-use ApiPlatform\Core\Exception\DenormalizationException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 
 /**
  * Generic item normalizer.
@@ -23,14 +23,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      *
-     * @throws DenormalizationException
+     * @throws InvalidArgumentException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['id']) && !isset($context['object_to_populate'])) {
-            if (!$context['allow_update']) {
-                throw new DenormalizationException('Update is not allowed for this operation.');
+            if (isset($context['allow_update']) && true !== $context['allow_update']) {
+                throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
             $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['id'], true);

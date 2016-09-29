@@ -100,7 +100,7 @@ Feature: Error handling
       And the JSON node "@context" should be equal to "/contexts/Error"
       And the JSON node "@type" should be equal to "Error"
       And the JSON node "hydra:title" should be equal to "An error occurred"
-      And the JSON node "hydra:description" should be equal to 'Update is not allowed for this operation.'
+      And the JSON node "hydra:description" should be equal to "Update is not allowed for this operation."
       And the JSON node "trace" should exist
 
     Scenario: Get an error during update of an existing relation with a non-allowed update operation
@@ -121,5 +121,5 @@ Feature: Error handling
       And the JSON node "@context" should be equal to "/contexts/Error"
       And the JSON node "@type" should be equal to "Error"
       And the JSON node "hydra:title" should be equal to "An error occurred"
-      And the JSON node "hydra:description" should be equal to 'Update is not allowed for this operation.'
+      And the JSON node "hydra:description" should be equal to "Update is not allowed for this operation."
       And the JSON node "trace" should exist
