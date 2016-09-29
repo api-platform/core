@@ -66,6 +66,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
+     * @param string       $originAlias
+     * @param string       $relationAlias
      */
     private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, string $originAlias = 'o', string &$relationAlias = 'a')
     {

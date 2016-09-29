@@ -53,6 +53,6 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
         $resourceMetadataFactory = new YamlResourceNameCollectionFactory([$configPath]);
 
-        $resourceMetadataFactory->create(FileConfigDummy::class);
+        $resourceMetadataFactory->create();
     }
 }

@@ -35,7 +35,7 @@ class OrderExtensionTest extends \PHPUnit_Framework_TestCase
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
-        $em = $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
@@ -54,7 +54,7 @@ class OrderExtensionTest extends \PHPUnit_Framework_TestCase
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
-        $em = $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension();
