@@ -103,7 +103,6 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'formats' => [],
         ])->shouldBeCalled();
 
-
         $action = new SwaggerUiAction(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),

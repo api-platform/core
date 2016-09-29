@@ -17,7 +17,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
-
  */
 final class QueryNameGenerator implements QueryNameGeneratorInterface
 {

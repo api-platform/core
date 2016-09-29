@@ -112,6 +112,8 @@ class ItemDataProvider implements ItemDataProviderInterface
      * @param ObjectManager $manager
      * @param string        $resourceClass
      *
+     * @throws PropertyNotFoundException
+     *
      * @return array
      */
     private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass) : array
