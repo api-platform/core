@@ -69,12 +69,6 @@
             <argument type="service" id="api_platform.filters" />
         </service>
 
-        <!-- Action -->
-
-        <service id="api_platform.hydra.action.exception" class="ApiPlatform\Core\Hydra\Action\ExceptionAction">
-            <argument type="service" id="api_platform.hydra.normalizer.error" />
-       </service>
-
     </services>
 
 </container>
