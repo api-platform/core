@@ -64,3 +64,23 @@ Feature: JSON-LD contexts generation
         }
       }
       """
+
+    Scenario: Retrieve Dummy with extended jsonld context
+      When I send a "GET" request to "/contexts/JsonldContextDummy"
+      Then the response status code should be 200
+      And the response should be in JSON
+      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+      And the JSON should be equal to:
+      """
+      {
+          "@context": {
+              "@vocab": "http:\/\/example.com\/doc.jsonld#",
+              "hydra": "http:\/\/www.w3.org\/ns\/hydra\/core#",
+              "person": {
+                  "@id": "http:\/\/example.com\/id",
+                  "@type": "@id",
+                  "foo": "bar"
+              }
+          }
+      }
+      """

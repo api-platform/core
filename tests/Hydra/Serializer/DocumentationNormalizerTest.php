@@ -39,7 +39,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version, []);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description']));
 
         $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -47,6 +47,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create('dummy', 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'name', true, true, true, true, false, false, null, null, []));
+        $propertyMetadataFactoryProphecy->create('dummy', 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'description', true, true, true, true, false, false, null, null, ['jsonld_context' => ['@type' => '@id']]));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
@@ -125,6 +126,21 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             'hydra:readable' => true,
                             'hydra:writable' => true,
                             'hydra:description' => 'name',
+                        ],
+                        1 => [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#dummy/description',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'description',
+                                'domain' => '#dummy',
+                                'range' => '@id',
+                            ],
+                            'hydra:title' => 'description',
+                            'hydra:required' => false,
+                            'hydra:readable' => true,
+                            'hydra:writable' => true,
+                            'hydra:description' => 'description',
                         ],
                     ],
                     'hydra:supportedOperation' => [
