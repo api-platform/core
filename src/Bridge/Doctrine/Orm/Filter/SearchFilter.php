@@ -258,12 +258,13 @@ class SearchFilter extends AbstractFilter
     /**
      * Adds where clause according to the strategy.
      *
-     * @param string       $strategy
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $field
-     * @param string       $value
-     * @param bool         $caseSensitive
+     * @param string                      $strategy
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $alias
+     * @param string                      $field
+     * @param string                      $value
+     * @param bool                        $caseSensitive
      *
      * @throws InvalidArgumentException If strategy does not exist
      */

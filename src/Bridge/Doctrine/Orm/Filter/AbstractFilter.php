@@ -270,10 +270,10 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Adds a join to the queryBuilder if none exists.
      *
-     * @param QueryBuilder       $queryBuilder
-     * @param QueryNameGenerator $queryNameGenerator
-     * @param string             $alias
-     * @param string             $association        the association field
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $alias
+     * @param string                      $association        the association field
      *
      * @return string the new association alias
      */
