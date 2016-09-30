@@ -85,6 +85,30 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
+    /**
+     * @dataProvider methodProvider
+     */
+    public function testDeserializeOnNullContent(string $method, bool $populateObject)
+    {
+        $result = $populateObject ? new \stdClass() : null;
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['data' => $result, '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], null);
+        $request->setMethod($method);
+        $request->headers->set('Content-Type', 'application/json');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $context = $populateObject ? ['object_to_populate' => $populateObject] : [];
+        $serializerProphecy->deserialize($result ? '{}' : '', 'Foo', 'json', $context)->willReturn($result)->shouldBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn([])->shouldBeCalled();
+
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
     public function methodProvider()
     {
         return [[Request::METHOD_POST, false], [Request::METHOD_PUT, true]];
