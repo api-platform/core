@@ -82,7 +82,7 @@ final class DeserializeListener
     {
         if (in_array($request->getMethod(), [Request::METHOD_PUT, Request::METHOD_POST])
             && $request->get('data')
-            && null == $request->getContent()
+            && empty($request->getContent())
         ) {
             return '{}';
         }
