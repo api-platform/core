@@ -281,6 +281,12 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getRange(PropertyMetadata $propertyMetadata)
     {
+        $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
+
+        if (isset($jsonldContext['@type'])) {
+            return $jsonldContext['@type'];
+        }
+
         if (null === $type = $propertyMetadata->getType()) {
             return;
         }
