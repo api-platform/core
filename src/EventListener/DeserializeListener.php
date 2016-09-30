@@ -66,9 +66,27 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $format, $context
+                $this->getRequestContent($request), $attributes['resource_class'], $format, $context
             )
         );
+    }
+
+    /**
+     * Extracts the content from the Request.
+     *
+     * @param Request $request
+     *
+     * @return string
+     */
+    private function getRequestContent(Request $request) : string
+    {
+        if (in_array($request->getMethod(), [Request::METHOD_PUT, Request::METHOD_POST])
+            && null === json_decode($request->getContent())
+        ) {
+            return '{}';
+        }
+
+        return $request->getContent();
     }
 
     /**
