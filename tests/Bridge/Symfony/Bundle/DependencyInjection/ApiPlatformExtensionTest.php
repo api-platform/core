@@ -268,7 +268,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.hal.normalizer.collection',
             'api_platform.hal.normalizer.entrypoint',
             'api_platform.hal.normalizer.item',
-            'api_platform.hydra.action.exception',
             'api_platform.hydra.listener.response.add_link_header',
             'api_platform.hydra.normalizer.collection',
             'api_platform.hydra.normalizer.collection_filters',
