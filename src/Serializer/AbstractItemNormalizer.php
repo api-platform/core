@@ -192,6 +192,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @param string      $attribute
      * @param Type        $type
+     * @param mixed       $value
      * @param string|null $format
      *
      * @throws InvalidArgumentException

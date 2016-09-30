@@ -160,8 +160,6 @@ class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testQueryResultExtension()
     {
-        $queryProphecy = $this->prophesize(AbstractQuery::class);
-
         $comparisonProphecy = $this->prophesize(Comparison::class);
         $comparison = $comparisonProphecy->reveal();
 
