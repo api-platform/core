@@ -17,6 +17,7 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - npm install -g swagger-cli
+  - npm install -g jsonapi-validator
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
