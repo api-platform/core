@@ -236,6 +236,31 @@ class RangeFilterTest extends KernelTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummyFloat[between]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[gt]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[gte]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[lt]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[lte]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyPrice[between]' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
