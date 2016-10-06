@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\IriHelper;
@@ -36,12 +37,14 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     private $resourceClassResolver;
     private $pageParameterName;
     private $resourceMetadataFactory;
+    private $propertyMetadataFactory;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataFactoryInterface $resourceMetadataFactory, string $pageParameterName)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, string $pageParameterName)
     {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->pageParameterName = $pageParameterName;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
     }
 
     /**
@@ -75,6 +78,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         if ($isPaginator) {
             $currentPage = $object->getCurrentPage();
             $lastPage = $object->getLastPage();
+            $itemsPerPage = $object->getItemsPerPage();
+
 
             $paginated = 1. !== $lastPage;
         }
@@ -97,7 +102,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 $data['links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
-
+        $identifier = null;
         foreach ($object as $obj) {
             $item = $this->normalizer->normalize($obj, $format, $context);
             $relationships = [];
@@ -107,12 +112,22 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 unset($item['relationships']);
             }
 
-            $data['data'][] = ['type' => $resourceMetadata->getShortName(), 'id' => '@todo', 'attributes' => $item, 'relationships' => $relationships];
+            foreach ($item as $property => $value) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+                if ($propertyMetadata->isIdentifier()) {
+                    $identifier = $item[$property];
+                }
+            }
 
+            $data['data'][] = ['type' => $resourceMetadata->getShortName(), 'id' => $identifier ?? '', 'attributes' => $item, 'relationships' => $relationships];
         }
 
         if (is_array($object) || $object instanceof \Countable) {
-            $data['meta']['total-pages'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
+            $data['meta']['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
+        }
+
+        if ($isPaginator) {
+            $data['meta']['itemsPerPage'] = (int) $itemsPerPage;
         }
 
         return $data;

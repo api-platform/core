@@ -17,7 +17,6 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -27,6 +26,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Converts between objects and array including HAL metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
@@ -116,7 +116,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             'links' => [],
             'relationships' => [],
             'attributes' => [],
-            'meta' => []
+            'meta' => [],
         ];
 
         foreach ($attributes as $attribute) {
@@ -143,7 +143,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $relation = ['name' => $attribute, 'type' => $shortName, 'cardinality' => $isOne ? 'one' : 'many'];
 
             $components['relationships'][] = $relation;
-
         }
 
         return $this->componentsCache[$context['cache_key']] = $components;
