@@ -28,6 +28,7 @@ Feature: JSON-LD contexts generation
             "dummy": "#Dummy/dummy",
             "dummyBoolean": "#Dummy/dummyBoolean",
             "dummyDate": "#Dummy/dummyDate",
+            "dummyFloat": "#Dummy/dummyFloat",
             "dummyPrice": "#Dummy/dummyPrice",
             "relatedDummy": {
                 "@id": "#Dummy/relatedDummy",
