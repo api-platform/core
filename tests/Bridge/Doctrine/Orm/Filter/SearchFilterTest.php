@@ -197,6 +197,18 @@ class SearchFilterTest extends KernelTestCase
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'dummyFloat' => [
+                'property' => 'dummyFloat',
+                'type' => 'float',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'dummyFloat[]' => [
+                'property' => 'dummyFloat',
+                'type' => 'float',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'dummyPrice' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',

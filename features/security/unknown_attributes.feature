@@ -27,6 +27,7 @@ Feature: Ignore unknown attributes
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": null,
+      "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
