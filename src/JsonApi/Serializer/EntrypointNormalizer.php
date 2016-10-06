@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Normalizes the API entrypoint.
  *
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class EntrypointNormalizer implements NormalizerInterface
@@ -43,7 +44,7 @@ final class EntrypointNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $entrypoint = ['links' => ['self' =>  $this->urlGenerator->generate('api_entrypoint')]];
+        $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint')]];
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
