@@ -142,6 +142,7 @@ Feature: Relations support
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": null,
+      "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": "/related_dummies/1",
       "relatedDummies": [
