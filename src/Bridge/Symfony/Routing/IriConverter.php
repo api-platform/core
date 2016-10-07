@@ -134,12 +134,16 @@ final class IriConverter implements IriConverterInterface
                 $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
 
                 if ($propertyMetadata->isIdentifier()) {
+                    if (isset($identifiers[$propertyName])) {
+                        throw new RuntimeException(sprintf('Composite identifiers not supported in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
+                    }
+
                     $identifiers[$propertyName] = $this->propertyAccessor->getValue($relatedItem, $relatedPropertyName);
                 }
             }
 
-            if (empty($identifiers[$propertyName])) {
-                throw new RuntimeException(sprintf('%s identifiers cannot be found', $resourceClass));
+            if (!isset($identifiers[$propertyName])) {
+                throw new RuntimeException(sprintf('No identifier found in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
             }
         }
 
