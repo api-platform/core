@@ -11,14 +11,17 @@
 
 namespace ApiPlatform\Core\Tests\PathResolver;
 
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 
 class UnderscoreOperationPathResolverTest extends \PHPUnit_Framework_TestCase
 {
     public function testResolveCollectionOperationPath()
     {
+        $resourceMetadata = new ResourceMetadata('ShortName');
+
         $underscoreOperationPathResolver = new UnderscoreOperationPathResolver();
 
-        $this->assertSame('/short_names.{_format}', $underscoreOperationPathResolver->resolveOperationPath('ShortName', [], true));
+        $this->assertSame('/short_names.{_format}', $underscoreOperationPathResolver->resolveOperationPath($resourceMetadata, [], true));
     }
 }

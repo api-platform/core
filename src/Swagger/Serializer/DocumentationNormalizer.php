@@ -73,10 +73,9 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $resourceShortName = $resourceMetadata->getShortName();
 
-            $this->addPaths($paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, true);
-            $this->addPaths($paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, false);
+            $this->addPaths($paths, $definitions, $resourceClass, $resourceMetadata, $mimeTypes, true);
+            $this->addPaths($paths, $definitions, $resourceClass, $resourceMetadata, $mimeTypes, false);
         }
 
         $definitions->ksort();
@@ -91,19 +90,18 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param \ArrayObject     $paths
      * @param \ArrayObject     $definitions
      * @param string           $resourceClass
-     * @param string           $resourceShortName
      * @param ResourceMetadata $resourceMetadata
      * @param array            $mimeTypes
      * @param bool             $collection
      */
-    private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, bool $collection)
+    private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, bool $collection)
     {
         if (null === $operations = $collection ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
             return;
         }
 
         foreach ($operations as $operationName => $operation) {
-            $path = $this->getPath($resourceShortName, $operation, $collection);
+            $path = $this->getPath($resourceMetadata, $operation, $collection);
             $method = $collection ? $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
 
             $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, $collection, $resourceClass, $resourceMetadata, $mimeTypes, $definitions);
@@ -118,15 +116,15 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @see https://github.com/OAI/OpenAPI-Specification/issues/93
      *
-     * @param string $resourceShortName
-     * @param array  $operation
-     * @param bool   $collection
+     * @param ResourceMetadata $resourceMetadata
+     * @param array            $operation
+     * @param bool             $collection
      *
      * @return string
      */
-    private function getPath(string $resourceShortName, array $operation, bool $collection) : string
+    private function getPath(ResourceMetadata $resourceMetadata, array $operation, bool $collection) : string
     {
-        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $collection);
+        $path = $this->operationPathResolver->resolveOperationPath($resourceMetadata, $operation, $collection);
         if ('.{_format}' === substr($path, -10)) {
             $path = substr($path, 0, -10);
         }
