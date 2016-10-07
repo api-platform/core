@@ -16,8 +16,7 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     And the JSON should be equal to:
     """
     {
-      "type": "https://tools.ietf.org/html/rfc2616#section-10",
-      "title": "An error occurred",
+      "title": "Bad Request",
       "detail": "name: This value should not be blank.",
       "violations": [
         {
@@ -43,7 +42,6 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "type" should be equal to "https://tools.ietf.org/html/rfc2616#section-10"
-    And the JSON node "title" should be equal to "An error occurred"
+    And the JSON node "title" should be equal to "Bad Request"
     And the JSON node "detail" should be equal to 'Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.'
     And the JSON node "trace" should exist
