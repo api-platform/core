@@ -11,14 +11,19 @@
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
  * The configuration of the bundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class Configuration implements ConfigurationInterface
 {
@@ -41,7 +46,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
 
-            ->arrayNode('collection')
+                ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('order')->defaultNull()->info('The default order of results.')->end()
@@ -64,6 +69,8 @@ final class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $this->addExceptionToStatusSection($rootNode);
+
         $this->addFormatSection($rootNode, 'formats', [
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'json' => ['mime_types' => ['application/json']], // Swagger support
@@ -75,6 +82,58 @@ final class Configuration implements ConfigurationInterface
         ]);
 
         return $treeBuilder;
+    }
+
+    /**
+     * Adds an exception to status section.
+     *
+     * @param ArrayNodeDefinition $rootNode
+     *
+     * @throws InvalidConfigurationException
+     */
+    private function addExceptionToStatusSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('exception_to_status')
+                    ->defaultValue([
+                        ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
+                        InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                    ])
+                    ->info('The list of exceptions mapped to their HTTP status code.')
+                    ->normalizeKeys(false)
+                    ->useAttributeAsKey('exception_class')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(function (array $exceptionToStatus) {
+                            foreach ($exceptionToStatus as &$httpStatusCode) {
+                                if (is_int($httpStatusCode)) {
+                                    continue;
+                                }
+
+                                if (defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
+                                    $httpStatusCode = constant($httpStatusCodeConstant);
+                                }
+                            }
+
+                            return $exceptionToStatus;
+                        })
+                    ->end()
+                    ->prototype('integer')->end()
+                    ->validate()
+                        ->ifArray()
+                        ->then(function (array $exceptionToStatus) {
+                            foreach ($exceptionToStatus as $httpStatusCode) {
+                                if ($httpStatusCode < 100 || $httpStatusCode >= 600) {
+                                    throw new InvalidConfigurationException(sprintf('The HTTP status code "%s" is not valid.', $httpStatusCode));
+                                }
+                            }
+
+                            return $exceptionToStatus;
+                        })
+                    ->end()
+                ->end()
+            ->end();
     }
 
     /**

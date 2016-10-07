@@ -47,6 +47,9 @@ api_platform:
             client_items_per_page:     true
             items_per_page:            3
     enable_nelmio_api_doc: true
+    exception_to_status:
+        Symfony\Component\Serializer\Exception\ExceptionInterface: 400
+        ApiPlatform\Core\Exception\InvalidArgumentException: 'HTTP_BAD_REQUEST'
 
 fos_user:
     db_driver:        'orm'

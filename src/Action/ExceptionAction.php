@@ -11,36 +11,48 @@
 
 namespace ApiPlatform\Core\Action;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Renders a normalized exception for a given {@see \Symfony\Component\Debug\Exception\FlattenException}.
+ *
+ * Usage:
+ *
+ *     $exceptionAction = new ExceptionAction(
+ *         new Serializer(),
+ *         [
+ *             'jsonproblem' => ['application/problem+json'],
+ *             'jsonld' => ['application/ld+json'],
+ *         ],
+ *         [
+ *             ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
+ *             InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+ *         ]
+ *     );
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class ExceptionAction
 {
-    const DEFAULT_EXCEPTION_TO_STATUS = [
-        ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
-        InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-    ];
-
     private $serializer;
     private $errorFormats;
     private $exceptionToStatus;
 
-    public function __construct(SerializerInterface $serializer, array $errorFormats, $exceptionToStatus = [])
+    /**
+     * @param SerializerInterface $serializer
+     * @param array               $errorFormats      A list of enabled formats, the first one will be the default
+     * @param array               $exceptionToStatus A list of exceptions mapped to their HTTP status code
+     */
+    public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [])
     {
         $this->serializer = $serializer;
         $this->errorFormats = $errorFormats;
-        $this->exceptionToStatus = self::DEFAULT_EXCEPTION_TO_STATUS + $exceptionToStatus;
+        $this->exceptionToStatus = $exceptionToStatus;
     }
 
     /**
