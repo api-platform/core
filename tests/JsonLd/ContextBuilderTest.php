@@ -95,7 +95,7 @@ class ContextBuilderTest extends \PHPUnit_Framework_TestCase
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'dummyPropertyA' => [
                 '@id' => '#DummyEntity/dummyPropertyA',
-                '@reverse' => 'parent'
+                '@reverse' => 'parent',
             ],
         ];
 
