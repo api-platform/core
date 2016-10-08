@@ -66,10 +66,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
-     * @param string       $originAlias
-     * @param string       $relationAlias
+     * @param string       $originAlias   the current entity alias (first o, then a1, a2 etc.)
+     * @param string       $relationAlias the previous relation alias to keep it unique
+     * @param bool         $wasLeftJoin   if the relation containing the new one had a left join, we have to force the new one to left join too
      */
-    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, string $originAlias = 'o', string &$relationAlias = 'a')
+    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false)
     {
         $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $j = 0;
@@ -82,12 +83,16 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
+            if (false === $wasLeftJoin) {
+                $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
 
-            if (null === $joinColumns) {
-                $method = 'leftJoin';
+                if (null === $joinColumns) {
+                    $method = 'leftJoin';
+                } else {
+                    $method = false === $joinColumns[0]['nullable'] ? 'innerJoin' : 'leftJoin';
+                }
             } else {
-                $method = false === $joinColumns[0]['nullable'] ? 'innerJoin' : 'leftJoin';
+                $method = 'leftJoin';
             }
 
             $associationAlias = $relationAlias.$i;
@@ -110,7 +115,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
 
             $relationAlias = $relationAlias.++$j;
-            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $associationAlias, $relationAlias);
+
+            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $associationAlias, $relationAlias, $method === 'leftJoin');
         }
     }
 }
