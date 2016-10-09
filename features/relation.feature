@@ -19,6 +19,7 @@ Feature: Relations support
       "@context": "/contexts/ThirdLevel",
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
+      "id": 1,
       "level": 3,
       "test": true
     }
@@ -39,6 +40,7 @@ Feature: Relations support
       "@context": "/contexts/DummyFriend",
       "@id": "/dummy_friends/1",
       "@type": "DummyFriend",
+      "id": 1,
       "name": "Zoidberg"
     }
     """
@@ -63,6 +65,7 @@ Feature: Relations support
       "thirdLevel": "/third_levels/1",
       "relatedToDummyFriend": null,
       "dummyBoolean": null,
+      "id": 1,
       "symfony": "symfony",
       "age": null
     }
@@ -150,6 +153,7 @@ Feature: Relations support
       ],
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Dummy with relations",
       "alias": null
     }

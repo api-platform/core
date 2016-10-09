@@ -21,23 +21,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
-    {
-        $data = parent::normalize($object, $format, $context);
-        if (!is_array($data)) {
-            return $data;
-        }
-
-        if (!isset($data['id'])) {
-            $data = ['id' => $this->iriConverter->getIriFromItem($object)] + $data;
-        }
-
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object

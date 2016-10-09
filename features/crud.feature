@@ -43,6 +43,7 @@ Feature: Create-Retrieve-Update-Delete
         ]
       },
       "name_converted": null,
+      "id": 1,
       "name": "My Dummy",
       "alias": null
     }
@@ -74,6 +75,7 @@ Feature: Create-Retrieve-Update-Delete
         ]
       },
       "name_converted": null,
+      "id": 1,
       "name": "My Dummy",
       "alias": null
     }
@@ -113,6 +115,7 @@ Feature: Create-Retrieve-Update-Delete
             ]
           },
           "name_converted": null,
+          "id": 1,
           "name": "My Dummy",
           "alias": null
         }
@@ -350,6 +353,7 @@ Feature: Create-Retrieve-Update-Delete
         }
       ],
       "name_converted": null,
+      "id": 1,
       "name": "A nice dummy",
       "alias": null
     }

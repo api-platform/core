@@ -28,6 +28,7 @@ Feature: Using uuid identifier on resource
       "@context": "/contexts/UuidIdentifierDummy",
       "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
       "@type": "UuidIdentifierDummy",
+      "uuid": "41B29566-144B-11E6-A148-3E1D05DEFE78",
       "name": "My Dummy"
     }
     """
@@ -40,17 +41,18 @@ Feature: Using uuid identifier on resource
     And the JSON should be equal to:
     """
     {
-    "@context": "/contexts/UuidIdentifierDummy",
-    "@id": "/uuid_identifier_dummies",
-    "@type": "hydra:Collection",
-    "hydra:member": [
-        {
-            "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
-            "@type": "UuidIdentifierDummy",
-            "name": "My Dummy"
-        }
-    ],
-    "hydra:totalItems": 1
+      "@context": "/contexts/UuidIdentifierDummy",
+      "@id": "/uuid_identifier_dummies",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+          {
+              "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
+              "@type": "UuidIdentifierDummy",
+              "uuid": "41B29566-144B-11E6-A148-3E1D05DEFE78",
+              "name": "My Dummy"
+          }
+      ],
+      "hydra:totalItems": 1
     }
     """
 
@@ -68,10 +70,11 @@ Feature: Using uuid identifier on resource
     And the JSON should be equal to:
     """
     {
-    "@context": "/contexts/UuidIdentifierDummy",
-    "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
-    "@type": "UuidIdentifierDummy",
-    "name": "My Dummy modified"
+      "@context": "/contexts/UuidIdentifierDummy",
+      "@id": "/uuid_identifier_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78",
+      "@type": "UuidIdentifierDummy",
+      "uuid": "41B29566-144B-11E6-A148-3E1D05DEFE78",
+      "name": "My Dummy modified"
     }
     """
 

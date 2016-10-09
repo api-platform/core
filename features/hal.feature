@@ -74,6 +74,7 @@ Feature: HAL support
       "dummyPrice": null,
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Dummy with relations",
       "alias": null
     }
@@ -113,6 +114,7 @@ Feature: HAL support
       "dummyPrice": null,
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "A nice dummy",
       "alias": null
     }
@@ -214,6 +216,7 @@ Feature: HAL support
             "dummyPrice": null,
             "jsonData": [],
             "name_converted": null,
+            "id": 1,
             "name": "A nice dummy",
             "alias": null
           }
