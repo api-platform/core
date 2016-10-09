@@ -33,6 +33,7 @@ Feature: Ignore unknown attributes
       "relatedDummies": [],
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Not existing",
       "alias": null
     }

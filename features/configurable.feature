@@ -19,6 +19,7 @@ Feature: Configurable resource CRUD
           {
               "@id": "/fileconfigdummies/1",
               "@type": "fileconfigdummy",
+              "id": 1,
               "name": "ConfigDummy"
           }
       ],
@@ -54,6 +55,7 @@ Feature: Configurable resource CRUD
           "@context": "\/contexts\/fileconfigdummy",
           "@id": "\/fileconfigdummies\/1",
           "@type": "fileconfigdummy",
+          "id": 1,
           "name": "ConfigDummy"
       }
     """

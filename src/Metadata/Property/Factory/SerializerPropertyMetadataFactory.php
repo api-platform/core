@@ -64,21 +64,20 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @param PropertyMetadata $propertyMetadata
      * @param string           $resourceClass
-     * @param string           $property
+     * @param string           $propertyName
      * @param string[]|null    $normalizationGroups
      * @param string[]|null    $denormalizationGroups
      *
      * @return PropertyMetadata
      */
-    private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $property, array $normalizationGroups = null, array $denormalizationGroups = null) : PropertyMetadata
+    private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null) : PropertyMetadata
     {
-        $groups = $this->getPropertySerializerGroups($resourceClass, $property);
+        $groups = $this->getPropertySerializerGroups($resourceClass, $propertyName);
 
-        if ($propertyMetadata->isIdentifier()) {
-            $propertyMetadata = $propertyMetadata->withReadable(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $groups)));
-        } elseif (false !== $propertyMetadata->isReadable()) {
+        if (false !== $propertyMetadata->isReadable()) {
             $propertyMetadata = $propertyMetadata->withReadable(null === $normalizationGroups || !empty(array_intersect($normalizationGroups, $groups)));
         }
+
         if (false !== $propertyMetadata->isWritable()) {
             $propertyMetadata = $propertyMetadata->withWritable(null === $denormalizationGroups || !empty(array_intersect($denormalizationGroups, $groups)));
         }
