@@ -48,7 +48,7 @@ class CompositeRelation
     /**
      * Get value.
      *
-     * @return value.
+     * @return value
      */
     public function getValue()
     {
@@ -58,7 +58,7 @@ class CompositeRelation
     /**
      * Set value.
      *
-     * @param value the value to set.
+     * @param value the value to set
      */
     public function setValue($value)
     {
@@ -68,7 +68,7 @@ class CompositeRelation
     /**
      * Get compositeItem.
      *
-     * @return compositeItem.
+     * @return compositeItem
      */
     public function getCompositeItem()
     {
@@ -78,7 +78,7 @@ class CompositeRelation
     /**
      * Set compositeItem.
      *
-     * @param compositeItem the value to set.
+     * @param compositeItem the value to set
      */
     public function setCompositeItem($compositeItem)
     {
@@ -88,7 +88,7 @@ class CompositeRelation
     /**
      * Get compositeLabel.
      *
-     * @return compositeLabel.
+     * @return compositeLabel
      */
     public function getCompositeLabel()
     {
@@ -98,7 +98,7 @@ class CompositeRelation
     /**
      * Set compositeLabel.
      *
-     * @param compositeLabel the value to set.
+     * @param compositeLabel the value to set
      */
     public function setCompositeLabel($compositeLabel)
     {

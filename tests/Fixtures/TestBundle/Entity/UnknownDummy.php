@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
 class UnknownDummy
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id

@@ -39,7 +39,7 @@ class CompositeLabel
     /**
      * Get id.
      *
-     * @return id.
+     * @return id
      */
     public function getId()
     {
@@ -49,7 +49,7 @@ class CompositeLabel
     /**
      * Get value.
      *
-     * @return value.
+     * @return value
      */
     public function getValue()
     {
@@ -59,7 +59,7 @@ class CompositeLabel
     /**
      * Set value.
      *
-     * @param value the value to set.
+     * @param value the value to set
      */
     public function setValue($value)
     {

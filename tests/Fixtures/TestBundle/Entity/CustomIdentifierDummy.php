@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CustomIdentifierDummy
 {
     /**
-     * @var int The custom identifier.
+     * @var int The custom identifier
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -32,7 +32,7 @@ class CustomIdentifierDummy
     private $customId;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column(length=30)
      */

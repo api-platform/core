@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class UuidIdentifierDummy
 {
     /**
-     * @var string The custom identifier.
+     * @var string The custom identifier
      *
      * @ORM\Column(type="guid")
      * @ORM\Id
@@ -31,7 +31,7 @@ class UuidIdentifierDummy
     private $uuid;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column(length=30)
      */

@@ -34,7 +34,7 @@ class RelatedDummy extends ParentDummy
     private $id;
 
     /**
-     * @var string A name.
+     * @var string A name
      *
      * @ORM\Column(nullable=true)
      */
@@ -47,7 +47,7 @@ class RelatedDummy extends ParentDummy
     protected $symfony = 'symfony';
 
     /**
-     * @var \DateTime A dummy date.
+     * @var \DateTime A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
@@ -67,7 +67,7 @@ class RelatedDummy extends ParentDummy
     public $relatedToDummyFriend;
 
     /**
-     * @var bool A dummy bool.
+     * @var bool A dummy bool
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
@@ -127,7 +127,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Get relatedToDummyFriend.
      *
-     * @return relatedToDummyFriend.
+     * @return relatedToDummyFriend
      */
     public function getRelatedToDummyFriend()
     {
@@ -137,7 +137,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Set relatedToDummyFriend.
      *
-     * @param relatedToDummyFriend the value to set.
+     * @param relatedToDummyFriend the value to set
      */
     public function setRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {
