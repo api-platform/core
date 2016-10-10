@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedToDummyFriend
 {
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -73,7 +73,7 @@ class RelatedToDummyFriend
     /**
      * Sets dummyFriend.
      *
-     * @param $dummyFriend the value to set.
+     * @param $dummyFriend the value to set
      */
     public function setDummyFriend($dummyFriend)
     {
@@ -93,7 +93,7 @@ class RelatedToDummyFriend
     /**
      * Sets relatedDummy.
      *
-     * @param $relatedDummy the value to set.
+     * @param $relatedDummy the value to set
      */
     public function setRelatedDummy($relatedDummy)
     {

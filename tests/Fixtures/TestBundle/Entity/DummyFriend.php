@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DummyFriend
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -37,7 +37,7 @@ class DummyFriend
     private $id;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -49,7 +49,7 @@ class DummyFriend
     /**
      * Get id.
      *
-     * @return id.
+     * @return id
      */
     public function getId()
     {
@@ -59,7 +59,7 @@ class DummyFriend
     /**
      * Set id.
      *
-     * @param id the value to set.
+     * @param id the value to set
      */
     public function setId($id)
     {
@@ -69,7 +69,7 @@ class DummyFriend
     /**
      * Get name.
      *
-     * @return name.
+     * @return name
      */
     public function getName()
     {
@@ -79,7 +79,7 @@ class DummyFriend
     /**
      * Set name.
      *
-     * @param name the value to set.
+     * @param name the value to set
      */
     public function setName($name)
     {

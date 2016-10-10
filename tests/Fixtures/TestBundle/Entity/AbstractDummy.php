@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 abstract class AbstractDummy
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -39,7 +39,7 @@ abstract class AbstractDummy
     private $id;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
