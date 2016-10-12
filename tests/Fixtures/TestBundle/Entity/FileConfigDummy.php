@@ -36,6 +36,13 @@ class FileConfigDummy
      */
     private $name;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column
+     */
+    private $foo;
+
     public function getId()
     {
         return $this->id;
@@ -49,5 +56,15 @@ class FileConfigDummy
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setFoo($foo)
+    {
+        $this->foo = $foo;
+    }
+
+    public function getFoo()
+    {
+        return $this->foo;
     }
 }

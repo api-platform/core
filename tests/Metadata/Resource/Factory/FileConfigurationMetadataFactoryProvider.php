@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
- * Resource metadata provider for file configurated factories tests.
+ * Resource metadata provider for file configured factories tests.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */

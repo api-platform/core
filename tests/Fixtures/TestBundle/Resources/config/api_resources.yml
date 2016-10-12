@@ -7,3 +7,6 @@ resources:
             custom_operation:  
                 method: 'GET'
                 controller: 'app.config_dummy_resource.action'
+        properties:
+            foo:
+                description: 'The dummy foo'

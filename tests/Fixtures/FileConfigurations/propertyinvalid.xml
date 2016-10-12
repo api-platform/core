@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+
+<resources>
+    <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy">
+        <property name="foo">
+            <foo>Foo</foo>
+        </property>
+    </resource>
+</resources>
