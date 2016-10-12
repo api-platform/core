@@ -298,6 +298,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     {
         $fileConfigDummy = new FileConfigDummy();
         $fileConfigDummy->setName('ConfigDummy');
+        $fileConfigDummy->setFoo('Foo');
 
         $this->manager->persist($fileConfigDummy);
         $this->manager->flush();

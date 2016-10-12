@@ -89,6 +89,16 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.cached.inner" />
         </service>
 
+        <service id="api_platform.metadata.property.name_collection_factory.yaml" class="ApiPlatform\Core\Metadata\Property\Factory\YamlPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory.yaml.inner" />
+        </service>
+
+        <service id="api_platform.metadata.property.name_collection_factory.xml" class="ApiPlatform\Core\Metadata\Property\Factory\XmlPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory.xml.inner" />
+        </service>
+
         <!-- Property metadata -->
 
         <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.annotation" />
@@ -106,6 +116,16 @@
         <service id="api_platform.metadata.property.metadata_factory.inherited" class="ApiPlatform\Core\Metadata\Property\Factory\InheritedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.inherited.inner" />
+        </service>
+
+        <service id="api_platform.metadata.property.metadata_factory.yaml" class="ApiPlatform\Core\Metadata\Property\Factory\YamlPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.yaml.inner" />
+        </service>
+
+        <service id="api_platform.metadata.property.metadata_factory.xml" class="ApiPlatform\Core\Metadata\Property\Factory\XmlPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.xml.inner" />
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.serializer" class="ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="30" public="false">

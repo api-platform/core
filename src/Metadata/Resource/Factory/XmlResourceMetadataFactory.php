@@ -83,9 +83,9 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
                 }
 
                 return [
-                    (string) $resource['shortName'] ?? null,
-                    (string) $resource['description'] ?? null,
-                    (string) $resource['iri'] ?? null,
+                    (string) $resource['shortName'] ?: null,
+                    (string) $resource['description'] ?: null,
+                    (string) $resource['iri'] ?: null,
                     $this->getAttributes($resource, 'itemOperation') ?: null,
                     $this->getAttributes($resource, 'collectionOperation') ?: null,
                     $this->getAttributes($resource, 'attribute') ?: null,
