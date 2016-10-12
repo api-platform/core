@@ -1,12 +1,19 @@
 <?php
 
-$finder = Symfony\CS\Finder\DefaultFinder::create()
+$finder = Symfony\CS\Finder::create()
     ->in(__DIR__)
-    ->exclude('features/fixtures/TestApp/cache')
+    ->exclude('tests/Fixtures/app/cache')
 ;
 
-return Symfony\CS\Config\Config::create()
-    ->setUsingCache(true)
-    ->fixers(['-psr0'])
+return Symfony\CS\Config::create()
+    ->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)
+    ->fixers([
+        '-phpdoc_annotation_without_dot',
+        '-psr0',
+        'ordered_use',
+        'phpdoc_order',
+        'short_array_syntax',
+    ])
     ->finder($finder)
+    ->setUsingCache(true)
 ;
