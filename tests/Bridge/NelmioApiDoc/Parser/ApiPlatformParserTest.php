@@ -112,7 +112,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'id' => [
                 'dataType' => DataTypes::INTEGER,
-                'required' => true,
+                'required' => false,
                 'description' => 'The id.',
                 'readonly' => true,
             ],
@@ -215,7 +215,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'id' => [
                 'dataType' => DataTypes::INTEGER,
-                'required' => true,
+                'required' => false,
                 'description' => 'The id.',
                 'readonly' => true,
             ],
@@ -346,7 +346,7 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
                 'children' => [
                     'id' => [
                         'dataType' => DataTypes::INTEGER,
-                        'required' => true,
+                        'required' => false,
                         'description' => null,
                         'readonly' => true,
                     ],

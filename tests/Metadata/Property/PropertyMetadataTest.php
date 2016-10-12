@@ -75,4 +75,25 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($newMetadata === $metadata);
         $this->assertEquals(['a' => 'b'], $newMetadata->getAttributes());
     }
+
+    public function testShouldReturnRequiredFalseWhenRequiredTrueIsSetButMaskedByWritableFalse()
+    {
+        $metadata = new PropertyMetadata();
+
+        $metadata = $metadata->withRequired(true);
+        $metadata = $metadata->withWritable(false);
+
+        $this->assertFalse($metadata->isRequired());
+    }
+
+    public function testShouldReturnPreviouslySetRequiredTrueWhenWritableFalseUnmasked()
+    {
+        $metadata = new PropertyMetadata();
+
+        $metadata = $metadata->withRequired(true);
+        $metadata = $metadata->withWritable(false);
+        $metadata = $metadata->withWritable(true);
+
+        $this->assertTrue($metadata->isRequired());
+    }
 }

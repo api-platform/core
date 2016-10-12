@@ -242,47 +242,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The property "id" of the resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" can not be required and read-only at the same time.
-     */
-    public function testNormalizeThrowsExceptionWithAReadOnlyAndRequiredProperty()
-    {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
-
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['post' => ['method' => 'POST']], [], []);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an id.', true, false, null, null, true));
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
-        $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
-        );
-
-        $normalizer->normalize($documentation);
-    }
-
     public function testNormalizeWithNameConverter()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
