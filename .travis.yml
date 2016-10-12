@@ -10,7 +10,7 @@ cache:
 matrix:
   include:
     - php: '7.0'
-      env: coverage=1
+      env: coverage=1 lint=1
     - php: '7.0'
       env: deps='low'
 
@@ -21,6 +21,8 @@ before_install:
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
+  - if [[ $lint = 1 ]]; then wget http://get.sensiolabs.org/php-cs-fixer.phar; fi
+  - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
   - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi
@@ -32,6 +34,7 @@ script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/behat --profile coverage; else vendor/bin/behat; fi
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
+  - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff; fi
 
 after_success:
   - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar; fi
