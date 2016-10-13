@@ -11,11 +11,11 @@ matrix:
   include:
     - php: '7.0'
       env: coverage=1 lint=1
-    - php: '7.0'
+    - php: '7.1'
       env: deps='low'
 
 before_install:
-  - phpenv config-rm xdebug.ini
+  - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - phpunit --self-update
   - npm install -g swagger-cli
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
