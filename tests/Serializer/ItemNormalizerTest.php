@@ -97,7 +97,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalize()
     {
-        $context = ['resource_class' => Dummy::class, 'allow_update' => true];
+        $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
 
         $propertyNameCollection = new PropertyNameCollection(['name']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -131,7 +131,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDenormalizeWithIdAndUpdateNotAllowed()
     {
-        $context = ['resource_class' => Dummy::class, 'allow_update' => false];
+        $context = ['resource_class' => Dummy::class, 'api_allow_update' => false];
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 

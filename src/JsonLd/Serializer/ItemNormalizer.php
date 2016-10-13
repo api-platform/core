@@ -91,7 +91,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context['object_to_populate'])) {
-            if (isset($context['allow_update']) && true !== $context['allow_update']) {
+            if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
