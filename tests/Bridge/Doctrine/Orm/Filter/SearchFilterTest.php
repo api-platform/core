@@ -702,7 +702,7 @@ class SearchFilterTest extends KernelTestCase
 
     public function testDoubleJoin()
     {
-        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'exact']);
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
         $queryBuilder = $this->repository->createQueryBuilder('o');
@@ -720,6 +720,30 @@ class SearchFilterTest extends KernelTestCase
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', Dummy::class));
+        $this->assertEquals($actual, $expected);
+    }
+
+    public function testTripleJoin()
+    {
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $filter = new SearchFilter(
+            $this->managerRegistry,
+            $requestStack,
+            $this->iriConverter,
+            $this->propertyAccessor,
+            null,
+            ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]
+        );
+
+        $queryBuilder->innerJoin('o.relatedDummy', 'relateddummy_a1');
+        $queryBuilder->innerJoin('relateddummy_a1.thirdLevel', 'thirdLevel_a1');
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
+        $actual = strtolower($queryBuilder->getQuery()->getDQL());
+        $expected = strtolower(sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', Dummy::class));
         $this->assertEquals($actual, $expected);
     }
 }
