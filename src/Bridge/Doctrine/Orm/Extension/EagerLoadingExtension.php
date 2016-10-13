@@ -22,6 +22,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Charles Sarrazin <charles@sarraz.in>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -40,10 +41,10 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (null !== $operationName) {
-            $context = ['collection_operation_name' => $operationName];
+            $propertyMetadataOptions = ['collection_operation_name' => $operationName];
         }
 
-        $this->joinRelations($queryBuilder, $resourceClass, $context ?? []);
+        $this->joinRelations($queryBuilder, $resourceClass, $propertyMetadataOptions ?? []);
     }
 
     /**
@@ -52,29 +53,10 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null)
     {
         if (null !== $operationName) {
-            $context = ['item_operation_name' => $operationName];
+            $propertyMetadataOptions = ['item_operation_name' => $operationName];
         }
 
-        $this->joinRelations($queryBuilder, $resourceClass, $context ?? []);
-    }
-
-    /**
-     * Get metadata properties for a given resource class.
-     *
-     * @param string $resourceClass
-     * @param array  $context       the serialization context
-     *
-     * @return array
-     */
-    private function getMetadataProperties(string $resourceClass, array $context = []) : array
-    {
-        $properties = [];
-
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $properties[$property] = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
-        }
-
-        return $properties;
+        $this->joinRelations($queryBuilder, $resourceClass, $propertyMetadataOptions ?? []);
     }
 
     /**
@@ -82,12 +64,12 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
-     * @param array        $context       the serialization context
-     * @param string       $originAlias   the current entity alias (first o, then a1, a2 etc.)
-     * @param string       $relationAlias the previous relation alias to keep it unique
-     * @param bool         $wasLeftJoin   if the relation containing the new one had a left join, we have to force the new one to left join too
+     * @param array        $propertyMetadataOptions
+     * @param string       $originAlias             the current entity alias (first o, then a1, a2 etc.)
+     * @param string       $relationAlias           the previous relation alias to keep it unique
+     * @param bool         $wasLeftJoin             if the relation containing the new one had a left join, we have to force the new one to left join too
      */
-    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, array $context = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false)
+    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, array $propertyMetadataOptions = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false)
     {
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
@@ -95,7 +77,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         foreach ($classMetadata->getAssociationNames() as $i => $association) {
             $mapping = $classMetadata->associationMappings[$association];
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $context);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
 
             if (ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'] || false === $propertyMetadata->isReadableLink()) {
                 continue;
@@ -118,7 +100,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $select = [];
             $targetClassMetadata = $entityManager->getClassMetadata($mapping['targetEntity']);
 
-            foreach ($this->getMetadataProperties($mapping['targetEntity']) as $property => $propertyMetadata) {
+            foreach ($this->propertyNameCollectionFactory->create($mapping['targetEntity']) as $property) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($mapping['targetEntity'], $property, $propertyMetadataOptions);
+
                 if (true === $propertyMetadata->isIdentifier()) {
                     $select[] = $property;
                     continue;
@@ -134,7 +118,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             $relationAlias = $relationAlias.++$j;
 
-            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $context, $associationAlias, $relationAlias, $method === 'leftJoin');
+            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin');
         }
     }
 }
