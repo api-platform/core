@@ -89,6 +89,13 @@ class Dummy
     public $dummyDate;
 
     /**
+     * @var string A dummy float.
+     *
+     * @ORM\Column(type="float", nullable=true)
+     */
+    public $dummyFloat;
+
+    /**
      * @var string A dummy price.
      *
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)

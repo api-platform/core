@@ -70,9 +70,11 @@ Feature: HAL support
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyFloat": null,
       "dummyPrice": null,
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Dummy with relations",
       "alias": null
     }
@@ -108,9 +110,11 @@ Feature: HAL support
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
+      "dummyFloat": null,
       "dummyPrice": null,
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "A nice dummy",
       "alias": null
     }
@@ -208,9 +212,11 @@ Feature: HAL support
             "dummy": null,
             "dummyBoolean": null,
             "dummyDate": "2015-03-01T10:00:00+00:00",
+            "dummyFloat": null,
             "dummyPrice": null,
             "jsonData": [],
             "name_converted": null,
+            "id": 1,
             "name": "A nice dummy",
             "alias": null
           }

@@ -98,7 +98,7 @@ services:
 
     app.my_dummy_resource.range_filter:
         parent:    'api_platform.doctrine.orm.range_filter'
-        arguments: [ { 'dummyPrice': ~ } ]
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
 
     app.my_dummy_resource.boolean_filter:
@@ -108,7 +108,7 @@ services:
 
     app.my_dummy_resource.numeric_filter:
         parent:    'api_platform.doctrine.orm.numeric_filter'
-        arguments: [ { 'dummyPrice': ~ } ]
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
 
     app.config_dummy_resource.action:

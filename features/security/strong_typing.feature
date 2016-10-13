@@ -26,11 +26,13 @@ Feature: Handle properly invalid data submitted to the API
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": null,
+      "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Not existing",
       "alias": null
     }
@@ -125,7 +127,7 @@ Feature: Handle properly invalid data submitted to the API
     """
     {
       "name": "foo",
-      "dummyPrice": 42
+      "dummyFloat": 42
     }
     """
     Then the response status code should be 201

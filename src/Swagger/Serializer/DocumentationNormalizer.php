@@ -387,10 +387,6 @@ final class DocumentationNormalizer implements NormalizerInterface
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
 
             if ($propertyMetadata->isRequired()) {
-                if (false === $propertyMetadata->isWritable()) {
-                    throw new RuntimeException(sprintf('The property "%s" of the resource "%s" can not be required and read-only at the same time.', $propertyName, $resourceClass));
-                }
-
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 

@@ -400,7 +400,7 @@ Feature: Date filter on collections
           },
           "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyPrice}",
+              "hydra:template": "\/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -507,6 +507,36 @@ Feature: Date filter on collections
                   },
                   {
                       "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat[between]",
+                      "property": "dummyFloat",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat[gt]",
+                      "property": "dummyFloat",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat[gte]",
+                      "property": "dummyFloat",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat[lt]",
+                      "property": "dummyFloat",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat[lte]",
+                      "property": "dummyFloat",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
                       "variable": "dummyPrice[between]",
                       "property": "dummyPrice",
                       "required": false
@@ -539,6 +569,12 @@ Feature: Date filter on collections
                       "@type": "IriTemplateMapping",
                       "variable": "dummyBoolean",
                       "property": "dummyBoolean",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat",
+                      "property": "dummyFloat",
                       "required": false
                   },
                   {

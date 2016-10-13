@@ -18,7 +18,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></response>
+    <response><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><id>1</id><name>XML!</name><alias/></response>
     """
 
   Scenario:  Retrieve a collection in XML
@@ -29,7 +29,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><item key="0"><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></item></response>
+    <response><item key="0"><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><id>1</id><name>XML!</name><alias/></item></response>
     """
 
   Scenario:  Retrieve a collection in XML using the .xml URL
@@ -39,7 +39,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><item key="0"><id>/dummies/1</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>XML!</name><alias/></item></response>
+    <response><item key="0"><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><id>1</id><name>XML!</name><alias/></item></response>
     """
 
   Scenario:  Retrieve a collection in JSON
@@ -52,16 +52,17 @@ Feature: Content Negotiation support
     """
     [
       {
-        "id": "/dummies/1",
         "description": null,
         "dummy": null,
         "dummyBoolean": null,
         "dummyDate": null,
+        "dummyFloat": null,
         "dummyPrice": null,
         "relatedDummy": null,
         "relatedDummies": [],
         "jsonData": [],
         "name_converted": null,
+        "id": 1,
         "name": "XML!",
         "alias": null
       }
@@ -80,7 +81,7 @@ Feature: Content Negotiation support
     And the response should be equal to
     """
     <?xml version="1.0"?>
-    <response><id>/dummies/2</id><description/><dummy/><dummyBoolean/><dummyDate/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><name>Sent in JSON</name><alias/></response>
+    <response><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><name_converted/><id>2</id><name>Sent in JSON</name><alias/></response>
     """
 
   Scenario: Requesting the same format in the Accept header and in the URL should work

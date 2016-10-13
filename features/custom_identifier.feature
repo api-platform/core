@@ -21,6 +21,7 @@ Feature: Using custom identifier on resource
       "@context": "/contexts/CustomIdentifierDummy",
       "@id": "/custom_identifier_dummies/1",
       "@type": "CustomIdentifierDummy",
+      "customId": 1,
       "name": "My Dummy"
     }
     """
@@ -36,6 +37,7 @@ Feature: Using custom identifier on resource
       "@context": "/contexts/CustomIdentifierDummy",
       "@id": "/custom_identifier_dummies/1",
       "@type": "CustomIdentifierDummy",
+      "customId": 1,
       "name": "My Dummy"
     }
     """
@@ -55,6 +57,7 @@ Feature: Using custom identifier on resource
         {
           "@id": "/custom_identifier_dummies/1",
           "@type": "CustomIdentifierDummy",
+          "customId": 1,
           "name": "My Dummy"
         }
       ],
@@ -79,6 +82,7 @@ Feature: Using custom identifier on resource
         "@context": "/contexts/CustomIdentifierDummy",
         "@id": "/custom_identifier_dummies/1",
         "@type": "CustomIdentifierDummy",
+        "customId": 1,
         "name": "My Dummy modified"
       }
       """

@@ -114,6 +114,11 @@ class NumericFilterTest extends KernelTestCase
                 'type' => 'int',
                 'required' => false,
             ],
+            'dummyFloat' => [
+                'property' => 'dummyFloat',
+                'type' => 'float',
+                'required' => false,
+            ],
             'dummyPrice' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',

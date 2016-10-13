@@ -22,6 +22,7 @@ Feature: Using custom writable identifier on resource
       "@context": "/contexts/CustomWritableIdentifierDummy",
       "@id": "/custom_writable_identifier_dummies/my_slug",
       "@type": "CustomWritableIdentifierDummy",
+      "slug": "my_slug",
       "name": "My Dummy"
     }
     """
@@ -37,6 +38,7 @@ Feature: Using custom writable identifier on resource
       "@context": "/contexts/CustomWritableIdentifierDummy",
       "@id": "/custom_writable_identifier_dummies/my_slug",
       "@type": "CustomWritableIdentifierDummy",
+      "slug": "my_slug",
       "name": "My Dummy"
     }
     """
@@ -56,6 +58,7 @@ Feature: Using custom writable identifier on resource
         {
           "@id": "/custom_writable_identifier_dummies/my_slug",
           "@type": "CustomWritableIdentifierDummy",
+          "slug": "my_slug",
           "name": "My Dummy"
         }
       ],
@@ -81,6 +84,7 @@ Feature: Using custom writable identifier on resource
       "@context": "/contexts/CustomWritableIdentifierDummy",
       "@id": "/custom_writable_identifier_dummies/slug_modified",
       "@type": "CustomWritableIdentifierDummy",
+      "slug": "slug_modified",
       "name": "My Dummy modified"
     }
     """
@@ -94,7 +98,7 @@ Feature: Using custom writable identifier on resource
     And 2 properties are available for hydra class "CustomWritableIdentifierDummy"
     And "name" property is readable for hydra class "CustomWritableIdentifierDummy"
     And "name" property is writable for hydra class "CustomWritableIdentifierDummy"
-    And "slug" property is not readable for hydra class "CustomWritableIdentifierDummy"
+    And "slug" property is readable for hydra class "CustomWritableIdentifierDummy"
     And "slug" property is writable for hydra class "CustomWritableIdentifierDummy"
 
   @dropSchema
