@@ -256,11 +256,11 @@ abstract class AbstractFilter implements FilterInterface
     {
         $parts = $queryBuilder->getDQLPart('join');
 
-        if (!isset($parts[$alias])) {
+        if (!isset($parts['o'])) {
             return;
         }
 
-        foreach ($parts[$alias] as $join) {
+        foreach ($parts['o'] as $join) {
             if (sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
                 return $join;
             }
