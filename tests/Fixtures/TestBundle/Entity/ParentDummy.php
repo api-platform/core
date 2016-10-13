@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class ParentDummy
 {
     /**
-     * @var int The age.
+     * @var int The age
      *
      * @ORM\Column(type="integer", nullable=true)
      */

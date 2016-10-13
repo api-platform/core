@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ThirdLevel
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id

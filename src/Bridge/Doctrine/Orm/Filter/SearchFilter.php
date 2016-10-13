@@ -30,27 +30,27 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class SearchFilter extends AbstractFilter
 {
     /**
-     * @var string Exact matching.
+     * @var string Exact matching
      */
     const STRATEGY_EXACT = 'exact';
 
     /**
-     * @var string The value must be contained in the field.
+     * @var string The value must be contained in the field
      */
     const STRATEGY_PARTIAL = 'partial';
 
     /**
-     * @var string Finds fields that are starting with the value.
+     * @var string Finds fields that are starting with the value
      */
     const STRATEGY_START = 'start';
 
     /**
-     * @var string Finds fields that are ending with the value.
+     * @var string Finds fields that are ending with the value
      */
     const STRATEGY_END = 'end';
 
     /**
-     * @var string Finds fields that are starting with the word.
+     * @var string Finds fields that are starting with the word
      */
     const STRATEGY_WORD_START = 'word_start';
 

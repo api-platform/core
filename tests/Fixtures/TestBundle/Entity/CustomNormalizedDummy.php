@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CustomNormalizedDummy
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -40,7 +40,7 @@ class CustomNormalizedDummy
     private $id;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -50,7 +50,7 @@ class CustomNormalizedDummy
     private $name;
 
     /**
-     * @var string The dummy name alias.
+     * @var string The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")

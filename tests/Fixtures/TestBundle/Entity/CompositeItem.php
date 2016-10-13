@@ -45,7 +45,7 @@ class CompositeItem
     /**
      * Get id.
      *
-     * @return id.
+     * @return id
      */
     public function getId()
     {
@@ -55,7 +55,7 @@ class CompositeItem
     /**
      * Get field1.
      *
-     * @return field1.
+     * @return field1
      */
     public function getField1()
     {
@@ -65,7 +65,7 @@ class CompositeItem
     /**
      * Set field1.
      *
-     * @param field1 the value to set.
+     * @param field1 the value to set
      */
     public function setField1($field1)
     {
@@ -75,7 +75,7 @@ class CompositeItem
     /**
      * Get compositeValues.
      *
-     * @return compositeValues.
+     * @return compositeValues
      */
     public function getCompositeValues()
     {

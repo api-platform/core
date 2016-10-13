@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Dummy
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -37,7 +37,7 @@ class Dummy
     private $id;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -46,7 +46,7 @@ class Dummy
     private $name;
 
     /**
-     * @var string The dummy name alias.
+     * @var string The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -59,7 +59,7 @@ class Dummy
     private $foo;
 
     /**
-     * @var string A short description of the item.
+     * @var string A short description of the item
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/description")
@@ -67,21 +67,21 @@ class Dummy
     public $description;
 
     /**
-     * @var string A dummy.
+     * @var string A dummy
      *
      * @ORM\Column(nullable=true)
      */
     public $dummy;
 
     /**
-     * @var bool A dummy boolean.
+     * @var bool A dummy boolean
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
     public $dummyBoolean;
 
     /**
-     * @var \DateTime A dummy date.
+     * @var \DateTime A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
@@ -89,35 +89,35 @@ class Dummy
     public $dummyDate;
 
     /**
-     * @var string A dummy float.
+     * @var string A dummy float
      *
      * @ORM\Column(type="float", nullable=true)
      */
     public $dummyFloat;
 
     /**
-     * @var string A dummy price.
+     * @var string A dummy price
      *
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     public $dummyPrice;
 
     /**
-     * @var RelatedDummy A related dummy.
+     * @var RelatedDummy A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */
     public $relatedDummy;
 
     /**
-     * @var ArrayCollection Several dummies.
+     * @var ArrayCollection Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
     public $relatedDummies;
 
     /**
-     * @var array serialize data.
+     * @var array serialize data
      *
      * @ORM\Column(type="json_array", nullable=true)
      */

@@ -8,7 +8,6 @@ $finder = Symfony\CS\Finder::create()
 return Symfony\CS\Config::create()
     ->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)
     ->fixers([
-        '-phpdoc_annotation_without_dot',
         '-psr0',
         'ordered_use',
         'phpdoc_order',
