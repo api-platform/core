@@ -25,7 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
 class JsonldContextDummy
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ApiProperty(identifier=true)
      * @ORM\Column(type="integer")
@@ -35,7 +35,7 @@ class JsonldContextDummy
     private $id;
 
     /**
-     * @var string The dummy person.
+     * @var string The dummy person
      *
      * @ApiProperty(
      *     attributes={

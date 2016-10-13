@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class OrderFilter extends AbstractFilter
 {
     /**
-     * @var string Keyword used to retrieve the value.
+     * @var string Keyword used to retrieve the value
      */
     protected $orderParameterName;
 

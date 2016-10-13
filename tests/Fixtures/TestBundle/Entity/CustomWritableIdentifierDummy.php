@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CustomWritableIdentifierDummy
 {
     /**
-     * @var string The special identifier.
+     * @var string The special identifier
      *
      * @ORM\Column(name="slug", type="string", length=30)
      * @ORM\Id
@@ -31,7 +31,7 @@ class CustomWritableIdentifierDummy
     private $slug;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column(name="name", type="string", length=30)
      */

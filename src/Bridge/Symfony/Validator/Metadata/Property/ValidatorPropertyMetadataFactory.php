@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Mapping\PropertyMetadataInterface as ValidatorPr
 final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     /**
-     * @var string[] A list of constraint classes making the entity required.
+     * @var string[] A list of constraint classes making the entity required
      */
     const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
