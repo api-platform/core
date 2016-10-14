@@ -168,6 +168,7 @@
         <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction">
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.error_formats%</argument>
+            <argument>%api_platform.exception_to_status%</argument>
         </service>
 
         <!-- Cache -->
