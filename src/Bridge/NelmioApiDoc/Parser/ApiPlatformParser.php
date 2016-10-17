@@ -85,7 +85,8 @@ final class ApiPlatformParser implements ParserInterface
         list($io, $resourceClass, $operationName) = explode(':', $item['class'], 3);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $operationName);
+        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $operationName, $io);
+
         if (!empty($classOperations['serializer_groups'])) {
             return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, [], $classOperations);
         }
@@ -125,6 +126,16 @@ final class ApiPlatformParser implements ParserInterface
         return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
     }
 
+    private function getGroupsContext(ResourceMetadata $resourceMetadata, string $operationName, bool $isNormalization)
+    {
+        $groupsContext = $isNormalization ? 'normalization_context' : 'denormalization_context';
+        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
+        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
+        $operation[$groupsContext]['groups'] = array_merge(isset($itemOperationAttribute) ? $itemOperationAttribute : [], isset($collectionOperationAttribute) ? $collectionOperationAttribute : []);
+
+        return $operation;
+    }
+
     /**
      * Returns groups of item & collection.
      *
@@ -133,23 +144,25 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName) : array
+    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName, string $io) : array
     {
-        $operation = [
-            'denormalization_context' => $resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []) + $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', []),
-            'normalization_context' => $resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []) + $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', []),
-        ];
+        $operation = $this->getGroupsContext($resourceMetadata, $operationName, true);
+        $operation += $this->getGroupsContext($resourceMetadata, $operationName, false);
 
-        $options = [
-            'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
-        ];
 
-        $options['serializer_groups'] = array_merge(
-            $options['serializer_groups'],
-            !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
-        );
+        if (self::OUT_PREFIX === $io) {
+            return [
+                'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
+            ];
+        }
 
-        return $options;
+        if (self::IN_PREFIX === $io) {
+            return [
+                'serializer_groups' => !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : [],
+            ];
+        }
+
+        return [];
     }
 
     /**
@@ -169,7 +182,6 @@ final class ApiPlatformParser implements ParserInterface
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
             if (
                 ($propertyMetadata->isReadable() && self::OUT_PREFIX === $io) ||
                 ($propertyMetadata->isWritable() && self::IN_PREFIX === $io)
