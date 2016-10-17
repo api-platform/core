@@ -45,7 +45,7 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe() || $request->isMethod(Request::METHOD_DELETE)) {
+        if ($request->isMethodSafe() || $request->isMethod(Request::METHOD_DELETE) || empty($content = $request->getContent())) {
             return;
         }
 
@@ -65,29 +65,8 @@ final class DeserializeListener
 
         $request->attributes->set(
             'data',
-            $this->serializer->deserialize(
-                $this->getRequestContent($request), $attributes['resource_class'], $format, $context
-            )
+            $this->serializer->deserialize($content, $attributes['resource_class'], $format, $context)
         );
-    }
-
-    /**
-     * Extracts the content from the Request.
-     *
-     * @param Request $request
-     *
-     * @return string
-     */
-    private function getRequestContent(Request $request) : string
-    {
-        if (in_array($request->getMethod(), [Request::METHOD_PUT, Request::METHOD_POST])
-            && $request->get('data')
-            && empty($request->getContent())
-        ) {
-            return '{}';
-        }
-
-        return $request->getContent();
     }
 
     /**
