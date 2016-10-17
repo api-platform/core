@@ -84,3 +84,42 @@ Feature: Error handling
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should exist
     And the JSON node "trace" should exist
+
+    Scenario: Get an error during update of an existing resource with a non-allowed update operation
+      When I add "Content-Type" header equal to "application/ld+json"
+      And I send a "POST" request to "/dummies" with body:
+      """
+      {
+        "@id": "/dummies/1",
+        "name": "Foo"
+      }
+      """
+      Then the response status code should be 400
+      And the response should be in JSON
+      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+      And the JSON node "@context" should be equal to "/contexts/Error"
+      And the JSON node "@type" should be equal to "Error"
+      And the JSON node "hydra:title" should be equal to "An error occurred"
+      And the JSON node "hydra:description" should be equal to "Update is not allowed for this operation."
+      And the JSON node "trace" should exist
+
+    Scenario: Get an error during update of an existing relation with a non-allowed update operation
+      When I add "Content-Type" header equal to "application/ld+json"
+      And I send a "POST" request to "/relation_embedders" with body:
+      """
+      {
+        "anotherRelated": {
+          "@id": "/related_dummies/2",
+          "@type": "https://schema.org/Product",
+          "symfony": "phalcon"
+        }
+      }
+      """
+      Then the response status code should be 400
+      And the response should be in JSON
+      And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+      And the JSON node "@context" should be equal to "/contexts/Error"
+      And the JSON node "@type" should be equal to "Error"
+      And the JSON node "hydra:title" should be equal to "An error occurred"
+      And the JSON node "hydra:description" should be equal to "Update is not allowed for this operation."
+      And the JSON node "trace" should exist

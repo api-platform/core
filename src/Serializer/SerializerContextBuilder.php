@@ -49,6 +49,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['item_operation_name'] = $attributes['item_operation_name'];
         }
 
+        if (!$normalization && !isset($context['api_allow_update'])) {
+            $context['api_allow_update'] = Request::METHOD_PUT === $request->getMethod();
+        }
+
         $context['resource_class'] = $attributes['resource_class'];
         $context['request_uri'] = $request->getRequestUri();
 
