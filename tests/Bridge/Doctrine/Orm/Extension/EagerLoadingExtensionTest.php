@@ -61,7 +61,6 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn([0 => 'relatedDummy', 'relatedDummy2']);
         $classMetadataProphecy->associationMappings = [
             'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
             'relatedDummy2' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
@@ -75,7 +74,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $relatedClassMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn([]);
+        $relatedClassMetadataProphecy->associationMappings = [];
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -110,6 +109,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy3', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy4', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy5', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
         $idPropertyMetadata = new PropertyMetadata();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
@@ -130,7 +130,6 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn(['relatedDummy', 'relatedDummy2', 'relatedDummy3', 'relatedDummy4']);
         $classMetadataProphecy->associationMappings = [
             'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
             'relatedDummy2' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
@@ -147,14 +146,12 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $relatedClassMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn(['relation']);
-
         $relatedClassMetadataProphecy->associationMappings = [
             'relation' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
         ];
 
         $unknownClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $unknownClassMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn([]);
+        $unknownClassMetadataProphecy->associationMappings = [];
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -188,7 +185,6 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', ['item_operation_name' => 'item_operation'])->shouldBeCalled()->willReturn(new PropertyMetadata());
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn(['foo']);
         $classMetadataProphecy->associationMappings = [
             'foo' => ['fetch' => 1],
         ];
@@ -209,7 +205,6 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', ['collection_operation_name' => 'collection_operation'])->shouldBeCalled()->willReturn(new PropertyMetadata());
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getAssociationNames()->shouldBeCalled()->willReturn(['foo']);
         $classMetadataProphecy->associationMappings = [
             'foo' => ['fetch' => 1],
         ];

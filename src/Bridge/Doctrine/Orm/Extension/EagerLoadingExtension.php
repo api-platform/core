@@ -74,9 +74,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
         $j = 0;
+        $i = 0;
 
-        foreach ($classMetadata->getAssociationNames() as $i => $association) {
-            $mapping = $classMetadata->associationMappings[$association];
+        foreach ($classMetadata->associationMappings as $association => $mapping) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
 
             if (ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'] || false === $propertyMetadata->isReadableLink()) {
@@ -95,7 +95,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 $method = 'leftJoin';
             }
 
-            $associationAlias = $relationAlias.$i;
+            $associationAlias = $relationAlias.$i++;
             $queryBuilder->{$method}($originAlias.'.'.$association, $associationAlias);
             $select = [];
             $targetClassMetadata = $entityManager->getClassMetadata($mapping['targetEntity']);
