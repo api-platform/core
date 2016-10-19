@@ -39,14 +39,6 @@
                         hljs.highlightBlock(e)
                     });
 
-                    // Temporary fix for https://github.com/swagger-api/swagger-ui/issues/2381
-                    $('input.parameter').each(function (i, e) {
-                        var $e = $(e);
-                        if ('undefined' === $e.val()) {
-                            $e.val('');
-                        }
-                    });
-
                     {% if operationId is not null %}
                         {% set domId = shortName ~ '_' ~ operationId %}
                         {% set id = app.request.attributes.get('id') %}
@@ -90,9 +82,9 @@
 </head>
 
 <body class="swagger-section">
-<div id="header">
+<div id="header" style="background-color: #253032; height: 35px">
     <div class="swagger-ui-wrap">
-        <a id="logo" href="https://api-platform.com">API Platform</a>
+        <a id="logo" href="https://api-platform.com"><img height="48" src="{{ asset('bundles/apiplatform/logo-header.svg') }}" alt="API Platform" style="position: relative; right: 10px"></a>
     </div>
 </div>
 
