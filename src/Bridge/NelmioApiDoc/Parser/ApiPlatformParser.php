@@ -149,7 +149,6 @@ final class ApiPlatformParser implements ParserInterface
         $operation = $this->getGroupsContext($resourceMetadata, $operationName, true);
         $operation += $this->getGroupsContext($resourceMetadata, $operationName, false);
 
-
         if (self::OUT_PREFIX === $io) {
             return [
                 'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
