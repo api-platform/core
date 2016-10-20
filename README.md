@@ -20,8 +20,7 @@ high performance API-first projects. Extend or override everything you want.
 
 ## Documentation
 
-The documentation of API Platform Core is available online and can be edited in
-[its dedicated repository](https://github.com/api-platform/doc/tree/master/core).
+The documentation of API Platform can be browsed [on the official website](https://api-platform.com/docs/).
 
-* [Get started with API Platform](https://github.com/api-platform/docs/blob/master/tutorial/index.md)
-* [A documentation](https://github.com/api-platform/doc/tree/master/core/)
+* [Get started with API Platform](https://api-platform.com/docs/distribution/)
+* [A documentation](https://api-platform.com/docs/)
