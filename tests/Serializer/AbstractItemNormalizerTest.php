@@ -247,8 +247,8 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getItemFromIri('/dummies/1', true)->willReturn($relatedDummy1)->shouldBeCalled();
-        $iriConverterProphecy->getItemFromIri('/dummies/2', true)->willReturn($relatedDummy2)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/dummies/1', true, Argument::type('array'))->willReturn($relatedDummy1)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/dummies/2', true, Argument::type('array'))->willReturn($relatedDummy2)->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();

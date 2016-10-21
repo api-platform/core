@@ -42,6 +42,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
                 ->scalarNode('default_operation_path_resolver')->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('eager_loading_max_joins')->defaultValue(100)->info('Max number of joined relations before EagerLoading throws a RuntimeException')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()

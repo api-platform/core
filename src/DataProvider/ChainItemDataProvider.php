@@ -33,11 +33,11 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
+    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false, array $context = [])
     {
         foreach ($this->dataProviders as $dataProviders) {
             try {
-                return $dataProviders->getItem($resourceClass, $id, $operationName, $fetchData);
+                return $dataProviders->getItem($resourceClass, $id, $operationName, $fetchData, $context);
             } catch (ResourceClassNotSupportedException $e) {
                 continue;
             }

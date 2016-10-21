@@ -53,7 +53,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemFromIri(string $iri, bool $fetchData = false)
+    public function getItemFromIri(string $iri, bool $fetchData = false, array $context = [])
     {
         try {
             $parameters = $this->router->match($iri);
@@ -65,7 +65,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $parameters['id'], null, $fetchData)) {
+        if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $parameters['id'], null, $fetchData, $context)) {
             return $item;
         }
 

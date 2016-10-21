@@ -270,7 +270,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (is_string($value)) {
             try {
-                return $this->iriConverter->getItemFromIri($value, true);
+                return $this->iriConverter->getItemFromIri($value, true, $context);
             } catch (InvalidArgumentException $e) {
                 // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
             }

@@ -70,6 +70,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'enable_fos_user' => false,
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
+            'eager_loading_max_joins' => 100,
             'collection' => [
                 'order' => null,
                 'order_parameter_name' => 'order',

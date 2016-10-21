@@ -90,7 +90,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', 3, null, false)->shouldBeCalledTimes(1);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', 3, null, false, [])->shouldBeCalledTimes(1);
 
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
 
@@ -117,7 +117,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', 3, null, true)
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', 3, null, true, [])
             ->willReturn('foo')
             ->shouldBeCalledTimes(1);
 

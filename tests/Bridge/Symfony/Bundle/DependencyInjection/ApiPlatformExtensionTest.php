@@ -196,6 +196,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
+            'api_platform.eager_loading_max_joins' => 100,
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
