@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -67,6 +67,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $components = $this->getComponents($object, $format, $context);
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'relationships');
+
         return $data + $rawData;
     }
 
@@ -75,7 +76,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -83,7 +84,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        throw new RuntimeException(sprintf('%s is a read-only format.', self::FORMAT));
+        // Avoid issues with proxies if we populated the object
+        if (isset($data['data']['id']) && !isset($context['object_to_populate'])) {
+            if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
+                throw new InvalidArgumentException('Update is not allowed for this operation.');
+            }
+
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['data']['id'], $context + ['fetch_data' => false]);
+        }
+
+        return parent::denormalize(isset($data['data']) ? $data['data']['attributes']: $data, $class, $format, $context);
     }
 
     /**
@@ -110,7 +120,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
         $attributes = parent::getAttributes($object, $format, $context);
         $options = $this->getFactoryOptions($context);
-        $shortName = '';
+        $shortName = $className = '';
         $components = [
             'links' => [],
             'relationships' => [],
@@ -129,9 +139,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     $isMany = null !== $valueType && ($className = $valueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                 } else {
                     $className = $type->getClassName();
-                    $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
+                    $isOne = null !== $className && $this->resourceClassResolver->isResourceClass($className);
                 }
-                $shortName = ($className && $this->resourceClassResolver->isResourceClass($className) ? $this->resourceMetadataFactory->create($className)->getShortName() : '');
+                $shortName = (null !== $className && $this->resourceClassResolver->isResourceClass($className) ? $this->resourceMetadataFactory->create($className)->getShortName() : '');
             }
 
             if (!$isOne && !$isMany) {
@@ -159,8 +169,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return array
      */
-    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type) : array
+    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
+        $identifier = '';
         foreach ($components[$type] as $relation) {
             $attributeValue = $this->getAttributeValue($object, $relation['name'], $format, $context);
             if (empty($attributeValue)) {
@@ -214,7 +225,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return string
      */
-    private function getRelationIri($rel) : string
+    private function getRelationIri($rel): string
     {
         return isset($rel['links']['self']) ? $rel['links']['self'] : $rel;
     }

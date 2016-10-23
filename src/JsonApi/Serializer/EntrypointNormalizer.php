@@ -49,7 +49,7 @@ final class EntrypointNormalizer implements NormalizerInterface
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if (empty($resourceMetadata->getCollectionOperations())) {
+            if ($resourceMetadata->getCollectionOperations()) {
                 continue;
             }
             try {

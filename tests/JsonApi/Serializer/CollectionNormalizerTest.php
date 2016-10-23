@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
+namespace ApiPlatform\Core\tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
@@ -75,7 +75,6 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataProphecy->create('Foo')->willReturn(new ResourceMetadata('Foo', 'A foo', '/foos', null, null, ['id', 'name']));
 
-
         $propertyMetadataProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataProphecy->create('Foo', 'id')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'id', true, true, true, true, false, true, null, null, []))->shouldBeCalled(1);
         $propertyMetadataProphecy->create('Foo', 'name')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'name', true, true, true, true, false, false, null, null, []))->shouldBeCalled(1);
@@ -102,7 +101,6 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                           'id' => 1,
                           'name' => 'Kévin',
                       ],
-                      'relationships' => [],
                     ],
             ],
             'meta' => [

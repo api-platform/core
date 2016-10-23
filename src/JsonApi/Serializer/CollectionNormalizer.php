@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Normalizes collections in the Json Api format.
+ * Normalizes collections in the JSON API format.
  *
  * @author Kevin Dunglas <dunglas@gmail.com>
  * @author Hamza Amrouche <hamza@les-tilleuls.coop>
@@ -60,6 +60,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        $currentPage = $lastPage = $itemsPerPage = 1;
         $data = ['data' => []];
         if (isset($context['api_sub_level'])) {
             foreach ($object as $index => $obj) {
@@ -79,7 +80,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $currentPage = $object->getCurrentPage();
             $lastPage = $object->getLastPage();
             $itemsPerPage = $object->getItemsPerPage();
-
 
             $paginated = 1. !== $lastPage;
         }
