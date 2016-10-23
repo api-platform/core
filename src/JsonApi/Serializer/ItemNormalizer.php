@@ -67,7 +67,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $components = $this->getComponents($object, $format, $context);
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'relationships');
-
         return $data + $rawData;
     }
 
@@ -185,11 +184,22 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 if ('links' === $type) {
                     $rel = $this->getRelationIri($rel);
                 }
+                $id = ['id' => $rel];
+
+                if (!is_string($rel)) {
+                    foreach ($rel as $property => $value) {
+                        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $property);
+                        if ($propertyMetadata->isIdentifier()) {
+                            $identifier = $rel[$property];
+                        }
+                    }
+                    $id = ['id' => $identifier] + $rel;
+                }
 
                 if (!empty($relation['type'])) {
-                    $data[$type][$relation['name']]['data'][] = ['id' => $rel, 'type' => $relation['type']];
+                    $data[$type][$relation['name']]['data'][] = $id + ['type' => $relation['type']];
                 } else {
-                    $data[$type][$relation['name']]['data'][] = ['id' => $rel];
+                    $data[$type][$relation['name']]['data'][] = $id;
                 }
             }
         }
