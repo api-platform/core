@@ -34,6 +34,7 @@ api_platform:
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
         html:                          ['text/html']
