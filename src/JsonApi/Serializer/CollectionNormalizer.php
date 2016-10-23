@@ -119,7 +119,17 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 }
             }
 
-            $data['data'][] = ['type' => $resourceMetadata->getShortName(), 'id' => $identifier ?? '', 'attributes' => $item, 'relationships' => $relationships];
+            $items = [
+                'type' => $resourceMetadata->getShortName(),
+                'id' => $identifier ?? '',
+                'attributes' => $item,
+            ];
+
+            if (!empty($relationships)) {
+                $items['relationships'] = $relationships;
+            }
+
+            $data['data'][] = $items;
         }
 
         if (is_array($object) || $object instanceof \Countable) {
