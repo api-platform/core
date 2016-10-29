@@ -131,9 +131,12 @@ final class ApiPlatformParser implements ParserInterface
         $groupsContext = $isNormalization ? 'normalization_context' : 'denormalization_context';
         $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
         $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
-        $operation[$groupsContext]['groups'] = array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []);
 
-        return $operation;
+        return [
+            $groupsContext => [
+                'groups' => array_merge(isset($itemOperationAttribute) ? $itemOperationAttribute : [], isset($collectionOperationAttribute) ? $collectionOperationAttribute : []),
+            ],
+        ];
     }
 
     /**
