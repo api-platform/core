@@ -132,16 +132,13 @@ final class QueryChecker
         }
 
         if (!empty($orderByAliases)) {
-            foreach ($joinParts as $rootAlias => $joins) {
+            foreach ($joinParts as $joins) {
                 foreach ($joins as $join) {
                     $alias = QueryJoinParser::getJoinAlias($join);
 
                     if (isset($orderByAliases[$alias])) {
                         $relationship = QueryJoinParser::getJoinRelationship($join);
-
-                        $relationshipParts = explode('.', $relationship);
-                        $parentAlias = $relationshipParts[0];
-                        $association = $relationshipParts[1];
+                        list($parentAlias, $association) = explode('.', $relationship);
 
                         $parentMetadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
 

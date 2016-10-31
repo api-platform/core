@@ -33,6 +33,8 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
     {

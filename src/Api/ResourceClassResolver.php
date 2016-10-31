@@ -49,7 +49,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
             $typeToFind = $type = $resourceClass;
         }
 
-        if (!$this->isResourceClass($typeToFind) || ($strict && isset($type) && $resourceClass !== $type)) {
+        if (($strict && isset($type) && $resourceClass !== $type) || !$this->isResourceClass($typeToFind)) {
             if (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass)) {
                 return $type;
             }

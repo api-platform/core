@@ -42,6 +42,8 @@ class CollectionDataProvider implements CollectionDataProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {

@@ -40,6 +40,7 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
      * {@inheritdoc}
      *
      * @throws ParseException
+     * @throws InvalidArgumentException
      */
     public function create() : ResourceNameCollection
     {

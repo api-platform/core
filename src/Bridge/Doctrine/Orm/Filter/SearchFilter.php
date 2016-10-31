@@ -168,9 +168,9 @@ class SearchFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
+            null === $value ||
             !$this->isPropertyEnabled($property) ||
-            !$this->isPropertyMapped($property, $resourceClass, true) ||
-            null === $value
+            !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
         }

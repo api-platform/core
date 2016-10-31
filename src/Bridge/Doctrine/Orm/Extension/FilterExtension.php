@@ -47,7 +47,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
         }
 
         foreach ($this->filters as $filterName => $filter) {
-            if (in_array($filterName, $resourceFilters) && $filter instanceof FilterInterface) {
+            if ($filter instanceof FilterInterface && in_array($filterName, $resourceFilters)) {
                 $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
             }
         }
