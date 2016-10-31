@@ -34,6 +34,8 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function create(string $resourceClass, array $options = []) : PropertyNameCollection
     {

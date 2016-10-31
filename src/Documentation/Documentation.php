@@ -32,7 +32,7 @@ final class Documentation
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
-        foreach ($formats as $format => $mimeTypes) {
+        foreach ($formats as $mimeTypes) {
             foreach ($mimeTypes as $mimeType) {
                 $this->mimeTypes[] = $mimeType;
             }

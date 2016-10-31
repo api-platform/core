@@ -40,6 +40,8 @@ final class XmlResourceNameCollectionFactory implements ResourceNameCollectionFa
 
     /**
      * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
      */
     public function create() : ResourceNameCollection
     {

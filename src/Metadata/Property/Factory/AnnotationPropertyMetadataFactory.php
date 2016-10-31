@@ -39,7 +39,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
     {
         $parentPropertyMetadata = null;
-        if (isset($this->decorated)) {
+        if ($this->decorated) {
             try {
                 $parentPropertyMetadata = $this->decorated->create($resourceClass, $property, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {

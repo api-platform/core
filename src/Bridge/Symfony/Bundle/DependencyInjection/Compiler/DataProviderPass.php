@@ -49,7 +49,7 @@ final class DataProviderPass implements CompilerPassInterface
 
         foreach ($services as $serviceId => $tags) {
             foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
+                $priority = $attributes['priority'] ?? 0;
                 $queue->insert(new Reference($serviceId), $priority);
             }
         }

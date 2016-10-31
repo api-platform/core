@@ -41,6 +41,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
      * {@inheritdoc}
      *
      * @throws ParseException
+     * @throws InvalidArgumentException
      */
     public function create(string $resourceClass) : ResourceMetadata
     {

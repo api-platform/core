@@ -65,6 +65,8 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @param string $resourceClass
      *
+     * @throws InvalidArgumentException
+     *
      * @return array
      */
     private function getMetadata(string $resourceClass) : array
