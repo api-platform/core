@@ -255,8 +255,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->replaceArgument(0, $yamlResources);
         $container->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->replaceArgument(0, $yamlResources);
 
+        $container->getDefinition('api_platform.metadata.property.name_collection_factory.yaml')->replaceArgument(0, $yamlResources);
+        $container->getDefinition('api_platform.metadata.property.metadata_factory.yaml')->replaceArgument(0, $yamlResources);
+
         $container->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->replaceArgument(0, $xmlResources);
+
+        $container->getDefinition('api_platform.metadata.property.name_collection_factory.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.property.metadata_factory.xml')->replaceArgument(0, $xmlResources);
     }
 
     /**

@@ -14,7 +14,8 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Creates a resource metadata from yml {@see Resource} configuration.
@@ -23,7 +24,6 @@ use Symfony\Component\Yaml\Parser as YamlParser;
  */
 final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
-    private $yamlParser;
     private $decorated;
     private $paths;
 
@@ -33,13 +33,14 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
      */
     public function __construct(array $paths, ResourceMetadataFactoryInterface $decorated = null)
     {
-        $this->yamlParser = new YamlParser();
         $this->paths = $paths;
         $this->decorated = $decorated;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws ParseException
      */
     public function create(string $resourceClass) : ResourceMetadata
     {
@@ -61,7 +62,14 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
         $metadata = null;
 
         foreach ($this->paths as $path) {
-            $resources = $this->yamlParser->parse(file_get_contents($path));
+            try {
+                $resources = Yaml::parse(file_get_contents($path));
+            } catch (ParseException $parseException) {
+                $parseException->setParsedFile($path);
+
+                throw $parseException;
+            }
+
             $resources = $resources['resources'] ?? $resources;
 
             foreach ($resources as $resource) {

@@ -222,12 +222,32 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.name_collection_factory.yaml')->willReturn($definition)->shouldBeCalled();
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.metadata_factory.yaml')->willReturn($definition)->shouldBeCalled();
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
         $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->willReturn($definition)->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
         $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->willReturn($definition)->shouldBeCalled();
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.name_collection_factory.xml')->willReturn($definition)->shouldBeCalled();
+
+        $definitionProphecy = $this->prophesize(Definition::class);
+        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
+        $definition = $definitionProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.metadata_factory.xml')->willReturn($definition)->shouldBeCalled();
 
         $definitions = [
             'api_platform.action.documentation',
@@ -301,9 +321,13 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.property.metadata_factory.property_info',
             'api_platform.metadata.property.metadata_factory.serializer',
             'api_platform.metadata.property.metadata_factory.validator',
+            'api_platform.metadata.property.metadata_factory.xml',
+            'api_platform.metadata.property.metadata_factory.yaml',
             'api_platform.metadata.property.name_collection_factory.cached',
             'api_platform.metadata.property.name_collection_factory.inherited',
             'api_platform.metadata.property.name_collection_factory.property_info',
+            'api_platform.metadata.property.name_collection_factory.xml',
+            'api_platform.metadata.property.name_collection_factory.yaml',
             'api_platform.metadata.resource.metadata_factory.annotation',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.operation',

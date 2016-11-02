@@ -23,3 +23,19 @@ resources:
                 '@type': 'hydra:Operation'
                 '@hydra:title': 'File config Dummy'
         iri: 'someirischema'
+        properties:
+            'foo':
+                description: 'The dummy foo'
+                readable: true
+                writable: true
+                readableLink: false
+                writableLink: false
+                required: true
+                attributes:
+                    'foo': ['Foo']
+                    'bar':
+                        0: ['Bar']
+                        'baz': 'Baz'
+                    'baz': 'Baz'
+            'name':
+                description: 'The dummy name'
