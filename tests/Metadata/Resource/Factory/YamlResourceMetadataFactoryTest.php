@@ -127,4 +127,14 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
 
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
     }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testCreateWithMalformedYaml()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
+
+        (new YamlResourceMetadataFactory([$configPath]))->create(FileConfigDummy::class);
+    }
 }

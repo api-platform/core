@@ -1,0 +1,5 @@
+resources:
+    configdummy:
+        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy'
+        properties:
+            'foo': 'invalid'

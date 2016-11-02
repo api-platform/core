@@ -55,4 +55,14 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $resourceMetadataFactory->create();
     }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testCreateWithMalformedYaml()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
+
+        (new YamlResourceNameCollectionFactory([$configPath]))->create();
+    }
 }
