@@ -34,5 +34,28 @@
             <attribute name="@type">hydra:Operation</attribute>
             <attribute name="@hydra:title">File config Dummy</attribute>
         </attribute>
+
+        <property
+                name="foo"
+                description="The dummy foo"
+                readable="true"
+                writable="true"
+                readableLink="false"
+                writableLink="false"
+                required="true"
+        >
+            <attribute name="foo">
+                <attribute>Foo</attribute>
+            </attribute>
+            <attribute name="bar">
+                <attribute>
+                    <attribute>Bar</attribute>
+                </attribute>
+                <attribute name="baz">Baz</attribute>
+            </attribute>
+            <attribute name="baz">Baz</attribute>
+        </property>
+
+        <property name="name" description="The dummy name" />
     </resource>
 </resources>

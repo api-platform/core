@@ -13,7 +13,8 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Creates a resource name collection from {@see Resource} configuration files.
@@ -22,7 +23,6 @@ use Symfony\Component\Yaml\Parser as YamlParser;
  */
 final class YamlResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-    private $yamlParser;
     private $paths;
     private $decorated;
 
@@ -32,13 +32,14 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
      */
     public function __construct(array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
     {
-        $this->yamlParser = new YamlParser();
         $this->paths = $paths;
         $this->decorated = $decorated;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws ParseException
      */
     public function create() : ResourceNameCollection
     {
@@ -50,7 +51,14 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
         }
 
         foreach ($this->paths as $path) {
-            $resources = $this->yamlParser->parse(file_get_contents($path));
+            try {
+                $resources = Yaml::parse(file_get_contents($path));
+            } catch (ParseException $parseException) {
+                $parseException->setParsedFile($path);
+
+                throw $parseException;
+            }
+
             $resources = $resources['resources'] ?? $resources;
 
             foreach ($resources as $resource) {

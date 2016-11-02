@@ -17,6 +17,7 @@
                 <xsd:element name="itemOperation" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
                 <xsd:element name="collectionOperation" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
                 <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
+                <xsd:element name="property" minOccurs="0" maxOccurs="unbounded" type="property"/>
             </xsd:sequence>
             <xsd:attribute type="xsd:string" name="class" use="required"/>
             <xsd:attribute type="xsd:string" name="shortName"/>
@@ -29,5 +30,20 @@
             <xsd:element name="attribute" type="attribute" minOccurs="0" maxOccurs="unbounded" />
         </xsd:choice>
         <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="property">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name"/>
+        <xsd:attribute type="xsd:string" name="description"/>
+        <xsd:attribute type="xsd:string" name="iri"/>
+        <xsd:attribute type="xsd:boolean" name="readable"/>
+        <xsd:attribute type="xsd:boolean" name="writable"/>
+        <xsd:attribute type="xsd:boolean" name="readableLink"/>
+        <xsd:attribute type="xsd:boolean" name="writableLink"/>
+        <xsd:attribute type="xsd:boolean" name="required"/>
+        <xsd:attribute type="xsd:boolean" name="identifier"/>
     </xsd:complexType>
 </xsd:schema>
