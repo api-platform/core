@@ -13,10 +13,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by range.
@@ -30,11 +27,6 @@ class RangeFilter extends AbstractFilter
     const PARAMETER_GREATER_THAN_OR_EQUAL = 'gte';
     const PARAMETER_LESS_THAN = 'lt';
     const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
-
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
-    }
 
     /**
      * {@inheritdoc}

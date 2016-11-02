@@ -104,7 +104,7 @@ final class ContextBuilder implements ContextBuilderInterface
             }
 
             if (true !== $propertyMetadata->isReadableLink()) {
-                $jsonldContext = $jsonldContext + [
+                $jsonldContext += [
                     '@id' => $id,
                     '@type' => '@id',
                 ];

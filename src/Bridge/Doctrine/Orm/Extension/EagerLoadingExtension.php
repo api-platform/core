@@ -116,7 +116,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
 
-            $relationAlias = $relationAlias.++$j;
+            $relationAlias .= ++$j;
 
             $this->joinRelations($queryBuilder, $mapping['targetEntity'], $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin');
         }

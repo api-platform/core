@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 
 /**
@@ -23,11 +22,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 final class Paginator implements \IteratorAggregate, PaginatorInterface
 {
     private $paginator;
-
-    /**
-     * @var Query
-     */
-    private $query;
 
     /**
      * @var int
@@ -52,9 +46,9 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     public function __construct(DoctrineOrmPaginator $paginator)
     {
         $this->paginator = $paginator;
-        $this->query = $paginator->getQuery();
-        $this->firstResult = $this->query->getFirstResult();
-        $this->maxResults = $this->query->getMaxResults();
+        $query = $paginator->getQuery();
+        $this->firstResult = $query->getFirstResult();
+        $this->maxResults = $query->getMaxResults();
         $this->totalItems = count($paginator);
     }
 

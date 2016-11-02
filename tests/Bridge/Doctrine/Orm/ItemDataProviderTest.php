@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -218,5 +219,34 @@ class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $dataProvider = new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $dataProvider->getItem(Dummy::class, 'foo');
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedExceptionMessage The repository class must have a "createQueryBuilder" method.
+     */
+    public function testCannotCreateQueryBuilder()
+    {
+        $repositoryProphecy = $this->prophesize(ObjectRepository::class);
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->getIdentifier()->willReturn(['id'])->shouldBeCalled();
+
+        $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy->getRepository(Dummy::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
+        $managerProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadataProphecy->reveal())->shouldBeCalled();
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn((new PropertyMetadata())->withIdentifier(true))->shouldBeCalled();
+
+        $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
+
+        (new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), [$extensionProphecy->reveal()]))->getItem(Dummy::class, 'foo');
     }
 }

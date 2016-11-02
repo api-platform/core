@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -53,6 +54,8 @@ class ItemDataProvider implements ItemDataProviderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
     {
@@ -68,6 +71,10 @@ class ItemDataProvider implements ItemDataProviderInterface
         }
 
         $repository = $manager->getRepository($resourceClass);
+        if (!method_exists($repository, 'createQueryBuilder')) {
+            throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
+        }
+
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 

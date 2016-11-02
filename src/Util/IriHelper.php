@@ -32,6 +32,8 @@ final class IriHelper
      * @param string $iri
      * @param string $pageParameterName
      *
+     * @throws InvalidArgumentException
+     *
      * @return array
      */
     public static function parseIri(string $iri, string $pageParameterName) : array

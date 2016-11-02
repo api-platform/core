@@ -131,7 +131,7 @@ final class ApiPlatformParser implements ParserInterface
         $groupsContext = $isNormalization ? 'normalization_context' : 'denormalization_context';
         $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
         $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
-        $operation[$groupsContext]['groups'] = array_merge(isset($itemOperationAttribute) ? $itemOperationAttribute : [], isset($collectionOperationAttribute) ? $collectionOperationAttribute : []);
+        $operation[$groupsContext]['groups'] = array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []);
 
         return $operation;
     }
@@ -141,6 +141,7 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @param ResourceMetadata $resourceMetadata
      * @param string           $operationName
+     * @param string           $io
      *
      * @return array
      */
@@ -213,15 +214,11 @@ final class ApiPlatformParser implements ParserInterface
             'readonly' => !$propertyMetadata->isWritable(),
         ];
 
-        if (null === $type) {
-            $type = $propertyMetadata->getType();
+        if (null === $type && null === $type = $propertyMetadata->getType()) {
+            // Default to string
+            $data['dataType'] = DataTypes::STRING;
 
-            if (null === $type) {
-                // Default to string
-                $data['dataType'] = DataTypes::STRING;
-
-                return $data;
-            }
+            return $data;
         }
 
         if ($type->isCollection()) {
