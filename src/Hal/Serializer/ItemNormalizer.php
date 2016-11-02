@@ -66,6 +66,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -190,7 +192,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getRelationIri($rel) : string
     {
-        return isset($rel['_links']['self']['href']) ? $rel['_links']['self']['href'] : $rel;
+        return $rel['_links']['self']['href'] ?? $rel;
     }
 
     /**

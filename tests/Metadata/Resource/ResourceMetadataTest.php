@@ -39,27 +39,27 @@ class ResourceMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('z', $metadata->getAttribute('notExist', 'z'));
 
         $newMetadata = $metadata->withShortName('name');
-        $this->assertFalse($metadata === $newMetadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('name', $newMetadata->getShortName());
 
         $newMetadata = $metadata->withDescription('description');
-        $this->assertFalse($metadata === $newMetadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('description', $newMetadata->getDescription());
 
         $newMetadata = $metadata->withIri('foo:bar');
-        $this->assertFalse($metadata === $newMetadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('foo:bar', $newMetadata->getIri());
 
         $newMetadata = $metadata->withItemOperations(['a' => ['b' => 'c']]);
-        $this->assertFalse($metadata === $newMetadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals(['a' => ['b' => 'c']], $newMetadata->getItemOperations());
 
         $newMetadata = $metadata->withCollectionOperations(['a' => ['b' => 'c']]);
-        $this->assertFalse($metadata === $newMetadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals(['a' => ['b' => 'c']], $newMetadata->getCollectionOperations());
 
         $newMetadata = $metadata->withAttributes(['a' => ['b' => 'c']]);
-        $this->assertFalse($metadata === $newMetadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals(['a' => ['b' => 'c']], $newMetadata->getAttributes());
     }
 }

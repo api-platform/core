@@ -27,6 +27,8 @@ final class FilterPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function process(ContainerBuilder $container)
     {

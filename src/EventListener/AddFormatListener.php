@@ -38,6 +38,9 @@ final class AddFormatListener
      * Sets the applicable format to the HttpFoundation Request.
      *
      * @param GetResponseEvent $event
+     *
+     * @throws NotFoundHttpException
+     * @throws NotAcceptableHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -55,7 +58,7 @@ final class AddFormatListener
         } elseif (!isset($this->formats[$routeFormat])) {
             throw new NotFoundHttpException('Not Found');
         } else {
-            $mimeTypes = $request->getMimeTypes($routeFormat);
+            $mimeTypes = Request::getMimeTypes($routeFormat);
         }
 
         // First, try to guess the format from the Accept header

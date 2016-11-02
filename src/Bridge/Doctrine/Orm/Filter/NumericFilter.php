@@ -13,11 +13,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by numeric values.
@@ -44,11 +41,6 @@ class NumericFilter extends AbstractFilter
         DBALType::INTEGER => true,
         DBALType::SMALLINT => true,
     ];
-
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
-    }
 
     /**
      * {@inheritdoc}

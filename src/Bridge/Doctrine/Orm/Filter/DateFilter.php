@@ -12,10 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by date intervals.
@@ -36,11 +33,6 @@ class DateFilter extends AbstractFilter
         'datetimetz' => true,
         'time' => true,
     ];
-
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
-    }
 
     /**
      * {@inheritdoc}
@@ -88,7 +80,7 @@ class DateFilter extends AbstractFilter
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
         }
 
-        $nullManagement = isset($this->properties[$property]) ? $this->properties[$property] : null;
+        $nullManagement = $this->properties[$property] ?? null;
 
         if (self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));

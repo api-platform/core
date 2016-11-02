@@ -55,7 +55,7 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         $extensions = [];
         foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
+                $priority = $tag['priority'] ?? 0;
                 $extensions[$priority][] = new Reference($serviceId);
             }
         }

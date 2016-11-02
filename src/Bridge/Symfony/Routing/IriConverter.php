@@ -61,7 +61,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
-        if (!isset($parameters['_api_resource_class']) || !isset($parameters['id'])) {
+        if (!isset($parameters['_api_resource_class'], $parameters['id'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 

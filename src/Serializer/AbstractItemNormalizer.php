@@ -153,7 +153,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
-        if ($type->isNullable() && null === $value) {
+        if (null === $value && $type->isNullable()) {
             $this->setValue($object, $attribute, $value);
 
             return;
@@ -200,7 +200,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
     {
         $builtinType = $type->getBuiltinType();
-        if (false !== strpos($format, 'json') && Type::BUILTIN_TYPE_FLOAT === $builtinType) {
+        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && false !== strpos($format, 'json')) {
             $isValid = is_float($value) || is_int($value);
         } else {
             $isValid = call_user_func('is_'.$builtinType, $value);
@@ -223,6 +223,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @param mixed            $value
      * @param string|null      $format
      * @param array            $context
+     *
+     * @throws InvalidArgumentException
      *
      * @return array
      */
@@ -344,14 +346,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function createRelationSerializationContext(string $resourceClass, array $context) : array
     {
         $context['resource_class'] = $resourceClass;
-        unset($context['item_operation_name']);
-        unset($context['collection_operation_name']);
+        unset($context['item_operation_name'], $context['collection_operation_name']);
 
         return $context;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws NoSuchPropertyException
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {

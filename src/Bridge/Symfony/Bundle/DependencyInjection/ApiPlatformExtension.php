@@ -38,11 +38,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        if (!isset($frameworkConfiguration['serializer']) || !isset($frameworkConfiguration['serializer']['enabled'])) {
+        if (!isset($frameworkConfiguration['serializer'], $frameworkConfiguration['serializer']['enabled'])) {
             $container->prependExtensionConfig('framework', ['serializer' => ['enabled' => true]]);
         }
 
-        if (!isset($frameworkConfiguration['property_info']) || !isset($frameworkConfiguration['property_info']['enabled'])) {
+        if (!isset($frameworkConfiguration['property_info'], $frameworkConfiguration['property_info']['enabled'])) {
             $container->prependExtensionConfig('framework', ['property_info' => ['enabled' => true]]);
         }
     }
