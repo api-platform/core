@@ -55,9 +55,11 @@ class ItemDataProvider implements ItemDataProviderInterface
     /**
      * {@inheritdoc}
      *
+     * The context may contain a `fetch_data` key representing whether the value should be fetched by Doctrine or if we should return a reference.
+     *
      * @throws RuntimeException
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $manager) {
@@ -66,6 +68,7 @@ class ItemDataProvider implements ItemDataProviderInterface
 
         $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
 
+        $fetchData = $context['fetch_data'] ?? false;
         if (!$fetchData && $manager instanceof EntityManagerInterface) {
             return $manager->getReference($resourceClass, $identifiers);
         }
@@ -81,7 +84,7 @@ class ItemDataProvider implements ItemDataProviderInterface
         $this->addWhereForIdentifiers($identifiers, $queryBuilder);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
 
             if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
                 return $extension->getResult($queryBuilder);

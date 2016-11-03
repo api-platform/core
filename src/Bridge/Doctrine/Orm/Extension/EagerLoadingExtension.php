@@ -12,8 +12,10 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
@@ -28,11 +30,47 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 {
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
+    private $resourceMetadataFactory;
+    private $enabled;
+    private $maxJoins;
+    private $eagerOnly;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, int $maxJoins = 30, bool $eagerOnly = true)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->enabled = $enabled;
+        $this->maxJoins = $maxJoins;
+        $this->eagerOnly = $eagerOnly;
+    }
+
+    /**
+     * Gets serializer groups once if available, if not it returns the $options array.
+     *
+     * @param array  $options       represents the operation name so that groups are the one of the specific operation
+     * @param string $resourceClass
+     * @param string $context       normalization_context or denormalization_context
+     *
+     * @return string[]
+     */
+    private function getSerializerGroups(string $resourceClass, array $options, string $context): array
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (isset($options['collection_operation_name'])) {
+            $context = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $context, null, true);
+        } elseif (isset($options['item_operation_name'])) {
+            $context = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], $context, null, true);
+        } else {
+            $context = $resourceMetadata->getAttribute($context);
+        }
+
+        if (empty($context['groups'])) {
+            return $options;
+        }
+
+        return ['serializer_groups' => $context['groups']];
     }
 
     /**
@@ -40,23 +78,46 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if (null !== $operationName) {
-            $propertyMetadataOptions = ['collection_operation_name' => $operationName];
+        if (false === $this->enabled) {
+            return;
         }
 
-        $this->joinRelations($queryBuilder, $resourceClass, $propertyMetadataOptions ?? []);
+        $options = [];
+
+        if (null !== $operationName) {
+            $options = ['collection_operation_name' => $operationName];
+        }
+
+        $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
+
+        $this->joinRelations($queryBuilder, $resourceClass, $groups);
     }
 
     /**
      * {@inheritdoc}
+     * The context may contain serialization groups which helps defining joined entities that are readable.
      */
-    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null)
+    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
-        if (null !== $operationName) {
-            $propertyMetadataOptions = ['item_operation_name' => $operationName];
+        if (false === $this->enabled) {
+            return;
         }
 
-        $this->joinRelations($queryBuilder, $resourceClass, $propertyMetadataOptions ?? []);
+        $options = [];
+
+        if (null !== $operationName) {
+            $options = ['item_operation_name' => $operationName];
+        }
+
+        if (isset($context['groups'])) {
+            $groups = ['serializer_groups' => $context['groups']];
+        } elseif (isset($context['resource_class'])) {
+            $groups = $this->getSerializerGroups($context['resource_class'], $options, isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context');
+        } else {
+            $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
+        }
+
+        $this->joinRelations($queryBuilder, $resourceClass, $groups);
     }
 
     /**
@@ -68,9 +129,16 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      * @param string       $originAlias             the current entity alias (first o, then a1, a2 etc.)
      * @param string       $relationAlias           the previous relation alias to keep it unique
      * @param bool         $wasLeftJoin             if the relation containing the new one had a left join, we have to force the new one to left join too
+     * @param int          $joinCount               the number of joins
+     *
+     * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, array $propertyMetadataOptions = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false)
+    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, array $propertyMetadataOptions = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false, int &$joinCount = 0)
     {
+        if ($joinCount > $this->maxJoins) {
+            throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.');
+        }
+
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
         $j = 0;
@@ -79,7 +147,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
 
-            if (ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'] || false === $propertyMetadata->isReadableLink()) {
+            if (true === $this->eagerOnly && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch']) {
+                continue;
+            }
+
+            if (false === $propertyMetadata->isReadableLink() || false === $propertyMetadata->isReadable()) {
                 continue;
             }
 
@@ -97,6 +169,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             $associationAlias = $relationAlias.$i++;
             $queryBuilder->{$method}($originAlias.'.'.$association, $associationAlias);
+            ++$joinCount;
             $select = [];
             $targetClassMetadata = $entityManager->getClassMetadata($mapping['targetEntity']);
 
@@ -118,7 +191,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             $relationAlias .= ++$j;
 
-            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin');
+            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin', $joinCount);
         }
     }
 }
