@@ -26,11 +26,11 @@ interface ItemDataProviderInterface
      * @param string      $resourceClass
      * @param string|null $operationName
      * @param int|string  $id
-     * @param bool        $fetchData
+     * @param array       $context
      *
      * @throws ResourceClassNotSupportedException
      *
      * @return object|null
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false);
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []);
 }

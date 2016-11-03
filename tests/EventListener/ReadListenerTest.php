@@ -87,7 +87,7 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = new \stdClass();
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', 1, 'get', true)->willReturn($data)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', 1, 'get', ['fetch_data' => true])->willReturn($data)->shouldBeCalled();
 
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
@@ -109,7 +109,7 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', 22, 'get', true)->willReturn(null)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', 22, 'get', ['fetch_data' => true])->willReturn(null)->shouldBeCalled();
 
         $request = new Request([], [], ['id' => 22, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
