@@ -65,6 +65,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundles = $container->getParameter('kernel.bundles');
 
         $this->registerMetadataConfiguration($container, $loader);
+        $this->registerDoctrineExtensionConfiguration($container, $config);
+        $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
@@ -266,6 +268,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->getDefinition('api_platform.metadata.property.name_collection_factory.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property.metadata_factory.xml')->replaceArgument(0, $xmlResources);
+    }
+
+    /**
+     * Manipulate doctrine extension services according to the configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config)
+    {
+        if (false === $config['eager_loading']['enabled']) {
+            $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
+        }
     }
 
     /**
