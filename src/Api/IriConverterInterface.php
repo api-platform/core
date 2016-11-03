@@ -25,13 +25,13 @@ interface IriConverterInterface
      * Retrieves an item from its IRI.
      *
      * @param string $iri
-     * @param bool   $fetchData
+     * @param array  $context
      *
      * @throws InvalidArgumentException
      *
      * @return object
      */
-    public function getItemFromIri(string $iri, bool $fetchData = false);
+    public function getItemFromIri(string $iri, array $context = []);
 
     /**
      * Gets the IRI associated with the given item.
