@@ -91,7 +91,7 @@ final class ReadListener
     private function getItemData(Request $request, array $attributes)
     {
         $id = $request->attributes->get('id');
-        $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name'], true);
+        $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name'], ['fetch_data' => true]);
 
         if (null === $data) {
             throw new NotFoundHttpException('Not Found');
