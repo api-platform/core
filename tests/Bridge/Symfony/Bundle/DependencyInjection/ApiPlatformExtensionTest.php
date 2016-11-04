@@ -168,6 +168,16 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
     }
 
+    public function testDisableEagerLoadingExtension()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading')->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['eager_loading' => ['enabled' => false]]]), $containerBuilder);
+    }
+
     private function getContainerBuilderProphecy()
     {
         $definitionArgument = Argument::that(function ($argument) {
@@ -196,7 +206,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
-            'api_platform.eager_loading.enabled' => true,
+            'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
             'api_platform.eager_loading.eager_only' => true,
         ];

@@ -31,16 +31,14 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $resourceMetadataFactory;
-    private $enabled;
     private $maxJoins;
     private $eagerOnly;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, int $maxJoins = 30, bool $eagerOnly = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $eagerOnly = true)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->enabled = $enabled;
         $this->maxJoins = $maxJoins;
         $this->eagerOnly = $eagerOnly;
     }
@@ -78,10 +76,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if (false === $this->enabled) {
-            return;
-        }
-
         $options = [];
 
         if (null !== $operationName) {
@@ -99,10 +93,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
-        if (false === $this->enabled) {
-            return;
-        }
-
         $options = [];
 
         if (null !== $operationName) {
