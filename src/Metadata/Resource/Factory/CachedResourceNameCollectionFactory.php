@@ -54,12 +54,8 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
             return $resourceNameCollection;
         }
 
-        try {
-            $cacheItem->set($resourceNameCollection);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
+        $cacheItem->set($resourceNameCollection);
+        $this->cacheItemPool->save($cacheItem);
 
         return $resourceNameCollection;
     }
