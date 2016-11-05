@@ -11,21 +11,24 @@
 
 namespace ApiPlatform\Core\PathResolver;
 
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+
 /**
  * Resolves the path of a resource operation.
  *
  * @author Paul Le Corre <paul@lecorre.me>
+ * @author Jérémy Leherpeur <jeremy@leherpeur.net>
  */
 interface OperationPathResolverInterface
 {
     /**
      * Resolves the operation path.
      *
-     * @param string $resourceShortName
-     * @param array  $operation         The operation metadata
-     * @param bool   $collection
+     * @param ResourceMetadata $resourceMetadata
+     * @param array            $operation        The operation metadata
+     * @param bool             $collection
      *
      * @return string
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string;
+    public function resolveOperationPath(ResourceMetadata $resourceMetadata, array $operation, bool $collection) : string;
 }

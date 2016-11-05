@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -19,6 +20,7 @@ use Symfony\Component\Routing\RouterInterface;
  * Resolves the operations path using a Symfony route.
  *
  * @author Guilhem N. <egetick@gmail.com>
+ * @author Jérémy Leherpeur <jeremy@leherpeur.net>
  */
 final class RouterOperationPathResolver implements OperationPathResolverInterface
 {
@@ -36,10 +38,10 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      *
      * @throws InvalidArgumentException
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(ResourceMetadata $resourceMetadata, array $operation, bool $collection) : string
     {
         if (!isset($operation['route_name'])) {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $collection);
+            return $this->deferred->resolveOperationPath($resourceMetadata, $operation, $collection);
         }
 
         $route = $this->router->getRouteCollection()->get($operation['route_name']);

@@ -11,21 +11,23 @@
 
 namespace ApiPlatform\Core\PathResolver;
 
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
  * Generates a path with words separated by dashes.
  *
  * @author Paul Le Corre <paul@lecorre.me>
+ * @author Jérémy Leherpeur <jeremy@leherpeur.net>
  */
 final class DashOperationPathResolver implements OperationPathResolverInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(ResourceMetadata $resourceMetadata, array $operation, bool $collection) : string
     {
-        $path = '/'.Inflector::pluralize(strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $resourceShortName)));
+        $path = '/'.Inflector::pluralize(strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $resourceMetadata->getShortName())));
 
         if (!$collection) {
             $path .= '/{id}';

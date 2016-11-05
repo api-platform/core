@@ -11,10 +11,13 @@
 
 namespace ApiPlatform\Core\PathResolver;
 
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+
 /**
  * Resolves the custom operations path.
  *
  * @author Guilhem N. <egetick@gmail.com>
+ * @author Jérémy Leherpeur <jeremy@leherpeur.net>
  */
 final class CustomOperationPathResolver implements OperationPathResolverInterface
 {
@@ -28,12 +31,12 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(ResourceMetadata $resourceMetadata, array $operation, bool $collection) : string
     {
         if (isset($operation['path'])) {
             return $operation['path'];
         }
 
-        return $this->deferred->resolveOperationPath($resourceShortName, $operation, $collection);
+        return $this->deferred->resolveOperationPath($resourceMetadata, $operation, $collection);
     }
 }

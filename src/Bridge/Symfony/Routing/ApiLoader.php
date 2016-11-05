@@ -15,6 +15,7 @@ use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
@@ -71,13 +72,13 @@ final class ApiLoader extends Loader
 
             if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
                 foreach ($collectionOperations as $operationName => $operation) {
-                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, true);
+                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, true);
                 }
             }
 
             if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
                 foreach ($itemOperations as $operationName => $operation) {
-                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, false);
+                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, false);
                 }
             }
         }
@@ -110,16 +111,16 @@ final class ApiLoader extends Loader
     /**
      * Creates and adds a route for the given operation to the route collection.
      *
-     * @param RouteCollection $routeCollection
-     * @param string          $resourceClass
-     * @param string          $operationName
-     * @param array           $operation
-     * @param string          $resourceShortName
-     * @param bool            $collection
+     * @param RouteCollection  $routeCollection
+     * @param string           $resourceClass
+     * @param string           $operationName
+     * @param array            $operation
+     * @param ResourceMetadata $resourceMetadata
+     * @param bool             $collection
      *
      * @throws RuntimeException
      */
-    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, string $resourceShortName, bool $collection)
+    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, ResourceMetadata $resourceMetadata, bool $collection)
     {
         if (isset($operation['route_name'])) {
             return;
@@ -145,9 +146,9 @@ final class ApiLoader extends Loader
             $actionName = sprintf('%s_%s', $operationName, $collection ? 'collection' : 'item');
         }
 
-        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $collection);
+        $path = $this->operationPathResolver->resolveOperationPath($resourceMetadata, $operation, $collection);
 
-        $resourceRouteName = Inflector::pluralize(Inflector::tableize($resourceShortName));
+        $resourceRouteName = Inflector::pluralize(Inflector::tableize($resourceMetadata->getShortName()));
         $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $resourceRouteName, $actionName);
 
         $route = new Route(
