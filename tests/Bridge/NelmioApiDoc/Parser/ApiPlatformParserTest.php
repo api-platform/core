@@ -68,6 +68,25 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    public function testNoOnDataFirstArray()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
+
+        $this->assertFalse($apiPlatformParser->supports([
+            'class' => sprintf('%s', ApiPlatformParser::OUT_PREFIX),
+        ]));
+    }
+
     public function testSupportsAttributeNormalization()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
