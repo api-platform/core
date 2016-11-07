@@ -342,7 +342,7 @@ class SearchFilter extends AbstractFilter
     protected function getIdFromValue(string $value)
     {
         try {
-            if ($item = $this->iriConverter->getItemFromIri($value)) {
+            if ($item = $this->iriConverter->getItemFromIri($value, ['fetch_data' => false])) {
                 return $this->propertyAccessor->getValue($item, 'id');
             }
         } catch (InvalidArgumentException $e) {
