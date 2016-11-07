@@ -68,7 +68,7 @@ class ItemDataProvider implements ItemDataProviderInterface
 
         $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
 
-        $fetchData = $context['fetch_data'] ?? false;
+        $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof EntityManagerInterface) {
             return $manager->getReference($resourceClass, $identifiers);
         }

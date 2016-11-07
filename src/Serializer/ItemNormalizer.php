@@ -33,7 +33,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['id'], ['fetch_data' => true] + $context);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['id'], ['fetch_data' => false] + $context);
         }
 
         return parent::denormalize($data, $class, $format, $context);
