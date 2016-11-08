@@ -68,7 +68,7 @@ class SearchFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -135,7 +135,7 @@ class SearchFilter extends AbstractFilter
      *
      * @return string
      */
-    private function getType(string $doctrineType) : string
+    private function getType(string $doctrineType): string
     {
         switch ($doctrineType) {
             case Type::TARRAY:
@@ -321,9 +321,9 @@ class SearchFilter extends AbstractFilter
      *
      * @return \Closure
      */
-    protected function createWrapCase(bool $caseSensitive) : \Closure
+    protected function createWrapCase(bool $caseSensitive): \Closure
     {
-        return function (string $expr) use ($caseSensitive) : string {
+        return function (string $expr) use ($caseSensitive): string {
             if ($caseSensitive) {
                 return $expr;
             }
@@ -359,7 +359,7 @@ class SearchFilter extends AbstractFilter
      *
      * @return array
      */
-    protected function normalizeValues(array $values) : array
+    protected function normalizeValues(array $values): array
     {
         foreach ($values as $key => $value) {
             if (!is_int($key) || !is_string($value)) {

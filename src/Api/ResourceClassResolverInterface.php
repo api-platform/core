@@ -31,7 +31,7 @@ interface ResourceClassResolverInterface
      *
      * @return string
      */
-    public function getResourceClass($value, string $resourceClass = null, bool $strict = false) : string;
+    public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string;
 
     /**
      * Is the given class a resource class?
@@ -40,5 +40,5 @@ interface ResourceClassResolverInterface
      *
      * @return bool
      */
-    public function isResourceClass(string $type) : bool;
+    public function isResourceClass(string $type): bool;
 }

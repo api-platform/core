@@ -30,7 +30,7 @@ interface OperationMethodResolverInterface extends BaseOperationMethodResolverIn
      *
      * @return Route
      */
-    public function getCollectionOperationRoute(string $resourceClass, string $operationName) : Route;
+    public function getCollectionOperationRoute(string $resourceClass, string $operationName): Route;
 
     /**
      * @param string $resourceClass
@@ -40,5 +40,5 @@ interface OperationMethodResolverInterface extends BaseOperationMethodResolverIn
      *
      * @return Route
      */
-    public function getItemOperationRoute(string $resourceClass, string $operationName) : Route;
+    public function getItemOperationRoute(string $resourceClass, string $operationName): Route;
 }

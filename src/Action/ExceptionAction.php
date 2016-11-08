@@ -63,7 +63,7 @@ final class ExceptionAction
      *
      * @return Response
      */
-    public function __invoke(FlattenException $exception, Request $request) : Response
+    public function __invoke(FlattenException $exception, Request $request): Response
     {
         $exceptionClass = $exception->getClass();
         foreach ($this->exceptionToStatus as $class => $status) {

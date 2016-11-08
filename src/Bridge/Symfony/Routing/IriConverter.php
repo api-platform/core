@@ -75,7 +75,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         $resourceClass = $this->getObjectClass($item);
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, false);
@@ -88,7 +88,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         try {
             return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, true), [], $referenceType);
@@ -106,7 +106,7 @@ final class IriConverter implements IriConverterInterface
      *
      * @return array
      */
-    private function getIdentifiersFromItem($item) : array
+    private function getIdentifiersFromItem($item): array
     {
         $identifiers = [];
         $resourceClass = $this->getObjectClass($item);
@@ -157,7 +157,7 @@ final class IriConverter implements IriConverterInterface
      *
      * @return string[]
      */
-    private function generateIdentifiersUrl(array $identifiers) : array
+    private function generateIdentifiersUrl(array $identifiers): array
     {
         if (1 === count($identifiers)) {
             return [rawurlencode(array_values($identifiers)[0])];

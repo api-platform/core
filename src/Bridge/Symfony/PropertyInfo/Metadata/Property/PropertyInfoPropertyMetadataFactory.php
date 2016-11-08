@@ -35,7 +35,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $name, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $name, array $options = []): PropertyMetadata
     {
         if (null === $this->decorated) {
             $propertyMetadata = new PropertyMetadata();

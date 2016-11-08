@@ -62,7 +62,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
         return [[$this->getPropertyMetadata($metadata)]];
     }
 
-    private function getPropertyMetadata(array $metadata) : PropertyMetadata
+    private function getPropertyMetadata(array $metadata): PropertyMetadata
     {
         $propertyMetadata = new PropertyMetadata();
 

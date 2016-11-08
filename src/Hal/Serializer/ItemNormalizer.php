@@ -150,7 +150,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return array
      */
-    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type) : array
+    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
         $key = '_'.$type;
         foreach ($components[$type] as $relation) {
@@ -190,7 +190,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return string
      */
-    private function getRelationIri($rel) : string
+    private function getRelationIri($rel): string
     {
         return $rel['_links']['self']['href'] ?? $rel;
     }

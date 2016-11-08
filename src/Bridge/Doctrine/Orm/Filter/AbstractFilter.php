@@ -80,7 +80,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return ClassMetadata
      */
-    protected function getClassMetadata(string $resourceClass) : ClassMetadata
+    protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
         return $this
             ->managerRegistry
@@ -95,7 +95,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return bool
      */
-    protected function isPropertyEnabled(string $property) : bool
+    protected function isPropertyEnabled(string $property): bool
     {
         if (null === $this->properties) {
             // to ensure sanity, nested properties must still be explicitly enabled
@@ -114,7 +114,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return bool
      */
-    protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false) : bool
+    protected function isPropertyMapped(string $property, string $resourceClass, bool $allowAssociation = false): bool
     {
         if ($this->isPropertyNested($property)) {
             $propertyParts = $this->splitPropertyParts($property);
@@ -134,7 +134,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return bool
      */
-    protected function isPropertyNested(string $property) : bool
+    protected function isPropertyNested(string $property): bool
     {
         return false !== strpos($property, '.');
     }
@@ -147,7 +147,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return ClassMetadata
      */
-    protected function getNestedMetadata(string $resourceClass, array $associations) : ClassMetadata
+    protected function getNestedMetadata(string $resourceClass, array $associations): ClassMetadata
     {
         $metadata = $this->getClassMetadata($resourceClass);
 
@@ -176,7 +176,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return array
      */
-    protected function splitPropertyParts(string $property) : array
+    protected function splitPropertyParts(string $property): array
     {
         $parts = explode('.', $property);
 
@@ -193,7 +193,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return array
      */
-    protected function extractProperties(Request $request) : array
+    protected function extractProperties(Request $request): array
     {
         $needsFixing = false;
 
@@ -226,7 +226,7 @@ abstract class AbstractFilter implements FilterInterface
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator) : array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator): array
     {
         $propertyParts = $this->splitPropertyParts($property);
         $parentAlias = $rootAlias;
@@ -277,7 +277,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @return string the new association alias
      */
-    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association) : string
+    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association): string
     {
         $join = $this->getExistingJoin($queryBuilder, $alias, $association);
 

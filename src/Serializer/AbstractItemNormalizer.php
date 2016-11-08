@@ -228,7 +228,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return array
      */
-    private function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context) : array
+    private function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
     {
         if (!is_array($value)) {
             throw new InvalidArgumentException(sprintf(
@@ -316,7 +316,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return array
      */
-    protected function getFactoryOptions(array $context) : array
+    protected function getFactoryOptions(array $context): array
     {
         $options = [];
 
@@ -343,7 +343,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return array
      */
-    protected function createRelationSerializationContext(string $resourceClass, array $context) : array
+    protected function createRelationSerializationContext(string $resourceClass, array $context): array
     {
         $context['resource_class'] = $resourceClass;
         unset($context['item_operation_name'], $context['collection_operation_name']);

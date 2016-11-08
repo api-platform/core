@@ -13,7 +13,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -33,7 +32,7 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No item route associated with the type "AppBundle\Entity\User".
      */
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
@@ -73,7 +72,7 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
      */
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()

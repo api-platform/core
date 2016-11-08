@@ -27,7 +27,7 @@ final class Entrypoint
         $this->resourceNameCollection = $resourceNameCollection;
     }
 
-    public function getResourceNameCollection() : ResourceNameCollection
+    public function getResourceNameCollection(): ResourceNameCollection
     {
         return $this->resourceNameCollection;
     }

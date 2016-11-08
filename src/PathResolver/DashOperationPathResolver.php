@@ -23,7 +23,7 @@ final class DashOperationPathResolver implements OperationPathResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
     {
         $path = '/'.Inflector::pluralize(strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $resourceShortName)));
 

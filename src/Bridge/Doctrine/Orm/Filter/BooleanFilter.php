@@ -33,7 +33,7 @@ class BooleanFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -108,7 +108,7 @@ class BooleanFilter extends AbstractFilter
      *
      * @return bool
      */
-    protected function isBooleanField(string $property, string $resourceClass) : bool
+    protected function isBooleanField(string $property, string $resourceClass): bool
     {
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);

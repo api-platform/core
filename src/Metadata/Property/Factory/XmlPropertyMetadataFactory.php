@@ -41,7 +41,7 @@ class XmlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $parentPropertyMetadata = null;
         if ($this->decorated) {
@@ -89,7 +89,7 @@ class XmlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return PropertyMetadata
      */
-    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property) : PropertyMetadata
+    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property): PropertyMetadata
     {
         if ($parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -108,7 +108,7 @@ class XmlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return array
      */
-    private function getMetadata(string $resourceClass, string $propertyName) : array
+    private function getMetadata(string $resourceClass, string $propertyName): array
     {
         foreach ($this->paths as $path) {
             try {
@@ -151,7 +151,7 @@ class XmlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return array
      */
-    private function getAttributes(\SimpleXMLElement $element) : array
+    private function getAttributes(\SimpleXMLElement $element): array
     {
         $attributes = [];
         foreach ($element->attribute as $attribute) {
@@ -175,7 +175,7 @@ class XmlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return PropertyMetadata
      */
-    private function update(PropertyMetadata $propertyMetadata, array $metadata) : PropertyMetadata
+    private function update(PropertyMetadata $propertyMetadata, array $metadata): PropertyMetadata
     {
         $metadataAccessors = [
             'description' => 'get',

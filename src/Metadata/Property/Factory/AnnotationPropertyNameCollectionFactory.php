@@ -38,7 +38,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         if ($this->decorated) {
             try {

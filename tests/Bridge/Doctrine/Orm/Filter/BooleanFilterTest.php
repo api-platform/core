@@ -127,7 +127,7 @@ class BooleanFilterTest extends KernelTestCase
      *
      * @return array
      */
-    public function provideApplyTestData() : array
+    public function provideApplyTestData(): array
     {
         return [
             'string ("true")' => [
@@ -138,7 +138,6 @@ class BooleanFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyBoolean' => 'true',
-
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],

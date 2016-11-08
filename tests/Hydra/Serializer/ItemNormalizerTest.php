@@ -121,7 +121,6 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
                      '@id' => '/dummies/1988',
                      '@type' => 'Dummy',
                      'name' => 'hello',
-
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }

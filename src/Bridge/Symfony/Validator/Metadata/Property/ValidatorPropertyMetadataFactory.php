@@ -43,7 +43,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $name, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $name, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $name, $options);
         if (null !== $propertyMetadata->isRequired()) {
@@ -76,7 +76,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      *
      * @return bool
      */
-    private function isRequiredByGroups(ValidatorPropertyMetadataInterface $validatorPropertyMetadata, array $options) : bool
+    private function isRequiredByGroups(ValidatorPropertyMetadataInterface $validatorPropertyMetadata, array $options): bool
     {
         foreach ($options['validation_groups'] as $validationGroup) {
             if (!is_string($validationGroup)) {
@@ -100,7 +100,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      *
      * @return bool
      */
-    private function isRequired(Constraint $constraint) : bool
+    private function isRequired(Constraint $constraint): bool
     {
         foreach (self::REQUIRED_CONSTRAINTS as $requiredConstraint) {
             if ($constraint instanceof $requiredConstraint) {

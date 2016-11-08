@@ -43,7 +43,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
      * @throws ParseException
      * @throws InvalidArgumentException
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
         $parentResourceMetadata = null;
         if ($this->decorated) {
@@ -124,7 +124,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
      *
      * @return ResourceMetadata
      */
-    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass) : ResourceMetadata
+    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -142,7 +142,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
      *
      * @return ResourceMetadata
      */
-    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value) : ResourceMetadata
+    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value): ResourceMetadata
     {
         $getter = 'get'.ucfirst($property);
 

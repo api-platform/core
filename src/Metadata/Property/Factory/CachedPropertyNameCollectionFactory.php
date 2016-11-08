@@ -36,7 +36,7 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
 

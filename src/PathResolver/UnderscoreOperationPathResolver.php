@@ -23,7 +23,7 @@ final class UnderscoreOperationPathResolver implements OperationPathResolverInte
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
     {
         $path = '/'.Inflector::pluralize(Inflector::tableize($resourceShortName));
 

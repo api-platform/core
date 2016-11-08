@@ -111,7 +111,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      *
      * @return array
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters) : array
+    private function getSearch(string $resourceClass, array $parts, array $filters): array
     {
         $variables = [];
         $mapping = [];

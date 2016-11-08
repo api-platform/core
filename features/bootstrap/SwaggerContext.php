@@ -137,7 +137,7 @@ final class SwaggerContext implements Context
         }
     }
 
-    private function getProperty(string $propertyName, string $className) : stdClass
+    private function getProperty(string $propertyName, string $className): stdClass
     {
         $properties = $this->getProperties($className);
         $propertyInfos = null;
@@ -160,7 +160,7 @@ final class SwaggerContext implements Context
      *
      * @return array | stdClass
      */
-    private function getOperation(string $method, string $className) : stdClass
+    private function getOperation(string $method, string $className): stdClass
     {
         foreach ($this->getOperations($className) as $classMethod => $operation) {
             if ($classMethod === $method) {
@@ -174,7 +174,7 @@ final class SwaggerContext implements Context
     /**
      * Gets all operations of a given class.
      */
-    private function getOperations(string $className) : stdClass
+    private function getOperations(string $className): stdClass
     {
         $classInfos = $this->getClassInfos($className);
 
@@ -184,14 +184,14 @@ final class SwaggerContext implements Context
     /**
      * Gets all properties of a given class.
      */
-    private function getProperties(string $className) : stdClass
+    private function getProperties(string $className): stdClass
     {
         $classInfos = $this->getClassInfos($className);
 
         return $classInfos->{'properties'} ?? new stdClass();
     }
 
-    private function getClassInfos(string $className) : stdClass
+    private function getClassInfos(string $className): stdClass
     {
         $json = $this->getLastJsonResponse();
         $classInfos = null;
@@ -209,7 +209,7 @@ final class SwaggerContext implements Context
         return $classInfos;
     }
 
-    private function getLastJsonResponse() : stdClass
+    private function getLastJsonResponse(): stdClass
     {
         $content = $this->restContext->getMink()->getSession()->getDriver()->getContent();
         if (null === ($decoded = json_decode($content))) {
