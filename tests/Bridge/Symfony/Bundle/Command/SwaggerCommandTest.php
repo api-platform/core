@@ -11,27 +11,26 @@
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Command;
 
-use Nelmio\ApiDocBundle\Tests\WebTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class SwaggerComandTest extends WebTestCase
+class SwaggerCommandTest extends KernelTestCase
 {
     public function testExecute()
     {
-        $this->getContainer();
+        self::bootKernel();
+
         $application = new Application(static::$kernel);
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
+
         $tester = new ApplicationTester($application);
-        $input = [
-            'command' => 'api:swagger:export',
-        ];
-        $tester->run($input);
-        $display = $tester->getDisplay();
-        $this->assertJson($display);
+        $tester->run(['command' => 'api:swagger:export']);
+
+        $this->assertJson($tester->getDisplay());
     }
 }
