@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class YamlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
+final class YamlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     private $paths;
     private $decorated;
