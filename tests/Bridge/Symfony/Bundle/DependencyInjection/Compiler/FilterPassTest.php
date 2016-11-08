@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
-use ApiPlatform\Core\Exception\RuntimeException;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,7 +41,7 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        RuntimeException
+     * @expectedException        \RuntimeException
      * @expectedExceptionMessage Filter tags must have an "id" property.
      */
     public function testIdNotExist()

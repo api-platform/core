@@ -35,7 +35,7 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteName(string $resourceClass, bool $collection) : string
+    public function getRouteName(string $resourceClass, bool $collection): string
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $collection]));
 

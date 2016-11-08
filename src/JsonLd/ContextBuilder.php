@@ -51,7 +51,7 @@ final class ContextBuilder implements ContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL) : array
+    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_URL): array
     {
         return [
             '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
@@ -62,7 +62,7 @@ final class ContextBuilder implements ContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntrypointContext(int $referenceType = UrlGeneratorInterface::ABS_PATH) : array
+    public function getEntrypointContext(int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         $context = $this->getBaseContext($referenceType);
 
@@ -83,7 +83,7 @@ final class ContextBuilder implements ContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : array
+    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
         $context = $this->getBaseContext($referenceType);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -125,7 +125,7 @@ final class ContextBuilder implements ContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string
+    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 

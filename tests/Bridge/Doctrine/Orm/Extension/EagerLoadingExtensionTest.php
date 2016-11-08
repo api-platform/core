@@ -13,7 +13,6 @@ namespace ApiPlatform\Core\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -275,7 +274,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.
      */
     public function testMaxDepthReached()

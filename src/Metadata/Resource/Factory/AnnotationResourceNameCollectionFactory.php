@@ -41,7 +41,7 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
     /**
      * {@inheritdoc}
      */
-    public function create() : ResourceNameCollection
+    public function create(): ResourceNameCollection
     {
         $classes = [];
         $includedFiles = [];

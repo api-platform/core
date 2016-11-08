@@ -38,7 +38,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
@@ -70,7 +70,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @return PropertyMetadata
      */
-    private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null) : PropertyMetadata
+    private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
         $groups = $this->getPropertySerializerGroups($resourceClass, $propertyName);
 
@@ -97,7 +97,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @return PropertyMetadata
      */
-    private function transformLinkStatus(PropertyMetadata $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null) : PropertyMetadata
+    private function transformLinkStatus(PropertyMetadata $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
         $propertyMetadata = $propertyMetadata->withReadableLink(true);
         $propertyMetadata = $propertyMetadata->withWritableLink(true);
@@ -147,7 +147,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @return (string[]|null)[]
      */
-    private function getEffectiveSerializerGroups(array $options, string $resourceClass) : array
+    private function getEffectiveSerializerGroups(array $options, string $resourceClass): array
     {
         if (isset($options['serializer_groups'])) {
             return [$options['serializer_groups'], $options['serializer_groups']];
@@ -176,7 +176,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @return string[]
      */
-    private function getPropertySerializerGroups(string $resourceClass, string $property) : array
+    private function getPropertySerializerGroups(string $resourceClass, string $property): array
     {
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($resourceClass);
 
@@ -196,7 +196,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @return string[]
      */
-    private function getResourceSerializerGroups(string $resourceClass) : array
+    private function getResourceSerializerGroups(string $resourceClass): array
     {
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($resourceClass);
 

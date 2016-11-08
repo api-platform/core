@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolver;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -49,7 +48,7 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No resource class found
      */
     public function testGetResourceClassWithWrongClassName()
@@ -62,7 +61,7 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No resource class found for object of type "ArrayIterator"
      */
     public function testGetResourceClassWithNoResourceClassName()
@@ -97,7 +96,7 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No resource class found.
      */
     public function testGetResourceClassWithNoResourceClassNameAndNoObject()

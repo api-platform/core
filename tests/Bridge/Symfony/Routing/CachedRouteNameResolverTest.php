@@ -35,7 +35,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No item route associated with the type "AppBundle\Entity\User".
      */
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
@@ -95,7 +95,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
      */
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()

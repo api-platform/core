@@ -45,7 +45,7 @@ class NumericFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -78,7 +78,7 @@ class NumericFilter extends AbstractFilter
      *
      * @return string
      */
-    private function getType(string $doctrineType) : string
+    private function getType(string $doctrineType): string
     {
         if (DBALType::DECIMAL === $doctrineType) {
             return 'string';
@@ -133,7 +133,7 @@ class NumericFilter extends AbstractFilter
      *
      * @return bool
      */
-    protected function isNumericField(string $property, string $resourceClass) : bool
+    protected function isNumericField(string $property, string $resourceClass): bool
     {
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);

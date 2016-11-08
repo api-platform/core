@@ -36,7 +36,7 @@ final class IriHelper
      *
      * @return array
      */
-    public static function parseIri(string $iri, string $pageParameterName) : array
+    public static function parseIri(string $iri, string $pageParameterName): array
     {
         $parts = parse_url($iri);
         if (false === $parts) {
@@ -64,7 +64,7 @@ final class IriHelper
      *
      * @return string
      */
-    public static function createIri(array $parts, array $parameters, string $pageParameterName, float $page = null) : string
+    public static function createIri(array $parts, array $parameters, string $pageParameterName, float $page = null): string
     {
         if (null !== $page) {
             $parameters[$pageParameterName] = $page;

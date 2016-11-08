@@ -14,7 +14,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -26,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 class IriConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No route matches "/users/3".
      */
     public function testGetItemFromIriNoRouteException()
@@ -53,7 +52,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No resource associated to "/users/3".
      */
     public function testGetItemFromIriNoResourceException()
@@ -80,7 +79,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Item not found for "/users/3".
      */
     public function testGetItemFromIriItemNotFoundException()

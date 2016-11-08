@@ -36,7 +36,7 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass]));
 

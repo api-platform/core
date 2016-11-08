@@ -38,7 +38,7 @@ final class QueryJoinParser
      *
      * @return ClassMetadata
      */
-    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : ClassMetadata
+    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): ClassMetadata
     {
         $rootEntities = $queryBuilder->getRootEntities();
         $rootAliases = $queryBuilder->getRootAliases();
@@ -104,7 +104,7 @@ final class QueryJoinParser
      *
      * @return string
      */
-    public static function getJoinRelationship(Join $join) : string
+    public static function getJoinRelationship(Join $join): string
     {
         static $relationshipProperty = null;
         static $initialized = false;
@@ -126,7 +126,7 @@ final class QueryJoinParser
      *
      * @return string
      */
-    public static function getJoinAlias(Join $join) : string
+    public static function getJoinAlias(Join $join): string
     {
         static $aliasProperty = null;
         static $initialized = false;
@@ -148,7 +148,7 @@ final class QueryJoinParser
      *
      * @return string[]
      */
-    public static function getOrderByParts(OrderBy $orderBy) : array
+    public static function getOrderByParts(OrderBy $orderBy): array
     {
         static $partsProperty = null;
         static $initialized = false;

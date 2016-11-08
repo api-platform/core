@@ -42,7 +42,7 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
      * @throws ParseException
      * @throws InvalidArgumentException
      */
-    public function create() : ResourceNameCollection
+    public function create(): ResourceNameCollection
     {
         $classes = [];
         if ($this->decorated) {

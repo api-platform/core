@@ -42,7 +42,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
         $parentResourceMetadata = null;
         if ($this->decorated) {
@@ -69,7 +69,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @return array
      */
-    private function getMetadata(string $resourceClass) : array
+    private function getMetadata(string $resourceClass): array
     {
         foreach ($this->paths as $path) {
             try {
@@ -106,7 +106,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @return array
      */
-    private function getAttributes(\SimpleXMLElement $resource, string $elementName) : array
+    private function getAttributes(\SimpleXMLElement $resource, string $elementName): array
     {
         $attributes = [];
         foreach ($resource->$elementName as $attribute) {
@@ -127,7 +127,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @return ResourceMetadata
      */
-    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass) : ResourceMetadata
+    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -144,7 +144,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      *
      * @return ResourceMetadata
      */
-    private function update(ResourceMetadata $resourceMetadata, array $metadata) : ResourceMetadata
+    private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $key => $property) {
             if (null === $metadata[$key] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {

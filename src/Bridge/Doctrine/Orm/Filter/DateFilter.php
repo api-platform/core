@@ -37,7 +37,7 @@ class DateFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -155,7 +155,7 @@ class DateFilter extends AbstractFilter
      *
      * @return bool
      */
-    protected function isDateField(string $property, string $resourceClass) : bool
+    protected function isDateField(string $property, string $resourceClass): bool
     {
         $propertyParts = $this->splitPropertyParts($property);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
@@ -171,7 +171,7 @@ class DateFilter extends AbstractFilter
      *
      * @return array
      */
-    protected function getFilterDescription(string $property, string $period) : array
+    protected function getFilterDescription(string $property, string $period): array
     {
         return [
             sprintf('%s[%s]', $property, $period) => [

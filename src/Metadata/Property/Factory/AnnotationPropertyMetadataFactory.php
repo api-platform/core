@@ -36,7 +36,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $parentPropertyMetadata = null;
         if ($this->decorated) {
@@ -92,7 +92,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @return PropertyMetadata
      */
-    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property) : PropertyMetadata
+    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property): PropertyMetadata
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -101,7 +101,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
-    private function createMetadata(ApiProperty $annotation, PropertyMetadata $parentPropertyMetadata = null) : PropertyMetadata
+    private function createMetadata(ApiProperty $annotation, PropertyMetadata $parentPropertyMetadata = null): PropertyMetadata
     {
         if (null === $parentPropertyMetadata) {
             return new PropertyMetadata(
@@ -127,7 +127,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         return $propertyMetadata;
     }
 
-    private function createWith(PropertyMetadata $propertyMetadata, array $property, $value) : PropertyMetadata
+    private function createWith(PropertyMetadata $propertyMetadata, array $property, $value): PropertyMetadata
     {
         $getter = $property[0].ucfirst($property[1]);
 

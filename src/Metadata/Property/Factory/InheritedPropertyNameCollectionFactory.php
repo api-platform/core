@@ -33,7 +33,7 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         $propertyNames = [];
 
