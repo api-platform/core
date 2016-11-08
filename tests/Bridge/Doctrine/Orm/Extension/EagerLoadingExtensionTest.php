@@ -274,7 +274,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
      * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.
      */
     public function testMaxDepthReached()

@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 class IriConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No route matches "/users/3".
      */
     public function testGetItemFromIriNoRouteException()
@@ -52,7 +52,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No resource associated to "/users/3".
      */
     public function testGetItemFromIriNoResourceException()
@@ -79,7 +79,7 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage Item not found for "/users/3".
      */
     public function testGetItemFromIriItemNotFoundException()
