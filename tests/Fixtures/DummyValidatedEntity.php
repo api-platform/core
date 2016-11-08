@@ -14,11 +14,11 @@ namespace ApiPlatform\Core\Tests\Fixtures;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Dummy Entity Validator.
+ * Dummy Validated Entity.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class DummyEntityValidator
+class DummyValidatedEntity
 {
     /**
      * @var int A dummy ID
