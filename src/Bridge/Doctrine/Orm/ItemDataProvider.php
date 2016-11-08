@@ -126,7 +126,7 @@ class ItemDataProvider implements ItemDataProviderInterface
      *
      * @return array
      */
-    private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass) : array
+    private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass): array
     {
         $identifierValues = [$id];
         $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();

@@ -48,7 +48,7 @@ class CoverageContext implements Context
         $writer->process(self::$coverage, __DIR__.'/../../build/cov/coverage-behat.cov');
     }
 
-    private function getCoverageKeyFromScope(BeforeScenarioScope $scope) : string
+    private function getCoverageKeyFromScope(BeforeScenarioScope $scope): string
     {
         return sprintf('%s::%s', $scope->getFeature()->getTitle(), $scope->getScenario()->getTitle());
     }

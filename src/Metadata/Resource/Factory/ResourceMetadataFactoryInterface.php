@@ -30,5 +30,5 @@ interface ResourceMetadataFactoryInterface
      *
      * @return ResourceMetadata
      */
-    public function create(string $resourceClass) : ResourceMetadata;
+    public function create(string $resourceClass): ResourceMetadata;
 }

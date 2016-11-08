@@ -36,7 +36,7 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
     /**
      * {@inheritdoc}
      */
-    public function create() : ResourceNameCollection
+    public function create(): ResourceNameCollection
     {
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY);

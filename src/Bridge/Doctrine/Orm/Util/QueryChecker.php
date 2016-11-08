@@ -33,7 +33,7 @@ final class QueryChecker
      *
      * @return bool
      */
-    public static function hasHavingClause(QueryBuilder $queryBuilder) : bool
+    public static function hasHavingClause(QueryBuilder $queryBuilder): bool
     {
         return !empty($queryBuilder->getDQLPart('having'));
     }
@@ -46,7 +46,7 @@ final class QueryChecker
      *
      * @return bool
      */
-    public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         return self::hasRootEntityWithIdentifier($queryBuilder, $managerRegistry, true);
     }
@@ -59,7 +59,7 @@ final class QueryChecker
      *
      * @return bool
      */
-    public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         return self::hasRootEntityWithIdentifier($queryBuilder, $managerRegistry, false);
     }
@@ -73,7 +73,7 @@ final class QueryChecker
      *
      * @return bool
      */
-    private static function hasRootEntityWithIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry, bool $isForeign) : bool
+    private static function hasRootEntityWithIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry, bool $isForeign): bool
     {
         foreach ($queryBuilder->getRootEntities() as $rootEntity) {
             $rootMetadata = $managerRegistry
@@ -95,7 +95,7 @@ final class QueryChecker
      *
      * @return bool
      */
-    public static function hasMaxResults(QueryBuilder $queryBuilder) : bool
+    public static function hasMaxResults(QueryBuilder $queryBuilder): bool
     {
         return null !== $queryBuilder->getMaxResults();
     }
@@ -109,7 +109,7 @@ final class QueryChecker
      *
      * @return bool
      */
-    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
             empty($orderByParts = $queryBuilder->getDQLPart('orderBy')) ||

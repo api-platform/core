@@ -34,7 +34,7 @@ final class RequestParser
      *
      * @return Request
      */
-    public static function parseAndDuplicateRequest(Request $request) : Request
+    public static function parseAndDuplicateRequest(Request $request): Request
     {
         $query = self::parseRequestParams($request->getQueryString() ?? '');
         $body = self::parseRequestParams($request->getContent());
@@ -53,7 +53,7 @@ final class RequestParser
      *
      * @return array
      */
-    public static function parseRequestParams(string $source) : array
+    public static function parseRequestParams(string $source): array
     {
         // '[' is urlencoded in the input, but we must urldecode it in order
         // to find it when replacing names with the regexp below.

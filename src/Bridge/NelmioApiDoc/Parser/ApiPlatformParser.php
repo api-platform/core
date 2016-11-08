@@ -80,7 +80,7 @@ final class ApiPlatformParser implements ParserInterface
     /**
      * {@inheritdoc}
      */
-    public function parse(array $item) : array
+    public function parse(array $item): array
     {
         list($io, $resourceClass, $operationName) = explode(':', $item['class'], 3);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -104,7 +104,7 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function parseResource(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []) : array
+    private function parseResource(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []): array
     {
         $visited[] = $resourceClass;
 
@@ -148,7 +148,7 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName, string $io) : array
+    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName, string $io): array
     {
         $operation = $this->getGroupsContext($resourceMetadata, $operationName, true);
         $operation += $this->getGroupsContext($resourceMetadata, $operationName, false);
@@ -179,7 +179,7 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function getPropertyMetadata(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited, array $options) : array
+    private function getPropertyMetadata(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited, array $options): array
     {
         $data = [];
 

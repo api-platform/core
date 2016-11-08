@@ -48,7 +48,7 @@ class OrderFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -104,7 +104,7 @@ class OrderFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    protected function extractProperties(Request $request) : array
+    protected function extractProperties(Request $request): array
     {
         return $request->query->get($this->orderParameterName, []);
     }

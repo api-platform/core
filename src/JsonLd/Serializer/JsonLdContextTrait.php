@@ -32,7 +32,7 @@ trait JsonLdContextTrait
      *
      * @return array
      */
-    private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []) : array
+    private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []): array
     {
         if (isset($context['jsonld_has_context'])) {
             return $data;

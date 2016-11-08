@@ -49,7 +49,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getAnnotations() : array
+    public function getAnnotations(): array
     {
         $hydraDoc = $this->documentationNormalizer->normalize(new Documentation($this->resourceNameCollectionFactory->create()));
         $entrypointHydraDoc = $this->getResourceHydraDoc($hydraDoc, '#Entrypoint');
@@ -96,7 +96,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      *
      * @return ApiDoc
      */
-    private function getApiDoc(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $resourceHydraDoc, array $entrypointHydraDoc = []) : ApiDoc
+    private function getApiDoc(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $resourceHydraDoc, array $entrypointHydraDoc = []): ApiDoc
     {
         if ($collection) {
             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);

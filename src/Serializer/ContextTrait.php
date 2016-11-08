@@ -26,7 +26,7 @@ trait ContextTrait
      *
      * @return array
      */
-    private function initContext(string $resourceClass, array $context) : array
+    private function initContext(string $resourceClass, array $context): array
     {
         if (isset($context['api_sub_level'])) {
             return $context;

@@ -64,7 +64,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withType(Type $type) : self
+    public function withType(Type $type): self
     {
         $metadata = clone $this;
         $metadata->type = $type;
@@ -89,7 +89,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withDescription($description) : self
+    public function withDescription($description): self
     {
         $metadata = clone $this;
         $metadata->description = $description;
@@ -114,7 +114,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withReadable(bool $readable) : self
+    public function withReadable(bool $readable): self
     {
         $metadata = clone $this;
         $metadata->readable = $readable;
@@ -139,7 +139,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withWritable(bool $writable) : self
+    public function withWritable(bool $writable): self
     {
         $metadata = clone $this;
         $metadata->writable = $writable;
@@ -168,7 +168,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withRequired(bool $required) : self
+    public function withRequired(bool $required): self
     {
         $metadata = clone $this;
         $metadata->required = $required;
@@ -193,7 +193,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withWritableLink(bool $writableLink) : self
+    public function withWritableLink(bool $writableLink): self
     {
         $metadata = clone $this;
         $metadata->writableLink = $writableLink;
@@ -218,7 +218,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withReadableLink(bool $readableLink) : self
+    public function withReadableLink(bool $readableLink): self
     {
         $metadata = clone $this;
         $metadata->readableLink = $readableLink;
@@ -243,7 +243,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withIri(string $iri = null) : self
+    public function withIri(string $iri = null): self
     {
         $metadata = clone $this;
         $metadata->iri = $iri;
@@ -268,7 +268,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withIdentifier(bool $identifier) : self
+    public function withIdentifier(bool $identifier): self
     {
         $metadata = clone $this;
         $metadata->identifier = $identifier;
@@ -293,7 +293,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withAttributes(array $attributes) : self
+    public function withAttributes(array $attributes): self
     {
         $metadata = clone $this;
         $metadata->attributes = $attributes;
@@ -318,7 +318,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withChildInherited(string $childInherited) : self
+    public function withChildInherited(string $childInherited): self
     {
         $metadata = clone $this;
         $metadata->childInherited = $childInherited;

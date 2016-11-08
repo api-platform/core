@@ -35,7 +35,7 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 

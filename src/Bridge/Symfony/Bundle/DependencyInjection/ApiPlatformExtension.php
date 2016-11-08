@@ -312,7 +312,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      *
      * @return array
      */
-    private function getFormats(array $configFormats) : array
+    private function getFormats(array $configFormats): array
     {
         $formats = [];
         foreach ($configFormats as $format => $value) {

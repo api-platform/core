@@ -28,7 +28,7 @@ interface OperationMethodResolverInterface
      *
      * @return string
      */
-    public function getCollectionOperationMethod(string $resourceClass, string $operationName) : string;
+    public function getCollectionOperationMethod(string $resourceClass, string $operationName): string;
 
     /**
      * @param string $resourceClass
@@ -38,5 +38,5 @@ interface OperationMethodResolverInterface
      *
      * @return string
      */
-    public function getItemOperationMethod(string $resourceClass, string $operationName) : string;
+    public function getItemOperationMethod(string $resourceClass, string $operationName): string;
 }

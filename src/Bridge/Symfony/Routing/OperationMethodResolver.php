@@ -37,7 +37,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollectionOperationMethod(string $resourceClass, string $operationName) : string
+    public function getCollectionOperationMethod(string $resourceClass, string $operationName): string
     {
         return $this->getOperationMethod($resourceClass, $operationName, true);
     }
@@ -45,7 +45,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemOperationMethod(string $resourceClass, string $operationName) : string
+    public function getItemOperationMethod(string $resourceClass, string $operationName): string
     {
         return $this->getOperationMethod($resourceClass, $operationName, false);
     }
@@ -53,7 +53,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getCollectionOperationRoute(string $resourceClass, string $operationName) : Route
+    public function getCollectionOperationRoute(string $resourceClass, string $operationName): Route
     {
         return $this->getOperationRoute($resourceClass, $operationName, true);
     }
@@ -61,7 +61,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemOperationRoute(string $resourceClass, string $operationName) : Route
+    public function getItemOperationRoute(string $resourceClass, string $operationName): Route
     {
         return $this->getOperationRoute($resourceClass, $operationName, false);
     }
@@ -75,7 +75,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      *
      * @return string
      */
-    private function getOperationMethod(string $resourceClass, string $operationName, bool $collection) : string
+    private function getOperationMethod(string $resourceClass, string $operationName, bool $collection): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
@@ -114,7 +114,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      *
      * @return Route
      */
-    private function getOperationRoute(string $resourceClass, string $operationName, bool $collection) : Route
+    private function getOperationRoute(string $resourceClass, string $operationName, bool $collection): Route
     {
         $routeName = $this->getRouteName($this->resourceMetadataFactory->create($resourceClass), $operationName, $collection);
         if (null !== $routeName) {
@@ -162,7 +162,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      *
      * @return Route
      */
-    private function getRoute(string $routeName) : Route
+    private function getRoute(string $routeName): Route
     {
         foreach ($this->router->getRouteCollection() as $name => $route) {
             if ($routeName === $name) {

@@ -31,7 +31,7 @@ final class RouteNameResolver implements RouteNameResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteName(string $resourceClass, bool $collection) : string
+    public function getRouteName(string $resourceClass, bool $collection): string
     {
         $operationType = $collection ? 'collection' : 'item';
 

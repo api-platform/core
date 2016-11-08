@@ -43,7 +43,7 @@ class YamlPropertyNameCollectionFactory implements PropertyNameCollectionFactory
      * @throws ParseException
      * @throws InvalidArgumentException
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         if ($this->decorated) {
             try {

@@ -31,5 +31,5 @@ interface PropertyNameCollectionFactoryInterface
      *
      * @return PropertyNameCollection
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection;
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection;
 }

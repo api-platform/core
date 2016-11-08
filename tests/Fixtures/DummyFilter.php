@@ -39,7 +39,7 @@ class DummyFilter implements FilterInterface
      *
      * @return array
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         return $this->description;
     }
