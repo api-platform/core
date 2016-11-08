@@ -41,7 +41,7 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        \RuntimeException
+     * @expectedException        \ApiPlatform\Core\Exception\RuntimeException
      * @expectedExceptionMessage Filter tags must have an "id" property.
      */
     public function testIdNotExist()
