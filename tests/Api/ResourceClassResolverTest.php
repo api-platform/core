@@ -48,7 +48,7 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No resource class found
      */
     public function testGetResourceClassWithWrongClassName()
@@ -61,7 +61,7 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No resource class found for object of type "ArrayIterator"
      */
     public function testGetResourceClassWithNoResourceClassName()
@@ -96,7 +96,7 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No resource class found.
      */
     public function testGetResourceClassWithNoResourceClassNameAndNoObject()
