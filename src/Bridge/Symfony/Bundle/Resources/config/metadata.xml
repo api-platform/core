@@ -5,6 +5,11 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- Extractor -->
+        <service id="api_platform.metadata.extractor.yaml" class="ApiPlatform\Core\Metadata\YamlExtractor" public="false">
+            <argument type="collection" />
+        </service>
+
         <!-- Resource name collection -->
 
         <service id="api_platform.metadata.resource.name_collection_factory" alias="api_platform.metadata.resource.name_collection_factory.annotation" />
@@ -19,13 +24,13 @@
         </service>
 
         <service id="api_platform.metadata.resource.name_collection_factory.yaml" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceNameCollectionFactory" public="false">
-                <argument type="collection" />
-                <argument type="service" id="api_platform.metadata.resource.name_collection_factory.yaml.inner" />
+            <argument type="service" id="api_platform.metadata.extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory.yaml.inner" />
         </service>
 
         <service id="api_platform.metadata.resource.name_collection_factory.xml" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceNameCollectionFactory" public="false">
-                <argument type="collection" />
-                <argument type="service" id="api_platform.metadata.resource.name_collection_factory.xml.inner" />
+            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory.xml.inner" />
         </service>
 
         <!-- Resource metadata -->
@@ -41,7 +46,7 @@
         </service>
 
        <service id="api_platform.metadata.resource.metadata_factory.yaml" decorates="api_platform.metadata.resource.metadata_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceMetadataFactory" decoration-priority="40" public="false">
-            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.yaml.inner" />
         </service>
 
@@ -90,7 +95,7 @@
         </service>
 
         <service id="api_platform.metadata.property.name_collection_factory.yaml" class="ApiPlatform\Core\Metadata\Property\Factory\YamlPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">
-            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.yaml.inner" />
         </service>
 
@@ -119,7 +124,7 @@
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.yaml" class="ApiPlatform\Core\Metadata\Property\Factory\YamlPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
-            <argument type="collection" />
+            <argument type="service" id="api_platform.metadata.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.yaml.inner" />
         </service>
 

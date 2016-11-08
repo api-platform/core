@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\YamlPropertyNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -26,7 +27,7 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
         $this->assertEquals(
-            (new YamlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class),
+            (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class),
             new PropertyNameCollection(['foo', 'name'])
         );
     }
@@ -42,8 +43,8 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             ->shouldBeCalled();
 
         $this->assertEquals(
-            (new YamlPropertyNameCollectionFactory([$configPath], $decorated->reveal()))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['foo', 'name', 'id'])
+            (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class),
+            new PropertyNameCollection(['id', 'foo', 'name'])
         );
     }
 
@@ -55,7 +56,7 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.yml';
 
-        (new YamlPropertyNameCollectionFactory([$configPath]))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class);
+        (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class);
     }
 
     /**
@@ -66,7 +67,7 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.yml';
 
-        (new YamlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class);
+        (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 
     /**
@@ -77,7 +78,7 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertiesinvalid.yml';
 
-        (new YamlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class);
+        (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 
     /**
@@ -88,18 +89,7 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertyinvalid.yml';
 
-        (new YamlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class);
-    }
-
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /"class" setting is expected to be a string, none given in ".+\/\.\.\/\.\.\/\.\.\/Fixtures\/FileConfigurations\/resourcenoclass\.yml"\./
-     */
-    public function testCreateWithoutResourceClass()
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
-
-        (new YamlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class);
+        (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 
     /**
@@ -109,6 +99,6 @@ class YamlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
-        (new YamlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class);
+        (new YamlPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 }

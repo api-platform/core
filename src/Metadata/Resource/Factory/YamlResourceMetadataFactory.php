@@ -14,8 +14,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 
 /**
  * Creates a resource metadata from yml {@see Resource} configuration.
@@ -24,23 +23,22 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
+    private $extractor;
     private $decorated;
-    private $paths;
 
     /**
-     * @param string[]                              $paths
+     * @param YamlExtractor                         $extractor
      * @param ResourceMetadataFactoryInterface|null $decorated
      */
-    public function __construct(array $paths, ResourceMetadataFactoryInterface $decorated = null)
+    public function __construct(YamlExtractor $extractor, ResourceMetadataFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @throws ParseException
      * @throws InvalidArgumentException
      */
     public function create(string $resourceClass): ResourceMetadata
@@ -60,55 +58,29 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
-        $metadata = null;
-
-        foreach ($this->paths as $path) {
-            try {
-                $resources = Yaml::parse(file_get_contents($path));
-            } catch (ParseException $parseException) {
-                $parseException->setParsedFile($path);
-
-                throw $parseException;
-            }
-
-            $resources = $resources['resources'] ?? $resources;
-
-            foreach ($resources as $resource) {
-                if (!isset($resource['class'])) {
-                    throw new InvalidArgumentException('Resource must represent a class, none found!');
-                }
-
-                if ($resourceClass !== $resource['class']) {
-                    continue;
-                }
-
-                $metadata = $resource;
-                break 2;
-            }
-        }
-
-        if (empty($metadata)) {
+        $resources = $this->extractor->getResources();
+        if (!isset($resources[$resourceClass])) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
         if (null === $parentResourceMetadata) {
             return new ResourceMetadata(
-                $metadata['shortName'] ?? null,
-                $metadata['description'] ?? null,
-                $metadata['iri'] ?? null,
-                $metadata['itemOperations'] ?? null,
-                $metadata['collectionOperations'] ?? null,
-                $metadata['attributes'] ?? null
+                $resources[$resourceClass]['shortName'],
+                $resources[$resourceClass]['description'],
+                $resources[$resourceClass]['iri'],
+                $resources[$resourceClass]['itemOperations'],
+                $resources[$resourceClass]['collectionOperations'],
+                $resources[$resourceClass]['attributes']
             );
         }
 
         $resourceMetadata = $parentResourceMetadata;
         foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'attributes'] as $property) {
-            if (!isset($metadata[$property])) {
+            if (!isset($resources[$resourceClass][$property])) {
                 continue;
             }
 
-            $resourceMetadata = $this->createWith($resourceMetadata, $property, $metadata[$property]);
+            $resourceMetadata = $this->createWith($resourceMetadata, $property, $resources[$resourceClass][$property]);
         }
 
         return $resourceMetadata;

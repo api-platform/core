@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
@@ -26,7 +27,7 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testYamlResourceName()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
-        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
+        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory(new YamlExtractor([$configPath]));
 
         $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([
             Dummy::class,
@@ -37,23 +38,9 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testYamlSingleResourceName()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
-        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
+        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory(new YamlExtractor([$configPath]));
 
-        $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([
-            FileConfigDummy::class,
-        ]));
-    }
-
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Resource must represent a class, none found!
-     */
-    public function testNoClassYamlResourceNameCollectionFactory()
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
-        $resourceMetadataFactory = new YamlResourceNameCollectionFactory([$configPath]);
-
-        $resourceMetadataFactory->create();
+        $this->assertEquals($yamlResourceNameCollectionFactory->create(), new ResourceNameCollection([FileConfigDummy::class]));
     }
 
     /**
@@ -63,6 +50,6 @@ class YamlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
-        (new YamlResourceNameCollectionFactory([$configPath]))->create();
+        (new YamlResourceNameCollectionFactory(new YamlExtractor([$configPath])))->create();
     }
 }

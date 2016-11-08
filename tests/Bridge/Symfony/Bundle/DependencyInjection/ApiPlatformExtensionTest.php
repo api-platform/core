@@ -32,14 +32,15 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    const DEFAULT_CONFIG = [
-        'api_platform' => [
-            'title' => 'title',
-            'description' => 'description',
-            'version' => 'version',
-            'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']], 'jsonhal' => ['mime_types' => ['application/hal+json']]],
+    const DEFAULT_CONFIG = ['api_platform' => [
+        'title' => 'title',
+        'description' => 'description',
+        'version' => 'version',
+        'formats' => [
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+            'jsonhal' => ['mime_types' => ['application/hal+json']],
         ],
-    ];
+    ]];
 
     private $extension;
 
@@ -225,22 +226,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
         $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.name_collection_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.metadata_factory.yaml')->willReturn($definition)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.yaml')->willReturn($definition)->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
@@ -352,6 +338,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.resource.name_collection_factory.cached',
             'api_platform.metadata.resource.name_collection_factory.xml',
             'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.metadata.extractor.yaml',
             'api_platform.negotiator',
             'api_platform.operation_method_resolver',
             'api_platform.operation_path_resolver.custom',
