@@ -21,7 +21,7 @@ use Symfony\Component\Config\Util\XmlUtils;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class XmlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
+final class XmlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     const RESOURCE_SCHEMA = __DIR__.'/../../schema/metadata.xsd';
 
