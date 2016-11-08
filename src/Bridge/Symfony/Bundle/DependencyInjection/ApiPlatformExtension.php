@@ -67,7 +67,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMetadataConfiguration($container, $loader);
         $this->registerDoctrineExtensionConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
