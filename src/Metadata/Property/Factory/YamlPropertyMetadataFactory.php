@@ -40,7 +40,7 @@ class YamlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $parentPropertyMetadata = null;
         if ($this->decorated) {
@@ -88,7 +88,7 @@ class YamlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return PropertyMetadata
      */
-    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property) : PropertyMetadata
+    private function handleNotFound(PropertyMetadata $parentPropertyMetadata = null, string $resourceClass, string $property): PropertyMetadata
     {
         if ($parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -108,7 +108,7 @@ class YamlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return array
      */
-    private function getMetadata(string $resourceClass, string $property) : array
+    private function getMetadata(string $resourceClass, string $property): array
     {
         foreach ($this->paths as $path) {
             try {
@@ -187,7 +187,7 @@ class YamlPropertyMetadataFactory implements PropertyMetadataFactoryInterface
      *
      * @return PropertyMetadata
      */
-    private function update(PropertyMetadata $propertyMetadata, array $metadata) : PropertyMetadata
+    private function update(PropertyMetadata $propertyMetadata, array $metadata): PropertyMetadata
     {
         $metadataAccessors = [
             'description' => 'get',

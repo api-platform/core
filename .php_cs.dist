@@ -1,0 +1,16 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__)
+    ->exclude('tests/Fixtures/app/cache')
+;
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@Symfony' => true,
+        'ordered_imports' => true,
+        'phpdoc_order' => true,
+        'short_array_syntax' => true,
+    ])
+    ->setFinder($finder)
+;

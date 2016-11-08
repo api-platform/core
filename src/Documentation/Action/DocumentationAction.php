@@ -36,7 +36,7 @@ final class DocumentationAction
         $this->formats = $formats;
     }
 
-    public function __invoke() : Documentation
+    public function __invoke(): Documentation
     {
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
     }

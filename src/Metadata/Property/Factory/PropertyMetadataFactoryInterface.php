@@ -32,5 +32,5 @@ interface PropertyMetadataFactoryInterface
      *
      * @return PropertyMetadata
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata;
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata;
 }

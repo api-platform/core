@@ -43,7 +43,7 @@ final class XmlResourceNameCollectionFactory implements ResourceNameCollectionFa
      *
      * @throws InvalidArgumentException
      */
-    public function create() : ResourceNameCollection
+    public function create(): ResourceNameCollection
     {
         $classes = [];
         if (null !== $this->decorated) {

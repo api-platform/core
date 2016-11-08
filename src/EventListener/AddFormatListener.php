@@ -128,7 +128,7 @@ final class AddFormatListener
      *
      * @return NotAcceptableHttpException
      */
-    private function getNotAcceptableHttpException(string $accept, array $mimeTypes = null) : NotAcceptableHttpException
+    private function getNotAcceptableHttpException(string $accept, array $mimeTypes = null): NotAcceptableHttpException
     {
         if (null === $mimeTypes) {
             $mimeTypes = array_keys($this->mimeTypes);

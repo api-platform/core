@@ -48,7 +48,7 @@ final class ContextAction
      *
      * @return array
      */
-    public function __invoke(string $shortName) : array
+    public function __invoke(string $shortName): array
     {
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];

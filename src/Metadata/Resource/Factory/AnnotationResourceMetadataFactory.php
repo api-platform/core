@@ -35,7 +35,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
         $parentResourceMetadata = null;
         if ($this->decorated) {
@@ -70,7 +70,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      *
      * @return ResourceMetadata
      */
-    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass) : ResourceMetadata
+    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -79,7 +79,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
     }
 
-    private function createMetadata(ApiResource $annotation, ResourceMetadata $parentResourceMetadata = null) : ResourceMetadata
+    private function createMetadata(ApiResource $annotation, ResourceMetadata $parentResourceMetadata = null): ResourceMetadata
     {
         if (!$parentResourceMetadata) {
             return new ResourceMetadata(
@@ -109,7 +109,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      *
      * @return ResourceMetadata
      */
-    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value) : ResourceMetadata
+    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value): ResourceMetadata
     {
         $getter = 'get'.ucfirst($property);
 

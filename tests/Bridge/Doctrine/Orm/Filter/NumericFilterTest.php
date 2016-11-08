@@ -137,7 +137,7 @@ class NumericFilterTest extends KernelTestCase
      *
      * @return array
      */
-    public function provideApplyTestData() : array
+    public function provideApplyTestData(): array
     {
         return [
             'numeric string (positive integer)' => [
@@ -148,7 +148,6 @@ class NumericFilterTest extends KernelTestCase
                 ],
                 [
                     'dummyPrice' => '21',
-
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],

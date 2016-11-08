@@ -37,7 +37,7 @@ final class PhpDocResourceMetadataFactory implements ResourceMetadataFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
 

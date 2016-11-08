@@ -55,7 +55,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrentPage() : float
+    public function getCurrentPage(): float
     {
         return floor($this->firstResult / $this->maxResults) + 1.;
     }
@@ -63,7 +63,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastPage() : float
+    public function getLastPage(): float
     {
         return ceil($this->totalItems / $this->maxResults) ?: 1.;
     }
@@ -71,7 +71,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemsPerPage() : float
+    public function getItemsPerPage(): float
     {
         return (float) $this->maxResults;
     }
@@ -79,7 +79,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getTotalItems() : float
+    public function getTotalItems(): float
     {
         return (float) $this->totalItems;
     }

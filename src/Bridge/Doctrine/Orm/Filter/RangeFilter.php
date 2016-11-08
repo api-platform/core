@@ -31,7 +31,7 @@ class RangeFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -198,7 +198,7 @@ class RangeFilter extends AbstractFilter
      *
      * @return array
      */
-    protected function getFilterDescription(string $fieldName, string $operator) : array
+    protected function getFilterDescription(string $fieldName, string $operator): array
     {
         return [
             sprintf('%s[%s]', $fieldName, $operator) => [

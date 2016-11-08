@@ -186,7 +186,7 @@ class OrderFilterTest extends KernelTestCase
      *
      * @return array
      */
-    public function provideApplyTestData() : array
+    public function provideApplyTestData(): array
     {
         return [
             'valid values' => [

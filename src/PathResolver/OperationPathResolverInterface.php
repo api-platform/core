@@ -27,5 +27,5 @@ interface OperationPathResolverInterface
      *
      * @return string
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string;
+    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string;
 }

@@ -80,7 +80,7 @@ final class DeserializeListener
      *
      * @return string
      */
-    private function getFormat(Request $request) : string
+    private function getFormat(Request $request): string
     {
         $contentType = $request->headers->get('CONTENT_TYPE');
         if (null === $contentType) {

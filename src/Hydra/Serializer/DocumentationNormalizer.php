@@ -112,7 +112,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName) : array
+    private function getClass(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
         $class = [
             '@id' => $prefixedShortName,
@@ -137,7 +137,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata) : array
+    private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
     {
         $attributes = $resourceMetadata->getAttributes();
         $context = [];
@@ -167,7 +167,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName) : array
+    private function getHydraProperties(string $resourceClass, ResourceMetadata $resourceMetadata, string $shortName, string $prefixedShortName): array
     {
         $properties = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
@@ -192,7 +192,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getHydraOperations(string $resourceClass, ResourceMetadata $resourceMetadata, string $prefixedShortName, bool $collection) : array
+    private function getHydraOperations(string $resourceClass, ResourceMetadata $resourceMetadata, string $prefixedShortName, bool $collection): array
     {
         if (null === $operations = $collection ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
             return [];
@@ -218,7 +218,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection) : array
+    private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection): array
     {
         if ($collection) {
             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
@@ -332,7 +332,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getClasses(array $entrypointProperties, array $classes) : array
+    private function getClasses(array $entrypointProperties, array $classes): array
     {
         $classes[] = [
             '@id' => '#Entrypoint',
@@ -421,7 +421,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName) : array
+    private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
         $type = $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'hydra:Link';
         $property = [
@@ -457,7 +457,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function computeDoc(Documentation $object, array $classes) : array
+    private function computeDoc(Documentation $object, array $classes): array
     {
         $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
 
@@ -480,7 +480,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getContext() : array
+    private function getContext(): array
     {
         return [
             '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',

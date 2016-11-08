@@ -28,7 +28,7 @@ final class EntrypointAction
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
-    public function __invoke() : Entrypoint
+    public function __invoke(): Entrypoint
     {
         return new Entrypoint($this->resourceNameCollectionFactory->create());
     }

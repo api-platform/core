@@ -44,7 +44,7 @@ interface IriConverterInterface
      *
      * @return string
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
 
     /**
      * Gets the IRI associated with the given resource collection.
@@ -56,5 +56,5 @@ interface IriConverterInterface
      *
      * @return string
      */
-    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
 }

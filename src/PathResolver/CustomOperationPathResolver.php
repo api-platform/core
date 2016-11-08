@@ -28,7 +28,7 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
     {
         if (isset($operation['path'])) {
             return $operation['path'];

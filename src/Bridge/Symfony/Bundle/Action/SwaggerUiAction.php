@@ -63,7 +63,7 @@ final class SwaggerUiAction
      *
      * @return array
      */
-    private function getContext(Request $request) : array
+    private function getContext(Request $request): array
     {
         $context = [
             'title' => $this->title,
