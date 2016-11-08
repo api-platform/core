@@ -14,8 +14,7 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 
 /**
  * Creates a property name collection from YAML {@see Property} configuration files.
@@ -24,30 +23,29 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    private $paths;
+    private $extractor;
     private $decorated;
 
-    /**
-     * @param array                                       $paths
-     * @param PropertyNameCollectionFactoryInterface|null $decorated
-     */
-    public function __construct(array $paths, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(YamlExtractor $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @throws ParseException
      * @throws InvalidArgumentException
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
+        $propertyNames = [];
+
         if ($this->decorated) {
             try {
-                $propertyNameCollection = $this->decorated->create($resourceClass, $options);
+                foreach ($propertyNameCollection = $this->decorated->create($resourceClass, $options) as $propertyName) {
+                    $propertyNames[$propertyName] = true;
+                }
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
                 // Ignore not found exceptions from parent
             }
@@ -61,62 +59,9 @@ final class YamlPropertyNameCollectionFactory implements PropertyNameCollectionF
             throw new ResourceClassNotFoundException(sprintf('The resource class "%s" does not exist.', $resourceClass));
         }
 
-        $propertyNames = [];
-
-        foreach ($this->paths as $path) {
-            try {
-                $resources = Yaml::parse(file_get_contents($path));
-            } catch (ParseException $parseException) {
-                $parseException->setParsedFile($path);
-
-                throw $parseException;
-            }
-
-            if (null === $resources = $resources['resources'] ?? $resources) {
-                continue;
-            }
-
-            if (!is_array($resources)) {
-                throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', gettype($resources), $path));
-            }
-
-            foreach ($resources as $resourceName => $resource) {
-                if (null === $resource) {
-                    continue;
-                }
-
-                if (!is_array($resource)) {
-                    throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $resourceName, gettype($resource), $path));
-                }
-
-                if (!isset($resource['class'])) {
-                    throw new InvalidArgumentException(sprintf('"class" setting is expected to be a string, none given in "%s".', $path));
-                }
-
-                if ($resourceClass !== $resource['class'] || !isset($resource['properties'])) {
-                    continue;
-                }
-
-                if (!is_array($resource['properties'])) {
-                    throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', gettype($resource['properties']), $path));
-                }
-
-                foreach ($resource['properties'] as $propertyName => $propertyValues) {
-                    if (null === $propertyValues) {
-                        continue;
-                    }
-
-                    if (!is_array($propertyValues)) {
-                        throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $propertyName, gettype($propertyValues), $path));
-                    }
-
-                    $propertyNames[$propertyName] = true;
-                }
-            }
-        }
-
-        if (isset($propertyNameCollection)) {
-            foreach ($propertyNameCollection as $propertyName) {
+        $resources = $this->extractor->getResources();
+        if (isset($resources[$resourceClass]['properties'])) {
+            foreach ($resources[$resourceClass]['properties'] as $propertyName => $property) {
                 $propertyNames[$propertyName] = true;
             }
         }

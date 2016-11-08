@@ -15,6 +15,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\YamlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -31,7 +32,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
+        $resourceMetadataFactory = new YamlResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
@@ -45,8 +46,8 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     public function testYamlDoesNotExistMetadataFactory()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.yml';
-        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory([$configPath]);
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
+        $yamlResourceNameCollectionFactory = new YamlResourceNameCollectionFactory(new YamlExtractor([$configPath]));
+        $resourceMetadataFactory = new YamlResourceMetadataFactory(new YamlExtractor([$configPath]));
 
         foreach ($yamlResourceNameCollectionFactory->create() as $resourceName) {
             $resourceMetadataFactory->create($resourceName);
@@ -60,7 +61,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.yml';
 
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
+        $resourceMetadataFactory = new YamlResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
@@ -74,23 +75,11 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/single_resource.yml';
 
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
+        $resourceMetadataFactory = new YamlResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
-    }
-
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Resource must represent a class, none found!
-     */
-    public function testNoClassYamlResourceMetadataFactory()
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath]);
-
-        $resourceMetadataFactory->create(FileConfigDummy::class);
     }
 
     /**
@@ -103,7 +92,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
 
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath], $decorated->reveal());
+        $resourceMetadataFactory = new YamlResourceMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
         $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
@@ -121,7 +110,7 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(FileConfigDummy::class)->willReturn($expectedResourceMetadata)->shouldBeCalled();
 
-        $resourceMetadataFactory = new YamlResourceMetadataFactory([$configPath], $decorated->reveal());
+        $resourceMetadataFactory = new YamlResourceMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
@@ -135,6 +124,6 @@ class YamlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
-        (new YamlResourceMetadataFactory([$configPath]))->create(FileConfigDummy::class);
+        (new YamlResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 }

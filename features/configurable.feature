@@ -19,9 +19,9 @@ Feature: Configurable resource CRUD
           {
               "@id": "/fileconfigdummies/1",
               "@type": "fileconfigdummy",
-              "foo": "Foo",
               "id": 1,
-              "name": "ConfigDummy"
+              "name": "ConfigDummy",
+              "foo": "Foo"
           }
       ],
       "hydra:totalItems": 1
@@ -53,11 +53,11 @@ Feature: Configurable resource CRUD
     And the JSON should be equal to:
     """
     {
-          "@context": "\/contexts\/fileconfigdummy",
-          "@id": "\/fileconfigdummies\/1",
-          "@type": "fileconfigdummy",
-          "foo": "Foo",
-          "id": 1,
-          "name": "ConfigDummy"
-      }
+      "@context": "/contexts/fileconfigdummy",
+      "@id": "/fileconfigdummies/1",
+      "@type": "fileconfigdummy",
+      "id": 1,
+      "name": "ConfigDummy",
+      "foo": "Foo"
+    }
     """

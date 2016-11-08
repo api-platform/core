@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\YamlPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -28,7 +29,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
-        $propertyMetadataFactory = new YamlPropertyMetadataFactory([$configPath]);
+        $propertyMetadataFactory = new YamlPropertyMetadataFactory(new YamlExtractor([$configPath]));
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
         $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
@@ -48,7 +49,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
             ->willReturn(new PropertyMetadata(null, null, null, null, true, null, null, false, null, null, ['Foo']))
             ->shouldBeCalled();
 
-        $propertyMetadataFactory = new YamlPropertyMetadataFactory([$configPath], $decorated->reveal());
+        $propertyMetadataFactory = new YamlPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
         $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
@@ -63,7 +64,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.yml';
 
-        (new YamlPropertyMetadataFactory([$configPath]))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class, 'foo');
+        (new YamlPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class, 'foo');
     }
 
     /**
@@ -74,7 +75,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
-        (new YamlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'bar');
+        (new YamlPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'bar');
     }
 
     /**
@@ -85,7 +86,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.yml';
 
-        (new YamlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'foo');
+        (new YamlPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 
     /**
@@ -96,7 +97,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertiesinvalid.yml';
 
-        (new YamlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'foo');
+        (new YamlPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 
     /**
@@ -107,18 +108,7 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertyinvalid.yml';
 
-        (new YamlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'foo');
-    }
-
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /"class" setting is expected to be a string, none given in ".+\/\.\.\/\.\.\/\.\.\/Fixtures\/FileConfigurations\/resourcenoclass\.yml"\./
-     */
-    public function testCreateWithoutResourceClass()
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenoclass.yml';
-
-        (new YamlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'foo');
+        (new YamlPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 
     /**
@@ -128,6 +118,6 @@ class YamlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPr
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
 
-        (new YamlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'foo');
+        (new YamlPropertyMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 }

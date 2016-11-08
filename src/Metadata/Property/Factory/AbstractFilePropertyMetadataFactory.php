@@ -24,16 +24,10 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
  */
 abstract class AbstractFilePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    protected $paths;
     protected $decorated;
 
-    /**
-     * @param string[]                              $paths
-     * @param PropertyMetadataFactoryInterface|null $decorated
-     */
-    public function __construct(array $paths, PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(PropertyMetadataFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
         $this->decorated = $decorated;
     }
 
@@ -78,7 +72,7 @@ abstract class AbstractFilePropertyMetadataFactory implements PropertyMetadataFa
     }
 
     /**
-     * Extracts metadata from the XML tree.
+     * Extracts metadata.
      *
      * @param string $resourceClass
      * @param string $propertyName

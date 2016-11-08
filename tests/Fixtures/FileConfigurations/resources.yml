@@ -1,10 +1,8 @@
 resources:
-    dummy:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy'
-    configdummy:
+    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy': ~
+    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
         shortName: 'thedummyshortname'
         description: 'Dummy resource'
-        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy'
         itemOperations:
             my_op_name:
                 method: 'GET'

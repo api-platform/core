@@ -13,8 +13,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
+use ApiPlatform\Core\Metadata\YamlExtractor;
 
 /**
  * Creates a resource name collection from {@see Resource} configuration files.
@@ -23,23 +22,18 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-    private $paths;
+    private $extractor;
     private $decorated;
 
-    /**
-     * @param string[]                                    $paths
-     * @param ResourceNameCollectionFactoryInterface|null $decorated
-     */
-    public function __construct(array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(YamlExtractor $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @throws ParseException
      * @throws InvalidArgumentException
      */
     public function create(): ResourceNameCollection
@@ -51,24 +45,8 @@ final class YamlResourceNameCollectionFactory implements ResourceNameCollectionF
             }
         }
 
-        foreach ($this->paths as $path) {
-            try {
-                $resources = Yaml::parse(file_get_contents($path));
-            } catch (ParseException $parseException) {
-                $parseException->setParsedFile($path);
-
-                throw $parseException;
-            }
-
-            $resources = $resources['resources'] ?? $resources;
-
-            foreach ($resources as $resource) {
-                if (!isset($resource['class'])) {
-                    throw new InvalidArgumentException('Resource must represent a class, none found!');
-                }
-
-                $classes[$resource['class']] = true;
-            }
+        foreach ($this->extractor->getResources() as $resourceClass => $resource) {
+            $classes[$resourceClass] = true;
         }
 
         return new ResourceNameCollection(array_keys($classes));

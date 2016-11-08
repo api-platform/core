@@ -1,3 +1,2 @@
 resources:
-    configdummy:
-        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist'
+    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist': ~

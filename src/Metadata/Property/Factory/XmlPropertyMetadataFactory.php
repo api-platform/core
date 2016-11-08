@@ -23,6 +23,19 @@ final class XmlPropertyMetadataFactory extends AbstractFilePropertyMetadataFacto
 {
     const RESOURCE_SCHEMA = __DIR__.'/../../schema/metadata.xsd';
 
+    private $paths;
+
+    /**
+     * @param string[]                              $paths
+     * @param PropertyMetadataFactoryInterface|null $decorated
+     */
+    public function __construct(array $paths, PropertyMetadataFactoryInterface $decorated = null)
+    {
+        parent::__construct($decorated);
+
+        $this->paths = $paths;
+    }
+
     /**
      * {@inheritdoc}
      */
