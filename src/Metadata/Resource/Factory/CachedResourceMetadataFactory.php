@@ -56,12 +56,8 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
             return $resourceMetadata;
         }
 
-        try {
-            $cacheItem->set($resourceMetadata);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
+        $cacheItem->set($resourceMetadata);
+        $this->cacheItemPool->save($cacheItem);
 
         return $resourceMetadata;
     }
