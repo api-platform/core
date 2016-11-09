@@ -15,6 +15,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -31,7 +32,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
+        $resourceMetadataFactory = new XmlResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
@@ -45,8 +46,8 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     public function testXmlDoesNotExistMetadataFactory()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.xml';
-        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
+        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory(new XmlExtractor([$configPath]));
+        $resourceMetadataFactory = new XmlResourceMetadataFactory(new XmlExtractor([$configPath]));
 
         foreach ($xmlResourceNameCollectionFactory->create() as $resourceName) {
             $resourceMetadataFactory->create($resourceName);
@@ -60,7 +61,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesoptional.xml';
 
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
+        $resourceMetadataFactory = new XmlResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
@@ -74,7 +75,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     public function testInvalidXmlResourceMetadataFactory()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath]);
+        $resourceMetadataFactory = new XmlResourceMetadataFactory(new XmlExtractor([$configPath]));
 
         $resourceMetadataFactory->create(FileConfigDummy::class);
     }
@@ -89,7 +90,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(FileConfigDummy::class)->willReturn(new ResourceMetadata(null, 'test'))->shouldBeCalled();
 
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath], $decorated->reveal());
+        $resourceMetadataFactory = new XmlResourceMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
         $expectedResourceMetadata = $expectedResourceMetadata->withDescription('test');
@@ -107,7 +108,7 @@ class XmlResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
         $decorated = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decorated->create(FileConfigDummy::class)->willReturn($expectedResourceMetadata)->shouldBeCalled();
 
-        $resourceMetadataFactory = new XmlResourceMetadataFactory([$configPath], $decorated->reveal());
+        $resourceMetadataFactory = new XmlResourceMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
 
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
 

@@ -13,7 +13,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use Symfony\Component\Config\Util\XmlUtils;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 
 /**
  * Creates a resource name collection from a XML {@see Resource} configuration files.
@@ -23,18 +23,12 @@ use Symfony\Component\Config\Util\XmlUtils;
  */
 final class XmlResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
-    const RESOURCE_SCHEMA = __DIR__.'/../../schema/metadata.xsd';
-
-    private $paths;
+    private $extractor;
     private $decorated;
 
-    /**
-     * @param string[]                                    $paths
-     * @param ResourceNameCollectionFactoryInterface|null $decorated
-     */
-    public function __construct(array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(XmlExtractor $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
@@ -52,16 +46,8 @@ final class XmlResourceNameCollectionFactory implements ResourceNameCollectionFa
             }
         }
 
-        foreach ($this->paths as $path) {
-            try {
-                $doc = XmlUtils::loadFile($path, self::RESOURCE_SCHEMA);
-            } catch (\InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            }
-
-            foreach ($doc->getElementsByTagName('resource') as $resource) {
-                $classes[$resource->getAttribute('class')] = true;
-            }
+        foreach ($this->extractor->getResources() as $key => $value) {
+            $classes[$key] = true;
         }
 
         return new ResourceNameCollection(array_keys($classes));
