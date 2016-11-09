@@ -56,12 +56,8 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
             return $propertyNameCollection;
         }
 
-        try {
-            $cacheItem->set($propertyNameCollection);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
+        $cacheItem->set($propertyNameCollection);
+        $this->cacheItemPool->save($cacheItem);
 
         return $propertyNameCollection;
     }
