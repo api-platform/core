@@ -11,10 +11,9 @@
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Symfony\Component\Config\Util\XmlUtils;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 
 /**
  * Creates a resource metadata from XML {@see Resource} configuration.
@@ -24,18 +23,12 @@ use Symfony\Component\Config\Util\XmlUtils;
  */
 final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
-    const RESOURCE_SCHEMA = __DIR__.'/../../schema/metadata.xsd';
-
-    private $paths;
+    private $extractor;
     private $decorated;
 
-    /**
-     * @param string[]                              $paths
-     * @param ResourceMetadataFactoryInterface|null $decorated
-     */
-    public function __construct(array $paths, ResourceMetadataFactoryInterface $decorated = null)
+    public function __construct(XmlExtractor $extractor, ResourceMetadataFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
@@ -53,68 +46,11 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
             }
         }
 
-        if (!class_exists($resourceClass) || empty($metadata = $this->getMetadata($resourceClass))) {
+        if (!class_exists($resourceClass) || !($resource = $this->extractor->getResources()[$resourceClass] ?? null)) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
-        return null === $parentResourceMetadata ? new ResourceMetadata(...$metadata) : $this->update($parentResourceMetadata, $metadata);
-    }
-
-    /**
-     * Extracts metadata from the XML tree.
-     *
-     * @param string $resourceClass
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return array
-     */
-    private function getMetadata(string $resourceClass): array
-    {
-        foreach ($this->paths as $path) {
-            try {
-                $domDocument = XmlUtils::loadFile($path, self::RESOURCE_SCHEMA);
-            } catch (\InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            }
-
-            $xml = simplexml_import_dom($domDocument);
-            foreach ($xml->resource as $resource) {
-                if ($resourceClass !== (string) $resource['class']) {
-                    continue;
-                }
-
-                return [
-                    (string) $resource['shortName'] ?: null,
-                    (string) $resource['description'] ?: null,
-                    (string) $resource['iri'] ?: null,
-                    $this->getAttributes($resource, 'itemOperation') ?: null,
-                    $this->getAttributes($resource, 'collectionOperation') ?: null,
-                    $this->getAttributes($resource, 'attribute') ?: null,
-                ];
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * Recursively transforms an attribute structure into an associative array.
-     *
-     * @param \SimpleXMLElement $resource
-     * @param string            $elementName
-     *
-     * @return array
-     */
-    private function getAttributes(\SimpleXMLElement $resource, string $elementName): array
-    {
-        $attributes = [];
-        foreach ($resource->$elementName as $attribute) {
-            $value = isset($attribute->attribute[0]) ? $this->getAttributes($attribute, 'attribute') : (string) $attribute;
-            isset($attribute['name']) ? $attributes[(string) $attribute['name']] = $value : $attributes[] = $value;
-        }
-
-        return $attributes;
+        return $this->update($parentResourceMetadata ?: new ResourceMetadata(), $resource);
     }
 
     /**
@@ -146,12 +82,12 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $key => $property) {
-            if (null === $metadata[$key] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
+        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
+            if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
                 continue;
             }
 
-            $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($metadata[$key]);
+            $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($metadata[$property]);
         }
 
         return $resourceMetadata;

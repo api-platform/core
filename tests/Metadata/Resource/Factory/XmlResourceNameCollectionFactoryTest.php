@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\XmlResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
@@ -26,7 +27,7 @@ class XmlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testXmlResourceName()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
-        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
+        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory(new XmlExtractor([$configPath]));
 
         $this->assertEquals($xmlResourceNameCollectionFactory->create(), new ResourceNameCollection([
             Dummy::class,
@@ -40,7 +41,7 @@ class XmlResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testInvalidXmlResourceNameCollectionFactory()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcesinvalid.xml';
-        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory([$configPath]);
+        $xmlResourceNameCollectionFactory = new XmlResourceNameCollectionFactory(new XmlExtractor([$configPath]));
         $xmlResourceNameCollectionFactory->create();
     }
 }

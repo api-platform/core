@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use Symfony\Component\Config\Util\XmlUtils;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 
 /**
  * Creates a property name collection from XML {@see Property} configuration files.
@@ -23,18 +23,12 @@ use Symfony\Component\Config\Util\XmlUtils;
  */
 final class XmlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    const RESOURCE_SCHEMA = __DIR__.'/../../schema/metadata.xsd';
-
-    private $paths;
+    private $extractor;
     private $decorated;
 
-    /**
-     * @param array                                       $paths
-     * @param PropertyNameCollectionFactoryInterface|null $decorated
-     */
-    public function __construct(array $paths, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(XmlExtractor $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
     {
-        $this->paths = $paths;
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
@@ -62,32 +56,15 @@ final class XmlPropertyNameCollectionFactory implements PropertyNameCollectionFa
         }
 
         $propertyNames = [];
-
-        foreach ($this->paths as $path) {
-            try {
-                $domDocument = XmlUtils::loadFile($path, self::RESOURCE_SCHEMA);
-            } catch (\InvalidArgumentException $e) {
-                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-            }
-
-            $properties = (new \DOMXPath($domDocument))->query(sprintf('//resources/resource[@class="%s"]/property', $resourceClass));
-
-            if (false === $properties || 0 >= $properties->length) {
-                continue;
-            }
-
-            foreach ($properties as $property) {
-                if ('' === $propertyName = $property->getAttribute('name')) {
-                    continue;
-                }
-
+        if (isset($propertyNameCollection)) {
+            foreach ($propertyNameCollection as $propertyName) {
                 $propertyNames[$propertyName] = true;
             }
         }
 
-        if (isset($propertyNameCollection)) {
-            foreach ($propertyNameCollection as $propertyName) {
-                $propertyNames[$propertyName] = true;
+        if ($properties = $this->extractor->getResources()[$resourceClass]['properties'] ?? null) {
+            foreach ($properties as $key => $value) {
+                $propertyNames[$key] = true;
             }
         }
 

@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\XmlPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -28,7 +29,7 @@ class XmlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
-        $propertyMetadataFactory = new XmlPropertyMetadataFactory([$configPath]);
+        $propertyMetadataFactory = new XmlPropertyMetadataFactory(new XmlExtractor([$configPath]));
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
         $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
@@ -48,7 +49,7 @@ class XmlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
             ->willReturn(new PropertyMetadata(null, null, null, null, true, null, null, false, null, null, ['Foo']))
             ->shouldBeCalled();
 
-        $propertyMetadataFactory = new XmlPropertyMetadataFactory([$configPath], $decorated->reveal());
+        $propertyMetadataFactory = new XmlPropertyMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
         $propertyMetadata = $propertyMetadataFactory->create(FileConfigDummy::class, 'foo');
 
         $this->assertInstanceOf(PropertyMetadata::class, $propertyMetadata);
@@ -63,7 +64,7 @@ class XmlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.xml';
 
-        (new XmlPropertyMetadataFactory([$configPath]))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class, 'foo');
+        (new XmlPropertyMetadataFactory(new XmlExtractor([$configPath])))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class, 'foo');
     }
 
     /**
@@ -74,7 +75,7 @@ class XmlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
-        (new XmlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'bar');
+        (new XmlPropertyMetadataFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class, 'bar');
     }
 
     /**
@@ -85,6 +86,6 @@ class XmlPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryPro
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertyinvalid.xml';
 
-        (new XmlPropertyMetadataFactory([$configPath]))->create(FileConfigDummy::class, 'foo');
+        (new XmlPropertyMetadataFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class, 'foo');
     }
 }

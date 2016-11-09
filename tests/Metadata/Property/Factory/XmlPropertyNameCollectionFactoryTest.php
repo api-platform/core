@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\XmlPropertyNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\XmlExtractor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -26,7 +27,7 @@ class XmlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
         $this->assertEquals(
-            (new XmlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class),
+            (new XmlPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class),
             new PropertyNameCollection(['foo', 'name'])
         );
     }
@@ -42,8 +43,8 @@ class XmlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
             ->shouldBeCalled();
 
         $this->assertEquals(
-            (new XmlPropertyNameCollectionFactory([$configPath], $decorated->reveal()))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['foo', 'name', 'id'])
+            (new XmlPropertyNameCollectionFactory(new XmlExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class),
+            new PropertyNameCollection(['id', 'foo', 'name'])
         );
     }
 
@@ -55,7 +56,7 @@ class XmlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.xml';
 
-        (new XmlPropertyNameCollectionFactory([$configPath]))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class);
+        (new XmlPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class);
     }
 
     /**
@@ -66,6 +67,6 @@ class XmlPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/propertyinvalid.xml';
 
-        (new XmlPropertyNameCollectionFactory([$configPath]))->create(FileConfigDummy::class);
+        (new XmlPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
 }
