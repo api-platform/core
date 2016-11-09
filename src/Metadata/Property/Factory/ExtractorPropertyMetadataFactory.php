@@ -11,23 +11,23 @@
 
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 
 /**
- * Common base class to load properties's metadata from files.
+ * Creates properties's metadata using an extractor.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @internal
  */
-abstract class AbstractFilePropertyMetadataFactory implements PropertyMetadataFactoryInterface
+final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    protected $decorated;
+    private $extractor;
+    private $decorated;
 
-    public function __construct(PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(ExtractorInterface $extractor, PropertyMetadataFactoryInterface $decorated = null)
     {
+        $this->extractor = $extractor;
         $this->decorated = $decorated;
     }
 
@@ -47,7 +47,7 @@ abstract class AbstractFilePropertyMetadataFactory implements PropertyMetadataFa
 
         if (
             !property_exists($resourceClass, $property) ||
-            empty($propertyMetadata = $this->getMetadata($resourceClass, $property))
+            !$propertyMetadata = $this->extractor->getResources()[$resourceClass]['properties'][$property] ?? false
         ) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
@@ -70,18 +70,6 @@ abstract class AbstractFilePropertyMetadataFactory implements PropertyMetadataFa
             $propertyMetadata['attributes']
         );
     }
-
-    /**
-     * Extracts metadata.
-     *
-     * @param string $resourceClass
-     * @param string $propertyName
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return array
-     */
-    abstract protected function getMetadata(string $resourceClass, string $propertyName): array;
 
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.

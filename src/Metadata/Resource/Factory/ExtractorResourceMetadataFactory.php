@@ -12,21 +12,21 @@
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\XmlExtractor;
 
 /**
- * Creates a resource metadata from XML {@see Resource} configuration.
+ * Creates resource's metadata using an extractor.
  *
- * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterface
+final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $extractor;
     private $decorated;
 
-    public function __construct(XmlExtractor $extractor, ResourceMetadataFactoryInterface $decorated = null)
+    public function __construct(ExtractorInterface $extractor, ResourceMetadataFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
@@ -46,7 +46,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
             }
         }
 
-        if (!class_exists($resourceClass) || !($resource = $this->extractor->getResources()[$resourceClass] ?? null)) {
+        if (!class_exists($resourceClass) || !$resource = $this->extractor->getResources()[$resourceClass] ?? false) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 

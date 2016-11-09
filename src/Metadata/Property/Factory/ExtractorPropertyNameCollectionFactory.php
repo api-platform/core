@@ -13,20 +13,21 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Metadata\YamlExtractor;
 
 /**
- * Creates a property name collection from YAML {@see Property} configuration files.
+ * Creates a property name collection using an extractor.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class YamlPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
+final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     private $extractor;
     private $decorated;
 
-    public function __construct(YamlExtractor $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(ExtractorInterface $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
@@ -59,9 +60,8 @@ final class YamlPropertyNameCollectionFactory implements PropertyNameCollectionF
             throw new ResourceClassNotFoundException(sprintf('The resource class "%s" does not exist.', $resourceClass));
         }
 
-        $resources = $this->extractor->getResources();
-        if (isset($resources[$resourceClass]['properties'])) {
-            foreach ($resources[$resourceClass]['properties'] as $propertyName => $property) {
+        if ($properties = $this->extractor->getResources()[$resourceClass]['properties'] ?? false) {
+            foreach ($properties as $propertyName => $property) {
                 $propertyNames[$propertyName] = true;
             }
         }
