@@ -56,12 +56,8 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return $propertyMetadata;
         }
 
-        try {
-            $cacheItem->set($propertyMetadata);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
+        $cacheItem->set($propertyMetadata);
+        $this->cacheItemPool->save($cacheItem);
 
         return $propertyMetadata;
     }
