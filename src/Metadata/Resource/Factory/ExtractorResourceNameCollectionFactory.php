@@ -12,20 +12,21 @@
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\Metadata\YamlExtractor;
 
 /**
  * Creates a resource name collection from {@see Resource} configuration files.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class YamlResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
+final class ExtractorResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
     private $extractor;
     private $decorated;
 
-    public function __construct(YamlExtractor $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(ExtractorInterface $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
