@@ -121,7 +121,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadDefaultConfig()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -133,7 +132,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['name_converter' => $nameConverterId]]), $containerBuilder);
@@ -147,7 +145,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'FOSUserBundle' => FOSUserBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
@@ -162,7 +159,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
@@ -172,7 +168,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger', '1')->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['eager_loading' => ['enabled' => false]]]), $containerBuilder);
@@ -202,6 +197,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.collection.pagination.page_parameter_name' => 'page',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
+            'api_platform.enable_swagger' => true,
+            'api_platform.enable_swagger_ui' => true,
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
             'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
             'api_platform.title' => 'title',
