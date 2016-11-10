@@ -141,7 +141,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('swagger.xml');
-        $container->setParameter('api_platform.enable_swagger', (string) $config['enable_swagger']);
+
+        if ($config['enable_swagger_ui']) {
+            $loader->load('swagger-ui.xml');
+            $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+        }
+
+        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
     }
 
     /**
