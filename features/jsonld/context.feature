@@ -8,7 +8,7 @@ Feature: JSON-LD contexts generation
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "@context.@vocab" should be equal to "http://example.com/doc.jsonld#"
+    And the JSON node "@context.@vocab" should be equal to "http://example.com/docs.jsonld#"
     And the JSON node "@context.hydra" should be equal to "http://www.w3.org/ns/hydra/core#"
     And the JSON node "@context.dummy.@id" should be equal to "Entrypoint/dummy"
     And the JSON node "@context.dummy.@type" should be equal to "@id"
@@ -22,7 +22,7 @@ Feature: JSON-LD contexts generation
     """
     {
         "@context": {
-            "@vocab": "http://example.com/doc.jsonld#",
+            "@vocab": "http://example.com/docs.jsonld#",
             "hydra": "http://www.w3.org/ns/hydra/core#",
             "description": "https://schema.org/description",
             "dummy": "#Dummy/dummy",
@@ -55,14 +55,14 @@ Feature: JSON-LD contexts generation
       And the JSON should be equal to:
       """
       {
-        "@context": {
-          "@vocab": "http://example.com/doc.jsonld#",
-          "hydra": "http://www.w3.org/ns/hydra/core#",
-          "paris": "#RelationEmbedder/paris",
-          "krondstadt": "#RelationEmbedder/krondstadt",
-          "anotherRelated": "#RelationEmbedder/anotherRelated",
-          "related": "#RelationEmbedder/related"
-        }
+          "@context": {
+              "@vocab": "http://example.com/docs.jsonld#",
+              "hydra": "http://www.w3.org/ns/hydra/core#",
+              "paris": "#RelationEmbedder/paris",
+              "krondstadt": "#RelationEmbedder/krondstadt",
+              "anotherRelated": "#RelationEmbedder/anotherRelated",
+              "related": "#RelationEmbedder/related"
+          }
       }
       """
 
@@ -75,10 +75,10 @@ Feature: JSON-LD contexts generation
       """
       {
           "@context": {
-              "@vocab": "http:\/\/example.com\/doc.jsonld#",
-              "hydra": "http:\/\/www.w3.org\/ns\/hydra\/core#",
+              "@vocab": "http://example.com/docs.jsonld#",
+              "hydra": "http://www.w3.org/ns/hydra/core#",
               "person": {
-                  "@id": "http:\/\/example.com\/id",
+                  "@id": "http://example.com/id",
                   "@type": "@id",
                   "foo": "bar"
               }
