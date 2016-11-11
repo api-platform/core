@@ -5,7 +5,7 @@ Feature: Documentation support
 
   @createSchema
   Scenario: Retrieve the Swagger/OpenAPI documentation
-    Given I send a "GET" request to "/doc.json"
+    Given I send a "GET" request to "/docs.json"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json; charset=utf-8"
@@ -60,9 +60,9 @@ Feature: Documentation support
     And the JSON node "paths./dummies.get.parameters[0].required" should be false
     And the JSON node "paths./dummies.get.parameters[0].type" should be equal to "integer"
 
-  Scenario: Swagger UI is enabled for the doc endpoint
+  Scenario: Swagger UI is enabled for docs endpoint
     Given I add "Accept" header equal to "text/html"
-    And I send a "GET" request to "/doc"
+    And I send a "GET" request to "/docs"
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
 
