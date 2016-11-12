@@ -30,13 +30,8 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
             'writableLink' => false,
             'required' => true,
             'attributes' => [
-                'foo' => [
-                    'Foo',
-                ],
-                'bar' => [
-                    ['Bar'],
-                    'baz' => 'Baz',
-                ],
+                'foo' => ['Foo'],
+                'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
             ],
         ];
@@ -54,9 +49,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
             'writableLink' => false,
             'required' => true,
             'identifier' => false,
-            'attributes' => [
-                'Foo',
-            ],
+            'attributes' => ['Foo'],
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];
