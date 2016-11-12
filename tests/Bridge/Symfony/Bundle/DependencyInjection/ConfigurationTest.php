@@ -89,6 +89,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'maximum_items_per_page' => null,
                 ],
             ],
+            'enable_doctrine_mongodb_odm' => false,
+            'enable_doctrine_orm' => true,
         ], $config);
     }
 

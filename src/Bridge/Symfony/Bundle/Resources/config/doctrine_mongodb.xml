@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.doctrine.metadata_factory"
+                 class="Doctrine\Common\Persistence\Mapping\ClassMetadataFactory" public="false">
+            <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
+        </service>
+
+        <service id="api_platform.doctrine.mongodb.collection_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="collection"></argument> <!-- extensions -->
+        </service>
+
+        <service id="api_platform.doctrine.mongodb.item_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory"/>
+            <argument type="service" id="api_platform.metadata.property.metadata_factory"/>
+            <argument type="collection"></argument> <!-- extensions -->
+        </service>
+
+        <service id="api_platform.doctrine.mongodb.default.collection_data_provider"
+                 parent="api_platform.doctrine.mongodb.collection_data_provider"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\CollectionDataProvider">
+            <tag name="api_platform.collection_data_provider"/>
+
+        </service>
+        <service id="api_platform.doctrine.mongodb.default.item_data_provider"
+                 parent="api_platform.doctrine.mongodb.item_data_provider"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\ItemDataProvider">
+            <tag name="api_platform.item_data_provider"/>
+        </service>
+
+        <!-- Filter -->
+
+        <!--<service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">-->
+        <!--<argument type="service" id="doctrine" />-->
+        <!--<argument type="service" id="request_stack" />-->
+        <!--<argument type="service" id="api_platform.iri_converter" />-->
+        <!--<argument type="service" id="api_platform.property_accessor" />-->
+        <!--</service>-->
+
+        <!--<service id="api_platform.doctrine.orm.order_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">-->
+        <!--<argument type="service" id="doctrine" />-->
+        <!--<argument type="service" id="request_stack" />-->
+        <!--<argument>%api_platform.collection.order_parameter_name%</argument>-->
+        <!--</service>-->
+
+        <!--<service id="api_platform.doctrine.orm.range_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter" public="false" abstract="true">-->
+        <!--<argument type="service" id="doctrine" />-->
+        <!--<argument type="service" id="request_stack" />-->
+        <!--</service>-->
+
+        <!--<service id="api_platform.doctrine.orm.date_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">-->
+        <!--<argument type="service" id="doctrine" />-->
+        <!--<argument type="service" id="request_stack" />-->
+        <!--</service>-->
+
+        <!-- Metadata loader -->
+
+        <service id="api_platform.doctrine.mongodb.metadata.property.factory.item"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property\DoctrineMongoDBPropertyMetadataFactory"
+                 decorates="api_platform.metadata.property.metadata_factory" public="false">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.doctrine.mongodb.metadata.property.factory.item.inner"/>
+        </service>
+
+        <!-- Event listener -->
+
+        <service id="api_platform.doctrine.listener.view.manager"
+                 class="ApiPlatform\Core\Bridge\Doctrine\EventListener\ManagerViewListener">
+            <argument type="service" id="doctrine_mongodb"/>
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="10"/>
+        </service>
+
+        <!-- Doctrine Query extensions -->
+
+        <!--<service id="api_platform.doctrine.orm.query_extension.eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" public="false">-->
+        <!--<tag name="api_platform.doctrine.orm.query_extension.item" />-->
+        <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
+        <!--</service>-->
+
+        <service id="api_platform.doctrine.mongodb.query_extension.filter"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\FilterExtension" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory"/>
+            <argument type="service" id="api_platform.filters"/>
+
+            <tag name="api_platform.doctrine.mongodb.query_extension.collection"/>
+        </service>
+
+        <service id="api_platform.doctrine.mongodb.query_extension.pagination"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension\PaginationExtension" public="false">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory"/>
+            <argument>%api_platform.collection.pagination.enabled%</argument>
+            <argument>%api_platform.collection.pagination.client_enabled%</argument>
+            <argument>%api_platform.collection.pagination.client_items_per_page%</argument>
+            <argument>%api_platform.collection.pagination.items_per_page%</argument>
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.items_per_page_parameter_name%</argument>
+
+            <tag name="api_platform.doctrine.mongodb.query_extension.collection"/>
+        </service>
+
+        <!--<service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">-->
+        <!--<argument>%api_platform.collection.order%</argument>-->
+
+        <!--<tag name="api_platform.doctrine.orm.query_extension.collection" />-->
+        <!--</service>-->
+    </services>
+
+</container>
