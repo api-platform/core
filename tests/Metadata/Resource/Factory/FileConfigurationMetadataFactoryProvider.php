@@ -60,10 +60,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
     public function optionalResourceMetadataProvider()
     {
         $resourceMetadata = new ResourceMetadata();
-
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'my_op_name' => ['method' => 'POST'],
-        ]);
+        $resourceMetadata = $resourceMetadata->withItemOperations(['my_op_name' => ['method' => 'POST']]);
 
         return [[$resourceMetadata]];
     }

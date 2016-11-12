@@ -32,14 +32,15 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    const DEFAULT_CONFIG = [
-        'api_platform' => [
-            'title' => 'title',
-            'description' => 'description',
-            'version' => 'version',
-            'formats' => ['jsonld' => ['mime_types' => ['application/ld+json']], 'jsonhal' => ['mime_types' => ['application/hal+json']]],
+    const DEFAULT_CONFIG = ['api_platform' => [
+        'title' => 'title',
+        'description' => 'description',
+        'version' => 'version',
+        'formats' => [
+            'jsonld' => ['mime_types' => ['application/ld+json']],
+            'jsonhal' => ['mime_types' => ['application/hal+json']],
         ],
-    ];
+    ]];
 
     private $extension;
 
@@ -216,48 +217,13 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $definitionProphecy = $this->prophesize(Definition::class);
         $definitionProphecy->addArgument([])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definition)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definitionProphecy->reveal())->shouldBeCalled();
 
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.name_collection_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.metadata_factory.yaml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.name_collection_factory.xml')->willReturn($definition)->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->replaceArgument(0, [])->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.property.metadata_factory.xml')->willReturn($definition)->shouldBeCalled();
+        foreach (['yaml', 'xml'] as $format) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->addArgument([])->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+        }
 
         $definitions = [
             'api_platform.action.documentation',
@@ -325,6 +291,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
+            'api_platform.metadata.extractor.yaml',
+            'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.inherited',

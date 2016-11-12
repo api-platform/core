@@ -1,8 +1,7 @@
 resources:
-    fileconfigdummy:
+    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
         shortName: 'fileconfigdummy'
         description: 'Dummy resource'
-        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy'
         itemOperations:
             custom_operation:  
                 method: 'GET'
