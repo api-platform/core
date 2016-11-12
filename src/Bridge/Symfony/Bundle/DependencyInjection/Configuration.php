@@ -54,6 +54,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
+                ->booleanNode('enable_swagger_ui')->defaultValue(true)->info('Enable Swagger ui.')->end()
 
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()

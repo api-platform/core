@@ -45,13 +45,7 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
         </service>
-
-        <!-- Event listener -->
-
-        <service id="api_platform.swagger.listener.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener">
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" />
-        </service>
-
+        
     </services>
 
 </container>
