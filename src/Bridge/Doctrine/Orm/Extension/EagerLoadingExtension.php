@@ -25,6 +25,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Charles Sarrazin <charles@sarraz.in>
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -32,15 +33,15 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     private $propertyMetadataFactory;
     private $resourceMetadataFactory;
     private $maxJoins;
-    private $eagerOnly;
+    private $forceEager;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $eagerOnly = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->maxJoins = $maxJoins;
-        $this->eagerOnly = $eagerOnly;
+        $this->forceEager = $forceEager;
     }
 
     /**
@@ -82,9 +83,10 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $options = ['collection_operation_name' => $operationName];
         }
 
+        $forceEager = $this->isForceEager($resourceClass, $options);
         $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
-        $this->joinRelations($queryBuilder, $resourceClass, $groups);
+        $this->joinRelations($queryBuilder, $resourceClass, $forceEager, $groups);
     }
 
     /**
@@ -99,6 +101,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $options = ['item_operation_name' => $operationName];
         }
 
+        $forceEager = $this->isForceEager($resourceClass, $options);
+
         if (isset($context['groups'])) {
             $groups = ['serializer_groups' => $context['groups']];
         } elseif (isset($context['resource_class'])) {
@@ -107,7 +111,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
         }
 
-        $this->joinRelations($queryBuilder, $resourceClass, $groups);
+        $this->joinRelations($queryBuilder, $resourceClass, $forceEager, $groups);
     }
 
     /**
@@ -115,6 +119,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
+     * @param bool         $forceEager
      * @param array        $propertyMetadataOptions
      * @param string       $originAlias             the current entity alias (first o, then a1, a2 etc.)
      * @param string       $relationAlias           the previous relation alias to keep it unique
@@ -123,7 +128,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, array $propertyMetadataOptions = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false, int &$joinCount = 0)
+    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, bool $forceEager, array $propertyMetadataOptions = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false, int &$joinCount = 0)
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.');
@@ -136,7 +141,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
 
-            if (true === $this->eagerOnly && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch']) {
+            if (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch']) {
                 continue;
             }
 
@@ -175,7 +180,30 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             $relationAlias .= ++$j;
 
-            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin', $joinCount);
+            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $forceEager, $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin', $joinCount);
         }
+    }
+
+    /**
+     * Does an operation force eager?
+     *
+     * @param string $resourceClass
+     * @param array  $options
+     *
+     * @return bool
+     */
+    private function isForceEager(string $resourceClass, array $options): bool
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (isset($options['collection_operation_name'])) {
+            $forceEager = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'force_eager', null, true);
+        } elseif (isset($options['item_operation_name'])) {
+            $forceEager = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'force_eager', null, true);
+        } else {
+            $forceEager = $resourceMetadata->getAttribute('force_eager');
+        }
+
+        return is_bool($forceEager) ? $forceEager : $this->forceEager;
     }
 }
