@@ -10,7 +10,7 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         'ordered_imports' => true,
         'phpdoc_order' => true,
-        'short_array_syntax' => true,
+        'array_syntax' => array('syntax' => 'short'),
     ])
     ->setFinder($finder)
 ;
