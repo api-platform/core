@@ -111,7 +111,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     }
 
     /**
-     * Left joins relations to eager load.
+     * Joins relations to eager load.
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $resourceClass
@@ -131,8 +131,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
-        $j = 0;
-        $i = 0;
+        $i = $j = 0;
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
@@ -145,16 +144,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            if (false === $wasLeftJoin) {
-                $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
-
-                if (null === $joinColumns) {
-                    $method = 'leftJoin';
-                } else {
-                    $method = false === $joinColumns[0]['nullable'] ? 'innerJoin' : 'leftJoin';
-                }
-            } else {
+            $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
+            if (false !== $wasLeftJoin || !isset($joinColumns[0]['nullable']) || false !== $joinColumns[0]['nullable']) {
                 $method = 'leftJoin';
+            } else {
+                $method = 'innerJoin';
             }
 
             $associationAlias = $relationAlias.$i++;
