@@ -159,24 +159,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $associationAlias = $relationAlias.$i++;
             $queryBuilder->{$method}($originAlias.'.'.$association, $associationAlias);
             ++$joinCount;
-            $select = [];
-            $targetClassMetadata = $entityManager->getClassMetadata($mapping['targetEntity']);
-
-            foreach ($this->propertyNameCollectionFactory->create($mapping['targetEntity']) as $property) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($mapping['targetEntity'], $property, $propertyMetadataOptions);
-
-                if (true === $propertyMetadata->isIdentifier()) {
-                    $select[] = $property;
-                    continue;
-                }
-
-                //the field test allows to add methods to a Resource which do not reflect real database fields
-                if (true === $targetClassMetadata->hasField($property) && true === $propertyMetadata->isReadable()) {
-                    $select[] = $property;
-                }
-            }
-
-            $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
 
             $relationAlias .= ++$j;
 
