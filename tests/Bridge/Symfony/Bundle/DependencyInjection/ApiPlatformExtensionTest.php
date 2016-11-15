@@ -206,7 +206,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.version' => 'version',
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
-            'api_platform.eager_loading.eager_only' => true,
+            'api_platform.eager_loading.force_eager' => true,
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();

@@ -74,7 +74,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'eager_loading' => [
                 'enabled' => true,
                 'max_joins' => 30,
-                'eager_only' => true,
+                'force_eager' => true,
             ],
             'collection' => [
                 'order' => null,
