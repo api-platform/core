@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +35,7 @@ final class SwaggerUiAction
     private $version;
     private $formats = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, \Twig_Environment $twig, string $title = '', string $description = '', string $version = '', array $formats = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, \Twig_Environment $twig, string $title = '', string $description = '', string $version = '', array $formats = [], string $swaggerUiPath = '')
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -44,11 +45,16 @@ final class SwaggerUiAction
         $this->description = $description;
         $this->version = $version;
         $this->formats = $formats;
+        $this->swaggerUiPath = $swaggerUiPath;
     }
 
     public function __invoke(Request $request)
     {
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+
+        if (!file_exists($this->swaggerUiPath)) {
+            throw new RuntimeException('Swagger-ui was not found, either you forgot to require swagger-ui or you might be missing the composer scripts. Please refer to https://api-platform.com/docs/core/swagger-ui for instructions.');
+        }
 
         return new Response($this->twig->render(
             'ApiPlatformBundle:SwaggerUi:index.html.twig',

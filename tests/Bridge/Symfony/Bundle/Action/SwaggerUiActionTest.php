@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
 {
+    const SWAGGER_UI_PATH = __DIR__.'/../../../../Fixtures/app/web/swagger-ui';
+
     /**
      * @dataProvider getInvokeParameters
      */
@@ -45,16 +47,14 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $serializerProphecy->reveal(),
-            $twigProphecy->reveal()
+            $twigProphecy->reveal(),
+            '', '', '', [], self::SWAGGER_UI_PATH
         );
         $action($request);
     }
 
     public function getInvokeParameters()
     {
-        $postRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'post']);
-        $postRequest->setMethod('POST');
-
         $twigCollectionProphecy = $this->prophesize(\Twig_Environment::class);
         $twigCollectionProphecy->render('ApiPlatformBundle:SwaggerUi:index.html.twig', [
             'spec' => 'hello',
@@ -107,7 +107,8 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $serializerProphecy->reveal(),
-            $twigProphecy->reveal()
+            $twigProphecy->reveal(),
+            '', '', '', [], self::SWAGGER_UI_PATH
         );
         $action($request);
     }
@@ -121,5 +122,30 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             [$nonSafeRequest],
             [new Request()],
         ];
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedExceptionMessage Swagger-ui was not found, either you forgot to require swagger-ui or you might be missing the composer scripts. Please refer to https://api-platform.com/docs/core/swagger-ui for instructions.
+     */
+    public function testThrowIfNoSwaggerUi()
+    {
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+
+        $twigProphecy = $this->prophesize(\Twig_Environment::class);
+
+        $action = new SwaggerUiAction(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $twigProphecy->reveal()
+        );
+
+        $action(new Request());
     }
 }

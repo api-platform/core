@@ -136,18 +136,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
-        if (!$config['enable_swagger']) {
+        if (!$config['swagger']['enabled']) {
             return;
         }
 
         $loader->load('swagger.xml');
 
-        if ($config['enable_swagger_ui']) {
+        if ($config['swagger']['ui_enabled']) {
             $loader->load('swagger-ui.xml');
-            $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+            $container->setParameter('api_platform.swagger.ui_enabled', $config['swagger']['ui_enabled']);
+            $container->setParameter('api_platform.swagger.ui_path', $config['swagger']['ui_path'] ?? $container->getParameter('kernel.root_dir').'/../web/swagger-ui');
         }
 
-        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+        $container->setParameter('api_platform.swagger.enabled', $config['swagger']['enabled']);
     }
 
     /**

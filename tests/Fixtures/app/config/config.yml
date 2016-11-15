@@ -50,6 +50,8 @@ api_platform:
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
         ApiPlatform\Core\Exception\InvalidArgumentException: 'HTTP_BAD_REQUEST'
+    swagger:
+        ui_path: '%kernel.root_dir%/web/swagger-ui'
 
 fos_user:
     db_driver:        'orm'

@@ -4,25 +4,28 @@
     <meta charset="UTF-8">
     <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
 
-    <link href="{{ asset('bundles/apiplatform/swagger-ui/css/typography.css') }}" media="screen" rel="stylesheet">
-    <link href="{{ asset('bundles/apiplatform/swagger-ui/css/reset.css') }}" media="screen" rel="stylesheet">
-    <link href="{{ asset('bundles/apiplatform/swagger-ui/css/screen.css') }}" media="screen" rel="stylesheet">
-    <link href="{{ asset('bundles/apiplatform/swagger-ui/css/reset.css') }}" media="print" rel="stylesheet">
-    <link href="{{ asset('bundles/apiplatform/swagger-ui/css/print.css') }}" media="print" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('swagger-ui/images/favicon-32x32.png') }}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{{ asset('swagger-ui/images/favicon-16x16.png') }}" sizes="16x16">
 
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/object-assign-pollyfill.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jquery-1.8.0.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jquery.slideto.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jquery.wiggle.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jquery.ba-bbq.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/handlebars-4.0.5.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/lodash.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/backbone-min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/highlight.9.1.0.pack.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jsoneditor.min.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/marked.js') }}"></script>
-    <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/swagger-oauth.js') }}"></script>
+    <link href="{{ asset('swagger-ui/css/typography.css') }}" media="screen" rel="stylesheet">
+    <link href="{{ asset('swagger-ui/css/reset.css') }}" media="screen" rel="stylesheet">
+    <link href="{{ asset('swagger-ui/css/screen.css') }}" media="screen" rel="stylesheet">
+    <link href="{{ asset('swagger-ui/css/reset.css') }}" media="print" rel="stylesheet">
+    <link href="{{ asset('swagger-ui/css/print.css') }}" media="print" rel="stylesheet">
+
+    <script src="{{ asset('swagger-ui/lib/object-assign-pollyfill.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/jquery-1.8.0.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/jquery.slideto.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/jquery.wiggle.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/jquery.ba-bbq.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/handlebars-4.0.5.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/lodash.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/backbone-min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/swagger-ui.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/highlight.9.1.0.pack.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/jsoneditor.min.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/marked.js') }}"></script>
+    <script src="{{ asset('swagger-ui/lib/swagger-oauth.js') }}"></script>
 
     <script>
         $(function () {

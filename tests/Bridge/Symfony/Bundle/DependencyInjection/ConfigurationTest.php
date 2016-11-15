@@ -69,8 +69,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'name_converter' => null,
             'enable_fos_user' => false,
             'enable_nelmio_api_doc' => false,
-            'enable_swagger' => true,
-            'enable_swagger_ui' => true,
+            'swagger' => [
+                'enabled' => true,
+                'ui_enabled' => true,
+            ],
             'eager_loading' => [
                 'enabled' => true,
                 'max_joins' => 30,
