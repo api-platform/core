@@ -42,34 +42,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     }
 
     /**
-     * Gets serializer groups once if available, if not it returns the $options array.
-     *
-     * @param array  $options       represents the operation name so that groups are the one of the specific operation
-     * @param string $resourceClass
-     * @param string $context       normalization_context or denormalization_context
-     *
-     * @return string[]
-     */
-    private function getSerializerGroups(string $resourceClass, array $options, string $context): array
-    {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if (isset($options['collection_operation_name'])) {
-            $context = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $context, null, true);
-        } elseif (isset($options['item_operation_name'])) {
-            $context = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], $context, null, true);
-        } else {
-            $context = $resourceMetadata->getAttribute($context);
-        }
-
-        if (empty($context['groups'])) {
-            return $options;
-        }
-
-        return ['serializer_groups' => $context['groups']];
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
@@ -83,7 +55,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $forceEager = $this->isForceEager($resourceClass, $options);
         $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
-        $this->joinRelations($queryBuilder, $resourceClass, $forceEager, $groups);
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
     }
 
     /**
@@ -108,24 +80,24 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
         }
 
-        $this->joinRelations($queryBuilder, $resourceClass, $forceEager, $groups);
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
     }
 
     /**
      * Joins relations to eager load.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $resourceClass
-     * @param bool         $forceEager
-     * @param array        $propertyMetadataOptions
-     * @param string       $originAlias             the current entity alias (first o, then a1, a2 etc.)
-     * @param string       $relationAlias           the previous relation alias to keep it unique
-     * @param bool         $wasLeftJoin             if the relation containing the new one had a left join, we have to force the new one to left join too
-     * @param int          $joinCount               the number of joins
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $resourceClass
+     * @param bool                        $forceEager
+     * @param string                      $parentAlias
+     * @param array                       $propertyMetadataOptions
+     * @param bool                        $wasLeftJoin             if the relation containing the new one had a left join, we have to force the new one to left join too
+     * @param int                         $joinCount               the number of joins
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, string $resourceClass, bool $forceEager, array $propertyMetadataOptions = [], string $originAlias = 'o', string &$relationAlias = 'a', bool $wasLeftJoin = false, int &$joinCount = 0)
+    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, string $parentAlias, array $propertyMetadataOptions = [], bool $wasLeftJoin = false, int &$joinCount = 0)
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.');
@@ -133,7 +105,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
-        $i = $j = 0;
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
@@ -153,14 +124,40 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 $method = 'innerJoin';
             }
 
-            $associationAlias = $relationAlias.$i++;
-            $queryBuilder->{$method}($originAlias.'.'.$association, $associationAlias);
+            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+            $queryBuilder->{$method}(sprintf('%s.%s', $parentAlias, $association), $associationAlias);
             ++$joinCount;
 
-            $relationAlias .= ++$j;
-
-            $this->joinRelations($queryBuilder, $mapping['targetEntity'], $forceEager, $propertyMetadataOptions, $associationAlias, $relationAlias, $method === 'leftJoin', $joinCount);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $associationAlias, $propertyMetadataOptions, $method === 'leftJoin', $joinCount);
         }
+    }
+
+    /**
+     * Gets serializer groups if available, if not it returns the $options array.
+     *
+     * @param string $resourceClass
+     * @param array  $options       represents the operation name so that groups are the one of the specific operation
+     * @param string $context       normalization_context or denormalization_context
+     *
+     * @return array
+     */
+    private function getSerializerGroups(string $resourceClass, array $options, string $context): array
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (isset($options['collection_operation_name'])) {
+            $context = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $context, null, true);
+        } elseif (isset($options['item_operation_name'])) {
+            $context = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], $context, null, true);
+        } else {
+            $context = $resourceMetadata->getAttribute($context);
+        }
+
+        if (empty($context['groups'])) {
+            return $options;
+        }
+
+        return ['serializer_groups' => $context['groups']];
     }
 
     /**
