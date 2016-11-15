@@ -14,7 +14,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
@@ -29,16 +28,14 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $resourceMetadataFactory;
     private $maxJoins;
     private $forceEager;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true)
+    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->maxJoins = $maxJoins;
         $this->forceEager = $forceEager;
