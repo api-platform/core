@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
 /**
@@ -35,6 +36,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+        $resourceMetadataDummy = $resourceMetadataFactory->create(Dummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
@@ -125,6 +127,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
         $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
         $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+        $resourceMetadataDummy = $resourceMetadataFactory->create(Dummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
         $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
@@ -214,6 +217,17 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     public function testCreateWithMalformedYaml()
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/parse_exception.yml';
+
+        (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /"ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" setting is expected to be null or an array, string given in ".+\/Fixtures\/FileConfigurations\/bad_declaration\.yml"\./
+     */
+    public function testCreateWithBadDeclaration()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/bad_declaration.yml';
 
         (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
     }
