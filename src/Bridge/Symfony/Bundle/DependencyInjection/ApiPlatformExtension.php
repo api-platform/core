@@ -65,7 +65,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundles = $container->getParameter('kernel.bundles');
 
         $this->registerMetadataConfiguration($container, $loader);
-        $this->registerDoctrineExtensionConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
@@ -73,6 +72,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLoaders($container, $bundles);
         $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
+        $this->registerDoctrineExtensionConfiguration($container, $config);
     }
 
     /**
