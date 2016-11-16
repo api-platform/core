@@ -52,9 +52,7 @@ final class YamlExtractor extends AbstractExtractor
     {
         foreach ($resourcesYaml as $resourceName => $resourceYaml) {
             if (null === $resourceYaml) {
-                $this->resources[$resourceName] = null;
-
-                continue;
+                $resourceYaml = [];
             }
 
             if (!is_array($resourceYaml)) {
