@@ -66,7 +66,7 @@ final class XmlExtractor extends AbstractExtractor
             if (isset($attribute->attribute[0])) {
                 $value = $this->getAttributes($attribute, 'attribute');
             } else {
-                $value = (string) $attribute;
+                $value = XmlUtils::phpize($attribute);
             }
 
             if (isset($attribute['name'])) {
