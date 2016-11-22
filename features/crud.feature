@@ -16,7 +16,9 @@ Feature: Create-Retrieve-Update-Delete
           "value1",
           "value2"
         ]
-      }
+      },
+      "dummyFloat": 1.2,
+      "dummyPrice": 1.2
     }
     """
     Then the response status code should be 201
@@ -32,8 +34,8 @@ Feature: Create-Retrieve-Update-Delete
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
-      "dummyFloat": null,
-      "dummyPrice": null,
+      "dummyFloat": 1.2,
+      "dummyPrice": "1.2",
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": {
@@ -64,8 +66,8 @@ Feature: Create-Retrieve-Update-Delete
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
-      "dummyFloat": null,
-      "dummyPrice": null,
+      "dummyFloat": 1.2,
+      "dummyPrice": "1.2",
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": {
@@ -104,8 +106,8 @@ Feature: Create-Retrieve-Update-Delete
           "dummy": null,
           "dummyBoolean": null,
           "dummyDate": "2015-03-01T10:00:00+00:00",
-          "dummyFloat": null,
-          "dummyPrice": null,
+          "dummyFloat": 1.2,
+          "dummyPrice": "1.2",
           "relatedDummy": null,
           "relatedDummies": [],
           "jsonData": {
@@ -340,8 +342,8 @@ Feature: Create-Retrieve-Update-Delete
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": "2015-03-01T10:00:00+00:00",
-      "dummyFloat": null,
-      "dummyPrice": null,
+      "dummyFloat": 1.2,
+      "dummyPrice": "1.2",
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": [
@@ -364,3 +366,4 @@ Feature: Create-Retrieve-Update-Delete
     When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204
     And the response should be empty
+
