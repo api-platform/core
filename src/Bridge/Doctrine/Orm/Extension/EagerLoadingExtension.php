@@ -12,6 +12,8 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -53,9 +55,14 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $forceEager = $this->isForceEager($resourceClass, $options);
-        $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
+        try {
+            $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
+
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
+        } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+            //ignore the not found exception
+        }
     }
 
     /**
@@ -107,7 +114,15 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
+            try {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $propertyMetadataOptions);
+            } catch (PropertyNotFoundException $propertyNotFoundException) {
+                //skip properties not found
+                continue;
+            } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+                //skip associations that are not resource classes
+                continue;
+            }
 
             if (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch']) {
                 continue;
