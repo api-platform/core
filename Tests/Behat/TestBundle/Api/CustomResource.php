@@ -66,4 +66,9 @@ class CustomResource implements ResourceInterface
     {
         return 'Custom';
     }
+
+    public function getBasePath()
+    {
+        return;
+    }
 }

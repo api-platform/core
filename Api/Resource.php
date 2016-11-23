@@ -57,6 +57,10 @@ class Resource implements RoutedResourceInterface
     /**
      * @var string|null
      */
+    private $basePath;
+    /**
+     * @var string|null
+     */
     private $itemRouteName;
     /**
      * @var string|null
@@ -234,6 +238,24 @@ class Resource implements RoutedResourceInterface
     public function getShortName()
     {
         return $this->shortName;
+    }
+
+    /**
+     * Initializes base path.
+     *
+     * @param string $basePath
+     */
+    public function initBasePath($basePath)
+    {
+        $this->basePath = $basePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBasePath()
+    {
+        return $this->basePath;
     }
 
     /**
