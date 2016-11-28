@@ -358,6 +358,9 @@ Feature: Create-Retrieve-Update-Delete
       "alias": null
     }
     """
+  Scenario: PUT request on custom operations without content
+    When I send a "PUT" request to "/dummies/1"
+    Then the response status code should be 200
 
   @dropSchema
   Scenario: Delete a resource
