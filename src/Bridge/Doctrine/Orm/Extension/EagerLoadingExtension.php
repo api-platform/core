@@ -134,8 +134,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
-            if (false !== $wasLeftJoin || !isset($joinColumns[0]['nullable']) || false !== $joinColumns[0]['nullable']) {
+            $isNullable = $mapping['joinColumns'][0]['nullable'] ?? true;
+            if (false !== $wasLeftJoin || true === $isNullable) {
                 $method = 'leftJoin';
             } else {
                 $method = 'innerJoin';
