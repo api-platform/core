@@ -51,7 +51,7 @@ final class ValidateListener
             return;
         }
 
-        if ($request->isMethodSafe() || $request->isMethod(Request::METHOD_DELETE)) {
+        if ($request->isMethodSafe(false) || $request->isMethod(Request::METHOD_DELETE)) {
             return;
         }
 

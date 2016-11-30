@@ -48,7 +48,7 @@ final class EventListener
         }
 
         $user = $event->getControllerResult();
-        if (!$user instanceof UserInterface || $request->isMethodSafe()) {
+        if (!$user instanceof UserInterface || $request->isMethodSafe(false)) {
             return;
         }
 
