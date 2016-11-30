@@ -73,7 +73,7 @@ final class SwaggerUiAction
             'operationId' => null,
         ];
 
-        if (!$request->isMethodSafe() || null === $resourceClass = $request->attributes->get('_api_resource_class')) {
+        if (!$request->isMethodSafe(false) || null === $resourceClass = $request->attributes->get('_api_resource_class')) {
             return $context;
         }
 
