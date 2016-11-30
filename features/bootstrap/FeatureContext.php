@@ -28,15 +28,22 @@ use Sanpi\Behatch\HttpCall\Request;
  */
 class FeatureContext implements Context, SnippetAcceptingContext
 {
-    /**
-     * @var ManagerRegistry
-     */
     private $doctrine;
 
     /**
      * @var \Doctrine\Common\Persistence\ObjectManager
      */
     private $manager;
+
+    /**
+     * @var SchemaTool
+     */
+    private $schemaTool;
+
+    /**
+     * @var array
+     */
+    private $classes;
 
     /**
      * @var Request
@@ -83,6 +90,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function dropDatabase()
     {
         $this->schemaTool->dropSchema($this->classes);
+        $this->doctrine->getManager()->clear();
     }
 
     /**
