@@ -16,6 +16,7 @@ use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
@@ -35,8 +36,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     private $maxJoins;
     private $forceEager;
 
-    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true)
     {
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->maxJoins = $maxJoins;
@@ -132,8 +134,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            $joinColumns = $mapping['joinColumns'] ?? $mapping['joinTable']['joinColumns'] ?? null;
-            if (false !== $wasLeftJoin || !isset($joinColumns[0]['nullable']) || false !== $joinColumns[0]['nullable']) {
+            $isNullable = $mapping['joinColumns'][0]['nullable'] ?? true;
+            if (false !== $wasLeftJoin || true === $isNullable) {
                 $method = 'leftJoin';
             } else {
                 $method = 'innerJoin';
@@ -143,8 +145,37 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $queryBuilder->{$method}(sprintf('%s.%s', $parentAlias, $association), $associationAlias);
             ++$joinCount;
 
+            try {
+                $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $propertyMetadataOptions);
+            } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+                continue;
+            }
+
             $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $associationAlias, $propertyMetadataOptions, $method === 'leftJoin', $joinCount);
         }
+    }
+
+    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions)
+    {
+        $select = [];
+        $entityManager = $queryBuilder->getEntityManager();
+        $targetClassMetadata = $entityManager->getClassMetadata($entity);
+
+        foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+
+            if (true === $propertyMetadata->isIdentifier()) {
+                $select[] = $property;
+                continue;
+            }
+
+            //the field test allows to add methods to a Resource which do not reflect real database fields
+            if (true === $targetClassMetadata->hasField($property) && true === $propertyMetadata->isReadable()) {
+                $select[] = $property;
+            }
+        }
+
+        $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
     }
 
     /**
