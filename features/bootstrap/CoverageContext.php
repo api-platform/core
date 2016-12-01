@@ -44,13 +44,8 @@ class CoverageContext implements Context
      */
     public static function tearDown()
     {
-        $writer = new PHP();
-        $writer->process(self::$coverage, __DIR__.'/../../build/cov/coverage-behat.cov');
-    }
-
-    private function getCoverageKeyFromScope(BeforeScenarioScope $scope): string
-    {
-        return sprintf('%s::%s', $scope->getFeature()->getTitle(), $scope->getScenario()->getTitle());
+        $feature = getenv('FEATURE') ?: 'behat';
+        (new PHP())->process(self::$coverage, __DIR__."/../../build/cov/coverage-$feature.cov");
     }
 
     /**
@@ -58,7 +53,7 @@ class CoverageContext implements Context
      */
     public function startCoverage(BeforeScenarioScope $scope)
     {
-        self::$coverage->start($this->getCoverageKeyFromScope($scope));
+        self::$coverage->start("{$scope->getFeature()->getTitle()}::{$scope->getScenario()->getTitle()}");
     }
 
     /**
