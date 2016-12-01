@@ -151,6 +151,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
+            if ($mapping['targetEntity'] === $resourceClass) {
+                $queryBuilder->addSelect($associationAlias);
+                continue;
+            }
+
             $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $associationAlias, $propertyMetadataOptions, $method === 'leftJoin', $joinCount);
         }
     }
