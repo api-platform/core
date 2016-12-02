@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1
+
+* Various fixes related to automatic eager loading
+* Symfony 3.2 compatibility
+
 ## 2.0.0
 
 * Full refactoring
