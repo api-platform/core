@@ -38,7 +38,7 @@
         "php-mock/php-mock-phpunit": "^1.1",
         "phpdocumentor/reflection-docblock": "^3.0",
         "phpdocumentor/type-resolver": "^0.2",
-        "phpunit/phpunit": "^5.6",
+        "phpunit/phpunit": "^5.6.8",
         "psr/log": "^1.0",
         "symfony/asset": "^2.7 || ^3.0",
         "symfony/cache": "^3.1",
