@@ -69,7 +69,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerLoaders($container, $bundles);
+        $this->registerLoaders($container, $bundles, $config['loader_paths']);
         $this->registerBundlesConfiguration($bundles, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config);
@@ -244,11 +244,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param string[]         $bundles
      */
-    private function registerLoaders(ContainerBuilder $container, array $bundles)
+    private function registerLoaders(ContainerBuilder $container, array $bundles, array $loaderPaths)
     {
-        $annotationPaths = [];
-        $yamlResources = [];
-        $xmlResources = [];
+        $annotationPaths = $loaderPaths['annotation'];
+        $yamlResources = $loaderPaths['yaml'];
+        $xmlResources = $loaderPaths['xml'];
 
         foreach ($bundles as $bundle) {
             $bundleDirectory = dirname((new \ReflectionClass($bundle))->getFileName());
