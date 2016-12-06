@@ -77,6 +77,21 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+
+                ->arrayNode('loader_paths')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('annotation')
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('yaml')
+                            ->prototype('scalar')->end()
+                        ->end()
+                        ->arrayNode('xml')
+                            ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         $this->addExceptionToStatusSection($rootNode);
