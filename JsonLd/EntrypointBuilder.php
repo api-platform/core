@@ -13,6 +13,7 @@ namespace Dunglas\ApiBundle\JsonLd;
 
 use Dunglas\ApiBundle\Api\IriConverterInterface;
 use Dunglas\ApiBundle\Api\ResourceCollectionInterface;
+use Dunglas\ApiBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -59,7 +60,9 @@ class EntrypointBuilder
         ];
 
         foreach ($this->resourceCollection as $resource) {
-            $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+            try {
+                $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter->getIriFromResource($resource);
+            } catch(InvalidArgumentException $ex) {}
         }
 
         return $entrypoint;

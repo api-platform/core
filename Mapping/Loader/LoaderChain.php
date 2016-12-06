@@ -76,13 +76,12 @@ class LoaderChain implements LoaderInterface
 
     /**
      * @param ClassMetadata $classMetaData
-     *
-     * @throws \RunTimeException
+     * @return bool
      */
     private function checkClassMetaData(ClassMetadata $classMetaData)
     {
         if (!$classMetaData->getIdentifier()) {
-            throw new \RunTimeException(sprintf('Class "%s" have no identifier.', $classMetaData->getName()));
+            return false;
         }
     }
 }

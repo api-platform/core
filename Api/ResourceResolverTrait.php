@@ -43,6 +43,7 @@ trait ResourceResolverTrait
      */
     public function guessResource($object, array $context = null, $strict = false)
     {
+
         $type = $object;
 
         if (is_object($type)) {
@@ -74,9 +75,7 @@ trait ResourceResolverTrait
                 }
             }
 
-            throw new InvalidArgumentException(
-                sprintf('No resource found for object of type "%s"', $type)
-            );
+           return false;
         }
 
         return $resource;
