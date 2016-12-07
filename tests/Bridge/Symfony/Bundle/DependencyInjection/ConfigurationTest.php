@@ -90,6 +90,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'maximum_items_per_page' => null,
                 ],
             ],
+            'loader_paths' => [
+                'annotation' => [],
+                'yaml' => [],
+                'xml' => [],
+            ],
         ], $config);
     }
 
