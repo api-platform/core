@@ -120,3 +120,20 @@ services:
 
     logger:
         class: Psr\Log\NullLogger
+
+    app.serializer.normalizer.discr_container_dummy:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DiscrContainerDummyDenormalizer'
+        public: false
+        tags:
+            - { name: 'serializer.normalizer', priority: 128 }
+        calls:
+            - [ 'setDenormalizer', ['@serializer'] ]
+
+
+    app.serializer.normalizer.discr_abstract_dummy:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DiscrAbstractDummyDenormalizer'
+        public: false
+        tags:
+            - { name: 'serializer.normalizer', priority: 128 }
+        calls:
+            - [ 'setDenormalizer', ['@serializer'] ]
