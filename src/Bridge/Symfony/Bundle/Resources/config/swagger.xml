@@ -42,10 +42,9 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument>%api_platform.formats%</argument>
-            <argument>%api_platform.title%</argument>
-            <argument>%api_platform.description%</argument>
+            <argument>%api_platform.swagger.ui_path%</argument>
         </service>
-        
+
     </services>
 
 </container>

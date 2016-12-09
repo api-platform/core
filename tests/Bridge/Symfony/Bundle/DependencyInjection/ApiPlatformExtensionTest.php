@@ -185,6 +185,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'DoctrineBundle' => DoctrineBundle::class,
         ])->shouldBeCalled();
 
+        $containerBuilderProphecy->getParameter('kernel.root_dir')->willReturn('root');
+
         $parameters = [
             'api_platform.collection.order' => null,
             'api_platform.collection.order_parameter_name' => 'order',
@@ -198,8 +200,9 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.collection.pagination.page_parameter_name' => 'page',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
-            'api_platform.enable_swagger' => true,
-            'api_platform.enable_swagger_ui' => true,
+            'api_platform.swagger.enabled' => true,
+            'api_platform.swagger.ui_enabled' => true,
+            'api_platform.swagger.ui_path' => 'root/../web/swagger-ui',
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
             'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
             'api_platform.title' => 'title',

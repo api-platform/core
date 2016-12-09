@@ -22,6 +22,8 @@ install:
   - cd %APPVEYOR_BUILD_FOLDER%
   - php -r "readfile('http://getcomposer.org/installer');" | php
   - php composer.phar install --no-interaction --no-progress
+  - php composer.phar require swagger-api/swagger-ui
+  - xcopy vendor\swagger-api\swagger-ui\dist tests\Fixtures\app\web\swagger-ui /s /e
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%

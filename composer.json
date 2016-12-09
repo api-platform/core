@@ -59,7 +59,8 @@
         "psr/cache-implementation": "To use metadata caching.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
         "symfony/config": "To load XML configuration files.",
-        "symfony/twig-bundle": "To use the Swagger UI integration."
+        "symfony/twig-bundle": "To use the Swagger UI integration.",
+        "swagger-api/swagger-ui": "^2.2"
     },
     "autoload": {
         "psr-4": { "ApiPlatform\\Core\\": "src/" }
