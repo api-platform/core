@@ -125,6 +125,37 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['name' => 'hello'], Dummy::class, null, $context));
     }
 
+    public function testDenormalizeWithIri()
+    {
+        $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
+
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactory = new PropertyMetadata(null, null, true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getItemFromIri('/dummies/12', ['resource_class' => Dummy::class, 'api_allow_update' => true, 'fetch_data' => false])->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['id' => '/dummies/12', 'name' => 'hello'], Dummy::class, null, $context));
+    }
+
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage Update is not allowed for this operation.
@@ -151,6 +182,6 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
-        $normalizer->denormalize(['id' => '/dummies/12', 'name' => 'hello'], Dummy::class, null, $context);
+        $normalizer->denormalize(['id' => '12', 'name' => 'hello'], Dummy::class, null, $context);
     }
 }

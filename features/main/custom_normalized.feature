@@ -22,12 +22,67 @@ Feature: Using custom normalized entity
       "@context": "/contexts/CustomNormalizedDummy",
       "@id": "/custom_normalized_dummies/1",
       "@type": "CustomNormalizedDummy",
+      "id": 1,
       "name": "My Dummy",
       "alias": "My alias"
     }
     """
 
-  Scenario: Get a resource
+  Scenario: Create a resource with a custom normalized dummy
+    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/json"
+    And I send a "POST" request to "/related_normalized_dummies" with body:
+    """
+    {
+      "name": "My Dummy"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+        "id": 1,
+        "name": "My Dummy",
+        "customNormalizedDummy": []
+    }
+    """
+
+  Scenario: Create a resource with a custom normalized dummy and an id
+    When I add "Content-Type" header equal to "application/json"
+    When I add "Accept" header equal to "application/json"
+    And I send a "PUT" request to "/related_normalized_dummies/1" with body:
+    """
+    {
+      "name": "My Dummy",
+      "customNormalizedDummy":[{
+        "@context": "/contexts/CustomNormalizedDummy",
+        "@id": "/custom_normalized_dummies/1",
+        "@type": "CustomNormalizedDummy",
+        "id": 1,
+        "name": "My Dummy"
+    }]
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "id": 1,
+      "name": "My Dummy",
+      "customNormalizedDummy":[{
+        "id": 1,
+        "name": "My Dummy",
+        "alias": "My alias"
+         }]
+    }
+    """
+
+
+  Scenario: Get a custom normalized dummy resource
     When I send a "GET" request to "/custom_normalized_dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
@@ -38,6 +93,7 @@ Feature: Using custom normalized entity
       "@context": "/contexts/CustomNormalizedDummy",
       "@id": "/custom_normalized_dummies/1",
       "@type": "CustomNormalizedDummy",
+      "id": 1,
       "name": "My Dummy",
       "alias": "My alias"
     }
@@ -58,6 +114,7 @@ Feature: Using custom normalized entity
         {
           "@id": "/custom_normalized_dummies/1",
           "@type": "CustomNormalizedDummy",
+           "id": 1,
           "name": "My Dummy",
           "alias": "My alias"
         }
@@ -83,6 +140,7 @@ Feature: Using custom normalized entity
       "@context": "/contexts/CustomNormalizedDummy",
       "@id": "/custom_normalized_dummies/1",
       "@type": "CustomNormalizedDummy",
+      "id": 1,
       "name": "My Dummy modified",
       "alias": "My alias"
     }
