@@ -13,22 +13,23 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Custom Normalized Dummy.
+ * Related to Normalized Dummy.
  *
- * @author Mikaël Labrut <labrut@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  *
  * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"output"}},
- *     "denormalization_context"={"groups"={"input"}}
+ *     "normalization_context"={"groups"={"related_output", "output"}},
+ *     "denormalization_context"={"groups"={"related_input", "input"}}
  * })
  * @ORM\Entity
  */
-class CustomNormalizedDummy
+class RelatedNormalizedDummy
 {
     /**
      * @var int The id
@@ -36,7 +37,7 @@ class CustomNormalizedDummy
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"input", "output"})
+     * @Groups({"related_output", "related_input"})
      */
     private $id;
 
@@ -46,23 +47,24 @@ class CustomNormalizedDummy
      * @ORM\Column
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"input", "output"})
+     * @Groups({"related_output", "related_input"})
      */
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var ArrayCollection Several Normalized dummies
      *
-     * @ORM\Column(nullable=true)
-     * @ApiProperty(iri="https://schema.org/alternateName")
-     * @Groups({"input", "output"})
+     * @ORM\ManyToMany(targetEntity="CustomNormalizedDummy")
+     * @Groups({"related_output", "related_input"})
      */
-    private $alias;
+    public $customNormalizedDummy;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function __construct()
+    {
+        $this->customNormalizedDummy = new ArrayCollection();
+    }
+
+    public function getId(): int
     {
         return $this->id;
     }
@@ -75,43 +77,24 @@ class CustomNormalizedDummy
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @return string
+     * @return ArrayCollection
      */
-    public function getAlias()
+    public function getCustomNormalizedDummy()
     {
-        return $this->alias;
+        return $this->customNormalizedDummy;
     }
 
     /**
-     * @param string $alias
+     * @param ArrayCollection $customNormalizedDummy
      */
-    public function setAlias($alias)
+    public function setCustomNormalizedDummy($customNormalizedDummy)
     {
-        $this->alias = $alias;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPersonalizedAlias()
-    {
-        return $this->alias;
-    }
-
-    /**
-     * @param string $value
-     */
-    public function setPersonalizedAlias($value)
-    {
-        $this->alias = $value;
+        $this->customNormalizedDummy = $customNormalizedDummy;
     }
 }
