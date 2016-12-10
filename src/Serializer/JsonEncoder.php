@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder as BaseJsonEncoder;
 
 /**
- * JSON-LD Encoder.
+ * A JSON encoder with appropriate default options to embed the generated document into HTML.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
