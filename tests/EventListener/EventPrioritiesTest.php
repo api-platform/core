@@ -29,6 +29,6 @@ class EventPrioritiesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(33, EventPriorities::PRE_WRITE);
         $this->assertEquals(31, EventPriorities::POST_WRITE);
         $this->assertEquals(9, EventPriorities::PRE_RESPOND);
-        $this->assertEquals(7, EventPriorities::POST_RESPOND);
+        $this->assertEquals(0, EventPriorities::POST_RESPOND);
     }
 }
