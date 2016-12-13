@@ -27,5 +27,5 @@ final class EventPriorities
     const PRE_WRITE = 33;
     const POST_WRITE = 31;
     const PRE_RESPOND = 9;
-    const POST_RESPOND = 7;
+    const POST_RESPOND = 0;
 }
