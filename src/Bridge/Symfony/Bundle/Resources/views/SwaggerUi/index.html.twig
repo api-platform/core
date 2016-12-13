@@ -23,59 +23,10 @@
     <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jsoneditor.min.js') }}"></script>
     <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/marked.js') }}"></script>
     <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/swagger-oauth.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
 
-    <script>
-        $(function () {
-            window.swaggerUi = new SwaggerUi({
-                url: '{{ path('api_doc', {'_format': 'json'} ) }}',
-                spec: {{ spec|replace({'<': '\u003c'})|raw }},
-                dom_id: 'swagger-ui-container',
-                supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
-                onComplete: function() {
-                    $('pre code').each(function(i, e) {
-                        hljs.highlightBlock(e)
-                    });
-
-                    {% if operationId is not null %}
-                        {% set domId = shortName ~ '_' ~ operationId %}
-                        {% set id = app.request.attributes.get('id') %}
-
-                        var queryParameters = {{ app.request.query.all()|json_encode|replace({'<': '\u003c'})|raw }};
-                        $('#{{ domId|escape('js') }} form.sandbox input.parameter').each(function (i, e) {
-                            var $e = $(e);
-                            var name = $e.attr('name');
-
-                            if (name in queryParameters) {
-                                $e.val(queryParameters[name]);
-                            }
-                        });
-
-                        {% if id %}
-                            $('#{{ domId|escape('js') }} form.sandbox input[name="id"]').val('{{ id|escape('js') }}');
-                        {% endif %}
-
-                        $('#{{ domId|escape('js') }} form.sandbox').submit();
-                        document.location.hash = '#!/{{ shortName|escape('js') }}/{{ operationId|escape('js') }}';
-                    {% endif %}
-                },
-                onFailure: function() {
-                    log('Unable to Load SwaggerUI');
-                },
-                docExpansion: 'list',
-                jsonEditor: false,
-                defaultModelRendering: 'schema',
-                showRequestHeaders: true
-            });
-
-            window.swaggerUi.load();
-
-            function log() {
-                if ('console' in window) {
-                    console.log.apply(console, arguments);
-                }
-            }
-        });
-    </script>
+    {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
+    <script id="swagger-data" type="application/json">{{ swagger_data|json_encode(65)|raw }}</script>
 </head>
 
 <body class="swagger-section">
