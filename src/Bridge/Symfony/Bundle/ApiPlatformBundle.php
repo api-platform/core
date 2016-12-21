@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\SwaggerProcessorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -34,5 +35,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new DataProviderPass());
         $container->addCompilerPass(new FilterPass());
         $container->addCompilerPass(new DoctrineQueryExtensionPass());
+        $container->addCompilerPass(new SwaggerProcessorPass());
     }
 }

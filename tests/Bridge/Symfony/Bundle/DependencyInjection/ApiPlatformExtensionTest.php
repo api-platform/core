@@ -346,6 +346,17 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.action.ui',
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.normalizer.documentation',
+            'api_platform.swagger.util.swagger_type_resolver',
+            'api_platform.swagger.util.swagger_operation_generator',
+            'api_platform.swagger.util.swagger_filter_definitions',
+            'api_platform.swagger.util.swagger_definitions',
+            'api_platform.swagger.extractor.collection_get_operation_extractor',
+            'api_platform.swagger.extractor.collection_post_operation_extractor',
+            'api_platform.swagger.extractor.item_delete_operation_extractor',
+            'api_platform.swagger.extractor.item_get_operation_extractor',
+            'api_platform.swagger.extractor.item_put_operation_extractor',
+            'api_platform.swagger.extractor.swagger_context_operation_extractor',
+            'api_platform.swagger.processor.swagger_extractor_processor',
         ];
 
         foreach ($definitions as $definition) {
