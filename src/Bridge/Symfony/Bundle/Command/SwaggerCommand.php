@@ -13,10 +13,10 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Console command to dump Swagger API documentations.
@@ -32,7 +32,7 @@ final class SwaggerCommand extends Command
     private $apiVersion;
     private $apiFormats;
 
-    public function __construct(DocumentationNormalizer $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats)
+    public function __construct(NormalizerInterface $documentationNormalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats)
     {
         parent::__construct();
 
