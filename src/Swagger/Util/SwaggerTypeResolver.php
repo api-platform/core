@@ -35,15 +35,15 @@ class SwaggerTypeResolver
     }
 
     /**
-     * @param string $type
-     * @param bool $isCollection
+     * @param string      $type
+     * @param bool        $isCollection
      * @param string|null $className
-     * @param bool|null $readableLink
+     * @param bool|null   $readableLink
+     * @param string      $definitionKey
      *
-     * @param string $definitionKey
      * @return array
      */
-    public function resolve(string $type, bool $isCollection, string $className = null, bool $readableLink = null, string $definitionKey): array
+    public function resolve(string $type, bool $isCollection, string $className = null, bool $readableLink = null, string $definitionKey = null): array
     {
         if ($isCollection) {
             return ['type' => 'array', 'items' => $this->resolve($type, false, $className, $readableLink, $definitionKey)];

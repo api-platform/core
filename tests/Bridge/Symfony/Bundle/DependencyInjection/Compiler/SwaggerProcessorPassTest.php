@@ -56,6 +56,7 @@ class SwaggerProcessorPassTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->hasDefinition('api_platform.swagger.processor.swagger_extractor_processor')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.swagger.processor.swagger_extractor_processor')->willReturn($swaggerExtractorProcessorProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.swagger_extractor')->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('foo')->willReturn($SwaggerOperationExtractorProphecy->reveal());
 

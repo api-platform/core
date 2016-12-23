@@ -34,12 +34,12 @@ final class SwaggerProcessorPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // if doctrine not loaded
         if (!$container->hasDefinition('api_platform.swagger.processor.swagger_extractor_processor')) {
             return;
         }
-        $extractors = $this->findAndSortTaggedServices('api_platform.swagger_extractor', $container);
-        $container->getDefinition('api_platform.swagger.processor.swagger_extractor_processor')->addArgument($extractors);
+        $container->getDefinition('api_platform.swagger.processor.swagger_extractor_processor')->addArgument(
+            $this->findAndSortTaggedServices('api_platform.swagger_extractor', $container)
+        );
     }
 
     /**
