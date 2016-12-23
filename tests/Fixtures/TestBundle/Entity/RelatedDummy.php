@@ -21,7 +21,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(iri="https://schema.org/Product")
+ * @ApiResource(
+ *     iri="https://schema.org/Product",
+ *     collectionOperations={
+ *          "get" = {"method"="GET"},
+ *          "get_by_parent" = {"method"="GET", "path"="/dummy/{id}/related_dummies"},
+ *          "post" = {"method"="POST"}
+ *     }
+ * )
  * @ORM\Entity
  */
 class RelatedDummy extends ParentDummy
@@ -137,7 +144,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Set relatedToDummyFriend.
      *
-     * @param relatedToDummyFriend the value to set
+     * @param RelatedToDummyFriend $relatedToDummyFriend
      */
     public function setRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {

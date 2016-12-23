@@ -71,6 +71,36 @@ Feature: Relations support
     }
     """
 
+  Scenario: Get related dummies by a path with a dynamic attribute
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/dummy/33/related_dummies"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+          "@context": "/contexts/RelatedDummy",
+          "@id": "/dummy/33/related_dummies",
+          "@type": "hydra:Collection",
+          "hydra:member": [
+              {
+                  "@id": "/related_dummies/1",
+                  "@type": "https://schema.org/Product",
+                  "name": null,
+                  "dummyDate": null,
+                  "thirdLevel": "/third_levels/1",
+                  "relatedToDummyFriend": [],
+                  "dummyBoolean": null,
+                  "id": 1,
+                  "symfony": "symfony",
+                  "age": null
+              }
+          ],
+          "hydra:totalItems": 1
+      }
+    """
+
   Scenario: Create a friend relationship
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/related_to_dummy_friends" with body:

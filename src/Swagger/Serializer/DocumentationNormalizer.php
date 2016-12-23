@@ -191,6 +191,16 @@ final class DocumentationNormalizer implements NormalizerInterface
         $responseDefinitionKey = $this->getDefinition($definitions, $collection, false, $resourceMetadata, $resourceClass, $operationName);
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
 
+        if (!array_key_exists('parameters', $pathOperation)) {
+            $pathParameters = $this->getRequiredPathParameters($resourceMetadata, $operationName, $collection);
+            $filtersParameters = $collection ? $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata) : [];
+            $parameters = array_merge($pathParameters, $filtersParameters);
+
+            if ($parameters) {
+                $pathOperation['parameters'] = $parameters;
+            }
+        }
+
         if ($collection) {
             $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
             $pathOperation['responses'] ?? $pathOperation['responses'] = [
@@ -203,20 +213,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                 ],
             ];
 
-            if (!isset($pathOperation['parameters']) && count($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata)) > 0) {
-                $pathOperation['parameters'] = $parameters;
-            }
-
             return $pathOperation;
         }
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
-            'name' => 'id',
-            'in' => 'path',
-            'required' => true,
-            'type' => 'integer',
-        ]];
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
                 'description' => sprintf('%s resource response', $resourceShortName),
@@ -559,6 +559,33 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * @param ResourceMetadata $metadata
+     * @param string           $operationName
+     * @param bool             $collection
+     *
+     * @return array
+     */
+    private function getRequiredPathParameters(ResourceMetadata $metadata, string $operationName, bool $collection): array
+    {
+        $operations = $collection ? $metadata->getCollectionOperations() : $metadata->getItemOperations();
+        $operation = $operations[$operationName];
+        $path = $this->getPath($metadata->getShortName(), $operation, $collection);
+        preg_match_all('#\{([^\}].+)\}#', $path, $matches);
+
+        $result = [];
+        foreach ($matches[1] as $requiredPathParameter) {
+            $result[] = [
+                'name' => $requiredPathParameter,
+                'in' => 'path',
+                'required' => true,
+                'type' => 'integer',
+            ];
+        }
+
+        return $result;
     }
 
     /**

@@ -72,7 +72,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $context = $this->initContext($resourceClass, $context);
 
-        $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+        $data['@id'] = $this->getIri($resourceClass, $context);
         $data['@type'] = 'hydra:Collection';
 
         $data['hydra:member'] = [];
@@ -85,5 +85,21 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         }
 
         return $data;
+    }
+
+    /**
+     * @param string $resourceClass
+     * @param array  $context
+     *
+     * @return string
+     */
+    private function getIri(string $resourceClass, array $context): string
+    {
+        $prepared = [];
+        if (!empty($context['request_uri'])) {
+            $prepared = parse_url($context['request_uri']);
+        }
+
+        return $prepared['path'] ?? $this->iriConverter->getIriFromResourceClass($resourceClass);
     }
 }
