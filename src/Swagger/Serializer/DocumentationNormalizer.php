@@ -196,7 +196,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $filtersParameters = $collection ? $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata) : [];
             $parameters = array_merge($pathParameters, $filtersParameters);
 
-            if (!empty($parameters)) {
+            if ($parameters) {
                 $pathOperation['parameters'] = $parameters;
             }
         }
