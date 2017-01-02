@@ -9,7 +9,7 @@ init:
   - SET PATH=c:\tools\php;%PATH%
 
 install:
-  - cinst -y php --version 7.0.9 # Force the PHP version: http://help.appveyor.com/discussions/problems/5616-not-able-to-build-due-to-problem-in-chocolateyinstallps1
+  - cinst -y php -i
   - cd c:\tools\php
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
