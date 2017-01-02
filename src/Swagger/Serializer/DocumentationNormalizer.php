@@ -189,6 +189,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function updateGetOperation(\ArrayObject $pathOperation, array $mimeTypes, bool $collection, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
     {
         $responseDefinitionKey = $this->getDefinition($definitions, $collection, false, $resourceMetadata, $resourceClass, $operationName);
+
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
 
         if ($collection) {
@@ -203,7 +204,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 ],
             ];
 
-            if (!isset($pathOperation['parameters']) && count($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata)) > 0) {
+            if (!isset($pathOperation['parameters']) && $parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $responseDefinitionKey)) {
                 $pathOperation['parameters'] = $parameters;
             }
 
@@ -350,8 +351,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         } else {
             $definitionKey = $resourceMetadata->getShortName();
         }
-
-        $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $serializerContext);
+        $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $serializerContext, $definitionKey);
 
         return $definitionKey;
     }
@@ -369,7 +369,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return \ArrayObject
      */
-    private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, array $serializerContext = null): \ArrayObject
+    private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, array $serializerContext = null, string $definitionKey = null): \ArrayObject
     {
         $definitionSchema = new \ArrayObject(['type' => 'object']);
 
@@ -390,7 +390,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 
-            $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($propertyMetadata);
+            $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($propertyMetadata, $definitionKey);
         }
 
         return $definitionSchema;
@@ -405,7 +405,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return \ArrayObject
      */
-    private function getPropertySchema(PropertyMetadata $propertyMetadata): \ArrayObject
+    private function getPropertySchema(PropertyMetadata $propertyMetadata, string $definitionKey = null): \ArrayObject
     {
         $propertySchema = new \ArrayObject();
 
@@ -430,7 +430,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $className = $valueType->getClassName();
         }
 
-        $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink());
+        $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitionKey);
 
         return new \ArrayObject((array) $propertySchema + $valueSchema);
     }
@@ -445,10 +445,10 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null): array
+    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null, string $definitionKey = null): array
     {
         if ($isCollection) {
-            return ['type' => 'array', 'items' => $this->getType($type, false, $className, $readableLink)];
+            return ['type' => 'array', 'items' => $this->getType($type, false, $className, $readableLink, $definitionKey)];
         }
 
         if (Type::BUILTIN_TYPE_STRING === $type) {
@@ -481,7 +481,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             if (true === $readableLink) {
-                return ['$ref' => sprintf('#/definitions/%s', $this->resourceMetadataFactory->create($className)->getShortName())];
+                return ['$ref' => sprintf('#/definitions/%s', $definitionKey ?: $this->resourceMetadataFactory->create($className)->getShortName())];
             }
         }
 
@@ -529,7 +529,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata): array
+    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata, string $definitionKey): array
     {
         if (null === $this->filterCollection) {
             return [];
@@ -548,7 +548,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     'in' => 'query',
                     'required' => $data['required'],
                 ];
-                $parameter += $this->getType($data['type'], false);
+                $parameter += $this->getType($data['type'], false, null, null, $definitionKey);
 
                 if (isset($data['swagger'])) {
                     $parameter = $data['swagger'] + $parameter;
