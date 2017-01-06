@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.2
+
+* Fix the support of the Symfony's serializer @MaxDepth annotation
+* Fix property range of relations in the Hydra doc when an IRI is used
+* Fix an error "api:swagger:export" command when decorating the Swagger normalizer
+* Fix an an error in the Swagger documentation generator when a property has several serialization groups
+
 ## 2.0.1
 
 * Various fixes related to automatic eager loading
