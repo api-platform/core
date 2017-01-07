@@ -28,7 +28,7 @@ publicly**. We will disclose details of the issue and credit you after having re
 ### Writing a Pull Request
 
 First of all, you must decide on what branch your changes will be based. If the changes your are going to make are
-fully backward-compatible, you should base your changes on the latest stable branch (`1.0` at the moment).
+fully backward-compatible, you should base your changes on the latest stable branch (`2.0` at the moment).
 Otherwise, you should base your changes on the `master` branch.
 
 ### Matching coding standards
