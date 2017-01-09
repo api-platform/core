@@ -331,6 +331,70 @@ class OrderFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
             ],
+            'nulls_smallest (asc)' => [
+                'order',
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_smallest',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'asc',
+                        'name' => 'desc',
+                    ],
+                ],
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate ASC, o.name DESC', Dummy::class),
+            ],
+            'nulls_smallest (desc)' => [
+                'order',
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_smallest',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'desc',
+                        'name' => 'desc',
+                    ],
+                ],
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate DESC, o.name DESC', Dummy::class),
+            ],
+            'nulls_largest (asc)' => [
+                'order',
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_largest',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'asc',
+                        'name' => 'desc',
+                    ],
+                ],
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate ASC, o.name DESC', Dummy::class),
+            ],
+            'nulls_largest (desc)' => [
+                'order',
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_largest',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'desc',
+                        'name' => 'desc',
+                    ],
+                ],
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
+            ],
         ];
     }
 }
