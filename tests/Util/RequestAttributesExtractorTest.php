@@ -61,7 +61,6 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
             ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'request' => true],
             RequestAttributesExtractor::extractAttributes($request)
         );
-
     }
 
     /**
