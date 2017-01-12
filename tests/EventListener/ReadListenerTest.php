@@ -39,6 +39,24 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
+    public function testRequestIsFalse()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_request' => false]);
+        $request->setMethod('PUT');
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener->onKernelRequest($event->reveal());
+    }
+
     public function testRetrieveCollectionPost()
     {
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);

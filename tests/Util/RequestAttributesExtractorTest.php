@@ -24,7 +24,7 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'collection_operation_name' => 'post'],
+            ['resource_class' => 'Foo', 'collection_operation_name' => 'post', 'request' => true],
             RequestAttributesExtractor::extractAttributes($request)
         );
     }
@@ -34,9 +34,34 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
 
         $this->assertEquals(
-            ['resource_class' => 'Foo', 'item_operation_name' => 'get'],
+            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'request' => true],
             RequestAttributesExtractor::extractAttributes($request)
         );
+    }
+
+    public function testExtractRequest()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_request' => '0']);
+
+        $this->assertEquals(
+            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'request' => false],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_request' => '1']);
+
+        $this->assertEquals(
+            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'request' => true],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+
+        $this->assertEquals(
+            ['resource_class' => 'Foo', 'item_operation_name' => 'get', 'request' => true],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+
     }
 
     /**
