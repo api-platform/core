@@ -34,7 +34,7 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
         // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
         $this->jsonEncoder = $jsonEncoder ?: new BaseJsonEncoder(
-        // The value "15" will be replaced by  `JsonResponse::DEFAULT_ENCODING_OPTIONS` when Symfony HttpFoundation 2.7 support will be dropped
+        // The value "15" will be replaced by  "JsonResponse::DEFAULT_ENCODING_OPTIONS" when Symfony HttpFoundation 2.7 support will be dropped
             new JsonEncode(15), new JsonDecode(true)
         );
     }
