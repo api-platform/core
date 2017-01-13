@@ -236,7 +236,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.cache.route_name_resolver',
             'api_platform.collection_data_provider',
             'api_platform.doctrine.listener.view.write',
-            'api_platform.doctrine.orm.util.identifier_manager',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
             'api_platform.doctrine.orm.collection_data_provider',

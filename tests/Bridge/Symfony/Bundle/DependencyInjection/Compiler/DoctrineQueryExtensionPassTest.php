@@ -33,7 +33,7 @@ class DoctrineQueryExtensionPassTest extends \PHPUnit_Framework_TestCase
         $collectionDataProviderDefinition = $collectionDataProviderDefinitionProphecy->reveal();
 
         $itemDataProviderDefinitionProphecy = $this->prophesize(Definition::class);
-        $itemDataProviderDefinitionProphecy->replaceArgument(2, Argument::type('array'))->shouldBeCalled();
+        $itemDataProviderDefinitionProphecy->replaceArgument(3, Argument::type('array'))->shouldBeCalled();
         $itemDataProviderDefinition = $itemDataProviderDefinitionProphecy->reveal();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
