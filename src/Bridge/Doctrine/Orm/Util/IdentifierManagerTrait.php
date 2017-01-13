@@ -12,23 +12,23 @@
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class IdentifierManager implements IdentifierManagerInterface
+/**
+ * @internal
+ */
+trait IdentifierManagerTrait
 {
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
-    {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-    }
-
     /**
-     * {@inheritdoc}
+     * Transform and check the identifier, composite or not.
+     *
+     * @param int|string    $id
+     * @param ObjectManager $manager
+     * @param string        $resourceClass
+     *
+     * @throws PropertyNotFoundException
+     *
+     * @return array
      */
     public function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass): array
     {

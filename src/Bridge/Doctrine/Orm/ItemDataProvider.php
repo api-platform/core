@@ -13,11 +13,13 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -31,18 +33,22 @@ use Doctrine\ORM\QueryBuilder;
 class ItemDataProvider implements ItemDataProviderInterface
 {
     private $managerRegistry;
-    private $identifierManager;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
     private $itemExtensions;
+
+    use IdentifierManagerTrait;
 
     /**
      * @param ManagerRegistry               $managerRegistry
      * @param IdentifierManagerInterface    $identifierManager
      * @param QueryItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, IdentifierManagerInterface $identifierManager, array $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
-        $this->identifierManager = $identifierManager;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
     }
 
@@ -60,7 +66,7 @@ class ItemDataProvider implements ItemDataProviderInterface
             throw new ResourceClassNotSupportedException();
         }
 
-        $identifiers = $this->identifierManager->normalizeIdentifiers($id, $manager, $resourceClass);
+        $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof EntityManagerInterface) {

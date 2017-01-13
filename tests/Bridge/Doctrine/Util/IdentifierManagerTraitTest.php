@@ -11,7 +11,7 @@
 
 namespace ApiPlatform\Core\Tests\Doctrine\Util;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManager;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -20,7 +20,20 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-class IdentifierManagerTest extends \PHPUnit_Framework_TestCase
+class IdentifierManagerTraitImpl
+{
+    use IdentifierManagerTrait;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
+
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    {
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
+    }
+}
+
+class IdentifierManagerTraitTest extends \PHPUnit_Framework_TestCase
 {
     private function getMetadataProphecies(array $identifiers, string $resourceClass)
     {
@@ -61,7 +74,7 @@ class IdentifierManagerTest extends \PHPUnit_Framework_TestCase
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataProphecies($identifiers, Dummy::class);
         $objectManager = $this->getObjectManagerProphecy($identifiers, Dummy::class);
 
-        $identifierManager = new IdentifierManager($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $identifierManager = new IdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $this->assertEquals($identifierManager->normalizeIdentifiers(1, $objectManager, Dummy::class), ['id' => 1]);
     }
@@ -72,7 +85,7 @@ class IdentifierManagerTest extends \PHPUnit_Framework_TestCase
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataProphecies($identifiers, Dummy::class);
         $objectManager = $this->getObjectManagerProphecy($identifiers, Dummy::class);
 
-        $identifierManager = new IdentifierManager($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $identifierManager = new IdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $this->assertEquals($identifierManager->normalizeIdentifiers('ida=1;idb=2', $objectManager, Dummy::class), ['ida' => 1, 'idb' => 2]);
     }
@@ -87,7 +100,7 @@ class IdentifierManagerTest extends \PHPUnit_Framework_TestCase
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataProphecies($identifiers, Dummy::class);
         $objectManager = $this->getObjectManagerProphecy($identifiers, Dummy::class);
 
-        $identifierManager = new IdentifierManager($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $identifierManager = new IdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $identifierManager->normalizeIdentifiers('idbad=1;idb=2', $objectManager, Dummy::class);
     }

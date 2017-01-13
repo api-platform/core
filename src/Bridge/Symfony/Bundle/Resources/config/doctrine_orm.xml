@@ -16,7 +16,8 @@
 
         <service id="api_platform.doctrine.orm.item_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.util.identifier_manager" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="collection" /> <!-- extensions -->
         </service>
 
@@ -82,13 +83,6 @@
             <argument type="service" id="doctrine" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
-        </service>
-
-	<!-- Utils -->
-
-        <service id="api_platform.doctrine.orm.util.identifier_manager" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManager">
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
         </service>
 
         <!-- Doctrine Query extensions -->
