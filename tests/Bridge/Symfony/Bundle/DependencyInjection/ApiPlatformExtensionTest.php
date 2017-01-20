@@ -242,7 +242,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.date_filter',
             'api_platform.doctrine.orm.default.collection_data_provider',
             'api_platform.doctrine.orm.default.item_data_provider',
-            'api_platform.doctrine.orm.default.item_data_provider',
             'api_platform.doctrine.orm.item_data_provider',
             'api_platform.doctrine.orm.metadata.property.metadata_factory',
             'api_platform.doctrine.orm.numeric_filter',
