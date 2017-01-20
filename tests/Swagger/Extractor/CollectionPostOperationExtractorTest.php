@@ -41,11 +41,10 @@ class CollectionPostOperationExtractorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($collectionGetOperationExtractor->supportsExtraction($operationData));
 
-        $operationData['method'] = 'WRONG';
-        $this->assertFalse($collectionGetOperationExtractor->supportsExtraction($operationData));
-
-        $operationData['method'] = 'POST';
         $operationData['isCollection'] = false;
+        $this->assertTrue($collectionGetOperationExtractor->supportsExtraction($operationData));
+
+        $operationData['method'] = 'WRONG';
         $this->assertFalse($collectionGetOperationExtractor->supportsExtraction($operationData));
     }
 

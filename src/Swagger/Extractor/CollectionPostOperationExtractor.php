@@ -69,6 +69,6 @@ final class CollectionPostOperationExtractor implements SwaggerOperationExtracto
 
     public function supportsExtraction(array $operationData): bool
     {
-        return SwaggerOperationDataGuard::check($operationData) && 'POST' === $operationData['method'] && $operationData['isCollection'];
+        return SwaggerOperationDataGuard::check($operationData) && 'POST' === $operationData['method'];
     }
 }
