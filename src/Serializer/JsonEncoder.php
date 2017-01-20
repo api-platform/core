@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\Serializer;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
@@ -32,10 +31,9 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
     {
         $this->format = $format;
 
-        // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
+        // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
         $this->jsonEncoder = $jsonEncoder ?: new BaseJsonEncoder(
-        // The value "15" will be replaced by  "JsonResponse::DEFAULT_ENCODING_OPTIONS" when Symfony HttpFoundation 2.7 support will be dropped
-            new JsonEncode(15), new JsonDecode(true)
+            new JsonEncode(JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE), new JsonDecode(true)
         );
     }
 
