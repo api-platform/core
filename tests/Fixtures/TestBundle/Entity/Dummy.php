@@ -130,6 +130,10 @@ class Dummy
      */
     public $nameConverted;
 
+    public static function staticMethod()
+    {
+    }
+
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
