@@ -19,6 +19,9 @@ use Doctrine\Common\Persistence\ObjectManager;
  */
 trait IdentifierManagerTrait
 {
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
+
     /**
      * Transform and check the identifier, composite or not.
      *
