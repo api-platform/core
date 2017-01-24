@@ -32,17 +32,16 @@ use Doctrine\ORM\QueryBuilder;
  */
 class ItemDataProvider implements ItemDataProviderInterface
 {
-    private $managerRegistry;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $itemExtensions;
-
     use IdentifierManagerTrait;
 
+    private $managerRegistry;
+    private $itemExtensions;
+
     /**
-     * @param ManagerRegistry               $managerRegistry
-     * @param IdentifierManagerInterface    $identifierManager
-     * @param QueryItemExtensionInterface[] $itemExtensions
+     * @param ManagerRegistry                        $managerRegistry
+     * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
+     * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
+     * @param QueryItemExtensionInterface[]          $itemExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [])
     {

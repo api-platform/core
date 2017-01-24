@@ -23,8 +23,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 class IdentifierManagerTraitImpl
 {
     use IdentifierManagerTrait;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
