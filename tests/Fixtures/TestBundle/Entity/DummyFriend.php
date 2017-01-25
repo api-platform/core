@@ -49,7 +49,7 @@ class DummyFriend
     /**
      * Get id.
      *
-     * @return id
+     * @return int
      */
     public function getId()
     {
@@ -69,7 +69,7 @@ class DummyFriend
     /**
      * Get name.
      *
-     * @return name
+     * @return string
      */
     public function getName()
     {
@@ -79,7 +79,7 @@ class DummyFriend
     /**
      * Set name.
      *
-     * @param name the value to set
+     * @param string the value to set
      */
     public function setName($name)
     {
