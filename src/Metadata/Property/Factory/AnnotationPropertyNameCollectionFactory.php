@@ -69,6 +69,10 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
 
         // Methods
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            if ($reflectionMethod->isStatic()) {
+                continue;
+            }
+
             $propertyName = $this->reflection->getProperty($reflectionMethod->name);
             if (!preg_match('/^[A-Z]{2,}/', $propertyName)) {
                 $propertyName = lcfirst($propertyName);

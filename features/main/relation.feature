@@ -303,6 +303,18 @@ Feature: Relations support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
+  Scenario: Post a relation with a not existing IRI
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
+    """
+    {
+      "related": "/related_dummies/123"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
   @dropSchema
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"

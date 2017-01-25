@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -273,7 +274,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (is_string($value)) {
             try {
-                return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => false]);
+                return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
+            } catch (ItemNotFoundException $e) {
+                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
                 // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
             }
