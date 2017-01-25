@@ -15,6 +15,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -69,7 +70,7 @@ final class IriConverter implements IriConverterInterface
             return $item;
         }
 
-        throw new InvalidArgumentException(sprintf('Item not found for "%s".', $iri));
+        throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
     }
 
     /**
