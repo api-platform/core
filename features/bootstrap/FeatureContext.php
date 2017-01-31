@@ -135,20 +135,22 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with relatedDummies
+     * @Given there are :nb dummy objects each having :relatedNb relatedDummies
      */
-    public function thereIsDummyObjectsWithRelatedDummies($nb)
+    public function thereIsDummyObjectsWithRelatedDummies($nb, $relatedNb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $relatedDummy = new RelatedDummy();
-            $relatedDummy->setName('RelatedDummy #'.$i);
-
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->addRelatedDummy($relatedDummy);
 
-            $this->manager->persist($relatedDummy);
+            for ($j = 1; $j <= $relatedNb; ++$j) {
+                $relatedDummy = new RelatedDummy();
+                $relatedDummy->setName('RelatedDummy #'.$j);
+                $this->manager->persist($relatedDummy);
+                $dummy->addRelatedDummy($relatedDummy);
+            }
+
             $this->manager->persist($dummy);
         }
 
