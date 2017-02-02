@@ -16,6 +16,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -128,11 +129,16 @@ final class IriConverter implements IriConverterInterface
 
             $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
             $relatedItem = $identifiers[$propertyName];
-
             unset($identifiers[$propertyName]);
 
             foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
+                try {
+                    $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
+                } catch (ResourceClassNotFoundException $e) {
+                    $identifiers[$propertyName] = (string) $relatedItem;
+
+                    continue;
+                }
 
                 if ($propertyMetadata->isIdentifier()) {
                     if (isset($identifiers[$propertyName])) {
