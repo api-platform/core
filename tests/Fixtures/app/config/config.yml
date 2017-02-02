@@ -69,6 +69,10 @@ nelmio_api_doc:
                 json:       'application/json'
 
 services:
+    object_primary_key.item_data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ObjectPrimaryKeyItemDataProvider'
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
     app.user_manager:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
         arguments:
