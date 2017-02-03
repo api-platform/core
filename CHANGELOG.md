@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.3
+
+* Fix a bug when handling invalid IRIs
+* Allow to have a property called id even in JSON-LD
+* Exclude static methods from AnnotationPropertyNameCollectionFactory
+* Improve compatibility with Symfony 2.8
+
 ## 2.0.2
 
 * Fix the support of the Symfony's serializer @MaxDepth annotation
