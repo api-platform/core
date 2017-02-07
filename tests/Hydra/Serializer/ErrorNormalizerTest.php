@@ -45,7 +45,7 @@ class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 '@context' => '/context/foo',
-                '@type' => 'Error',
+                '@type' => 'hydra:Error',
                 'hydra:title' => 'An error occurred',
                 'hydra:description' => 'Hello',
             ],
@@ -54,7 +54,7 @@ class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 '@context' => '/context/foo',
-                '@type' => 'Error',
+                '@type' => 'hydra:Error',
                 'hydra:title' => 'Hi',
                 'hydra:description' => 'Hello',
             ],
