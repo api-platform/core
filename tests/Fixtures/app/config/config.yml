@@ -57,6 +57,9 @@ fos_user:
     service:
         user_manager: 'app.user_manager'
     user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
+    from_email:
+        address:      'no-reply@les-tilleuls.coop'
+        sender_name:  'Kévin Dunglas'
 
 nelmio_api_doc:
     sandbox:
