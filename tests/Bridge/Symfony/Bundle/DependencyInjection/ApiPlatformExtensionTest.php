@@ -290,6 +290,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
+            'api_platform.listener.request.deny_access',
             'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.annotation',
