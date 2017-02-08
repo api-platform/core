@@ -396,13 +396,13 @@ final class DocumentationNormalizer implements NormalizerInterface
                 [
                     '@type' => 'hydra:SupportedProperty',
                     'hydra:property' => [
-                        '@id' => '#ConstraintViolationList/violation',
+                        '@id' => '#ConstraintViolationList/violations',
                         '@type' => 'rdf:Property',
-                        'rdfs:label' => 'violation',
+                        'rdfs:label' => 'violations',
                         'domain' => '#ConstraintViolationList',
                         'range' => '#ConstraintViolation',
                     ],
-                    'hydra:title' => 'violation',
+                    'hydra:title' => 'violations',
                     'hydra:description' => 'The violations',
                     'hydra:readable' => true,
                     'hydra:writable' => false,
