@@ -76,7 +76,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     public function testNotPrependSerializerWhenConfigExist()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0=> ['serializer' => ['enabled' => false]]])->shouldBeCalled();
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('serializer', $config);
