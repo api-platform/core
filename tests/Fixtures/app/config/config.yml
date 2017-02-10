@@ -123,6 +123,11 @@ services:
         arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
 
+    app.my_dummy_resource.exists_filter:
+        parent:    'api_platform.doctrine.orm.exists_filter'
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
+
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']

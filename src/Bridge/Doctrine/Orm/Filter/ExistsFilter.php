@@ -13,9 +13,11 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by whether a property value exists or not.
@@ -24,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
  *
  * A query parameter with key but no value is treated as `true`, e.g.:
- * Request: GET /products?exists[brand]
+ * Request: GET /products?brand[exists]
  * Interpretation: filter products which have a brand
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
@@ -32,6 +34,11 @@ use Symfony\Component\HttpFoundation\Request;
 class ExistsFilter extends AbstractFilter
 {
     const QUERY_PARAMETER_KEY = 'exists';
+
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
+    {
+        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
+    }
 
     /**
      * {@inheritdoc}
@@ -50,7 +57,7 @@ class ExistsFilter extends AbstractFilter
                 continue;
             }
 
-            $description[sprintf('%s[%s]', self::QUERY_PARAMETER_KEY, $property)] = [
+            $description[sprintf('%s[%s]', $property, self::QUERY_PARAMETER_KEY)] = [
                 'property' => $property,
                 'type' => 'bool',
                 'required' => false,
@@ -66,6 +73,7 @@ class ExistsFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
+            !isset($value[self::QUERY_PARAMETER_KEY]) ||
             !$this->isPropertyEnabled($property) ||
             !$this->isPropertyMapped($property, $resourceClass, true) ||
             !$this->isNullableField($property, $resourceClass)
@@ -73,13 +81,13 @@ class ExistsFilter extends AbstractFilter
             return;
         }
 
-        if (in_array($value, ['true', '1', '', null], true)) {
+        if (in_array($value[self::QUERY_PARAMETER_KEY], ['true', '1', '', null], true)) {
             $value = true;
-        } elseif (in_array($value, ['false', '0'], true)) {
+        } elseif (in_array($value[self::QUERY_PARAMETER_KEY], ['false', '0'], true)) {
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid value for "%s[%s]", expected one of ( "%s" )', self::QUERY_PARAMETER_KEY, $property, implode('" | "', [
+                'exception' => new InvalidArgumentException(sprintf('Invalid value for "%s[%s]", expected one of ( "%s" )', $property, self::QUERY_PARAMETER_KEY, implode('" | "', [
                     'true',
                     'false',
                     '1',
@@ -121,14 +129,6 @@ class ExistsFilter extends AbstractFilter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function extractProperties(Request $request): array
-    {
-        return $request->query->get(self::QUERY_PARAMETER_KEY, []);
-    }
-
-    /**
      * Determines whether the given property refers to a nullable field.
      *
      * @param string $property
@@ -145,22 +145,20 @@ class ExistsFilter extends AbstractFilter
 
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isSingleValuedAssociation($field)) {
-                if ($metadata instanceof ClassMetadataInfo) {
-                    $associationMapping = $metadata->getAssociationMapping($field);
-
-                    return $this->isAssociationNullable($associationMapping);
-                } else {
+                if (!($metadata instanceof ClassMetadataInfo)) {
                     return false;
                 }
+
+                $associationMapping = $metadata->getAssociationMapping($field);
+
+                return $this->isAssociationNullable($associationMapping);
             }
 
             return true;
         }
 
-        if ($metadata->hasField($field)) {
-            if ($metadata instanceof ClassMetadataInfo) {
-                return $metadata->isNullable($field);
-            }
+        if ($metadata instanceof ClassMetadataInfo && $metadata->hasField($field)) {
+            return $metadata->isNullable($field);
         }
 
         return false;
