@@ -43,11 +43,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         foreach ($frameworkConfiguration as $frameworkParameters) {
             if (isset($frameworkParameters['serializer'])) {
-                $serializerConfig = $serializerConfig? : $frameworkParameters['serializer'];
+                $serializerConfig = $serializerConfig ?: $frameworkParameters['serializer'];
             }
 
             if (isset($frameworkParameters['property_info'])) {
-                $propertyInfoConfig = $propertyInfoConfig? : $frameworkParameters['property_info'];
+                $propertyInfoConfig = $propertyInfoConfig ?: $frameworkParameters['property_info'];
             }
         }
 
