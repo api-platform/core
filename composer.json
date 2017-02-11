@@ -40,6 +40,7 @@
         "phpdocumentor/type-resolver": "^0.2",
         "phpunit/phpunit": "^5.6.8",
         "psr/log": "^1.0",
+        "sensio/framework-extra-bundle": "^3.0",
         "symfony/asset": "^2.7 || ^3.0",
         "symfony/cache": "^3.1",
         "symfony/config": "^3.2",
