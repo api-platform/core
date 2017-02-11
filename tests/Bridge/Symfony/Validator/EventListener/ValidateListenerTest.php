@@ -36,8 +36,11 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy->create()->shouldNotBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
+        $request = new Request();
+        $request->setMethod('POST');
+
         $event = $this->prophesize(GetResponseForControllerResultEvent::class);
-        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
 
         $listener = new ValidateListener($validator, $resourceMetadataFactory);
         $listener->onKernelView($event->reveal());
