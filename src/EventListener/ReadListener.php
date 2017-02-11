@@ -52,7 +52,7 @@ final class ReadListener
             return;
         }
 
-        if (!$attributes['request']) {
+        if (!$attributes['receive']) {
             return;
         }
 

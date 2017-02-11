@@ -16,6 +16,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -26,6 +27,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ValidateListenerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testNotAnApiPlatformRequest()
+    {
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate()->shouldNotBeCalled();
+        $validator = $validatorProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create()->shouldNotBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
+
+        $listener = new ValidateListener($validator, $resourceMetadataFactory);
+        $listener->onKernelView($event->reveal());
+    }
+
     public function testValidatorIsCalled()
     {
         $data = new DummyEntity();
@@ -41,7 +59,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    public function testRequestIsFalse()
+    public function testDoNotCallWhenReceiveFlagIsFalse()
     {
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
@@ -81,11 +99,11 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expectedValidationGroups
      * @param mixed $data
-     * @param bool  $request
+     * @param bool  $receive
      *
      * @return array
      */
-    private function createEventObject($expectedValidationGroups, $data, bool $request = true)
+    private function createEventObject($expectedValidationGroups, $data, bool $receive = true)
     {
         $resourceMetadata = new ResourceMetadata(null, null, null, [
             'create' => [
@@ -94,7 +112,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        if ($request) {
+        if ($receive) {
             $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata)->shouldBeCalled();
         }
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -105,7 +123,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
             '_api_item_operation_name' => 'create',
             '_api_format' => 'json',
             '_api_mime_type' => 'application/json',
-            '_api_request' => $request,
+            '_api_receive' => $receive,
         ]);
 
         $request->setMethod(Request::METHOD_POST);

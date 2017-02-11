@@ -55,7 +55,7 @@ final class DeserializeListener
             return;
         }
 
-        if (!$attributes['request']) {
+        if (!$attributes['receive']) {
             return;
         }
 

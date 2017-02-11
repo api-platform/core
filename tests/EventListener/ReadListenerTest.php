@@ -30,16 +30,14 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
-        $request = new Request();
-
         $event = $this->prophesize(GetResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
 
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
-    public function testRequestIsFalse()
+    public function testDoNotCallWhenReceiveFlagIsFalse()
     {
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -47,7 +45,7 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
-        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_request' => false]);
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('PUT');
 
         $event = $this->prophesize(GetResponseEvent::class);

@@ -55,7 +55,7 @@ final class ValidateListener
             return;
         }
 
-        if (!$attributes['request']) {
+        if (!$attributes['receive']) {
             return;
         }
 

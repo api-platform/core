@@ -61,11 +61,11 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testDoNotCallWhenRequestRequestIsFalse()
+    public function testDoNotCallWhenReceiveFlagIsFalse()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
-        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_request' => false]);
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod(Request::METHOD_POST);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
