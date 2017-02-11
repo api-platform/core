@@ -12,10 +12,10 @@
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
