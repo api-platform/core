@@ -45,13 +45,17 @@ final class ValidateListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
+        if ($request->isMethodSafe(false) || $request->isMethod(Request::METHOD_DELETE)) {
+            return;
+        }
+
         try {
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         } catch (RuntimeException $e) {
             return;
         }
 
-        if ($request->isMethodSafe(false) || $request->isMethod(Request::METHOD_DELETE)) {
+        if (!$attributes['receive']) {
             return;
         }
 
