@@ -76,7 +76,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     public function testNotPrependSerializerWhenConfigExist()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => ['enabled' => false]])->shouldBeCalled();
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('serializer', $config);
@@ -89,7 +89,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     public function testNotPrependPropertyInfoWhenConfigExist()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['property_info' => ['enabled' => false]])->shouldBeCalled();
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['property_info' => ['enabled' => false]]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::any())->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::that(function (array $config) {
             return array_key_exists('property_info', $config);
@@ -112,7 +112,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     public function testPrependWhenNotEnabled()
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(['serializer' => []])->shouldBeCalled();
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => []]])->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
