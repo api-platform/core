@@ -55,6 +55,10 @@ final class DeserializeListener
             return;
         }
 
+        if (!$attributes['receive']) {
+            return;
+        }
+
         $format = $this->getFormat($request);
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 

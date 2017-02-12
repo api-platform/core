@@ -52,6 +52,10 @@ final class ReadListener
             return;
         }
 
+        if (!$attributes['receive']) {
+            return;
+        }
+
         if (isset($attributes['collection_operation_name'])) {
             $data = $this->getCollectionData($request, $attributes);
         } else {

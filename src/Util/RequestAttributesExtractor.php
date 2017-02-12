@@ -56,6 +56,12 @@ final class RequestAttributesExtractor
             throw new RuntimeException('One of the request attribute "_api_collection_operation_name" or "_api_item_operation_name" must be defined.');
         }
 
+        if (null === $apiRequest = $request->attributes->get('_api_receive')) {
+            $result['receive'] = true;
+        } else {
+            $result['receive'] = (bool) $apiRequest;
+        }
+
         return $result;
     }
 }
