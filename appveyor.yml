@@ -1,16 +1,17 @@
 build: false
 platform: x86
-clone_folder: c:\projects\dunglas\api-bundle
+clone_folder: c:\projects\api-platform\core
 
 cache:
   - '%LOCALAPPDATA%\Composer\files'
 
 init:
-  - SET PATH=c:\tools\php;%PATH%
+  - SET PATH=c:\tools\php71;%PATH%
 
 install:
-  - cinst -y php -i
-  - cd c:\tools\php
+  - ps: Set-Service wuauserv -StartupType Manual
+  - cinst -y php
+  - cd c:\tools\php71
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
