@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,17 +44,12 @@ final class ValidateListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || $request->isMethod(Request::METHOD_DELETE)) {
-            return;
-        }
-
-        try {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
-            return;
-        }
-
-        if (!$attributes['receive']) {
+        if (
+            $request->isMethodSafe(false)
+            || $request->isMethod(Request::METHOD_DELETE)
+            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || !$attributes['receive']
+        ) {
             return;
         }
 
