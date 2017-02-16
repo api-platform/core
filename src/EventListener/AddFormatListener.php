@@ -86,8 +86,11 @@ final class AddFormatListener
         }
 
         // Finally, if no Accept header nor Symfony request format is set, return the default format
-        reset($this->formats);
-        $request->setRequestFormat(each($this->formats)['key']);
+        foreach ($this->formats as $format => $mimeType) {
+            $request->setRequestFormat($format);
+
+            return;
+        }
     }
 
     /**

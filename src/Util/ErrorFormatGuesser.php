@@ -39,8 +39,10 @@ final class ErrorFormatGuesser
             return ['key' => $requestFormat, 'value' => $errorFormats[$requestFormat]];
         }
 
-        reset($errorFormats);
+        foreach ($errorFormats as $key => $value) {
+            return ['key' => $key, 'value' => $value];
+        }
 
-        return each($errorFormats);
+        return [];
     }
 }
