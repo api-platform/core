@@ -78,6 +78,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
@@ -94,7 +95,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $this->assertEquals(['name' => 'hello'], $normalizer->normalize($dummy));
+        $this->assertEquals(['name' => 'hello'], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
     public function testDenormalize()

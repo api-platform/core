@@ -43,31 +43,16 @@ class DummyOffer
      */
     private $value;
 
-    /**
-     * Get id.
-     *
-     * @return id
-     */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Get value.
-     *
-     * @return value
-     */
     public function getValue(): int
     {
         return $this->value;
     }
 
-    /**
-     * Set value.
-     *
-     * @param value the value to set
-     */
     public function setValue(int $value)
     {
         $this->value = $value;

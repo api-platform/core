@@ -46,13 +46,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['cache_key'] = $this->getHalCacheKey($format, $context);
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
+        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+        $context['api_normalize'] = true;
 
         $rawData = parent::normalize($object, $format, $context);
         if (!is_array($rawData)) {
             return $rawData;
         }
 
-        $data = ['_links' => ['self' => ['href' => $this->iriConverter->getIriFromItem($object)]]];
+        $data = ['_links' => ['self' => ['href' => $context['iri']]]];
         $components = $this->getComponents($object, $format, $context);
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'embedded');

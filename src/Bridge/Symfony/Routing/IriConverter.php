@@ -21,6 +21,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
@@ -93,9 +94,15 @@ final class IriConverter implements IriConverterInterface
         $resourceClass = $this->getObjectClass($item);
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, false);
 
-        $identifiers = $this->generateIdentifiersUrl($this->identifiersExtractor->getIdentifiersFromItem($item));
+        try {
+            $identifiers = $this->generateIdentifiersUrl($this->identifiersExtractor->getIdentifiersFromItem($item));
 
-        return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
+        } catch (RuntimeException $e) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+        }
     }
 
     /**

@@ -4,10 +4,11 @@ parameters:
     excludes_analyse:
         - tests/Fixtures/app/cache
     ignoreErrors:
-        - '#Call to an undefined method Symfony\\Component\\Routing\\Exception\\ExceptionInterface::getCode()#'
+        - '#Call to an undefined method Symfony\\Component\\Routing\\Exception\\ExceptionInterface::getCode\(\)#'
         - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
         - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]+#'
         - '#Call to an undefined method PHPUnit_Framework_MockObject_MockObject::[a-zA-Z0-9_]+\(\)#'
+        - '#Call to an undefined method Doctrine\\Common\\Persistence\\Mapping\\ClassMetadata::getAssociationMappings\(\)#'
 
         # False positives
         - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects Doctrine\\ORM\\Query\\Expr\\Base, Doctrine\\ORM\\Query\\Expr\\Join\[\] given#' # Fixed in Doctrine's master

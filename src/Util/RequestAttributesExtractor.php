@@ -39,9 +39,7 @@ final class RequestAttributesExtractor
      */
     public static function extractAttributes(Request $request)
     {
-        $result = [
-            'resource_class' => $request->attributes->get('_api_resource_class'),
-        ];
+        $result = ['resource_class' => $request->attributes->get('_api_resource_class')];
 
         if ($subresourceContext = $request->attributes->get('_api_subresource_context')) {
             $result['subresource_context'] = $subresourceContext;

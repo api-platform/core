@@ -12,12 +12,12 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/Answer",
-      "@id": "/answers/1",
-      "@type": "Answer",
-      "id": 1,
-      "content": "42",
-      "question": "/questions/1"
+        "@context": "\/contexts\/Answer",
+        "@id": "\/answers\/1",
+        "@type": "Answer",
+        "id": 1,
+        "content": "42",
+        "question": "\/questions\/1"
     }
     """
 

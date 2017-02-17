@@ -15,7 +15,7 @@ framework:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
     templating:
-        engines:                       ['twig'] # For Swagger YU
+        engines:                       ['twig'] # For Swagger UI
 
 doctrine:
     dbal:
@@ -49,6 +49,13 @@ api_platform:
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
         ApiPlatform\Core\Exception\InvalidArgumentException: 'HTTP_BAD_REQUEST'
+    http_cache:
+        invalidation:
+            enabled: true
+        max_age:        60
+        shared_max_age: 3600
+        vary:           ['Content-Type', 'Cookie']
+        public:         true
 
 fos_user:
     db_driver:        'orm'
@@ -157,3 +164,5 @@ services:
     logger:
         class: Psr\Log\NullLogger
 
+    api_platform.http_cache.purger:
+        class: ApiPlatform\Core\Tests\Fixtures\NullPurger
