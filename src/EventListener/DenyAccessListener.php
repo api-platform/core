@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -45,15 +44,11 @@ final class DenyAccessListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-
-        try {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             return;
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-
         if (isset($attributes['collection_operation_name'])) {
             $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], 'is_granted', null, true);
         } else {
