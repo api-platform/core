@@ -63,21 +63,13 @@ class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The request attribute "_api_resource_class" must be defined.
-     */
     public function testResourceClassNotSet()
     {
-        RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_item_operation_name' => 'get']));
+        $this->assertEmpty(RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_item_operation_name' => 'get'])));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage One of the request attribute "_api_collection_operation_name" or "_api_item_operation_name" must be defined.
-     */
     public function testOperationNotSet()
     {
-        RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_resource_class' => 'Foo']));
+        $this->assertEmpty(RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_resource_class' => 'Foo'])));
     }
 }
