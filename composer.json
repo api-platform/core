@@ -46,6 +46,7 @@
         "symfony/config": "^3.2",
         "symfony/dependency-injection": "^2.7 || ^3.0",
         "symfony/doctrine-bridge": "^2.8 || ^3.0",
+        "symfony/expression-language": "^2.8 || ^3.0",
         "symfony/phpunit-bridge": "^2.7 || ^3.0",
         "symfony/security": "^2.7 || ^3.0",
         "symfony/templating": "^2.7 || ^3.0",
@@ -59,7 +60,9 @@
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
+        "symfony/expression-language": "To use authorization features.",
         "symfony/config": "To load XML configuration files.",
+        "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration."
     },
     "autoload": {
