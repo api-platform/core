@@ -11,14 +11,18 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -418,6 +422,42 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $relatedDummy2 = new RelatedDummy();
         $relatedDummy2->setName('RelatedDummy without friends');
         $this->manager->persist($relatedDummy2);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is an answer :answer to the question :question
+     */
+    public function thereIsAnAnswerToTheQuestion($a, $q)
+    {
+        $answer = new Answer();
+        $answer->setContent($a);
+
+        $question = new Question();
+        $question->setContent($q);
+
+        $question->setAnswer($answer);
+
+        $this->manager->persist($answer);
+        $this->manager->persist($question);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb nodes in a container :uuid
+     */
+    public function thereAreNodesInAContainer($nb, $uuid)
+    {
+        $container = new Container();
+        $container->setId($uuid);
+        $this->manager->persist($container);
+
+        for ($i = 0; $i < $nb; ++$i) {
+            $node = new Node();
+            $node->setContainer($container);
+            $node->setSerial($i);
+            $this->manager->persist($node);
+        }
 
         $this->manager->flush();
     }

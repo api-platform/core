@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -33,9 +34,9 @@ final class RouteNameResolver implements RouteNameResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteName(string $resourceClass, bool $collection): string
+    public function getRouteName(string $resourceClass, $operationType): string
     {
-        $operationType = $collection ? 'collection' : 'item';
+        $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
             $currentResourceClass = $route->getDefault('_api_resource_class');

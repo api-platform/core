@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -395,12 +396,19 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (
-            $attributeValue &&
             $type &&
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $context);
+            /*
+             * On a subresource, we know the value of the identifiers.
+             * If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri
+             */
+            if (null === $attributeValue && $context['operation_type'] === OperationType::SUBRESOURCE && isset($context['subresource_resources'][$className])) {
+                return $this->iriConverter->getItemIriFromResourceClass($className, $context['subresource_resources'][$className]);
+            } elseif ($attributeValue) {
+                return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $context);
+            }
         }
 
         return $this->serializer->normalize($attributeValue, $format, $context);

@@ -139,9 +139,8 @@ services:
 
     app.related_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact' } ]
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
-
 
     logger:
         class: Psr\Log\NullLogger

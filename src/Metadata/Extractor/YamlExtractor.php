@@ -107,6 +107,7 @@ final class YamlExtractor extends AbstractExtractor
                 'identifier' => $this->phpize($propertyValues, 'identifier', 'bool'),
                 'iri' => $this->phpize($propertyValues, 'iri', 'string'),
                 'attributes' => $propertyValues['attributes'] ?? null,
+                'subresource' => $this->phpize($propertyValues, 'subresource', 'bool'),
             ];
         }
     }

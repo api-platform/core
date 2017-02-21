@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -103,7 +104,31 @@ final class IriConverter implements IriConverterInterface
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         try {
-            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, true), [], $referenceType);
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::COLLECTION), [], $referenceType);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    {
+        try {
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM), $identifiers, $referenceType);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubresourceIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    {
+        try {
+            return $this->router->generate($this->routeNameResolver->getRouteName($resourceClass, OperationType::SUBRESOURCE), $identifiers, $referenceType);
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }

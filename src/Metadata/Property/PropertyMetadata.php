@@ -33,8 +33,9 @@ final class PropertyMetadata
     private $identifier;
     private $childInherited;
     private $attributes;
+    private $subresource;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, bool $subresource = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -47,6 +48,7 @@ final class PropertyMetadata
         $this->iri = $iri;
         $this->childInherited = $childInherited;
         $this->attributes = $attributes;
+        $this->subresource = $subresource;
     }
 
     /**
@@ -324,6 +326,19 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->childInherited = $childInherited;
+
+        return $metadata;
+    }
+
+    public function hasSubresource()
+    {
+        return $this->subresource;
+    }
+
+    public function withSubresource(bool $subresource = null): self
+    {
+        $metadata = clone $this;
+        $metadata->subresource = $subresource;
 
         return $metadata;
     }

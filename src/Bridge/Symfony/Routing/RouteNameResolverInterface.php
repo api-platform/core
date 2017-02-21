@@ -25,12 +25,12 @@ interface RouteNameResolverInterface
     /**
      * Finds the route name for a resource.
      *
-     * @param string $resourceClass
-     * @param bool   $collection
+     * @param string      $resourceClass
+     * @param bool|string $operationType
      *
      * @throws InvalidArgumentException
      *
      * @return string
      */
-    public function getRouteName(string $resourceClass, bool $collection): string;
+    public function getRouteName(string $resourceClass, $operationType): string;
 }

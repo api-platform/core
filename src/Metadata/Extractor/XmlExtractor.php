@@ -130,6 +130,7 @@ final class XmlExtractor extends AbstractExtractor
                 'identifier' => $this->phpize($property, 'identifier', 'bool'),
                 'iri' => $this->phpize($property, 'iri', 'string'),
                 'attributes' => $this->getAttributes($property, 'attribute'),
+                'subresource' => $this->phpize($property, 'subresource', 'bool'),
             ];
         }
 
