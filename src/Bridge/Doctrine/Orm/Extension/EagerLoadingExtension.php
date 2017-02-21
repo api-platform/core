@@ -31,6 +31,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $resourceMetadataFactory;
     private $maxJoins;
