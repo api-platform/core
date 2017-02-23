@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Util\PaginationHelper;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -48,8 +49,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
+    private $paginationHelper;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null, PaginationHelper $paginationHelper = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -60,6 +62,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->urlGenerator = $urlGenerator;
         $this->filterCollection = $filterCollection;
         $this->nameConverter = $nameConverter;
+        $this->paginationHelper = $paginationHelper;
     }
 
     /**
@@ -208,6 +211,11 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $pathOperation['parameters'] = $parameters;
             }
 
+            $paginationParameters = $this->getPaginationParameters($resourceClass, $operationName);
+            if (!empty($paginationParameters)) {
+                $pathOperation['parameters'] = empty($pathOperation['parameters']) ? $pathOperation['parameters'] : array_merge($pathOperation['parameters'], $paginationParameters);
+            }
+
             return $pathOperation;
         }
 
@@ -227,6 +235,55 @@ final class DocumentationNormalizer implements NormalizerInterface
         ];
 
         return $pathOperation;
+    }
+
+    /**
+     * @param string $resourceClass
+     * @param string $operationName
+     * @return array
+     */
+    protected function getPaginationParameters(string $resourceClass, string $operationName)
+    {
+        $this->paginationHelper->setResourceAndOperation($resourceClass, $operationName);
+
+        if (!$this->paginationHelper->isResourcePaginationEnabled()) {
+            return [];
+        }
+
+        $paginationParameters = [];
+
+        if ($this->paginationHelper->getConfig('clientEnabled')) {
+            $paginationParameters[] = [
+                "name" => $this->paginationHelper->getConfig('parameterNameEnabled'),
+                "in" => "query",
+                "type" => "boolean",
+                "description" => "Enable pagination",
+                "default" => $this->paginationHelper->isPaginationEnabled(),
+            ];
+        }
+
+        $paginationParameters[] = [
+            "name" => $this->paginationHelper->getConfig('parameterNamePage'),
+            "in" => "query",
+            "type" => "integer",
+            "description" => "Page number",
+            "default" => 1,
+            "minimum" => 1
+        ];
+
+        if ($this->paginationHelper->getConfig('clientItemsPerPage')) {
+            $paginationParameters[] = [
+                "name" => $this->paginationHelper->getConfig('parameterNameItemsPerPage'),
+                "in" => "query",
+                "type" => "integer",
+                "description" => "Items per page",
+                "default" => $this->paginationHelper->getItemsPerPage(),
+                "minimum" => 1,
+                "maximum" => $this->paginationHelper->getConfig('maximumItemsPerPage')
+            ];
+        }
+
+        return $paginationParameters;
     }
 
     /**
