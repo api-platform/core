@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Api\IdentifiersExtractor;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -43,8 +45,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $iriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
+    protected $identifiersExtractor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
@@ -54,8 +57,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
 
+        if (null === $identifiersExtractor) {
+            @trigger_error('Not injecting IdentifiersExtractorInterface is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3');
+            $this->identifiersExtractor = new IdentifiersExtractor($this->propertyNameCollectionFactory, $this->propertyMetadataFactory, $this->propertyAccessor);
+        } else {
+            $this->identifiersExtractor = $identifiersExtractor;
+        }
+
         $this->setCircularReferenceHandler(function ($object) {
-            return $this->iriConverter->getIriFromItem($object);
+            return $this->hasIri($object) ? $this->iriConverter->getIriFromItem($object) : spl_object_hash($object);
         });
     }
 
@@ -86,7 +96,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context = $this->initContext($resourceClass, $context);
         $context['api_normalize'] = true;
 
-        if (isset($context['resources'])) {
+        if (isset($context['resources']) && $this->hasIri($object)) {
             $resource = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
             $context['resources'][$resource] = $resource;
         }
@@ -421,7 +431,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
+     * Normalizes a relation.
      *
      * @param PropertyMetadata $propertyMetadata
      * @param mixed            $relatedObject
@@ -433,7 +443,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
-        if ($propertyMetadata->isReadableLink()) {
+        if ($propertyMetadata->isReadableLink() || !$this->hasIri($relatedObject)) {
             return $this->serializer->normalize($relatedObject, $format, $this->createRelationSerializationContext($resourceClass, $context));
         }
 
@@ -443,5 +453,21 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $iri;
+    }
+
+    /**
+     * Determines whether an item has an IRI.
+     *
+     * @param object $object
+     *
+     * @return bool
+     *
+     * @internal
+     */
+    protected function hasIri($object): bool
+    {
+        $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($object);
+
+        return (bool) array_filter($identifiers);
     }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -34,18 +35,24 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
      */
-    public function testDonTSupportDenormalization()
+    public function testDontSupportDenormalization()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', ItemNormalizer::FORMAT));
@@ -66,11 +73,17 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $resourceClassResolverProphecy->getResourceClass($dummy)->willReturn(Dummy::class)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass($std)->willThrow(new InvalidArgumentException())->shouldBeCalled();
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonhal'));
@@ -98,6 +111,9 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class)->shouldBeCalled();
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($dummy)->willReturn(['id']);
+
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
@@ -106,7 +122,11 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            $identifiersExtractorProphecy->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -141,6 +161,9 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class)->shouldBeCalled();
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($dummy)->willReturn(['id']);
+
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello')->shouldBeCalled();
@@ -149,7 +172,11 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            $identifiersExtractorProphecy->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
