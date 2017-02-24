@@ -11,7 +11,6 @@
 
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,13 +44,12 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe(false) || $request->isMethod(Request::METHOD_DELETE)) {
-            return;
-        }
-
-        try {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if (
+            $request->isMethodSafe(false)
+            || $request->isMethod(Request::METHOD_DELETE)
+            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || !$attributes['receive']
+        ) {
             return;
         }
 

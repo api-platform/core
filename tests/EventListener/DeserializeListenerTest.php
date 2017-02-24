@@ -61,6 +61,24 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
+    public function testDoNotCallWhenReceiveFlagIsFalse()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
+        $request->setMethod(Request::METHOD_POST);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize()->shouldNotBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
+
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
     /**
      * @dataProvider methodProvider
      */
