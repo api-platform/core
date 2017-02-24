@@ -52,7 +52,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             return;
         }
 
-        $this->paginationHelper->setResourceAndOperation( $resourceClass, $operationName );
+        $this->paginationHelper->setResourceAndOperation($resourceClass, $operationName);
         if (!$this->paginationHelper->isPaginationEnabled()) {
             return;
         }
@@ -75,7 +75,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             return false;
         }
 
-        $this->paginationHelper->setResourceAndOperation( $resourceClass, $operationName );
+        $this->paginationHelper->setResourceAndOperation($resourceClass, $operationName);
 
         return $this->paginationHelper->isPaginationEnabled();
     }

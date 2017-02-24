@@ -240,6 +240,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * @param string $resourceClass
      * @param string $operationName
+     *
      * @return array
      */
     protected function getPaginationParameters(string $resourceClass, string $operationName)
@@ -252,34 +253,34 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $paginationParameters = [];
 
-        if ($this->paginationHelper->getConfig('clientEnabled')) {
+        if ($this->paginationHelper->isClientPaginationEnabledByDefault()) {
             $paginationParameters[] = [
-                "name" => $this->paginationHelper->getConfig('parameterNameEnabled'),
-                "in" => "query",
-                "type" => "boolean",
-                "description" => "Enable pagination",
-                "default" => $this->paginationHelper->isPaginationEnabled(),
+                'name' => $this->paginationHelper->getParameterNameEnabled(),
+                'in' => 'query',
+                'type' => 'boolean',
+                'description' => 'Enable pagination',
+                'default' => $this->paginationHelper->isPaginationEnabled(),
             ];
         }
 
         $paginationParameters[] = [
-            "name" => $this->paginationHelper->getConfig('parameterNamePage'),
-            "in" => "query",
-            "type" => "integer",
-            "description" => "Page number",
-            "default" => 1,
-            "minimum" => 1
+            'name' => $this->paginationHelper->getParameterNamePage(),
+            'in' => 'query',
+            'type' => 'integer',
+            'description' => 'Page number',
+            'default' => 1,
+            'minimum' => 1,
         ];
 
-        if ($this->paginationHelper->getConfig('clientItemsPerPage')) {
+        if ($this->paginationHelper->isClientItemsPerPageEnabledByDefault()) {
             $paginationParameters[] = [
-                "name" => $this->paginationHelper->getConfig('parameterNameItemsPerPage'),
-                "in" => "query",
-                "type" => "integer",
-                "description" => "Items per page",
-                "default" => $this->paginationHelper->getItemsPerPage(),
-                "minimum" => 1,
-                "maximum" => $this->paginationHelper->getConfig('maximumItemsPerPage')
+                'name' => $this->paginationHelper->getParameterNameItemsPerPage(),
+                'in' => 'query',
+                'type' => 'integer',
+                'description' => 'Items per page',
+                'default' => $this->paginationHelper->getItemsPerPage(),
+                'minimum' => 1,
+                'maximum' => $this->paginationHelper->getDefaultMaximumItemsPerPage(),
             ];
         }
 

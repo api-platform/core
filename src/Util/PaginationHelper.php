@@ -1,11 +1,11 @@
 <?php
+
 namespace ApiPlatform\Core\Util;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
-
 
 class PaginationHelper
 {
@@ -26,10 +26,8 @@ class PaginationHelper
     private $resourceClass;
     private $operationName;
 
-
     /**
-     * PaginationHelper constructor.
-     * @param RequestStack $requestStack
+     * @param RequestStack                     $requestStack
      * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
      */
     public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory)
@@ -38,15 +36,14 @@ class PaginationHelper
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
-
     /**
-     * @param bool $enabled
-     * @param bool $clientEnabled
-     * @param bool $clientItemsPerPage
-     * @param int $itemsPerPage
-     * @param string $parameterNamePage
-     * @param string $parameterNameEnabled
-     * @param string $parameterNameItemsPerPage
+     * @param bool     $enabled
+     * @param bool     $clientEnabled
+     * @param bool     $clientItemsPerPage
+     * @param int      $itemsPerPage
+     * @param string   $parameterNamePage
+     * @param string   $parameterNameEnabled
+     * @param string   $parameterNameItemsPerPage
      * @param int|null $maximumItemsPerPage
      */
     public function setConfig(bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $parameterNamePage = 'page', string $parameterNameEnabled = 'pagination', string $parameterNameItemsPerPage = 'itemsPerPage', int $maximumItemsPerPage = null)
@@ -62,23 +59,8 @@ class PaginationHelper
         $this->parameterNameItemsPerPage = $parameterNameItemsPerPage;
     }
 
-
     /**
-     * @param $name
-     * @return null
-     */
-    public function getConfig($name)
-    {
-        if (!in_array($name, ['enabled', 'clientEnabled', 'clientItemsPerPage', 'itemsPerPage', 'maximumItemsPerPage', 'parameterNamePage', 'parameterNameEnabled', 'parameterNameItemsPerPage'])) {
-            return null;
-        }
-
-        return $this->$name;
-    }
-
-
-    /**
-     * @param string $resourceClass
+     * @param string      $resourceClass
      * @param string|null $operationName
      */
     public function setResourceAndOperation(string $resourceClass, string $operationName = null)
@@ -87,9 +69,9 @@ class PaginationHelper
         $this->operationName = $operationName;
     }
 
-
     /**
      * @return null|\Symfony\Component\HttpFoundation\Request
+     *
      * @throws Exception
      */
     protected function getRequest()
@@ -102,9 +84,9 @@ class PaginationHelper
         return $request;
     }
 
-
     /**
      * @return ResourceMetadata
+     *
      * @throws Exception
      */
     protected function getResourceMetadata(): ResourceMetadata
@@ -120,11 +102,11 @@ class PaginationHelper
         return $this->resourceMetadata;
     }
 
-
     /**
      * @param string $key
-     * @param null $defaultValue
-     * @param bool $resourceFallback
+     * @param null   $defaultValue
+     * @param bool   $resourceFallback
+     *
      * @return mixed
      */
     protected function getResourceMetadataAttribute(string $key, $defaultValue = null, bool $resourceFallback = false)
@@ -158,7 +140,6 @@ class PaginationHelper
         return $enabled;
     }
 
-
     /**
      * @return float
      */
@@ -169,23 +150,22 @@ class PaginationHelper
         $maximumItemsPerPage = $this->getResourceMetadataAttribute('maximum_items_per_page', $this->maximumItemsPerPage, true);
 
         if ($clientItemsPerPage) {
-            $itemsPerPage = (float)$this->getRequest()->query->get($this->parameterNameItemsPerPage, $itemsPerPage);
+            $itemsPerPage = (float) $this->getRequest()->query->get($this->parameterNameItemsPerPage, $itemsPerPage);
 
             if (null !== $this->maximumItemsPerPage && $itemsPerPage >= $maximumItemsPerPage) {
                 $itemsPerPage = $maximumItemsPerPage;
             }
         }
 
-        return (float)$itemsPerPage;
+        return (float) $itemsPerPage;
     }
-
 
     /**
      * @return int
      */
     public function getPage(): int
     {
-        $page = (int)$this->getRequest()->query->get($this->parameterNamePage, 1);
+        $page = (int) $this->getRequest()->query->get($this->parameterNamePage, 1);
 
         if ($page < 1) {
             $page = 1;
@@ -194,4 +174,56 @@ class PaginationHelper
         return $page;
     }
 
+    /**
+     * @return bool
+     */
+    public function isPaginationEnabledByDefault(): bool
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClientPaginationEnabledByDefault(): bool
+    {
+        return $this->clientEnabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClientItemsPerPageEnabledByDefault(): bool
+    {
+        return $this->clientItemsPerPage;
+    }
+
+    public function getDefaultMaximumItemsPerPage()
+    {
+        return $this->maximumItemsPerPage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParameterNamePage(): string
+    {
+        return $this->parameterNamePage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParameterNameEnabled(): string
+    {
+        return $this->parameterNameEnabled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParameterNameItemsPerPage(): string
+    {
+        return $this->parameterNameItemsPerPage;
+    }
 }
