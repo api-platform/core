@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace ApiPlatform\Core\Util;
 
@@ -70,9 +78,9 @@ class PaginationHelper
     }
 
     /**
-     * @return null|\Symfony\Component\HttpFoundation\Request
-     *
      * @throws Exception
+     *
+     * @return null|\Symfony\Component\HttpFoundation\Request
      */
     protected function getRequest()
     {
@@ -85,9 +93,9 @@ class PaginationHelper
     }
 
     /**
-     * @return ResourceMetadata
-     *
      * @throws Exception
+     *
+     * @return ResourceMetadata
      */
     protected function getResourceMetadata(): ResourceMetadata
     {
