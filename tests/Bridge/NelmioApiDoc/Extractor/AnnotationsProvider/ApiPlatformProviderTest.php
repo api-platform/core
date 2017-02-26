@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\NelmioApiDoc\Extractor\AnnotationsProvider;
+namespace ApiPlatform\Core\Tests\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;

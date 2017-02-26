@@ -59,7 +59,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Test
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.xml';
 
-        (new ExtractorPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class);
+        (new ExtractorPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create('ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist');
     }
 
     /**
@@ -107,7 +107,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Test
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourcenotfound.yml';
 
-        (new ExtractorPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist::class);
+        (new ExtractorPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create('ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThisDoesNotExist');
     }
 
     /**

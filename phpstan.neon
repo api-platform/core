@@ -1,0 +1,5 @@
+parameters:
+    autoload_files:
+        - tests/Fixtures/app/AppKernel.php
+    excludes_analyse:
+        - tests/Fixtures/app/cache

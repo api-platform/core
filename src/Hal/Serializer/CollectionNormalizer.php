@@ -68,9 +68,9 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
-        $paginated = $isPaginator = $object instanceof PaginatorInterface;
 
-        if ($isPaginator) {
+        $currentPage = $lastPage = $itemsPerPage = null;
+        if ($paginated = $isPaginator = $object instanceof PaginatorInterface) {
             $currentPage = $object->getCurrentPage();
             $lastPage = $object->getLastPage();
             $itemsPerPage = $object->getItemsPerPage();
@@ -78,15 +78,15 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $paginated = 1. !== $lastPage;
         }
 
-        $data = [
-            '_links' => [
-                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
-            ],
-        ];
+        $data = ['_links' => [
+            'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage),
+        ]];
 
         if ($paginated) {
-            $data['_links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-            $data['_links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            $data['_links'] = [
+                'first' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.),
+                'last' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage),
+            ];
 
             if (1. !== $currentPage) {
                 $data['_links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);

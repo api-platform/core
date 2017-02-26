@@ -18,6 +18,7 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - composer global require phpstan/phpstan:0.7-dev # only 0.7 is compatible with Symfony
   - npm install -g swagger-cli
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
@@ -36,6 +37,7 @@ script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
+  - if [[ $lint = 1 ]]; phpstan analyse -c phpstan.neon -l1 --ansi src tests; fi
 
 after_success:
   - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar; fi

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\Action;
+namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction;
 use ApiPlatform\Core\Documentation\Documentation;
