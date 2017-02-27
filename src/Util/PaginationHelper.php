@@ -52,9 +52,6 @@ class PaginationHelper
         $this->operationName = $operationName;
     }
 
-    /**
-     * @return bool
-     */
     public function isResourcePaginationEnabled(): bool
     {
         $enabled = $this->getResourceMetadataAttribute('pagination_enabled', $this->enabled, true);
@@ -63,9 +60,6 @@ class PaginationHelper
         return $enabled || $clientEnabled;
     }
 
-    /**
-     * @return bool
-     */
     public function isPaginationEnabled(): bool
     {
         $enabled = $this->getResourceMetadataAttribute('pagination_enabled', $this->enabled, true);
@@ -78,29 +72,25 @@ class PaginationHelper
         return (bool) $enabled;
     }
 
-    /**
-     * @return float
-     */
-    public function getItemsPerPage(): float
+    public function getItemsPerPage(): int
     {
         $itemsPerPage = $this->getResourceMetadataAttribute('pagination_items_per_page', $this->itemsPerPage, true);
         $clientItemsPerPage = $this->getResourceMetadataAttribute('pagination_client_items_per_page', $this->clientItemsPerPage, true);
         $maximumItemsPerPage = $this->getResourceMetadataAttribute('maximum_items_per_page', $this->maximumItemsPerPage, true);
 
         if ($clientItemsPerPage) {
-            $itemsPerPage = (float) $this->getRequestParameter($this->parameterNameItemsPerPage, $itemsPerPage);
-
-            if (null !== $this->maximumItemsPerPage && $itemsPerPage >= $maximumItemsPerPage) {
-                $itemsPerPage = $maximumItemsPerPage;
-            }
+            $itemsPerPage = (int) $this->getRequestParameter($this->parameterNameItemsPerPage, $itemsPerPage);
         }
 
-        return (float) $itemsPerPage;
+        if ($itemsPerPage < 1) {
+            $itemsPerPage = 1;
+        } elseif (null !== $this->maximumItemsPerPage && $itemsPerPage >= $maximumItemsPerPage) {
+            $itemsPerPage = $maximumItemsPerPage;
+        }
+
+        return (int) $itemsPerPage;
     }
 
-    /**
-     * @return int
-     */
     public function getPage(): int
     {
         $page = (int) $this->getRequestParameter($this->parameterNamePage, 1);
@@ -112,68 +102,44 @@ class PaginationHelper
         return $page;
     }
 
-    /**
-     * @return bool
-     */
     public function isClientPaginationEnabled(): bool
     {
         return (bool) $this->getResourceMetadataAttribute('client_pagination_enabled', $this->clientEnabled, true);
     }
 
-    /**
-     * @return bool
-     */
     public function isClientItemsPerPageEnabled(): bool
     {
         return (bool) $this->getResourceMetadataAttribute('pagination_client_items_per_page', $this->clientItemsPerPage, true);
     }
 
-    /**
-     * @return int
-     */
     public function getMaximumItemsPerPage(): int
     {
         return (int) $this->getResourceMetadataAttribute('maximum_items_per_page', $this->maximumItemsPerPage, true);
     }
 
-    /**
-     * @return string
-     */
     public function getParameterNamePage(): string
     {
         return $this->parameterNamePage;
     }
 
-    /**
-     * @return string
-     */
     public function getParameterNameEnabled(): string
     {
         return $this->parameterNameEnabled;
     }
 
-    /**
-     * @return string
-     */
     public function getParameterNameItemsPerPage(): string
     {
         return $this->parameterNameItemsPerPage;
     }
 
-    /**
-     * @param string $key
-     * @param null   $default
-     *
-     * @return string
-     */
-    private function getRequestParameter(string $key, $default = null)
+    private function getRequestParameter(string $key, $default = null): string
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             return $default;
         }
 
-        return $request->query->get($key, $default);
+        return (string) $request->query->get($key, $default);
     }
 
     /**

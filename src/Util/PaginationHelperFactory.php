@@ -45,12 +45,6 @@ class PaginationHelperFactory
         $this->parameterNameItemsPerPage = $parameterNameItemsPerPage;
     }
 
-    /**
-     * @param string      $resourceClass
-     * @param string|null $operationName
-     *
-     * @return PaginationHelper
-     */
     public function create(string $resourceClass, string $operationName = null): PaginationHelper
     {
         return new PaginationHelper($this->requestStack, $this->resourceMetadataFactory, $resourceClass, $operationName, $this->enabled, $this->clientEnabled, $this->clientItemsPerPage, $this->itemsPerPage, $this->parameterNamePage, $this->parameterNameEnabled, $this->parameterNameItemsPerPage, $this->maximumItemsPerPage);

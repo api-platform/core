@@ -237,12 +237,6 @@ final class DocumentationNormalizer implements NormalizerInterface
         return $pathOperation;
     }
 
-    /**
-     * @param string $resourceClass
-     * @param string $operationName
-     *
-     * @return array
-     */
     private function getPaginationParameters(string $resourceClass, string $operationName): array
     {
         if (!$this->paginationHelperFactory) {
