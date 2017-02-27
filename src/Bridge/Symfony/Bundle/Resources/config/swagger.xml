@@ -16,7 +16,7 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.filters" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-            <argument type="service" id="api_platform.util.pagination_helper" />
+            <argument type="service" id="api_platform.util.pagination_helper_factory" />
 
             <tag name="serializer.normalizer" priority="16" />
         </service>

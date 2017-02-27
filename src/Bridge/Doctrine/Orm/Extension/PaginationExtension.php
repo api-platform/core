@@ -15,7 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\PaginationHelper;
+use ApiPlatform\Core\Util\PaginationHelperFactory;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
@@ -32,14 +32,18 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     private $managerRegistry;
     private $requestStack;
     private $resourceMetadataFactory;
-    private $paginationHelper;
+    private $paginationHelperFactory;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, PaginationHelper $paginationHelper)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null, PaginationHelperFactory $paginationHelperFactory = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->paginationHelper = $paginationHelper;
+
+        if (!$paginationHelperFactory) {
+            $paginationHelperFactory = new PaginationHelperFactory($requestStack, $resourceMetadataFactory, $enabled, $clientEnabled, $clientItemsPerPage, $itemsPerPage, $pageParameterName, $enabledParameterName, $itemsPerPageParameterName, $maximumItemPerPage);
+        }
+        $this->paginationHelperFactory = $paginationHelperFactory;
     }
 
     /**
@@ -52,16 +56,15 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             return;
         }
 
-        $this->paginationHelper->setResourceAndOperation($resourceClass, $operationName);
-        if (!$this->paginationHelper->isPaginationEnabled()) {
+        $paginationHelper = $this->paginationHelperFactory->create($resourceClass, $operationName);
+        if (!$paginationHelper->isPaginationEnabled()) {
             return;
         }
 
-        $itemsPerPage = $this->paginationHelper->getItemsPerPage();
-        $page = $this->paginationHelper->getPage();
+        $itemsPerPage = $paginationHelper->getItemsPerPage();
 
         $queryBuilder
-            ->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setFirstResult(($paginationHelper->getPage() - 1) * $itemsPerPage)
             ->setMaxResults($itemsPerPage);
     }
 
@@ -75,9 +78,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             return false;
         }
 
-        $this->paginationHelper->setResourceAndOperation($resourceClass, $operationName);
-
-        return $this->paginationHelper->isPaginationEnabled();
+        return $this->paginationHelperFactory->create($resourceClass, $operationName)->isPaginationEnabled();
     }
 
     /**

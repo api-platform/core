@@ -23,7 +23,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
-use ApiPlatform\Core\Util\PaginationHelper;
+use ApiPlatform\Core\Util\PaginationHelperFactory;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -49,9 +49,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
-    private $paginationHelper;
+    private $paginationHelperFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null, PaginationHelper $paginationHelper = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null, PaginationHelperFactory $paginationHelperFactory = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -62,7 +62,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->urlGenerator = $urlGenerator;
         $this->filterCollection = $filterCollection;
         $this->nameConverter = $nameConverter;
-        $this->paginationHelper = $paginationHelper;
+        $this->paginationHelperFactory = $paginationHelperFactory;
     }
 
     /**
@@ -212,8 +212,8 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             $paginationParameters = $this->getPaginationParameters($resourceClass, $operationName);
-            if (!empty($paginationParameters)) {
-                $pathOperation['parameters'] = empty($pathOperation['parameters']) ? $pathOperation['parameters'] : array_merge($pathOperation['parameters'], $paginationParameters);
+            if ($paginationParameters) {
+                $pathOperation['parameters'] = isset($pathOperation['parameters']) ? array_merge($pathOperation['parameters'], $paginationParameters) : $paginationParameters;
             }
 
             return $pathOperation;
@@ -243,28 +243,32 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    protected function getPaginationParameters(string $resourceClass, string $operationName)
+    private function getPaginationParameters(string $resourceClass, string $operationName): array
     {
-        $this->paginationHelper->setResourceAndOperation($resourceClass, $operationName);
+        if (!$this->paginationHelperFactory) {
+            return [];
+        }
 
-        if (!$this->paginationHelper->isResourcePaginationEnabled()) {
+        $paginationHelper = $this->paginationHelperFactory->create($resourceClass, $operationName);
+
+        if (!$paginationHelper->isResourcePaginationEnabled()) {
             return [];
         }
 
         $paginationParameters = [];
 
-        if ($this->paginationHelper->isClientPaginationEnabledByDefault()) {
+        if ($paginationHelper->isClientPaginationEnabled()) {
             $paginationParameters[] = [
-                'name' => $this->paginationHelper->getParameterNameEnabled(),
+                'name' => $paginationHelper->getParameterNameEnabled(),
                 'in' => 'query',
                 'type' => 'boolean',
                 'description' => 'Enable pagination',
-                'default' => $this->paginationHelper->isPaginationEnabled(),
+                'default' => $paginationHelper->isPaginationEnabled(),
             ];
         }
 
         $paginationParameters[] = [
-            'name' => $this->paginationHelper->getParameterNamePage(),
+            'name' => $paginationHelper->getParameterNamePage(),
             'in' => 'query',
             'type' => 'integer',
             'description' => 'Page number',
@@ -272,15 +276,15 @@ final class DocumentationNormalizer implements NormalizerInterface
             'minimum' => 1,
         ];
 
-        if ($this->paginationHelper->isClientItemsPerPageEnabledByDefault()) {
+        if ($paginationHelper->isClientItemsPerPageEnabled()) {
             $paginationParameters[] = [
-                'name' => $this->paginationHelper->getParameterNameItemsPerPage(),
+                'name' => $paginationHelper->getParameterNameItemsPerPage(),
                 'in' => 'query',
                 'type' => 'integer',
                 'description' => 'Items per page',
-                'default' => $this->paginationHelper->getItemsPerPage(),
+                'default' => $paginationHelper->getItemsPerPage(),
                 'minimum' => 1,
-                'maximum' => $this->paginationHelper->getDefaultMaximumItemsPerPage(),
+                'maximum' => $paginationHelper->getMaximumItemsPerPage(),
             ];
         }
 
