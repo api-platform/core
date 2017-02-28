@@ -50,7 +50,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         }
 
         if (($strict && isset($type) && $resourceClass !== $type) || !$this->isResourceClass($typeToFind)) {
-            if (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass)) {
+            if ($this->isResourceClass($resourceClass)) {
                 return $type;
             }
 
