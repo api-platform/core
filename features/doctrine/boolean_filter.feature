@@ -4,7 +4,7 @@ Feature: Boolean filter on collections
   I need to retrieve collections with boolean value
 
   @createSchema
-  Scenario: Get collection by dummyBoolean false
+  Scenario: Get collection by dummyBoolean true
     Given there is "15" dummy objects with dummyBoolean true
     When I send a "GET" request to "/dummies?dummyBoolean=true"
     Then the response status code should be 200
@@ -34,8 +34,11 @@ Feature: Boolean filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyBoolean=0"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyBoolean=true"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -70,8 +73,11 @@ Feature: Boolean filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyBoolean=1"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyBoolean=1"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -106,8 +112,11 @@ Feature: Boolean filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyBoolean=false"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyBoolean=false"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+           }
         }
       }
     }
@@ -144,8 +153,11 @@ Feature: Boolean filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?unknown=0"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?unknown=0"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+           }
         }
       }
     }
@@ -179,8 +191,11 @@ Feature: Boolean filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?unknown=1$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?unknown=1"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+           }
         }
       }
     }
