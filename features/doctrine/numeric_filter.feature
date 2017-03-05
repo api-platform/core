@@ -23,8 +23,11 @@ Feature: Numeric filter on collections
           "maxItems": 0
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?id=9.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?id=9.99$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -57,8 +60,11 @@ Feature: Numeric filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?id=10"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?id=10"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -95,8 +101,11 @@ Feature: Numeric filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?unknown=0"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?unknown=0"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -130,8 +139,11 @@ Feature: Numeric filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?unknown=1$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?unknown=1"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
