@@ -21,7 +21,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
-use Sanpi\Behatch\HttpCall\Request;
+use Behatch\HttpCall\Request;
 
 /**
  * Defines application features from the specific context.
