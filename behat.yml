@@ -6,8 +6,8 @@ default:
         - 'HydraContext'
         - 'SwaggerContext'
         - 'Behat\MinkExtension\Context\MinkContext'
-        - 'Sanpi\Behatch\Context\RestContext'
-        - 'Sanpi\Behatch\Context\JsonContext'
+        - 'Behatch\Context\RestContext'
+        - 'Behatch\Context\JsonContext'
   extensions:
     'Behat\Symfony2Extension':
       kernel:
@@ -32,5 +32,5 @@ coverage:
         - 'SwaggerContext'
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
-        - 'Sanpi\Behatch\Context\RestContext'
-        - 'Sanpi\Behatch\Context\JsonContext'
+        - 'Behatch\Context\RestContext'
+        - 'Behatch\Context\JsonContext'
