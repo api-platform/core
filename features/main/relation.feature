@@ -185,8 +185,11 @@ Feature: Relations support
           "maxItems": 1
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?relatedDummy=%2Frelated_dummies%2F1$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?relatedDummy=%2Frelated_dummies%2F1$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -218,8 +221,11 @@ Feature: Relations support
           "maxItems": 1
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?relatedDummies\\[\\]=%2Frelated_dummies%2F1$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?relatedDummies%5B%5D=%2Frelated_dummies%2F1$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }

@@ -49,8 +49,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^15$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[between\\]=12.99..15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bbetween%5D=12.99..15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -84,8 +87,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^30$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[between\\]=9.99..12.99..15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bbetween%5D=9.99..12.99..15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -128,8 +134,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^8$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[lt\\]=12.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Blt%5D=12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -180,8 +189,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^16$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[lte\\]=12.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Blte%5D=12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -223,8 +235,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^7$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgt%5D=15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -273,8 +288,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^14$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gte\\]=15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgte%5D=15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -316,8 +334,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^7$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=12.99\\&dummyPrice\\[lt\\]=19.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgt%5D=12.99&dummyPrice%5Blt%5D=19.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -343,8 +364,11 @@ Feature: Range filter on collections
         },
         "hydra:totalItems": {"pattern": "^0$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=19.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgt%5D=19.99$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
