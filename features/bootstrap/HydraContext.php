@@ -37,7 +37,7 @@ class HydraContext implements Context
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext('Sanpi\Behatch\Context\RestContext');
+        $this->restContext = $environment->getContext('Behatch\Context\RestContext');
     }
 
     /**

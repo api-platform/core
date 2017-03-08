@@ -75,7 +75,7 @@ Feature: Date filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05\\&page=1$"},
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05&page=1$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -152,7 +152,7 @@ Feature: Date filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05Z\\&page=1$"},
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05Z&page=1$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -191,7 +191,7 @@ Feature: Date filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05\\&dummyDate%5Bafter%5D=2015-04-05$"},
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bbefore%5D=2015-04-05&dummyDate%5Bafter%5D=2015-04-05$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -256,7 +256,7 @@ Feature: Date filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-06\\&dummyDate%5Bbefore%5D=2015-04-04$"},
+            "@id": {"pattern": "^/dummies\\?dummyDate%5Bafter%5D=2015-04-06&dummyDate%5Bbefore%5D=2015-04-04$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -296,8 +296,11 @@ Feature: Date filter on collections
           "maxItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -334,7 +337,7 @@ Feature: Date filter on collections
         "hydra:view": {
           "type": "object",
           "properties": {
-            "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28\\&relatedDummy_dummyDate%5Bafter%5D=2015-04-28$"},
+            "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28&relatedDummy_dummyDate%5Bafter%5D=2015-04-28$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -371,8 +374,11 @@ Feature: Date filter on collections
           "maxItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28T00%3A00%3A00%2B00%3A00$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?relatedDummy\\.dummyDate%5Bafter%5D=2015-04-28T00%3A00%3A00%2B00%3A00$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
