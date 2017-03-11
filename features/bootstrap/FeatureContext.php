@@ -235,6 +235,14 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsDummyObjectsWithDummyBoolean($nb, $bool)
     {
+        if (in_array($bool, ['true', '1', 1], true)) {
+            $bool = true;
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
+            $bool = false;
+        } else {
+            $expected = ['true', 'false', '1', '0'];
+            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+        }
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
         for ($i = 1; $i <= $nb; ++$i) {
@@ -242,7 +250,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDescription($descriptions[($i - 1) % 2]);
-            $dummy->setDummyBoolean((bool) $bool);
+            $dummy->setDummyBoolean($bool);
 
             $this->manager->persist($dummy);
         }
