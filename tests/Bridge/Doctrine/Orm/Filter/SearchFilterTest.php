@@ -14,9 +14,12 @@ namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Prophecy\Argument;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,7 +65,23 @@ class SearchFilterTest extends KernelTestCase
         self::bootKernel();
         $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->iriConverter = self::$kernel->getContainer()->get('api_platform.iri_converter');
+
+        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+            if (false !== strpos($args[0], '/related_dummies')) {
+                $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
+
+                return $relatedDummyProphecy->reveal();
+            }
+
+            throw new InvalidArgumentException();
+        });
+
+        $this->iriConverter = $iriConverterProphecy->reveal();
+
         $this->propertyAccessor = self::$kernel->getContainer()->get('property_accessor');
         $this->repository = $manager->getRepository(Dummy::class);
         $this->resourceClass = Dummy::class;
