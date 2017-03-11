@@ -74,7 +74,7 @@ final class ValidateListener
         }
 
         $violations = $this->validator->validate($data, null, $validationGroups);
-        if (0 !== count($violations)) {
+        if ($violations) {
             throw new ValidationException($violations);
         }
     }
