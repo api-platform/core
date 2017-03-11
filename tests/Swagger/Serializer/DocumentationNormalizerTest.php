@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\OAuth2\Config\OAuth2Config;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
@@ -65,6 +66,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
+        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -73,6 +76,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
+            $oauth2Config,
             $operationPathResolver,
             $urlGeneratorProphecy->reveal()
         );
@@ -271,6 +275,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
 
+        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -279,6 +285,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
+            $oauth2Config,
             $operationPathResolver,
             $urlGeneratorProphecy->reveal(),
             null,
@@ -384,6 +391,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
+        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -392,6 +401,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
+            $oauth2Config,
             $operationPathResolver,
             $urlGeneratorProphecy->reveal()
         );
@@ -570,6 +580,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
+        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -578,6 +590,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
+            $oauth2Config,
             $operationPathResolver,
             $urlGeneratorProphecy->reveal()
         );
@@ -759,6 +772,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
+        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -767,6 +782,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
+            $oauth2Config,
             $operationPathResolver,
             $urlGeneratorProphecy->reveal()
         );
@@ -930,6 +946,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
 
+        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $filters = new FilterCollection([
@@ -954,6 +972,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
+            $oauth2Config,
             $operationPathResolver,
             $urlGeneratorProphecy->reveal(),
             $filters

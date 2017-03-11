@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\OAuth2\Config\OAuth2Config;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -45,11 +46,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $operationPathResolver;
+    private $oauth2Config;
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, OAuth2Config $oauth2Config, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -57,6 +59,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
+        $this->oauth2Config = $oauth2Config;
         $this->urlGenerator = $urlGenerator;
         $this->filterCollection = $filterCollection;
         $this->nameConverter = $nameConverter;
@@ -508,6 +511,25 @@ final class DocumentationNormalizer implements NormalizerInterface
             ],
             'paths' => $paths,
         ];
+
+        if ($this->oauth2Config->isEnabled()) {
+            $doc['securityDefinitions'] = [
+                'oauth' => [
+                    'type'             => $this->oauth2Config->getType(),
+                    'description'      => 'OAuth2 client_credentials Grant',
+                    'flow'             => $this->oauth2Config->getFlow(),
+                    'tokenUrl'         => $this->oauth2Config->getTokenUrl(),
+                    'authorizationUrl' => $this->oauth2Config->getAuthorizationUrl(),
+                    'scopes'           => $this->oauth2Config->getScopes()
+                ]
+            ];
+
+            $doc['security'] = [
+                [
+                    'oauth' => []
+                ]
+            ];
+        }
 
         if ('' !== $description = $documentation->getDescription()) {
             $doc['info']['description'] = $description;
