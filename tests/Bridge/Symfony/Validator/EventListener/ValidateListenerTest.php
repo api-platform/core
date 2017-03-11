@@ -50,7 +50,6 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $violationsProphecy = $this->prophesize(ConstraintViolationListInterface::class);
-        $violationsProphecy->count()->willReturn(1)->shouldBeCalled();
         $violations = $violationsProphecy->reveal();
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
