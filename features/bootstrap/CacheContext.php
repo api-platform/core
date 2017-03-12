@@ -10,6 +10,7 @@
  */
 
 use Behat\Behat\Context\Context;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -29,7 +30,12 @@ class CacheContext implements Context
         $cacheDir = __DIR__.'/../../tests/Fixtures/app/cache';
 
         if ($fs->exists($cacheDir)) {
-            $fs->remove($cacheDir);
+            try {
+                $fs->remove($cacheDir);
+            } catch (IOException $e) {
+                echo "Impossible to remove $cacheDir";
+                echo $e->getMessage();
+            }
         }
     }
 }
