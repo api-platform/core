@@ -29,7 +29,7 @@ class OAuth2ConfigTest extends \PHPUnit_Framework_TestCase
             '/oauth/v2/token',
             '/oauth/v2/auth',
             [
-                'scope param'
+                'scope param',
             ]
         );
         $this->assertTrue($config->isEnabled());
@@ -53,7 +53,7 @@ class OAuth2ConfigTest extends \PHPUnit_Framework_TestCase
             '/oauth/v2/token',
             '/oauth/v2/auth',
             [
-                'scope param'
+                'scope param',
             ]
         );
         $this->assertEquals([
@@ -64,7 +64,7 @@ class OAuth2ConfigTest extends \PHPUnit_Framework_TestCase
             'flow' => 'application',
             'tokenUrl' => '/oauth/v2/token',
             'authorizationUrl' => '/oauth/v2/auth',
-            'scopes' => ['scope param']
+            'scopes' => ['scope param'],
         ], $config->serialize());
     }
 }

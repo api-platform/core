@@ -515,19 +515,19 @@ final class DocumentationNormalizer implements NormalizerInterface
         if ($this->oauth2Config->isEnabled()) {
             $doc['securityDefinitions'] = [
                 'oauth' => [
-                    'type'             => $this->oauth2Config->getType(),
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => $this->oauth2Config->getFlow(),
-                    'tokenUrl'         => $this->oauth2Config->getTokenUrl(),
+                    'type' => $this->oauth2Config->getType(),
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => $this->oauth2Config->getFlow(),
+                    'tokenUrl' => $this->oauth2Config->getTokenUrl(),
                     'authorizationUrl' => $this->oauth2Config->getAuthorizationUrl(),
-                    'scopes'           => $this->oauth2Config->getScopes()
-                ]
+                    'scopes' => $this->oauth2Config->getScopes(),
+                ],
             ];
 
             $doc['security'] = [
                 [
-                    'oauth' => []
-                ]
+                    'oauth' => [],
+                ],
             ];
         }
 

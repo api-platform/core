@@ -243,12 +243,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
             'securityDefinitions' => [
                 'oauth' => [
-                    'type'             => 'oauth2',
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => 'application',
-                    'tokenUrl'         => '/oauth/v2/token',
+                    'type' => 'oauth2',
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes'           => ['scope param']
+                    'scopes' => ['scope param'],
                 ]
             ],
             'security' => [['oauth' => []]],
@@ -354,12 +354,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
             'securityDefinitions' => [
                 'oauth' => [
-                    'type'             => 'oauth2',
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => 'application',
-                    'tokenUrl'         => '/oauth/v2/token',
+                    'type' => 'oauth2',
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes'           => ['scope param']
+                    'scopes' => ['scope param'],
                 ]
             ],
             'security' => [['oauth' => []]],
@@ -554,12 +554,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
             'securityDefinitions' => [
                 'oauth' => [
-                    'type'             => 'oauth2',
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => 'application',
-                    'tokenUrl'         => '/oauth/v2/token',
+                    'type' => 'oauth2',
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes'           => ['scope param']
+                    'scopes' => ['scope param'],
                 ]
             ],
             'security' => [['oauth' => []]],
@@ -754,12 +754,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
             'securityDefinitions' => [
                 'oauth' => [
-                    'type'             => 'oauth2',
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => 'application',
-                    'tokenUrl'         => '/oauth/v2/token',
+                    'type' => 'oauth2',
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes'           => ['scope param']
+                    'scopes' => ['scope param'],
                 ]
             ],
             'security' => [['oauth' => []]],
@@ -957,12 +957,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
             'securityDefinitions' => [
                 'oauth' => [
-                    'type'             => 'oauth2',
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => 'application',
-                    'tokenUrl'         => '/oauth/v2/token',
+                    'type' => 'oauth2',
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes'           => ['scope param']
+                    'scopes' => ['scope param'],
                 ]
             ],
             'security' => [['oauth' => []]],
@@ -1076,24 +1076,24 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
             'definitions' => new \ArrayObject([
                 'Dummy' => new \ArrayObject([
-                    'type'        => 'object',
+                    'type' => 'object',
                     'description' => 'This is a dummy.',
-                    'properties'  => [
+                    'properties' => [
                         'name' => new \ArrayObject([
                             'description' => 'This is a name.',
-                            'type'        => 'string',
+                            'type' => 'string',
                         ]),
                     ],
                 ]),
             ]),
             'securityDefinitions' => [
                 'oauth' => [
-                    'type'             => 'oauth2',
-                    'description'      => 'OAuth2 client_credentials Grant',
-                    'flow'             => 'application',
-                    'tokenUrl'         => '/oauth/v2/token',
+                    'type' => 'oauth2',
+                    'description' => 'OAuth2 client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes'           => ['scope param']
+                    'scopes' => ['scope param'],
                 ]
             ],
             'security' => [['oauth' => []]],

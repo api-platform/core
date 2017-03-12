@@ -77,7 +77,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
                 'flow' => 'application',
                 'tokenUrl' => '/oauth/v2/token',
                 'authorizationUrl' => '/oauth/v2/auth',
-                'scopes' => ['scope param']
+                'scopes' => ['scope param'],
             ],
             'swagger_data' => [
                 'url' => '/url',
@@ -102,7 +102,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
                 'flow' => 'application',
                 'tokenUrl' => '/oauth/v2/token',
                 'authorizationUrl' => '/oauth/v2/auth',
-                'scopes' => ['scope param']
+                'scopes' => ['scope param'],
             ],
             'swagger_data' => [
                 'url' => '/url',
@@ -145,7 +145,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
                 'flow' => 'application',
                 'tokenUrl' => '/oauth/v2/token',
                 'authorizationUrl' => '/oauth/v2/auth',
-                'scopes' => ['scope param']
+                'scopes' => ['scope param'],
             ],
             'swagger_data' => [
                 'url' => '/url',

@@ -72,7 +72,7 @@ final class SwaggerUiAction
             'title' => $this->title,
             'description' => $this->description,
             'formats' => $this->formats,
-            'oauth2' => $this->oauth2Config->serialize()
+            'oauth2' => $this->oauth2Config->serialize(),
         ];
 
         $swaggerData = [

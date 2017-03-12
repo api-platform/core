@@ -28,7 +28,7 @@ final class OAuth2Config implements \Serializable
     private $scopes;
 
     public function __construct(
-        bool $enabled = false,
+        bool $enabled,
         string $clientId,
         string $clientSecret,
         string $type,
@@ -57,7 +57,7 @@ final class OAuth2Config implements \Serializable
             'flow' => $this->flow,
             'tokenUrl' => $this->tokenUrl,
             'authorizationUrl' => $this->authorizationUrl,
-            'scopes' => $this->scopes
+            'scopes' => $this->scopes,
         ];
     }
 
