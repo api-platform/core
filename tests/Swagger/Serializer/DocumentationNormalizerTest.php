@@ -249,7 +249,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
                     'scopes' => ['scope param'],
-                ]
+                ],
             ],
             'security' => [['oauth' => []]],
         ];
@@ -360,7 +360,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
                     'scopes' => ['scope param'],
-                ]
+                ],
             ],
             'security' => [['oauth' => []]],
         ];
@@ -560,7 +560,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
                     'scopes' => ['scope param'],
-                ]
+                ],
             ],
             'security' => [['oauth' => []]],
         ];
@@ -760,7 +760,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
                     'scopes' => ['scope param'],
-                ]
+                ],
             ],
             'security' => [['oauth' => []]],
         ];
@@ -963,7 +963,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
                     'scopes' => ['scope param'],
-                ]
+                ],
             ],
             'security' => [['oauth' => []]],
         ];
@@ -1094,7 +1094,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
                     'scopes' => ['scope param'],
-                ]
+                ],
             ],
             'security' => [['oauth' => []]],
         ];
