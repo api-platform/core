@@ -77,7 +77,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'force_eager' => true,
             ],
             'collection' => [
-                'order' => null,
+                'order' => 'ASC',
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
