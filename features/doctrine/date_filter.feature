@@ -395,18 +395,18 @@ Feature: Date filter on collections
     And the JSON should be equal to:
     """
     {
-          "@context": "\/contexts\/Dummy",
-          "@id": "\/dummies",
+          "@context": "/contexts/Dummy",
+          "@id": "/dummies",
           "@type": "hydra:Collection",
           "hydra:member": [],
           "hydra:totalItems": 0,
           "hydra:view": {
-              "@id": "\/dummies?relatedDummy.dummyDate%5Bafter%5D=2015-04-28",
+              "@id": "/dummies?relatedDummy.dummyDate%5Bafter%5D=2015-04-28",
               "@type": "hydra:PartialCollectionView"
           },
           "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice}",
+              "hydra:template": "/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -467,6 +467,12 @@ Feature: Date filter on collections
                       "@type": "IriTemplateMapping",
                       "variable": "dummy",
                       "property": "dummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies.name",
+                      "property": "relatedDummies.name",
                       "required": false
                   },
                   {

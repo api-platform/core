@@ -60,13 +60,13 @@ Feature: Relations support
       "@context": "/contexts/RelatedDummy",
       "@id": "/related_dummies/1",
       "@type": "https://schema.org/Product",
+      "id": 1,
       "name": null,
+      "symfony": "symfony",
       "dummyDate": null,
       "thirdLevel": "/third_levels/1",
-      "relatedToDummyFriend": null,
+      "relatedToDummyFriend": [],
       "dummyBoolean": null,
-      "id": 1,
-      "symfony": "symfony",
       "age": null
     }
     """

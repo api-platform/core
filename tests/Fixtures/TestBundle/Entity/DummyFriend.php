@@ -42,7 +42,7 @@ class DummyFriend
      * @ORM\Column
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany"})
+     * @Groups({"fakemanytomany", "friends"})
      */
     private $name;
 
