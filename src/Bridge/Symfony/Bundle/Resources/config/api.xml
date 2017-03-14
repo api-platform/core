@@ -116,7 +116,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
         </service>
 
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
