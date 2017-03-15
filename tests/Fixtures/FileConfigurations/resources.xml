@@ -8,18 +8,20 @@
             description="Dummy resource"
             iri="someirischema"
     >
-        <itemOperation name="my_op_name">
-            <attribute name="method">GET</attribute>
-        </itemOperation>
-        <itemOperation name="my_other_op_name">
-            <attribute name="method">POST</attribute>
-        </itemOperation>
-
-        <collectionOperation name="my_collection_op">
-            <attribute name="method">POST</attribute>
-            <attribute name="path">the/collection/path</attribute>
-        </collectionOperation>
-
+        <itemOperations>
+            <itemOperation name="my_op_name">
+                <attribute name="method">GET</attribute>
+            </itemOperation>
+            <itemOperation name="my_other_op_name">
+                <attribute name="method">POST</attribute>
+            </itemOperation>
+        </itemOperations>
+        <collectionOperations>
+            <collectionOperation name="my_collection_op">
+                <attribute name="method">POST</attribute>
+                <attribute name="path">the/collection/path</attribute>
+            </collectionOperation>
+        </collectionOperations>
         <attribute name="normalization_context">
             <attribute name="groups">
                 <attribute>default</attribute>

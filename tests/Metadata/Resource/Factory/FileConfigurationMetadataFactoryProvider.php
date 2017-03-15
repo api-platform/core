@@ -64,4 +64,36 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
 
         return [[$resourceMetadata]];
     }
+
+    public function noCollectionOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withItemOperations(['my_op_name' => ['method' => 'POST']]);
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([]);
+
+        return [[$resourceMetadata]];
+    }
+
+    public function noItemOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withCollectionOperations(['my_op_name' => ['method' => 'POST']]);
+        $resourceMetadata = $resourceMetadata->withItemOperations([]);
+
+        return [[$resourceMetadata]];
+    }
+
+    public function legacyOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+          'my_op_name' => ['method' => 'POST'],
+          'my_other_op_name' => ['method' => 'GET'],
+        ]);
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([
+            'my_op_name' => ['method' => 'POST'],
+        ]);
+
+        return [[$resourceMetadata]];
+    }
 }

@@ -73,6 +73,53 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
+     * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @group legacy
+     * @dataProvider legacyOperationsResourceMetadataProvider
+     */
+    public function testLegacyOperationsResourceMetadata($expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/legacyoperations.xml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
+     * @dataProvider noCollectionOperationsResourceMetadataProvider
+     */
+    public function testXmlNoCollectionOperationsResourceMetadata($expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/nocollectionoperations.xml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
+     * @dataProvider noItemOperationsResourceMetadataProvider
+     */
+    public function testXmlNoItemOperationsResourceMetadata($expectedResourceMetadata)
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/noitemoperations.xml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
+        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
+
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+
+        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
+    }
+
+    /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      */
     public function testInvalidXmlResourceMetadataFactory()
@@ -102,6 +149,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
+     * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
      * @dataProvider resourceMetadataProvider
      */
     public function testXmlExistingParentResourceMetadataFactory(ResourceMetadata $expectedResourceMetadata)
