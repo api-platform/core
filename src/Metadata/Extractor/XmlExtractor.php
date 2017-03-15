@@ -43,24 +43,30 @@ final class XmlExtractor extends AbstractExtractor
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),
                 'description' => $this->phpize($resource, 'description', 'string'),
                 'iri' => $this->phpize($resource, 'iri', 'string'),
-                'itemOperations' => null,
-                'collectionOperations' => null,
+                'itemOperations' => $this->getOperations($resource, 'itemOperation'),
+                'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
                 'properties' => $this->getProperties($resource) ?: null,
             ];
-
-            if (isset($resource->itemOperations)) {
-                $this->resources[$resourceClass]['itemOperations'] = $this->getAttributes(
-                    $resource->itemOperations, 'itemOperation'
-                );
-            }
-
-            if (isset($resource->collectionOperations)) {
-                $this->resources[$resourceClass]['collectionOperations'] = $this->getAttributes(
-                    $resource->collectionOperations, 'collectionOperation'
-                );
-            }
         }
+    }
+
+    /**
+     * Return the array containing configured operations. Returns NULL if there is no operation configuration.
+     *
+     * @param \SimpleXMLElement $resource
+     * @param string            $operationType
+     * @return array|null
+     */
+    private function getOperations(\SimpleXMLElement $resource, string $operationType)
+    {
+        $operationsParent = $operationType . 's';
+
+        if (!isset($resource->$operationsParent)) {
+            return null;
+        }
+
+        return $this->getAttributes($resource->$operationsParent, $operationType);;
     }
 
     /**
