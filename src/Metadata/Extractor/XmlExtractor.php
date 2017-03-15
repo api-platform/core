@@ -49,14 +49,15 @@ final class XmlExtractor extends AbstractExtractor
                 'properties' => $this->getProperties($resource) ?: null,
             ];
 
-            if (property_exists($resource, 'itemOperations')) {
-                $this->resources[$resourceClass]['itemOperations'] =  $this->getAttributes(
+            if (isset($resource->itemOperations)) {
+                $this->resources[$resourceClass]['itemOperations'] = $this->getAttributes(
                     $resource->itemOperations, 'itemOperation'
                 );
             }
 
-            if (property_exists($resource, 'collectionOperations')) {
-                $this->resources[$resourceClass]['collectionOperations'] =  $this->getAttributes(
+            if (isset($resource->collectionOperations)) {
+                echo ":)";
+                $this->resources[$resourceClass]['collectionOperations'] = $this->getAttributes(
                     $resource->collectionOperations, 'collectionOperation'
                 );
             }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources>
+        <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy">
+            <itemOperations>
+                <itemOperation name="my_op_name">
+                    <attribute name="method">POST</attribute>
+                </itemOperation>
+            </itemOperations>
+
+            <collectionOperations />
+        </resource>
+</resources>

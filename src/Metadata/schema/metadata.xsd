@@ -27,8 +27,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="itemOperations">
-        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="itemOperation" minOccurs="1" maxOccurs="unbounded" type="itemOperation"/>
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="itemOperation" minOccurs="0" maxOccurs="unbounded" type="itemOperation"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -40,8 +40,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="collectionOperations">
-        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="collectionOperation" minOccurs="1" maxOccurs="unbounded" type="itemOperation"/>
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="collectionOperation" minOccurs="0" maxOccurs="unbounded" type="collectionOperation"/>
         </xsd:sequence>
     </xsd:complexType>
 
