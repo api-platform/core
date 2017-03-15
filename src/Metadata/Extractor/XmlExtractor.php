@@ -66,7 +66,7 @@ final class XmlExtractor extends AbstractExtractor
             return null;
         }
 
-        return $this->getAttributes($resource->$operationsParent, $operationType);;
+        return $this->getAttributes($resource->$operationsParent, $operationType);
     }
 
     /**
