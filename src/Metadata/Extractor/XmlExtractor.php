@@ -56,14 +56,15 @@ final class XmlExtractor extends AbstractExtractor
      *
      * @param \SimpleXMLElement $resource
      * @param string            $operationType
+     *
      * @return array|null
      */
     private function getOperations(\SimpleXMLElement $resource, string $operationType)
     {
-        $operationsParent = $operationType . 's';
+        $operationsParent = $operationType.'s';
 
         if (!isset($resource->$operationsParent)) {
-            return null;
+            return;
         }
 
         return $this->getAttributes($resource->$operationsParent, $operationType);
