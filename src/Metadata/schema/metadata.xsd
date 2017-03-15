@@ -14,6 +14,8 @@
 
     <xsd:complexType name="resource">
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="itemOperation" minOccurs="0" maxOccurs="unbounded" type="itemOperation"/>
+                <xsd:element name="collectionOperation" minOccurs="0" maxOccurs="unbounded" type="collectionOperation"/>
                 <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
                 <xsd:element name="property" minOccurs="0" maxOccurs="unbounded" type="property"/>
                 <xsd:element name="itemOperations" minOccurs="0" maxOccurs="unbounded" type="itemOperations"/>

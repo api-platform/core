@@ -61,6 +61,15 @@ final class XmlExtractor extends AbstractExtractor
      */
     private function getOperations(\SimpleXMLElement $resource, string $operationType)
     {
+        $legacyOperations = $this->getAttributes($resource, $operationType);
+        if ($legacyOperations !== []) {
+          @trigger_error(
+            sprintf('Configuring "%s" tags without using a parent "%s" tag is deprecrated since API Platform 2.3 and will not be possible anymore in API Platform 3', $operationType, $operationType, E_USER_DEPRECATED)
+          );
+
+          return $legacyOperations;
+        }
+
         $operationsParent = $operationType.'s';
 
         if (!isset($resource->$operationsParent)) {
