@@ -56,7 +56,6 @@ final class XmlExtractor extends AbstractExtractor
             }
 
             if (isset($resource->collectionOperations)) {
-                echo ":)";
                 $this->resources[$resourceClass]['collectionOperations'] = $this->getAttributes(
                     $resource->collectionOperations, 'collectionOperation'
                 );
