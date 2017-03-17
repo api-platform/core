@@ -9,11 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Util;
+namespace ApiPlatform\Core\Util\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\PaginationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @author Jonathan Doelfs <jd@sodatech.com>
+ */
 class PaginationHelperFactory
 {
     private $requestStack;

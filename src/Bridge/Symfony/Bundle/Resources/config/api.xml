@@ -188,7 +188,7 @@
 
         <!-- Util -->
 
-        <service id="api_platform.util.pagination_helper_factory" class="ApiPlatform\Core\Util\PaginationHelperFactory">
+        <service id="api_platform.util.pagination_helper_factory" class="ApiPlatform\Core\Util\Factory\PaginationHelperFactory">
             <argument type="service" id="request_stack" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.collection.pagination.enabled%</argument>

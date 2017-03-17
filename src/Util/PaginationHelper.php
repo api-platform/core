@@ -14,6 +14,9 @@ namespace ApiPlatform\Core\Util;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @author Jonathan Doelfs <jd@sodatech.com>
+ */
 class PaginationHelper
 {
     private $requestStack;
@@ -84,7 +87,7 @@ class PaginationHelper
 
         if ($itemsPerPage < 1) {
             $itemsPerPage = 1;
-        } elseif (null !== $this->maximumItemsPerPage && $itemsPerPage >= $maximumItemsPerPage) {
+        } elseif ($maximumItemsPerPage > 0 && $itemsPerPage >= $maximumItemsPerPage) {
             $itemsPerPage = $maximumItemsPerPage;
         }
 
