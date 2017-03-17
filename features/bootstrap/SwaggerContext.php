@@ -12,7 +12,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Sanpi\Behatch\Context\RestContext;
+use Behatch\Context\RestContext;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class SwaggerContext implements Context

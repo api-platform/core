@@ -34,8 +34,11 @@ Feature: Search filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?name=my$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?name=my"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -99,8 +102,11 @@ Feature: Search filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?alias=Ali$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?alias=Ali"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -135,8 +141,11 @@ Feature: Search filter on collections
           }
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?description=smart$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?description=smart"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -161,8 +170,11 @@ Feature: Search filter on collections
           "maxItems": 0
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?name=MuYm$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?name=MuYm$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }

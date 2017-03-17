@@ -186,7 +186,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ])->shouldBeCalled();
 
         $parameters = [
-            'api_platform.collection.order' => null,
+            'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.client_enabled' => false,
             'api_platform.collection.pagination.client_items_per_page' => false,
