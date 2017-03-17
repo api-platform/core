@@ -11,10 +11,10 @@
 
 namespace ApiPlatform\Core\tests\Util\Factory;
 
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\Factory\PaginationHelperFactory;
 use ApiPlatform\Core\Util\PaginationHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 
 /**
  * @author Jonathan Doelfs <jd@sodatech.com>
