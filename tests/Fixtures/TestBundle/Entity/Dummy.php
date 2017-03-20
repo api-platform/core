@@ -22,7 +22,17 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}})
+ * @ApiResource(attributes={
+ *     "filters"={
+ *         "my_dummy.boolean",
+ *         "my_dummy.date",
+ *         "my_dummy.exists",
+ *         "my_dummy.numeric",
+ *         "my_dummy.order",
+ *         "my_dummy.range",
+ *         "my_dummy.search",
+ *     },
+ * })
  * @ORM\Entity
  */
 class Dummy
