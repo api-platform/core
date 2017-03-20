@@ -31,15 +31,15 @@ class RelatedToDummyFriend
      * @ORM\Column
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany"})
+     * @Groups({"fakemanytomany", "friends"})
      */
     private $name;
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="DummyFriend", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="DummyFriend")
      * @ORM\JoinColumn(name="dummyfriend_id", referencedColumnName="id", nullable=false)
-     * @Groups({"fakemanytomany"})
+     * @Groups({"fakemanytomany", "friends"})
      */
     private $dummyFriend;
 
