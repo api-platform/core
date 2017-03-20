@@ -70,6 +70,12 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="api_platform.doctrine.orm.exists_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+        </service>
+
         <!-- Metadata loader -->
 
         <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
