@@ -12,7 +12,7 @@ $(function () {
                     clientSecret: oauth2.clientSecret,
                     realm: oauth2.type,
                     appName: 'API',
-                    scopeSeparator: " ",
+                    scopeSeparator: ' ',
                     additionalQueryStringParams: {}
                 });
             }
