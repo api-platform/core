@@ -6,7 +6,7 @@ $(function () {
         dom_id: 'swagger-ui-container',
         supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
         onComplete: function() {
-            if (oauth2.enabled && typeof initOAuth == "function") {
+            if (oauth2.enabled && 'function' === typeof initOAuth) {
                 initOAuth({
                     clientId: oauth2.clientId,
                     clientSecret: oauth2.clientSecret,
