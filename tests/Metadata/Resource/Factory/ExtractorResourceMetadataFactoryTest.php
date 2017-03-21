@@ -122,21 +122,6 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
-     * @dataProvider noCollectionOperationsResourceMetadataProvider
-     */
-    public function testXmlNoCollectionOperationsResourceMetadata($expectedResourceMetadata)
-    {
-        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/nocollectionoperations.xml';
-
-        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new XmlExtractor([$configPath]));
-        $resourceMetadata = $resourceMetadataFactory->create(FileConfigDummy::class);
-
-        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
-
-        $this->assertEquals($expectedResourceMetadata, $resourceMetadata);
-    }
-
-    /**
      * @dataProvider noItemOperationsResourceMetadataProvider
      */
     public function testXmlNoItemOperationsResourceMetadata($expectedResourceMetadata)
