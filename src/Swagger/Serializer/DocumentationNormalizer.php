@@ -524,11 +524,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 ],
             ];
 
-            $doc['security'] = [
-                [
-                    'oauth' => [],
-                ],
-            ];
+            $doc['security'] = [['oauth' => []]];
         }
 
         if ('' !== $description = $documentation->getDescription()) {
