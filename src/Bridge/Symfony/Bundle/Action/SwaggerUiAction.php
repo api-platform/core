@@ -72,12 +72,12 @@ final class SwaggerUiAction
             'title' => $this->title,
             'description' => $this->description,
             'formats' => $this->formats,
-            'oauth' => $this->oauthConfig->serialize(),
         ];
 
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
             'spec' => $this->normalizer->normalize($documentation, 'json'),
+            'oauth' => $this->oauthConfig->serialize(),
         ];
 
         if ($request->isMethodSafe(false) && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {

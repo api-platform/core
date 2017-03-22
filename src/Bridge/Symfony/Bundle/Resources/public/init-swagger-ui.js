@@ -6,11 +6,11 @@ $(function () {
         dom_id: 'swagger-ui-container',
         supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
         onComplete: function() {
-            if (oauth.enabled && 'function' === typeof initOAuth) {
+            if (data.oauth.enabled && 'function' === typeof initOAuth) {
                 initOAuth({
-                    clientId: oauth.clientId,
-                    clientSecret: oauth.clientSecret,
-                    realm: oauth.type,
+                    clientId: data.oauth.clientId,
+                    clientSecret: data.oauth.clientSecret,
+                    realm: data.oauth.type,
                     appName: 'API',
                     scopeSeparator: ' ',
                     additionalQueryStringParams: {}
