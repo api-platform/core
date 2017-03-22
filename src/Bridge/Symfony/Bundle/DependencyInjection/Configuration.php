@@ -57,7 +57,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_swagger_ui')->defaultValue(true)->info('Enable Swagger ui.')->end()
 
                 ->arrayNode('oauth2')
-                    ->canBeDisabled()
+                    ->canBeEnabled()
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('enabled')->defaultFalse()->info('To enable or disable oauth2')->end()
