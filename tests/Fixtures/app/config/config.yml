@@ -94,7 +94,7 @@ services:
 
     app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial' } ]
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start' } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
 
     # Tests if the id default to the service name, do not add id attributes here
@@ -132,5 +132,17 @@ services:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
 
+    app.entity.filter.dummy_car:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'colors.prop': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
+
+    app.related_dummy_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
+
+
     logger:
         class: Psr\Log\NullLogger
+

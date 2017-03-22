@@ -111,6 +111,15 @@
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="32" />
         </service>
 
+        <!-- This needs to be executed right after the filter extension -->
+
+        <service id="api_platform.doctrine.orm.query_extension.filter_eager_loading" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>%api_platform.eager_loading.force_eager%</argument>
+
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="31" />
+        </service>
+
         <service id="api_platform.doctrine.orm.query_extension.pagination" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine" />
             <argument type="service" id="request_stack" />

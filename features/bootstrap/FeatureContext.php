@@ -13,8 +13,12 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
@@ -135,18 +139,21 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with relatedDummies
+     * @Given there is :nb dummy objects having each :nbrelated relatedDummies
      */
-    public function thereIsDummyObjectsWithRelatedDummies($nb)
+    public function thereIsDummyObjectsWithRelatedDummies($nb, $nbrelated)
     {
         for ($i = 1; $i <= $nb; ++$i) {
-            $relatedDummy = new RelatedDummy();
-            $relatedDummy->setName('RelatedDummy #'.$i);
-
             $dummy = new Dummy();
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
-            $dummy->addRelatedDummy($relatedDummy);
+
+            for ($j = 1; $j <= $nbrelated; ++$j) {
+                $relatedDummy = new RelatedDummy();
+                $relatedDummy->setName('RelatedDummy'.$j.$i);
+                $this->manager->persist($relatedDummy);
+                $dummy->addRelatedDummy($relatedDummy);
+            }
 
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
@@ -317,6 +324,62 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $fileConfigDummy->setFoo('Foo');
 
         $this->manager->persist($fileConfigDummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a DummyCar entity with related colors
+     */
+    public function thereIsAFooEntityWithRelatedBars()
+    {
+        $foo = new DummyCar();
+        $this->manager->persist($foo);
+
+        $bar1 = new DummyCarColor();
+        $bar1->setProp('red');
+        $bar1->setCar($foo);
+        $this->manager->persist($bar1);
+
+        $bar2 = new DummyCarColor();
+        $bar2->setProp('blue');
+        $bar2->setCar($foo);
+        $this->manager->persist($bar2);
+
+        $foo->setColors([$bar1, $bar2]);
+        $this->manager->persist($foo);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a RelatedDummy with :nb friends
+     */
+    public function thereIsARelatedDummyWithFriends($nb)
+    {
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setName('RelatedDummy with friends');
+        $this->manager->persist($relatedDummy);
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $friend = new DummyFriend();
+            $friend->setName('Friend-'.$i);
+
+            $this->manager->persist($friend);
+
+            $relation = new RelatedToDummyFriend();
+            $relation->setName('Relation-'.$i);
+            $relation->setDummyFriend($friend);
+            $relation->setRelatedDummy($relatedDummy);
+
+            $relatedDummy->addRelatedToDummyFriend($relation);
+
+            $this->manager->persist($relation);
+        }
+
+        $relatedDummy2 = new RelatedDummy();
+        $relatedDummy2->setName('RelatedDummy without friends');
+        $this->manager->persist($relatedDummy2);
+
         $this->manager->flush();
     }
 }
