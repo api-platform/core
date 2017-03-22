@@ -11,7 +11,7 @@ $(function () {
                     clientId: data.oauth.clientId,
                     clientSecret: data.oauth.clientSecret,
                     realm: data.oauth.type,
-                    appName: 'API',
+                    appName: data.spec.info.title,
                     scopeSeparator: ' ',
                     additionalQueryStringParams: {}
                 });
