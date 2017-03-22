@@ -44,8 +44,6 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument>%api_platform.formats%</argument>
-            <argument>%api_platform.title%</argument>
-            <argument>%api_platform.description%</argument>
             <argument type="service" id="api_platform.oauth.oauth_config" />
         </service>
 
