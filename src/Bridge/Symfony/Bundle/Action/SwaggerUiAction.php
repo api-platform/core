@@ -38,18 +38,18 @@ final class SwaggerUiAction
     private $version;
     private $formats = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, OAuthConfig $oauthConfig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [], OAuthConfig $oauthConfig = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->normalizer = $normalizer;
         $this->twig = $twig;
-        $this->oauthConfig = $oauthConfig;
         $this->urlGenerator = $urlGenerator;
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
         $this->formats = $formats;
+        $this->oauthConfig = $oauthConfig;
     }
 
     public function __invoke(Request $request)
@@ -77,8 +77,11 @@ final class SwaggerUiAction
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
             'spec' => $this->normalizer->normalize($documentation, 'json'),
-            'oauth' => $this->oauthConfig->serialize(),
         ];
+
+        if ($this->oauthConfig instanceof OAuthConfig) {
+            $swaggerData['oauth'] = $this->oauthConfig->serialize();
+        }
 
         if ($request->isMethodSafe(false) && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {
             $swaggerData['id'] = $request->attributes->get('id');

@@ -17,7 +17,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\OAuth\Config\OAuthConfig;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ProphecyInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,8 +42,6 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(['Hello' => 'world'])->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
@@ -53,7 +50,6 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $twigProphecy->reveal(),
-            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
         $action($request);
@@ -72,16 +68,6 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => ['Hello' => 'world'],
-                'oauth' => [
-                    'enabled' => true,
-                    'clientId' => 'clientid123',
-                    'clientSecret' => 'clientSecret123',
-                    'type' => 'oauth2',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
                 'shortName' => 'F',
                 'operationId' => 'getFCollection',
                 'id' => null,
@@ -97,16 +83,6 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => ['Hello' => 'world'],
-                'oauth' => [
-                    'enabled' => true,
-                    'clientId' => 'clientid123',
-                    'clientSecret' => 'clientSecret123',
-                    'type' => 'oauth2',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
                 'shortName' => 'F',
                 'operationId' => 'getFItem',
                 'id' => null,
@@ -140,20 +116,8 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => ['Hello' => 'world'],
-                'oauth' => [
-                    'enabled' => true,
-                    'clientId' => 'clientid123',
-                    'clientSecret' => 'clientSecret123',
-                    'type' => 'oauth2',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
             ],
         ])->shouldBeCalled();
-
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
@@ -163,7 +127,6 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $twigProphecy->reveal(),
-            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
         $action($request);
