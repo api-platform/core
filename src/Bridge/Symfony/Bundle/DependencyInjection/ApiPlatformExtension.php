@@ -159,8 +159,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.oauth.tokenUrl', $config['oauth']['tokenUrl']);
         $container->setParameter('api_platform.oauth.authorizationUrl', $config['oauth']['authorizationUrl']);
         $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
-
-        $loader->load('oauth.xml');
     }
 
     /**

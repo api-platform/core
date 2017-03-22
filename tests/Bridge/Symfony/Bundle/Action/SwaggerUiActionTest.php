@@ -68,6 +68,16 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => ['Hello' => 'world'],
+                'oauth' => [
+                    'enabled' => false,
+                    'clientId' => '',
+                    'clientSecret' => '',
+                    'type' => '',
+                    'flow' => '',
+                    'tokenUrl' => '',
+                    'authorizationUrl' => '',
+                    'scopes' => [],
+                ],
                 'shortName' => 'F',
                 'operationId' => 'getFCollection',
                 'id' => null,
@@ -83,6 +93,16 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => ['Hello' => 'world'],
+                'oauth' => [
+                    'enabled' => false,
+                    'clientId' => '',
+                    'clientSecret' => '',
+                    'type' => '',
+                    'flow' => '',
+                    'tokenUrl' => '',
+                    'authorizationUrl' => '',
+                    'scopes' => [],
+                ],
                 'shortName' => 'F',
                 'operationId' => 'getFItem',
                 'id' => null,
@@ -116,6 +136,16 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => ['Hello' => 'world'],
+                'oauth' => [
+                    'enabled' => false,
+                    'clientId' => '',
+                    'clientSecret' => '',
+                    'type' => '',
+                    'flow' => '',
+                    'tokenUrl' => '',
+                    'authorizationUrl' => '',
+                    'scopes' => [],
+                ],
             ],
         ])->shouldBeCalled();
 

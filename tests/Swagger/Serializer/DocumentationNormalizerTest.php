@@ -23,7 +23,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\OAuth\Config\OAuthConfig;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
@@ -272,8 +271,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -286,7 +283,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $urlGeneratorProphecy->reveal(),
             null,
             $nameConverterProphecy->reveal(),
-            $oauthConfig
+            true,
+            'oauth2',
+            'application',
+            '/oauth/v2/token',
+            '/oauth/v2/auth',
+            ['scope param']
         );
 
         $expected = [
