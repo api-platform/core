@@ -33,7 +33,7 @@ class ExceptionActionTest extends \PHPUnit_Framework_TestCase
         $flattenException = FlattenException::create($serializerException->reveal());
 
         $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem')->willReturn();
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn();
 
         $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']], [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST]);
 
@@ -57,7 +57,7 @@ class ExceptionActionTest extends \PHPUnit_Framework_TestCase
         $flattenException = FlattenException::create($serializerException->reveal());
 
         $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem')->willReturn();
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $flattenException->getStatusCode()])->willReturn();
 
         $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']]);
 
