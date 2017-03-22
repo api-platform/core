@@ -23,7 +23,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\OAuth2\Config\OAuth2Config;
+use ApiPlatform\Core\OAuth\Config\OAuthConfig;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
@@ -66,7 +66,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -77,7 +77,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauth2Config,
+            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -244,7 +244,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth2 client_credentials Grant',
+                    'description' => 'OAuth client_credentials Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
@@ -286,7 +286,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
 
-        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -297,7 +297,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauth2Config,
+            $oauthConfig,
             $urlGeneratorProphecy->reveal(),
             null,
             $nameConverterProphecy->reveal()
@@ -355,7 +355,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth2 client_credentials Grant',
+                    'description' => 'OAuth client_credentials Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
@@ -413,7 +413,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -424,7 +424,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauth2Config,
+            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -555,7 +555,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth2 client_credentials Grant',
+                    'description' => 'OAuth client_credentials Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
@@ -613,7 +613,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -624,7 +624,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauth2Config,
+            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -755,7 +755,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth2 client_credentials Grant',
+                    'description' => 'OAuth client_credentials Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
@@ -816,7 +816,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -827,7 +827,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauth2Config,
+            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -958,7 +958,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth2 client_credentials Grant',
+                    'description' => 'OAuth client_credentials Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
@@ -1001,7 +1001,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
 
-        $oauth2Config = new OAuth2Config(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
+        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -1028,7 +1028,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauth2Config,
+            $oauthConfig,
             $urlGeneratorProphecy->reveal(),
             $filters
         );
@@ -1089,7 +1089,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'securityDefinitions' => [
                 'oauth' => [
                     'type' => 'oauth2',
-                    'description' => 'OAuth2 client_credentials Grant',
+                    'description' => 'OAuth client_credentials Grant',
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',

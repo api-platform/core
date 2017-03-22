@@ -14,7 +14,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Action;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\OAuth2\Config\OAuth2Config;
+use ApiPlatform\Core\OAuth\Config\OAuthConfig;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -31,20 +31,20 @@ final class SwaggerUiAction
     private $resourceMetadataFactory;
     private $normalizer;
     private $twig;
-    private $oauth2Config;
+    private $oauthConfig;
     private $urlGenerator;
     private $title;
     private $description;
     private $version;
     private $formats = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, OAuth2Config $oauth2Config, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, OAuthConfig $oauthConfig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [])
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->normalizer = $normalizer;
         $this->twig = $twig;
-        $this->oauth2Config = $oauth2Config;
+        $this->oauthConfig = $oauthConfig;
         $this->urlGenerator = $urlGenerator;
         $this->title = $title;
         $this->description = $description;
@@ -72,7 +72,7 @@ final class SwaggerUiAction
             'title' => $this->title,
             'description' => $this->description,
             'formats' => $this->formats,
-            'oauth2' => $this->oauth2Config->serialize(),
+            'oauth' => $this->oauthConfig->serialize(),
         ];
 
         $swaggerData = [

@@ -75,7 +75,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundles = $container->getParameter('kernel.bundles');
 
         $this->registerMetadataConfiguration($container, $loader);
-        $this->registerOAuth2Configuration($container, $config, $loader);
+        $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
@@ -139,28 +139,28 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
-     * Registers the OAuth2 configuration.
+     * Registers the OAuth configuration.
      *
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
      */
-    private function registerOAuth2Configuration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerOAuthConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
-        if (!$config['oauth2']) {
+        if (!$config['oauth']) {
             return;
         }
 
-        $container->setParameter('api_platform.oauth2.enabled', $config['oauth2']['enabled']);
-        $container->setParameter('api_platform.oauth2.clientId', $config['oauth2']['clientId']);
-        $container->setParameter('api_platform.oauth2.clientSecret', $config['oauth2']['clientSecret']);
-        $container->setParameter('api_platform.oauth2.type', $config['oauth2']['type']);
-        $container->setParameter('api_platform.oauth2.flow', $config['oauth2']['flow']);
-        $container->setParameter('api_platform.oauth2.tokenUrl', $config['oauth2']['tokenUrl']);
-        $container->setParameter('api_platform.oauth2.authorizationUrl', $config['oauth2']['authorizationUrl']);
-        $container->setParameter('api_platform.oauth2.scopes', $config['oauth2']['scopes']);
+        $container->setParameter('api_platform.oauth.enabled', $config['oauth']['enabled']);
+        $container->setParameter('api_platform.oauth.clientId', $config['oauth']['clientId']);
+        $container->setParameter('api_platform.oauth.clientSecret', $config['oauth']['clientSecret']);
+        $container->setParameter('api_platform.oauth.type', $config['oauth']['type']);
+        $container->setParameter('api_platform.oauth.flow', $config['oauth']['flow']);
+        $container->setParameter('api_platform.oauth.tokenUrl', $config['oauth']['tokenUrl']);
+        $container->setParameter('api_platform.oauth.authorizationUrl', $config['oauth']['authorizationUrl']);
+        $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
 
-        $loader->load('oauth2.xml');
+        $loader->load('oauth.xml');
     }
 
     /**

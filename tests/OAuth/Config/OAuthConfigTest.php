@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\OAuth2\Config;
+namespace ApiPlatform\Core\tests\OAuth\Config;
 
-use ApiPlatform\Core\OAuth2\Config\OAuth2Config;
+use ApiPlatform\Core\OAuth\Config\OAuthConfig;
 
 /**
  * @author Daniel Kiesel <icodr8@gmail.com>
  */
-class OAuth2ConfigTest extends \PHPUnit_Framework_TestCase
+class OAuthConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function testValueObject()
     {
-        $config = new OAuth2Config(
+        $config = new OAuthConfig(
             true,
             'clientid123',
             'clientSecret123',
@@ -44,7 +44,7 @@ class OAuth2ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeObject()
     {
-        $config = new OAuth2Config(
+        $config = new OAuthConfig(
             false,
             'clientid123',
             'clientSecret123',

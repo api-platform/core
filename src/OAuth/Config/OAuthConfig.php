@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\OAuth2\Config;
+namespace ApiPlatform\Core\OAuth\Config;
 
 /**
- * OAuth2 config.
+ * OAuth config.
  *
  * @author Daniel Kiesel <icodr8@gmail.com>
  */
-final class OAuth2Config implements \Serializable
+final class OAuthConfig implements \Serializable
 {
     private $enabled;
     private $clientId;

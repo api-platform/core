@@ -22,10 +22,10 @@
     <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/highlight.9.1.0.pack.js') }}"></script>
     <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/jsoneditor.min.js') }}"></script>
     <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/marked.js') }}"></script>
-    {% if oauth2.enabled %}
+    {% if oauth.enabled %}
         <script src="{{ asset('bundles/apiplatform/swagger-ui/lib/swagger-oauth.js') }}"></script>
         <script>
-            var oauth2 = {{ oauth2 | json_encode() | raw }};
+            var oauth = {{ oauth | json_encode() | raw }};
         </script>
     {% endif %}
     <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>

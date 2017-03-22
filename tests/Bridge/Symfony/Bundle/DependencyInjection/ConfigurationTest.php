@@ -71,7 +71,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
-            'oauth2' => [
+            'oauth' => [
                 'enabled' => false,
                 'clientId' => '',
                 'clientSecret' => '',

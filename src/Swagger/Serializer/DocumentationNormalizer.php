@@ -22,7 +22,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\OAuth2\Config\OAuth2Config;
+use ApiPlatform\Core\OAuth\Config\OAuthConfig;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -46,12 +46,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $operationPathResolver;
-    private $oauth2Config;
+    private $oauthConfig;
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, OAuth2Config $oauth2Config, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, OAuthConfig $oauthConfig, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -59,7 +59,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
-        $this->oauth2Config = $oauth2Config;
+        $this->oauthConfig = $oauthConfig;
         $this->urlGenerator = $urlGenerator;
         $this->filterCollection = $filterCollection;
         $this->nameConverter = $nameConverter;
@@ -512,15 +512,15 @@ final class DocumentationNormalizer implements NormalizerInterface
             'paths' => $paths,
         ];
 
-        if ($this->oauth2Config->isEnabled()) {
+        if ($this->oauthConfig->isEnabled()) {
             $doc['securityDefinitions'] = [
                 'oauth' => [
-                    'type' => $this->oauth2Config->getType(),
-                    'description' => 'OAuth2 client_credentials Grant',
-                    'flow' => $this->oauth2Config->getFlow(),
-                    'tokenUrl' => $this->oauth2Config->getTokenUrl(),
-                    'authorizationUrl' => $this->oauth2Config->getAuthorizationUrl(),
-                    'scopes' => $this->oauth2Config->getScopes(),
+                    'type' => $this->oauthConfig->getType(),
+                    'description' => 'OAuth client_credentials Grant',
+                    'flow' => $this->oauthConfig->getFlow(),
+                    'tokenUrl' => $this->oauthConfig->getTokenUrl(),
+                    'authorizationUrl' => $this->oauthConfig->getAuthorizationUrl(),
+                    'scopes' => $this->oauthConfig->getScopes(),
                 ],
             ];
 
