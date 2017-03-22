@@ -46,12 +46,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $operationPathResolver;
-    private $oauthConfig;
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
+    private $oauthConfig;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, OAuthConfig $oauthConfig, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null, OAuthConfig $oauthConfig = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -59,10 +59,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
-        $this->oauthConfig = $oauthConfig;
         $this->urlGenerator = $urlGenerator;
         $this->filterCollection = $filterCollection;
         $this->nameConverter = $nameConverter;
+        $this->oauthConfig = $oauthConfig;
     }
 
     /**
@@ -512,7 +512,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'paths' => $paths,
         ];
 
-        if ($this->oauthConfig->isEnabled()) {
+        if ($this->oauthConfig instanceof OAuthConfig && $this->oauthConfig->isEnabled()) {
             $doc['securityDefinitions'] = [
                 'oauth' => [
                     'type' => $this->oauthConfig->getType(),

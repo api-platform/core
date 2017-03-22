@@ -66,8 +66,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -77,7 +75,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -241,17 +238,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
-            'securityDefinitions' => [
-                'oauth' => [
-                    'type' => 'oauth2',
-                    'description' => 'OAuth client_credentials Grant',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
-            ],
-            'security' => [['oauth' => []]],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -297,10 +283,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauthConfig,
             $urlGeneratorProphecy->reveal(),
             null,
-            $nameConverterProphecy->reveal()
+            $nameConverterProphecy->reveal(),
+            $oauthConfig
         );
 
         $expected = [
@@ -413,8 +399,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -424,7 +408,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -552,17 +535,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
-            'securityDefinitions' => [
-                'oauth' => [
-                    'type' => 'oauth2',
-                    'description' => 'OAuth client_credentials Grant',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
-            ],
-            'security' => [['oauth' => []]],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -613,8 +585,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -624,7 +594,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -752,17 +721,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
-            'securityDefinitions' => [
-                'oauth' => [
-                    'type' => 'oauth2',
-                    'description' => 'OAuth client_credentials Grant',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
-            ],
-            'security' => [['oauth' => []]],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -816,8 +774,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -827,7 +783,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauthConfig,
             $urlGeneratorProphecy->reveal()
         );
 
@@ -955,17 +910,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
-            'securityDefinitions' => [
-                'oauth' => [
-                    'type' => 'oauth2',
-                    'description' => 'OAuth client_credentials Grant',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
-            ],
-            'security' => [['oauth' => []]],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1001,8 +945,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
 
-        $oauthConfig = new OAuthConfig(true, 'clientid123', 'clientSecret123', 'oauth2', 'application', '/oauth/v2/token', '/oauth/v2/auth', ['scope param']);
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $filters = new FilterCollection([
@@ -1028,7 +970,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $oauthConfig,
             $urlGeneratorProphecy->reveal(),
             $filters
         );
@@ -1086,17 +1027,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
-            'securityDefinitions' => [
-                'oauth' => [
-                    'type' => 'oauth2',
-                    'description' => 'OAuth client_credentials Grant',
-                    'flow' => 'application',
-                    'tokenUrl' => '/oauth/v2/token',
-                    'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
-                ],
-            ],
-            'security' => [['oauth' => []]],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));

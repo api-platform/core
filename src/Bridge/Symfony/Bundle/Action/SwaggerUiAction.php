@@ -31,12 +31,12 @@ final class SwaggerUiAction
     private $resourceMetadataFactory;
     private $normalizer;
     private $twig;
-    private $oauthConfig;
     private $urlGenerator;
     private $title;
     private $description;
     private $version;
     private $formats = [];
+    private $oauthConfig;
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [], OAuthConfig $oauthConfig = null)
     {
