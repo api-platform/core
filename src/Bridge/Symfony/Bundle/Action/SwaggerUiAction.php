@@ -93,14 +93,14 @@ final class SwaggerUiAction
         ];
 
         $swaggerData['oauth'] = [
-            'enabled'          => $this->oauthEnabled,
-            'clientId'         => $this->oauthClientId,
-            'clientSecret'     => $this->oauthClientSecret,
-            'type'             => $this->oauthType,
-            'flow'             => $this->oauthFlow,
-            'tokenUrl'         => $this->oauthTokenUrl,
+            'enabled' => $this->oauthEnabled,
+            'clientId' => $this->oauthClientId,
+            'clientSecret' => $this->oauthClientSecret,
+            'type' => $this->oauthType,
+            'flow' => $this->oauthFlow,
+            'tokenUrl' => $this->oauthTokenUrl,
             'authorizationUrl' => $this->oauthAuthorizationUrl,
-            'scopes'           => $this->oauthScopes,
+            'scopes' => $this->oauthScopes,
         ];
 
         if ($request->isMethodSafe(false) && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {
