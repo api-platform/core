@@ -249,6 +249,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.order_filter',
             'api_platform.doctrine.orm.query_extension.eager_loading',
             'api_platform.doctrine.orm.query_extension.filter',
+            'api_platform.doctrine.orm.query_extension.filter_eager_loading',
             'api_platform.doctrine.orm.query_extension.order',
             'api_platform.doctrine.orm.query_extension.pagination',
             'api_platform.doctrine.orm.range_filter',

@@ -12,6 +12,7 @@
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(iri="https://schema.org/Product")
+ * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.friends"}})
  * @ORM\Entity
  */
 class RelatedDummy extends ParentDummy
@@ -30,6 +31,7 @@ class RelatedDummy extends ParentDummy
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Groups({"friends"})
      */
     private $id;
 
@@ -37,12 +39,13 @@ class RelatedDummy extends ParentDummy
      * @var string A name
      *
      * @ORM\Column(nullable=true)
+     * @Groups({"friends"})
      */
     public $name;
 
     /**
      * @ORM\Column
-     * @Groups({"barcelona", "chicago"})
+     * @Groups({"barcelona", "chicago", "friends"})
      */
     protected $symfony = 'symfony';
 
@@ -51,25 +54,32 @@ class RelatedDummy extends ParentDummy
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
+     * @Groups({"friends"})
      */
     public $dummyDate;
 
     /**
      * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
-     * @Groups({"barcelona", "chicago"})
+     * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;
 
     /**
-     * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, fetch="EAGER", mappedBy="relatedDummy")
-     * @Groups({"fakemanytomany"})
+     * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
+     * @Groups({"fakemanytomany", "friends"})
      */
     public $relatedToDummyFriend;
+
+    public function __construct()
+    {
+        $this->relatedToDummyFriend = new ArrayCollection();
+    }
 
     /**
      * @var bool A dummy bool
      *
      * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"friends"})
      */
     public $dummyBoolean;
 
@@ -139,8 +149,8 @@ class RelatedDummy extends ParentDummy
      *
      * @param relatedToDummyFriend the value to set
      */
-    public function setRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
+    public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {
-        $this->relatedToDummyFriend = $relatedToDummyFriend;
+        $this->relatedToDummyFriend->add($relatedToDummyFriend);
     }
 }
