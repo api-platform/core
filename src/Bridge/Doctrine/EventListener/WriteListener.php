@@ -58,7 +58,6 @@ final class WriteListener
             case Request::METHOD_POST:
                 $objectManager->persist($controllerResult);
                 break;
-
             case Request::METHOD_DELETE:
                 $objectManager->remove($controllerResult);
                 $event->setControllerResult(null);

@@ -87,7 +87,7 @@ class OrderFilter extends AbstractFilter
         }
 
         $direction = strtoupper($direction);
-        if (!in_array($direction, ['ASC', 'DESC'])) {
+        if (!in_array($direction, ['ASC', 'DESC'], true)) {
             return;
         }
 

@@ -160,13 +160,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         switch ($method) {
             case 'GET':
                 return $this->updateGetOperation($pathOperation, $mimeTypes, $collection, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
-
             case 'POST':
                 return $this->updatePostOperation($pathOperation, $mimeTypes, $collection, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
-
             case 'PUT':
                 return $this->updatePutOperation($pathOperation, $mimeTypes, $collection, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
-
             case 'DELETE':
                 return $this->updateDeleteOperation($pathOperation, $resourceShortName);
         }
@@ -538,7 +535,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $parameters = [];
         $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         foreach ($this->filterCollection as $filterName => $filter) {
-            if (!in_array($filterName, $resourceFilters)) {
+            if (!in_array($filterName, $resourceFilters, true)) {
                 continue;
             }
 

@@ -57,7 +57,6 @@ final class EventListener
                 $this->userManager->deleteUser($user);
                 $event->setControllerResult(null);
                 break;
-
             default:
                 $this->userManager->updateUser($user);
                 break;

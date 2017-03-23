@@ -132,7 +132,6 @@ final class YamlExtractor extends AbstractExtractor
                     return $array[$key];
                 }
                 break;
-
             case 'string':
                 if (is_string($array[$key])) {
                     return $array[$key];

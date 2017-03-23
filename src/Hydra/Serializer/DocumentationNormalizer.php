@@ -298,16 +298,12 @@ final class DocumentationNormalizer implements NormalizerInterface
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_STRING:
                 return 'xmls:string';
-
             case Type::BUILTIN_TYPE_INT:
                 return 'xmls:integer';
-
             case Type::BUILTIN_TYPE_FLOAT:
                 return 'xmls:decimal';
-
             case Type::BUILTIN_TYPE_BOOL:
                 return 'xmls:boolean';
-
             case Type::BUILTIN_TYPE_OBJECT:
                 if (null === $className = $type->getClassName()) {
                     return;

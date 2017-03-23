@@ -127,7 +127,6 @@ class RangeFilter extends AbstractFilter
                     ->setParameter(sprintf('%s_2', $valueParameter), $rangeValue[1]);
 
                 break;
-
             case self::PARAMETER_GREATER_THAN:
                 if (!is_numeric($value)) {
                     $this->logger->notice('Invalid filter ignored', [
@@ -142,7 +141,6 @@ class RangeFilter extends AbstractFilter
                     ->setParameter($valueParameter, $value);
 
                 break;
-
             case self::PARAMETER_GREATER_THAN_OR_EQUAL:
                 if (!is_numeric($value)) {
                     $this->logger->notice('Invalid filter ignored', [
@@ -157,7 +155,6 @@ class RangeFilter extends AbstractFilter
                     ->setParameter($valueParameter, $value);
 
                 break;
-
             case self::PARAMETER_LESS_THAN:
                 if (!is_numeric($value)) {
                     $this->logger->notice('Invalid filter ignored', [
@@ -172,7 +169,6 @@ class RangeFilter extends AbstractFilter
                     ->setParameter($valueParameter, $value);
 
                 break;
-
             case self::PARAMETER_LESS_THAN_OR_EQUAL:
                 if (!is_numeric($value)) {
                     $this->logger->notice('Invalid filter ignored', [

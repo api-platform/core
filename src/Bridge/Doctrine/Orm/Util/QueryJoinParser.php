@@ -78,7 +78,7 @@ final class QueryJoinParser
             }
         }
 
-        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases)];
+        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases, true)];
 
         $rootMetadata = $managerRegistry
             ->getManagerForClass($rootEntity)

@@ -235,7 +235,7 @@ class HydraContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return isset($classInfos->{'hydra:supportedOperation'}) ? $classInfos->{'hydra:supportedOperation'} : [];
+        return $classInfos->{'hydra:supportedOperation'} ?? [];
     }
 
     /**
@@ -251,7 +251,7 @@ class HydraContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return isset($classInfos->{'hydra:supportedProperty'}) ? $classInfos->{'hydra:supportedProperty'} : [];
+        return $classInfos->{'hydra:supportedProperty'} ?? [];
     }
 
     /**

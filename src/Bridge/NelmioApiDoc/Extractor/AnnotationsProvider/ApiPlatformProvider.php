@@ -128,7 +128,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
 
             $data['filters'] = [];
             foreach ($this->filters as $filterName => $filter) {
-                if (in_array($filterName, $resourceFilters)) {
+                if (in_array($filterName, $resourceFilters, true)) {
                     foreach ($filter->getDescription($resourceClass) as $name => $definition) {
                         $data['filters'][] = ['name' => $name] + $definition;
                     }

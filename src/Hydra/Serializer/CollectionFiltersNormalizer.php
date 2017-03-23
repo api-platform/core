@@ -80,7 +80,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         $currentFilters = [];
         foreach ($this->filters as $filterName => $filter) {
-            if (in_array($filterName, $resourceFilters)) {
+            if (in_array($filterName, $resourceFilters, true)) {
                 $currentFilters[] = $filter;
             }
         }
