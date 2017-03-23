@@ -35,14 +35,14 @@ final class SwaggerUiAction
     private $description;
     private $version;
     private $formats = [];
-    private $oauthEnabled = false;
+    private $oauthEnabled;
     private $oauthClientId;
     private $oauthClientSecret;
     private $oauthType;
     private $oauthFlow;
     private $oauthTokenUrl;
     private $oauthAuthorizationUrl;
-    private $oauthScopes = [];
+    private $oauthScopes;
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {

@@ -48,12 +48,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
-    private $oauthEnabled = false;
+    private $oauthEnabled;
     private $oauthType;
     private $oauthFlow;
     private $oauthTokenUrl;
     private $oauthAuthorizationUrl;
-    private $oauthScopes = [];
+    private $oauthScopes;
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {
