@@ -48,8 +48,14 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $urlGenerator;
     private $filterCollection;
     private $nameConverter;
+    private $oauthEnabled;
+    private $oauthType;
+    private $oauthFlow;
+    private $oauthTokenUrl;
+    private $oauthAuthorizationUrl;
+    private $oauthScopes;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, FilterCollection $filterCollection = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -60,6 +66,12 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->urlGenerator = $urlGenerator;
         $this->filterCollection = $filterCollection;
         $this->nameConverter = $nameConverter;
+        $this->oauthEnabled = $oauthEnabled;
+        $this->oauthType = $oauthType;
+        $this->oauthFlow = $oauthFlow;
+        $this->oauthTokenUrl = $oauthTokenUrl;
+        $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
+        $this->oauthScopes = $oauthScopes;
     }
 
     /**
@@ -508,6 +520,21 @@ final class DocumentationNormalizer implements NormalizerInterface
             ],
             'paths' => $paths,
         ];
+
+        if ($this->oauthEnabled) {
+            $doc['securityDefinitions'] = [
+                'oauth' => [
+                    'type' => $this->oauthType,
+                    'description' => 'OAuth client_credentials Grant',
+                    'flow' => $this->oauthFlow,
+                    'tokenUrl' => $this->oauthTokenUrl,
+                    'authorizationUrl' => $this->oauthAuthorizationUrl,
+                    'scopes' => $this->oauthScopes,
+                ],
+            ];
+
+            $doc['security'] = [['oauth' => []]];
+        }
 
         if ('' !== $description = $documentation->getDescription()) {
             $doc['info']['description'] = $description;

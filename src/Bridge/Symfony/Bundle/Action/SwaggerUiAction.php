@@ -35,8 +35,16 @@ final class SwaggerUiAction
     private $description;
     private $version;
     private $formats = [];
+    private $oauthEnabled;
+    private $oauthClientId;
+    private $oauthClientSecret;
+    private $oauthType;
+    private $oauthFlow;
+    private $oauthTokenUrl;
+    private $oauthAuthorizationUrl;
+    private $oauthScopes;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, \Twig_Environment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', array $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -47,6 +55,14 @@ final class SwaggerUiAction
         $this->description = $description;
         $this->version = $version;
         $this->formats = $formats;
+        $this->oauthEnabled = $oauthEnabled;
+        $this->oauthClientId = $oauthClientId;
+        $this->oauthClientSecret = $oauthClientSecret;
+        $this->oauthType = $oauthType;
+        $this->oauthFlow = $oauthFlow;
+        $this->oauthTokenUrl = $oauthTokenUrl;
+        $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
+        $this->oauthScopes = $oauthScopes;
     }
 
     public function __invoke(Request $request)
@@ -74,6 +90,17 @@ final class SwaggerUiAction
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
             'spec' => $this->normalizer->normalize($documentation, 'json'),
+        ];
+
+        $swaggerData['oauth'] = [
+            'enabled' => $this->oauthEnabled,
+            'clientId' => $this->oauthClientId,
+            'clientSecret' => $this->oauthClientSecret,
+            'type' => $this->oauthType,
+            'flow' => $this->oauthFlow,
+            'tokenUrl' => $this->oauthTokenUrl,
+            'authorizationUrl' => $this->oauthAuthorizationUrl,
+            'scopes' => $this->oauthScopes,
         ];
 
         if ($request->isMethodSafe(false) && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {

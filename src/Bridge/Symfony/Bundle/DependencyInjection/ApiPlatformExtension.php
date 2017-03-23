@@ -75,6 +75,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundles = $container->getParameter('kernel.bundles');
 
         $this->registerMetadataConfiguration($container, $loader);
+        $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
@@ -135,6 +136,29 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!interface_exists(DocBlockFactoryInterface::class)) {
             $container->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc');
         }
+    }
+
+    /**
+     * Registers the OAuth configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerOAuthConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['oauth']) {
+            return;
+        }
+
+        $container->setParameter('api_platform.oauth.enabled', $config['oauth']['enabled']);
+        $container->setParameter('api_platform.oauth.clientId', $config['oauth']['clientId']);
+        $container->setParameter('api_platform.oauth.clientSecret', $config['oauth']['clientSecret']);
+        $container->setParameter('api_platform.oauth.type', $config['oauth']['type']);
+        $container->setParameter('api_platform.oauth.flow', $config['oauth']['flow']);
+        $container->setParameter('api_platform.oauth.tokenUrl', $config['oauth']['tokenUrl']);
+        $container->setParameter('api_platform.oauth.authorizationUrl', $config['oauth']['authorizationUrl']);
+        $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
     }
 
     /**

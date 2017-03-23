@@ -16,7 +16,12 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.filters" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
-
+            <argument>%api_platform.oauth.enabled%</argument>
+            <argument>%api_platform.oauth.type%</argument>
+            <argument>%api_platform.oauth.flow%</argument>
+            <argument>%api_platform.oauth.tokenUrl%</argument>
+            <argument>%api_platform.oauth.authorizationUrl%</argument>
+            <argument>%api_platform.oauth.scopes%</argument>
             <tag name="serializer.normalizer" priority="16" />
         </service>
 
@@ -43,8 +48,14 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument>%api_platform.formats%</argument>
-            <argument>%api_platform.title%</argument>
-            <argument>%api_platform.description%</argument>
+            <argument>%api_platform.oauth.enabled%</argument>
+            <argument>%api_platform.oauth.clientId%</argument>
+            <argument>%api_platform.oauth.clientSecret%</argument>
+            <argument>%api_platform.oauth.type%</argument>
+            <argument>%api_platform.oauth.flow%</argument>
+            <argument>%api_platform.oauth.tokenUrl%</argument>
+            <argument>%api_platform.oauth.authorizationUrl%</argument>
+            <argument>%api_platform.oauth.scopes%</argument>
         </service>
 
     </services>

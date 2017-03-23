@@ -6,6 +6,17 @@ $(function () {
         dom_id: 'swagger-ui-container',
         supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
         onComplete: function() {
+            if (data.oauth.enabled && 'function' === typeof initOAuth) {
+                initOAuth({
+                    clientId: data.oauth.clientId,
+                    clientSecret: data.oauth.clientSecret,
+                    realm: data.oauth.type,
+                    appName: data.spec.info.title,
+                    scopeSeparator: ' ',
+                    additionalQueryStringParams: {}
+                });
+            }
+
             $('pre code').each(function(i, e) {
                 hljs.highlightBlock(e)
             });

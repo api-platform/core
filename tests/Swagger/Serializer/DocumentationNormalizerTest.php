@@ -282,7 +282,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $operationPathResolver,
             $urlGeneratorProphecy->reveal(),
             null,
-            $nameConverterProphecy->reveal()
+            $nameConverterProphecy->reveal(),
+            true,
+            'oauth2',
+            'application',
+            '/oauth/v2/token',
+            '/oauth/v2/auth',
+            ['scope param']
         );
 
         $expected = [
@@ -334,6 +340,17 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
             ]),
+            'securityDefinitions' => [
+                'oauth' => [
+                    'type' => 'oauth2',
+                    'description' => 'OAuth client_credentials Grant',
+                    'flow' => 'application',
+                    'tokenUrl' => '/oauth/v2/token',
+                    'authorizationUrl' => '/oauth/v2/auth',
+                    'scopes' => ['scope param'],
+                ],
+            ],
+            'security' => [['oauth' => []]],
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
@@ -1001,17 +1018,17 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
             ]),
             'definitions' => new \ArrayObject([
-                    'Dummy' => new \ArrayObject([
-                            'type' => 'object',
-                            'description' => 'This is a dummy.',
-                            'properties' => [
-                                'name' => new \ArrayObject([
-                                    'description' => 'This is a name.',
-                                    'type' => 'string',
-                                ]),
-                            ],
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'description' => 'This is a name.',
+                            'type' => 'string',
                         ]),
+                    ],
                 ]),
+            ]),
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
