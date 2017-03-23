@@ -15,11 +15,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Util\Factory\PaginationHelperFactory;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -33,28 +32,18 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     private $managerRegistry;
     private $requestStack;
     private $resourceMetadataFactory;
-    private $enabled;
-    private $clientEnabled;
-    private $clientItemsPerPage;
-    private $itemsPerPage;
-    private $pageParameterName;
-    private $enabledParameterName;
-    private $itemsPerPageParameterName;
-    private $maximumItemPerPage;
+    private $paginationHelperFactory;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null, PaginationHelperFactory $paginationHelperFactory = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->enabled = $enabled;
-        $this->clientEnabled = $clientEnabled;
-        $this->clientItemsPerPage = $clientItemsPerPage;
-        $this->itemsPerPage = $itemsPerPage;
-        $this->pageParameterName = $pageParameterName;
-        $this->enabledParameterName = $enabledParameterName;
-        $this->itemsPerPageParameterName = $itemsPerPageParameterName;
-        $this->maximumItemPerPage = $maximumItemPerPage;
+
+        if (!$paginationHelperFactory) {
+            $paginationHelperFactory = new PaginationHelperFactory($requestStack, $resourceMetadataFactory, $enabled, $clientEnabled, $clientItemsPerPage, $itemsPerPage, $pageParameterName, $enabledParameterName, $itemsPerPageParameterName, $maximumItemPerPage);
+        }
+        $this->paginationHelperFactory = $paginationHelperFactory;
     }
 
     /**
@@ -67,19 +56,15 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             return;
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (!$this->isPaginationEnabled($request, $resourceMetadata, $operationName)) {
+        $paginationHelper = $this->paginationHelperFactory->create($resourceClass, $operationName);
+        if (!$paginationHelper->isPaginationEnabled()) {
             return;
         }
 
-        $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
-        if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-            $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
-            $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
-        }
+        $itemsPerPage = $paginationHelper->getItemsPerPage();
 
         $queryBuilder
-            ->setFirstResult(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
+            ->setFirstResult(($paginationHelper->getPage() - 1) * $itemsPerPage)
             ->setMaxResults($itemsPerPage);
     }
 
@@ -93,9 +78,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             return false;
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        return $this->isPaginationEnabled($request, $resourceMetadata, $operationName);
+        return $this->paginationHelperFactory->create($resourceClass, $operationName)->isPaginationEnabled();
     }
 
     /**
@@ -107,18 +90,6 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         return new Paginator($doctrineOrmPaginator);
-    }
-
-    private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool
-    {
-        $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
-        $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
-
-        if ($clientEnabled) {
-            $enabled = filter_var($request->query->get($this->enabledParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
-        }
-
-        return $enabled;
     }
 
     /**

@@ -338,6 +338,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.action.ui',
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.normalizer.documentation',
+            'api_platform.util.pagination_helper_factory',
         ];
 
         foreach ($definitions as $definition) {
