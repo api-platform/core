@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.4
+
+* [security] Hide error's message in prod mode when a 500 error occurs
+* Prevent duplicate data validation
+* Fix filter Eager Loading
+* Fix the Hydra documentation for `ConstraintViolationList`
+* Fix some edge cases with the automatic configuration of Symfony
+* Remove calls to `each()` (deprecated since PHP 7.2)
+* Add a missing property in `EagerLoadingExtension`
+
 ## 2.0.3
 
 * Fix a bug when handling invalid IRIs

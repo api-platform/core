@@ -66,9 +66,11 @@ final class ExceptionAction
     public function __invoke(FlattenException $exception, Request $request): Response
     {
         $exceptionClass = $exception->getClass();
+        $statusCode = $exception->getStatusCode();
+
         foreach ($this->exceptionToStatus as $class => $status) {
             if (is_a($exceptionClass, $class, true)) {
-                $exception->setStatusCode($status);
+                $statusCode = $status;
 
                 break;
             }
@@ -80,6 +82,6 @@ final class ExceptionAction
         $headers['X-Content-Type-Options'] = 'nosniff';
         $headers['X-Frame-Options'] = 'deny';
 
-        return new Response($this->serializer->serialize($exception, $format['key']), $exception->getStatusCode(), $headers);
+        return new Response($this->serializer->serialize($exception, $format['key'], ['statusCode' => $statusCode]), $statusCode, $headers);
     }
 }
