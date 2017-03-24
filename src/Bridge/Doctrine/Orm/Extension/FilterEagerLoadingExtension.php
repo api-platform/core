@@ -58,9 +58,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         $queryBuilderClone->andWhere($queryBuilderClone->expr()->in('o', $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator)->getDQL()));
 
         $queryBuilder->resetDQLPart('where');
-        foreach ($queryBuilderClone->getDQLPart('where')->getParts() as $wherePart) {
-            $queryBuilder->add('where', $wherePart);
-        }
+        $queryBuilder->add('where', $queryBuilderClone->getDQLPart('where'));
     }
 
     /**
@@ -101,10 +99,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
             $queryBuilderClone->add('join', [$join], true);
         }
 
-        //Change where aliases
-        foreach ($wherePart->getParts() as $where) {
-            $queryBuilderClone->add('where', str_replace($aliases, $replacements, $where));
-        }
+        $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));
 
         return $queryBuilderClone;
     }
