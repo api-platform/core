@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -102,8 +103,17 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         }
 
         //Change where aliases
-        foreach ($wherePart->getParts() as $where) {
-            $queryBuilderClone->add('where', str_replace($aliases, $replacements, $where));
+        switch (true) {
+            case $wherePart instanceof Expr\Orx:
+                foreach ($wherePart->getParts() as $where) {
+                    $queryBuilderClone->orWhere(str_replace($aliases, $replacements, $where));
+                }
+                break;
+            case $wherePart instanceof Expr\Andx:
+                foreach ($wherePart->getParts() as $where) {
+                    $queryBuilderClone->andWhere(str_replace($aliases, $replacements, $where));
+                }
+                break;
         }
 
         return $queryBuilderClone;
