@@ -22,7 +22,7 @@ before_install:
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
-  - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.0.0/php-cs-fixer.phar; fi
+  - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.1.2/php-cs-fixer.phar; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
