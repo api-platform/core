@@ -189,6 +189,42 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there is :nb dummy objects with dummyDate and dummyBoolean :bool
+     */
+    public function thereIsDummyObjectsWithDummyDateAndDummyBoolean($nb, $bool)
+    {
+        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
+
+        if (in_array($bool, ['true', '1', 1], true)) {
+            $bool = true;
+        } elseif (in_array($bool, ['false', '0', 0], true)) {
+            $bool = false;
+        } else {
+            $expected = ['true', 'false', '1', '0'];
+            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+        }
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setDescription($descriptions[($i - 1) % 2]);
+            $dummy->setDummyBoolean($bool);
+
+            // Last Dummy has a null date
+            if ($nb !== $i) {
+                $dummy->setDummyDate($date);
+            }
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is :nb dummy objects with dummyDate and relatedDummy
      */
     public function thereIsDummyObjectsWithDummyDateAndRelatedDummy($nb)
