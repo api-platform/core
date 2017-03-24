@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -18,7 +20,7 @@ use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a property name collection from {@see Property} annotations.
+ * Creates a property name collection from {@see ApiProperty} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -74,7 +76,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
 
             $propertyName = $this->reflection->getProperty($reflectionMethod->name);
-            if (!preg_match('/^[A-Z]{2,}/', $propertyName)) {
+            if (null !== $propertyName && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
                 $propertyName = lcfirst($propertyName);
             }
 

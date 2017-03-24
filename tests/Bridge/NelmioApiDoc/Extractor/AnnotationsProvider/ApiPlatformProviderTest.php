@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\NelmioApiDoc\Extractor\AnnotationsProvider;
 
 use ApiPlatform\Core\Api\FilterCollection;
