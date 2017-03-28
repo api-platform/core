@@ -303,7 +303,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return 'xmls:integer';
 
             case Type::BUILTIN_TYPE_FLOAT:
-                return 'xmls:number';
+                return 'xmls:decimal';
 
             case Type::BUILTIN_TYPE_BOOL:
                 return 'xmls:boolean';
