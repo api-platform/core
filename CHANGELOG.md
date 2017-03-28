@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.6
+
+* Correct the XML Schema type generated for floats in the Hydra documentation
+
+## 2.0.5
+
+* Fix a bug when multiple filters are applied
+
 ## 2.0.4
 
 * [security] Hide error's message in prod mode when a 500 error occurs
