@@ -57,6 +57,48 @@ that you did not make in your PR, you're doing it wrong.
 
 All Pull Requests must include [this header](.github/PULL_REQUEST_TEMPLATE.md).
 
+### Tests
+
+On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integration tests (`behat`).
+
+Both `phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
+
+#### Phpunit and coverage generation
+
+To launch unit tests:
+
+```
+vendor/bin/phpunit --stop-on-failure -vvv
+```
+
+If you want coverage, you will need the `phpdbg` package and run:
+
+```
+phpdbg -qrr vendor/bin/phpunit --coverage-html coverage -vvv --stop-on-failure
+```
+
+Sometimes there might be an error with too many open files when generating coverage. To fix this, you can increase the `ulimit`, for example:
+
+```
+ulimit -n 4000
+```
+
+Coverage will be available in `coverage/index.html`.
+
+#### Behat
+
+The command to launch Behat tests is:
+
+```
+./vendor/bin/behat --stop-on-failure -vvv
+```
+
+You may need to clear the cache manually before running behat tests because of the temporary sql database. To do so, just remove the `test` cache directory:
+
+```
+rm -r tests/Fixtures/app/cache/test
+```
+
 ## Squash your commits
 
 If you have 3 commits. So start with:
