@@ -1,0 +1,89 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace ApiPlatform\Core\Api;
+
+use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
+/**
+ * {@inheritdoc}
+ *
+ * @author Antoine Bluchet <soyuka@gmail.com>
+ */
+final class IdentifiersExtractor implements IdentifiersExtractorInterface
+{
+    use ClassInfoTrait;
+
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
+    private $propertyAccessor;
+
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
+    {
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
+        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifiersFromItem($item): array
+    {
+        $identifiers = [];
+        $resourceClass = $this->getObjectClass($item);
+
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+
+            $identifier = $propertyMetadata->isIdentifier();
+            if (null === $identifier || false === $identifier) {
+                continue;
+            }
+
+            $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+
+            if (!is_object($identifiers[$propertyName])) {
+                continue;
+            }
+
+            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
+            $relatedItem = $identifiers[$propertyName];
+
+            unset($identifiers[$propertyName]);
+
+            foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
+
+                if ($propertyMetadata->isIdentifier()) {
+                    if (isset($identifiers[$propertyName])) {
+                        throw new RuntimeException(sprintf('Composite identifiers not supported in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
+                    }
+
+                    $identifiers[$propertyName] = $this->propertyAccessor->getValue($relatedItem, $relatedPropertyName);
+                }
+            }
+
+            if (!isset($identifiers[$propertyName])) {
+                throw new RuntimeException(sprintf('No identifier found in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
+            }
+        }
+
+        return $identifiers;
+    }
+}
