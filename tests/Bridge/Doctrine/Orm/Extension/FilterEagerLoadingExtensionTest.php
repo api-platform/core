@@ -211,6 +211,6 @@ SQL;
 
     private function toDQLString(string $dql): string
     {
-        return str_replace(PHP_EOL, '', str_replace('  ', '', $dql));
+        return preg_replace('/\\r\\n|\\n/', '', str_replace('  ', '', $dql));
     }
 }
