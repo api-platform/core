@@ -80,6 +80,9 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         //reset parts
         $queryBuilderClone->resetDQLPart('join');
         $queryBuilderClone->resetDQLPart('where');
+        $queryBuilderClone->resetDQLPart('orderBy');
+        $queryBuilderClone->resetDQLPart('groupBy');
+        $queryBuilderClone->resetDQLPart('having');
 
         //Change from alias
         $from = $queryBuilderClone->getDQLPart('from')[0];

@@ -129,4 +129,88 @@ class FilterEagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('SELECT o FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
     }
+
+    /**
+     * https://github.com/api-platform/core/issues/1021.
+     */
+    public function testHiddenOrderBy()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o', 'CASE WHEN o.dateCreated IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dateCreated_null_rank')
+            ->from(DummyCar::class, 'o')
+            ->leftJoin('o.colors', 'colors')
+            ->where('o.colors = :foo')
+            ->orderBy('_o_dateCreated_null_rank DESC')
+            ->setParameter('foo', 1);
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
+
+        $expected = <<<SQL
+SELECT o, CASE WHEN o.dateCreated IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dateCreated_null_rank 
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o 
+LEFT JOIN o.colors colors 
+WHERE o IN(
+  SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 
+  LEFT JOIN o_2.colors colors_2 
+  WHERE o_2.colors = :foo
+) ORDER BY _o_dateCreated_null_rank DESC ASC
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+    }
+
+    public function testGroupBy()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o', 'count(o.id) as counter')
+            ->from(DummyCar::class, 'o')
+            ->leftJoin('o.colors', 'colors')
+            ->where('o.colors = :foo')
+            ->orderBy('o.colors')
+            ->groupBy('o.colors')
+            ->having('counter > 3')
+            ->setParameter('foo', 1);
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
+
+        $expected = <<<SQL
+SELECT o, count(o.id) as counter 
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o 
+LEFT JOIN o.colors colors WHERE o 
+IN(
+  SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 
+  LEFT JOIN o_2.colors colors_2 
+  WHERE o_2.colors = :foo
+) 
+GROUP BY o.colors HAVING counter > 3 
+ORDER BY o.colors ASC
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+    }
+
+    private function toDQLString(string $dql): string
+    {
+        return str_replace(PHP_EOL, '', str_replace('  ', '', $dql));
+    }
 }
