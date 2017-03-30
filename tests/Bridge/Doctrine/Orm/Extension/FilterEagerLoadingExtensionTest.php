@@ -15,9 +15,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
@@ -112,6 +114,7 @@ class FilterEagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -123,6 +126,7 @@ class FilterEagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
@@ -140,6 +144,7 @@ class FilterEagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -152,6 +157,7 @@ class FilterEagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
 
@@ -176,6 +182,7 @@ SQL;
 
         $em = $this->prophesize(EntityManager::class);
         $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -190,6 +197,7 @@ SQL;
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
 
@@ -204,6 +212,57 @@ IN(
 ) 
 GROUP BY o.colors HAVING counter > 3 
 ORDER BY o.colors ASC
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+    }
+
+    public function testCompositeIdentifiers()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new ResourceMetadata(CompositeRelation::class));
+
+        $classMetadata = new ClassMetadataInfo(CompositeRelation::class);
+        $classMetadata->isIdentifierComposite = true;
+        $classMetadata->identifier = ['item', 'label'];
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(CompositeRelation::class)->shouldBeCalled()->willReturn($classMetadata);
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o')
+            ->from(CompositeRelation::class, 'o')
+            ->innerJoin('o.compositeItem', 'item')
+            ->innerJoin('o.compositeLabel', 'label')
+            ->where('item.field1 = :foo')
+            ->setParameter('foo', 1);
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias('item')->shouldBeCalled()->willReturn('item_2');
+        $queryNameGenerator->generateJoinAlias('label')->shouldBeCalled()->willReturn('label_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
+
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, 'get');
+
+        $expected = <<<SQL
+SELECT o 
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o 
+INNER JOIN o.compositeItem item 
+INNER JOIN o.compositeLabel label 
+WHERE o.item IN(
+    SELECT IDENTITY(o_2.item) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2 
+    INNER JOIN o_2.compositeItem item_2 
+    INNER JOIN o_2.compositeLabel label_2 
+    WHERE item_2.field1 = :foo
+) AND o.label IN(
+    SELECT IDENTITY(o_2.label) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2 
+    INNER JOIN o_2.compositeItem item_2 
+    INNER JOIN o_2.compositeLabel label_2 
+    WHERE item_2.field1 = :foo
+)
 SQL;
 
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
