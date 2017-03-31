@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait ErrorNormalizerTrait
 {
-    private function getErrorMessage($object, bool $debug = false): string
+    private function getErrorMessage($object, array $context, bool $debug = false): string
     {
         $message = $object->getMessage();
 

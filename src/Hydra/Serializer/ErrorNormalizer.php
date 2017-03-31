@@ -46,7 +46,7 @@ final class ErrorNormalizer implements NormalizerInterface
             $trace = $object->getTrace();
         }
 
-        $message = $this->getErrorMessage($object, $this->debug);
+        $message = $this->getErrorMessage($object, $context, $this->debug);
 
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),

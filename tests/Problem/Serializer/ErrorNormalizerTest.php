@@ -91,4 +91,18 @@ class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
             [Response::HTTP_BAD_REQUEST, 'Bad Request Message', true],
         ];
     }
+
+    public function testErrorServerNormalizeContextStatus()
+    {
+        $normalizer = new ErrorNormalizer(false);
+        $exception = FlattenException::create(new \Exception(''), 500);
+
+        $expected = [
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'detail' => Response::$statusTexts[502],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($exception, null, ['statusCode' => 502]));
+    }
 }

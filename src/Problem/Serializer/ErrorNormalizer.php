@@ -43,7 +43,7 @@ final class ErrorNormalizer implements NormalizerInterface
             $trace = $object->getTrace();
         }
 
-        $message = $this->getErrorMessage($object, $this->debug);
+        $message = $this->getErrorMessage($object, $context, $this->debug);
 
         $data = [
             'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
