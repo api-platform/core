@@ -285,6 +285,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (false === $config['eager_loading']['enabled']) {
             $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
+            $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
         }
     }
 
