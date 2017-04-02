@@ -2,6 +2,7 @@ default:
   suites:
     default:
       contexts:
+        - 'CacheContext'
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'HydraContext'
         - 'SwaggerContext'
@@ -25,7 +26,6 @@ default:
 coverage:
   suites:
     default:
-      contexts:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'HydraContext'
