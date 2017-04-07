@@ -21,7 +21,7 @@ default:
       sessions:
         default:
           symfony2: ~
-    'Sanpi\Behatch\Extension': ~
+    'Behatch\Extension': ~
 
 coverage:
   suites:

@@ -52,7 +52,11 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
-        $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, ApiResource::class);
+        $resourceAnnotation = $this->reader->getClassAnnotation(
+            $reflectionClass,
+            ApiResource::class
+        );
+
         if (null === $resourceAnnotation) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
@@ -70,7 +74,10 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      *
      * @return ResourceMetadata
      */
-    private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
+    private function handleNotFound(
+        ResourceMetadata $parentPropertyMetadata = null,
+        string $resourceClass
+    ): ResourceMetadata
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -79,7 +86,10 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
     }
 
-    private function createMetadata(ApiResource $annotation, ResourceMetadata $parentResourceMetadata = null): ResourceMetadata
+    private function createMetadata(
+        ApiResource $annotation,
+        ResourceMetadata $parentResourceMetadata = null
+    ): ResourceMetadata
     {
         if (!$parentResourceMetadata) {
             return new ResourceMetadata(
@@ -94,7 +104,11 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
 
         $resourceMetadata = $parentResourceMetadata;
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
-            $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
+            $resourceMetadata = $this->createWith(
+                $resourceMetadata,
+                $property,
+                $annotation->$property
+            );
         }
 
         return $resourceMetadata;
@@ -109,15 +123,19 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
      *
      * @return ResourceMetadata
      */
-    private function createWith(ResourceMetadata $resourceMetadata, string $property, $value): ResourceMetadata
+    private function createWith(
+        ResourceMetadata $resourceMetadata,
+        string $property,
+        $value
+    ): ResourceMetadata
     {
-        $getter = 'get'.ucfirst($property);
+        $getter = 'get' . ucfirst($property);
 
         if (null !== $resourceMetadata->$getter()) {
             return $resourceMetadata;
         }
 
-        $wither = 'with'.ucfirst($property);
+        $wither = 'with' . ucfirst($property);
 
         return $resourceMetadata->$wither($value);
     }

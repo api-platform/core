@@ -43,10 +43,22 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
 
         if (isset($attributes['collection_operation_name'])) {
-            $context = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], $key, [], true);
+            $context = $resourceMetadata->getCollectionOperationAttribute(
+                $attributes['collection_operation_name'],
+                $key,
+                [],
+                true
+            );
+
             $context['collection_operation_name'] = $attributes['collection_operation_name'];
         } else {
-            $context = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], $key, [], true);
+            $context = $resourceMetadata->getItemOperationAttribute(
+                $attributes['item_operation_name'],
+                $key,
+                [],
+                true
+            );
+
             $context['item_operation_name'] = $attributes['item_operation_name'];
         }
 

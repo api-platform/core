@@ -42,8 +42,14 @@ final class ApiLoader extends Loader
     private $container;
     private $formats;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats)
-    {
+    public function __construct(
+        KernelInterface $kernel,
+        ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        ResourceMetadataFactoryInterface $resourceMetadataFactory,
+        OperationPathResolverInterface $operationPathResolver,
+        ContainerInterface $container,
+        array $formats
+    ) {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;

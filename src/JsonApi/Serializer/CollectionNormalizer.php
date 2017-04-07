@@ -39,8 +39,12 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     private $resourceMetadataFactory;
     private $propertyMetadataFactory;
 
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, string $pageParameterName)
-    {
+    public function __construct(
+        ResourceClassResolverInterface $resourceClassResolver,
+        ResourceMetadataFactoryInterface $resourceMetadataFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        string $pageParameterName
+    ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->pageParameterName = $pageParameterName;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -62,17 +66,26 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     {
         $currentPage = $lastPage = $itemsPerPage = 1;
         $data = ['data' => []];
-        if (isset($context['api_sub_level'])) {
-            foreach ($object as $index => $obj) {
-                $data['data'][][$index] = $this->normalizer->normalize($obj, $format, $context);
-            }
 
-            return $data;
-        }
+        // TODO: Document the use of api_sub_level
+        // if (isset($context['api_sub_level'])) {
+        //     foreach ($object as $index => $obj) {
+        //         $data['data'][][$index] = $this->normalizer->normalize($obj, $format, $context);
+        //     }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        //     return $data;
+        // }
+
+        $resourceClass = $this->resourceClassResolver->getResourceClass(
+            $object,
+            $context['resource_class'] ?? null,
+            true
+        );
+
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
         $context = $this->initContext($resourceClass, $context);
+
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
         $paginated = $isPaginator = $object instanceof PaginatorInterface;
 
@@ -85,26 +98,54 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         }
 
         $data = [
-                'links' => [
-                    'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
-                ],
+            'data' => [],
+            'links' => [
+                'self' => IriHelper::createIri(
+                    $parsed['parts'],
+                    $parsed['parameters'],
+                    $this->pageParameterName,
+                    $paginated ? $currentPage : null
+                ),
+            ],
         ];
 
         if ($paginated) {
-            $data['links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-            $data['links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            $data['links']['first'] = IriHelper::createIri(
+                $parsed['parts'],
+                $parsed['parameters'],
+                $this->pageParameterName,
+                1.
+            );
+
+            $data['links']['last'] = IriHelper::createIri(
+                $parsed['parts'],
+                $parsed['parameters'],
+                $this->pageParameterName,
+                $lastPage
+            );
 
             if (1. !== $currentPage) {
-                $data['links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
+                $data['links']['prev'] = IriHelper::createIri(
+                    $parsed['parts'],
+                    $parsed['parameters'],
+                    $this->pageParameterName,
+                    $currentPage - 1.
+                );
             }
 
             if ($currentPage !== $lastPage) {
-                $data['links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
+                $data['links']['next'] = IriHelper::createIri(
+                    $parsed['parts'],
+                    $parsed['parameters'],
+                    $this->pageParameterName,
+                    $currentPage + 1.
+                );
             }
         }
+
         $identifier = null;
         foreach ($object as $obj) {
-            $item = $this->normalizer->normalize($obj, $format, $context);
+            $item = $this->normalizer->normalize($obj, $format, $context)['data']['attributes'];
             $relationships = [];
 
             if (isset($item['relationships'])) {
@@ -114,6 +155,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
             foreach ($item as $property => $value) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+
                 if ($propertyMetadata->isIdentifier()) {
                     $identifier = $item[$property];
                 }
@@ -121,7 +163,9 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
             $items = [
                 'type' => $resourceMetadata->getShortName(),
-                'id' => $identifier ?? '',
+                // The id attribute must be a string
+                // http://jsonapi.org/format/#document-resource-object-identification
+                'id' => (string) $identifier ?? '',
                 'attributes' => $item,
             ];
 
@@ -133,7 +177,9 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         }
 
         if (is_array($object) || $object instanceof \Countable) {
-            $data['meta']['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
+            $data['meta']['totalItems'] = $object instanceof PaginatorInterface ?
+                (int) $object->getTotalItems() :
+                count($object);
         }
 
         if ($isPaginator) {

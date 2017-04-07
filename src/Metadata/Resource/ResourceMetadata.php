@@ -25,8 +25,14 @@ final class ResourceMetadata
     private $collectionOperations;
     private $attributes;
 
-    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null)
-    {
+    public function __construct(
+        string $shortName = null,
+        string $description = null,
+        string $iri = null,
+        array $itemOperations = null,
+        array $collectionOperations = null,
+        array $attributes = null
+    ) {
         $this->shortName = $shortName;
         $this->description = $description;
         $this->iri = $iri;
@@ -170,9 +176,19 @@ final class ResourceMetadata
      *
      * @return mixed
      */
-    public function getCollectionOperationAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
-    {
-        return $this->getOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
+    public function getCollectionOperationAttribute(
+        string $operationName,
+        string $key,
+        $defaultValue = null,
+        bool $resourceFallback = false
+    ) {
+        return $this->getOperationAttribute(
+            $this->collectionOperations,
+            $operationName,
+            $key,
+            $defaultValue,
+            $resourceFallback
+        );
     }
 
     /**
@@ -185,9 +201,19 @@ final class ResourceMetadata
      *
      * @return mixed
      */
-    public function getItemOperationAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
-    {
-        return $this->getOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
+    public function getItemOperationAttribute(
+        string $operationName,
+        string $key,
+        $defaultValue = null,
+        bool $resourceFallback = false
+    ) {
+        return $this->getOperationAttribute(
+            $this->itemOperations,
+            $operationName,
+            $key,
+            $defaultValue,
+            $resourceFallback
+        );
     }
 
     /**
@@ -201,8 +227,13 @@ final class ResourceMetadata
      *
      * @return mixed
      */
-    private function getOperationAttribute(array $operations = null, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
-    {
+    private function getOperationAttribute(
+        array $operations = null,
+        string $operationName,
+        string $key,
+        $defaultValue = null,
+        bool $resourceFallback = false
+    ) {
         if (isset($operations[$operationName][$key])) {
             return $operations[$operationName][$key];
         }

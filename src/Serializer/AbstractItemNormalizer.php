@@ -41,8 +41,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $resourceClassResolver;
     protected $propertyAccessor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
-    {
+    public function __construct(
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        IriConverterInterface $iriConverter,
+        ResourceClassResolverInterface $resourceClassResolver,
+        PropertyAccessorInterface $propertyAccessor = null,
+        NameConverterInterface $nameConverter = null,
+        ClassMetadataFactoryInterface $classMetadataFactory = null
+    ) {
         parent::__construct($classMetadataFactory, $nameConverter);
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -79,7 +86,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $resourceClass = $this->resourceClassResolver->getResourceClass(
+            $object,
+            $context['resource_class'] ?? null,
+            true
+        );
         $context = $this->initContext($resourceClass, $context);
         $context['api_normalize'] = true;
 
@@ -120,14 +131,21 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
-    {
+    protected function getAllowedAttributes(
+        $classOrObject,
+        array $context,
+        $attributesAsString = false
+    ) {
         $options = $this->getFactoryOptions($context);
-        $propertyNames = $this->propertyNameCollectionFactory->create($context['resource_class'], $options);
+        $propertyNames = $this
+            ->propertyNameCollectionFactory
+            ->create($context['resource_class'], $options);
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
+            $propertyMetadata = $this
+                ->propertyMetadataFactory
+                ->create($context['resource_class'], $propertyName, $options);
 
             if (
                 (isset($context['api_normalize']) && $propertyMetadata->isReadable()) ||
@@ -143,9 +161,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
-    {
-        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
+    protected function setAttributeValue(
+        $object,
+        $attribute,
+        $value,
+        $format = null,
+        array $context = []
+    ) {
+        $propertyMetadata = $this->propertyMetadataFactory->create(
+            $context['resource_class'],
+            $attribute,
+            $this->getFactoryOptions($context)
+        );
         $type = $propertyMetadata->getType();
 
         if (null === $type) {
@@ -169,7 +196,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->setValue(
                 $object,
                 $attribute,
-                $this->denormalizeCollection($attribute, $propertyMetadata, $type, $className, $value, $format, $context)
+                $this->denormalizeCollection(
+                    $attribute,
+                    $propertyMetadata,
+                    $type,
+                    $className,
+                    $value,
+                    $format,
+                    $context
+                )
             );
 
             return;
@@ -179,7 +214,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->setValue(
                 $object,
                 $attribute,
-                $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $context)
+                $this->denormalizeRelation(
+                    $attribute,
+                    $propertyMetadata,
+                    $className,
+                    $value,
+                    $format,
+                    $context
+                )
             );
 
             return;
@@ -230,7 +272,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return array
      */
-    private function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
+    private function denormalizeCollection(
+        string $attribute,
+        PropertyMetadata $propertyMetadata,
+        Type $type,
+        string $className,
+        $value,
+        string $format = null,
+        array $context
+    ): array
     {
         if (!is_array($value)) {
             throw new InvalidArgumentException(sprintf(
@@ -270,8 +320,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return object|null
      */
-    private function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
-    {
+    protected function denormalizeRelation(
+        string $attributeName,
+        PropertyMetadata $propertyMetadata,
+        string $className,
+        $value,
+        string $format = null,
+        array $context
+    ) {
         if (is_string($value)) {
             try {
                 return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
@@ -362,7 +418,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
-        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
+        $propertyMetadata = $this->propertyMetadataFactory->create(
+            $context['resource_class'],
+            $attribute,
+            $this->getFactoryOptions($context)
+        );
 
         try {
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
@@ -415,7 +475,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return string|array
      */
-    private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
+    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
         if ($propertyMetadata->isReadableLink()) {
             return $this->serializer->normalize($relatedObject, $format, $this->createRelationSerializationContext($resourceClass, $context));
