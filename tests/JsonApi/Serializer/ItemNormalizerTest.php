@@ -186,7 +186,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
             'data' => [
                 'type' => 'Dummy',
                 'id' => null,
-                'attributes' => ['name' => 'hello']
+                'attributes' => ['name' => 'hello'],
             ],
         ];
 

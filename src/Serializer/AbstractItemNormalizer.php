@@ -280,8 +280,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $value,
         string $format = null,
         array $context
-    ): array
-    {
+    ): array {
         if (!is_array($value)) {
             throw new InvalidArgumentException(sprintf(
                 'The type of the "%s" attribute must be "array", "%s" given.', $attribute, gettype($value)

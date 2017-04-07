@@ -13,14 +13,14 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
-use Behatch\Json\JsonInspector;
 use Behatch\Json\Json;
+use Behatch\Json\JsonInspector;
 
 final class JsonApiContext implements Context
 {
-    protected $restContext;
+    private $restContext;
 
-    protected $inspector;
+    private $inspector;
 
     /**
      * Gives access to the Behatch context.
@@ -50,7 +50,7 @@ final class JsonApiContext implements Context
             throw new \RuntimeException('JSON response seems to be invalid');
         }
 
-        file_put_contents(dirname(__FILE__) . '/response.json', $content);
+        file_put_contents(dirname(__FILE__).'/response.json', $content);
     }
 
     /**
@@ -68,7 +68,7 @@ final class JsonApiContext implements Context
     }
 
     /**
-     * Checks that given JSON node is equal to an empty array
+     * Checks that given JSON node is equal to an empty array.
      *
      * @Then the JSON node :node should be an empty array
      */
@@ -84,7 +84,7 @@ final class JsonApiContext implements Context
     }
 
     /**
-     * Checks that given JSON node is a number
+     * Checks that given JSON node is a number.
      *
      * @Then the JSON node :node should be a number
      */
@@ -100,7 +100,7 @@ final class JsonApiContext implements Context
     }
 
     /**
-     * Checks that given JSON node is not an empty string
+     * Checks that given JSON node is not an empty string.
      *
      * @Then the JSON node :node should not be an empty string
      */
@@ -115,19 +115,19 @@ final class JsonApiContext implements Context
         }
     }
 
-    protected function getValueOfNode($node)
+    private function getValueOfNode($node)
     {
         $json = $this->getJson();
 
         return $this->inspector->evaluate($json, $node);
     }
 
-    protected function getJson()
+    private function getJson()
     {
         return new Json($this->getContent());
     }
 
-    protected function getContent()
+    private function getContent()
     {
         return $this->restContext->getMink()->getSession()->getDriver()->getContent();
     }

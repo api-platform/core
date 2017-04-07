@@ -77,8 +77,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
     private function handleNotFound(
         ResourceMetadata $parentPropertyMetadata = null,
         string $resourceClass
-    ): ResourceMetadata
-    {
+    ): ResourceMetadata {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
         }
@@ -89,8 +88,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
     private function createMetadata(
         ApiResource $annotation,
         ResourceMetadata $parentResourceMetadata = null
-    ): ResourceMetadata
-    {
+    ): ResourceMetadata {
         if (!$parentResourceMetadata) {
             return new ResourceMetadata(
                 $annotation->shortName,
@@ -127,15 +125,14 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         ResourceMetadata $resourceMetadata,
         string $property,
         $value
-    ): ResourceMetadata
-    {
-        $getter = 'get' . ucfirst($property);
+    ): ResourceMetadata {
+        $getter = 'get'.ucfirst($property);
 
         if (null !== $resourceMetadata->$getter()) {
             return $resourceMetadata;
         }
 
-        $wither = 'with' . ucfirst($property);
+        $wither = 'with'.ucfirst($property);
 
         return $resourceMetadata->$wither($value);
     }

@@ -224,7 +224,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     $isMany = null !== $valueType
                         && ($className = $valueType->getClassName())
                         && $this->resourceClassResolver->isResourceClass($className);
-
                 } else {
                     $className = $type->getClassName();
 
@@ -250,7 +249,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $relation = [
                 'name' => $attribute,
                 'type' => $shortName,
-                'cardinality' => $isOne ? 'one' : 'many'
+                'cardinality' => $isOne ? 'one' : 'many',
             ];
 
             $components['relationships'][] = $relation;
@@ -277,13 +276,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         array $context,
         array $components,
         string $type = 'relationships'
-    ): array
-    {
+    ): array {
         $data = [];
 
         $identifier = '';
         foreach ($components[$type] as $relation) {
-
             $attributeValue = $this->getAttributeValue(
                 $object,
                 $relation['name'],
@@ -298,7 +295,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $data[$relation['name']] = [
                 // TODO: Pending review
                 // 'links' => ['self' => $this->iriConverter->getIriFromItem($object)],
-                'data' => []
+                'data' => [],
             ];
 
             // Many to one relationship
@@ -379,13 +376,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * See: http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @param  string           $attributeName    [description]
-     * @param  PropertyMetadata $propertyMetadata [description]
-     * @param  string           $className        [description]
-     * @param  [type]           $data             [description]
-     * @param  string|null      $format           [description]
-     * @param  array            $context          [description]
-     * @return [type]                             [description]
+     * @param string           $attributeName    [description]
+     * @param PropertyMetadata $propertyMetadata [description]
+     * @param string           $className        [description]
+     * @param [type]           $data             [description]
+     * @param string|null      $format           [description]
+     * @param array            $context          [description]
+     *
+     * @return [type] [description]
      */
     protected function denormalizeRelation(
         string $attributeName,
@@ -469,7 +467,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         return ['data' => [
             'type' => $resourceMetadata->getShortName(),
-            'id' => (string) reset($identifiers)
+            'id' => (string) reset($identifiers),
         ]];
     }
 

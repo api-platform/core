@@ -161,7 +161,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 null,
                 [
                     'api_sub_level' => true,
-                    'resource_class' => 'Foo'
+                    'resource_class' => 'Foo',
                 ]
             )
             ->willReturn([
@@ -170,9 +170,9 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                     'id' => 1,
                     'attributes' => [
                         'id' => 1,
-                        'name' => 'Kévin'
-                    ]
-                ]
+                        'name' => 'Kévin',
+                    ],
+                ],
             ]);
 
         $normalizer->setNormalizer($itemNormalizer->reveal());
