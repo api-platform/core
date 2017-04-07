@@ -61,13 +61,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         $forceEager = $this->isForceEager($resourceClass, $options);
 
-        try {
-            $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
+        $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
-        } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
-            //ignore the not found exception
-        }
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
     }
 
     /**

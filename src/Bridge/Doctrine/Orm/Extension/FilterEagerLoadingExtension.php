@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -38,7 +40,10 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if (false === $this->forceEager || false === $this->isForceEager($resourceClass, ['collection_operation_name' => $operationName])) {
+        $em = $queryBuilder->getEntityManager();
+        $classMetadata = $em->getClassMetadata($resourceClass);
+
+        if (!$this->hasFetchEagerAssociation($em, $classMetadata) && (false === $this->forceEager || false === $this->isForceEager($resourceClass, ['collection_operation_name' => $operationName]))) {
             return;
         }
 
@@ -58,8 +63,6 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
         $queryBuilderClone = clone $queryBuilder;
         $queryBuilderClone->resetDQLPart('where');
-
-        $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
 
         if (!$classMetadata->isIdentifierComposite) {
             $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
@@ -144,5 +147,28 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         }
 
         return is_bool($forceEager) ? $forceEager : $this->forceEager;
+    }
+
+    private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, &$checked = [])
+    {
+        $checked[] = $classMetadata->name;
+
+        foreach ($classMetadata->associationMappings as $mapping) {
+            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
+                return true;
+            }
+
+            $related = $em->getClassMetadata($mapping['targetEntity']);
+
+            if (in_array($related->name, $checked)) {
+                continue;
+            }
+
+            if (true === $this->hasFetchEagerAssociation($em, $related, $checked)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
