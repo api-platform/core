@@ -210,6 +210,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
             'api_platform.eager_loading.force_eager' => true,
+            'api_platform.resource_class_directories' => [],
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -219,7 +220,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
         $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->addArgument([])->shouldBeCalled();
+        $definitionProphecy->addArgument('%api_platform.resource_class_directories%')->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definitionProphecy->reveal())->shouldBeCalled();
 
         foreach (['yaml', 'xml'] as $format) {

@@ -21,6 +21,7 @@ use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
@@ -43,8 +44,9 @@ final class ApiLoader extends Loader
     private $operationPathResolver;
     private $container;
     private $formats;
+    private $resourceClassDirectories;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [])
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -52,14 +54,18 @@ final class ApiLoader extends Loader
         $this->operationPathResolver = $operationPathResolver;
         $this->container = $container;
         $this->formats = $formats;
+        $this->resourceClassDirectories = $resourceClassDirectories;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function load($data, $type = null)
+    public function load($data, $type = null): RouteCollection
     {
         $routeCollection = new RouteCollection();
+        foreach ($this->resourceClassDirectories as $directory) {
+            $routeCollection->addResource(new DirectoryResource($directory, '/\.php$/'));
+        }
 
         $this->loadExternalFiles($routeCollection);
 
