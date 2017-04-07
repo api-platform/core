@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -78,7 +80,7 @@ final class QueryJoinParser
             }
         }
 
-        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases)];
+        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases, true)];
 
         $rootMetadata = $managerRegistry
             ->getManagerForClass($rootEntity)

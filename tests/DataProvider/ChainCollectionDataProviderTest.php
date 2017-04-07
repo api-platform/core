@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ChainCollectionDataProvider;
@@ -44,13 +46,13 @@ class ChainCollectionDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([$dummy, $dummy2], $chainItemDataProvider->getCollection(Dummy::class));
     }
 
-    public function testGetCollectionExeptions()
+    public function testGetCollectionExceptions()
     {
         $firstDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
-        $firstDataProvider->getCollection('notfound', 1)->willThrow(ResourceClassNotSupportedException::class);
+        $firstDataProvider->getCollection('notfound', 'op')->willThrow(ResourceClassNotSupportedException::class);
 
         $chainItemDataProvider = new ChainCollectionDataProvider([$firstDataProvider->reveal()]);
 
-        $this->assertEquals('', $chainItemDataProvider->getCollection('notfound', 1));
+        $this->assertEquals('', $chainItemDataProvider->getCollection('notfound', 'op'));
     }
 }

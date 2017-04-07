@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -16,7 +18,7 @@ use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 
 /**
- * Creates a resource name collection from {@see Resource} configuration files.
+ * Creates a resource name collection from {@see ApiResource} configuration files.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Antoine Bluchet <soyuka@gmail.com>

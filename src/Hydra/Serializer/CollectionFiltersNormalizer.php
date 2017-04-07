@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
@@ -69,7 +71,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         }
 
-        if ([] === $resourceFilters) {
+        if (!$resourceFilters) {
             return $data;
         }
 
@@ -80,12 +82,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         $currentFilters = [];
         foreach ($this->filters as $filterName => $filter) {
-            if (in_array($filterName, $resourceFilters)) {
+            if (in_array($filterName, $resourceFilters, true)) {
                 $currentFilters[] = $filter;
             }
         }
 
-        if ([] !== $currentFilters) {
+        if ($currentFilters) {
             $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters);
         }
 

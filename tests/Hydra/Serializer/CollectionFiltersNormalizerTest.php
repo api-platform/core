@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\tests\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
@@ -126,7 +128,7 @@ class CollectionFiltersNormalizerTest extends \PHPUnit_Framework_TestCase
             $decorated->reveal(),
             $resourceMetadataFactory->reveal(),
             $resourceClassResolver->reveal(),
-            new FilterCollection([$filter->reveal()])
+            new FilterCollection(['foo' => $filter->reveal()])
         );
 
         $this->assertEquals([

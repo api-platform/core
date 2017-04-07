@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;

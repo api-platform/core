@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -19,7 +21,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ProphecyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -29,7 +30,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Tes
     /**
      * @dataProvider getDependencies
      */
-    public function testCreate(ProphecyInterface $decorated = null, array $results)
+    public function testCreate(PropertyNameCollectionFactoryInterface $decorated = null, array $results)
     {
         $reader = $this->prophesize(Reader::class);
         $reader->getPropertyAnnotation(new \ReflectionProperty(Dummy::class, 'name'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
@@ -39,7 +40,7 @@ class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Tes
         $reader->getMethodAnnotation(new \ReflectionMethod(Dummy::class, 'staticMethod'), ApiProperty::class)->shouldNotBeCalled();
         $reader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
 
-        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
+        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal(), $decorated);
         $metadata = $factory->create(Dummy::class, []);
 
         $this->assertEquals($results, iterator_to_array($metadata));
@@ -55,8 +56,8 @@ class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Tes
 
         return [
             [null, ['name', 'alias']],
-            [$decoratedThrowsNotFound, ['name', 'alias']],
-            [$decoratedReturnParent, ['name', 'alias', 'foo']],
+            [$decoratedThrowsNotFound->reveal(), ['name', 'alias']],
+            [$decoratedReturnParent->reveal(), ['name', 'alias', 'foo']],
         ];
     }
 

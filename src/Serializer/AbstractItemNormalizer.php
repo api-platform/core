@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -202,7 +204,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
     {
         $builtinType = $type->getBuiltinType();
-        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && false !== strpos($format, 'json')) {
+        if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
             $isValid = is_float($value) || is_int($value);
         } else {
             $isValid = call_user_func('is_'.$builtinType, $value);

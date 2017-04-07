@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
@@ -62,7 +64,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $appliedFilters = $parsed['parameters'];
         unset($appliedFilters[$this->enabledParameterName]);
 
-        if ([] === $appliedFilters && !$paginated) {
+        if (!$appliedFilters && !$paginated) {
             return $data;
         }
 

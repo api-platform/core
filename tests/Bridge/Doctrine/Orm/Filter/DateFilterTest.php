@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
@@ -124,14 +126,14 @@ class DateFilterTest extends KernelTestCase
             ],
             'after' => [
                 [
-                    'dummyDate' => true,
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 AND o.dummyDate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
             'before (all properties enabled)' => [
                 null,
@@ -144,14 +146,14 @@ class DateFilterTest extends KernelTestCase
             ],
             'before' => [
                 [
-                    'dummyDate' => true,
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
                         'before' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
             ],
             'before + after (all properties enabled)' => [
                 null,
@@ -165,7 +167,7 @@ class DateFilterTest extends KernelTestCase
             ],
             'before + after' => [
                 [
-                    'dummyDate' => true,
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
@@ -173,11 +175,11 @@ class DateFilterTest extends KernelTestCase
                         'before' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE (o.dummyDate <= :dummyDate_p1 AND o.dummyDate IS NOT NULL) AND (o.dummyDate >= :dummyDate_p2 AND o.dummyDate IS NOT NULL)', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
             ],
             'property not enabled' => [
                 [
-                    'unknown',
+                    'unknown' => null,
                 ],
                 [
                     'dummyDate' => [
@@ -189,14 +191,14 @@ class DateFilterTest extends KernelTestCase
             ],
             'nested property' => [
                 [
-                    'relatedDummy.dummyDate' => true,
+                    'relatedDummy.dummyDate' => null,
                 ],
                 [
                     'relatedDummy.dummyDate' => [
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyDate >= :dummyDate_p1 AND relatedDummy_a1.dummyDate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
             'after (exclude_null)' => [
                 [

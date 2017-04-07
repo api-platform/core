@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -235,7 +237,7 @@ class HydraContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return isset($classInfos->{'hydra:supportedOperation'}) ? $classInfos->{'hydra:supportedOperation'} : [];
+        return $classInfos->{'hydra:supportedOperation'} ?? [];
     }
 
     /**
@@ -251,7 +253,7 @@ class HydraContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return isset($classInfos->{'hydra:supportedProperty'}) ? $classInfos->{'hydra:supportedProperty'} : [];
+        return $classInfos->{'hydra:supportedProperty'} ?? [];
     }
 
     /**
