@@ -22,6 +22,7 @@ Feature: JSONAPI support
     And I valide it with jsonapi-validator
     And the JSON node "data" should be an empty array
 
+  @createSchema @current
   Scenario: Create a ThirdLevel
     When I add "Content-Type" header equal to "application/vnd.api+json"
     And I add "Accept" header equal to "application/vnd.api+json"
@@ -57,6 +58,7 @@ Feature: JSONAPI support
     And I valide it with jsonapi-validator
     And print last JSON response
 
+  @current
   Scenario: Create a related dummy
     When I add "Content-Type" header equal to "application/vnd.api+json"
     And I add "Accept" header equal to "application/vnd.api+json"
@@ -84,6 +86,8 @@ Feature: JSONAPI support
     And I save the response
     And I valide it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
+    And the JSON node "data.attributes.name" should be equal to "sup yo"
+    And the JSON node "data.attributes.age" should be equal to the number 23
 
   @dropSchema
   Scenario: Retrieve the related dummy
