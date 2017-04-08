@@ -35,6 +35,7 @@
             <argument type="service" id="api_platform.operation_path_resolver.custom" />
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.resource_class_directories%</argument>
 
             <tag name="routing.loader" />
         </service>

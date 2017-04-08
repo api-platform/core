@@ -160,7 +160,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
             $related = $em->getClassMetadata($mapping['targetEntity']);
 
-            if (in_array($related->name, $checked)) {
+            if (in_array($related->name, $checked, true)) {
                 continue;
             }
 

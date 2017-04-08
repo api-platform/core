@@ -258,7 +258,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerLoaders(ContainerBuilder $container, array $bundles)
     {
-        $annotationPaths = [];
+        $resourceClassDirectories = [];
         $yamlResources = [];
         $xmlResources = [];
 
@@ -267,12 +267,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $this->addFileResources($bundleDirectory, $xmlResources, $yamlResources);
 
             if (file_exists($entityDirectory = $bundleDirectory.'/Entity')) {
-                $annotationPaths[] = $entityDirectory;
+                $resourceClassDirectories[] = $entityDirectory;
                 $container->addResource(new DirectoryResource($entityDirectory, '/\.php$/'));
             }
         }
 
-        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument($annotationPaths);
+        $container->setParameter('api_platform.resource_class_directories', $resourceClassDirectories);
+        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument('%api_platform.resource_class_directories%');
         $container->getDefinition('api_platform.metadata.extractor.yaml')->addArgument($yamlResources);
         $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
     }
