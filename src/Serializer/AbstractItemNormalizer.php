@@ -25,6 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Base item normalizer.
@@ -146,6 +147,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $propertyMetadata = $this
                 ->propertyMetadataFactory
                 ->create($context['resource_class'], $propertyName, $options);
+
+            if (
+                isset($context['api_denormalize'])
+                    && !$propertyMetadata->isWritable()
+                    && !$propertyMetadata->isIdentifier()
+            ) {
+                throw new RuntimeException(sprintf(
+                    'Property \'%s.%s\' is not writeable',
+                    $context['resource_class'],
+                    $propertyName
+                ));
+            }
 
             if (
                 (isset($context['api_normalize']) && $propertyMetadata->isReadable()) ||

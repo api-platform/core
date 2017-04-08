@@ -24,6 +24,7 @@ use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Converts between objects and array including HAL metadata.

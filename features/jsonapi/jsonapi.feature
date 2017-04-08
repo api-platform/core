@@ -1,7 +1,7 @@
 Feature: JSONAPI support
-  In order to use the JSONAPI hypermedia format
+  In order to use the JSON API hypermedia format
   As a client software developer
-  I need to be able to retrieve valid HAL responses.
+  I need to be able to retrieve valid JSON API responses.
 
   @createSchema
   Scenario: Retrieve the API entrypoint
@@ -66,7 +66,7 @@ Feature: JSONAPI support
       "data": {
         "type": "related-dummy",
         "attributes": {
-          "name": "sup yo",
+          "name": "John Doe",
           "age": 23
         },
         "relationships": {
@@ -84,10 +84,9 @@ Feature: JSONAPI support
     And I save the response
     And I valide it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
-    And the JSON node "data.attributes.name" should be equal to "sup yo"
+    And the JSON node "data.attributes.name" should be equal to "John Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
 
-  @dropSchema
   Scenario: Retrieve the related dummy
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/related_dummies/1"
@@ -102,7 +101,7 @@ Feature: JSONAPI support
         "type": "RelatedDummy",
         "attributes": {
           "id": 1,
-          "name": "sup yo",
+          "name": "John Doe",
           "symfony": "symfony",
           "dummyDate": null,
           "dummyBoolean": null,
@@ -119,6 +118,28 @@ Feature: JSONAPI support
       }
     }
     """
+
+  @dropSchema
+  Scenario: Update a resource via PATCH
+    When I add "Accept" header equal to "application/vnd.api+json"
+    When I add "Content-Type" header equal to "application/vnd.api+json"
+    And I send a "PATCH" request to "/related_dummies/1" with body:
+    """
+    {
+      "data": {
+        "type": "related-dummy",
+        "attributes": {
+          "name": "Jane Doe"
+        }
+      }
+    }
+    """
+    Then print last JSON response
+    And I save the response
+    And I valide it with jsonapi-validator
+    And the JSON node "data.id" should not be an empty string
+    And the JSON node "data.attributes.name" should be equal to "Jane Doe"
+    And the JSON node "data.attributes.age" should be equal to the number 23
 
   # Scenario: Embed a relation in a parent object
   #   When I add "Content-Type" header equal to "application/json"
