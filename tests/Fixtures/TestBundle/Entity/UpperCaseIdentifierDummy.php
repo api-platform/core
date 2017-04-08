@@ -15,14 +15,12 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Custom identifier dummy.
- *
- * @author Exploit.cz <insekticid@exploit.cz>
+ * UpperCaseIdentifier dummy.
  *
  * @ApiResource
  * @ORM\Entity
  */
-class UuidIdentifierDummy
+class UpperCaseIdentifierDummy
 {
     /**
      * @var string The custom identifier
@@ -30,7 +28,7 @@ class UuidIdentifierDummy
      * @ORM\Column(type="guid")
      * @ORM\Id
      */
-    private $uuid;
+    private $Uuid;
 
     /**
      * @var string The dummy name
@@ -41,12 +39,12 @@ class UuidIdentifierDummy
 
     public function getUuid(): string
     {
-        return $this->uuid;
+        return $this->Uuid;
     }
 
-    public function setUuid(string $uuid)
+    public function setUuid(string $Uuid)
     {
-        $this->uuid = $uuid;
+        $this->Uuid = $Uuid;
     }
 
     public function getName(): string
