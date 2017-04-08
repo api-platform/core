@@ -22,7 +22,6 @@ Feature: JSONAPI support
     And I valide it with jsonapi-validator
     And the JSON node "data" should be an empty array
 
-  @createSchema @current
   Scenario: Create a ThirdLevel
     When I add "Content-Type" header equal to "application/vnd.api+json"
     And I add "Accept" header equal to "application/vnd.api+json"
@@ -58,7 +57,6 @@ Feature: JSONAPI support
     And I valide it with jsonapi-validator
     And print last JSON response
 
-  @current
   Scenario: Create a related dummy
     When I add "Content-Type" header equal to "application/vnd.api+json"
     And I add "Accept" header equal to "application/vnd.api+json"
@@ -92,10 +90,35 @@ Feature: JSONAPI support
   @dropSchema
   Scenario: Retrieve the related dummy
     When I add "Accept" header equal to "application/vnd.api+json"
-    And I send a "GET" request to "/third_levels/1"
-    Then I save the response
+    And I send a "GET" request to "/related_dummies/1"
+    Then print last JSON response
+    And I save the response
     And I valide it with jsonapi-validator
-    And print last JSON response
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "id": "1",
+        "type": "RelatedDummy",
+        "attributes": {
+          "id": 1,
+          "name": "sup yo",
+          "symfony": "symfony",
+          "dummyDate": null,
+          "dummyBoolean": null,
+          "age": 23
+        },
+        "relationships": {
+          "thirdLevel": {
+            "data": {
+              "type": "ThirdLevel",
+              "id": "1"
+            }
+          }
+        }
+      }
+    }
+    """
 
   # Scenario: Embed a relation in a parent object
   #   When I add "Content-Type" header equal to "application/json"
