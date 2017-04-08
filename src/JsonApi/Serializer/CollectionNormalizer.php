@@ -146,7 +146,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $identifier = null;
         foreach ($object as $obj) {
-
             $item = $this->normalizer->normalize($obj, $format, $context)['data']['attributes'];
 
             $relationships = [];

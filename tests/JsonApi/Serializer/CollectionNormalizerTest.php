@@ -57,7 +57,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * TODO: Find out if api_sub_level flag support is needed
+     * TODO: Find out if api_sub_level flag support is needed.
      */
     // public function testNormalizeApiSubLevel()
     // {
