@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Util;
 
-use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -30,12 +29,10 @@ final class RequestAttributesExtractor
     }
 
     /**
-     * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not
-     * contain required attributes.
+     * Extracts resource class, operation name and format request attributes. Returns an empty array if the request does
+     * not contain required attributes.
      *
      * @param Request $request
-     *
-     * @throws RuntimeException
      *
      * @return array
      */
@@ -44,7 +41,7 @@ final class RequestAttributesExtractor
         $result = ['resource_class' => $request->attributes->get('_api_resource_class')];
 
         if (null === $result['resource_class']) {
-            throw new RuntimeException('The request attribute "_api_resource_class" must be defined.');
+            return [];
         }
 
         $collectionOperationName = $request->attributes->get('_api_collection_operation_name');
@@ -55,7 +52,13 @@ final class RequestAttributesExtractor
         } elseif ($itemOperationName) {
             $result['item_operation_name'] = $itemOperationName;
         } else {
-            throw new RuntimeException('One of the request attribute "_api_collection_operation_name" or "_api_item_operation_name" must be defined.');
+            return [];
+        }
+
+        if (null === $apiRequest = $request->attributes->get('_api_receive')) {
+            $result['receive'] = true;
+        } else {
+            $result['receive'] = (bool) $apiRequest;
         }
 
         return $result;

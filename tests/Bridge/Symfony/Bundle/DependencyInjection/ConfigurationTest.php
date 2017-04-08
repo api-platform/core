@@ -79,7 +79,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'force_eager' => true,
             ],
             'collection' => [
-                'order' => null,
+                'order' => 'ASC',
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
@@ -91,6 +91,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'items_per_page_parameter_name' => 'itemsPerPage',
                     'maximum_items_per_page' => null,
                 ],
+            ],
+            'loader_paths' => [
+                'annotation' => [],
+                'yaml' => [],
+                'xml' => [],
             ],
         ], $config);
     }

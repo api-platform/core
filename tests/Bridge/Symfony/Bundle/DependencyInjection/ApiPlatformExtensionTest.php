@@ -189,7 +189,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ])->shouldBeCalled();
 
         $parameters = [
-            'api_platform.collection.order' => null,
+            'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
             'api_platform.collection.pagination.client_enabled' => false,
             'api_platform.collection.pagination.client_items_per_page' => false,
@@ -245,7 +245,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.date_filter',
             'api_platform.doctrine.orm.default.collection_data_provider',
             'api_platform.doctrine.orm.default.item_data_provider',
-            'api_platform.doctrine.orm.default.item_data_provider',
             'api_platform.doctrine.orm.item_data_provider',
             'api_platform.doctrine.orm.metadata.property.metadata_factory',
             'api_platform.doctrine.orm.numeric_filter',
@@ -295,6 +294,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
+            'api_platform.listener.request.deny_access',
             'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.annotation',

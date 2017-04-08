@@ -45,12 +45,40 @@ final class XmlExtractor extends AbstractExtractor
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),
                 'description' => $this->phpize($resource, 'description', 'string'),
                 'iri' => $this->phpize($resource, 'iri', 'string'),
-                'itemOperations' => $this->getAttributes($resource, 'itemOperation') ?: null,
-                'collectionOperations' => $this->getAttributes($resource, 'collectionOperation') ?: null,
+                'itemOperations' => $this->getOperations($resource, 'itemOperation'),
+                'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
                 'properties' => $this->getProperties($resource) ?: null,
             ];
         }
+    }
+
+    /**
+     * Return the array containing configured operations. Returns NULL if there is no operation configuration.
+     *
+     * @param \SimpleXMLElement $resource
+     * @param string            $operationType
+     *
+     * @return array|null
+     */
+    private function getOperations(\SimpleXMLElement $resource, string $operationType)
+    {
+        $legacyOperations = $this->getAttributes($resource, $operationType);
+        if ($legacyOperations !== []) {
+          @trigger_error(
+            sprintf('Configuring "%s" tags without using a parent "%s" tag is deprecrated since API Platform 2.3 and will not be possible anymore in API Platform 3', $operationType, $operationType, E_USER_DEPRECATED)
+          );
+
+          return $legacyOperations;
+        }
+
+        $operationsParent = $operationType.'s';
+
+        if (!isset($resource->$operationsParent)) {
+            return;
+        }
+
+        return $this->getAttributes($resource->$operationsParent, $operationType);
     }
 
     /**

@@ -11,3 +11,7 @@ relation_embedded.custom_get:
     methods:  ['GET', 'HEAD']
     defaults:
         _controller:     'TestBundle:Custom:custom'
+
+controller:
+    resource: "@TestBundle/Controller"
+    type:     annotation

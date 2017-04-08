@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,8 +37,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
      */
     public function createFromRequest(Request $request, bool $normalization, array $attributes = null): array
     {
-        if (null === $attributes) {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
+        if (null === $attributes && !$attributes = RequestAttributesExtractor::extractAttributes($request)) {
+            throw new RuntimeException('Request attributes are not valid.');
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);

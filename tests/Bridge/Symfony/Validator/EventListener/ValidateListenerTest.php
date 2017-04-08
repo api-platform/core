@@ -28,6 +28,26 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ValidateListenerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testNotAnApiPlatformRequest()
+    {
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate()->shouldNotBeCalled();
+        $validator = $validatorProphecy->reveal();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create()->shouldNotBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $request = new Request();
+        $request->setMethod('POST');
+
+        $event = $this->prophesize(GetResponseForControllerResultEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ValidateListener($validator, $resourceMetadataFactory);
+        $listener->onKernelView($event->reveal());
+    }
+
     public function testValidatorIsCalled()
     {
         $data = new DummyEntity();
@@ -38,6 +58,21 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $validator = $validatorProphecy->reveal();
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
+
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
+        $validationViewListener->onKernelView($event);
+    }
+
+    public function testDoNotCallWhenReceiveFlagIsFalse()
+    {
+        $data = new DummyEntity();
+        $expectedValidationGroups = ['a', 'b', 'c'];
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldNotBeCalled();
+        $validator = $validatorProphecy->reveal();
+
+        list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data, false);
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
         $validationViewListener->onKernelView($event);
@@ -56,7 +91,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $violations = $violationsProphecy->reveal();
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled()->willReturn($violations)->shouldBeCalled();
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($violations)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
@@ -68,10 +103,11 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $expectedValidationGroups
      * @param mixed $data
+     * @param bool  $receive
      *
      * @return array
      */
-    private function createEventObject($expectedValidationGroups, $data)
+    private function createEventObject($expectedValidationGroups, $data, bool $receive = true)
     {
         $resourceMetadata = new ResourceMetadata(null, null, null, [
             'create' => [
@@ -80,7 +116,9 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata)->shouldBeCalled();
+        if ($receive) {
+            $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata)->shouldBeCalled();
+        }
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $kernel = $this->prophesize(HttpKernelInterface::class)->reveal();
@@ -89,6 +127,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
             '_api_item_operation_name' => 'create',
             '_api_format' => 'json',
             '_api_mime_type' => 'application/json',
+            '_api_receive' => $receive,
         ]);
 
         $request->setMethod(Request::METHOD_POST);

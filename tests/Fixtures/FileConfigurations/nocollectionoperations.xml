@@ -2,8 +2,12 @@
 
 <resources>
         <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy">
-            <itemOperation name="my_op_name">
+            <itemOperations>
+                <itemOperation name="my_op_name">
                     <attribute name="method">POST</attribute>
-            </itemOperation>
+                </itemOperation>
+            </itemOperations>
+
+            <collectionOperations />
         </resource>
 </resources>

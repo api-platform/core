@@ -52,9 +52,7 @@ final class SerializeListener
             return;
         }
 
-        try {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             $this->serializeRawData($event, $request, $controllerResult);
 
             return;
