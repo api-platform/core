@@ -103,9 +103,12 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
 
-        $propertyMetadataFactory = new PropertyMetadata(null, null, true);
+        $propertyMetadataProphecy = new PropertyMetadata(null, null, true, true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy
+            ->create(Dummy::class, 'name', [])
+            ->willReturn($propertyMetadataProphecy)
+            ->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -133,9 +136,12 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
 
-        $propertyMetadataFactory = new PropertyMetadata(null, null, true);
+        $propertyMetadata = new PropertyMetadata(null, null, true, true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy
+            ->create(Dummy::class, 'name', [])
+            ->willReturn($propertyMetadata)
+            ->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getItemFromIri('/dummies/12', ['resource_class' => Dummy::class, 'api_allow_update' => true, 'fetch_data' => false])->shouldBeCalled();
