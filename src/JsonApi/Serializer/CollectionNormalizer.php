@@ -65,9 +65,9 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     public function normalize($object, $format = null, array $context = [])
     {
         $currentPage = $lastPage = $itemsPerPage = 1;
-        $data = ['data' => []];
 
         // TODO: Document the use of api_sub_level
+        // $data = ['data' => []];
         // if (isset($context['api_sub_level'])) {
         //     foreach ($object as $index => $obj) {
         //         $data['data'][][$index] = $this->normalizer->normalize($obj, $format, $context);
@@ -100,6 +100,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $data = [
             'data' => [],
             'links' => [
+                // TODO: This should not be an IRI
                 'self' => IriHelper::createIri(
                     $parsed['parts'],
                     $parsed['parameters'],
@@ -145,7 +146,9 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $identifier = null;
         foreach ($object as $obj) {
+
             $item = $this->normalizer->normalize($obj, $format, $context)['data']['attributes'];
+
             $relationships = [];
 
             if (isset($item['relationships'])) {
@@ -169,7 +172,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 'attributes' => $item,
             ];
 
-            if (!empty($relationships)) {
+            if ($relationships) {
                 $items['relationships'] = $relationships;
             }
 

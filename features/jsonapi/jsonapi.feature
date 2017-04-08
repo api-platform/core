@@ -85,6 +85,7 @@ Feature: JSONAPI support
     And I valide it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
 
+  @dropSchema
   Scenario: Retrieve the related dummy
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/third_levels/1"

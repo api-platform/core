@@ -288,7 +288,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $context
             );
 
-            if (empty($attributeValue)) {
+            if (!$attributeValue) {
                 continue;
             }
 
@@ -330,7 +330,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     $id = ['id' => $identifier] + $rel;
                 }
 
-                if (!empty($relation['type'])) {
+                if ($relation['type']) {
                     $data[$relation['name']]['data'][] = $id + ['type' => $relation['type']];
                 } else {
                     $data[$relation['name']]['data'][] = $id;
