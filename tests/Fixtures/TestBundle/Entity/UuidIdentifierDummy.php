@@ -17,8 +17,6 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Custom identifier dummy.
  *
- * @author Exploit.cz <insekticid@exploit.cz>
- *
  * @ApiResource
  * @ORM\Entity
  */
