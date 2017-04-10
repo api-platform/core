@@ -15,6 +15,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\SwaggerProcessorPass;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -29,6 +30,7 @@ class ApiPlatformBundleTest extends \PHPUnit_Framework_TestCase
         $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(FilterPass::class))->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(DoctrineQueryExtensionPass::class))->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(SwaggerProcessorPass::class))->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
         $bundle->build($containerProphecy->reveal());

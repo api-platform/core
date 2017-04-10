@@ -12,7 +12,6 @@
 namespace ApiPlatform\Core\Tests\Swagger;
 
 use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
@@ -23,11 +22,21 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
-use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
+use ApiPlatform\Core\Swagger\Extractor\CollectionGetOperationExtractor;
+use ApiPlatform\Core\Swagger\Extractor\CollectionPostOperationExtractor;
+use ApiPlatform\Core\Swagger\Extractor\ItemDeleteOperationExtractor;
+use ApiPlatform\Core\Swagger\Extractor\ItemGetOperationExtractor;
+use ApiPlatform\Core\Swagger\Extractor\ItemPutOperationExtractor;
+use ApiPlatform\Core\Swagger\Extractor\SwaggerContextOperationExtractor;
+use ApiPlatform\Core\Swagger\Processor\SwaggerExtractorProcessor;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
+use ApiPlatform\Core\Swagger\Util\SwaggerDefinitions;
+use ApiPlatform\Core\Swagger\Util\SwaggerFilterDefinitions;
+use ApiPlatform\Core\Swagger\Util\SwaggerOperationGenerator;
+use ApiPlatform\Core\Swagger\Util\SwaggerTypeResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -39,42 +48,85 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNormalize()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(
+            new ResourceNameCollection([Dummy::class]),
+            'Test API',
+            'This is a test API.',
+            '1.2.3',
+            ['jsonld' => ['application/ld+json']]
+        );
 
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET'],
+                'put' => ['method' => 'PUT'],
+            ],
+            [
+                'get' => ['method' => 'GET'],
+                'post' => ['method' => 'POST'],
+                'custom' => ['method' => 'GET', 'path' => '/foo'],
+                'custom2' => ['method' => 'POST', 'path' => '/foo'],
+            ],
+            []
+        );
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], []);
+        $operationData = [
+           ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+           ['resourceClass' => Dummy::class, 'operationName' => 'put', 'operation' => ['method' => 'PUT'], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'PUT', 'mimeTypes' => ['application/ld+json']],
+           ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+           ['resourceClass' => Dummy::class, 'operationName' => 'post', 'operation' => ['method' => 'POST'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'POST', 'mimeTypes' => ['application/ld+json']],
+           ['resourceClass' => Dummy::class, 'operationName' => 'custom', 'operation' => ['method' => 'GET', 'path' => '/foo'], 'isCollection' => true, 'path' => '/foo', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+           ['resourceClass' => Dummy::class, 'operationName' => 'custom2', 'operation' => ['method' => 'POST', 'path' => '/foo'], 'isCollection' => true, 'path' => '/foo', 'method' => 'POST', 'mimeTypes' => ['application/ld+json']],
+        ];
+        $swaggerOperationGeneratorProphecy = $this->prophesize(SwaggerOperationGenerator::class);
+        $swaggerOperationGeneratorProphecy->generate(Argument::any())->willReturn($operationData);
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(
+            new PropertyNameCollection(['id', 'name'])
+        );
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $typeResolver = new SwaggerTypeResolver(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $swaggerDefinitions = new SwaggerDefinitions(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $typeResolver
+        );
+
+        $swaggerFilterDefinitionsProphecy = $this->prophesize(SwaggerFilterDefinitions::class);
+        $swaggerFilterDefinitionsProphecy->get(Argument::any())->willReturn([]);
+
+        $swaggerProcessor = $this->getSwaggerProcessor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $swaggerDefinitions,
+            $swaggerFilterDefinitionsProphecy->reveal()
+        );
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
         $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $urlGeneratorProphecy->reveal(),
+            $swaggerProcessor,
+            $swaggerDefinitions,
+            $swaggerOperationGeneratorProphecy->reveal()
         );
 
         $expected = [
@@ -239,49 +291,66 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $result = $normalizer->normalize($documentation);
+        $this->assertEquals($expected, $result);
     }
 
     public function testNormalizeWithNameConverter()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
+        $documentation = new Documentation(
+            new ResourceNameCollection([Dummy::class]),
+            'Dummy API',
+            'This is a dummy API',
+            '1.2.3',
+            ['jsonld' => ['application/ld+json']]
+        );
 
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'nameConverted']));
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            [
+                'get' => ['method' => 'GET'],
+            ],
+            [],
+            []
+        );
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], []);
+        $operationData = [
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+        ];
+
+        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
+        $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
+        $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
+
+        $swaggerOperationGeneratorProphecy = $this->prophesize(SwaggerOperationGenerator::class);
+        $swaggerOperationGeneratorProphecy->generate(Argument::any())->willReturn($operationData);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['name', 'nameConverted'])
+        );
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, null, null, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'nameConverted')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a converted name.', true, true, null, null, false));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $typeResolver = new SwaggerTypeResolver(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
-        $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
-        $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
-        $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
-
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
-        $normalizer = new DocumentationNormalizer(
+        $swaggerDefinitions = new SwaggerDefinitions(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal(),
-            null,
+            $typeResolver,
             $nameConverterProphecy->reveal(),
             true,
             'oauth2',
@@ -289,6 +358,25 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             '/oauth/v2/token',
             '/oauth/v2/auth',
             ['scope param']
+        );
+
+        $swaggerFilterDefinitionsProphecy = $this->prophesize(SwaggerFilterDefinitions::class);
+        $swaggerFilterDefinitionsProphecy->get(Argument::any())->willReturn([]);
+
+        $swaggerProcessor = $this->getSwaggerProcessor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $swaggerDefinitions,
+            $swaggerFilterDefinitionsProphecy->reveal()
+        );
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
+
+        $normalizer = new DocumentationNormalizer(
+            $urlGeneratorProphecy->reveal(),
+            $swaggerProcessor,
+            $swaggerDefinitions,
+            $swaggerOperationGeneratorProphecy->reveal()
         );
 
         $expected = [
@@ -353,20 +441,21 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'security' => [['oauth' => []]],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $result = $normalizer->normalize($documentation);
+        file_put_contents('test.log', print_r($result, true));
+
+        $this->assertEquals($expected, $result);
     }
 
     public function testNormalizeWithOnlyNormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+        $documentation = new Documentation(
+            new ResourceNameCollection([Dummy::class]),
+            'Test API',
+            'This is a test API.',
+            '1.2.3',
+            ['jsonld' => ['application/ld+json']]
+        );
 
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
@@ -382,35 +471,59 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             []
         );
+
+        $operationData = [
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'put', 'operation' => ['method' => 'PUT', 'normalization_context' => ['groups' => 'dummy']], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'PUT', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'post', 'operation' => ['method' => 'POST'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'POST', 'mimeTypes' => ['application/ld+json']],
+       ];
+
+        $swaggerOperationGeneratorProphecy = $this->prophesize(SwaggerOperationGenerator::class);
+        $swaggerOperationGeneratorProphecy->generate(Argument::any())->willReturn($operationData);
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'gerard')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a gerard.', true, true, true, true, false, false, null, null, []));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
+        $typeResolver = new SwaggerTypeResolver(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $swaggerDefinitions = new SwaggerDefinitions(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $typeResolver
+        );
+
+        $swaggerFilterDefinitionsProphecy = $this->prophesize(SwaggerFilterDefinitions::class);
+        $swaggerFilterDefinitionsProphecy->get(Argument::any())->willReturn([]);
+
+        $swaggerProcessor = $this->getSwaggerProcessor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $swaggerDefinitions,
+            $swaggerFilterDefinitionsProphecy->reveal()
+        );
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
         $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $urlGeneratorProphecy->reveal(),
+            $swaggerProcessor,
+            $swaggerDefinitions,
+            $swaggerOperationGeneratorProphecy->reveal()
         );
 
         $expected = [
@@ -544,15 +657,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeWithOnlyDenormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+        $documentation = new Documentation(
+            new ResourceNameCollection([Dummy::class]),
+            'Test API',
+            'This is a test API.',
+            '1.2.3',
+            ['jsonld' => ['application/ld+json']]
+        );
 
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
@@ -568,35 +679,58 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             []
         );
+        $operationData = [
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'put', 'operation' => ['method' => 'PUT', 'denormalization_context' => ['groups' => 'dummy']], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'PUT', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'post', 'operation' => ['method' => 'POST'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'POST', 'mimeTypes' => ['application/ld+json']],
+        ];
+
+        $swaggerOperationGeneratorProphecy = $this->prophesize(SwaggerOperationGenerator::class);
+        $swaggerOperationGeneratorProphecy->generate(Argument::any())->willReturn($operationData);
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'gerard')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a gerard.', true, true, true, true, false, false, null, null, []));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
+        $typeResolver = new SwaggerTypeResolver(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $swaggerDefinitions = new SwaggerDefinitions(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $typeResolver
+        );
+
+        $swaggerFilterDefinitionsProphecy = $this->prophesize(SwaggerFilterDefinitions::class);
+        $swaggerFilterDefinitionsProphecy->get(Argument::any())->willReturn([]);
+
+        $swaggerProcessor = $this->getSwaggerProcessor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $swaggerDefinitions,
+            $swaggerFilterDefinitionsProphecy->reveal()
+        );
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
         $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $urlGeneratorProphecy->reveal(),
+            $swaggerProcessor,
+            $swaggerDefinitions,
+            $swaggerOperationGeneratorProphecy->reveal()
         );
 
         $expected = [
@@ -730,15 +864,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeWithNormalizationAndDenormalizationGroups()
     {
-        $title = 'Test API';
-        $description = 'This is a test API.';
-        $formats = ['jsonld' => ['application/ld+json']];
-        $version = '1.2.3';
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+        $documentation = new Documentation(
+            new ResourceNameCollection([Dummy::class]),
+            'Test API',
+            'This is a test API.',
+            '1.2.3',
+            ['jsonld' => ['application/ld+json']]
+        );
 
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
@@ -757,35 +889,59 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             []
         );
+
+        $operationData = [
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'put', 'operation' => ['method' => 'PUT', 'normalization_context' => ['groups' => 'dummy'], 'denormalization_context' => ['groups' => 'dummy']], 'isCollection' => false, 'path' => '/dummies/{id}', 'method' => 'PUT', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+            ['resourceClass' => Dummy::class, 'operationName' => 'post', 'operation' => ['method' => 'POST'], 'isCollection' => true, 'path' => '/dummies', 'method' => 'POST', 'mimeTypes' => ['application/ld+json']],
+        ];
+
+        $swaggerOperationGeneratorProphecy = $this->prophesize(SwaggerOperationGenerator::class);
+        $swaggerOperationGeneratorProphecy->generate(Argument::any())->willReturn($operationData);
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'gerard')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a gerard.', true, true, true, true, false, false, null, null, []));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
+        $typeResolver = new SwaggerTypeResolver(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $swaggerDefinitions = new SwaggerDefinitions(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $typeResolver
+        );
+
+        $swaggerFilterDefinitionsProphecy = $this->prophesize(SwaggerFilterDefinitions::class);
+        $swaggerFilterDefinitionsProphecy->get(Argument::any())->willReturn([]);
+
+        $swaggerProcessor = $this->getSwaggerProcessor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $swaggerDefinitions,
+            $swaggerFilterDefinitionsProphecy->reveal()
+        );
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
         $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $urlGeneratorProphecy->reveal(),
+            $swaggerProcessor,
+            $swaggerDefinitions,
+            $swaggerOperationGeneratorProphecy->reveal()
         );
 
         $expected = [
@@ -919,10 +1075,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testFilters()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+        $documentation = new Documentation(
+            new ResourceNameCollection([Dummy::class]),
+            '',
+            '',
+            '0.0.0',
+            ['jsonld' => ['application/ld+json']]
+        );
 
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
@@ -932,22 +1091,36 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2']]],
             []
         );
+
+        $operationData = [
+            ['resourceClass' => Dummy::class, 'operationName' => 'get', 'operation' => ['method' => 'GET', 'filters' => ['f1', 'f2']], 'isCollection' => true, 'path' => '/dummies', 'method' => 'GET', 'mimeTypes' => ['application/ld+json']],
+        ];
+
+        $swaggerOperationGeneratorProphecy = $this->prophesize(SwaggerOperationGenerator::class);
+        $swaggerOperationGeneratorProphecy->generate(Argument::any())->willReturn($operationData);
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $typeResolver = new SwaggerTypeResolver(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
-
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $swaggerDefinitions = new SwaggerDefinitions(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $typeResolver
+        );
 
         $filters = new FilterCollection([
             'f1' => new DummyFilter(['name' => [
@@ -965,15 +1138,26 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]]),
         ]);
 
-        $normalizer = new DocumentationNormalizer(
+        $swaggerFilterDefinitions = new SwaggerFilterDefinitions(
             $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal(),
+            $typeResolver,
             $filters
+        );
+
+        $swaggerProcessor = $this->getSwaggerProcessor(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $swaggerDefinitions,
+            $swaggerFilterDefinitions
+        );
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
+
+        $normalizer = new DocumentationNormalizer(
+            $urlGeneratorProphecy->reveal(),
+            $swaggerProcessor,
+            $swaggerDefinitions,
+            $swaggerOperationGeneratorProphecy->reveal()
         );
 
         $expected = [
@@ -1032,5 +1216,50 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    /**
+     * @param $resourceMetadataFactory
+     * @param $swaggerDefinitions
+     * @param $swaggerFilterDefinitions
+     *
+     * @return SwaggerExtractorProcessor
+     */
+    private function getSwaggerProcessor($resourceMetadataFactory, $swaggerDefinitions, $swaggerFilterDefinitions): SwaggerExtractorProcessor
+    {
+        $collectionGetOperationExtractor = new CollectionGetOperationExtractor(
+            $resourceMetadataFactory,
+            $swaggerDefinitions,
+            $swaggerFilterDefinitions
+        );
+
+        $collectionPostOperationExtractor = new CollectionPostOperationExtractor(
+            $resourceMetadataFactory,
+            $swaggerDefinitions
+        );
+        $itemDeleteOperationExtractor = new ItemDeleteOperationExtractor(
+            $resourceMetadataFactory
+        );
+        $itemGetOperationExtractor = new ItemGetOperationExtractor(
+            $resourceMetadataFactory,
+            $swaggerDefinitions
+        );
+        $itemPutOperationExtractor = new ItemPutOperationExtractor(
+            $resourceMetadataFactory,
+            $swaggerDefinitions
+        );
+
+        $swaggerContextOperationExtractor = new SwaggerContextOperationExtractor();
+
+        $swaggerProcessor = new SwaggerExtractorProcessor([
+            $swaggerContextOperationExtractor,
+            $collectionGetOperationExtractor,
+            $collectionPostOperationExtractor,
+            $itemDeleteOperationExtractor,
+            $itemGetOperationExtractor,
+            $itemPutOperationExtractor,
+        ]);
+
+        return $swaggerProcessor;
     }
 }

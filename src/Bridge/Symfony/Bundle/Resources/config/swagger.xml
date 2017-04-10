@@ -5,16 +5,29 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!--Util-->
+        <service id="api_platform.swagger.util.swagger_type_resolver" class="ApiPlatform\Core\Swagger\Util\SwaggerTypeResolver" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+        </service>
 
-        <service id="api_platform.swagger.normalizer.documentation" class="ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer" public="false">
+        <service id="api_platform.swagger.util.swagger_operation_generator" class="ApiPlatform\Core\Swagger\Util\SwaggerOperationGenerator" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.operation_path_resolver" />
+            <argument type="service" id="api_platform.operation_method_resolver" />
+        </service>
+
+        <service  id="api_platform.swagger.util.swagger_filter_definitions" class="ApiPlatform\Core\Swagger\Util\SwaggerFilterDefinitions">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.swagger.util.swagger_type_resolver" />
+            <argument type="service" id="api_platform.filters" />
+        </service>
+
+        <service id="api_platform.swagger.util.swagger_definitions" class="ApiPlatform\Core\Swagger\Util\SwaggerDefinitions" >
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.operation_method_resolver" />
-            <argument type="service" id="api_platform.operation_path_resolver" />
-            <argument type="service" id="api_platform.router" />
-            <argument type="service" id="api_platform.filters" />
+            <argument type="service" id="api_platform.swagger.util.swagger_type_resolver" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument>%api_platform.oauth.enabled%</argument>
             <argument>%api_platform.oauth.type%</argument>
@@ -22,8 +35,60 @@
             <argument>%api_platform.oauth.tokenUrl%</argument>
             <argument>%api_platform.oauth.authorizationUrl%</argument>
             <argument>%api_platform.oauth.scopes%</argument>
+        </service>
+
+        <!--Extractor-->
+        <service id="api_platform.swagger.extractor.collection_get_operation_extractor" class="ApiPlatform\Core\Swagger\Extractor\CollectionGetOperationExtractor" public="false" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.swagger.util.swagger_definitions" />
+            <argument type="service" id="api_platform.swagger.util.swagger_filter_definitions" />
+
+            <tag name="api_platform.swagger_extractor" />
+        </service>
+
+        <service id="api_platform.swagger.extractor.collection_post_operation_extractor" class="ApiPlatform\Core\Swagger\Extractor\CollectionPostOperationExtractor" public="false" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.swagger.util.swagger_definitions" />
+
+            <tag name="api_platform.swagger_extractor" />
+        </service>
+
+        <service id="api_platform.swagger.extractor.item_delete_operation_extractor" class="ApiPlatform\Core\Swagger\Extractor\ItemDeleteOperationExtractor" public="false" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+
+            <tag name="api_platform.swagger_extractor" />
+        </service>
+
+        <service id="api_platform.swagger.extractor.item_get_operation_extractor" class="ApiPlatform\Core\Swagger\Extractor\ItemGetOperationExtractor" public="false" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.swagger.util.swagger_definitions" />
+
+            <tag name="api_platform.swagger_extractor" />
+        </service>
+
+        <service id="api_platform.swagger.extractor.item_put_operation_extractor" class="ApiPlatform\Core\Swagger\Extractor\ItemPutOperationExtractor" public="false" >
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.swagger.util.swagger_definitions" />
+
+            <tag name="api_platform.swagger_extractor" />
+        </service>
+
+        <service id="api_platform.swagger.extractor.swagger_context_operation_extractor" class="ApiPlatform\Core\Swagger\Extractor\SwaggerContextOperationExtractor" public="false" >
+            <tag name="api_platform.swagger_extractor" priority="10"/>
+        </service>
+
+        <!--Processor-->
+        <service id="api_platform.swagger.processor.swagger_extractor_processor" class="ApiPlatform\Core\Swagger\Processor\SwaggerExtractorProcessor" public="false" />
+
+        <service id="api_platform.swagger.normalizer.documentation" class="ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer" public="false">
+            <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.swagger.processor.swagger_extractor_processor" />
+            <argument type="service" id="api_platform.swagger.util.swagger_definitions" />
+            <argument type="service" id="api_platform.swagger.util.swagger_operation_generator" />
+
             <tag name="serializer.normalizer" priority="16" />
         </service>
+
 
         <service id="api_platform.swagger.command.swagger_command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\SwaggerCommand">
             <argument type="service" id="api_platform.swagger.normalizer.documentation" />
@@ -48,6 +113,8 @@
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
             <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.title%</argument>
+            <argument>%api_platform.description%</argument>
             <argument>%api_platform.oauth.enabled%</argument>
             <argument>%api_platform.oauth.clientId%</argument>
             <argument>%api_platform.oauth.clientSecret%</argument>
