@@ -9,18 +9,34 @@
  * file that was distributed with this source code.
  */
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 final class JsonApiContext implements Context
 {
     private $restContext;
 
     private $inspector;
+
+    private $doctrine;
+
+    /**
+     * @var \Doctrine\Common\Persistence\ObjectManager
+     */
+    private $manager;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+        $this->manager = $doctrine->getManager();
+    }
 
     /**
      * Gives access to the Behatch context.
@@ -130,5 +146,33 @@ final class JsonApiContext implements Context
     private function getContent()
     {
         return $this->restContext->getMink()->getSession()->getDriver()->getContent();
+    }
+
+    /**
+     * @Given there is a RelatedDummy
+     */
+    public function thereIsARelatedDummy()
+    {
+        $relatedDummy = new RelatedDummy();
+
+        $relatedDummy->setName('RelatedDummy with friends');
+
+        $this->manager->persist($relatedDummy);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a DummyFriend
+     */
+    public function thereIsADummyFriend()
+    {
+        $friend = new DummyFriend();
+
+        $friend->setName('DummyFriend');
+
+        $this->manager->persist($friend);
+
+        $this->manager->flush();
     }
 }

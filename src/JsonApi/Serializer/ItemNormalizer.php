@@ -27,7 +27,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Converts between objects and array including HAL metadata.
+ * Converts between objects and array.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -394,6 +394,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
         string $format = null,
         array $context
     ) {
+        // Null is allowed for empty to-one relationships, see
+        // http://jsonapi.org/format/#document-resource-object-linkage
+        if (null === $data['data']) {
+            return;
+        }
+
+        // TODO: Add tests
+        // An empty array is allowed for empty to-many relationships, see
+        // http://jsonapi.org/format/#document-resource-object-linkage
+        if ([] === $data['data']) {
+            return;
+        }
+
         if (!isset($data['data'])) {
             throw new InvalidArgumentException(
                 'Key \'data\' expected. Only resource linkage currently supported, see: http://jsonapi.org/format/#document-resource-object-linkage'
@@ -512,14 +525,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $resourceClass = $this->getObjectClass($item);
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            $propertyMetadata = $this
+                ->propertyMetadataFactory
+                ->create($resourceClass, $propertyName);
 
             $identifier = $propertyMetadata->isIdentifier();
             if (null === $identifier || false === $identifier) {
                 continue;
             }
 
-            $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+            $identifiers[$propertyName] = $this
+                ->propertyAccessor
+                ->getValue($item, $propertyName);
 
             if (!is_object($identifiers[$propertyName])) {
                 continue;
@@ -530,8 +547,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             unset($identifiers[$propertyName]);
 
-            foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
+            foreach (
+                $this
+                    ->propertyNameCollectionFactory
+                    ->create($relatedResourceClass)
+                    as $relatedPropertyName
+            ) {
+                $propertyMetadata = $this
+                    ->propertyMetadataFactory
+                    ->create($relatedResourceClass, $relatedPropertyName);
 
                 if ($propertyMetadata->isIdentifier()) {
                     if (isset($identifiers[$propertyName])) {
@@ -543,10 +567,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
                         ));
                     }
 
-                    $identifiers[$propertyName] = $this->propertyAccessor->getValue(
-                        $relatedItem,
-                        $relatedPropertyName
-                    );
+                    $identifiers[$propertyName] = $this
+                        ->propertyAccessor
+                        ->getValue(
+                            $relatedItem,
+                            $relatedPropertyName
+                        );
                 }
             }
 

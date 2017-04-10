@@ -32,8 +32,11 @@ final class EntrypointNormalizer implements NormalizerInterface
     private $iriConverter;
     private $urlGenerator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        ResourceMetadataFactoryInterface $resourceMetadataFactory,
+        IriConverterInterface $iriConverter,
+        UrlGeneratorInterface $urlGenerator
+    ) {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;

@@ -42,6 +42,19 @@
 
             <tag name="serializer.normalizer" priority="8" />
         </service>
+
+        <service id="api_platform.jsonapi.normalizer.constraint_violation_list" class="ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer">
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+
+            <tag name="serializer.normalizer" priority="32"/>
+        </service>
+
+        <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer">
+            <argument>%kernel.debug%</argument>
+
+            <tag name="serializer.normalizer" priority="16"/>
+        </service>
     </services>
 
 </container>

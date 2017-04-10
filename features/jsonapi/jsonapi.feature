@@ -87,6 +87,29 @@ Feature: JSONAPI support
     And the JSON node "data.attributes.name" should be equal to "John Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
 
+  Scenario: Create a related dummy with en empty relationship
+    When I add "Content-Type" header equal to "application/vnd.api+json"
+    And I add "Accept" header equal to "application/vnd.api+json"
+    And I send a "POST" request to "/related_dummies" with body:
+    """
+    {
+      "data": {
+        "type": "related-dummy",
+        "attributes": {
+          "name": "John Doe"
+        },
+        "relationships": {
+          "thirdLevel": {
+            "data": null
+          }
+        }
+      }
+    }
+    """
+    Then print last JSON response
+    And I save the response
+    And I valide it with jsonapi-validator
+
   Scenario: Retrieve the related dummy
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/related_dummies/1"

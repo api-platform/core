@@ -5,7 +5,7 @@ default:
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'HydraContext'
         - 'SwaggerContext'
-        - 'JsonApiContext'
+        - 'JsonApiContext': { doctrine: '@doctrine' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
         - 'Behatch\Context\JsonContext'
