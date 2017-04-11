@@ -88,6 +88,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
                 $metadata['shortName'] ?? null,
                 $metadata['description'] ?? null,
                 $metadata['iri'] ?? null,
+                $metadata['type'] ?? null,
                 $metadata['itemOperations'] ?? null,
                 $metadata['collectionOperations'] ?? null,
                 $metadata['attributes'] ?? null
@@ -95,7 +96,7 @@ final class YamlResourceMetadataFactory implements ResourceMetadataFactoryInterf
         }
 
         $resourceMetadata = $parentResourceMetadata;
-        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'type', 'attributes'] as $property) {
             if (!isset($metadata[$property])) {
                 continue;
             }

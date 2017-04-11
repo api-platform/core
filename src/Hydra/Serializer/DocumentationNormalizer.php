@@ -90,7 +90,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             $class = [
                 '@id' => $prefixedShortName,
-                '@type' => 'hydra:Class',
+                '@type' =>$resourceMetadata->getType() ?? "hydra:Class",
                 'rdfs:label' => $shortName,
                 'hydra:title' => $shortName,
             ];

@@ -21,15 +21,17 @@ final class ResourceMetadata
     private $shortName;
     private $description;
     private $iri;
+    private $type;
     private $itemOperations;
     private $collectionOperations;
     private $attributes;
 
-    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null)
+    public function __construct(string $shortName = null, string $description = null, string $iri = null,string $type = null,  array $itemOperations = null, array $collectionOperations = null, array $attributes = null)
     {
         $this->shortName = $shortName;
         $this->description = $description;
         $this->iri = $iri;
+        $this->type = $type;
         $this->itemOperations = $itemOperations;
         $this->collectionOperations = $collectionOperations;
         $this->attributes = $attributes;
@@ -106,6 +108,31 @@ final class ResourceMetadata
     {
         $metadata = clone $this;
         $metadata->iri = $iri;
+
+        return $metadata;
+    }
+
+    /**
+     * Gets the associated type.
+     *
+     * @return string|null
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Returns a new instance with the given type.
+     *
+     * @param string $type
+     *
+     * @return self
+     */
+    public function withType(string $type) : self
+    {
+        $metadata = clone $this;
+        $metadata->type = $type;
 
         return $metadata;
     }

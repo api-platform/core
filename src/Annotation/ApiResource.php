@@ -37,6 +37,11 @@ final class ApiResource
     public $iri;
 
     /**
+     * @var string
+     */
+    public $type;
+
+    /**
      * @var array
      */
     public $itemOperations;

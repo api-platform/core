@@ -86,6 +86,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
                 $annotation->shortName,
                 $annotation->description,
                 $annotation->iri,
+                $annotation->type,
                 $annotation->itemOperations,
                 $annotation->collectionOperations,
                 $annotation->attributes
@@ -93,7 +94,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         }
 
         $resourceMetadata = $parentResourceMetadata;
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'iri', 'type', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
             $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
         }
 

@@ -96,6 +96,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
           'shortName' => $metadata->getAttribute('shortName') ?: null,
           'description' => $metadata->getAttribute('description') ?: null,
           'iri' => $metadata->getAttribute('iri') ?: null,
+          'type' => $metadata->getAttribute('type') ?: null,
           'itemOperations' => $this->getOperations($xpath->query('./itemOperations/operation', $metadata)) ?: null,
           'collectionOperations' => $this->getOperations($xpath->query('./collectionOperations/operation', $metadata)) ?: null,
           'attributes' => $this->getAttributes($xpath->query('./attributes/attribute', $metadata)),
@@ -106,6 +107,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
               $metadata['shortName'],
               $metadata['description'],
               $metadata['iri'],
+              $metadata['type'],
               $metadata['itemOperations'],
               $metadata['collectionOperations'],
               $metadata['attributes']
@@ -114,7 +116,7 @@ final class XmlResourceMetadataFactory implements ResourceMetadataFactoryInterfa
 
         $resourceMetadata = $parentResourceMetadata;
 
-        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'type', 'attributes'] as $property) {
             if (!isset($metadata[$property])) {
                 continue;
             }
