@@ -123,11 +123,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
         $options = $this->getFactoryOptions($context);
-        $propertyNames = $this->propertyNameCollectionFactory->create($context['resource_class'], $options);
+        $resourceClass = is_string($classOrObject) ? $classOrObject : get_class($classOrObject);
+
+        $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
-            $resourceClass = is_string($classOrObject) ? $classOrObject : get_class($classOrObject);
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
 
             if (
