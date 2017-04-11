@@ -186,6 +186,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         if ($isPaginator) {
             $data['meta']['itemsPerPage'] = (int) $itemsPerPage;
+            $data['meta']['currentPage'] = (int) $currentPage;
         }
 
         return $data;
