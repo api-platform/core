@@ -79,7 +79,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, get_class($object), true);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, null, true);
         $context = $this->initContext($resourceClass, $context);
         $context['api_normalize'] = true;
 
