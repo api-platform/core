@@ -159,7 +159,7 @@ final class ApiLoader extends Loader
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ],
             [],
-            [],
+            isset($operation['options']) && is_array($operation['options']) ? $operation['options'] : [],
             '',
             [],
             [$operation['method']]
