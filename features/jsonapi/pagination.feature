@@ -8,6 +8,9 @@ Feature: JSON API pagination handling
     Given there is "10" dummy objects
     And I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/dummies"
+    Then the response status code should be 200
+    And I save the response
+    And I valide it with jsonapi-validator
     And the JSON node "data" should have 3 elements
     And the JSON node "meta.totalItems" should be equal to the number 10
     And the JSON node "meta.itemsPerPage" should be equal to the number 3
@@ -22,6 +25,7 @@ Feature: JSON API pagination handling
   Scenario: Get a paginated collection according to custom items per page in request
     And I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/dummies?itemsPerPage=15"
+    Then the response status code should be 200
     And I save the response
     And I valide it with jsonapi-validator
     And the JSON node "data" should have 10 elements
