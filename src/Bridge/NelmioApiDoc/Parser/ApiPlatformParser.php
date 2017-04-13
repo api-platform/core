@@ -238,7 +238,7 @@ final class ApiPlatformParser implements ParserInterface
                     return $data;
                 }
 
-                $data['subType'] = $subProperty['subType'];
+                $data['subType'] = $subProperty['subType'] ?? null;
                 if (isset($subProperty['children'])) {
                     $data['children'] = $subProperty['children'];
                 }
