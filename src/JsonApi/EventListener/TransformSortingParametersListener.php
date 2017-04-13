@@ -43,7 +43,7 @@ final class TransformSortingParametersListener
     {
         $request = $event->getRequest();
 
-        // If page query parameter is not defined or is already an array, never mind
+        // If order query parameter is not defined or is already an array, never mind
         if (
             !$request->query->get($this->orderParameterName)
                 || is_array($request->query->get($this->orderParameterName))

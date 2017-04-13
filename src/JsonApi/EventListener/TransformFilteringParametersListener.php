@@ -14,14 +14,14 @@ namespace ApiPlatform\Core\JsonApi\EventListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
- * Flattens possible 'page' array query parameter into dot-separated values to avoid
- * conflicts with Doctrine\Orm\Extension\PaginationExtension.
+ * Flattens possible 'filter' array query parameter into first-level query parameters
+ * to be processed by api-platform.
  *
- * See: http://jsonapi.org/format/#fetching-pagination
+ * See: http://jsonapi.org/format/#fetching-filtering and http://jsonapi.org/recommendations/#filtering
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
-final class FlattenPaginationParametersListener
+final class TransformFilteringParametersListener
 {
     /**
      * Flatens possible 'page' array query parameter.
@@ -34,21 +34,21 @@ final class FlattenPaginationParametersListener
     {
         $request = $event->getRequest();
 
-        // If 'page' query parameter is not defined or is not an array, never mind
-        if (!$request->query->get('page') || !is_array($request->query->get('page'))) {
+        // If page query parameter is not defined or is not an array, never mind
+        if (!$request->query->get('filter') || !is_array($request->query->get('filter'))) {
             return;
         }
 
         // Otherwise, flatten into dot-separated values
-        $pageParameters = $request->query->get('page');
+        $pageParameters = $request->query->get('filter');
 
         foreach ($pageParameters as $pageParameterName => $pageParameterValue) {
             $request->query->set(
-                sprintf('page.%s', $pageParameterName),
+                $pageParameterName,
                 $pageParameterValue
             );
         }
 
-        $request->query->remove('page');
+        $request->query->remove('filter');
     }
 }
