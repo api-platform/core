@@ -20,6 +20,7 @@ use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Normalizes collections in the JSON API format.
@@ -56,28 +57,30 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
+        return self::FORMAT === $format
+            && (is_array($data) || ($data instanceof \Traversable));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($data, $format = null, array $context = [])
     {
         $currentPage = $lastPage = $itemsPerPage = 1;
 
-        // TODO: Document the use of api_sub_level
-        // $data = ['data' => []];
-        // if (isset($context['api_sub_level'])) {
-        //     foreach ($object as $index => $obj) {
-        //         $data['data'][][$index] = $this->normalizer->normalize($obj, $format, $context);
-        //     }
+        // If we are normalizing stuff one level down (i.e., an attribute which
+        // could be already an array)
+        $returnDataArray = [];
+        if (isset($context['api_sub_level'])) {
+            foreach ($data as $index => $obj) {
+                $returnDataArray['data'][][$index] = $this->normalizer->normalize($obj, $format, $context);
+            }
 
-        //     return $data;
-        // }
+            return $data;
+        }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(
-            $object,
+            $data,
             $context['resource_class'] ?? null,
             true
         );
@@ -87,20 +90,19 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
 
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
-        $paginated = $isPaginator = $object instanceof PaginatorInterface;
+        $paginated = $isPaginator = $data instanceof PaginatorInterface;
 
         if ($isPaginator) {
-            $currentPage = $object->getCurrentPage();
-            $lastPage = $object->getLastPage();
-            $itemsPerPage = $object->getItemsPerPage();
+            $currentPage = $data->getCurrentPage();
+            $lastPage = $data->getLastPage();
+            $itemsPerPage = $data->getItemsPerPage();
 
             $paginated = 1. !== $lastPage;
         }
 
-        $data = [
+        $returnDataArray = [
             'data' => [],
             'links' => [
-                // TODO: This should not be an IRI
                 'self' => IriHelper::createIri(
                     $parsed['parts'],
                     $parsed['parameters'],
@@ -111,14 +113,14 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         ];
 
         if ($paginated) {
-            $data['links']['first'] = IriHelper::createIri(
+            $returnDataArray['links']['first'] = IriHelper::createIri(
                 $parsed['parts'],
                 $parsed['parameters'],
                 $this->pageParameterName,
                 1.
             );
 
-            $data['links']['last'] = IriHelper::createIri(
+            $returnDataArray['links']['last'] = IriHelper::createIri(
                 $parsed['parts'],
                 $parsed['parameters'],
                 $this->pageParameterName,
@@ -126,7 +128,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             );
 
             if (1. !== $currentPage) {
-                $data['links']['prev'] = IriHelper::createIri(
+                $returnDataArray['links']['prev'] = IriHelper::createIri(
                     $parsed['parts'],
                     $parsed['parameters'],
                     $this->pageParameterName,
@@ -135,7 +137,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             }
 
             if ($currentPage !== $lastPage) {
-                $data['links']['next'] = IriHelper::createIri(
+                $returnDataArray['links']['next'] = IriHelper::createIri(
                     $parsed['parts'],
                     $parsed['parameters'],
                     $this->pageParameterName,
@@ -145,8 +147,16 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         }
 
         $identifier = null;
-        foreach ($object as $obj) {
-            $item = $this->normalizer->normalize($obj, $format, $context)['data']['attributes'];
+        foreach ($data as $obj) {
+            $item = $this->normalizer->normalize($obj, $format, $context);
+
+            if (!isset($item['data']['attributes'])) {
+                throw new RuntimeException(
+                    'data.attributes key expected but not found during JSON API normalization'
+                );
+            }
+
+            $item = $item['data']['attributes'];
 
             $relationships = [];
 
@@ -175,20 +185,20 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 $items['relationships'] = $relationships;
             }
 
-            $data['data'][] = $items;
+            $returnDataArray['data'][] = $items;
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['meta']['totalItems'] = $object instanceof PaginatorInterface ?
-                (int) $object->getTotalItems() :
-                count($object);
+        if (is_array($data) || $data instanceof \Countable) {
+            $returnDataArray['meta']['totalItems'] = $data instanceof PaginatorInterface ?
+                (int) $data->getTotalItems() :
+                count($data);
         }
 
         if ($isPaginator) {
-            $data['meta']['itemsPerPage'] = (int) $itemsPerPage;
-            $data['meta']['currentPage'] = (int) $currentPage;
+            $returnDataArray['meta']['itemsPerPage'] = (int) $itemsPerPage;
+            $returnDataArray['meta']['currentPage'] = (int) $currentPage;
         }
 
-        return $data;
+        return $returnDataArray;
     }
 }

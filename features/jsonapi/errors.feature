@@ -1,4 +1,4 @@
-Feature: JSONAPI error handling
+Feature: JSON API error handling
   In order to be able to handle error client side
   As a client software developer
   I need to retrieve an JSON API serialization of errors

@@ -1,4 +1,4 @@
-Feature: JSONAPI support
+Feature: JSON API basic support
   In order to use the JSON API hypermedia format
   As a client software developer
   I need to be able to retrieve valid JSON API responses.
