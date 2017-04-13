@@ -205,6 +205,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
             'meta' => [
                 'totalItems' => 1312,
                 'itemsPerPage' => 12,
+                'currentPage' => 3
             ],
         ];
 

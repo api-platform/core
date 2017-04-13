@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Converts pagination parameters from JSON API recommended convention to
- * api-platform convention
+ * api-platform convention.
  *
  * See: http://jsonapi.org/format/#fetching-sorting and
  * https://api-platform.com/docs/core/filters#order-filter
@@ -27,7 +27,7 @@ final class TransformSortingParametersListener
     /**
      * @var string Keyword used to retrieve the value
      */
-    protected $orderParameterName;
+    private $orderParameterName;
 
     public function __construct(string $orderParameterName)
     {

@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 final class FlattenPaginationParametersListener
 {
     /**
-     * Flatens possible 'page' array query parameter
+     * Flatens possible 'page' array query parameter.
      *
      * @param GetResponseEvent $event
      *

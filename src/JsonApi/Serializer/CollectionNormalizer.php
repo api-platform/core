@@ -13,6 +13,7 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\ContextTrait;
@@ -20,7 +21,6 @@ use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Normalizes collections in the JSON API format.
