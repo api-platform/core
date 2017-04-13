@@ -41,7 +41,7 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
 
         // Inherited from parent
         foreach ($this->decorated->create($resourceClass, $options) as $propertyName) {
-            $propertyNames[$propertyName] = true;
+            $propertyNames[$propertyName] = (string) $propertyName;
         }
 
         foreach ($this->resourceNameCollection->create() as $knownResourceClass) {
@@ -51,11 +51,11 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
 
             if (is_subclass_of($knownResourceClass, $resourceClass)) {
                 foreach ($this->create($knownResourceClass) as $propertyName) {
-                    $propertyNames[$propertyName] = true;
+                    $propertyNames[$propertyName] = $propertyName;
                 }
             }
         }
 
-        return new PropertyNameCollection(array_keys($propertyNames));
+        return new PropertyNameCollection(array_values($propertyNames));
     }
 }
