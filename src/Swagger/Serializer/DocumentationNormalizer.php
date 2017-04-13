@@ -100,7 +100,9 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, bool $collection)
     {
-        if (null === $operations = $collection ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
+        $operations = $collection ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations();
+
+        if (!$operations) {
             return;
         }
 
@@ -168,9 +170,9 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return $this->updatePutOperation($pathOperation, $mimeTypes, $collection, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':
                 return $this->updateDeleteOperation($pathOperation, $resourceShortName);
+            default:
+                throw new RuntimeException(sprintf('Method "%s" is not supported', $method));
         }
-
-        return $pathOperation;
     }
 
     /**
@@ -187,7 +189,8 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function updateGetOperation(\ArrayObject $pathOperation, array $mimeTypes, bool $collection, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
     {
-        $responseDefinitionKey = $this->getDefinition($definitions, $collection, false, $resourceMetadata, $resourceClass, $operationName);
+        $serializerContext = $this->getSerializerContext($collection, false, $resourceMetadata, $operationName);
+        $responseDefinitionKey = $this->getDefinition($definitions, $resourceMetadata, $resourceClass, $serializerContext);
 
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
 
@@ -203,7 +206,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 ],
             ];
 
-            if (!isset($pathOperation['parameters']) && $parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $responseDefinitionKey)) {
+            if (!isset($pathOperation['parameters']) && $parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
                 $pathOperation['parameters'] = $parameters;
             }
 
@@ -249,12 +252,16 @@ final class DocumentationNormalizer implements NormalizerInterface
             'name' => lcfirst($resourceShortName),
             'in' => 'body',
             'description' => sprintf('The new %s resource', $resourceShortName),
-            'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $collection, true, $resourceMetadata, $resourceClass, $operationName))],
+            'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                $this->getSerializerContext($collection, true, $resourceMetadata, $operationName)
+            ))],
         ]];
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '201' => [
                 'description' => sprintf('%s resource created', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $collection, false, $resourceMetadata, $resourceClass, $operationName))],
+                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                    $this->getSerializerContext($collection, false, $resourceMetadata, $operationName)
+                ))],
             ],
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
@@ -291,13 +298,17 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'name' => lcfirst($resourceShortName),
                 'in' => 'body',
                 'description' => sprintf('The updated %s resource', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $collection, true, $resourceMetadata, $resourceClass, $operationName))],
+                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                    $this->getSerializerContext($collection, true, $resourceMetadata, $operationName)
+                ))],
             ],
         ];
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
                 'description' => sprintf('%s resource updated', $resourceShortName),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $collection, false, $resourceMetadata, $resourceClass, $operationName))],
+                'schema' => ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions, $resourceMetadata, $resourceClass,
+                    $this->getSerializerContext($collection, false, $resourceMetadata, $operationName)
+                ))],
             ],
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
@@ -332,25 +343,24 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * @param \ArrayObject     $definitions
-     * @param bool             $collection
-     * @param bool             $parameter
      * @param ResourceMetadata $resourceMetadata
      * @param string           $resourceClass
-     * @param string           $operationName
+     * @param array|null       $serializerContext
      *
      * @return string
      */
-    private function getDefinition(\ArrayObject $definitions, bool $collection, bool $parameter, ResourceMetadata $resourceMetadata, string $resourceClass, string $operationName): string
+    private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
-        $contextKey = $parameter ? 'denormalization_context' : 'normalization_context';
-        $serializerContext = $collection ? $resourceMetadata->getCollectionOperationAttribute($operationName, $contextKey, null, true) : $resourceMetadata->getItemOperationAttribute($operationName, $contextKey, null, true);
-
         if (isset($serializerContext['groups'])) {
             $definitionKey = sprintf('%s_%s', $resourceMetadata->getShortName(), md5(serialize($serializerContext['groups'])));
         } else {
             $definitionKey = $resourceMetadata->getShortName();
         }
-        $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $serializerContext, $definitionKey);
+
+        if (!isset($definitions[$definitionKey])) {
+            $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
+            $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $definitions, $serializerContext);
+        }
 
         return $definitionKey;
     }
@@ -362,13 +372,12 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @param string           $resourceClass
      * @param ResourceMetadata $resourceMetadata
+     * @param \ArrayObject     $definitions
      * @param array|null       $serializerContext
-     *
-     * @throws RuntimeException
      *
      * @return \ArrayObject
      */
-    private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, array $serializerContext = null, string $definitionKey = null): \ArrayObject
+    private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
     {
         $definitionSchema = new \ArrayObject(['type' => 'object']);
 
@@ -389,7 +398,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $definitionSchema['required'][] = $normalizedPropertyName;
             }
 
-            $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($propertyMetadata, $definitionKey);
+            $definitionSchema['properties'][$normalizedPropertyName] = $this->getPropertySchema($propertyMetadata, $definitions, $serializerContext);
         }
 
         return $definitionSchema;
@@ -401,10 +410,12 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject
      *
      * @param PropertyMetadata $propertyMetadata
+     * @param \ArrayObject     $definitions
+     * @param array|null       $serializerContext
      *
      * @return \ArrayObject
      */
-    private function getPropertySchema(PropertyMetadata $propertyMetadata, string $definitionKey = null): \ArrayObject
+    private function getPropertySchema(PropertyMetadata $propertyMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
     {
         $propertySchema = new \ArrayObject();
 
@@ -429,7 +440,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $className = $valueType->getClassName();
         }
 
-        $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitionKey);
+        $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitions, $serializerContext);
 
         return new \ArrayObject((array) $propertySchema + $valueSchema);
     }
@@ -437,17 +448,19 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets the Swagger's type corresponding to the given PHP's type.
      *
-     * @param string $type
-     * @param bool   $isCollection
-     * @param string $className
-     * @param bool   $readableLink
+     * @param string       $type
+     * @param bool         $isCollection
+     * @param string       $className
+     * @param bool         $readableLink
+     * @param \ArrayObject $definitions
+     * @param array|null   $serializerContext
      *
      * @return array
      */
-    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null, string $definitionKey = null): array
+    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null, \ArrayObject $definitions, array $serializerContext = null): array
     {
         if ($isCollection) {
-            return ['type' => 'array', 'items' => $this->getType($type, false, $className, $readableLink, $definitionKey)];
+            return ['type' => 'array', 'items' => $this->getType($type, false, $className, $readableLink, $definitions, $serializerContext)];
         }
 
         if (Type::BUILTIN_TYPE_STRING === $type) {
@@ -480,7 +493,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             if (true === $readableLink) {
-                return ['$ref' => sprintf('#/definitions/%s', $definitionKey ?: $this->resourceMetadataFactory->create($className)->getShortName())];
+                return ['$ref' => sprintf('#/definitions/%s', $this->getDefinition($definitions,
+                    $this->resourceMetadataFactory->create($className),
+                    $className, $serializerContext)
+                )];
             }
         }
 
@@ -525,10 +541,12 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param string           $resourceClass
      * @param string           $operationName
      * @param ResourceMetadata $resourceMetadata
+     * @param \ArrayObject     $definitions
+     * @param array|null       $serializerContext
      *
      * @return array
      */
-    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata, string $definitionKey): array
+    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata, \ArrayObject $definitions, array $serializerContext = null): array
     {
         if (null === $this->filterCollection) {
             return [];
@@ -547,7 +565,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     'in' => 'query',
                     'required' => $data['required'],
                 ];
-                $parameter += $this->getType($data['type'], false, null, null, $definitionKey);
+                $parameter += $this->getType($data['type'], false, null, null, $definitions, $serializerContext);
 
                 if (isset($data['swagger'])) {
                     $parameter = $data['swagger'] + $parameter;
@@ -566,5 +584,24 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return self::FORMAT === $format && $data instanceof Documentation;
+    }
+
+    /**
+     * @param bool             $collection
+     * @param bool             $denormalization
+     * @param ResourceMetadata $resourceMetadata
+     * @param string           $operationName
+     *
+     * @return array|null
+     */
+    private function getSerializerContext(bool $collection, bool $denormalization, ResourceMetadata $resourceMetadata, string $operationName)
+    {
+        $contextKey = $denormalization ? 'denormalization_context' : 'normalization_context';
+
+        if ($collection) {
+            return $resourceMetadata->getCollectionOperationAttribute($operationName, $contextKey, null, true);
+        }
+
+        return $resourceMetadata->getItemOperationAttribute($operationName, $contextKey, null, true);
     }
 }
