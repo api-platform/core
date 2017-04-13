@@ -58,7 +58,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $postRequest->setMethod('POST');
 
         $twigCollectionProphecy = $this->prophesize(\Twig_Environment::class);
-        $twigCollectionProphecy->render('ApiPlatformBundle:SwaggerUi:index.html.twig', [
+        $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'spec' => 'hello',
             'shortName' => 'F',
             'operationId' => 'getFCollection',
@@ -68,7 +68,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         ])->shouldBeCalled();
 
         $twigItemProphecy = $this->prophesize(\Twig_Environment::class);
-        $twigItemProphecy->render('ApiPlatformBundle:SwaggerUi:index.html.twig', [
+        $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'spec' => 'hello',
             'shortName' => 'F',
             'operationId' => 'getFItem',
@@ -96,7 +96,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $serializerProphecy->serialize(Argument::type(Documentation::class), 'json')->willReturn('hello')->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(\Twig_Environment::class);
-        $twigProphecy->render('ApiPlatformBundle:SwaggerUi:index.html.twig', [
+        $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
             'spec' => 'hello',
             'shortName' => null,
             'operationId' => null,

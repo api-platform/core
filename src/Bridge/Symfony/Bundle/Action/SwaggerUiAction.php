@@ -53,7 +53,7 @@ final class SwaggerUiAction
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
 
         return new Response($this->twig->render(
-            'ApiPlatformBundle:SwaggerUi:index.html.twig',
+            '@ApiPlatform/SwaggerUi/index.html.twig',
             $this->getContext($request) + ['spec' => $this->serializer->serialize($documentation, 'json')])
         );
     }
