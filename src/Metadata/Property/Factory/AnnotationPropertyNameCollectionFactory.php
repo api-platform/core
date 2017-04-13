@@ -65,7 +65,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         // Properties
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             if (null !== $this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class)) {
-                $propertyNames[$reflectionProperty->name] = true;
+                $propertyNames[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }
 
@@ -81,7 +81,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
 
             if (null !== $propertyName && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class)) {
-                $propertyNames[$propertyName] = true;
+                $propertyNames[$propertyName] = $propertyName;
             }
         }
 
@@ -92,6 +92,6 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
         }
 
-        return new PropertyNameCollection(array_keys($propertyNames));
+        return new PropertyNameCollection(array_values($propertyNames));
     }
 }
