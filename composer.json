@@ -34,7 +34,7 @@
         "doctrine/doctrine-bundle": "^1.6.3",
         "doctrine/orm": "^2.5",
         "doctrine/annotations": "^1.2",
-        "friendsofsymfony/user-bundle": "^2.0@dev",
+        "friendsofsymfony/user-bundle": "^2.0",
         "nelmio/api-doc-bundle": "^2.11.2",
         "php-mock/php-mock-phpunit": "^1.1",
         "phpdocumentor/reflection-docblock": "^3.0",
