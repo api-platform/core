@@ -112,14 +112,6 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
 
-        <!-- This listener must be executed only when the current object is available -->
-        <service id="api_platform.listener.request.deny_access" class="ApiPlatform\Core\EventListener\DenyAccessListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
-
-            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="1" />
-        </service>
-
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
