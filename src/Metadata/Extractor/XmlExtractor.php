@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Extractor;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -152,7 +154,6 @@ final class XmlExtractor extends AbstractExtractor
         switch ($type) {
             case 'string':
                 return (string) $array[$key];
-
             case 'bool':
                 return (bool) XmlUtils::phpize($array[$key]);
         }

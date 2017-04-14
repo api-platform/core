@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -25,6 +27,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ErrorNormalizer implements NormalizerInterface
 {
     const FORMAT = 'jsonld';
+
+    use ErrorNormalizerTrait;
 
     private $urlGenerator;
     private $debug;
@@ -40,15 +44,11 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $message = $object->getMessage();
         if ($this->debug) {
             $trace = $object->getTrace();
-        } elseif ($object instanceof FlattenException) {
-            $statusCode = $context['statusCode'] ?? $object->getStatusCode();
-            if ($statusCode >= 500 && $statusCode < 600) {
-                $message = Response::$statusTexts[$statusCode];
-            }
         }
+
+        $message = $this->getErrorMessage($object, $context, $this->debug);
 
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),

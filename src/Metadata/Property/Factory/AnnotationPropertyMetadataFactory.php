@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -18,7 +20,7 @@ use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a property metadata from {@see Property} annotations.
+ * Creates a property metadata from {@see ApiProperty} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -121,7 +123,9 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 
         $propertyMetadata = $parentPropertyMetadata;
         foreach ([['get', 'description'], ['is', 'readable'], ['is', 'writable'], ['is', 'readableLink'], ['is', 'writableLink'], ['is', 'required'], ['get', 'iri'], ['is', 'identifier'], ['get', 'attributes']] as $property) {
-            $propertyMetadata = $this->createWith($propertyMetadata, $property, $annotation->{$property[1]});
+            if (null !== $value = $annotation->{$property[1]}) {
+                $propertyMetadata = $this->createWith($propertyMetadata, $property, $value);
+            }
         }
 
         return $propertyMetadata;
@@ -130,7 +134,6 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     private function createWith(PropertyMetadata $propertyMetadata, array $property, $value): PropertyMetadata
     {
         $getter = $property[0].ucfirst($property[1]);
-
         if (null !== $propertyMetadata->$getter()) {
             return $propertyMetadata;
         }

@@ -22,7 +22,7 @@ before_install:
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
-  - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.0.0/php-cs-fixer.phar; fi
+  - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.1.2/php-cs-fixer.phar; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
@@ -32,11 +32,11 @@ install:
   - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
 
 script:
-  - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov; else vendor/bin/phpunit; fi
-  - if [[ $coverage = 1 ]]; then for feature in $(ls -d features/*/ | cut -f2 -d'/' | grep -v bootstrap); do FEATURE=$feature phpdbg -qrr vendor/bin/behat --profile coverage features/$feature; done; else vendor/bin/behat; fi
+  - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --colors=never --coverage-php build/cov/coverage-phpunit.cov; else vendor/bin/phpunit --colors=never; fi
+  - if [[ $coverage = 1 ]]; then for feature in $(ls -d features/*/ | cut -f2 -d'/' | grep -v bootstrap); do FEATURE=$feature phpdbg -qrr vendor/bin/behat --profile coverage features/$feature --no-colors; done; else vendor/bin/behat --no-colors; fi
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
-  - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff; fi
+  - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
 
 after_success:
   - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar; fi

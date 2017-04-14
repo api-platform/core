@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\tests\Metadata\Resource;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -27,11 +29,13 @@ class ResourceMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], $metadata->getItemOperations());
         $this->assertEquals('a', $metadata->getItemOperationAttribute('iop1', 'foo', 'z', false));
         $this->assertEquals('bar', $metadata->getItemOperationAttribute('iop1', 'baz', 'z', true));
+        $this->assertEquals('bar', $metadata->getItemOperationAttribute(null, 'baz', 'z', true));
         $this->assertEquals('z', $metadata->getItemOperationAttribute('iop1', 'notExist', 'z', true));
         $this->assertEquals('z', $metadata->getItemOperationAttribute('notExist', 'notExist', 'z', true));
         $this->assertEquals(['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], $metadata->getCollectionOperations());
         $this->assertEquals('c', $metadata->getCollectionOperationAttribute('cop1', 'foo', 'z', false));
         $this->assertEquals('bar', $metadata->getCollectionOperationAttribute('cop1', 'baz', 'z', true));
+        $this->assertEquals('bar', $metadata->getCollectionOperationAttribute(null, 'baz', 'z', true));
         $this->assertEquals('z', $metadata->getCollectionOperationAttribute('cop1', 'notExist', 'z', true));
         $this->assertEquals('z', $metadata->getCollectionOperationAttribute('notExist', 'notExist', 'z', true));
         $this->assertEquals(['baz' => 'bar'], $metadata->getAttributes());

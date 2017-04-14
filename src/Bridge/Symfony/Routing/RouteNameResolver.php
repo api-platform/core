@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -40,7 +42,7 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
             $methods = $route->getMethods();
 
-            if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods))) {
+            if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods, true))) {
                 return $routeName;
             }
         }

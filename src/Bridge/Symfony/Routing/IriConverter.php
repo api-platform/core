@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -161,7 +163,7 @@ final class IriConverter implements IriConverterInterface
     private function generateIdentifiersUrl(array $identifiers): array
     {
         if (1 === count($identifiers)) {
-            return [rawurlencode(array_values($identifiers)[0])];
+            return [rawurlencode((string) array_values($identifiers)[0])];
         }
 
         foreach ($identifiers as $name => $value) {

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Swagger;
 
 use ApiPlatform\Core\Api\FilterCollection;
@@ -28,6 +30,7 @@ use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -363,9 +366,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $formats = ['jsonld' => ['application/ld+json']];
         $version = '1.2.3';
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $groups = ['dummy', 'foo', 'bar'];
+
+        $ref = 'Dummy_'.md5(serialize($groups));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => 'dummy'])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
 
         $dummyMetadata = new ResourceMetadata(
@@ -374,7 +380,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             'http://schema.example.com/Dummy',
             [
                 'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'normalization_context' => ['groups' => 'dummy']],
+                'put' => ['method' => 'PUT', 'normalization_context' => ['groups' => $groups]],
             ],
             [
                 'get' => ['method' => 'GET'],
@@ -505,7 +511,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy resource updated',
-                                'schema' => ['$ref' => '#/definitions/Dummy_be35824b9d92d1dfc6f78fe086649b8f'],
+                                'schema' => ['$ref' => '#/definitions/'.$ref],
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
@@ -525,7 +531,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         ]),
                     ],
                 ]),
-                'Dummy_be35824b9d92d1dfc6f78fe086649b8f' => new \ArrayObject([
+                $ref => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
@@ -1025,6 +1031,354 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'name' => new \ArrayObject([
                             'description' => 'This is a name.',
                             'type' => 'string',
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    public function testSupports()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal()
+        );
+
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+
+        $this->assertEquals(true, $normalizer->supportsNormalization($documentation, 'json'));
+        $this->assertEquals(false, $normalizer->supportsNormalization($documentation));
+        $this->assertEquals(false, $normalizer->supportsNormalization(new Dummy(), 'json'));
+    }
+
+    public function testNoOperations()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldNotBeCalled();
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            [],
+            [],
+            []
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldNotBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldNotBeCalled();
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal()
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/',
+            'info' => [
+                'title' => '',
+                'version' => '0.0.0',
+            ],
+            'paths' => new \ArrayObject([]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedMessage Method "foo" is not supported
+     */
+    public function testMethodNotSupported()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            [],
+            ['get' => ['method' => 'FOO']],
+            []
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('FOO');
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal()
+        );
+
+        $normalizer->normalize($documentation);
+    }
+
+    public function testNormalizeWithNestedNormalizationGroups()
+    {
+        $title = 'Test API';
+        $description = 'This is a test API.';
+        $formats = ['jsonld' => ['application/ld+json']];
+        $version = '1.2.3';
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
+        $groups = ['dummy', 'foo', 'bar'];
+        $ref = 'Dummy_'.md5(serialize($groups));
+        $relatedDummyRef = 'RelatedDummy_'.md5(serialize($groups));
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['name', 'relatedDummy']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['name']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET'],
+                'put' => ['method' => 'PUT', 'normalization_context' => ['groups' => $groups]],
+            ],
+            [
+                'get' => ['method' => 'GET'],
+                'post' => ['method' => 'POST'],
+            ],
+            []
+        );
+
+        $relatedDummyMetadata = new ResourceMetadata(
+            'RelatedDummy',
+            'This is a related dummy.',
+            'http://schema.example.com/RelatedDummy',
+            [
+                'get' => ['method' => 'GET'],
+            ],
+            [],
+            []
+        );
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedDummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class), 'This is a related dummy \o/.', true, true, true, true, false, false, null, null, []));
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'put')->shouldBeCalled()->willReturn('PUT');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal()
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => [
+                            'Dummy',
+                        ],
+                        'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy collection response',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
+                                ],
+                            ],
+                        ],
+                    ]),
+                    'post' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'postDummyCollection',
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Creates a Dummy resource.',
+                        'parameters' => [[
+                            'name' => 'dummy',
+                            'in' => 'body',
+                            'description' => 'The new Dummy resource',
+                            'schema' => ['$ref' => '#/definitions/Dummy'],
+                        ]],
+                        'responses' => [
+                            201 => [
+                                'description' => 'Dummy resource created',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [[
+                            'name' => 'id',
+                            'in' => 'path',
+                            'type' => 'integer',
+                            'required' => true,
+                        ]],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                    'put' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'putDummyItem',
+                        'consumes' => ['application/ld+json'],
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Replaces the Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'integer',
+                                'required' => true,
+                            ],
+                            [
+                                'name' => 'dummy',
+                                'in' => 'body',
+                                'description' => 'The updated Dummy resource',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource updated',
+                                'schema' => ['$ref' => '#/definitions/'.$ref],
+                            ],
+                            400 => ['description' => 'Invalid input'],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
+                ]),
+                $ref => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                        'relatedDummy' => new \ArrayObject([
+                            'description' => 'This is a related dummy \o/.',
+                            '$ref' => '#/definitions/'.$relatedDummyRef,
+                        ]),
+                    ],
+                ]),
+                $relatedDummyRef => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a related dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/RelatedDummy'],
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
                         ]),
                     ],
                 ]),

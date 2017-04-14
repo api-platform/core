@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -18,7 +20,7 @@ use ApiPlatform\Core\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a property name collection from {@see Property} annotations.
+ * Creates a property name collection from {@see ApiProperty} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -63,7 +65,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         // Properties
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             if (null !== $this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class)) {
-                $propertyNames[$reflectionProperty->name] = true;
+                $propertyNames[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }
 
@@ -74,12 +76,12 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
 
             $propertyName = $this->reflection->getProperty($reflectionMethod->name);
-            if (!$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
+            if (null !== $propertyName && !$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
                 $propertyName = lcfirst($propertyName);
             }
 
             if (null !== $propertyName && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class)) {
-                $propertyNames[$propertyName] = true;
+                $propertyNames[$propertyName] = $propertyName;
             }
         }
 
@@ -90,6 +92,6 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
         }
 
-        return new PropertyNameCollection(array_keys($propertyNames));
+        return new PropertyNameCollection(array_values($propertyNames));
     }
 }

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -45,7 +47,7 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
         if ($this->decorated) {
             try {
                 foreach ($propertyNameCollection = $this->decorated->create($resourceClass, $options) as $propertyName) {
-                    $propertyNames[$propertyName] = true;
+                    $propertyNames[$propertyName] = $propertyName;
                 }
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
                 // Ignore not found exceptions from parent
@@ -62,10 +64,10 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
 
         if ($properties = $this->extractor->getResources()[$resourceClass]['properties'] ?? false) {
             foreach ($properties as $propertyName => $property) {
-                $propertyNames[$propertyName] = true;
+                $propertyNames[$propertyName] = $propertyName;
             }
         }
 
-        return new PropertyNameCollection(array_keys($propertyNames));
+        return new PropertyNameCollection(array_values($propertyNames));
     }
 }

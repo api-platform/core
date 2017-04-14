@@ -35,6 +35,7 @@
             <argument type="service" id="api_platform.operation_path_resolver.custom" />
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.resource_class_directories%</argument>
 
             <tag name="routing.loader" />
         </service>
@@ -117,13 +118,6 @@
             <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="1" />
-        </service>
-
-        <service id="api_platform.listener.view.validate" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener">
-            <argument type="service" id="validator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
         </service>
 
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
