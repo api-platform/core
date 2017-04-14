@@ -21,6 +21,7 @@ Feature: JSON API pagination handling
     And the JSON node "data" should have 1 elements
     And the JSON node "meta.currentPage" should be equal to the number 4
 
+  @dropSchema
   Scenario: Get a paginated collection according to custom items per page in request
     And I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/dummies?itemsPerPage=15"

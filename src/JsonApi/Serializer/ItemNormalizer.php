@@ -91,7 +91,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         // Get and populate identifier if existent
-        $identifier = $this->getItemIdentifierValue($object, $context, $objectAttributesData);
+        $identifier = $this->getIdentifierFromItem($object);
 
         // Get and populate item type
         $resourceClass = $this->resourceClassResolver->getResourceClass(
@@ -470,7 +470,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $identifiers = $this->getIdentifiersFromItem($relatedObject);
+        $identifier = $this->getIdentifierFromItem($relatedObject);
+
+        return ['data' => [
+            'type' => $resourceMetadata->getShortName(),
+            'id' => (string) $identifier,
+        ]];
+    }
+
+    private function getIdentifierFromItem($item)
+    {
+        $identifiers = $this->getIdentifiersFromItem($item);
 
         if (count($identifiers) > 1) {
             throw new RuntimeException(sprintf(
@@ -479,31 +489,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             ));
         }
 
-        return ['data' => [
-            'type' => $resourceMetadata->getShortName(),
-            'id' => (string) reset($identifiers),
-        ]];
-    }
-
-    private function getItemIdentifierValue($object, $context, $objectAttributesData)
-    {
-        $resourceClass = $this->resourceClassResolver->getResourceClass(
-            $object,
-            $context['resource_class'] ?? null,
-            true
-        );
-
-        foreach ($objectAttributesData as $attributeName => $value) {
-            $propertyMetadata = $this
-                ->propertyMetadataFactory
-                ->create($resourceClass, $attributeName);
-
-            if ($propertyMetadata->isIdentifier()) {
-                return $objectAttributesData[$attributeName];
-            }
-        }
-
-        return null;
+        return reset($identifiers);
     }
 
     /**

@@ -142,7 +142,6 @@ Feature: JSON API basic support
     }
     """
 
-  @dropSchema
   Scenario: Update a resource via PATCH
     When I add "Accept" header equal to "application/vnd.api+json"
     When I add "Content-Type" header equal to "application/vnd.api+json"
@@ -164,15 +163,31 @@ Feature: JSON API basic support
     And the JSON node "data.attributes.name" should be equal to "Jane Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
 
-  # Scenario: Embed a relation in a parent object
-  #   When I add "Content-Type" header equal to "application/json"
-  #   And I send a "POST" request to "/relation_embedders" with body:
-  #   """
-  #   {
-  #     "related": "/related_dummies/1"
-  #   }
-  #   """
-  #   Then the response status code should be 201
+  Scenario: Embed a relation in a parent object
+    When I add "Accept" header equal to "application/vnd.api+json"
+    When I add "Content-Type" header equal to "application/vnd.api+json"
+    And I send a "POST" request to "/relation_embedders" with body:
+    """
+    {
+      "data": {
+        "relationships": {
+          "related": {
+            "data": {
+              "type": "related-dummy",
+              "id": "1"
+            }
+          }
+        }
+      }
+    }
+    """
+    Then print last JSON response
+    Then the response status code should be 201
+    And I save the response
+    And I valide it with jsonapi-validator
+    And the JSON node "data.id" should not be an empty string
+    And the JSON node "data.attributes.krondstadt" should be equal to "Krondstadt"
+    And the JSON node "data.relationships.related.data.id" should be equal to "1"
 
   # Scenario: Get the object with the embedded relation
   #   When I add "Accept" header equal to "application/vnd.api+json"
