@@ -3,6 +3,7 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
   As a client software developer
   I need to retrieve an RFC 7807 compliant serialization of errors
 
+  @createSchema
   Scenario: Get an error
     When I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"
@@ -28,6 +29,7 @@ Feature: Error handling valid according to RFC 7807 (application/problem+json)
     }
     """
 
+  @dropSchema
   Scenario: Get an error during deserialization of simple relation
     When I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"

@@ -46,12 +46,12 @@
         "symfony/config": "^3.2",
         "symfony/dependency-injection": "^2.7 || ^3.0",
         "symfony/doctrine-bridge": "^2.8 || ^3.0",
-        "symfony/phpunit-bridge": "^2.7 || ^3.0",
-        "symfony/security": "^2.7 || ^3.0",
-        "symfony/validator": "^2.7 || ^3.0",
         "symfony/finder": "^2.7 || ^3.0",
         "symfony/framework-bundle": "^3.1",
-        "symfony/twig-bundle": "^2.8 || ^3.1"
+        "symfony/phpunit-bridge": "^2.7 || ^3.0",
+        "symfony/security": "^2.7 || ^3.0",
+        "symfony/twig-bundle": "^2.8 || ^3.1",
+        "symfony/validator": "^2.7 || ^3.0"
     },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",

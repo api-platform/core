@@ -123,7 +123,9 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 
         $propertyMetadata = $parentPropertyMetadata;
         foreach ([['get', 'description'], ['is', 'readable'], ['is', 'writable'], ['is', 'readableLink'], ['is', 'writableLink'], ['is', 'required'], ['get', 'iri'], ['is', 'identifier'], ['get', 'attributes']] as $property) {
-            $propertyMetadata = $this->createWith($propertyMetadata, $property, $annotation->{$property[1]});
+            if (null !== $value = $annotation->{$property[1]}) {
+                $propertyMetadata = $this->createWith($propertyMetadata, $property, $value);
+            }
         }
 
         return $propertyMetadata;
@@ -132,7 +134,6 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     private function createWith(PropertyMetadata $propertyMetadata, array $property, $value): PropertyMetadata
     {
         $getter = $property[0].ucfirst($property[1]);
-
         if (null !== $propertyMetadata->$getter()) {
             return $propertyMetadata;
         }

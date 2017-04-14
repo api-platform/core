@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -56,7 +57,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
-                ->booleanNode('enable_swagger_ui')->defaultValue(true)->info('Enable Swagger ui.')->end()
+                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
 
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
