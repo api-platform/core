@@ -18,8 +18,7 @@ Feature: JSON API error handling
     """
     Then the response status code should be 400
     And print last JSON response
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON should be equal to:
     """
     {
@@ -53,8 +52,7 @@ Feature: JSON API error handling
     """
     And print last JSON response
     Then the response status code should be 400
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON should be equal to:
     """
     {

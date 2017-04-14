@@ -18,7 +18,6 @@ Feature: JSON API basic support
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And print last JSON response
-    And I save the response
     And I validate it with jsonapi-validator
     And the JSON node "data" should be an empty array
 
@@ -39,21 +38,18 @@ Feature: JSON API basic support
     Then the response status code should be 201
     # TODO: The response should have a Location header identifying the newly created resource
     And print last JSON response
-    And I save the response
     And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
 
   Scenario: Retrieve the collection
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/third_levels"
-    Then I save the response
     And I validate it with jsonapi-validator
     And print last JSON response
 
   Scenario: Retrieve the third level
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/third_levels/1"
-    Then I save the response
     And I validate it with jsonapi-validator
     And print last JSON response
 
@@ -81,7 +77,6 @@ Feature: JSON API basic support
     }
     """
     Then print last JSON response
-    And I save the response
     And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.name" should be equal to "John Doe"
@@ -107,13 +102,11 @@ Feature: JSON API basic support
     }
     """
     Then print last JSON response
-    And I save the response
     And I validate it with jsonapi-validator
 
   Scenario: Retrieve a collection with relationships
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/related_dummies"
-    Then I save the response
     And I validate it with jsonapi-validator
     And the JSON node "data[0].relationships.thirdLevel.data.id" should be equal to "1"
 
@@ -121,7 +114,6 @@ Feature: JSON API basic support
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/related_dummies/1"
     Then print last JSON response
-    And I save the response
     And I validate it with jsonapi-validator
     And the JSON should be equal to:
     """
@@ -164,7 +156,6 @@ Feature: JSON API basic support
     }
     """
     Then print last JSON response
-    And I save the response
     And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.name" should be equal to "Jane Doe"
@@ -190,7 +181,6 @@ Feature: JSON API basic support
     }
     """
     Then the response status code should be 201
-    And I save the response
     And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.krondstadt" should be equal to "Krondstadt"

@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Prophecy\Argument;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -130,7 +131,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $propertyNameCollectionFactoryProphecy
             ->create(Dummy::class, [])
-            ->willReturn(new PropertyNameCollection(['name']))
+            ->willReturn(new PropertyNameCollection(['id', 'name']))
             ->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this
@@ -142,8 +143,8 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
             ->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy
-            ->create(Dummy::class, 'name')
-            ->willReturn(new PropertyMetadata(null, null, true))
+            ->create(Dummy::class, 'id', [])
+            ->willReturn(new PropertyMetadata(null, null, true, null, null, null, null, true))
             ->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this
@@ -152,6 +153,20 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $resourceClassResolverProphecy
             ->getResourceClass($dummy, null, true)
             ->willReturn(Dummy::class)
+            ->shouldBeCalled();
+
+        // We're also gonna fake this to test normalization of ids
+        $propertyAccessorProphecy = $this
+            ->prophesize(PropertyAccessorInterface::class);
+
+        $propertyAccessorProphecy
+            ->getValue($dummy, 'id')
+            ->willReturn(10)
+            ->shouldBeCalled();
+
+        $propertyAccessorProphecy
+            ->getValue($dummy, 'name')
+            ->willReturn('hello')
             ->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this
@@ -174,12 +189,29 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
             ->willReturn('hello')
             ->shouldBeCalled();
 
+        // Normalization of the fake id property
+        $serializerProphecy
+            ->normalize(10, null, Argument::type('array'))
+            ->willReturn(10)
+            ->shouldBeCalled();
+
+        // Generation of the fake id
+        $propertyNameCollectionFactoryProphecy
+            ->create(Dummy::class)
+            ->willReturn(new PropertyNameCollection(['id']))
+            ->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy
+            ->create(Dummy::class, 'id')
+            ->willReturn(new PropertyMetadata(null, null, true, null, null, null, null, true))
+            ->shouldBeCalled();
+
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            null,
+            $propertyAccessorProphecy->reveal(),
             null,
             $resourceMetadataFactoryProphecy->reveal(),
             $this->prophesize(ItemDataProviderInterface::class)->reveal()
@@ -190,8 +222,11 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $expected = [
             'data' => [
                 'type' => 'Dummy',
-                'id' => null,
-                'attributes' => ['name' => 'hello'],
+                'id' => '10',
+                'attributes' => [
+                    'id' => 10,
+                    'name' => 'hello',
+                ],
             ],
         ];
 

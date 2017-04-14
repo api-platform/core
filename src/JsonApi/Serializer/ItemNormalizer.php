@@ -234,10 +234,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
                 $shortName =
                     (
-                        null !== $className
-                            && $this->resourceClassResolver->isResourceClass($className)
-                                ? $this->resourceMetadataFactory->create($className)->getShortName() :
-                                ''
+                        (
+                            null !== $className
+                                && $this->resourceClassResolver->isResourceClass($className)
+                        )
+                            ? $this->resourceMetadataFactory->create($className)->getShortName() :
+                            ''
                     );
             }
 
@@ -281,10 +283,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $data = [];
 
         $identifier = '';
-        foreach ($components[$type] as $relation) {
+        foreach ($components[$type] as $relationDataArray) {
             $attributeValue = $this->getAttributeValue(
                 $object,
-                $relation['name'],
+                $relationDataArray['name'],
                 $format,
                 $context
             );
@@ -293,49 +295,27 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 continue;
             }
 
-            $data[$relation['name']] = [
-                // TODO: Pending review
-                // 'links' => ['self' => $this->iriConverter->getIriFromItem($object)],
+            $data[$relationDataArray['name']] = [
                 'data' => [],
             ];
 
             // Many to one relationship
-            if ('one' === $relation['cardinality']) {
-                // TODO: Pending review
-                // if ('links' === $type) {
-                //     $data[$relation['name']]['data'][] = ['id' => $this->getRelationIri($attributeValue)];
-
-                //     continue;
-                // }
-
-                $data[$relation['name']] = $attributeValue;
+            if ('one' === $relationDataArray['cardinality']) {
+                $data[$relationDataArray['name']] = $attributeValue;
 
                 continue;
             }
 
-            // TODO: Pending review
             // Many to many relationship
-            foreach ($attributeValue as $rel) {
-                if ('links' === $type) {
-                    $rel = $this->getRelationIri($rel);
-                }
-                $id = ['id' => $rel];
-
-                if (!is_string($rel)) {
-                    foreach ($rel as $property => $value) {
-                        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $property);
-                        if ($propertyMetadata->isIdentifier()) {
-                            $identifier = $rel[$property];
-                        }
-                    }
-                    $id = ['id' => $identifier] + $rel;
+            foreach ($attributeValue as $attributeValueElement) {
+                if (!isset($attributeValueElement['data'])) {
+                    throw new RuntimeException(sprintf(
+                        'Expected \'data\' attribute in collection for attribute \'%s\'',
+                        $relationDataArray['name']
+                    ));
                 }
 
-                if ($relation['type']) {
-                    $data[$relation['name']]['data'][] = $id + ['type' => $relation['type']];
-                } else {
-                    $data[$relation['name']]['data'][] = $id;
-                }
+                $data[$relationDataArray['name']]['data'][] = $attributeValueElement['data'];
             }
         }
 

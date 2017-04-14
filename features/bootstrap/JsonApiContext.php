@@ -66,7 +66,11 @@ final class JsonApiContext implements Context
             throw new \RuntimeException('JSON response seems to be invalid');
         }
 
-        file_put_contents(dirname(__FILE__).'/response.json', $content);
+        $fileName = dirname(__FILE__).'/response.json';
+
+        file_put_contents($fileName, $content);
+
+        return $fileName;
     }
 
     /**
@@ -74,13 +78,19 @@ final class JsonApiContext implements Context
      */
     public function iValidateItWithJsonapiValidator()
     {
+        $fileName = $this->iSaveTheResponse();
+
         $validationResponse = exec(sprintf('cd %s && jsonapi-validator -f response.json', dirname(__FILE__)));
 
         $isValidJsonapi = 'response.json is valid JSON API.' === $validationResponse;
 
         if (!$isValidJsonapi) {
+            unlink($fileName);
+
             throw new \RuntimeException('JSON response seems to be invalid JSON API');
         }
+
+        unlink($fileName);
     }
 
     /**

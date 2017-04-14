@@ -9,13 +9,11 @@ Feature: JSON API filter handling
     And I add "Accept" header equal to "application/vnd.api+json"
     When I send a "GET" request to "/dummies?filter[name]=my"
     Then the response status code should be 200
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data" should have 3 elements
     When I send a "GET" request to "/dummies?filter[name]=foo"
     Then the response status code should be 200
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data" should have 0 elements
 
   @dropSchema
@@ -23,6 +21,5 @@ Feature: JSON API filter handling
     Given I add "Accept" header equal to "application/vnd.api+json"
     When I send a "GET" request to "/dummies?filter[dummyDate][after]=2015-04-28"
     Then the response status code should be 200
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data" should have 2 elements

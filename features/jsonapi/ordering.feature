@@ -9,8 +9,7 @@ Feature: JSON API order handling
     And I add "Accept" header equal to "application/vnd.api+json"
     When I send a "GET" request to "/dummies?order=id"
     Then the response status code should be 200
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON should be valid according to this schema:
     """
     {
@@ -53,8 +52,7 @@ Feature: JSON API order handling
     """
     And I send a "GET" request to "/dummies?order=-id"
     Then the response status code should be 200
-    And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON should be valid according to this schema:
     """
     {
