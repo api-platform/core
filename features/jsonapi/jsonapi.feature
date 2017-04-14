@@ -181,52 +181,9 @@ Feature: JSON API basic support
       }
     }
     """
-    Then print last JSON response
     Then the response status code should be 201
     And I save the response
     And I valide it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.krondstadt" should be equal to "Krondstadt"
     And the JSON node "data.relationships.related.data.id" should be equal to "1"
-
-  # Scenario: Get the object with the embedded relation
-  #   When I add "Accept" header equal to "application/vnd.api+json"
-  #   And I send a "GET" request to "/relation_embedders/1"
-  #   Then the response status code should be 200
-  #   And the response should be in JSON
-  #   And the header "Content-Type" should be equal to "application/vnd.api+json; charset=utf-8"
-  #   And the JSON should be equal to:
-  #   """
-  #   {
-  #         "relationships": {
-  #             "related": {
-  #                 "relationships": {
-  #                     "thirdLevel": {
-  #                         "level": 3
-  #                     }
-  #                 },
-  #                 "symfony": "symfony"
-  #             }
-  #         },
-  #         "krondstadt": "Krondstadt"
-  #   }
-  #   """
-
-  # Scenario: Get a collection
-  #   When I add "Accept" header equal to "application/vnd.api+json"
-  #   And I send a "GET" request to "/dummies"
-  #   Then the response status code should be 200
-  #   And the response should be in JSON
-  #   And the header "Content-Type" should be equal to "application/vnd.api+json; charset=utf-8"
-  #   And the JSON should be equal to:
-  #   """
-  #   {
-  #         "links": {
-  #             "self": "/dummies"
-  #         },
-  #         "meta": {
-  #             "totalItems": 0,
-  #             "itemsPerPage": 3
-  #         }
-  #     }
-  #   """
