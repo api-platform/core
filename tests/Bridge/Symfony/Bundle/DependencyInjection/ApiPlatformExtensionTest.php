@@ -219,10 +219,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->addArgument('%api_platform.resource_class_directories%')->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definitionProphecy->reveal())->shouldBeCalled();
-
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
             $definitionProphecy->addArgument([])->shouldBeCalled();
@@ -353,10 +349,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.action.get_item' => 'api_platform.action.placeholder',
             'api_platform.action.post_collection' => 'api_platform.action.placeholder',
             'api_platform.action.put_item' => 'api_platform.action.placeholder',
-            'api_platform.metadata.property.metadata_factory' => 'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory' => 'api_platform.metadata.property.metadata_factory.xml',
             'api_platform.metadata.property.name_collection_factory' => 'api_platform.metadata.property.name_collection_factory.property_info',
-            'api_platform.metadata.resource.metadata_factory' => 'api_platform.metadata.resource.metadata_factory.annotation',
-            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory' => 'api_platform.metadata.resource.metadata_factory.xml',
+            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.xml',
             'api_platform.operation_path_resolver' => 'api_platform.operation_path_resolver.router',
             'api_platform.operation_path_resolver.default' => 'api_platform.operation_path_resolver.underscore',
             'api_platform.property_accessor' => 'property_accessor',
