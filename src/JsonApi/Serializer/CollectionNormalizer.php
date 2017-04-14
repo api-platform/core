@@ -147,29 +147,30 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         }
 
         $identifier = null;
-        foreach ($data as $obj) {
-            $item = $this->normalizer->normalize($obj, $format, $context);
+        foreach ($data as $item) {
+            $normalizedItem = $this->normalizer->normalize($item, $format, $context);
 
-            if (!isset($item['data']['attributes'])) {
+            if (!isset($normalizedItem['data'])) {
                 throw new RuntimeException(
-                    'data.attributes key expected but not found during JSON API normalization'
+                    'data key expected but not found during JSON API normalization'
                 );
             }
 
-            $item = $item['data']['attributes'];
+            $normalizedItem = $normalizedItem['data'];
 
             $relationships = [];
 
-            if (isset($item['relationships'])) {
-                $relationships = $item['relationships'];
-                unset($item['relationships']);
+            if (isset($normalizedItem['relationships'])) {
+                $relationships = $normalizedItem['relationships'];
+
+                unset($normalizedItem['relationships']);
             }
 
-            foreach ($item as $property => $value) {
+            foreach ($normalizedItem['attributes'] as $property => $value) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
                 if ($propertyMetadata->isIdentifier()) {
-                    $identifier = $item[$property];
+                    $identifier = $normalizedItem['attributes'][$property];
                 }
             }
 
@@ -178,7 +179,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 // The id attribute must be a string
                 // http://jsonapi.org/format/#document-resource-object-identification
                 'id' => (string) $identifier ?? '',
-                'attributes' => $item,
+                'attributes' => $normalizedItem['attributes'],
             ];
 
             if ($relationships) {

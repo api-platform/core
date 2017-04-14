@@ -70,9 +70,9 @@ final class JsonApiContext implements Context
     }
 
     /**
-     * @Then I valide it with jsonapi-validator
+     * @Then I validate it with jsonapi-validator
      */
-    public function iValideItWithJsonapiValidator()
+    public function iValidateItWithJsonapiValidator()
     {
         $validationResponse = exec(sprintf('cd %s && jsonapi-validator -f response.json', dirname(__FILE__)));
 

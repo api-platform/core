@@ -19,7 +19,7 @@ Feature: JSON API basic support
     Then the response status code should be 200
     And print last JSON response
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data" should be an empty array
 
   Scenario: Create a ThirdLevel
@@ -40,21 +40,21 @@ Feature: JSON API basic support
     # TODO: The response should have a Location header identifying the newly created resource
     And print last JSON response
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
 
   Scenario: Retrieve the collection
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/third_levels"
     Then I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And print last JSON response
 
   Scenario: Retrieve the third level
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/third_levels/1"
     Then I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And print last JSON response
 
   Scenario: Create a related dummy
@@ -82,7 +82,7 @@ Feature: JSON API basic support
     """
     Then print last JSON response
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.name" should be equal to "John Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
@@ -108,14 +108,21 @@ Feature: JSON API basic support
     """
     Then print last JSON response
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
+
+  Scenario: Retrieve a collection with relationships
+    When I add "Accept" header equal to "application/vnd.api+json"
+    And I send a "GET" request to "/related_dummies"
+    Then I save the response
+    And I validate it with jsonapi-validator
+    And the JSON node "data[0].relationships.thirdLevel.data.id" should be equal to "1"
 
   Scenario: Retrieve the related dummy
     When I add "Accept" header equal to "application/vnd.api+json"
     And I send a "GET" request to "/related_dummies/1"
     Then print last JSON response
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON should be equal to:
     """
     {
@@ -158,11 +165,12 @@ Feature: JSON API basic support
     """
     Then print last JSON response
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.name" should be equal to "Jane Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
 
+  @dropSchema
   Scenario: Embed a relation in a parent object
     When I add "Accept" header equal to "application/vnd.api+json"
     When I add "Content-Type" header equal to "application/vnd.api+json"
@@ -183,7 +191,26 @@ Feature: JSON API basic support
     """
     Then the response status code should be 201
     And I save the response
-    And I valide it with jsonapi-validator
+    And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.krondstadt" should be equal to "Krondstadt"
     And the JSON node "data.relationships.related.data.id" should be equal to "1"
+
+  # Scenario: Create a dummy with items in a many-to-many relationship
+  #   When I add "Content-Type" header equal to "application/json"
+  #   And I send a "POST" request to "/dummies" with body:
+  #   """
+  #   {
+  #     "data": {
+  #       "attributes": {
+  #         "name": "Dummy with relations",
+  #         "dummyDate": "2015-03-01T10:00:00+00:00",
+  #         "relatedDummy": "http://example.com/related_dummies/1",
+  #         "relatedDummies": [
+  #           "/related_dummies/1"
+  #         ]
+  #       }
+  #     }
+  #   }
+  #   """
+  #   Then the response status code should be 201
