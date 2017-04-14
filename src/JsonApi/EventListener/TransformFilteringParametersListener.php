@@ -34,6 +34,11 @@ final class TransformFilteringParametersListener
     {
         $request = $event->getRequest();
 
+        // This applies only to jsonapi request format
+        if ('jsonapi' !== $request->getRequestFormat()) {
+            return;
+        }
+
         // If page query parameter is not defined or is not an array, never mind
         if (!$request->query->get('filter') || !is_array($request->query->get('filter'))) {
             return;

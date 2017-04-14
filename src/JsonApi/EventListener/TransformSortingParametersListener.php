@@ -43,6 +43,11 @@ final class TransformSortingParametersListener
     {
         $request = $event->getRequest();
 
+        // This applies only to jsonapi request format
+        if ('jsonapi' !== $request->getRequestFormat()) {
+            return;
+        }
+
         // If order query parameter is not defined or is already an array, never mind
         if (
             !$request->query->get($this->orderParameterName)
