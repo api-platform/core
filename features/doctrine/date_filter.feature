@@ -406,7 +406,7 @@ Feature: Date filter on collections
           },
           "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice,description[exists],relatedDummy.name[exists],dummyBoolean[exists]}",
+              "hydra:template": "\/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,order[id],order[name],order[description],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice,description[exists],relatedDummy.name[exists],dummyBoolean[exists]}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -485,6 +485,12 @@ Feature: Date filter on collections
                       "@type": "IriTemplateMapping",
                       "variable": "order[name]",
                       "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[description]",
+                      "property": "description",
                       "required": false
                   },
                   {
