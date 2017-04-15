@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Parser;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -59,7 +61,7 @@ final class ApiPlatformParser implements ParserInterface
     public function supports(array $item)
     {
         $data = explode(':', $item['class'], 3);
-        if (!in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX])) {
+        if (!in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX], true)) {
             return false;
         }
         if (!isset($data[1])) {
@@ -134,7 +136,7 @@ final class ApiPlatformParser implements ParserInterface
 
         return [
             $groupsContext => [
-                'groups' => array_merge(isset($itemOperationAttribute) ? $itemOperationAttribute : [], isset($collectionOperationAttribute) ? $collectionOperationAttribute : []),
+                'groups' => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
             ],
         ];
     }
@@ -236,7 +238,7 @@ final class ApiPlatformParser implements ParserInterface
                     return $data;
                 }
 
-                $data['subType'] = $subProperty['subType'];
+                $data['subType'] = $subProperty['subType'] ?? null;
                 if (isset($subProperty['children'])) {
                     $data['children'] = $subProperty['children'];
                 }
@@ -277,7 +279,7 @@ final class ApiPlatformParser implements ParserInterface
 
             $data['actualType'] = DataTypes::MODEL;
             $data['subType'] = $className;
-            $data['children'] = in_array($className, $visited) ? [] : $this->parseResource($resourceMetadata, $className, $io);
+            $data['children'] = in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io);
 
             return $data;
         }

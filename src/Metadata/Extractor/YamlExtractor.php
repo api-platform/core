@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Extractor;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -132,7 +134,6 @@ final class YamlExtractor extends AbstractExtractor
                     return $array[$key];
                 }
                 break;
-
             case 'string':
                 if (is_string($array[$key])) {
                     return $array[$key];

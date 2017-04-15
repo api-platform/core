@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -132,7 +134,7 @@ final class SwaggerContext implements Context
     public function assertPropertyIsRequired(string $propertyName, string $className)
     {
         $classInfo = $this->getClassInfos($className);
-        if (!in_array($propertyName, $classInfo->required)) {
+        if (!in_array($propertyName, $classInfo->required, true)) {
             throw new \Exception(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }

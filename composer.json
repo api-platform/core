@@ -19,6 +19,7 @@
         "psr/cache": "^1.0",
         "symfony/http-foundation": "^2.7 || ^3.0",
         "symfony/http-kernel": "^2.7 || ^3.0",
+        "symfony/property-access": "^2.7 || ^3.0",
         "symfony/property-info": "^3.1",
         "symfony/serializer": "^3.1",
         "willdurand/negotiation": "^2.0.3"
@@ -33,7 +34,7 @@
         "doctrine/doctrine-bundle": "^1.6.3",
         "doctrine/orm": "^2.5",
         "doctrine/annotations": "^1.2",
-        "friendsofsymfony/user-bundle": "^2.0@dev",
+        "friendsofsymfony/user-bundle": "^2.0",
         "nelmio/api-doc-bundle": "^2.11.2",
         "php-mock/php-mock-phpunit": "^1.1",
         "phpdocumentor/reflection-docblock": "^3.0",
@@ -47,13 +48,12 @@
         "symfony/dependency-injection": "^2.7 || ^3.0",
         "symfony/doctrine-bridge": "^2.8 || ^3.0",
         "symfony/expression-language": "^2.8 || ^3.0",
-        "symfony/phpunit-bridge": "^2.7 || ^3.0",
-        "symfony/security": "^2.7 || ^3.0",
-        "symfony/templating": "^2.7 || ^3.0",
-        "symfony/validator": "^2.7 || ^3.0",
         "symfony/finder": "^2.7 || ^3.0",
         "symfony/framework-bundle": "^3.1",
-        "symfony/twig-bundle": "^2.8 || ^3.1"
+        "symfony/phpunit-bridge": "^2.7 || ^3.0",
+        "symfony/security": "^2.7 || ^3.0",
+        "symfony/twig-bundle": "^2.8 || ^3.1",
+        "symfony/validator": "^2.7 || ^3.0"
     },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",

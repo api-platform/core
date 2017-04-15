@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Util;
 
 /**
@@ -37,5 +39,7 @@ final class Reflection
         if (preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
             return $matches[2];
         }
+
+        return null;
     }
 }

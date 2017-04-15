@@ -99,6 +99,8 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.eager_loading.max_joins%</argument>
             <argument>%api_platform.eager_loading.force_eager%</argument>
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="64" />
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="64" />

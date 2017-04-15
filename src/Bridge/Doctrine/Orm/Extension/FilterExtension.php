@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
@@ -47,7 +49,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
         }
 
         foreach ($this->filters as $filterName => $filter) {
-            if ($filter instanceof FilterInterface && in_array($filterName, $resourceFilters)) {
+            if ($filter instanceof FilterInterface && in_array($filterName, $resourceFilters, true)) {
                 $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
             }
         }

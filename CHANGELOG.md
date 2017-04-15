@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.7
+
+* [security] Hide error's message in prod mode when a 500 error occurs (Api Problem format)
+* Fix sorting when eager loading is used
+* Allow eager loading when using composite identifiers
+* Don't use automatic eager loading when disabled in the config
+* Use `declare(strict_types=1)` and improve coding standards
+* Automatically refresh routes in dev mode when a resource is created or deleted
+
 ## 2.0.6
 
 * Correct the XML Schema type generated for floats in the Hydra documentation

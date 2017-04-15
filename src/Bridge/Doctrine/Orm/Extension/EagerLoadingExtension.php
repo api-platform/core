@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -18,8 +20,10 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Eager loads relations.
@@ -36,14 +40,18 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     private $resourceMetadataFactory;
     private $maxJoins;
     private $forceEager;
+    private $serializerContextBuilder;
+    private $requestStack;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->maxJoins = $maxJoins;
         $this->forceEager = $forceEager;
+        $this->serializerContextBuilder = $serializerContextBuilder;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -59,13 +67,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         $forceEager = $this->isForceEager($resourceClass, $options);
 
-        try {
-            $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
+        $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
-        } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
-            //ignore the not found exception
-        }
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
     }
 
     /**
@@ -195,6 +199,20 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     private function getSerializerGroups(string $resourceClass, array $options, string $context): array
     {
+        $request = null;
+
+        if (null !== $this->requestStack && null !== $this->serializerContextBuilder) {
+            $request = $this->requestStack->getCurrentRequest();
+        }
+
+        if (null !== $request) {
+            $contextFromRequest = $this->serializerContextBuilder->createFromRequest($request, $context === 'normalization_context');
+
+            if (isset($contextFromRequest['groups'])) {
+                return ['serializer_groups' => $contextFromRequest['groups']];
+            }
+        }
+
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         if (isset($options['collection_operation_name'])) {

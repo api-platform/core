@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Documentation\Documentation;
@@ -69,7 +71,7 @@ final class SwaggerUiAction
     {
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
 
-        return new Response($this->twig->render('ApiPlatformBundle:SwaggerUi:index.html.twig', $this->getContext($request, $documentation)));
+        return new Response($this->twig->render('@ApiPlatform/SwaggerUi/index.html.twig', $this->getContext($request, $documentation)));
     }
 
     /**

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -42,7 +44,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context)
     {
         try {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['id'], $context + ['fetch_data' => false]);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => false]);
         } catch (InvalidArgumentException $e) {
             $identifier = null;
             foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $context) as $propertyName) {

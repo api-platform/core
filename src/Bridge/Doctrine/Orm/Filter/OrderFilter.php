@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -113,7 +115,7 @@ class OrderFilter extends AbstractFilter
         }
 
         $direction = strtoupper($direction);
-        if (!in_array($direction, ['ASC', 'DESC'])) {
+        if (!in_array($direction, ['ASC', 'DESC'], true)) {
             return;
         }
 

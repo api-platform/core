@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\FosUser;
 
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
@@ -54,7 +56,6 @@ final class EventListener
                 $this->userManager->deleteUser($user);
                 $event->setControllerResult(null);
                 break;
-
             default:
                 $this->userManager->updateUser($user);
                 break;

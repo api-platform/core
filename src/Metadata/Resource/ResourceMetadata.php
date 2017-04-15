@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource;
 
 /**
@@ -25,14 +27,8 @@ final class ResourceMetadata
     private $collectionOperations;
     private $attributes;
 
-    public function __construct(
-        string $shortName = null,
-        string $description = null,
-        string $iri = null,
-        array $itemOperations = null,
-        array $collectionOperations = null,
-        array $attributes = null
-    ) {
+    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null)
+    {
         $this->shortName = $shortName;
         $this->description = $description;
         $this->iri = $iri;
@@ -169,72 +165,47 @@ final class ResourceMetadata
     /**
      * Gets a collection operation attribute, optionally fallback to a resource attribute.
      *
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
+     * @param string|null $operationName
+     * @param string      $key
+     * @param mixed       $defaultValue
+     * @param bool        $resourceFallback
      *
      * @return mixed
      */
-    public function getCollectionOperationAttribute(
-        string $operationName,
-        string $key,
-        $defaultValue = null,
-        bool $resourceFallback = false
-    ) {
-        return $this->getOperationAttribute(
-            $this->collectionOperations,
-            $operationName,
-            $key,
-            $defaultValue,
-            $resourceFallback
-        );
+    public function getCollectionOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    {
+        return $this->getOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
      * Gets an item operation attribute, optionally fallback to a resource attribute.
      *
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
+     * @param string|null $operationName
+     * @param string      $key
+     * @param mixed       $defaultValue
+     * @param bool        $resourceFallback
      *
      * @return mixed
      */
-    public function getItemOperationAttribute(
-        string $operationName,
-        string $key,
-        $defaultValue = null,
-        bool $resourceFallback = false
-    ) {
-        return $this->getOperationAttribute(
-            $this->itemOperations,
-            $operationName,
-            $key,
-            $defaultValue,
-            $resourceFallback
-        );
+    public function getItemOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    {
+        return $this->getOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
      * Gets an operation attribute, optionally fallback to a resource attribute.
      *
-     * @param array|null $operations
-     * @param string     $operationName
-     * @param string     $key
-     * @param mixed      $defaultValue
-     * @param bool       $resourceFallback
+     * @param array|null  $operations
+     * @param string|null $operationName
+     * @param string      $key
+     * @param mixed       $defaultValue
+     * @param bool        $resourceFallback
      *
      * @return mixed
      */
-    private function getOperationAttribute(
-        array $operations = null,
-        string $operationName,
-        string $key,
-        $defaultValue = null,
-        bool $resourceFallback = false
-    ) {
-        if (isset($operations[$operationName][$key])) {
+    private function getOperationAttribute(array $operations = null, string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    {
+        if (null !== $operationName && isset($operations[$operationName][$key])) {
             return $operations[$operationName][$key];
         }
 

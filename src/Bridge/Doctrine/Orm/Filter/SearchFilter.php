@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -140,21 +142,17 @@ class SearchFilter extends AbstractFilter
         switch ($doctrineType) {
             case Type::TARRAY:
                 return 'array';
-
             case Type::BIGINT:
             case Type::INTEGER:
             case Type::SMALLINT:
                 return 'int';
-
             case Type::BOOLEAN:
                 return 'bool';
-
             case Type::DATE:
             case Type::TIME:
             case Type::DATETIME:
             case Type::DATETIMETZ:
                     return \DateTimeInterface::class;
-
             case Type::FLOAT:
                 return 'float';
         }
@@ -263,12 +261,12 @@ class SearchFilter extends AbstractFilter
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string                      $alias
      * @param string                      $field
-     * @param string                      $value
+     * @param mixed                       $value
      * @param bool                        $caseSensitive
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $value, bool $caseSensitive)
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $value, bool $caseSensitive)
     {
         $wrapCase = $this->createWrapCase($caseSensitive);
         $valueParameter = $queryNameGenerator->generateParameterName($field);
@@ -280,31 +278,26 @@ class SearchFilter extends AbstractFilter
                     ->andWhere(sprintf($wrapCase('%s.%s').' = '.$wrapCase(':%s'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
                 break;
-
             case self::STRATEGY_PARTIAL:
                 $queryBuilder
                     ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s, \'%%\')'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
                 break;
-
             case self::STRATEGY_START:
                 $queryBuilder
                     ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(:%s, \'%%\')'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
                 break;
-
             case self::STRATEGY_END:
                 $queryBuilder
                     ->andWhere(sprintf($wrapCase('%s.%s').' LIKE '.$wrapCase('CONCAT(\'%%\', :%s)'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
                 break;
-
             case self::STRATEGY_WORD_START:
                 $queryBuilder
                     ->andWhere(sprintf($wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(:%3$s, \'%%\')').' OR '.$wrapCase('%1$s.%2$s').' LIKE '.$wrapCase('CONCAT(\'%% \', :%3$s, \'%%\')'), $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
                 break;
-
             default:
                 throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
         }

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
@@ -17,6 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -165,11 +168,25 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
     }
 
+    public function testEnablSecurity()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => DoctrineBundle::class,
+            'SecurityBundle' => SecurityBundle::class,
+        ])->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.listener.request.deny_access', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
+    }
+
     public function testDisableEagerLoadingExtension()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading')->shouldBeCalled();
+        $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['eager_loading' => ['enabled' => false]]]), $containerBuilder);
     }
@@ -215,6 +232,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
             'api_platform.eager_loading.force_eager' => true,
+            'api_platform.resource_class_directories' => [],
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -222,10 +240,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
-
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->addArgument([])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->willReturn($definitionProphecy->reveal())->shouldBeCalled();
 
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
@@ -300,7 +314,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
-            'api_platform.listener.request.deny_access',
             'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.annotation',
@@ -359,10 +372,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.action.post_collection' => 'api_platform.action.placeholder',
             'api_platform.action.put_item' => 'api_platform.action.placeholder',
             'api_platform.action.patch_item' => 'api_platform.action.placeholder',
-            'api_platform.metadata.property.metadata_factory' => 'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory' => 'api_platform.metadata.property.metadata_factory.xml',
             'api_platform.metadata.property.name_collection_factory' => 'api_platform.metadata.property.name_collection_factory.property_info',
-            'api_platform.metadata.resource.metadata_factory' => 'api_platform.metadata.resource.metadata_factory.annotation',
-            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory' => 'api_platform.metadata.resource.metadata_factory.xml',
+            'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.xml',
             'api_platform.operation_path_resolver' => 'api_platform.operation_path_resolver.router',
             'api_platform.operation_path_resolver.default' => 'api_platform.operation_path_resolver.underscore',
             'api_platform.property_accessor' => 'property_accessor',

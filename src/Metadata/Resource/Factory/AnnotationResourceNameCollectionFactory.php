@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -16,7 +18,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
- * Creates a resource name collection from {@see Resource} annotations.
+ * Creates a resource name collection from {@see ApiResource} annotations.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -58,7 +60,6 @@ final class WriteListener
             case Request::METHOD_POST:
                 $objectManager->persist($controllerResult);
                 break;
-
             case Request::METHOD_DELETE:
                 $objectManager->remove($controllerResult);
                 $event->setControllerResult(null);
