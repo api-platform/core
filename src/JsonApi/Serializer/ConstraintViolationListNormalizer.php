@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 final class ConstraintViolationListNormalizer implements NormalizerInterface
 {
@@ -36,34 +37,10 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
     {
         $violations = [];
         foreach ($object as $violation) {
-            $fieldName = $violation->getPropertyPath();
-
-            $propertyMetadata = $this->propertyMetadataFactory
-                ->create(
-                    get_class($violation->getRoot()),
-                    $fieldName
-                );
-
-            if ($this->nameConverter) {
-                $fieldName = $this->nameConverter->normalize($fieldName);
-            }
-
-            $violationPath = sprintf(
-                'data/attributes/%s',
-                $fieldName
-            );
-
-            if (null !== $propertyMetadata->getType()->getClassName()) {
-                $violationPath = sprintf(
-                    'data/relationships/%s',
-                    $fieldName
-                );
-            }
-
             $violations[] = [
                 'detail' => $violation->getMessage(),
                 'source' => [
-                    'pointer' => $violationPath,
+                    'pointer' => $this->getSourcePointerFromViolation($violation),
                 ],
             ];
         }
@@ -77,5 +54,38 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
+    }
+
+    private function getSourcePointerFromViolation(ConstraintViolationInterface $violation)
+    {
+        $fieldName = $violation->getPropertyPath();
+
+        if (!$fieldName) {
+            return 'data';
+        }
+
+        $propertyMetadata = $this->propertyMetadataFactory
+            ->create(
+                // Im quite sure this requires some thought in case of validations
+                // over relationships
+                get_class($violation->getRoot()),
+                $fieldName
+            );
+
+        if ($this->nameConverter) {
+            $fieldName = $this->nameConverter->normalize($fieldName);
+        }
+
+        if (null !== $propertyMetadata->getType()->getClassName()) {
+            return sprintf(
+                'data/relationships/%s',
+                $fieldName
+            );
+        }
+
+        return sprintf(
+            'data/attributes/%s',
+            $fieldName
+        );
     }
 }
