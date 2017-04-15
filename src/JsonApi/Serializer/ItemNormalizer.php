@@ -146,20 +146,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        // TODO: Test what is this about
         // Avoid issues with proxies if we populated the object
-        // if (isset($data['data']['id']) && !isset($context['object_to_populate'])) {
-        //     if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
-        //         throw new InvalidArgumentException('Update is not allowed for this operation.');
-        //     }
+        if (isset($data['data']['id']) && !isset($context['object_to_populate'])) {
+            if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
+                throw new InvalidArgumentException('Update is not allowed for this operation.');
+            }
 
-        //     $context['object_to_populate'] = $this->iriConverter->getItemFromIri(
-        //         $data['data']['id'],
-        //         $context + ['fetch_data' => false]
-        //     );
-        // }
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri(
+                $data['data']['id'],
+                $context + ['fetch_data' => false]
+            );
+        }
 
-        // Approach #1
         // Merge attributes and relations previous to apply parents denormalizing
         $dataToDenormalize = array_merge(
             $data['data']['attributes'] ?? [],
@@ -201,7 +199,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $options = $this->getFactoryOptions($context);
 
-        $shortName = $className = '';
+        $typeShortName = $className = '';
 
         $components = [
             'links' => [],
@@ -232,7 +230,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                         && $this->resourceClassResolver->isResourceClass($className);
                 }
 
-                $shortName =
+                $typeShortName =
                     (
                         (
                             null !== $className
@@ -251,7 +249,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             $relation = [
                 'name' => $attribute,
-                'type' => $shortName,
+                'type' => $typeShortName,
                 'cardinality' => $isOne ? 'one' : 'many',
             ];
 
@@ -283,25 +281,31 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $data = [];
 
         $identifier = '';
-        foreach ($components[$type] as $relationDataArray) {
+        foreach ($components[$type] as $relationshipDataArray) {
+            $relationshipName = $relationshipDataArray['name'];
+
             $attributeValue = $this->getAttributeValue(
                 $object,
-                $relationDataArray['name'],
+                $relationshipName,
                 $format,
                 $context
             );
+
+            if ($this->nameConverter) {
+                $relationshipName = $this->nameConverter->normalize($relationshipName);
+            }
 
             if (!$attributeValue) {
                 continue;
             }
 
-            $data[$relationDataArray['name']] = [
+            $data[$relationshipName] = [
                 'data' => [],
             ];
 
             // Many to one relationship
-            if ('one' === $relationDataArray['cardinality']) {
-                $data[$relationDataArray['name']] = $attributeValue;
+            if ('one' === $relationshipDataArray['cardinality']) {
+                $data[$relationshipName] = $attributeValue;
 
                 continue;
             }
@@ -311,11 +315,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 if (!isset($attributeValueElement['data'])) {
                     throw new RuntimeException(sprintf(
                         'Expected \'data\' attribute in collection for attribute \'%s\'',
-                        $relationDataArray['name']
+                        $relationshipName
                     ));
                 }
 
-                $data[$relationDataArray['name']]['data'][] = $attributeValueElement['data'];
+                $data[$relationshipName]['data'][] = $attributeValueElement['data'];
             }
         }
 
