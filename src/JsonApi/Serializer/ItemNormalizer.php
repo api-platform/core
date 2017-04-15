@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -160,10 +162,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // Approach #1
         // Merge attributes and relations previous to apply parents denormalizing
         $dataToDenormalize = array_merge(
-            isset($data['data']['attributes']) ?
-                $data['data']['attributes'] : [],
-            isset($data['data']['relationships']) ?
-                $data['data']['relationships'] : []
+            $data['data']['attributes'] ?? [],
+            $data['data']['relationships'] ?? []
         );
 
         return parent::denormalize(
@@ -331,7 +331,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getRelationIri($rel): string
     {
-        return isset($rel['links']['self']) ? $rel['links']['self'] : $rel;
+        return $rel['links']['self'] ?? $rel;
     }
 
     /**

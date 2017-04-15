@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Serializer\NameConverter;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -47,7 +49,7 @@ class CamelCaseToDashedCaseNameConverter implements NameConverterInterface
      */
     public function normalize($propertyName)
     {
-        if (null === $this->attributes || in_array($propertyName, $this->attributes)) {
+        if (null === $this->attributes || in_array($propertyName, $this->attributes, true)) {
             $lcPropertyName = lcfirst($propertyName);
             $snakeCasedName = '';
 
@@ -79,7 +81,7 @@ class CamelCaseToDashedCaseNameConverter implements NameConverterInterface
             $camelCasedName = lcfirst($camelCasedName);
         }
 
-        if (null === $this->attributes || in_array($camelCasedName, $this->attributes)) {
+        if (null === $this->attributes || in_array($camelCasedName, $this->attributes, true)) {
             return $camelCasedName;
         }
 

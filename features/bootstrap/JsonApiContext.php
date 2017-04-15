@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Behat\Behat\Context\Context;
@@ -66,7 +68,7 @@ final class JsonApiContext implements Context
             throw new \RuntimeException('JSON response seems to be invalid');
         }
 
-        $fileName = dirname(__FILE__).'/response.json';
+        $fileName = __DIR__.'/response.json';
 
         file_put_contents($fileName, $content);
 
@@ -80,7 +82,7 @@ final class JsonApiContext implements Context
     {
         $fileName = $this->iSaveTheResponse();
 
-        $validationResponse = exec(sprintf('cd %s && jsonapi-validator -f response.json', dirname(__FILE__)));
+        $validationResponse = exec(sprintf('cd %s && jsonapi-validator -f response.json', __DIR__));
 
         $isValidJsonapi = 'response.json is valid JSON API.' === $validationResponse;
 
