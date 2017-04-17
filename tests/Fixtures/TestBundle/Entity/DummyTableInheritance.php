@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
- * @ORM\DiscriminatorMap({"dummyTableInheritance" = "DummyTableInheritance", "dummyTableInheritanceChild" = "dummyTableInheritanceChild"})
+ * @ORM\DiscriminatorMap({"dummyTableInheritance" = "DummyTableInheritance", "dummyTableInheritanceChild" = "DummyTableInheritanceChild", "dummyTableInheritanceDifferentChild" = "DummyTableInheritanceDifferentChild"})
  * @ApiResource
  */
 class DummyTableInheritance
