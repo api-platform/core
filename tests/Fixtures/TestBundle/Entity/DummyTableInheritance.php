@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
@@ -31,6 +32,8 @@ class DummyTableInheritance
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Groups({"default"})
      */
     private $id;
 
@@ -38,8 +41,18 @@ class DummyTableInheritance
      * @var string The dummy name
      *
      * @ORM\Column
+     *
+     * @Groups({"default"})
      */
     private $name;
+
+    /**
+     * @var DummyTableInheritanceRelated
+     *
+     * @ORM\ManyToOne(targetEntity="DummyTableInheritanceRelated", inversedBy="children")
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
+     */
+    private $parent;
 
     public function getName()
     {
@@ -54,5 +67,25 @@ class DummyTableInheritance
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return DummyTableInheritanceRelated
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param DummyTableInheritanceRelated $parent
+     *
+     * @return $this
+     */
+    public function setParent(DummyTableInheritanceRelated $parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
     }
 }

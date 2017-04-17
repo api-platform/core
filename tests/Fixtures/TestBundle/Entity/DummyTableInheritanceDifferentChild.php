@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
@@ -26,6 +27,8 @@ class DummyTableInheritanceDifferentChild extends DummyTableInheritance
      * @var string The dummy email
      *
      * @ORM\Column
+     *
+     * @Groups({"default"})
      */
     private $email;
 
