@@ -78,5 +78,4 @@ class DummyTableInheritanceRelated
 
         return $this;
     }
-
 }
