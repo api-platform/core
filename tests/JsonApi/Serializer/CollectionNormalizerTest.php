@@ -58,41 +58,6 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    /**
-     * TODO: Find out if api_sub_level flag support is needed.
-     */
-    // public function testNormalizeApiSubLevel()
-    // {
-    //     $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-    //     $resourceClassResolverProphecy->getResourceClass()->shouldNotBeCalled();
-
-    //     $resourceMetadataProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-
-    //     $propertyMetadataProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-
-    //     $itemNormalizer = $this->prophesize(NormalizerInterface::class);
-
-    //     $itemNormalizer
-    //         ->normalize('bar', null, ['api_sub_level' => true])
-    //         ->willReturn(22);
-
-    //     $normalizer = new CollectionNormalizer(
-    //         $resourceClassResolverProphecy->reveal(),
-    //         $resourceMetadataProphecy->reveal(),
-    //         $propertyMetadataProphecy->reveal(),
-    //         'page'
-    //     );
-
-    //     $normalizer->setNormalizer($itemNormalizer->reveal());
-
-    //     $this->assertEquals(
-    //         ['data' => [['foo' => 22]]],
-    //         $normalizer->normalize(
-    //             ['foo' => 'bar'], null, ['api_sub_level' => true]
-    //         )
-    //     );
-    // }
-
     public function testNormalizePaginator()
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);

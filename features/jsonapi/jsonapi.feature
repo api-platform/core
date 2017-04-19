@@ -36,7 +36,7 @@ Feature: JSON API basic support
     }
     """
     Then the response status code should be 201
-    # TODO: The response should have a Location header identifying the newly created resource
+    Then print last response headers
     And print last JSON response
     And I validate it with jsonapi-validator
     And the JSON node "data.id" should not be an empty string
@@ -185,22 +185,3 @@ Feature: JSON API basic support
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.krondstadt" should be equal to "Krondstadt"
     And the JSON node "data.relationships.related.data.id" should be equal to "1"
-
-  # Scenario: Create a dummy with items in a many-to-many relationship
-  #   When I add "Content-Type" header equal to "application/json"
-  #   And I send a "POST" request to "/dummies" with body:
-  #   """
-  #   {
-  #     "data": {
-  #       "attributes": {
-  #         "name": "Dummy with relations",
-  #         "dummyDate": "2015-03-01T10:00:00+00:00",
-  #         "relatedDummy": "http://example.com/related_dummies/1",
-  #         "relatedDummies": [
-  #           "/related_dummies/1"
-  #         ]
-  #       }
-  #     }
-  #   }
-  #   """
-  #   Then the response status code should be 201

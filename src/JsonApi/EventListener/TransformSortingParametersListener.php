@@ -58,8 +58,7 @@ final class TransformSortingParametersListener
             return;
         }
 
-        $orderParametersArray =
-            explode(',', $request->query->get($this->orderParameterName));
+        $orderParametersArray = explode(',', $request->query->get($this->orderParameterName));
 
         $transformedOrderParametersArray = [];
         foreach ($orderParametersArray as $orderParameter) {

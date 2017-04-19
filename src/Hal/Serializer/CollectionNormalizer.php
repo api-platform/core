@@ -57,9 +57,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     public function normalize($object, $format = null, array $context = [])
     {
         $data = [];
-        $currentPage = 1;
-        $lastPage = 1;
-        $itemsPerPage = 0;
         if (isset($context['api_sub_level'])) {
             foreach ($object as $index => $obj) {
                 $data[$index] = $this->normalizer->normalize($obj, $format, $context);

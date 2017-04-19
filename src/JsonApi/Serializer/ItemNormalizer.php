@@ -112,9 +112,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $components
         );
 
-        // TODO: Pending population of links
-        // $item = $this->populateRelation($item, $object, $format, $context, $components, 'links');
-
         $item = [
             // The id attribute must be a string
             // See: http://jsonapi.org/format/#document-resource-object-identification
@@ -230,15 +227,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
                         && $this->resourceClassResolver->isResourceClass($className);
                 }
 
-                $typeShortName =
-                    (
-                        (
-                            null !== $className
-                                && $this->resourceClassResolver->isResourceClass($className)
-                        )
-                            ? $this->resourceMetadataFactory->create($className)->getShortName() :
-                            ''
-                    );
+                $typeShortName = '';
+
+                if ($className && $this->resourceClassResolver->isResourceClass($className)) {
+                    $typeShortName = $this
+                        ->resourceMetadataFactory
+                        ->create($className)
+                        ->getShortName();
+                }
             }
 
             if (!$isOne && !$isMany) {
@@ -384,7 +380,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return;
         }
 
-        // TODO: Add tests
         // An empty array is allowed for empty to-many relationships, see
         // http://jsonapi.org/format/#document-resource-object-linkage
         if ([] === $data['data']) {
@@ -480,8 +475,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * Find identifiers from an Item (Object).
      *
      * Taken from ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter
-     *
-     * TODO: Review if this would be useful if defined somewhere else
      *
      * @param object $item
      *
