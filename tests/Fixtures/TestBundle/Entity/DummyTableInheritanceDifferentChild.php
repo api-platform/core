@@ -21,24 +21,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity
  * @ApiResource
  */
-class DummyTableInheritanceChild extends DummyTableInheritance
+class DummyTableInheritanceDifferentChild extends DummyTableInheritance
 {
     /**
-     * @var string The dummy nickname
+     * @var string The dummy email
      *
      * @ORM\Column
      *
      * @Groups({"default"})
      */
-    private $nickname;
+    private $email;
 
-    public function getNickname()
+    public function getEmail()
     {
-        return $this->nickname;
+        return $this->email;
     }
 
-    public function setNickname($nickname)
+    public function setEmail($email)
     {
-        $this->nickname = $nickname;
+        $this->email = $email;
     }
 }
