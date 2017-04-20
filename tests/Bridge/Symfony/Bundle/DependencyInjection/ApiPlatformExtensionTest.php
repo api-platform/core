@@ -19,6 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
@@ -151,6 +153,25 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
+    }
+
+    public function testFosUserPriority()
+    {
+        $builder = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($builder, new FileLocator(dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
+        $loader->load('api.xml');
+        $loader->load('fos_user.xml');
+
+        $fosListener = $builder->getDefinition('api_platform.fos_user.event_listener');
+        $viewListener = $builder->getDefinition('api_platform.listener.view.serialize');
+
+        // Ensure FOSUser event listener priority is always greater than the view serialize listener
+        $this->assertGreaterThan(
+            $viewListener->getTag('kernel.event_listener')[0]['priority'],
+            $fosListener->getTag('kernel.event_listener')[0]['priority'],
+            "api_platform.fos_user.event_listener priority needs to be greater than that of api_platform.listener.view.serialize"
+        );
     }
 
     public function testEnableNelmioApiDoc()
