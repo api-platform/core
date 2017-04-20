@@ -74,7 +74,7 @@ final class ReadListener
     private function getCollectionData(Request $request, array $attributes)
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            return;
+            return null;
         }
 
         return $this->collectionDataProvider->getCollection($attributes['resource_class'], $attributes['collection_operation_name']);

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata as PersistenceClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
@@ -38,9 +39,9 @@ final class QueryJoinParser
      * @param QueryBuilder    $queryBuilder
      * @param ManagerRegistry $managerRegistry
      *
-     * @return ClassMetadata
+     * @return PersistenceClassMetadata
      */
-    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): ClassMetadata
+    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): PersistenceClassMetadata
     {
         $rootEntities = $queryBuilder->getRootEntities();
         $rootAliases = $queryBuilder->getRootAliases();

@@ -8,3 +8,6 @@ parameters:
         - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
         - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]#'
         - '#Call to an undefined method PHPUnit_Framework_MockObject_MockObject::[a-zA-Z0-9_]+\(\)#'
+
+        # False positives
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\[a-zA-Z]+Extension::isForceEager\(\) should return bool but returns bool|mixed#'
