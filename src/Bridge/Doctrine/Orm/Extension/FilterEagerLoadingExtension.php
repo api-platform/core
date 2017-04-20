@@ -88,8 +88,8 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
      *
      * @param QueryBuilder                $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $originAlias  - the base alias
-     * @param string                      $replacement  - the replacement for the base alias, will change the from alias
+     * @param string                      $originAlias        the base alias
+     * @param string                      $replacement        the replacement for the base alias, will change the from alias
      *
      * @return QueryBuilder
      */
