@@ -81,7 +81,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         $data = [
             '_links' => [
-                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage),
+                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             ],
         ];
 
