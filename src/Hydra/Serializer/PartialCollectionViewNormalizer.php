@@ -70,15 +70,13 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         $data['hydra:view'] = [
-            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage),
+            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             '@type' => 'hydra:PartialCollectionView',
         ];
 
         if ($paginated) {
-            $data['hydra:view'] = [
-                'hydra:first' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.),
-                'hydra:last' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage),
-            ];
+            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
 
             if (1. !== $currentPage) {
                 $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
