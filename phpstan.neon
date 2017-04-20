@@ -3,3 +3,8 @@ parameters:
         - tests/Fixtures/app/AppKernel.php
     excludes_analyse:
         - tests/Fixtures/app/cache
+    ignoreErrors:
+        - '#Call to an undefined method Symfony\\Component\\Routing\\Exception\\ExceptionInterface::getCode()#'
+        - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
+        - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]#'
+        - '#Call to an undefined method PHPUnit_Framework_MockObject_MockObject::[a-zA-Z0-9_]+\(\)#'
