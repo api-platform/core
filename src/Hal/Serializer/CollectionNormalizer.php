@@ -70,6 +70,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
         $paginated = $isPaginator = $object instanceof PaginatorInterface;
 
+        $currentPage = $lastPage = $itemsPerPage = null;
         if ($isPaginator) {
             $currentPage = $object->getCurrentPage();
             $lastPage = $object->getLastPage();
