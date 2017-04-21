@@ -23,6 +23,7 @@ before_install:
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
   - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.1.2/php-cs-fixer.phar; fi
+  - if [[ $lint = 1 ]]; then composer global require phpstan/phpstan; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
@@ -37,6 +38,7 @@ script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
+  - if [[ $lint = 1 ]]; then phpstan analyse -c phpstan.neon -l5 --ansi src tests; fi
 
 after_success:
   - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar; fi

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Doctrine\Util;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 

@@ -87,9 +87,11 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
      * Returns a clone of the given query builder where everything gets re-aliased.
      *
      * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryBuilder
-     * @param string                      $originAlias  - the base alias
-     * @param string                      $replacement  - the replacement for the base alias, will change the from alias
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $originAlias        the base alias
+     * @param string                      $replacement        the replacement for the base alias, will change the from alias
+     *
+     * @return QueryBuilder
      */
     private function getQueryBuilderWithNewAliases(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $originAlias = 'o', string $replacement = 'o_2')
     {

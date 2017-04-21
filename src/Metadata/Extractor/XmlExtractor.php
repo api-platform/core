@@ -148,7 +148,7 @@ final class XmlExtractor extends AbstractExtractor
     private function phpize(\SimpleXMLElement $array, string $key, string $type)
     {
         if (!isset($array[$key])) {
-            return;
+            return null;
         }
 
         switch ($type) {
@@ -157,5 +157,7 @@ final class XmlExtractor extends AbstractExtractor
             case 'bool':
                 return (bool) XmlUtils::phpize($array[$key]);
         }
+
+        return null;
     }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -82,7 +83,7 @@ final class QueryChecker
                 ->getManagerForClass($rootEntity)
                 ->getClassMetadata($rootEntity);
 
-            if ($isForeign ? $rootMetadata->isIdentifierComposite : $rootMetadata->containsForeignIdentifier) {
+            if ($rootMetadata instanceof ClassMetadata && ($isForeign ? $rootMetadata->isIdentifierComposite : $rootMetadata->containsForeignIdentifier)) {
                 return true;
             }
         }

@@ -1,0 +1,16 @@
+parameters:
+    autoload_files:
+        - tests/Fixtures/app/AppKernel.php
+    excludes_analyse:
+        - tests/Fixtures/app/cache
+    ignoreErrors:
+        - '#Call to an undefined method Symfony\\Component\\Routing\\Exception\\ExceptionInterface::getCode()#'
+        - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'
+        - '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy::\$[a-zA-Z0-9_]+#'
+        - '#Call to an undefined method PHPUnit_Framework_MockObject_MockObject::[a-zA-Z0-9_]+\(\)#'
+
+        # False positives
+        - '#scalar#' # Fixed in PHPStan 0.7
+        - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects Doctrine\\ORM\\Query\\Expr\\Base, Doctrine\\ORM\\Query\\Expr\\Join\[\] given#' # Fixed in Doctrine's master
+        - '#Parameter \#1 \$rootNode of method ApiPlatform\\Core\\Bridge\\Symfony\\Bundle\\DependencyInjection\\Configuration::[a-zA-Z0-9]+\(\) expects Symfony\\Component\\Config\\Definition\\Builder\\ArrayNodeDefinition, Symfony\\Component\\Config\\Definition\\Builder\\ArrayNodeDefinition|Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition given#'
+        - '#Parameter \#1 \$source of static method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) expects string, string\|resource given#'

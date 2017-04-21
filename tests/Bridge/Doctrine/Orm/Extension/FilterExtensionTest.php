@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Doctrine\Orm\Extension;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;

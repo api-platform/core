@@ -14,35 +14,31 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * Resource linked to a standard object.
- *
  * @ORM\Entity
  * @ApiResource
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ContainNonResource
+class DummyTableInheritanceDifferentChild extends DummyTableInheritance
 {
     /**
-     * @var mixed
+     * @var string The dummy email
      *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column
+     *
+     * @Groups({"default"})
      */
-    public $id;
+    private $email;
 
-    /**
-     * @var self
-     */
-    public $nested;
+    public function getEmail()
+    {
+        return $this->email;
+    }
 
-    /**
-     * @var NotAResource
-     */
-    public $notAResource;
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
 }

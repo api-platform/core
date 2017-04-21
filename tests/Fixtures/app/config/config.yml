@@ -87,7 +87,7 @@ services:
             -  '%fos_user.model.user.class%'
 
     fos_user.mailer.default:
-        class: 'ApiPlatform\Core\Tests\Mock\MailerMock'
+        class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
 
     app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'

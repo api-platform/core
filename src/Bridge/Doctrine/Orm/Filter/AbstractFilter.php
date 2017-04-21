@@ -259,7 +259,7 @@ abstract class AbstractFilter implements FilterInterface
         $parts = $queryBuilder->getDQLPart('join');
 
         if (!isset($parts['o'])) {
-            return;
+            return null;
         }
 
         foreach ($parts['o'] as $join) {
@@ -267,6 +267,8 @@ abstract class AbstractFilter implements FilterInterface
                 return $join;
             }
         }
+
+        return null;
     }
 
     /**

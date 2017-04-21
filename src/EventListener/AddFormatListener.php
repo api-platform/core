@@ -76,7 +76,7 @@ final class AddFormatListener
         }
 
         // Then use the Symfony request format if available and applicable
-        $requestFormat = $request->getRequestFormat(null) ?: null;
+        $requestFormat = $request->getRequestFormat('') ?: null;
         if (null !== $requestFormat) {
             $mimeType = $request->getMimeType($requestFormat);
 
