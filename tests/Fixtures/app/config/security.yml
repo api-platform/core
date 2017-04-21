@@ -1,5 +1,6 @@
 security:
     encoders:
+        ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User: bcrypt
         FOS\UserBundle\Model\UserInterface: plaintext
 
     providers:
