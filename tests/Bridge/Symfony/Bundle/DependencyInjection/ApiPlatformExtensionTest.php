@@ -170,7 +170,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThan(
             $viewListener->getTag('kernel.event_listener')[0]['priority'],
             $fosListener->getTag('kernel.event_listener')[0]['priority'],
-            "api_platform.fos_user.event_listener priority needs to be greater than that of api_platform.listener.view.serialize"
+            'api_platform.fos_user.event_listener priority needs to be greater than that of api_platform.listener.view.serialize'
         );
     }
 
