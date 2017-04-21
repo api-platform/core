@@ -14,3 +14,4 @@ parameters:
         - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects Doctrine\\ORM\\Query\\Expr\\Base, Doctrine\\ORM\\Query\\Expr\\Join\[\] given#' # Fixed in Doctrine's master
         - '#Parameter \#1 \$rootNode of method ApiPlatform\\Core\\Bridge\\Symfony\\Bundle\\DependencyInjection\\Configuration::[a-zA-Z0-9]+\(\) expects Symfony\\Component\\Config\\Definition\\Builder\\ArrayNodeDefinition, Symfony\\Component\\Config\\Definition\\Builder\\ArrayNodeDefinition|Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition given#'
         - '#Parameter \#1 \$source of static method ApiPlatform\\Core\\Util\\RequestParser::parseRequestParams\(\) expects string, string\|resource given#'
+        - '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
