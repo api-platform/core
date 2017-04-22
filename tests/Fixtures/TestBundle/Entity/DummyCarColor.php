@@ -70,7 +70,7 @@ class DummyCarColor
      *
      * @return static
      */
-    public function setCar(DummyCar $car)
+    public function setCar(DummyCar $car = null)
     {
         $this->car = $car;
 

@@ -321,7 +321,6 @@ Feature: Relations support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  @dropSchema
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
@@ -350,5 +349,35 @@ Feature: Relations support
         "thirdLevel": null
       },
       "related": null
+    }
+    """
+
+  @dropSchema
+  Scenario: Validation error on empty string relation
+    Given there is a DummyCar entity with related colors
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/dummy_car_colors/1" with body:
+    """
+    {
+      "prop": "red",
+      "car": ""
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "\/contexts\/ConstraintViolationList",
+      "@type": "ConstraintViolationList",
+      "hydra:title": "An error occurred",
+      "hydra:description": "car: This value should not be blank.",
+      "violations": [
+        {
+          "propertyPath": "car",
+          "message": "This value should not be blank."
+        }
+      ]
     }
     """
