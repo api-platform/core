@@ -280,7 +280,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             } catch (ItemNotFoundException $e) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                if ("" === $value && ($propertyMetadata->isWritableLink() || $this->resourceClassResolver->isResourceClass($className))) {
+                if ('' === $value && ($propertyMetadata->isWritableLink() || $this->resourceClassResolver->isResourceClass($className))) {
                     return null;
                 }
                 // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
