@@ -8,7 +8,7 @@
         <service id="api_platform.fos_user.event_listener" class="ApiPlatform\Core\Bridge\FosUser\EventListener">
             <argument type="service" id="fos_user.user_manager" />
 
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="11" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="24" />
         </service>
     </services>
 

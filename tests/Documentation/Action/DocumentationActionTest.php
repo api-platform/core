@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\tests\Action;
+namespace ApiPlatform\Core\Tests\Documentation\Action;
 
 use ApiPlatform\Core\Documentation\Action\DocumentationAction;
 use ApiPlatform\Core\Documentation\Documentation;

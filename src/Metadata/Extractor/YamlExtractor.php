@@ -125,7 +125,7 @@ final class YamlExtractor extends AbstractExtractor
     private function phpize(array $array, string $key, string $type)
     {
         if (!isset($array[$key])) {
-            return;
+            return null;
         }
 
         switch ($type) {

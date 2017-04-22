@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\NelmioApiDoc\Parser;
+namespace ApiPlatform\Core\Tests\Bridge\NelmioApiDoc\Parser;
 
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;

@@ -39,9 +39,9 @@ class CompositeLabel
     private $value;
 
     /**
-     * Get id.
+     * Gets id.
      *
-     * @return id
+     * @return int
      */
     public function getId()
     {
@@ -49,9 +49,9 @@ class CompositeLabel
     }
 
     /**
-     * Get value.
+     * Gets value.
      *
-     * @return value
+     * @return string
      */
     public function getValue()
     {
@@ -59,9 +59,9 @@ class CompositeLabel
     }
 
     /**
-     * Set value.
+     * Sets value.
      *
-     * @param value the value to set
+     * @param string the value to set
      */
     public function setValue($value)
     {

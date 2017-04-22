@@ -29,7 +29,7 @@ final class ExceptionListener extends BaseExceptionListener
         $request = $event->getRequest();
         // Normalize exceptions only for routes managed by API Platform
         if (
-            'html' === $request->getRequestFormat(null) ||
+            'html' === $request->getRequestFormat('') ||
             (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond'))
         ) {
             return;

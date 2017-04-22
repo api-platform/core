@@ -28,7 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
 class ContainNonResource
 {
     /**
-     * @var int
+     * @var mixed
      *
      * @ORM\Column(type="integer")
      * @ORM\Id

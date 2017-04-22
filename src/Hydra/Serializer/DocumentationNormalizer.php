@@ -290,7 +290,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         if (null === $type = $propertyMetadata->getType()) {
-            return;
+            return null;
         }
 
         if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueType()) {
@@ -308,7 +308,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return 'xmls:boolean';
             case Type::BUILTIN_TYPE_OBJECT:
                 if (null === $className = $type->getClassName()) {
-                    return;
+                    return null;
                 }
 
                 if (is_a($className, \DateTimeInterface::class, true)) {

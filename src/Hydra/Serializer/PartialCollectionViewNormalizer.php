@@ -50,6 +50,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
+        $currentPage = $lastPage = null;
         if ($paginated = $object instanceof PaginatorInterface) {
             $currentPage = $object->getCurrentPage();
             $lastPage = $object->getLastPage();

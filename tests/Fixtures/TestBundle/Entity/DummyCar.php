@@ -39,7 +39,7 @@ class DummyCar
     private $id;
 
     /**
-     * @var string Something else
+     * @var mixed Something else
      *
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
      *
@@ -58,7 +58,7 @@ class DummyCar
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getColors()
     {
@@ -66,7 +66,7 @@ class DummyCar
     }
 
     /**
-     * @param string $colors
+     * @param mixed $colors
      *
      * @return static
      */

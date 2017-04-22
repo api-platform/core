@@ -22,6 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
@@ -419,5 +420,18 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $this->manager->persist($relatedDummy2);
 
         $this->manager->flush();
+    }
+
+    /**
+     * @Then the password :password for user :user should be hashed
+     */
+    public function thePasswordForUserShouldBeHashed($password, $user)
+    {
+        $repository = $this->doctrine->getRepository(User::class);
+        $user = $repository->find($user);
+
+        if (!password_verify($password, $user->getPassword())) {
+            throw new \Exception('User password mismatch');
+        }
     }
 }
