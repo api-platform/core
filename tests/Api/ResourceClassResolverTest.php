@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolver;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -49,9 +50,38 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
+    public function testGetResourceClassWithTraversableAsValue()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('JLM');
+
+        $dummies = new \ArrayIterator([$dummy]);
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $resourceClass = $resourceClassResolver->getResourceClass($dummies, Dummy::class);
+
+        $this->assertEquals($resourceClass, Dummy::class);
+    }
+
+    public function testGetResourceClassWithPaginatorInterfaceAsValue()
+    {
+        $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $resourceClass = $resourceClassResolver->getResourceClass($paginatorProphecy->reveal(), Dummy::class);
+
+        $this->assertEquals($resourceClass, Dummy::class);
+    }
+
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found
+     * @expectedExceptionMessage No resource class found for object of type "stdClass".
      */
     public function testGetResourceClassWithWrongClassName()
     {
@@ -64,12 +94,11 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found for object of type "ArrayIterator"
+     * @expectedExceptionMessage No resource class found.
      */
     public function testGetResourceClassWithNoResourceClassName()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
         $resourceClassResolver->getResourceClass(new \ArrayIterator([]), null);
