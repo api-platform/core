@@ -51,6 +51,7 @@
             <argument type="service" id="api_platform.route_name_resolver" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
         </service>
 
         <!-- Serializer -->
@@ -165,9 +166,27 @@
             <argument>%api_platform.exception_to_status%</argument>
         </service>
 
+        <!-- Identifiers extractor -->
+
+        <service id="api_platform.identifiers_extractor" class="ApiPlatform\Core\Api\IdentifiersExtractor" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.property_accessor" />
+        </service>
+
+        <service id="api_platform.identifiers_extractor.cached" class="ApiPlatform\Core\Api\CachedIdentifiersExtractor" decorates="api_platform.identifiers_extractor" public="false">
+            <argument type="service" id="api_platform.cache.identifiers_extractor" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached.inner" />
+            <argument type="service" id="api_platform.property_accessor" />
+        </service>
+
         <!-- Cache -->
 
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="api_platform.cache.identifiers_extractor" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
     </services>
