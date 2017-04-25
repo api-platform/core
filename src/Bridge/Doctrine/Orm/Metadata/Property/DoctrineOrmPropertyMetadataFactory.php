@@ -59,6 +59,11 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         foreach ($identifiers as $identifier) {
             if ($identifier === $property) {
                 $propertyMetadata = $propertyMetadata->withIdentifier(true);
+
+                if (null !== $propertyMetadata->isWritable()) {
+                    break;
+                }
+
                 if ($doctrineClassMetadata instanceof ClassMetadataInfo) {
                     $writable = $doctrineClassMetadata->isIdentifierNatural();
                 } else {
