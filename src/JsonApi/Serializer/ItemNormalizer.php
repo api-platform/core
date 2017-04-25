@@ -432,7 +432,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             foreach ($attributeValue as $attributeValueElement) {
                 if (!isset($attributeValueElement['data'])) {
                     throw new RuntimeException(sprintf(
-                        'The JSON API attribute \'%s\' must contain a "data" key.'
+                        'The JSON API attribute \'%s\' must contain a "data" key.',
                         $relationshipName
                     ));
                 }
