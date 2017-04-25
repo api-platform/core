@@ -86,13 +86,11 @@ final class JsonApiContext implements Context
 
         $isValidJsonapi = 'response.json is valid JSON API.' === $validationResponse;
 
-        if (!$isValidJsonapi) {
-            unlink($fileName);
+        unlink($fileName);
 
+        if (!$isValidJsonapi) {
             throw new \RuntimeException('JSON response seems to be invalid JSON API');
         }
-
-        unlink($fileName);
     }
 
     /**

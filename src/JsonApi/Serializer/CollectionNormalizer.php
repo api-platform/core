@@ -42,12 +42,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     private $resourceMetadataFactory;
     private $propertyMetadataFactory;
 
-    public function __construct(
-        ResourceClassResolverInterface $resourceClassResolver,
-        ResourceMetadataFactoryInterface $resourceMetadataFactory,
-        PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        string $pageParameterName
-    ) {
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, string $pageParameterName)
+    {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->pageParameterName = $pageParameterName;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -59,8 +55,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format
-            && (is_array($data) || ($data instanceof \Traversable));
+        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
     }
 
     /**
@@ -105,46 +100,21 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $returnDataArray = [
             'data' => [],
             'links' => [
-                'self' => IriHelper::createIri(
-                    $parsed['parts'],
-                    $parsed['parameters'],
-                    $this->pageParameterName,
-                    $paginated ? $currentPage : null
-                ),
+                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             ],
         ];
 
         if ($paginated) {
-            $returnDataArray['links']['first'] = IriHelper::createIri(
-                $parsed['parts'],
-                $parsed['parameters'],
-                $this->pageParameterName,
-                1.
-            );
+            $returnDataArray['links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
 
-            $returnDataArray['links']['last'] = IriHelper::createIri(
-                $parsed['parts'],
-                $parsed['parameters'],
-                $this->pageParameterName,
-                $lastPage
-            );
+            $returnDataArray['links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
 
             if (1. !== $currentPage) {
-                $returnDataArray['links']['prev'] = IriHelper::createIri(
-                    $parsed['parts'],
-                    $parsed['parameters'],
-                    $this->pageParameterName,
-                    $currentPage - 1.
-                );
+                $returnDataArray['links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
             if ($currentPage !== $lastPage) {
-                $returnDataArray['links']['next'] = IriHelper::createIri(
-                    $parsed['parts'],
-                    $parsed['parameters'],
-                    $this->pageParameterName,
-                    $currentPage + 1.
-                );
+                $returnDataArray['links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
 
@@ -154,25 +124,17 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
             if (!isset($normalizedItem['data'])) {
                 throw new RuntimeException(
-                    'data key expected but not found during JSON API normalization'
+                    'The JSON API document must contain a "data" key.'
                 );
             }
 
-            $normalizedItem = $normalizedItem['data'];
+            $normalizedItemData = $normalizedItem['data'];
 
-            $relationships = [];
-
-            if (isset($normalizedItem['relationships'])) {
-                $relationships = $normalizedItem['relationships'];
-
-                unset($normalizedItem['relationships']);
-            }
-
-            foreach ($normalizedItem['attributes'] as $property => $value) {
+            foreach ($normalizedItemData['attributes'] as $property => $value) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
                 if ($propertyMetadata->isIdentifier()) {
-                    $identifier = $normalizedItem['attributes'][$property];
+                    $identifier = $normalizedItemData['attributes'][$property];
                 }
             }
 
@@ -181,11 +143,11 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
                 // The id attribute must be a string
                 // http://jsonapi.org/format/#document-resource-object-identification
                 'id' => (string) $identifier ?? '',
-                'attributes' => $normalizedItem['attributes'],
+                'attributes' => $normalizedItemData['attributes'],
             ];
 
-            if ($relationships) {
-                $items['relationships'] = $relationships;
+            if (isset($normalizedItemData['relationships'])) {
+                $items['relationships'] = $normalizedItemData['relationships'];
             }
 
             $returnDataArray['data'][] = $items;
@@ -193,7 +155,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         if (is_array($data) || $data instanceof \Countable) {
             $returnDataArray['meta']['totalItems'] = $data instanceof PaginatorInterface ?
-                (int) $data->getTotalItems() :
+                $data->getTotalItems() :
                 count($data);
         }
 

@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  * Flattens possible 'page' array query parameter into dot-separated values to avoid
  * conflicts with Doctrine\Orm\Extension\PaginationExtension.
  *
- * See: http://jsonapi.org/format/#fetching-pagination
+ * @see http://jsonapi.org/format/#fetching-pagination
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
@@ -42,7 +42,9 @@ final class FlattenPaginationParametersListener
         }
 
         // If 'page' query parameter is not defined or is not an array, never mind
-        if (!$request->query->get('page') || !is_array($request->query->get('page'))) {
+        $page = $request->query->get('page');
+
+        if (null === $page || !is_array($page)) {
             return;
         }
 

@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
+use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class ErrorNormalizer implements NormalizerInterface
 {
     const FORMAT = 'jsonapi';
+
+    use ErrorNormalizerTrait;
 
     private $debug;
 
@@ -29,17 +32,11 @@ final class ErrorNormalizer implements NormalizerInterface
 
     public function normalize($object, $format = null, array $context = [])
     {
-        $message = $object->getMessage();
-
         if ($this->debug) {
             $trace = $object->getTrace();
-        } elseif ($object instanceof FlattenException) {
-            $statusCode = $context['statusCode'] ?? $object->getStatusCode();
-
-            if ($statusCode >= 500 && $statusCode < 600) {
-                $message = Response::$statusTexts[$statusCode];
-            }
         }
+
+        $message = $object->getErrorMessage($object, $context, $this->debug);
 
         $data = [
             'title' => $context['title'] ?? 'An error occurred',

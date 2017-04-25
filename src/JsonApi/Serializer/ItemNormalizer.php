@@ -42,29 +42,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
     const FORMAT = 'jsonapi';
 
     private $componentsCache = [];
-
     private $resourceMetadataFactory;
-
     private $itemDataProvider;
 
-    public function __construct(
-        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
-        PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        IriConverterInterface $iriConverter,
-        ResourceClassResolverInterface $resourceClassResolver,
-        PropertyAccessorInterface $propertyAccessor = null,
-        NameConverterInterface $nameConverter = null,
-        ResourceMetadataFactoryInterface $resourceMetadataFactory,
-        ItemDataProviderInterface $itemDataProvider
-    ) {
-        parent::__construct(
-            $propertyNameCollectionFactory,
-            $propertyMetadataFactory,
-            $iriConverter,
-            $resourceClassResolver,
-            $propertyAccessor,
-            $nameConverter
-        );
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, ItemDataProviderInterface $itemDataProvider)
+    {
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->itemDataProvider = $itemDataProvider;
@@ -96,21 +79,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $identifier = $this->getIdentifierFromItem($object);
 
         // Get and populate item type
-        $resourceClass = $this->resourceClassResolver->getResourceClass(
-            $object,
-            $context['resource_class'] ?? null,
-            true
-        );
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         // Get and populate relations
         $components = $this->getComponents($object, $format, $context);
-        $objectRelationshipsData = $this->getPopulatedRelations(
-            $object,
-            $format,
-            $context,
-            $components
-        );
+        $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $context, $components);
 
         $item = [
             // The id attribute must be a string
@@ -178,6 +152,165 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
+     * Sets a value of the object using the PropertyAccess component.
+     *
+     * @param object $object
+     * @param string $attributeName
+     * @param mixed  $value
+     */
+    private function setValue($object, string $attributeName, $value)
+    {
+        try {
+            $this->propertyAccessor->setValue($object, $attributeName, $value);
+        } catch (NoSuchPropertyException $exception) {
+            // Properties not found are ignored
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    {
+        $propertyMetadata = $this->propertyMetadataFactory->create(
+            $context['resource_class'],
+            $attribute,
+            $this->getFactoryOptions($context)
+        );
+        $type = $propertyMetadata->getType();
+
+        if (null === $type) {
+            // No type provided, blindly set the value
+            $this->setValue($object, $attribute, $value);
+
+            return;
+        }
+
+        if (null === $value && $type->isNullable()) {
+            $this->setValue($object, $attribute, $value);
+
+            return;
+        }
+
+        if (
+            $type->isCollection() &&
+            null !== ($collectionValueType = $type->getCollectionValueType()) &&
+            null !== $className = $collectionValueType->getClassName()
+        ) {
+            $this->setValue(
+                $object,
+                $attribute,
+                $this->denormalizeCollectionFromArray($attribute, $propertyMetadata, $type, $className, $value, $format, $context)
+            );
+
+            return;
+        }
+
+        if (null !== $className = $type->getClassName()) {
+            $this->setValue(
+                $object,
+                $attribute,
+                $this->denormalizeRelationFromArray($attribute, $propertyMetadata, $className, $value, $format, $context)
+            );
+
+            return;
+        }
+
+        $this->validateType($attribute, $type, $value, $format);
+        $this->setValue($object, $attribute, $value);
+    }
+
+    /**
+     * Denormalizes a collection of objects.
+     *
+     * @param string           $attribute
+     * @param PropertyMetadata $propertyMetadata
+     * @param Type             $type
+     * @param string           $className
+     * @param mixed            $value
+     * @param string|null      $format
+     * @param array            $context
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return array
+     */
+    private function denormalizeCollectionFromArray(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
+    {
+        if (!is_array($value)) {
+            throw new InvalidArgumentException(sprintf(
+                'The type of the "%s" attribute must be "array", "%s" given.', $attribute, gettype($value)
+            ));
+        }
+
+        $collectionKeyType = $type->getCollectionKeyType();
+        $collectionKeyBuiltinType = null === $collectionKeyType ? null : $collectionKeyType->getBuiltinType();
+
+        $values = [];
+        foreach ($value as $index => $obj) {
+            if (null !== $collectionKeyBuiltinType && !call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
+                throw new InvalidArgumentException(sprintf(
+                        'The type of the key "%s" must be "%s", "%s" given.',
+                        $index, $collectionKeyBuiltinType, gettype($index))
+                );
+            }
+
+            $values[$index] = $this->denormalizeRelationFromArray($attribute, $propertyMetadata, $className, $obj, $format, $context);
+        }
+
+        return $values;
+    }
+
+        /**
+     * {@inheritdoc}
+     *
+     * @throws NoSuchPropertyException
+     */
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
+    {
+        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
+
+        try {
+            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+        } catch (NoSuchPropertyException $e) {
+            if (null === $propertyMetadata->isChildInherited()) {
+                throw $e;
+            }
+
+            $attributeValue = null;
+        }
+
+        $type = $propertyMetadata->getType();
+
+        if (
+            (is_array($attributeValue) || $attributeValue instanceof \Traversable) &&
+            $type &&
+            $type->isCollection() &&
+            ($collectionValueType = $type->getCollectionValueType()) &&
+            ($className = $collectionValueType->getClassName()) &&
+            $this->resourceClassResolver->isResourceClass($className)
+        ) {
+            $value = [];
+            foreach ($attributeValue as $index => $obj) {
+                $value[$index] = $this->normalizeRelationToArray($propertyMetadata, $obj, $className, $format, $context);
+            }
+
+            return $value;
+        }
+
+        if (
+            $attributeValue &&
+            $type &&
+            ($className = $type->getClassName()) &&
+            $this->resourceClassResolver->isResourceClass($className)
+        ) {
+            return $this->normalizeRelationToArray($propertyMetadata, $attributeValue, $className, $format, $context);
+        }
+
+        return $this->serializer->normalize($attributeValue, $format, $context);
+    }
+
+    /**
      * Gets JSON API components of the resource: attributes, relationships, meta and links.
      *
      * @param object      $object
@@ -217,23 +350,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 if ($type->isCollection()) {
                     $valueType = $type->getCollectionValueType();
 
-                    $isMany = null !== $valueType
-                        && ($className = $valueType->getClassName())
-                        && $this->resourceClassResolver->isResourceClass($className);
+                    $isMany = null !== $valueType && ($className = $valueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                 } else {
                     $className = $type->getClassName();
 
-                    $isOne = null !== $className
-                        && $this->resourceClassResolver->isResourceClass($className);
+                    $isOne = null !== $className && $this->resourceClassResolver->isResourceClass($className);
                 }
 
                 $typeShortName = '';
 
                 if ($className && $this->resourceClassResolver->isResourceClass($className)) {
-                    $typeShortName = $this
-                        ->resourceMetadataFactory
-                        ->create($className)
-                        ->getShortName();
+                    $typeShortName = $this->resourceMetadataFactory->create($className)->getShortName();
                 }
             }
 
@@ -267,13 +394,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return array
      */
-    private function getPopulatedRelations(
-        $object,
-        string $format = null,
-        array $context,
-        array $components,
-        string $type = 'relationships'
-    ): array {
+    private function getPopulatedRelations($object, string $format = null, array $context, array $components, string $type = 'relationships'): array
+    {
         $data = [];
 
         $identifier = '';
@@ -310,7 +432,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             foreach ($attributeValue as $attributeValueElement) {
                 if (!isset($attributeValueElement['data'])) {
                     throw new RuntimeException(sprintf(
-                        'Expected \'data\' attribute in collection for attribute \'%s\'',
+                        'The JSON API attribute \'%s\' must contain a "data" key.'
                         $relationshipName
                     ));
                 }
@@ -355,25 +477,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Denormalizes a resource linkage relation.
      *
-     * See: http://jsonapi.org/format/#document-resource-object-linkage
+     * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @param string           $attributeName    [description]
-     * @param PropertyMetadata $propertyMetadata [description]
-     * @param string           $className        [description]
-     * @param [type]           $data             [description]
-     * @param string|null      $format           [description]
-     * @param array            $context          [description]
+     * @param string           $attributeName
+     * @param PropertyMetadata $propertyMetadata
+     * @param string           $className
+     * @param mixed            $data
+     * @param string|null      $format
+     * @param array            $context
      *
-     * @return [type] [description]
+     * @return object|null
      */
-    protected function denormalizeRelation(
-        string $attributeName,
-        PropertyMetadata $propertyMetadata,
-        string $className,
-        $data,
-        string $format = null,
-        array $context
-    ) {
+    private function denormalizeRelationFromArray(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $data, string $format = null, array $context)
+    {
         // Null is allowed for empty to-one relationships, see
         // http://jsonapi.org/format/#document-resource-object-linkage
         if (null === $data['data']) {
@@ -415,7 +531,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * Normalizes a relation as resource linkage relation.
      *
-     * See: http://jsonapi.org/format/#document-resource-object-linkage
+     * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
      * For example, it may return the following array:
      *
@@ -434,13 +550,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return string|array
      */
-    protected function normalizeRelation(
-        PropertyMetadata $propertyMetadata,
-        $relatedObject,
-        string $resourceClass,
-        string $format = null,
-        array $context
-    ) {
+    private function normalizeRelationToArray(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
+    {
         $resourceClass = $this->resourceClassResolver->getResourceClass(
             $relatedObject,
             null,
@@ -510,12 +621,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             unset($identifiers[$propertyName]);
 
-            foreach (
-                $this
-                    ->propertyNameCollectionFactory
-                    ->create($relatedResourceClass)
-                    as $relatedPropertyName
-            ) {
+            foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {
                 $propertyMetadata = $this
                     ->propertyMetadataFactory
                     ->create($relatedResourceClass, $relatedPropertyName);

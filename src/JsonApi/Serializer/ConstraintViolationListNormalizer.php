@@ -25,10 +25,8 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
 
     private $nameConverter;
 
-    public function __construct(
-        PropertyMetadataFactoryInterface $propertyMetadataFactory,
-        NameConverterInterface $nameConverter = null
-    ) {
+    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
+    {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->nameConverter = $nameConverter;
     }
@@ -72,20 +70,14 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
                 $fieldName
             );
 
-        if ($this->nameConverter) {
+        if (null !== $this->nameConverter) {
             $fieldName = $this->nameConverter->normalize($fieldName);
         }
 
         if (null !== $propertyMetadata->getType()->getClassName()) {
-            return sprintf(
-                'data/relationships/%s',
-                $fieldName
-            );
+            return sprintf('data/relationships/%s', $fieldName);
         }
 
-        return sprintf(
-            'data/attributes/%s',
-            $fieldName
-        );
+        return sprintf('data/attributes/%s', $fieldName);
     }
 }

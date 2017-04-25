@@ -147,11 +147,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
-        $propertyMetadata = $this->propertyMetadataFactory->create(
-            $context['resource_class'],
-            $attribute,
-            $this->getFactoryOptions($context)
-        );
+        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
         $type = $propertyMetadata->getType();
 
         if (null === $type) {
@@ -276,7 +272,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return object|null
      */
-    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
+    private function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
     {
         if (is_string($value)) {
             try {
@@ -421,7 +417,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return string|array
      */
-    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
+    private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
         if ($propertyMetadata->isReadableLink()) {
             return $this->serializer->normalize($relatedObject, $format, $this->createRelationSerializationContext($resourceClass, $context));

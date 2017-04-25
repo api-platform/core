@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  * Flattens possible 'filter' array query parameter into first-level query parameters
  * to be processed by api-platform.
  *
- * See: http://jsonapi.org/format/#fetching-filtering and http://jsonapi.org/recommendations/#filtering
+ * @see http://jsonapi.org/format/#fetching-filtering and http://jsonapi.org/recommendations/#filtering
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
@@ -41,13 +41,15 @@ final class TransformFilteringParametersListener
             return;
         }
 
-        // If page query parameter is not defined or is not an array, never mind
-        if (!$request->query->get('filter') || !is_array($request->query->get('filter'))) {
+        // If filter query parameter is not defined or is not an array, never mind
+        $filter = $request->query->get('filter');
+
+        if (null === $filter || !is_array($filter)) {
             return;
         }
 
         // Otherwise, flatten into dot-separated values
-        $pageParameters = $request->query->get('filter');
+        $pageParameters = $filter;
 
         foreach ($pageParameters as $pageParameterName => $pageParameterValue) {
             $request->query->set(
