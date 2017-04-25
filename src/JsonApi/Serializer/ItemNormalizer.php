@@ -261,7 +261,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return $values;
     }
 
-        /**
+    /**
      * {@inheritdoc}
      *
      * @throws NoSuchPropertyException
