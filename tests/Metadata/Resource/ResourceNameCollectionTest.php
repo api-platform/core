@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\tests\Metadata\Resource;
+namespace ApiPlatform\Core\Tests\Metadata\Resource;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 

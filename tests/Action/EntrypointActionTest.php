@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\tests\Action;
+namespace ApiPlatform\Core\Tests\Action;
 
 use ApiPlatform\Core\Action\EntrypointAction;
 use ApiPlatform\Core\Api\Entrypoint;

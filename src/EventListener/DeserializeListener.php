@@ -88,7 +88,7 @@ final class DeserializeListener
         }
 
         $format = $request->getFormat($contentType);
-        if (!isset($this->formats[$format])) {
+        if (null === $format || !isset($this->formats[$format])) {
             $supportedMimeTypes = [];
             foreach ($this->formats as $mimeTypes) {
                 foreach ($mimeTypes as $mimeType) {

@@ -205,7 +205,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        if (null !== $request) {
+        if (null !== $this->serializerContextBuilder && null !== $request) {
             $contextFromRequest = $this->serializerContextBuilder->createFromRequest($request, $context === 'normalization_context');
 
             if (isset($contextFromRequest['groups'])) {

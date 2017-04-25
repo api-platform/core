@@ -36,8 +36,8 @@ final class ErrorFormatGuesser
      */
     public static function guessErrorFormat(Request $request, array $errorFormats): array
     {
-        $requestFormat = $request->getRequestFormat(null);
-        if (null !== $requestFormat && isset($errorFormats[$requestFormat])) {
+        $requestFormat = $request->getRequestFormat('');
+        if ('' !== $requestFormat && isset($errorFormats[$requestFormat])) {
             return ['key' => $requestFormat, 'value' => $errorFormats[$requestFormat]];
         }
 

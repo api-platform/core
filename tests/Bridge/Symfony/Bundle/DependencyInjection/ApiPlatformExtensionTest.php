@@ -20,6 +20,7 @@ use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -27,6 +28,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
@@ -154,6 +156,25 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_fos_user' => true]]), $containerBuilder);
     }
 
+    public function testFosUserPriority()
+    {
+        $builder = new ContainerBuilder();
+
+        $loader = new XmlFileLoader($builder, new FileLocator(dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
+        $loader->load('api.xml');
+        $loader->load('fos_user.xml');
+
+        $fosListener = $builder->getDefinition('api_platform.fos_user.event_listener');
+        $viewListener = $builder->getDefinition('api_platform.listener.view.serialize');
+
+        // Ensure FOSUser event listener priority is always greater than the view serialize listener
+        $this->assertGreaterThan(
+            $viewListener->getTag('kernel.event_listener')[0]['priority'],
+            $fosListener->getTag('kernel.event_listener')[0]['priority'],
+            'api_platform.fos_user.event_listener priority needs to be greater than that of api_platform.listener.view.serialize'
+        );
+    }
+
     public function testEnableNelmioApiDoc()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
@@ -254,6 +275,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.action.exception',
             'api_platform.action.placeholder',
             'api_platform.cache.metadata.property',
+            'api_platform.cache.identifiers_extractor',
             'api_platform.cache.metadata.resource',
             'api_platform.cache.route_name_resolver',
             'api_platform.collection_data_provider',
@@ -340,6 +362,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.resource.name_collection_factory.cached',
             'api_platform.metadata.resource.name_collection_factory.xml',
             'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.identifiers_extractor',
+            'api_platform.identifiers_extractor.cached',
             'api_platform.negotiator',
             'api_platform.operation_method_resolver',
             'api_platform.operation_path_resolver.custom',

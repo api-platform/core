@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Doctrine\Util;
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -26,21 +26,23 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManagerInterface;
 
-class IdentifierManagerTraitImpl
-{
-    use IdentifierManagerTrait {
-        IdentifierManagerTrait::normalizeIdentifiers as public;
-    }
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
-    {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
-    }
-}
-
 class IdentifierManagerTraitTest extends \PHPUnit_Framework_TestCase
 {
+    private function getIdentifierManagerTraitImpl(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    {
+        return new class($propertyNameCollectionFactory, $propertyMetadataFactory) {
+            use IdentifierManagerTrait {
+                IdentifierManagerTrait::normalizeIdentifiers as public;
+            }
+
+            public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+            {
+                $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+                $this->propertyMetadataFactory = $propertyMetadataFactory;
+            }
+        };
+    }
+
     public function testSingleIdentifier()
     {
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
@@ -52,7 +54,7 @@ class IdentifierManagerTraitTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $identifierManager = new IdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $identifierManager = $this->getIdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $this->assertEquals($identifierManager->normalizeIdentifiers(1, $objectManager, Dummy::class), ['id' => 1]);
     }
@@ -72,7 +74,7 @@ class IdentifierManagerTraitTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $identifierManager = new IdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $identifierManager = $this->getIdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $this->assertEquals($identifierManager->normalizeIdentifiers('ida=1;idb=2', $objectManager, Dummy::class), ['ida' => 1, 'idb' => 2]);
     }
@@ -96,7 +98,7 @@ class IdentifierManagerTraitTest extends \PHPUnit_Framework_TestCase
             ],
         ]);
 
-        $identifierManager = new IdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
+        $identifierManager = $this->getIdentifierManagerTraitImpl($propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $identifierManager->normalizeIdentifiers('idbad=1;idb=2', $objectManager, Dummy::class);
     }

@@ -26,7 +26,7 @@ final class SwaggerUiListener
     {
         $request = $event->getRequest();
         if (
-            'html' !== $request->getRequestFormat(null) ||
+            'html' !== $request->getRequestFormat('') ||
             (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond'))
         ) {
             return;

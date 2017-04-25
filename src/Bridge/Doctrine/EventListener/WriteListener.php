@@ -81,7 +81,7 @@ final class WriteListener
     {
         $objectManager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $objectManager || !is_object($data)) {
-            return;
+            return null;
         }
 
         return $objectManager;

@@ -16,40 +16,42 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
+ * @ORM\Entity
  * @ApiResource(
  *     attributes={
- *          "normalization_context"={"groups"={"colors"}},
- *          "filters"={"dummy_car_colors.search_filter"}
+ *          "normalization_context"={"groups"={"default"}},
+ *          "denormalization_context"={"groups"={"default"}}
  *     }
  * )
- * @ORM\Entity
  */
-class DummyCar
+class DummyTableInheritanceRelated
 {
     /**
-     * @var int The entity Id
+     * @var int The id
      *
-     * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     *
+     * @Groups({"default"})
      */
     private $id;
 
     /**
-     * @var mixed Something else
+     * @var ArrayCollection Related children
      *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
+     * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
      *
-     * @Serializer\Groups({"colors"})
+     * @Groups({"default"})
      */
-    private $colors;
+    private $children;
 
     public function __construct()
     {
-        $this->colors = new ArrayCollection();
+        $this->children = new ArrayCollection();
     }
 
     public function getId()
@@ -58,21 +60,21 @@ class DummyCar
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
-    public function getColors()
+    public function getChildren()
     {
-        return $this->colors;
+        return $this->children;
     }
 
     /**
-     * @param mixed $colors
+     * @param $children
      *
-     * @return static
+     * @return $this
      */
-    public function setColors($colors)
+    public function setChildren($children)
     {
-        $this->colors = $colors;
+        $this->children = $children;
 
         return $this;
     }
