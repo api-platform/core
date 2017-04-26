@@ -4,7 +4,7 @@ $(function () {
         url: data.url,
         spec: data.spec,
         dom_id: 'swagger-ui-container',
-        supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
+        supportedSubmitMethods: ['get', 'post', 'put', 'patch', 'delete'],
         onComplete: function() {
             if (data.oauth.enabled && 'function' === typeof initOAuth) {
                 initOAuth({

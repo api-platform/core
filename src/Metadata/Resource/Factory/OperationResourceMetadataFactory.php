@@ -46,7 +46,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
         if (null === $resourceMetadata->getItemOperations()) {
             $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations(
-                $isAbstract ? ['GET', 'DELETE'] : ['GET', 'PUT', 'DELETE']
+                $isAbstract ? ['GET', 'DELETE'] : ['GET', 'PUT', 'DELETE', 'PATCH']
             ));
         }
 

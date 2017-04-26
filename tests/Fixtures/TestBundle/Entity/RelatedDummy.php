@@ -24,7 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.friends"}})
+ * @ApiResource(
+ *     iri="https://schema.org/Product",
+ *     attributes={
+ *         "normalization_context"={"groups"={"friends"}},
+ *         "filters"={"related_dummy.friends"}
+ *     }
+ * )
  * @ORM\Entity
  */
 class RelatedDummy extends ParentDummy
