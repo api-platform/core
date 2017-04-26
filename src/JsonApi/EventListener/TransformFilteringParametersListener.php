@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 final class TransformFilteringParametersListener
 {
     /**
-     * Flatens possible 'page' array query parameter.
+     * Flatens possible 'filter' array query parameter.
      *
      * @param GetResponseEvent $event
      *
@@ -42,19 +42,17 @@ final class TransformFilteringParametersListener
         }
 
         // If filter query parameter is not defined or is not an array, never mind
-        $filter = $request->query->get('filter');
+        $filterParameters = $request->query->get('filter');
 
-        if (null === $filter || !is_array($filter)) {
+        if (null === $filterParameters || !is_array($filterParameters)) {
             return;
         }
 
-        // Otherwise, flatten into dot-separated values
-        $pageParameters = $filter;
-
-        foreach ($pageParameters as $pageParameterName => $pageParameterValue) {
+        // Otherwise, flatten one level to comply with api-platform filter expectations
+        foreach ($filterParameters as $filterParameterName => $filterParameterValue) {
             $request->query->set(
-                $pageParameterName,
-                $pageParameterValue
+                $filterParameterName,
+                $filterParameterValue
             );
         }
 

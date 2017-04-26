@@ -36,11 +36,9 @@ final class ErrorNormalizer implements NormalizerInterface
             $trace = $object->getTrace();
         }
 
-        $message = $object->getErrorMessage($object, $context, $this->debug);
-
         $data = [
             'title' => $context['title'] ?? 'An error occurred',
-            'description' => $message ?? (string) $object,
+            'description' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 
         if (isset($trace)) {
