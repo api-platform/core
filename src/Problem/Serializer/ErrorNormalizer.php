@@ -45,12 +45,10 @@ final class ErrorNormalizer implements NormalizerInterface
             $trace = $object->getTrace();
         }
 
-        $message = $this->getErrorMessage($object, $context, $this->debug);
-
         $data = [
             'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => $context['title'] ?? 'An error occurred',
-            'detail' => $message ?? (string) $object,
+            'detail' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 
         if (isset($trace)) {
