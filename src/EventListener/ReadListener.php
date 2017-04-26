@@ -58,6 +58,8 @@ final class ReadListener
             return;
         }
 
+        $data = [];
+
         if (isset($attributes['item_operation_name'])) {
             $data = $this->getItemData($request, $attributes);
         } elseif (isset($attributes['collection_operation_name'])) {

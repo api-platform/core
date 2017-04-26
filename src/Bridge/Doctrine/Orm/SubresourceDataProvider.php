@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
@@ -42,6 +44,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
      * @param ManagerRegistry                        $managerRegistry
      * @param PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory
      * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
+     * @param QueryCollectionExtensionInterface[]    $collectionExtensions
      * @param QueryItemExtensionInterface[]          $itemExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $collectionExtensions = [], array $itemExtensions = [])
@@ -93,6 +96,10 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             }
 
             $classMetadata = $manager->getClassMetadata($identifierResourceClass);
+
+            if (!$classMetadata instanceof ClassMetadataInfo) {
+                throw new RuntimeException("The class metadata for $identifierResourceClass must be an instance of ClassMetadataInfo.");
+            }
 
             $qb = $manager->createQueryBuilder();
             $alias = $queryNameGenerator->generateJoinAlias($identifier);

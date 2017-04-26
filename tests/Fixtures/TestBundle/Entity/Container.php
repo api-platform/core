@@ -14,6 +14,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -42,7 +43,7 @@ class Container
      * )
      * @ORM\OrderBy({"serial"="ASC"})
      *
-     * @var Collection|Node[]
+     * @var ArrayCollection|Node[]
      */
     private $nodes;
 
@@ -54,13 +55,16 @@ class Container
         return $this->id;
     }
 
+    /**
+     * @param string id
+     */
     public function setId(string $id)
     {
         $this->id = $id;
     }
 
     /**
-     * @return array|Node[]
+     * @return ArrayCollection|Node[]
      */
     public function getNodes()
     {
