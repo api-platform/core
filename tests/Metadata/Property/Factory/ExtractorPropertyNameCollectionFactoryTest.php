@@ -64,7 +64,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Test
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessageRegExp /.+Element 'foo': This element is not expected\..+/
+     * @expectedExceptionMessageRegExp #.+Element '\{https://api-platform.com/schema/metadata\}foo': This element is not expected\..+#
      */
     public function testCreateWithInvalidXml()
     {
