@@ -183,7 +183,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->setValue(
                 $object,
                 $attribute,
-                $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $context)
+                $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $this->createChildContext($context, $attribute))
             );
 
             return;
@@ -254,7 +254,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 );
             }
 
-            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $context);
+            $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $this->createChildContext($context, $attribute));
         }
 
         return $values;
@@ -390,7 +390,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         ) {
             $value = [];
             foreach ($attributeValue as $index => $obj) {
-                $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $className, $format, $context);
+                $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $className, $format, $this->createChildContext($context, $attribute));
             }
 
             return $value;
@@ -408,7 +408,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (null === $attributeValue && $context['operation_type'] === OperationType::SUBRESOURCE && isset($context['subresource_resources'][$className])) {
                 return $this->iriConverter->getItemIriFromResourceClass($className, $context['subresource_resources'][$className]);
             } elseif ($attributeValue) {
-                return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $context);
+                return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
             }
         }
 

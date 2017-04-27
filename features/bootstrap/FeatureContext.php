@@ -24,6 +24,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
@@ -142,6 +143,28 @@ class FeatureContext implements Context, SnippetAcceptingContext
             }
 
             $this->manager->persist($dummyGroup);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummy property objects
+     */
+    public function thereIsDummyPropertyObjects($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyProperty = new DummyProperty();
+            $dummyGroup = new DummyGroup();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+            }
+
+            $dummyProperty->group = $dummyGroup;
+
+            $this->manager->persist($dummyGroup);
+            $this->manager->persist($dummyProperty);
         }
 
         $this->manager->flush();

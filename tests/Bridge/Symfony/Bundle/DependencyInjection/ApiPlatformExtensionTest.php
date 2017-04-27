@@ -386,6 +386,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.router',
             'api_platform.serializer.context_builder',
             'api_platform.serializer.context_builder.filter',
+            'api_platform.serializer.property_filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.normalizer.item',
             'api_platform.subresource_data_provider',
