@@ -45,6 +45,7 @@ final class FilterPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition('api_platform.filters')->addArgument($filters);
+        $container->getDefinition('api_platform.filter_locator')->addArgument($filters);
+        $container->getDefinition('api_platform.filter_collection_factory')->addArgument(array_keys($filters));
     }
 }

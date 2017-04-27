@@ -55,10 +55,10 @@ Feature: Documentation support
     And "id" property exists for the Swagger class "Dummy"
     And "name" property is required for Swagger class "Dummy"
     # Filters
-    And the JSON node "paths./dummies.get.parameters[0].name" should be equal to "id"
+    And the JSON node "paths./dummies.get.parameters[0].name" should be equal to "dummyBoolean"
     And the JSON node "paths./dummies.get.parameters[0].in" should be equal to "query"
     And the JSON node "paths./dummies.get.parameters[0].required" should be false
-    And the JSON node "paths./dummies.get.parameters[0].type" should be equal to "integer"
+    And the JSON node "paths./dummies.get.parameters[0].type" should be equal to "boolean"
 
   Scenario: Swagger UI is enabled for docs endpoint
     Given I add "Accept" header equal to "text/html"

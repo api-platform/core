@@ -28,4 +28,20 @@ class YamlExtractorTest extends \PHPUnit_Framework_TestCase
     {
         (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/badpropertytype.yml']))->getResources();
     }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /Unable to parse in ".+\/\.\.\/\.\.\/Fixtures\/FileConfigurations\/parse_exception.yml"/
+     */
+    public function testParseException()
+    {
+        (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/parse_exception.yml']))->getResources();
+    }
+
+    public function testEmptyResources()
+    {
+        $resources = (new YamlExtractor([__DIR__.'/../../Fixtures/FileConfigurations/resources_empty.yml']))->getResources();
+
+        $this->assertEmpty($resources);
+    }
 }
