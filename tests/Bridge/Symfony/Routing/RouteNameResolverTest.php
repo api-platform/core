@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -21,6 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @group legacy
  */
 class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -111,5 +113,26 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', true);
 
         $this->assertSame('some_collection_route', $actual);
+    }
+
+    public function testGetRouteNameForSubresourceRoute()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('some_subresource_route', new Route('/some/item/path/{id}', [
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_subresource_operation_name' => 'some_item_op',
+        ]));
+        $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_collection_operation_name' => 'some_collection_op',
+        ]));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection);
+
+        $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
+        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::SUBRESOURCE);
+
+        $this->assertSame('some_subresource_route', $actual);
     }
 }

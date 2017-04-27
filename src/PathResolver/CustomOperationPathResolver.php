@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\PathResolver;
 
+use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
+
 /**
  * Resolves the custom operations path.
  *
@@ -30,12 +32,12 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType): string
     {
         if (isset($operation['path'])) {
             return $operation['path'];
         }
 
-        return $this->deferred->resolveOperationPath($resourceShortName, $operation, $collection);
+        return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType));
     }
 }

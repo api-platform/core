@@ -38,10 +38,10 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      *
      * @throws InvalidArgumentException
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType): string
     {
         if (!isset($operation['route_name'])) {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $collection);
+            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $operationType);
         }
 
         $route = $this->router->getRouteCollection()->get($operation['route_name']);

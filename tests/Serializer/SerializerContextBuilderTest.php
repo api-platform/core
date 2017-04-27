@@ -48,23 +48,27 @@ class SerializerContextBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateFromRequest()
     {
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => ''];
+        $expected = ['foo' => 'bar', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '', 'operation_type' => 'item'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'pot', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'collection_operation_name' => 'pot',  'resource_class' => 'Foo', 'request_uri' => ''];
+        $expected = ['foo' => 'bar', 'collection_operation_name' => 'pot',  'resource_class' => 'Foo', 'request_uri' => '', 'operation_type' => 'collection'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => false];
+        $expected = ['bar' => 'baz', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => false, 'operation_type' => 'item'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml'], [], [], ['REQUEST_METHOD' => 'POST']);
-        $expected = ['bar' => 'baz', 'collection_operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => false];
+        $expected = ['bar' => 'baz', 'collection_operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => false, 'operation_type' => 'collection'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'put', '_api_format' => 'xml', '_api_mime_type' => 'text/xml'], [], [], ['REQUEST_METHOD' => 'PUT']);
-        $expected = ['bar' => 'baz', 'collection_operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => true];
+        $expected = ['bar' => 'baz', 'collection_operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => true, 'operation_type' => 'collection'];
+        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml'], [], [], ['REQUEST_METHOD' => 'GET']);
+        $expected = ['bar' => 'baz', 'subresource_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '', 'operation_type' => 'subresource', 'api_allow_update' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
 
@@ -78,7 +82,7 @@ class SerializerContextBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testReuseExistingAttributes()
     {
-        $expected = ['bar' => 'baz', 'item_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => false];
+        $expected = ['bar' => 'baz', 'item_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '', 'api_allow_update' => false, 'operation_type' => 'item'];
         $this->assertEquals($expected, $this->builder->createFromRequest(new Request(), false, ['resource_class' => 'Foo', 'item_operation_name' => 'get']));
     }
 }

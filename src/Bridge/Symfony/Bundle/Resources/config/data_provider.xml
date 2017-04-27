@@ -9,6 +9,8 @@
 
         <service id="api_platform.collection_data_provider" class="ApiPlatform\Core\DataProvider\ChainCollectionDataProvider" />
 
+        <service id="api_platform.subresource_data_provider" class="ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider" />
+
         <service id="api_platform.filters" class="ApiPlatform\Core\Api\FilterCollection" public="false" />
     </services>
 

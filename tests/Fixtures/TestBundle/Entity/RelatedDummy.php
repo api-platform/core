@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -61,12 +62,14 @@ class RelatedDummy extends ParentDummy
     public $dummyDate;
 
     /**
+     * @ApiProperty(subresource=true)
      * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
      * @Groups({"barcelona", "chicago", "friends"})
      */
     public $thirdLevel;
 
     /**
+     * @ApiProperty(subresource=true)
      * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
      * @Groups({"fakemanytomany", "friends"})
      */

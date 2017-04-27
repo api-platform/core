@@ -125,6 +125,7 @@ class Dummy
      * @var ArrayCollection Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     * @ApiProperty(subresource=true)
      */
     public $relatedDummies;
 

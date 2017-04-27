@@ -53,8 +53,10 @@ final class DenyAccessListener
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         if (isset($attributes['collection_operation_name'])) {
             $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], 'is_granted', null, true);
-        } else {
+        } elseif (isset($attributes['item_operation_name'])) {
             $isGranted = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], 'is_granted', null, true);
+        } else {
+            $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['subresource_operation_name'], 'is_granted', null, true);
         }
 
         if (null === $isGranted) {

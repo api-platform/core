@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\PathResolver;
 
+use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
@@ -25,12 +27,24 @@ final class UnderscoreOperationPathResolver implements OperationPathResolverInte
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType): string
     {
-        $path = '/'.Inflector::pluralize(Inflector::tableize($resourceShortName));
+        $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
 
-        if (!$collection) {
+        if ($operationType === OperationType::SUBRESOURCE && 1 < count($operation['identifiers'])) {
+            $path = str_replace('.{_format}', '', $resourceShortName);
+        } else {
+            $path = '/'.Inflector::pluralize(Inflector::tableize($resourceShortName));
+        }
+
+        if ($operationType === OperationType::ITEM) {
             $path .= '/{id}';
+        }
+
+        if ($operationType === OperationType::SUBRESOURCE) {
+            list($key) = end($operation['identifiers']);
+            $property = true === $operation['collection'] ? Inflector::pluralize(Inflector::tableize($operation['property'])) : Inflector::tableize($operation['property']);
+            $path .= sprintf('/{%s}/%s', $key, $property);
         }
 
         $path .= '.{_format}';
