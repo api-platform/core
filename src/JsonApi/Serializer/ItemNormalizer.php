@@ -26,6 +26,7 @@ use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -227,7 +228,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @param PropertyMetadata $propertyMetadata
      * @param Type             $type
      * @param string           $className
-     * @param mixed            $value
+     * @param mixed            $rawData
      * @param string|null      $format
      * @param array            $context
      *
@@ -235,11 +236,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return array
      */
-    private function denormalizeCollectionFromArray(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
+    private function denormalizeCollectionFromArray(string $attributeName, PropertyMetadata $propertyMetadata, Type $type, string $className, $rawData, string $format = null, array $context): array
     {
-        if (!is_array($value)) {
+        // A 'data' key is expected as the first level of the array
+        $data = $rawData['data'];
+
+        if (!is_array($data)) {
             throw new InvalidArgumentException(sprintf(
-                'The type of the "%s" attribute must be "array", "%s" given.', $attribute, gettype($value)
+                'The type of the "%s" attribute must be "array", "%s" given.', $attributeName, gettype($data)
             ));
         }
 
@@ -247,15 +251,22 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $collectionKeyBuiltinType = null === $collectionKeyType ? null : $collectionKeyType->getBuiltinType();
 
         $values = [];
-        foreach ($value as $index => $obj) {
-            if (null !== $collectionKeyBuiltinType && !call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
+        foreach ($data as $rawIndex => $obj) {
+            $index = $rawIndex;
+
+            // Given JSON API forces ids to be strings, we might need to cast stuff
+            if (null !== $collectionKeyBuiltinType && 'int' === $collectionKeyBuiltinType) {
+                $index = (int) $index;
+            } elseif (null !== $collectionKeyBuiltinType && !call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
                 throw new InvalidArgumentException(sprintf(
-                        'The type of the key "%s" must be "%s", "%s" given.',
-                        $index, $collectionKeyBuiltinType, gettype($index))
-                );
+                    'The type of the key "%s" must be "%s", "%s" given.',
+                    $index,
+                    $collectionKeyBuiltinType,
+                    gettype($index)
+                ));
             }
 
-            $values[$index] = $this->denormalizeRelationFromArray($attribute, $propertyMetadata, $className, $obj, $format, $context);
+            $values[$index] = $this->denormalizeRelationFromArray($attributeName, $propertyMetadata, $className, $obj, $format, $context);
         }
 
         return $values;
@@ -482,41 +493,44 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @param string           $attributeName
      * @param PropertyMetadata $propertyMetadata
      * @param string           $className
-     * @param mixed            $data
+     * @param mixed            $rawData
      * @param string|null      $format
      * @param array            $context
      *
      * @return object|null
      */
-    private function denormalizeRelationFromArray(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $data, string $format = null, array $context)
+    private function denormalizeRelationFromArray(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $rawData, string $format = null, array $context)
     {
+        // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
+        if (!is_array($rawData) || !$this->resourceClassResolver->isResourceClass($className)) {
+            return $this->serializer->denormalize($rawData, $className, $format, $this->createRelationSerializationContext($className, $context));
+        }
+
+        $dataToDenormalize = $rawData;
+
+        if (array_key_exists('data', $rawData)) {
+            $dataToDenormalize = $rawData['data'];
+        }
+
         // Null is allowed for empty to-one relationships, see
         // http://jsonapi.org/format/#document-resource-object-linkage
-        if (null === $data['data']) {
+        if (null === $dataToDenormalize) {
             return;
         }
 
         // An empty array is allowed for empty to-many relationships, see
         // http://jsonapi.org/format/#document-resource-object-linkage
-        if ([] === $data['data']) {
+        if ([] === $dataToDenormalize) {
             return;
         }
 
-        if (!isset($data['data'])) {
-            throw new InvalidArgumentException(
-                'Key \'data\' expected. Only resource linkage currently supported, see: http://jsonapi.org/format/#document-resource-object-linkage'
-            );
-        }
-
-        $data = $data['data'];
-
-        if (!is_array($data) || 2 !== count($data)) {
+        if (!is_array($dataToDenormalize) || 2 !== count($dataToDenormalize)) {
             throw new InvalidArgumentException(
                 'Only resource linkage supported currently supported, see: http://jsonapi.org/format/#document-resource-object-linkage'
             );
         }
 
-        if (!isset($data['id'])) {
+        if (!isset($dataToDenormalize['id'])) {
             throw new InvalidArgumentException(
                 'Only resource linkage supported currently supported, see: http://jsonapi.org/format/#document-resource-object-linkage'
             );
@@ -524,7 +538,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         return $this->itemDataProvider->getItem(
             $this->resourceClassResolver->getResourceClass(null, $className),
-            $data['id']
+            $dataToDenormalize['id'],
+            null,
+            $context + ['fetch_data' => true]
         );
     }
 

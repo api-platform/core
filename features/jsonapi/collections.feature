@@ -8,7 +8,7 @@ Feature: JSON API collections support
   Scenario: Correctly serialize a collection
     When I add "Accept" header equal to "application/vnd.api+json"
     And I add "Content-Type" header equal to "application/vnd.api+json"
-    And I send a "POST" request to "/circular_references" with body:
+    Then I send a "POST" request to "/circular_references" with body:
     """
     {
       "data": {}

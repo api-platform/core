@@ -165,7 +165,7 @@ final class JsonApiContext implements Context
     {
         $relatedDummy = new RelatedDummy();
 
-        $relatedDummy->setName('RelatedDummy with friends');
+        $relatedDummy->setName('RelatedDummy with no friends');
 
         $this->manager->persist($relatedDummy);
 

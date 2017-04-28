@@ -82,7 +82,78 @@ Feature: JSON API basic support
     And the JSON node "data.attributes.name" should be equal to "John Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
 
-  Scenario: Create a related dummy with en empty relationship
+  Scenario: Create a dummy with relations
+    Given there is a RelatedDummy
+    When I add "Content-Type" header equal to "application/vnd.api+json"
+    And I add "Accept" header equal to "application/vnd.api+json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "data": {
+        "type": "dummy",
+        "attributes": {
+          "name": "Dummy with relations",
+          "dummyDate": "2015-03-01T10:00:00+00:00"
+        },
+        "relationships": {
+          "relatedDummy": {
+            "data": {
+              "type": "related-dummy",
+              "id": "2"
+            }
+          },
+          "relatedDummies": {
+            "data": [
+              {
+                "type": "related-dummy",
+                "id": "1"
+              },
+              {
+                "type": "related-dummy",
+                "id": "2"
+              }
+            ]
+          }
+        }
+      }
+    }
+    """
+    And the response status code should be 201
+    And the JSON node "data.relationships.relatedDummies.data" should have 2 elements
+    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "2"
+
+  Scenario: Update a resource with a many-to-many relationship via PATCH
+    When I add "Content-Type" header equal to "application/vnd.api+json"
+    And I add "Accept" header equal to "application/vnd.api+json"
+    And I send a "PATCH" request to "/dummies/1" with body:
+    """
+    {
+      "data": {
+        "type": "dummy",
+        "relationships": {
+          "relatedDummy": {
+            "data": {
+              "type": "related-dummy",
+              "id": "1"
+            }
+          },
+          "relatedDummies": {
+            "data": [
+              {
+                "type": "related-dummy",
+                "id": "2"
+              }
+            ]
+          }
+        }
+      }
+    }
+    """
+    And the response status code should be 200
+    And the JSON node "data.relationships.relatedDummies.data" should have 1 elements
+    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "1"
+
+  Scenario: Create a related dummy with an empty relationship
     When I add "Content-Type" header equal to "application/vnd.api+json"
     And I add "Accept" header equal to "application/vnd.api+json"
     And I send a "POST" request to "/related_dummies" with body:
@@ -163,7 +234,7 @@ Feature: JSON API basic support
 
   @dropSchema
   Scenario: Embed a relation in a parent object
-    When I add "Accept" header equal to "application/vnd.api+json"
+    qWhen I add "Accept" header equal to "application/vnd.api+json"
     When I add "Content-Type" header equal to "application/vnd.api+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
