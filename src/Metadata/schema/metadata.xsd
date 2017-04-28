@@ -1,7 +1,9 @@
 <?xml version="1.0" ?>
 
 <xsd:schema
+        xmlns="https://api-platform.com/schema/metadata"
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="https://api-platform.com/schema/metadata"
         elementFormDefault="qualified">
 
     <xsd:element name="resources" type="resources"/>

@@ -48,13 +48,11 @@ final class ErrorNormalizer implements NormalizerInterface
             $trace = $object->getTrace();
         }
 
-        $message = $this->getErrorMessage($object, $context, $this->debug);
-
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),
             '@type' => 'hydra:Error',
             'hydra:title' => $context['title'] ?? 'An error occurred',
-            'hydra:description' => $message ?? (string) $object,
+            'hydra:description' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 
         if (isset($trace)) {

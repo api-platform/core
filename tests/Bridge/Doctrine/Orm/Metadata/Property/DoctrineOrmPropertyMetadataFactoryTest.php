@@ -79,10 +79,34 @@ class DoctrineOrmPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id', []), $propertyMetadata);
     }
 
+    public function testCreateIsWritable()
+    {
+        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = $propertyMetadata->withWritable(false);
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
+
+        $classMetadata = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
+
+        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
+
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManager->reveal());
+
+        $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
+
+        $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id', []);
+
+        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
+        $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+    }
+
     public function testCreateClassMetadataInfo()
     {
         $propertyMetadata = new PropertyMetadata();
-        $propertyMetadata = $propertyMetadata->withWritable(true);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
@@ -108,7 +132,6 @@ class DoctrineOrmPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateClassMetadata()
     {
         $propertyMetadata = new PropertyMetadata();
-        $propertyMetadata = $propertyMetadata->withWritable(true);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);

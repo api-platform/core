@@ -170,22 +170,25 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();
         $targetClassMetadata = $entityManager->getClassMetadata($entity);
+        if ($targetClassMetadata->subClasses) {
+            $queryBuilder->addSelect($associationAlias);
+        } else {
+            foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
 
-        foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+                if (true === $propertyMetadata->isIdentifier()) {
+                    $select[] = $property;
+                    continue;
+                }
 
-            if (true === $propertyMetadata->isIdentifier()) {
-                $select[] = $property;
-                continue;
+                //the field test allows to add methods to a Resource which do not reflect real database fields
+                if (true === $targetClassMetadata->hasField($property) && true === $propertyMetadata->isReadable()) {
+                    $select[] = $property;
+                }
             }
 
-            //the field test allows to add methods to a Resource which do not reflect real database fields
-            if (true === $targetClassMetadata->hasField($property) && true === $propertyMetadata->isReadable()) {
-                $select[] = $property;
-            }
+            $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
         }
-
-        $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
     }
 
     /**
