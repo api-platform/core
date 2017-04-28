@@ -352,8 +352,10 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testForceEager()
     {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withAttributes(['normalization_context' => ['groups' => 'foobar']]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
@@ -365,8 +367,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $idPropertyMetadata = new PropertyMetadata();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
 
-        $propertyMetadataFactoryProphecy->create(UnknownDummy::class, 'id', [])->willReturn($idPropertyMetadata)->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relation', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(UnknownDummy::class, 'id', ['serializer_groups' => 'foobar'])->willReturn($idPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relation', ['serializer_groups' => 'foobar'])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 

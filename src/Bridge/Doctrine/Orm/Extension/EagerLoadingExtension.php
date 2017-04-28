@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\ShouldEagerLoad;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -35,6 +36,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    use ShouldEagerLoad;
+
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $resourceMetadataFactory;
@@ -65,7 +68,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $options = ['collection_operation_name' => $operationName];
         }
 
-        $forceEager = $this->isForceEager($resourceClass, $options);
+        $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
 
         $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
@@ -84,7 +87,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $options = ['item_operation_name' => $operationName];
         }
 
-        $forceEager = $this->isForceEager($resourceClass, $options);
+        $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
 
         if (isset($context['groups'])) {
             $groups = ['serializer_groups' => $context['groups']];
@@ -131,6 +134,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
+            // We don't want to interfere with doctrine on this association
             if (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch']) {
                 continue;
             }
@@ -231,28 +235,5 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         return ['serializer_groups' => $context['groups']];
-    }
-
-    /**
-     * Does an operation force eager?
-     *
-     * @param string $resourceClass
-     * @param array  $options
-     *
-     * @return bool
-     */
-    private function isForceEager(string $resourceClass, array $options): bool
-    {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if (isset($options['collection_operation_name'])) {
-            $forceEager = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'force_eager', null, true);
-        } elseif (isset($options['item_operation_name'])) {
-            $forceEager = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'force_eager', null, true);
-        } else {
-            $forceEager = $resourceMetadata->getAttribute('force_eager');
-        }
-
-        return is_bool($forceEager) ? $forceEager : $this->forceEager;
     }
 }
