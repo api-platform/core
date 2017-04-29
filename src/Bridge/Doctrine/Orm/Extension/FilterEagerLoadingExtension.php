@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\ShouldEagerLoad;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -26,6 +25,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
+    use ShouldEagerLoad;
+
     private $resourceMetadataFactory;
     private $forceEager;
 
@@ -43,7 +44,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
 
-        if (!$this->hasFetchEagerAssociation($em, $classMetadata) && (false === $this->forceEager || false === $this->isForceEager($resourceClass, ['collection_operation_name' => $operationName]))) {
+        if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
             return;
         }
 
@@ -128,49 +129,5 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));
 
         return $queryBuilderClone;
-    }
-
-    /**
-     * Does an operation force eager?
-     *
-     * @param string $resourceClass
-     * @param array  $options
-     *
-     * @return bool
-     */
-    private function isForceEager(string $resourceClass, array $options): bool
-    {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if (isset($options['collection_operation_name'])) {
-            $forceEager = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'force_eager', null, true);
-        } else {
-            $forceEager = $resourceMetadata->getAttribute('force_eager');
-        }
-
-        return is_bool($forceEager) ? $forceEager : $this->forceEager;
-    }
-
-    private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, &$checked = [])
-    {
-        $checked[] = $classMetadata->name;
-
-        foreach ($classMetadata->associationMappings as $mapping) {
-            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
-                return true;
-            }
-
-            $related = $em->getClassMetadata($mapping['targetEntity']);
-
-            if (in_array($related->name, $checked, true)) {
-                continue;
-            }
-
-            if (true === $this->hasFetchEagerAssociation($em, $related, $checked)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
