@@ -45,6 +45,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
                 ->scalarNode('default_operation_path_resolver')->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('group_parameter_name')->defaultValue('groups')->info('The default name of the parameter handling the groups.')->end()
                 ->arrayNode('eager_loading')
                     ->canBeDisabled()
                     ->addDefaultsIfNotSet()

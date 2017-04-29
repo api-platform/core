@@ -113,6 +113,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
+        $container->setParameter('api_platform.group_parameter_name', $config['group_parameter_name']);
         $container->setParameter('api_platform.eager_loading.enabled', $config['eager_loading']['enabled']);
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.force_eager', $config['eager_loading']['force_eager']);
