@@ -14,13 +14,16 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
  * Answer.
  *
  * @ORM\Table(name="answer")
  * @ORM\Entity
- * @ApiResource
+ * @ApiResource(collectionOperations={
+ *     "get_subresource_answer"={"method"="GET", "normalization_context"={"groups"={"foobar"}}}
+ * })
  */
 class Answer
 {
@@ -28,16 +31,19 @@ class Answer
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Serializer\Groups({"foobar"})
      */
     private $id;
 
     /**
      * @ORM\Column(name="content", type="string", nullable=false)
+     * @Serializer\Groups({"foobar"})
      */
     private $content;
 
     /**
      * @ORM\OneToOne(targetEntity="Question", mappedBy="answer")
+     * @Serializer\Groups({"foobar"})
      */
     private $question;
 
