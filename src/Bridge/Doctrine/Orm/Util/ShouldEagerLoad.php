@@ -18,6 +18,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @internal
  */
 trait ShouldEagerLoad
 {
@@ -49,9 +51,11 @@ trait ShouldEagerLoad
      *
      * @param EntityManager     $em
      * @param ClassMetadataInfo $classMetadata
-     * @param array             $checked       array cache of tested metadata classes
+     * @param array             $checked array cache of tested metadata classes
+     *
+     * @return bool
      */
-    private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, &$checked = [])
+    private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, array &$checked = []): bool
     {
         $checked[] = $classMetadata->name;
 
