@@ -95,7 +95,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getComponents($object, string $format = null, array $context)
     {
-        if (isset($this->componentsCache[$context['cache_key']])) {
+        if (false !== $context['cache_key'] && isset($this->componentsCache[$context['cache_key']])) {
             return $this->componentsCache[$context['cache_key']];
         }
 
@@ -137,7 +137,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $components['links'][] = $relation;
         }
 
-        return $this->componentsCache[$context['cache_key']] = $components;
+        if (false !== $context['cache_key']) {
+            $this->componentsCache[$context['cache_key']] = $components;
+        }
+
+        return $components;
     }
 
     /**
