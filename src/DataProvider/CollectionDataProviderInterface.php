@@ -30,7 +30,7 @@ interface CollectionDataProviderInterface
      *
      * @throws ResourceClassNotSupportedException
      *
-     * @return array|PaginatorInterface|\Traversable
+     * @return array|\Traversable
      */
     public function getCollection(string $resourceClass, string $operationName = null);
 }
