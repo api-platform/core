@@ -23,6 +23,9 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 trait ShouldEagerLoad
 {
+    private $forceEager;
+    private $resourceMetadataFactory;
+
     /**
      * Checks if an operation has a `force_eager` attribute.
      *
@@ -51,7 +54,7 @@ trait ShouldEagerLoad
      *
      * @param EntityManager     $em
      * @param ClassMetadataInfo $classMetadata
-     * @param array             $checked array cache of tested metadata classes
+     * @param array             $checked       array cache of tested metadata classes
      *
      * @return bool
      */
