@@ -18,9 +18,14 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @internal
  */
 trait ShouldEagerLoad
 {
+    private $forceEager;
+    private $resourceMetadataFactory;
+
     /**
      * Checks if an operation has a `force_eager` attribute.
      *
@@ -50,8 +55,10 @@ trait ShouldEagerLoad
      * @param EntityManager     $em
      * @param ClassMetadataInfo $classMetadata
      * @param array             $checked       array cache of tested metadata classes
+     *
+     * @return bool
      */
-    private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, &$checked = [])
+    private function hasFetchEagerAssociation(EntityManager $em, ClassMetadataInfo $classMetadata, array &$checked = []): bool
     {
         $checked[] = $classMetadata->name;
 

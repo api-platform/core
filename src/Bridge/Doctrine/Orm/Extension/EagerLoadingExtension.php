@@ -40,9 +40,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
-    private $resourceMetadataFactory;
     private $maxJoins;
-    private $forceEager;
     private $serializerContextBuilder;
     private $requestStack;
 
