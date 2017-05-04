@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  *
  * @internal
  */
-trait ShouldEagerLoad
+trait EagerLoadingTrait
 {
     private $forceEager;
     private $resourceMetadataFactory;

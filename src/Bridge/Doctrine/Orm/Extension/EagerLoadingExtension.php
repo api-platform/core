@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\ShouldEagerLoad;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    use ShouldEagerLoad;
+    use EagerLoadingTrait;
 
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
