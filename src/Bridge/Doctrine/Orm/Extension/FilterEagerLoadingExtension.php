@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\ShouldEagerLoad;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -25,7 +25,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
-    use ShouldEagerLoad;
+    use EagerLoadingTrait;
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $forceEager = true)
     {
