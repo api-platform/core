@@ -78,6 +78,24 @@ Feature: Using uuid identifier on resource
     }
     """
 
+  Scenario: Create a resource with custom id generator
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/custom_generated_identifiers" with body:
+    """
+    {}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/CustomGeneratedIdentifier",
+      "@id": "/custom_generated_identifiers/foo",
+      "@type": "CustomGeneratedIdentifier",
+      "id": "foo"
+    }
+    """
 
   @dropSchema
   Scenario: Delete a resource

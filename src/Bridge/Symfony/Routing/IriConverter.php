@@ -122,14 +122,17 @@ final class IriConverter implements IriConverterInterface
                 continue;
             }
 
-            $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+            $identifier = $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
 
-            if (!is_object($identifiers[$propertyName])) {
+            if (!is_object($identifier)) {
+                continue;
+            } elseif (method_exists($identifier, '__toString')) {
+                $identifiers[$propertyName] = (string) $identifier;
                 continue;
             }
 
-            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
-            $relatedItem = $identifiers[$propertyName];
+            $relatedResourceClass = $this->getObjectClass($identifier);
+            $relatedItem = $identifier;
 
             unset($identifiers[$propertyName]);
 
