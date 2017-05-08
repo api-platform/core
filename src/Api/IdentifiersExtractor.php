@@ -47,43 +47,35 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     {
         $identifiers = [];
         $resourceClass = $this->getObjectClass($item);
-
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
             $identifier = $propertyMetadata->isIdentifier();
             if (null === $identifier || false === $identifier) {
                 continue;
             }
-
-            $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
-
-            if (!is_object($identifiers[$propertyName])) {
+            $identifier = $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+            if (!is_object($identifier)) {
+                continue;
+            } elseif (method_exists($identifier, '__toString')) {
+                $identifiers[$propertyName] = (string) $identifier;
                 continue;
             }
-
-            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
-            $relatedItem = $identifiers[$propertyName];
-
+            $relatedResourceClass = $this->getObjectClass($identifier);
+            $relatedItem = $identifier;
             unset($identifiers[$propertyName]);
-
             foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($relatedResourceClass, $relatedPropertyName);
-
                 if ($propertyMetadata->isIdentifier()) {
                     if (isset($identifiers[$propertyName])) {
                         throw new RuntimeException(sprintf('Composite identifiers not supported in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
                     }
-
                     $identifiers[$propertyName] = $this->propertyAccessor->getValue($relatedItem, $relatedPropertyName);
                 }
             }
-
             if (!isset($identifiers[$propertyName])) {
                 throw new RuntimeException(sprintf('No identifier found in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
             }
         }
-
         return $identifiers;
     }
 }
