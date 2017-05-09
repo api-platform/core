@@ -76,6 +76,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 throw new RuntimeException(sprintf('No identifier found in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
             }
         }
+
         return $identifiers;
     }
 }
