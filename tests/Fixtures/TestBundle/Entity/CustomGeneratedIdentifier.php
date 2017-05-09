@@ -37,6 +37,6 @@ class CustomGeneratedIdentifier
 
     public function getId()
     {
-        return (string) $this->id;
+        return $this->id;
     }
 }
