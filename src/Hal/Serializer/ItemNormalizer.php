@@ -44,6 +44,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $context['cache_key'] = $this->getHalCacheKey($format, $context);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $context = $this->initContext($resourceClass, $context);
 
         $rawData = parent::normalize($object, $format, $context);
         if (!is_array($rawData)) {
