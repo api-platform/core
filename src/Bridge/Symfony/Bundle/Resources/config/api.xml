@@ -74,6 +74,14 @@
             <tag name="serializer.normalizer" />
         </service>
 
+        <!-- Group filter -->
+
+        <service id="api_platform.serializer.group_filter" class="ApiPlatform\Core\Serializer\GroupFilter" public="false" decorates="api_platform.serializer.context_builder">
+            <argument type="service" id="api_platform.serializer.group_filter.inner" />
+            <argument>%api_platform.group_parameter_name%</argument>
+            <tag name="api_platform.filter" id="api_platform.group_filter" />
+        </service>
+
         <!-- Resources Operations path resolver -->
 
         <service id="api_platform.operation_path_resolver" alias="api_platform.operation_path_resolver.router" public="false" />
