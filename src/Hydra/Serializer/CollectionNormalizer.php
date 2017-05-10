@@ -76,7 +76,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
 
         if (isset($context['operation_type']) && $context['operation_type'] === OperationType::SUBRESOURCE) {
-            $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context['subresource_identifiers']);
+            $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
         } else {
             $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
         }

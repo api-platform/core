@@ -17,9 +17,12 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
@@ -473,5 +476,24 @@ class FeatureContext implements Context, SnippetAcceptingContext
         if (!password_verify($password, $user->getPassword())) {
             throw new \Exception('User password mismatch');
         }
+    }
+
+    /**
+     * @Given I have a product with offers
+     */
+    public function createProductWithOffers()
+    {
+        $offer = new DummyOffer();
+        $offer->setValue(2);
+        $aggregate = new DummyAggregateOffer();
+        $aggregate->setValue(1);
+        $aggregate->addOffer($offer);
+
+        $product = new DummyProduct();
+        $product->setName('Dummy product');
+        $product->addOffer($aggregate);
+
+        $this->manager->persist($product);
+        $this->manager->flush();
     }
 }

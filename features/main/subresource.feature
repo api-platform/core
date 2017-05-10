@@ -204,7 +204,6 @@ Feature: Subresource support
     }
     """
 
-  @dropSchema
   Scenario: Get the embedded relation collection
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
     And the response status code should be 200
@@ -222,3 +221,50 @@ Feature: Subresource support
     }
     """
 
+  Scenario: Get offers subresource from aggregate offers subresource
+    Given I have a product with offers
+    When I send a "GET" request to "/dummy_products/1/offers/1/offers"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/DummyOffer",
+      "@id": "/dummy_products/1/offers/1/offers",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/dummy_offers/1",
+          "@type": "DummyOffer",
+          "id": 1,
+          "value": 2
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
+
+  @dropSchema
+  Scenario: Get offers subresource from aggregate offers subresource
+    When I send a "GET" request to "/dummy_aggregate_offers/1/offers"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/DummyOffer",
+      "@id": "/dummy_aggregate_offers/1/offers",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/dummy_offers/1",
+          "@type": "DummyOffer",
+          "id": 1,
+          "value": 2
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """

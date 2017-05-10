@@ -173,7 +173,7 @@ final class ApiLoader extends Loader
                     '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
                     '_format' => null,
                     '_api_resource_class' => $subresource,
-                    '_api_subresource_operation_name' => 'get_subresource_'.$operation['property'],
+                    '_api_subresource_operation_name' => $operation['route_name'],
                     '_api_subresource_context' => [
                         'property' => $operation['property'],
                         'identifiers' => $operation['identifiers'],

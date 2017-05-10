@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,8 +35,15 @@ final class RouteNameResolver implements RouteNameResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteName(string $resourceClass, $operationType): string
+    public function getRouteName(string $resourceClass, $operationType /**, array $context = [] **/): string
     {
+        if (func_num_args() > 2) {
+            $context = func_get_arg(2);
+        } else {
+            $context = [];
+            @trigger_error(sprintf('Method %s() will have a third `$context = []` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
@@ -44,10 +52,30 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $methods = $route->getMethods();
 
             if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods, true))) {
+                if ($operationType === OperationType::SUBRESOURCE && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
+                    continue;
+                }
+
                 return $routeName;
             }
         }
 
         throw new InvalidArgumentException(sprintf('No %s route associated with the type "%s".', $operationType, $resourceClass));
+    }
+
+    private function isSameSubresource(array $context, array $currentContext): bool
+    {
+        $subresources = array_keys($context['subresource_resources']);
+        $currentSubresources = [];
+
+        foreach ($currentContext['identifiers'] as $identiferContext) {
+            $currentSubresources[] = $identiferContext[1];
+        }
+
+        if ($currentSubresources === $subresources) {
+            return true;
+        }
+
+        return false;
     }
 }

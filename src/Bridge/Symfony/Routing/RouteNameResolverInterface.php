@@ -32,5 +32,5 @@ interface RouteNameResolverInterface
      *
      * @return string
      */
-    public function getRouteName(string $resourceClass, $operationType): string;
+    public function getRouteName(string $resourceClass, $operationType /**, array $context = [] **/): string;
 }

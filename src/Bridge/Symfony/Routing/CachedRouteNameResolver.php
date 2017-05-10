@@ -37,7 +37,7 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteName(string $resourceClass, $operationType): string
+    public function getRouteName(string $resourceClass, $operationType /**, array $context = []**/): string
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $operationType]));
 
@@ -51,7 +51,14 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
             // do nothing
         }
 
-        $routeName = $this->decorated->getRouteName($resourceClass, $operationType);
+        if (func_num_args() > 2) {
+            $context = func_get_arg(2);
+        } else {
+            $context = [];
+            @trigger_error(sprintf('Method %s() will have a third `$context = []` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $routeName = $this->decorated->getRouteName($resourceClass, $operationType, $context);
 
         if (!isset($cacheItem)) {
             return $routeName;
