@@ -33,11 +33,10 @@ use Doctrine\ORM\QueryBuilder;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class ItemDataProvider implements ItemDataProviderInterface
+final class ItemDataProvider implements ItemDataProviderInterface
 {
     private $managerRegistry;
     private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
     private $itemExtensions;
 
     /**
@@ -50,7 +49,6 @@ class ItemDataProvider implements ItemDataProviderInterface
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
     }
 

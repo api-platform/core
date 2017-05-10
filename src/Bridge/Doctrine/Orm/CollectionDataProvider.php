@@ -27,7 +27,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class CollectionDataProvider implements CollectionDataProviderInterface
+final class CollectionDataProvider implements CollectionDataProviderInterface
 {
     private $managerRegistry;
     private $collectionExtensions;
