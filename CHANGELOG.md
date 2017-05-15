@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0.8
+
+* Leverage serialization groups to eager load data
+* Fix the Swagger Normalizer to correctly support nested serialization groups
+* Use strict types
+* Get rid of the dependency to the Templating component
+* Explicitly add missing dependency to PropertyAccess component
+* Allow the operation name to be null in ResourceMetadata
+* Fix an undefined index error occurring in some cases when using sub types
+* Make the bundle working even when soft dependencies aren't installed
+* Fix serialization of multiple inheritance child types
+* Fix the priority of the FOSUSer's event listener
+* Fix the resource class resolver with using `\Traversable` values
+* Fix inheritance of property metadata for the Doctrine ORM property metadata factory
+* EagerLoadingExtension: Disable partial fetching if entity has subclasses
+* Refactoring and cleanup of the eager loading mechanism
+* Fix the handling of composite identifiers
+* Fix HAL normalizer when the context isn't serializable
+* Fix some quality problems found by PHPStan
+
 ## 2.0.7
 
 * [security] Hide error's message in prod mode when a 500 error occurs (Api Problem format)
