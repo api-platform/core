@@ -15,15 +15,14 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -35,9 +34,9 @@ use Doctrine\ORM\QueryBuilder;
  */
 class ItemDataProvider implements ItemDataProviderInterface
 {
+    use IdentifierManagerTrait;
+
     private $managerRegistry;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
     private $itemExtensions;
 
     /**
@@ -115,56 +114,5 @@ class ItemDataProvider implements ItemDataProviderInterface
 
             $queryBuilder->setParameter($placeholder, $value);
         }
-    }
-
-    /**
-     * Transform and check the identifier, composite or not.
-     *
-     * @param int|string    $id
-     * @param ObjectManager $manager
-     * @param string        $resourceClass
-     *
-     * @throws PropertyNotFoundException
-     *
-     * @return array
-     */
-    private function normalizeIdentifiers($id, ObjectManager $manager, string $resourceClass): array
-    {
-        $identifierValues = [$id];
-        $doctrineMetadataIdentifier = $manager->getClassMetadata($resourceClass)->getIdentifier();
-
-        if (count($doctrineMetadataIdentifier) >= 2) {
-            $identifiers = explode(';', $id);
-            $identifiersMap = [];
-
-            // first transform identifiers to a proper key/value array
-            foreach ($identifiers as $identifier) {
-                $keyValue = explode('=', $identifier);
-                $identifiersMap[$keyValue[0]] = $keyValue[1];
-            }
-        }
-
-        $identifiers = [];
-        $i = 0;
-
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
-            $identifier = $propertyMetadata->isIdentifier();
-            if (null === $identifier || false === $identifier) {
-                continue;
-            }
-
-            $identifier = !isset($identifiersMap) ? $identifierValues[$i] ?? null : $identifiersMap[$propertyName] ?? null;
-
-            if (null === $identifier) {
-                throw new PropertyNotFoundException(sprintf('Invalid identifier "%s", "%s" has not been found.', $id, $propertyName));
-            }
-
-            $identifiers[$propertyName] = $identifier;
-            ++$i;
-        }
-
-        return $identifiers;
     }
 }
