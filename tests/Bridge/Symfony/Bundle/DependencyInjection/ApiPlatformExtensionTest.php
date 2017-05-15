@@ -21,7 +21,6 @@ use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -261,7 +260,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
         }
 
-        $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
+        $containerBuilderProphecy->fileExists(Argument::type('string'))->shouldBeCalled();
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
         foreach (['yaml', 'xml'] as $format) {
@@ -302,6 +301,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.range_filter',
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.subresource_data_provider',
+            'api_platform.filter_locator',
+            'api_platform.filter_collection_factory',
             'api_platform.filters',
             'api_platform.doctrine.listener.view.write',
             'api_platform.jsonld.normalizer.item',

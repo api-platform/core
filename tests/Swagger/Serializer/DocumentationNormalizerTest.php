@@ -26,11 +26,13 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
+use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -925,37 +927,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testFilters()
     {
-        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
-
-        $dummyMetadata = new ResourceMetadata(
-            'Dummy',
-            'This is a dummy.',
-            null,
-            [],
-            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2']]],
-            []
-        );
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
-
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
-
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-
-        $filters = new FilterCollection([
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filters = [
             'f1' => new DummyFilter(['name' => [
                 'property' => 'name',
                 'type' => 'string',
@@ -969,75 +942,58 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 'required' => false,
                 'strategy' => 'partial',
             ]]),
-        ]);
-
-        $normalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal(),
-            $filters
-        );
-
-        $expected = [
-            'swagger' => '2.0',
-            'basePath' => '/',
-            'info' => [
-                'title' => '',
-                'version' => '0.0.0',
-            ],
-            'paths' => new \ArrayObject([
-                '/dummies' => [
-                    'get' => new \ArrayObject([
-                        'tags' => ['Dummy'],
-                        'operationId' => 'getDummyCollection',
-                        'produces' => ['application/ld+json'],
-                        'summary' => 'Retrieves the collection of Dummy resources.',
-                        'responses' => [
-                            200 => [
-                                'description' => 'Dummy collection response',
-                                'schema' => [
-                                    'type' => 'array',
-                                    'items' => ['$ref' => '#/definitions/Dummy'],
-                                ],
-                            ],
-                        ],
-                        'parameters' => [
-                            [
-                                'x-foo' => 'bar',
-                                'name' => 'name',
-                                'in' => 'query',
-                                'required' => true,
-                                'type' => 'string',
-                            ],
-                            [
-                                'name' => 'ha',
-                                'in' => 'query',
-                                'required' => false,
-                                'type' => 'integer',
-                            ],
-                        ],
-                    ]),
-                ],
-            ]),
-            'definitions' => new \ArrayObject([
-                'Dummy' => new \ArrayObject([
-                    'type' => 'object',
-                    'description' => 'This is a dummy.',
-                    'properties' => [
-                        'name' => new \ArrayObject([
-                            'description' => 'This is a name.',
-                            'type' => 'string',
-                        ]),
-                    ],
-                ]),
-            ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        foreach ($filters as $filterId => $filter) {
+            $filterLocatorProphecy->has($filterId)->willReturn(true)->shouldBeCalled();
+            $filterLocatorProphecy->get($filterId)->willReturn($filter)->shouldBeCalled();
+        }
+
+        $filterLocatorProphecy->has('f3')->willReturn(false)->shouldBeCalled();
+
+        $this->normalizeWithFilters($filterLocatorProphecy->reveal());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
+     */
+    public function testFiltersWithDeprecatedFilterCollection()
+    {
+        $this->normalizeWithFilters(new FilterCollection([
+            'f1' => new DummyFilter(['name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => true,
+                'strategy' => 'exact',
+                'swagger' => ['x-foo' => 'bar'],
+            ]]),
+            'f2' => new DummyFilter(['ha' => [
+                'property' => 'foo',
+                'type' => 'int',
+                'required' => false,
+                'strategy' => 'partial',
+            ]]),
+        ]));
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface or null.
+     */
+    public function testConstructWithInvalidFilterLocator()
+    {
+        new DocumentationNormalizer(
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal(),
+            $this->prophesize(OperationPathResolverInterface::class)->reveal(),
+            $this->prophesize(UrlGeneratorInterface::class)->reveal(),
+            new \ArrayObject()
+        );
     }
 
     public function testSupports()
@@ -1379,6 +1335,107 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'name' => new \ArrayObject([
                             'type' => 'string',
                             'description' => 'This is a name.',
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    private function normalizeWithFilters($filterLocator)
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            null,
+            [],
+            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3']]],
+            []
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal(),
+            $filterLocator
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/',
+            'info' => [
+                'title' => '',
+                'version' => '0.0.0',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyCollection',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves the collection of Dummy resources.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy collection response',
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => ['$ref' => '#/definitions/Dummy'],
+                                ],
+                            ],
+                        ],
+                        'parameters' => [
+                            [
+                                'x-foo' => 'bar',
+                                'name' => 'name',
+                                'in' => 'query',
+                                'required' => true,
+                                'type' => 'string',
+                            ],
+                            [
+                                'name' => 'ha',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'description' => 'This is a name.',
+                            'type' => 'string',
                         ]),
                     ],
                 ]),

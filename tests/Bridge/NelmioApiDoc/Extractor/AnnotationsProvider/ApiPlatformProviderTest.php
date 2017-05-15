@@ -26,6 +26,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -45,17 +46,72 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $filters = new FilterCollection();
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocator = $filterLocatorProphecy->reveal();
 
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolver = $operationMethodResolverProphecy->reveal();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactory, $documentationNormalizer, $resourceMetadataFactory, $filters, $operationMethodResolver);
+        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactory, $documentationNormalizer, $resourceMetadataFactory, $filterLocator, $operationMethodResolver);
 
         $this->assertInstanceOf(AnnotationsProviderInterface::class, $apiPlatformProvider);
     }
 
     public function testGetAnnotations()
+    {
+        $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
+        $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
+            'name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => 'false',
+                'strategy' => 'partial',
+            ],
+        ])->shouldBeCalled();
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('my_dummy.search')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->get('my_dummy.search')->willReturn($dummySearchFilterProphecy->reveal())->shouldBeCalled();
+
+        $this->extractAnnotations($filterLocatorProphecy->reveal());
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
+     */
+    public function testGetAnnotationsWithDeprecatedFilterCollection()
+    {
+        $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
+        $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
+            'name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => 'false',
+                'strategy' => 'partial',
+            ],
+        ])->shouldBeCalled();
+
+        $this->extractAnnotations(new FilterCollection(['my_dummy.search' => $dummySearchFilterProphecy->reveal()]));
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
+     */
+    public function testConstructWithInvalidFilterLocator()
+    {
+        new ApiPlatformProvider(
+            $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(NormalizerInterface::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new \ArrayObject(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
+    }
+
+    private function extractAnnotations($filterLocator)
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
@@ -94,20 +150,6 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
-        $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
-            'name' => [
-                'property' => 'name',
-                'type' => 'string',
-                'required' => 'false',
-                'strategy' => 'partial',
-            ],
-        ])->shouldBeCalled();
-        $dummySearchFilter = $dummySearchFilterProphecy->reveal();
-        $filters = new FilterCollection([
-            'my_dummy.search' => $dummySearchFilter,
-        ]);
-
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->willReturn('POST')->shouldBeCalled();
@@ -121,7 +163,7 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'delete')->willReturn((new Route('/dummies/{id}'))->setMethods(['DELETE']))->shouldBeCalled();
         $operationMethodResolver = $operationMethodResolverProphecy->reveal();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactory, $apiDocumentationBuilder, $resourceMetadataFactory, $filters, $operationMethodResolver);
+        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactory, $apiDocumentationBuilder, $resourceMetadataFactory, $filterLocator, $operationMethodResolver);
 
         $actual = $apiPlatformProvider->getAnnotations();
 

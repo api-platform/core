@@ -406,91 +406,13 @@ Feature: Date filter on collections
           },
           "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "\/dummies{?id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,order[id],order[name],order[relatedDummy.symfony],dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],dummyBoolean,dummyFloat,dummyPrice,description[exists],relatedDummy.name[exists],dummyBoolean[exists]}",
+              "hydra:template": "/dummies{?dummyBoolean,dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],dummyFloat,dummyPrice,order[id],order[name],order[relatedDummy.symfony],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "id",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "id[]",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "name",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "alias",
-                      "property": "alias",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "description",
-                      "property": "description",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy.name",
-                      "property": "relatedDummy.name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy.name[]",
-                      "property": "relatedDummy.name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies[]",
-                      "property": "relatedDummies",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "dummy",
-                      "property": "dummy",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "relatedDummies.name",
-                      "property": "relatedDummies.name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[id]",
-                      "property": "id",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[name]",
-                      "property": "name",
-                      "required": false
-                  },
-                  {
-                      "@type": "IriTemplateMapping",
-                      "variable": "order[relatedDummy.symfony]",
-                      "property": "relatedDummy.symfony",
+                      "variable": "dummyBoolean",
+                      "property": "dummyBoolean",
                       "required": false
                   },
                   {
@@ -515,6 +437,54 @@ Feature: Date filter on collections
                       "@type": "IriTemplateMapping",
                       "variable": "relatedDummy.dummyDate[after]",
                       "property": "relatedDummy.dummyDate",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "description[exists]",
+                      "property": "description",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummy.name[exists]",
+                      "property": "relatedDummy.name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyBoolean[exists]",
+                      "property": "dummyBoolean",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyFloat",
+                      "property": "dummyFloat",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummyPrice",
+                      "property": "dummyPrice",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[id]",
+                      "property": "id",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[name]",
+                      "property": "name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "order[relatedDummy.symfony]",
+                      "property": "relatedDummy.symfony",
                       "required": false
                   },
                   {
@@ -579,38 +549,68 @@ Feature: Date filter on collections
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "dummyBoolean",
-                      "property": "dummyBoolean",
+                      "variable": "id",
+                      "property": "id",
                       "required": false
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "dummyFloat",
-                      "property": "dummyFloat",
+                      "variable": "id[]",
+                      "property": "id",
                       "required": false
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "dummyPrice",
-                      "property": "dummyPrice",
+                      "variable": "name",
+                      "property": "name",
                       "required": false
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "description[exists]",
+                      "variable": "alias",
+                      "property": "alias",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "description",
                       "property": "description",
                       "required": false
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "relatedDummy.name[exists]",
+                      "variable": "relatedDummy.name",
                       "property": "relatedDummy.name",
                       "required": false
                   },
                   {
                       "@type": "IriTemplateMapping",
-                      "variable": "dummyBoolean[exists]",
-                      "property": "dummyBoolean",
+                      "variable": "relatedDummy.name[]",
+                      "property": "relatedDummy.name",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies",
+                      "property": "relatedDummies",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies[]",
+                      "property": "relatedDummies",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "dummy",
+                      "property": "dummy",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
+                      "variable": "relatedDummies.name",
+                      "property": "relatedDummies.name",
                       "required": false
                   }
               ]

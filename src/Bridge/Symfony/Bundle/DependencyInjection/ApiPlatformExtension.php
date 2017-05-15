@@ -76,6 +76,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
         $loader->load('data_provider.xml');
+        $loader->load('filter.xml');
 
         if (interface_exists(ValidatorInterface::class)) {
             $loader->load('validator.xml');

@@ -31,18 +31,20 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->addArgument(Argument::that(function (array $arg) {
+        $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
             return !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference;
         }))->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
+
+        $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterCollectionFactoryDefinitionProphecy->addArgument(['my_id'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.filters')->willReturn($definition)->shouldBeCalled();
-        $containerBuilder = $containerBuilderProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $dataProviderPass->process($containerBuilder);
+        $dataProviderPass->process($containerBuilderProphecy->reveal());
     }
 
     public function testIdNotExist()
@@ -51,17 +53,19 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->addArgument(Argument::that(function (array $arg) {
+        $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
             return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
         }))->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
+
+        $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterCollectionFactoryDefinitionProphecy->addArgument(['bar'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.filters')->willReturn($definition)->shouldBeCalled();
-        $containerBuilder = $containerBuilderProphecy->reveal();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $dataProviderPass->process($containerBuilder);
+        $dataProviderPass->process($containerBuilderProphecy->reveal());
     }
 }
