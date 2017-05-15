@@ -64,11 +64,6 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory.serializer.inner" />
         </service>
 
-        <service id="api_platform.metadata.property.metadata_factory.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
-            <argument type="service" id="validator" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory.validator.inner" />
-        </service>
-
         <service id="api_platform.metadata.property.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.inner" />
