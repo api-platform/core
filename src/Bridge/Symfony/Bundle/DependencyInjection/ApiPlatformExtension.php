@@ -113,6 +113,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
+        $container->setParameter('api_platform.api_resources_directory', $config['api_resources_directory']);
         $container->setParameter('api_platform.eager_loading.enabled', $config['eager_loading']['enabled']);
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.force_eager', $config['eager_loading']['force_eager']);
@@ -168,6 +169,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $resourceClassDirectories = $loaderPaths['annotation'];
         $xmlResources = $loaderPaths['xml'];
         $yamlResources = $loaderPaths['yaml'];
+        $resourcesDirectory = $container->getParameter('api_platform.api_resources_directory');
 
         foreach ($bundles as $bundle) {
             $bundleDirectory = dirname((new \ReflectionClass($bundle))->getFileName());
@@ -176,7 +178,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $xmlResources = array_merge($xmlResources, $newXmlResources);
             $yamlResources = array_merge($yamlResources, $newYamlResources);
 
-            if (file_exists($entityDirectory = $bundleDirectory.'/Entity')) {
+            if (file_exists($entityDirectory = $bundleDirectory.'/'.$resourcesDirectory)) {
                 $resourceClassDirectories[] = $entityDirectory;
                 $container->addResource(new DirectoryResource($entityDirectory, '/\.php$/'));
             }

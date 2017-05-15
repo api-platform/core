@@ -107,6 +107,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'yaml' => [],
                 'xml' => [],
             ],
+            'api_resources_directory' => 'Entity',
         ], $config);
     }
 
