@@ -46,7 +46,7 @@ trait EagerLoadingTrait
             $forceEager = $resourceMetadata->getAttribute('force_eager');
         }
 
-        return is_bool($forceEager) ? $forceEager : $this->forceEager;
+        return is_bool($forceEager) ? $forceEager : (bool) $this->forceEager;
     }
 
     /**

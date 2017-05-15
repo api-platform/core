@@ -27,7 +27,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 {
     use EagerLoadingTrait;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $forceEager = true)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->forceEager = $forceEager;
