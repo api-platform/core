@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
@@ -77,7 +76,7 @@ final class ReadListener
      * @param Request $request
      * @param array   $attributes
      *
-     * @return array|\Traversable|PaginatorInterface|null
+     * @return array|\Traversable|null
      */
     private function getCollectionData(Request $request, array $attributes)
     {
