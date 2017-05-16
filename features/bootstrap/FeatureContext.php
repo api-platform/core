@@ -616,6 +616,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function thereIsAFooEntityWithRelatedBars()
     {
         $foo = new DummyCar();
+        $foo->setName('mustli');
+        $foo->setCanSell(true);
+        $foo->setAvailableAt(new \DateTime());
         $this->manager->persist($foo);
 
         $bar1 = new DummyCarColor();

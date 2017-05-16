@@ -580,6 +580,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.yaml',
             'api_platform.metadata.property.name_collection_factory.yaml',
+            'api_platform.metadata.resource.filter_metadata_factory.annotation',
             'api_platform.metadata.resource.metadata_factory.annotation',
             'api_platform.metadata.resource.metadata_factory.operation',
             'api_platform.metadata.resource.metadata_factory.php_doc',

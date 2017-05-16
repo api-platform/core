@@ -48,19 +48,67 @@ Feature: Search filter on collections
             "@id": "/dummy_cars?colors.prop=red",
             "@type": "hydra:PartialCollectionView"
         },
-        "hydra:search": {
-            "@type": "hydra:IriTemplate",
-            "hydra:template": "/dummy_cars{?colors.prop}",
-            "hydra:variableRepresentation": "BasicRepresentation",
-            "hydra:mapping": [
-                {
-                    "@type": "IriTemplateMapping",
-                    "variable": "colors.prop",
-                    "property": "colors.prop",
-                    "required": false
-                }
-            ]
-        }
+				"hydra:search": {
+        "@type": "hydra:IriTemplate",
+        "hydra:template": "\/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],colors.prop,name}",
+        "hydra:variableRepresentation": "BasicRepresentation",
+        "hydra:mapping": [
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "availableAt[before]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "availableAt[strictly_before]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "availableAt[after]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "availableAt[strictly_after]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "canSell",
+            "property": "canSell",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "foobar[]",
+            "property": null,
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "foobargroups[]",
+            "property": null,
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "colors.prop",
+            "property": "colors.prop",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "name",
+            "property": "name",
+            "required": false
+          }
+        ]
+      }
     }
     """
 
