@@ -221,6 +221,8 @@ abstract class AbstractFilter implements FilterInterface
      * @param string                      $rootAlias
      * @param QueryBuilder                $queryBuilder
      * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $conditionType      the condition association (see $queryBuilder->join() doc)
+     * @param string                      $indexBy            the index association (see $queryBuilder->join() doc)
      *
      * @throws InvalidArgumentException If property is not nested
      *
@@ -228,13 +230,13 @@ abstract class AbstractFilter implements FilterInterface
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator): array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $conditionType = null, sting $indexBy = null): array
     {
         $propertyParts = $this->splitPropertyParts($property);
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
+            $alias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $conditionType, $indexBy);
             $parentAlias = $alias;
         }
 
@@ -278,17 +280,19 @@ abstract class AbstractFilter implements FilterInterface
      * @param QueryNameGeneratorInterface $queryNameGenerator
      * @param string                      $alias
      * @param string                      $association        the association field
+     * @param string                      $conditionType      the condition association (see $queryBuilder->join() doc)
+     * @param string                      $indexBy            the index association (see $queryBuilder->join() doc)
      *
      * @return string the new association alias
      */
-    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association): string
+    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, string $conditionType = null, sting $indexBy = null): string
     {
         $join = $this->getExistingJoin($queryBuilder, $alias, $association);
 
         if (null === $join) {
             $associationAlias = $queryNameGenerator->generateJoinAlias($association);
             $queryBuilder
-                ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+                ->join(sprintf('%s.%s', $alias, $association), $associationAlias, $conditionType, $indexBy);
         } else {
             $associationAlias = $join->getAlias();
         }
