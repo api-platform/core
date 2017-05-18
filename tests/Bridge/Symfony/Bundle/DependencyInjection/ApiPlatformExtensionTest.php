@@ -231,6 +231,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.eager_loading.enabled' => Argument::type('bool'),
             'api_platform.eager_loading.max_joins' => 30,
             'api_platform.eager_loading.force_eager' => true,
+            'api_platform.eager_loading.fetch_partial' => false,
             'api_platform.resource_class_directories' => [],
         ];
         foreach ($parameters as $key => $value) {

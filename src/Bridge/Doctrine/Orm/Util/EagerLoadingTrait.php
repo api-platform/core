@@ -24,6 +24,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 trait EagerLoadingTrait
 {
     private $forceEager;
+    private $fetchPartial;
     private $resourceMetadataFactory;
 
     /**
@@ -36,17 +37,45 @@ trait EagerLoadingTrait
      */
     private function shouldOperationForceEager(string $resourceClass, array $options): bool
     {
+        return $this->getBooleanOperationAttribute($resourceClass, $options, 'force_eager', $this->forceEager);
+    }
+
+    /**
+     * Checks if an operation has a `fetch_partial` attribute.
+     *
+     * @param string $resourceClass
+     * @param array  $options
+     *
+     * @return bool
+     */
+    private function shouldOperationFetchPartial(string $resourceClass, array $options): bool
+    {
+        return $this->getBooleanOperationAttribute($resourceClass, $options, 'fetch_partial', $this->fetchPartial);
+    }
+
+    /**
+     * Get the boolean attribute of an operation or the resource metadata.
+     *
+     * @param string $resourceClass
+     * @param array  $options
+     * @param string $attributeName
+     * @param bool   $default
+     *
+     * @return bool
+     */
+    private function getBooleanOperationAttribute(string $resourceClass, array $options, string $attributeName, bool $default): bool
+    {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         if (isset($options['collection_operation_name'])) {
-            $forceEager = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'force_eager', null, true);
+            $attribute = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $attributeName, null, true);
         } elseif (isset($options['item_operation_name'])) {
-            $forceEager = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'force_eager', null, true);
+            $attribute = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], $attributeName, null, true);
         } else {
-            $forceEager = $resourceMetadata->getAttribute('force_eager');
+            $attribute = $resourceMetadata->getAttribute($attributeName);
         }
 
-        return is_bool($forceEager) ? $forceEager : (bool) $this->forceEager;
+        return is_bool($attribute) ? $attribute : $default;
     }
 
     /**

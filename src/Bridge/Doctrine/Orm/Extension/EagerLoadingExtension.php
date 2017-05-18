@@ -44,13 +44,17 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     private $serializerContextBuilder;
     private $requestStack;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null)
+    /**
+     * @TODO move $fetchPartial after $forceEager (@soyuka) in 3.0
+     */
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->maxJoins = $maxJoins;
         $this->forceEager = $forceEager;
+        $this->fetchPartial = $fetchPartial;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->requestStack = $requestStack;
     }
@@ -67,10 +71,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
+        $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
 
         $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
 
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $groups);
     }
 
     /**
@@ -86,6 +91,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
+        $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
 
         if (isset($context['groups'])) {
             $groups = ['serializer_groups' => $context['groups']];
@@ -95,7 +101,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $groups = $this->getSerializerGroups($resourceClass, $options, 'normalization_context');
         }
 
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $queryBuilder->getRootAliases()[0], $groups);
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $groups);
     }
 
     /**
@@ -112,7 +118,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, string $parentAlias, array $propertyMetadataOptions = [], bool $wasLeftJoin = false, int &$joinCount = 0)
+    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $propertyMetadataOptions = [], bool $wasLeftJoin = false, int &$joinCount = 0)
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.');
@@ -152,18 +158,23 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $queryBuilder->{$method}(sprintf('%s.%s', $parentAlias, $association), $associationAlias);
             ++$joinCount;
 
-            try {
-                $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $propertyMetadataOptions);
-            } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
-                continue;
+            if (true === $fetchPartial) {
+                try {
+                    $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $propertyMetadataOptions);
+                } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
+                    continue;
+                }
+            } else {
+                $queryBuilder->addSelect($associationAlias);
             }
 
+            // Avoid recursion
             if ($mapping['targetEntity'] === $resourceClass) {
                 $queryBuilder->addSelect($associationAlias);
                 continue;
             }
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $associationAlias, $propertyMetadataOptions, $method === 'leftJoin', $joinCount);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $propertyMetadataOptions, $method === 'leftJoin', $joinCount);
         }
     }
 
@@ -184,7 +195,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 }
 
                 //the field test allows to add methods to a Resource which do not reflect real database fields
-                if (true === $targetClassMetadata->hasField($property) && true === $propertyMetadata->isReadable()) {
+                if (true === $targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || true === $propertyMetadata->isReadable())) {
                     $select[] = $property;
                 }
             }
