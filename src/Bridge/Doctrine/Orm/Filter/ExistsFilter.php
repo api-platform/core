@@ -15,11 +15,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by whether a property value exists or not.
@@ -36,11 +33,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ExistsFilter extends AbstractFilter
 {
     const QUERY_PARAMETER_KEY = 'exists';
-
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties);
-    }
 
     /**
      * {@inheritdoc}
