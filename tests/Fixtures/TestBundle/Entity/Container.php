@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 /*
  * This file is part of the API Platform project.
  *
@@ -9,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
@@ -25,7 +26,7 @@ class Container
 {
     /**
      * @ORM\Id
-     * @ORM\Column(name="id", type="guid")
+     * @ORM\Column(type="guid")
      *
      * @var string UUID
      */
@@ -47,17 +48,11 @@ class Container
      */
     private $nodes;
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string id
-     */
     public function setId(string $id)
     {
         $this->id = $id;
