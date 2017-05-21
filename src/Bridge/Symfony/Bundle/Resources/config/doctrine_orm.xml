@@ -113,6 +113,7 @@
             <argument>%api_platform.eager_loading.force_eager%</argument>
             <argument type="service" id="request_stack" />
             <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument>%api_platform.eager_loading.fetch_partial%</argument>
 
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="64" />
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="64" />

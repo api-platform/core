@@ -87,6 +87,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled' => true,
                 'max_joins' => 30,
                 'force_eager' => true,
+                'fetch_partial' => false,
             ],
             'collection' => [
                 'order' => 'ASC',

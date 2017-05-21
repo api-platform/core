@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
@@ -287,8 +288,14 @@ abstract class AbstractFilter implements FilterInterface
 
         if (null === $join) {
             $associationAlias = $queryNameGenerator->generateJoinAlias($association);
-            $queryBuilder
-                ->join(sprintf('%s.%s', $alias, $association), $associationAlias);
+
+            if (true === QueryChecker::hasLeftJoin($queryBuilder)) {
+                $queryBuilder
+                    ->leftJoin(sprintf('%s.%s', $alias, $association), $associationAlias);
+            } else {
+                $queryBuilder
+                    ->innerJoin(sprintf('%s.%s', $alias, $association), $associationAlias);
+            }
         } else {
             $associationAlias = $join->getAlias();
         }

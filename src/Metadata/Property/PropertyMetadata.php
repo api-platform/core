@@ -291,6 +291,23 @@ final class PropertyMetadata
     }
 
     /**
+     * Gets an attribute.
+     *
+     * @param string $key
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $key, $defaultValue = null)
+    {
+        if (isset($this->attributes[$key])) {
+            return $this->attributes[$key];
+        }
+
+        return $defaultValue;
+    }
+
+    /**
      * Returns a new instance with the given attribute.
      *
      * @param array $attributes
