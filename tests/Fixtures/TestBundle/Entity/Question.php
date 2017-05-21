@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 /*
  * This file is part of the API Platform project.
  *
@@ -10,6 +9,8 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -17,21 +18,20 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table(name="question")
  * @ORM\Entity
  * @ApiResource
  */
 class Question
 {
     /**
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @ORM\Column(name="content", type="string", nullable=true)
+     * @ORM\Column(nullable=true)
      */
     private $content;
 

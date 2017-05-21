@@ -1,6 +1,5 @@
 <?php
 
-declare(strict_types=1);
 /*
  * This file is part of the API Platform project.
  *
@@ -9,6 +8,8 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
@@ -19,7 +20,6 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 /**
  * Answer.
  *
- * @ORM\Table(name="answer")
  * @ORM\Entity
  * @ApiResource(collectionOperations={
  *     "get_subresource_answer"={"method"="GET", "normalization_context"={"groups"={"foobar"}}}
@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 class Answer
 {
     /**
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"foobar"})
@@ -36,7 +36,7 @@ class Answer
     private $id;
 
     /**
-     * @ORM\Column(name="content", type="string", nullable=false)
+     * @ORM\Column(nullable=false)
      * @Serializer\Groups({"foobar"})
      */
     private $content;
