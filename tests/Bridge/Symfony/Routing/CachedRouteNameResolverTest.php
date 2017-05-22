@@ -39,6 +39,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No item route associated with the type "AppBundle\Entity\User".
+     * @group legacy
      */
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
     {
@@ -50,7 +51,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->shouldNotBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false)
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false, [])
             ->willThrow(new InvalidArgumentException('No item route associated with the type "AppBundle\Entity\User".'))
             ->shouldBeCalled();
 
@@ -58,6 +59,9 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', false);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetRouteNameForItemRouteOnCacheMiss()
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
@@ -69,7 +73,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->willReturn(true)->shouldBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false)->willReturn('some_item_route')->shouldBeCalled();
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', false, [])->willReturn('some_item_route')->shouldBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
         $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', false);
@@ -99,6 +103,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
+     * @group legacy
      */
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()
     {
@@ -110,7 +115,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->shouldNotBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true)
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true, [])
             ->willThrow(new InvalidArgumentException('No collection route associated with the type "AppBundle\Entity\User".'))
             ->shouldBeCalled();
 
@@ -118,6 +123,9 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', true);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetRouteNameForCollectionRouteOnCacheMiss()
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
@@ -129,7 +137,7 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cacheItemPoolProphecy->save($cacheItemProphecy)->willReturn(true)->shouldBeCalled();
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
-        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true)->willReturn('some_collection_route')->shouldBeCalled();
+        $decoratedProphecy->getRouteName('AppBundle\Entity\User', true, [])->willReturn('some_collection_route')->shouldBeCalled();
 
         $cachedRouteNameResolver = new CachedRouteNameResolver($cacheItemPoolProphecy->reveal(), $decoratedProphecy->reveal());
         $actual = $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', true);
