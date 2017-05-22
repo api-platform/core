@@ -1105,11 +1105,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedMessage Method "foo" is not supported
-     */
-    public function testMethodNotSupported()
+    public function testWithCustomMethod()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
 
@@ -1135,6 +1131,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('FOO');
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -1148,7 +1145,24 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $urlGeneratorProphecy->reveal()
         );
 
-        $normalizer->normalize($documentation);
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/',
+            'info' => [
+                'title' => '',
+                'version' => '0.0.0',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies' => [
+                    'foo' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyCollection',
+                    ]),
+                ],
+            ]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
     public function testNormalizeWithNestedNormalizationGroups()
