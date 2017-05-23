@@ -136,6 +136,19 @@ services:
         arguments: [ { 'colors.prop': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
 
+    app.entity.filter.dummy_property.property:
+        parent:    'api_platform.serializer.property_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
+
+    app.entity.filter.dummy_group.group:
+        parent:    'api_platform.serializer.group_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.group' } ]
+
+    app.entity.filter.dummy_group.override_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'override_groups', true ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
+
     app.related_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
