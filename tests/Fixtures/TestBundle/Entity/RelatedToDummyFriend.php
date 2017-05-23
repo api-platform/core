@@ -42,6 +42,7 @@ class RelatedToDummyFriend
      * @ORM\ManyToOne(targetEntity="DummyFriend")
      * @ORM\JoinColumn(name="dummyfriend_id", referencedColumnName="id", nullable=false)
      * @Groups({"fakemanytomany", "friends"})
+     * @Assert\NotNull
      */
     private $dummyFriend;
 
@@ -49,6 +50,7 @@ class RelatedToDummyFriend
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="RelatedDummy", inversedBy="relatedToDummyFriend")
      * @ORM\JoinColumn(name="relateddummy_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @Assert\NotNull
      */
     private $relatedDummy;
 

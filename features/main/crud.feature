@@ -230,6 +230,12 @@ Feature: Create-Retrieve-Update-Delete
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "order[description]",
+            "property": "description",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "order[relatedDummy.name]",
             "property": "relatedDummy.name",
             "required": false

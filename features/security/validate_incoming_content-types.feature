@@ -13,4 +13,4 @@ Feature: Validate incoming content type
     """
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should be equal to 'The content-type "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/xml", "text/xml", "application/json", "text/html".'
+    And the JSON node "hydra:description" should be equal to 'The content-type "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/vnd.api+json", "application/xml", "text/xml", "application/json", "text/html".'

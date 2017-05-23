@@ -248,6 +248,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return $this->updateGetOperation($pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'POST':
                 return $this->updatePostOperation($pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
+            case 'PATCH':
+                $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Updates the %s resource.', $resourceShortName);
             case 'PUT':
                 return $this->updatePutOperation($pathOperation, $mimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':

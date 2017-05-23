@@ -786,6 +786,12 @@ Feature: Date filter on collections
                   },
                   {
                       "@type": "IriTemplateMapping",
+                      "variable": "order[description]",
+                      "property": "description",
+                      "required": false
+                  },
+                  {
+                      "@type": "IriTemplateMapping",
                       "variable": "order[relatedDummy.symfony]",
                       "property": "relatedDummy.symfony",
                       "required": false

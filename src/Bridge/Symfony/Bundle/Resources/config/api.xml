@@ -175,6 +175,7 @@
         <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" />
