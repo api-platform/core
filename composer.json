@@ -36,6 +36,7 @@
         "doctrine/orm": "^2.5",
         "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0",
+        "guzzlehttp/guzzle": "^6.0",
         "nelmio/api-doc-bundle": "^2.11.2",
         "php-mock/php-mock-phpunit": "^1.1",
         "phpdocumentor/reflection-docblock": "^3.0",
@@ -63,6 +64,7 @@
     },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
+        "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",

@@ -19,9 +19,11 @@ use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -87,15 +89,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('security.xml');
         }
 
+        $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
+
         $this->registerMetadataConfiguration($container, $loader, $bundles, $config['loader_paths']);
         $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerBundlesConfiguration($bundles, $config, $loader);
+        $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
         $this->registerCacheConfiguration($container);
-        $this->registerDoctrineExtensionConfiguration($container, $config);
+        $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
+        $this->registerHttpCache($container, $config, $loader, $useDoctrine);
     }
 
     /**
@@ -129,6 +134,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled_parameter_name', $config['collection']['pagination']['enabled_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.items_per_page_parameter_name', $config['collection']['pagination']['items_per_page_parameter_name']);
+        $container->setParameter('api_platform.http_cache.etag', $config['http_cache']['etag']);
+        $container->setParameter('api_platform.http_cache.max_age', $config['http_cache']['max_age']);
+        $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
+        $container->setParameter('api_platform.http_cache.vary', $config['http_cache']['vary']);
+        $container->setParameter('api_platform.http_cache.public', $config['http_cache']['public']);
 
         $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
 
@@ -308,11 +318,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param string[]      $bundles
      * @param array         $config
      * @param XmlFileLoader $loader
+     * @param bool          $useDoctrine
      */
-    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader)
+    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
         // Doctrine ORM support
-        if (isset($bundles['DoctrineBundle']) && class_exists(Version::class)) {
+        if ($useDoctrine) {
             $loader->load('doctrine_orm.xml');
         }
 
@@ -349,13 +360,48 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      *
      * @param ContainerBuilder $container
      * @param array            $config
+     * @param bool             $useDoctrine
      */
-    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config)
+    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine)
     {
-        if (false === $config['eager_loading']['enabled']) {
-            $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
-            $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
+        if (!$useDoctrine || $config['eager_loading']['enabled']) {
+            return;
         }
+
+        $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
+        $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
+    }
+
+    private function registerHttpCache(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    {
+        $loader->load('http_cache.xml');
+
+        if (!$config['http_cache']['invalidation']['enabled']) {
+            return;
+        }
+
+        if ($useDoctrine) {
+            $loader->load('doctrine_orm_http_cache_purger.xml');
+        }
+
+        $loader->load('http_cache_tags.xml');
+
+        if (!$config['http_cache']['invalidation']['varnish_urls']) {
+            return;
+        }
+
+        $references = [];
+        foreach ($config['http_cache']['invalidation']['varnish_urls'] as $url) {
+            $id = sprintf('api_platform.http_cache.purger.varnish_client.%s', $url);
+            $references[] = new Reference($id);
+
+            $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
+            $definition->addArgument(['base_uri' => $url]);
+            $container->setDefinition($id, $definition);
+        }
+
+        $container->getDefinition('api_platform.http_cache.purger.varnish')->addArgument($references);
+        $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish');
     }
 
     /**

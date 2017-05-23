@@ -45,6 +45,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'jsonhal' => ['mime_types' => ['application/hal+json']],
         ],
+        'http_cache' => ['invalidation' => [
+            'enabled' => true,
+            'varnish_urls' => ['test'],
+        ]],
     ]];
 
     private $extension;
@@ -189,7 +193,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
     }
 
-    public function testEnablSecurity()
+    public function testEnableSecurity()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
@@ -256,6 +260,11 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.eager_loading.force_eager' => true,
             'api_platform.eager_loading.fetch_partial' => false,
             'api_platform.resource_class_directories' => [],
+            'api_platform.http_cache.etag' => true,
+            'api_platform.http_cache.max_age' => null,
+            'api_platform.http_cache.shared_max_age' => null,
+            'api_platform.http_cache.vary' => ['Content-Type'],
+            'api_platform.http_cache.public' => null,
         ];
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
@@ -304,6 +313,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.subresource_data_provider',
             'api_platform.filter_locator',
             'api_platform.filter_collection_factory',
+            'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.filters',
             'api_platform.doctrine.listener.view.write',
             'api_platform.jsonld.normalizer.item',
@@ -393,6 +403,11 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.action.ui',
             'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.normalizer.documentation',
+            'api_platform.http_cache.listener.response.configure',
+            'api_platform.http_cache.purger.varnish',
+            'api_platform.http_cache.purger.varnish_client',
+            'api_platform.http_cache.listener.response.add_tags',
+            'api_platform.http_cache.purger.varnish_client.test',
         ];
 
         foreach ($definitions as $definition) {
@@ -415,6 +430,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
+            'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -423,6 +439,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->getParameter('api_platform.api_resources_directory')->willReturn('Entity');
+        $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
 
         return $containerBuilderProphecy;
     }

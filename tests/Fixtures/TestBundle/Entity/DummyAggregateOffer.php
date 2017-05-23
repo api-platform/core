@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -58,61 +59,31 @@ class DummyAggregateOffer
         $this->offers = new ArrayCollection();
     }
 
-    /**
-     * Get offers.
-     *
-     * @return offers
-     */
-    public function getOffers(): ArrayCollection
+    public function getOffers(): Collection
     {
         return $this->offers;
     }
 
-    /**
-     * Set offers.
-     *
-     * @param offers the value to set
-     */
     public function setOffers($offers)
     {
         $this->offers = $offers;
     }
 
-    /**
-     * Add offer.
-     *
-     * @param offer the value to add
-     */
     public function addOffer(DummyOffer $offer)
     {
         $this->offers->add($offer);
     }
 
-    /**
-     * Get id.
-     *
-     * @return id
-     */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Get value.
-     *
-     * @return value
-     */
     public function getValue(): int
     {
         return $this->value;
     }
 
-    /**
-     * Set value.
-     *
-     * @param value the value to set
-     */
     public function setValue(int $value)
     {
         $this->value = $value;

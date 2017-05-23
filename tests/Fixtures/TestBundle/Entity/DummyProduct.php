@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -39,7 +40,7 @@ class DummyProduct
     private $id;
 
     /**
-     * @var ArrayCollection
+     * @var Collection
      *
      * @ApiProperty(subresource=true)
      * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="id", cascade={"persist"})
@@ -58,61 +59,31 @@ class DummyProduct
         $this->offers = new ArrayCollection();
     }
 
-    /**
-     * Get offers.
-     *
-     * @return offers
-     */
-    public function getOffers(): ArrayCollection
+    public function getOffers(): Collection
     {
         return $this->offers;
     }
 
-    /**
-     * Set offers.
-     *
-     * @param offers the value to set
-     */
     public function setOffers($offers)
     {
         $this->offers = $offers;
     }
 
-    /**
-     * Add offer.
-     *
-     * @param offer the value to add
-     */
     public function addOffer(DummyAggregateOffer $offer)
     {
         $this->offers->add($offer);
     }
 
-    /**
-     * Get id.
-     *
-     * @return id
-     */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Get name.
-     *
-     * @return name
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * Set name.
-     *
-     * @param name the value to set
-     */
     public function setName($name)
     {
         $this->name = $name;

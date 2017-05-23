@@ -5,6 +5,7 @@ default:
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'HydraContext'
         - 'SwaggerContext'
+        - 'HttpCacheContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
         - 'Behatch\Context\JsonContext'
@@ -26,10 +27,10 @@ coverage:
   suites:
     default:
       contexts:
-      contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'HydraContext'
         - 'SwaggerContext'
+        - 'HttpCacheContext'
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'

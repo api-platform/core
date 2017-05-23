@@ -109,6 +109,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'xml' => [],
             ],
             'api_resources_directory' => 'Entity',
+            'http_cache' => [
+                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
+                'etag' => true,
+                'max_age' => null,
+                'shared_max_age' => null,
+                'vary' => ['Content-Type'],
+                'public' => null,
+            ],
         ], $config);
     }
 

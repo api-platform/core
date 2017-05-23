@@ -114,6 +114,33 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+
+                ->arrayNode('http_cache')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('etag')->defaultTrue()->info('Automatically generate etags for API responses.')->end()
+                        ->integerNode('max_age')->defaultNull()->info('Default value for the response max age.')->end()
+                        ->integerNode('shared_max_age')->defaultNull()->info('Default value for the response shared (proxy) max age.')->end()
+                        ->arrayNode('vary')
+                            ->defaultValue(['Content-Type'])
+                            ->prototype('scalar')->end()
+                            ->info('Default values of the "Vary" HTTP header.')
+                        ->end()
+                        ->booleanNode('public')->defaultNull()->info('To make all responses public by default.')->end()
+                        ->arrayNode('invalidation')
+                            ->info('Enable the tags-based cache invalidation system.')
+                            ->canBeEnabled()
+                            ->children()
+                                ->arrayNode('varnish_urls')
+                                    ->defaultValue([])
+                                    ->prototype('scalar')->end()
+                                    ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
             ->end();
 
         $this->addExceptionToStatusSection($rootNode);
