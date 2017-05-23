@@ -102,6 +102,7 @@ Feature: Subresource support
           "thirdLevel": "/third_levels/1",
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
+          "embeddedDummy": [],
           "age": null
         },
         {
@@ -114,6 +115,7 @@ Feature: Subresource support
           "thirdLevel": "/third_levels/1",
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
+          "embeddedDummy": [],
           "age": null
         }
       ],
@@ -168,6 +170,7 @@ Feature: Subresource support
           "thirdLevel": "/third_levels/1",
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
+          "embeddedDummy": [],
           "age": null
         }
       ],

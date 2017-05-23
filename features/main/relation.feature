@@ -67,6 +67,9 @@ Feature: Relations support
       "thirdLevel": "/third_levels/1",
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
+      "embeddedDummy": null,
+      "id": 1,
+      "symfony": "symfony",
       "age": null
     }
     """

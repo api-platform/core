@@ -84,8 +84,8 @@ class SearchFilter extends AbstractFilter
                 continue;
             }
 
-            if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
+            if ($this->isPropertyNested($property, $resourceClass)) {
+                $propertyParts = $this->splitPropertyParts($property, $resourceClass);
                 $field = $propertyParts['field'];
                 $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
             } else {
@@ -167,7 +167,7 @@ class SearchFilter extends AbstractFilter
     {
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
@@ -176,8 +176,8 @@ class SearchFilter extends AbstractFilter
         $alias = 'o';
         $field = $property;
 
-        if ($this->isPropertyNested($property)) {
-            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
             $metadata = $this->getNestedMetadata($resourceClass, $associations);
         } else {
             $metadata = $this->getClassMetadata($resourceClass);

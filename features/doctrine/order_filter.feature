@@ -331,7 +331,7 @@ Feature: Order filter on collections
               "properties": {
                 "@id": {
                   "type": "string",
-                  "pattern": "^/dummies/2$"
+                  "pattern": "^/dummies/2"
                 }
               }
             },
@@ -353,6 +353,125 @@ Feature: Order filter on collections
           "type": "object",
           "properties": {
             "@id": {"pattern": "^/dummies\\?order%5BrelatedDummy%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get collection ordered in ascending order on an embedded and on which order filter has been enabled in whitelist mode
+    Given there is "30" dummy objects with embeddedDummy
+    When I send a "GET" request to "/embedded_dummies?order[embeddedDummy]=asc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/3$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?order%5BembeddedDummy%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get collection ordered by default configured order on a embedded string property and on which order filter has been enabled in whitelist mode with default descending order
+    When I send a "GET" request to "/embedded_dummies?order[embeddedDummy.dummyName]"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/9"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/8"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/7"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?order%5BembeddedDummy\\.dummyName%5D="},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }

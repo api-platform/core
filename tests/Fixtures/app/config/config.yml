@@ -93,18 +93,18 @@ services:
 
     app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start' } ]
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
 
     # Tests if the id default to the service name, do not add id attributes here
     my_dummy.order:
         parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
-        tags:      [ { name: 'api_platform.filter' } ]
+        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
     app.my_dummy_resource.date_filter:
         parent:    'api_platform.doctrine.orm.date_filter'
-        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
 
     app.my_dummy_resource.range_filter:
@@ -114,7 +114,7 @@ services:
 
     app.my_dummy_resource.boolean_filter:
         parent:    'api_platform.doctrine.orm.boolean_filter'
-        arguments: [ { 'dummyBoolean': ~ } ]
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
 
     app.my_dummy_resource.numeric_filter:

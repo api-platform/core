@@ -166,6 +166,210 @@ Feature: Boolean filter on collections
     """
     And the JSON node "hydra:totalItems" should be equal to 10
 
+  Scenario: Get collection by embeddedDummy.dummyBoolean true
+    Given there is "15" embedded dummy objects with embeddedDummy.dummyBoolean true
+    And there is "10" embedded dummy objects with embeddedDummy.dummyBoolean false
+    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=true"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/embedded_dummies/1$"},
+                  {"pattern": "^/embedded_dummies/2$"},
+                  {"pattern": "^/embedded_dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?embeddedDummy\\.dummyBoolean=true"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+    And the JSON node "hydra:totalItems" should be equal to 15
+
+  Scenario: Get collection by embeddedDummy.dummyBoolean true
+    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/embedded_dummies/1$"},
+                  {"pattern": "^/embedded_dummies/2$"},
+                  {"pattern": "^/embedded_dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?embeddedDummy\\.dummyBoolean=1"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+    And the JSON node "hydra:totalItems" should be equal to 15
+
+  Scenario: Get collection by embeddedDummy.dummyBoolean false
+    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=false"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/embedded_dummies/16$"},
+                  {"pattern": "^/embedded_dummies/17$"},
+                  {"pattern": "^/embedded_dummies/18$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?embeddedDummy\\.dummyBoolean=false"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+    And the JSON node "hydra:totalItems" should be equal to 10
+
+  Scenario: Get collection by embeddedDummy.dummyBoolean false
+    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/embedded_dummies/16$"},
+                  {"pattern": "^/embedded_dummies/17$"},
+                  {"pattern": "^/embedded_dummies/18$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?embeddedDummy\\.dummyBoolean=0"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+    And the JSON node "hydra:totalItems" should be equal to 10
+
+  Scenario: Get collection by association with embed relatedDummy.embeddedDummy.dummyBoolean true
+    Given there is "15" embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean true
+    And there is "10" embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean false
+    When I send a "GET" request to "/embedded_dummies?relatedDummy.embeddedDummy.dummyBoolean=true"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/embedded_dummies/26$"},
+                  {"pattern": "^/embedded_dummies/27$"},
+                  {"pattern": "^/embedded_dummies/28$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?relatedDummy.embeddedDummy\\.dummyBoolean=true"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+    And the JSON node "hydra:totalItems" should be equal to 15
+
   @dropSchema
   Scenario: Get collection ordered by a non valid properties
     When I send a "GET" request to "/dummies?unknown=0"

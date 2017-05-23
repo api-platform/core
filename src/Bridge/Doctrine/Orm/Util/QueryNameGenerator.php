@@ -38,6 +38,6 @@ final class QueryNameGenerator implements QueryNameGeneratorInterface
      */
     public function generateParameterName(string $name): string
     {
-        return sprintf('%s_p%d', $name, $this->incrementedName++);
+        return sprintf('%s_p%d', str_replace('.', '_', $name), $this->incrementedName++);
     }
 }

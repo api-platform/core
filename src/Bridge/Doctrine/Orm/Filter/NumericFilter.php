@@ -60,7 +60,7 @@ class NumericFilter extends AbstractFilter
             if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isNumericField($property, $resourceClass)) {
                 continue;
             }
-            $propertyParts = $this->splitPropertyParts($property);
+            $propertyParts = $this->splitPropertyParts($property, $resourceClass);
             $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
             $description[$property] = [
@@ -99,7 +99,7 @@ class NumericFilter extends AbstractFilter
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if (
-            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isNumericField($property, $resourceClass)
         ) {
@@ -117,8 +117,8 @@ class NumericFilter extends AbstractFilter
         $alias = 'o';
         $field = $property;
 
-        if ($this->isPropertyNested($property)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
@@ -137,7 +137,7 @@ class NumericFilter extends AbstractFilter
      */
     protected function isNumericField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         return isset(self::DOCTRINE_NUMERIC_TYPES[$metadata->getTypeOfField($propertyParts['field'])]);

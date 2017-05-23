@@ -88,6 +88,14 @@ class RelatedDummy extends ParentDummy
      */
     public $dummyBoolean;
 
+    /**
+     * @var EmbeddableDummy
+     *
+     * @ORM\Embedded(class="EmbeddableDummy")
+     * @Groups({"friends"})
+     */
+    public $embeddedDummy;
+
     public function getId()
     {
         return $this->id;
@@ -162,5 +170,21 @@ class RelatedDummy extends ParentDummy
     public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {
         $this->relatedToDummyFriend->add($relatedToDummyFriend);
+    }
+
+    /**
+     * @return EmbeddableDummy
+     */
+    public function getEmbeddedDummy()
+    {
+        return $this->embeddedDummy;
+    }
+
+    /**
+     * @param EmbeddableDummy $embeddedDummy
+     */
+    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
+    {
+        $this->embeddedDummy = $embeddedDummy;
     }
 }
