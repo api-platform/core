@@ -1,4 +1,22 @@
-$(function () {
+window.onload = function() {
+  const data = JSON.parse(document.getElementById('swagger-data').innerText);
+  const ui = SwaggerUIBundle({
+    spec: data.spec,
+    dom_id: '#swagger-ui',
+    validatorUrl: null,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout"
+  });
+  window.ui = ui
+};
+
+/*$(function () {
     var data = JSON.parse($('#swagger-data').html());
     window.swaggerUi = new SwaggerUi({
         url: data.url,
@@ -58,4 +76,4 @@ $(function () {
             console.log.apply(console, arguments);
         }
     }
-});
+});*/
