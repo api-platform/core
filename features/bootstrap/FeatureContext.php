@@ -351,6 +351,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
         }
 
         $this->manager->flush();
+        $this->manager->clear();
     }
 
     /**
