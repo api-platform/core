@@ -331,7 +331,7 @@ Feature: Order filter on collections
               "properties": {
                 "@id": {
                   "type": "string",
-                  "pattern": "^/dummies/2"
+                  "pattern": "^/dummies/2$"
                 }
               }
             },
