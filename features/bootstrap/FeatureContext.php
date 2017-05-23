@@ -473,16 +473,15 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is an answer :answer to the question :question
+     * @Given there is an answer ":answer" to the question ":question"
      */
-    public function thereIsAnAnswerToTheQuestion($a, $q)
+    public function thereIsAnAnswerToTheQuestion(string $a, string $q)
     {
         $answer = new Answer();
         $answer->setContent($a);
 
         $question = new Question();
         $question->setContent($q);
-
         $question->setAnswer($answer);
 
         $this->manager->persist($answer);
