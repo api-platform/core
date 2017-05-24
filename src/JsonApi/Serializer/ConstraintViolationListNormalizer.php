@@ -19,13 +19,17 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
+/**
+ * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} to a JSON API error representation.
+ *
+ * @author Héctor Hurtarte <hectorh30@gmail.com>
+ */
 final class ConstraintViolationListNormalizer implements NormalizerInterface
 {
     const FORMAT = 'jsonapi';
 
     private $nameConverter;
     private $propertyMetadataFactory;
-
 
     public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
     {
@@ -66,8 +70,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
 
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(
-            // Im quite sure this requires some thought in case of validations
-            // over relationships
+                // Im quite sure this requires some thought in case of validations over relationships
                 get_class($violation->getRoot()),
                 $fieldName
             );
@@ -77,9 +80,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         }
 
         if (null !== $propertyMetadata->getType()->getClassName()) {
-            return sprintf('data/relationships/%s', $fieldName);
+            return "data/relationships/$fieldName";
         }
 
-        return sprintf('data/attributes/%s', $fieldName);
+        return "data/attributes/$fieldName";
     }
 }

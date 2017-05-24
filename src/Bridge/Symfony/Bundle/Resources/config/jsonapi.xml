@@ -11,6 +11,10 @@
             <tag name="serializer.encoder" />
         </service>
 
+        <service id="api_platform.jsonapi.name_converter.reserved_attribute_name" class="ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter" public="false">
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+        </service>
+
         <service id="api_platform.jsonapi.normalizer.entrypoint" class="ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -21,9 +25,6 @@
 
         <service id="api_platform.jsonapi.normalizer.collection" class="ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
 
 
@@ -36,16 +37,17 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.property_accessor" />
-            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.identifiers_extractor" />
 
             <tag name="serializer.normalizer" priority="8" />
         </service>
 
         <service id="api_platform.jsonapi.normalizer.constraint_violation_list" class="ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
 
             <tag name="serializer.normalizer" priority="32"/>
         </service>

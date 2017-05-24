@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Flattens possible 'page' array query parameter into dot-separated values to avoid
- * conflicts with Doctrine\Orm\Extension\PaginationExtension.
+ * conflicts with {@see \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension}.
  *
  * @see http://jsonapi.org/format/#fetching-pagination
  *
@@ -26,11 +26,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 final class FlattenPaginationParametersListener
 {
     /**
-     * Flatens possible 'page' array query parameter.
+     * Flattens possible 'page' array query parameter.
      *
      * @param GetResponseEvent $event
-     *
-     * @throws NotFoundHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -52,10 +50,7 @@ final class FlattenPaginationParametersListener
         $pageParameters = $request->query->get('page');
 
         foreach ($pageParameters as $pageParameterName => $pageParameterValue) {
-            $request->query->set(
-                sprintf('page.%s', $pageParameterName),
-                $pageParameterValue
-            );
+            $request->query->set("page.$pageParameterName", $pageParameterValue);
         }
 
         $request->query->remove('page');

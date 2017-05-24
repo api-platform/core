@@ -17,11 +17,16 @@ use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+/**
+ * Converts {@see \Exception} or {@see \Symfony\Component\Debug\Exception\FlattenException} to a JSON API error representation.
+ *
+ * @author Héctor Hurtarte <hectorh30@gmail.com>
+ */
 final class ErrorNormalizer implements NormalizerInterface
 {
-    const FORMAT = 'jsonapi';
-
     use ErrorNormalizerTrait;
+
+    const FORMAT = 'jsonapi';
 
     private $debug;
 

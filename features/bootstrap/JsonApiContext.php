@@ -11,32 +11,35 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Behat\Behat\Context\Context;
-use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
+use Behatch\Json\JsonSchema;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use JsonSchema\RefResolver;
+use JsonSchema\Uri\UriRetriever;
+use JsonSchema\Validator;
 
 final class JsonApiContext implements Context
 {
-    private $restContext;
-
     private $inspector;
-
-    private $doctrine;
-
-    /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
-     */
+    private $jsonApiSchemaFile;
+    private $restContext;
     private $manager;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, string $jsonApiSchemaFile)
     {
-        $this->doctrine = $doctrine;
+        if (!is_file($jsonApiSchemaFile)) {
+            throw new \InvalidArgumentException('The JSON API schema doesn\'t exist.');
+        }
+
+        $this->inspector = new JsonInspector('javascript');
+        $this->jsonApiSchemaFile = $jsonApiSchemaFile;
         $this->manager = $doctrine->getManager();
     }
 
@@ -49,48 +52,21 @@ final class JsonApiContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
-        $environment = $scope->getEnvironment();
-
-        $this->restContext = $environment->getContext(RestContext::class);
-
-        $this->inspector = new JsonInspector('javascript');
+        $this->restContext = $scope->getEnvironment()->getContext(RestContext::class);
     }
 
     /**
-     * @Then I save the response
+     * @Then the JSON should be valid according to the JSON API schema
      */
-    public function iSaveTheResponse()
+    public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
     {
-        $content = $this->getContent();
+        $refResolver = new RefResolver(new UriRetriever());
+        $refResolver::$maxDepth = 15;
 
-        if (null === ($decoded = json_decode($content))) {
-            throw new \RuntimeException('JSON response seems to be invalid');
-        }
-
-        $fileName = __DIR__.'/response.json';
-
-        file_put_contents($fileName, $content);
-
-        return $fileName;
-    }
-
-    /**
-     * @Then I validate it with jsonapi-validator
-     */
-    public function iValidateItWithJsonapiValidator()
-    {
-        $fileName = $this->iSaveTheResponse();
-
-        $validationResponse = exec(sprintf('cd %s && jsonapi-validator -f response.json', __DIR__));
-
-        $isValidJsonapi = 'response.json is valid JSON API.' === $validationResponse;
-
-        unlink($fileName);
-
-        if (!$isValidJsonapi) {
-            throw new \RuntimeException('JSON response seems to be invalid JSON API');
-        }
+        (new JsonSchema(file_get_contents($this->jsonApiSchemaFile), 'file://'.__DIR__))
+            ->resolve($refResolver)
+            ->validate($this->getJson(), new Validator())
+        ;
     }
 
     /**
@@ -100,9 +76,7 @@ final class JsonApiContext implements Context
      */
     public function theJsonNodeShouldBeAnEmptyArray($node)
     {
-        $actual = $this->getValueOfNode($node);
-
-        if (!is_array($actual) || !empty($actual)) {
+        if (!is_array($actual = $this->getValueOfNode($node)) || !empty($actual)) {
             throw new \Exception(
                 sprintf("The node value is '%s'", json_encode($actual))
             );
@@ -116,9 +90,7 @@ final class JsonApiContext implements Context
      */
     public function theJsonNodeShouldBeANumber($node)
     {
-        $actual = $this->getValueOfNode($node);
-
-        if (!is_numeric($actual)) {
+        if (!is_numeric($actual = $this->getValueOfNode($node))) {
             throw new \Exception(
                 sprintf('The node value is `%s`', json_encode($actual))
             );
@@ -132,20 +104,59 @@ final class JsonApiContext implements Context
      */
     public function theJsonNodeShouldNotBeAnEmptyString($node)
     {
-        $actual = $this->getValueOfNode($node);
-
-        if ($actual === '') {
+        if ('' === $actual = $this->getValueOfNode($node)) {
             throw new \Exception(
                 sprintf('The node value is `%s`', json_encode($actual))
             );
         }
     }
 
+    /**
+     * @Given there is a RelatedDummy
+     */
+    public function thereIsARelatedDummy()
+    {
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setName('RelatedDummy with no friends');
+
+        $this->manager->persist($relatedDummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a DummyFriend
+     */
+    public function thereIsADummyFriend()
+    {
+        $friend = new DummyFriend();
+        $friend->setName('DummyFriend');
+
+        $this->manager->persist($friend);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a CircularReference
+     */
+    public function thereIsACircularReference()
+    {
+        $circularReference = new CircularReference();
+        $circularReference->parent = $circularReference;
+
+        $circularReferenceBis = new CircularReference();
+        $circularReferenceBis->parent = $circularReference;
+
+        $circularReference->children->add($circularReference);
+        $circularReference->children->add($circularReferenceBis);
+
+        $this->manager->persist($circularReference);
+        $this->manager->persist($circularReferenceBis);
+        $this->manager->flush();
+    }
+
     private function getValueOfNode($node)
     {
-        $json = $this->getJson();
-
-        return $this->inspector->evaluate($json, $node);
+        return $this->inspector->evaluate($this->getJson(), $node);
     }
 
     private function getJson()
@@ -156,33 +167,5 @@ final class JsonApiContext implements Context
     private function getContent()
     {
         return $this->restContext->getMink()->getSession()->getDriver()->getContent();
-    }
-
-    /**
-     * @Given there is a RelatedDummy
-     */
-    public function thereIsARelatedDummy()
-    {
-        $relatedDummy = new RelatedDummy();
-
-        $relatedDummy->setName('RelatedDummy with no friends');
-
-        $this->manager->persist($relatedDummy);
-
-        $this->manager->flush();
-    }
-
-    /**
-     * @Given there is a DummyFriend
-     */
-    public function thereIsADummyFriend()
-    {
-        $friend = new DummyFriend();
-
-        $friend->setName('DummyFriend');
-
-        $this->manager->persist($friend);
-
-        $this->manager->flush();
     }
 }

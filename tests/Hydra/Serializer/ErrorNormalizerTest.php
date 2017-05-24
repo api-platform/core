@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSupportNormalization()
+    public function testSupportsNormalization()
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
@@ -41,9 +41,9 @@ class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerStatusCode
      *
-     * @param $status            http status code of the Exception
-     * @param $originalMessage   original message of the Exception
-     * @param $debug             simulates kernel debug variable
+     * @param int    $status          http status code of the Exception
+     * @param string $originalMessage original message of the Exception
+     * @param bool   $debug           simulates kernel debug variable
      */
     public function testErrorServerNormalize($status, $originalMessage, $debug)
     {

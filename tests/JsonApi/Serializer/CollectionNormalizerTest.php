@@ -11,15 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\tests\JsonApi\Serializer;
+namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -31,41 +27,22 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceMetadataProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $propertyMetadataProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $normalizer = new CollectionNormalizer(
-            $resourceClassResolverProphecy->reveal(),
-            $resourceMetadataProphecy->reveal(),
-            $propertyMetadataProphecy->reveal(),
-            'page'
-        );
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
 
-        $this->assertTrue($normalizer->supportsNormalization(
-            [],
-            CollectionNormalizer::FORMAT
-        ));
-
-        $this->assertTrue($normalizer->supportsNormalization(
-            new \ArrayObject(),
-            CollectionNormalizer::FORMAT
-        ));
-
+        $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
+        $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization([], 'xml'));
-        $this->assertFalse($normalizer->supportsNormalization(
-            new \ArrayObject(),
-            'xml'
-        ));
+        $this->assertFalse($normalizer->supportsNormalization(new \ArrayObject(), 'xml'));
     }
 
     public function testNormalizePaginator()
     {
         $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
-        $paginatorProphecy->getCurrentPage()->willReturn(3);
-        $paginatorProphecy->getLastPage()->willReturn(7);
-        $paginatorProphecy->getItemsPerPage()->willReturn(12);
-        $paginatorProphecy->getTotalItems()->willReturn(1312);
-
+        $paginatorProphecy->getCurrentPage()->willReturn(3.)->shouldBeCalled();
+        $paginatorProphecy->getLastPage()->willReturn(7.)->shouldBeCalled();
+        $paginatorProphecy->getItemsPerPage()->willReturn(12.)->shouldBeCalled();
+        $paginatorProphecy->getTotalItems()->willReturn(1312.)->shouldBeCalled();
         $paginatorProphecy->rewind()->shouldBeCalled();
         $paginatorProphecy->next()->willReturn()->shouldBeCalled();
         $paginatorProphecy->current()->willReturn('foo')->shouldBeCalled();
@@ -74,66 +51,15 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $paginator = $paginatorProphecy->reveal();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy
-            ->getResourceClass($paginator, null, true)
-            ->willReturn('Foo')
-            ->shouldBeCalled();
-
-        $resourceMetadataProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataProphecy
-            ->create('Foo')
-            ->willReturn(
-                new ResourceMetadata('Foo', 'A foo', '/foos', null, null, ['id', 'name'])
-            );
-
-        $propertyMetadataProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataProphecy
-            ->create('Foo', 'id')
-            ->willReturn(new PropertyMetadata(
-                new Type(Type::BUILTIN_TYPE_INT),
-                'id',
-                true,
-                true,
-                true,
-                true,
-                false,
-                true,
-                null,
-                null,
-                []
-            ))
-            ->shouldBeCalled(1);
-
-        $propertyMetadataProphecy
-            ->create('Foo', 'name')
-            ->willReturn(new PropertyMetadata(
-                new Type(Type::BUILTIN_TYPE_STRING),
-                'name',
-                true,
-                true,
-                true,
-                true,
-                false,
-                false,
-                null,
-                null,
-                []
-            ))
-            ->shouldBeCalled(1);
-
-        $normalizer = new CollectionNormalizer(
-            $resourceClassResolverProphecy->reveal(),
-            $resourceMetadataProphecy->reveal(),
-            $propertyMetadataProphecy->reveal(),
-            'page'
-        );
+        $resourceClassResolverProphecy->getResourceClass($paginator, null, true)->willReturn('Foo')->shouldBeCalled();
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer
             ->normalize(
                 'foo',
-                null,
+                CollectionNormalizer::FORMAT,
                 [
+                    'uri' => 'http://localhost/foos?page=3',
                     'api_sub_level' => true,
                     'resource_class' => 'Foo',
                 ]
@@ -149,15 +75,16 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $expected = [
             'links' => [
-                'self' => '/?page=3',
-                'first' => '/?page=1',
-                'last' => '/?page=7',
-                'prev' => '/?page=2',
-                'next' => '/?page=4',
+                'self' => 'http://localhost/foos?page=3',
+                'first' => 'http://localhost/foos?page=1',
+                'last' => 'http://localhost/foos?page=7',
+                'prev' => 'http://localhost/foos?page=2',
+                'next' => 'http://localhost/foos?page=4',
             ],
             'data' => [
                 [
@@ -176,6 +103,86 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($paginator));
+        $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, ['uri' => 'http://localhost/foos?page=3']));
+    }
+
+    public function testNormalizeArray()
+    {
+        $data = ['foo'];
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willReturn('Foo')->shouldBeCalled();
+
+        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
+        $itemNormalizer
+            ->normalize(
+                'foo',
+                CollectionNormalizer::FORMAT,
+                [
+                    'uri' => 'http://localhost/foos',
+                    'api_sub_level' => true,
+                    'resource_class' => 'Foo',
+                ]
+            )
+            ->willReturn([
+                'data' => [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Baptiste',
+                    ],
+                ],
+            ]);
+
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer->setNormalizer($itemNormalizer->reveal());
+
+        $expected = [
+            'links' => ['self' => 'http://localhost/foos'],
+            'data' => [
+                [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Baptiste',
+                    ],
+                ],
+            ],
+            'meta' => ['totalItems' => 1],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['uri' => 'http://localhost/foos']));
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedExceptionMessage The JSON API document must contain a "data" key.
+     */
+    public function testNormalizeWithoutDataKey()
+    {
+        $data = ['foo'];
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willReturn('Foo')->shouldBeCalled();
+
+        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
+        $itemNormalizer
+            ->normalize(
+                'foo',
+                CollectionNormalizer::FORMAT,
+                [
+                    'uri' => 'http://localhost/foos',
+                    'api_sub_level' => true,
+                    'resource_class' => 'Foo',
+                ]
+            )
+            ->willReturn([]);
+
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer->setNormalizer($itemNormalizer->reveal());
+
+        $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['uri' => 'http://localhost/foos']);
     }
 }

@@ -19,14 +19,15 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  * Flattens possible 'filter' array query parameter into first-level query parameters
  * to be processed by api-platform.
  *
- * @see http://jsonapi.org/format/#fetching-filtering and http://jsonapi.org/recommendations/#filtering
+ * @see http://jsonapi.org/format/#fetching-filtering
+ * @see http://jsonapi.org/recommendations/#filtering
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
 final class TransformFilteringParametersListener
 {
     /**
-     * Flatens possible 'filter' array query parameter.
+     * Flattens possible 'filter' array query parameter.
      *
      * @param GetResponseEvent $event
      */
@@ -39,7 +40,7 @@ final class TransformFilteringParametersListener
             return;
         }
 
-        // If filter query parameter is not defined or is not an array, never mind
+        // If 'filter' query parameter is not defined or is not an array, never mind
         $filterParameters = $request->query->get('filter');
 
         if (null === $filterParameters || !is_array($filterParameters)) {
@@ -48,10 +49,7 @@ final class TransformFilteringParametersListener
 
         // Otherwise, flatten one level to comply with api-platform filter expectations
         foreach ($filterParameters as $filterParameterName => $filterParameterValue) {
-            $request->query->set(
-                $filterParameterName,
-                $filterParameterValue
-            );
+            $request->query->set($filterParameterName, $filterParameterValue);
         }
 
         $request->query->remove('filter');

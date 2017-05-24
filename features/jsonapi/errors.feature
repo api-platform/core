@@ -3,11 +3,13 @@ Feature: JSON API error handling
   As a client software developer
   I need to retrieve an JSON API serialization of errors
 
+  Background:
+    Given I add "Accept" header equal to "application/vnd.api+json"
+    And I add "Content-Type" header equal to "application/vnd.api+json"
+
   @createSchema
   Scenario: Get a validation error on an attribute
-    When I add "Content-Type" header equal to "application/vnd.api+json"
-    And I add "Accept" header equal to "application/vnd.api+json"
-    And I send a "POST" request to "/dummies" with body:
+    When I send a "POST" request to "/dummies" with body:
     """
     {
       "data": {
@@ -17,8 +19,8 @@ Feature: JSON API error handling
     }
     """
     Then the response status code should be 400
-    And print last JSON response
-    And I validate it with jsonapi-validator
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON API schema
     And the JSON should be equal to:
     """
     {
@@ -37,9 +39,7 @@ Feature: JSON API error handling
   Scenario: Get a validation error on an relationship
     Given there is a RelatedDummy
     And there is a DummyFriend
-    When I add "Content-Type" header equal to "application/vnd.api+json"
-    And I add "Accept" header equal to "application/vnd.api+json"
-    And I send a "POST" request to "/related_to_dummy_friends" with body:
+    When I send a "POST" request to "/related_to_dummy_friends" with body:
     """
     {
       "data": {
@@ -50,9 +50,9 @@ Feature: JSON API error handling
       }
     }
     """
-    And print last JSON response
     Then the response status code should be 400
-    And I validate it with jsonapi-validator
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON API schema
     And the JSON should be equal to:
     """
     {

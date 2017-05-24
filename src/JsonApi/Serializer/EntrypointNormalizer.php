@@ -46,7 +46,7 @@ final class EntrypointNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint')]];
+        $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -54,8 +54,9 @@ final class EntrypointNormalizer implements NormalizerInterface
             if (!$resourceMetadata->getCollectionOperations()) {
                 continue;
             }
+
             try {
-                $entrypoint['links'][lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+                $entrypoint['links'][lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_URL);
             } catch (InvalidArgumentException $ex) {
                 // Ignore resources without GET operations
             }

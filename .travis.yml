@@ -26,9 +26,7 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install 6.10.2
   - npm install -g swagger-cli
-  - npm install -g jsonapi-validator
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
   - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi

@@ -73,6 +73,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         $context['resource_class'] = $attributes['resource_class'];
         $context['request_uri'] = $request->getRequestUri();
+        $context['uri'] = $request->getUri();
 
         if (isset($attributes['subresource_context'])) {
             $context['subresource_identifiers'] = [];

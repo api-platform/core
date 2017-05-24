@@ -1,15 +1,18 @@
 Feature: JSON API order handling
   In order to be able to handle ordering
   As a client software developer
-  I need to be able to specify ordering parameters according to JSON API recomendation
+  I need to be able to specify ordering parameters according to JSON API recommendation
+
+  Background:
+    Given I add "Content-Type" header equal to "application/vnd.api+json"
+    And I add "Accept" header equal to "application/vnd.api+json"
 
   @createSchema
-  Scenario: Get collection ordered in ascending or descending order on an integer property and on which order filter has been enabled in whitelist mode
+  Scenario: Get collection ordered in ascending order on an integer property and on which order filter has been enabled in whitelist mode
     Given there is "30" dummy objects
-    And I add "Accept" header equal to "application/vnd.api+json"
     When I send a "GET" request to "/dummies?order=id"
     Then the response status code should be 200
-    And I validate it with jsonapi-validator
+    And the JSON should be valid according to the JSON API schema
     And the JSON should be valid according to this schema:
     """
     {
@@ -21,7 +24,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^1$"
                 }
@@ -30,7 +33,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^2$"
                 }
@@ -39,7 +42,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^3$"
                 }
@@ -50,9 +53,11 @@ Feature: JSON API order handling
       }
     }
     """
-    And I send a "GET" request to "/dummies?order=-id"
+
+  Scenario: Get collection ordered in descending order on an integer property and on which order filter has been enabled in whitelist mode
+    When I send a "GET" request to "/dummies?order=-id"
     Then the response status code should be 200
-    And I validate it with jsonapi-validator
+    And the JSON should be valid according to the JSON API schema
     And the JSON should be valid according to this schema:
     """
     {
@@ -64,7 +69,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^30$"
                 }
@@ -73,7 +78,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^29$"
                 }
@@ -82,7 +87,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^28$"
                 }
@@ -96,9 +101,9 @@ Feature: JSON API order handling
 
   @dropSchema
   Scenario: Get collection ordered on two properties previously whitelisted
-    Given I add "Accept" header equal to "application/vnd.api+json"
     When I send a "GET" request to "/dummies?order=description,-id"
-    And the JSON should be valid according to this schema:
+    Then the JSON should be valid according to the JSON API schema
+    Then the JSON should be valid according to this schema:
     """
     {
       "type": "object",
@@ -109,7 +114,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^30$"
                 }
@@ -118,7 +123,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^28$"
                 }
@@ -127,7 +132,7 @@ Feature: JSON API order handling
             {
               "type": "object",
               "properties": {
-                "id": {
+                "_id": {
                   "type": "string",
                   "pattern": "^26$"
                 }
