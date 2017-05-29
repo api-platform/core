@@ -73,6 +73,16 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
+            'oauth' => [
+                'enabled' => false,
+                'clientId' => '',
+                'clientSecret' => '',
+                'type' => 'oauth2',
+                'flow' => 'application',
+                'tokenUrl' => '/oauth/v2/token',
+                'authorizationUrl' => '/oauth/v2/auth',
+                'scopes' => [],
+            ],
             'eager_loading' => [
                 'enabled' => true,
                 'max_joins' => 30,
@@ -80,7 +90,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'fetch_partial' => false,
             ],
             'collection' => [
-                'order' => null,
+                'order' => 'ASC',
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
@@ -92,6 +102,20 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'items_per_page_parameter_name' => 'itemsPerPage',
                     'maximum_items_per_page' => null,
                 ],
+            ],
+            'loader_paths' => [
+                'annotation' => [],
+                'yaml' => [],
+                'xml' => [],
+            ],
+            'api_resources_directory' => 'Entity',
+            'http_cache' => [
+                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
+                'etag' => true,
+                'max_age' => null,
+                'shared_max_age' => null,
+                'vary' => ['Content-Type'],
+                'public' => null,
             ],
         ], $config);
     }

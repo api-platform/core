@@ -17,11 +17,12 @@
 
         "doctrine/inflector": "^1.0",
         "psr/cache": "^1.0",
-        "symfony/http-foundation": "^2.7 || ^3.0",
-        "symfony/http-kernel": "^2.7 || ^3.0",
+        "psr/container": "^1.0",
+        "symfony/http-foundation": "^3.3@beta",
+        "symfony/http-kernel": "^3.3@beta",
         "symfony/property-access": "^2.7 || ^3.0",
-        "symfony/property-info": "^3.1",
-        "symfony/serializer": "^3.1",
+        "symfony/property-info": "^3.3@beta",
+        "symfony/serializer": "^3.3@beta",
         "willdurand/negotiation": "^2.0.3"
     },
     "require-dev": {
@@ -35,30 +36,41 @@
         "doctrine/orm": "^2.5",
         "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0",
+        "guzzlehttp/guzzle": "^6.0",
         "nelmio/api-doc-bundle": "^2.11.2",
         "php-mock/php-mock-phpunit": "^1.1",
         "phpdocumentor/reflection-docblock": "^3.0",
         "phpdocumentor/type-resolver": "^0.2",
         "phpunit/phpunit": "^5.6.8",
         "psr/log": "^1.0",
-        "symfony/asset": "^2.7 || ^3.0",
-        "symfony/cache": "^3.1",
-        "symfony/config": "^3.2",
-        "symfony/dependency-injection": "^2.7 || ^3.0",
+        "sensio/framework-extra-bundle": "^3.0",
+        "symfony/asset": "^3.3@beta",
+        "symfony/cache": "^3.3@beta",
+        "symfony/config": "^3.3@beta",
+        "symfony/console": "^3.3@beta",
+        "symfony/dependency-injection": "^3.3@beta",
         "symfony/doctrine-bridge": "^2.8 || ^3.0",
-        "symfony/finder": "^2.7 || ^3.0",
-        "symfony/framework-bundle": "^3.1",
+        "symfony/event-dispatcher": "^3.3@beta",
+        "symfony/expression-language": "^2.8 || ^3.0",
+        "symfony/finder": "^3.3@beta",
+        "symfony/form": "^3.3@beta",
+        "symfony/framework-bundle": "^3.3@beta",
         "symfony/phpunit-bridge": "^2.7 || ^3.0",
+        "symfony/routing": "^3.3@beta",
         "symfony/security": "^2.7 || ^3.0",
         "symfony/twig-bundle": "^2.8 || ^3.1",
-        "symfony/validator": "^2.7 || ^3.0"
+        "symfony/validator": "^3.3@beta",
+        "symfony/yaml": "^3.3@beta"
     },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
+        "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
+        "symfony/expression-language": "To use authorization features.",
         "symfony/config": "To load XML configuration files.",
+        "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration."
     },
     "autoload": {
@@ -69,7 +81,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0.x-dev"
+            "dev-master": "2.1.x-dev"
         }
     }
 }

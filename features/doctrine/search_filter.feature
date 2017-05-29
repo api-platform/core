@@ -104,6 +104,46 @@ Feature: Search filter on collections
     }
     """
 
+  Scenario: Search collection by name (partial)
+    Given there are "30" embedded dummy objects
+    When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyName=my"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/embedded_dummies/1$"},
+                  {"pattern": "^/embedded_dummies/2$"},
+                  {"pattern": "^/embedded_dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?embeddedDummy\\.dummyName=my"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Search collection by name (partial case insensitive)
     When I send a "GET" request to "/dummies?dummy=somedummytest1"
     Then the response status code should be 200

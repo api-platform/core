@@ -35,6 +35,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class OrderFilter extends AbstractFilter
 {
+    const NULLS_SMALLEST = 'nulls_smallest';
+    const NULLS_LARGEST = 'nulls_largest';
+    const NULLS_DIRECTION_MAP = [
+        self::NULLS_SMALLEST => [
+            'ASC' => 'ASC',
+            'DESC' => 'DESC',
+        ],
+        self::NULLS_LARGEST => [
+            'ASC' => 'DESC',
+            'DESC' => 'ASC',
+        ],
+    ];
+
     /**
      * @var string Keyword used to retrieve the value
      */
@@ -42,6 +55,19 @@ class OrderFilter extends AbstractFilter
 
     public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, string $orderParameterName, LoggerInterface $logger = null, array $properties = null)
     {
+        if (null !== $properties) {
+            $properties = array_map(function ($propertyOptions) {
+                // shorthand for default direction
+                if (is_string($propertyOptions)) {
+                    $propertyOptions = [
+                        'default_direction' => $propertyOptions,
+                    ];
+                }
+
+                return $propertyOptions;
+            }, $properties);
+        }
+
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
         $this->orderParameterName = $orderParameterName;
@@ -59,7 +85,7 @@ class OrderFilter extends AbstractFilter
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
-        foreach ($properties as $property => $defaultDirection) {
+        foreach ($properties as $property => $propertyOptions) {
             if (!$this->isPropertyMapped($property, $resourceClass)) {
                 continue;
             }
@@ -79,13 +105,13 @@ class OrderFilter extends AbstractFilter
      */
     protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if (!$this->isPropertyEnabled($property) || !$this->isPropertyMapped($property, $resourceClass)) {
+        if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
         }
 
-        if (empty($direction) && isset($this->properties[$property])) {
+        if (empty($direction) && null !== $defaultDirection = $this->properties[$property]['default_direction'] ?? null) {
             // fallback to default direction
-            $direction = $this->properties[$property];
+            $direction = $defaultDirection;
         }
 
         $direction = strtoupper($direction);
@@ -96,8 +122,17 @@ class OrderFilter extends AbstractFilter
         $alias = 'o';
         $field = $property;
 
-        if ($this->isPropertyNested($property)) {
-            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+        }
+
+        if (null !== $nullsComparison = $this->properties[$property]['nulls_comparison'] ?? null) {
+            $nullsDirection = self::NULLS_DIRECTION_MAP[$nullsComparison][$direction];
+
+            $nullRankHiddenField = sprintf('_%s_%s_null_rank', $alias, $field);
+
+            $queryBuilder->addSelect(sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
+            $queryBuilder->addOrderBy($nullRankHiddenField, $nullsDirection);
         }
 
         $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $direction);
@@ -106,7 +141,7 @@ class OrderFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
-    protected function extractProperties(Request $request): array
+    protected function extractProperties(Request $request/*, string $resourceClass*/): array
     {
         return $request->query->get($this->orderParameterName, []);
     }

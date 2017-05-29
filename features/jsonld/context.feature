@@ -40,6 +40,7 @@ Feature: JSON-LD contexts generation
             },
             "jsonData": "#Dummy/jsonData",
             "nameConverted": "#Dummy/nameConverted",
+						"id": "#Dummy/id",
             "name": "http://schema.org/name",
             "alias": "https://schema.org/alternateName",
             "foo": "#Dummy/foo"

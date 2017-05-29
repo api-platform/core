@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -41,7 +42,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     public function getCollectionOperationMethod(string $resourceClass, string $operationName): string
     {
-        return $this->getOperationMethod($resourceClass, $operationName, true);
+        return $this->getOperationMethod($resourceClass, $operationName, OperationType::COLLECTION);
     }
 
     /**
@@ -49,7 +50,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     public function getItemOperationMethod(string $resourceClass, string $operationName): string
     {
-        return $this->getOperationMethod($resourceClass, $operationName, false);
+        return $this->getOperationMethod($resourceClass, $operationName, OperationType::ITEM);
     }
 
     /**
@@ -57,7 +58,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     public function getCollectionOperationRoute(string $resourceClass, string $operationName): Route
     {
-        return $this->getOperationRoute($resourceClass, $operationName, true);
+        return $this->getOperationRoute($resourceClass, $operationName, OperationType::COLLECTION);
     }
 
     /**
@@ -65,33 +66,33 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     public function getItemOperationRoute(string $resourceClass, string $operationName): Route
     {
-        return $this->getOperationRoute($resourceClass, $operationName, false);
+        return $this->getOperationRoute($resourceClass, $operationName, OperationType::ITEM);
     }
 
     /**
      * @param string $resourceClass
      * @param string $operationName
-     * @param bool   $collection
+     * @param string $operationType
      *
      * @throws RuntimeException
      *
      * @return string
      */
-    private function getOperationMethod(string $resourceClass, string $operationName, bool $collection): string
+    private function getOperationMethod(string $resourceClass, string $operationName, string $operationType): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        if ($collection) {
-            $method = $resourceMetadata->getCollectionOperationAttribute($operationName, 'method');
-        } else {
+        if ($operationType === OperationType::ITEM) {
             $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
+        } else {
+            $method = $resourceMetadata->getCollectionOperationAttribute($operationName, 'method');
         }
 
         if (null !== $method) {
             return $method;
         }
 
-        if (null === $routeName = $this->getRouteName($resourceMetadata, $operationName, $collection)) {
+        if (null === $routeName = $this->getRouteName($resourceMetadata, $operationName, $operationType)) {
             throw new RuntimeException(sprintf('Either a "route_name" or a "method" operation attribute must exist for the operation "%s" of the resource "%s".', $operationName, $resourceClass));
         }
 
@@ -110,20 +111,20 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      *
      * @param string $resourceClass
      * @param string $operationName
-     * @param bool   $collection
+     * @param string $operationType
      *
      * @throws RuntimeException
      *
      * @return Route
      */
-    private function getOperationRoute(string $resourceClass, string $operationName, bool $collection): Route
+    private function getOperationRoute(string $resourceClass, string $operationName, string $operationType): Route
     {
-        $routeName = $this->getRouteName($this->resourceMetadataFactory->create($resourceClass), $operationName, $collection);
+        $routeName = $this->getRouteName($this->resourceMetadataFactory->create($resourceClass), $operationName, $operationType);
         if (null !== $routeName) {
             return $this->getRoute($routeName);
         }
 
-        $operationNameKey = sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item');
+        $operationNameKey = sprintf('_api_%s_operation_name', $operationType);
 
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
             $currentResourceClass = $route->getDefault('_api_resource_class');
@@ -142,17 +143,17 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      *
      * @param ResourceMetadata $resourceMetadata
      * @param string           $operationName
-     * @param bool             $collection
+     * @param string           $operationType
      *
      * @return string|null
      */
-    private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, bool $collection)
+    private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType)
     {
-        if ($collection) {
-            return $resourceMetadata->getCollectionOperationAttribute($operationName, 'route_name');
+        if ($operationType === OperationType::ITEM) {
+            return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
         }
 
-        return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
+        return $resourceMetadata->getCollectionOperationAttribute($operationName, 'route_name');
     }
 
     /**

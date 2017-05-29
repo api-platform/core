@@ -25,6 +25,7 @@ before_install:
   - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.3.1/php-cs-fixer.phar; fi
   - if [[ $lint = 1 ]]; then composer global require phpstan/phpstan; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
+  - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
 install:
   - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi

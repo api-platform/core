@@ -15,7 +15,7 @@ framework:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
     templating:
-        engines:                       ['twig'] # For Swagger YU
+        engines:                       ['twig'] # For Swagger UI
 
 doctrine:
     dbal:
@@ -49,6 +49,13 @@ api_platform:
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
         ApiPlatform\Core\Exception\InvalidArgumentException: 'HTTP_BAD_REQUEST'
+    http_cache:
+        invalidation:
+            enabled: true
+        max_age:        60
+        shared_max_age: 3600
+        vary:           ['Content-Type', 'Cookie']
+        public:         true
 
 fos_user:
     db_driver:        'orm'
@@ -93,17 +100,18 @@ services:
 
     app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start' } ]
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
 
-    app.my_dummy_resource.order_filter:
+    # Tests if the id default to the service name, do not add id attributes here
+    my_dummy.order:
         parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
+        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
     app.my_dummy_resource.date_filter:
         parent:    'api_platform.doctrine.orm.date_filter'
-        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
 
     app.my_dummy_resource.range_filter:
@@ -113,13 +121,18 @@ services:
 
     app.my_dummy_resource.boolean_filter:
         parent:    'api_platform.doctrine.orm.boolean_filter'
-        arguments: [ { 'dummyBoolean': ~ } ]
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
 
     app.my_dummy_resource.numeric_filter:
         parent:    'api_platform.doctrine.orm.numeric_filter'
         arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
+
+    app.my_dummy_resource.exists_filter:
+        parent:    'api_platform.doctrine.orm.exists_filter'
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
 
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
@@ -130,12 +143,26 @@ services:
         arguments: [ { 'colors.prop': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
 
+    app.entity.filter.dummy_property.property:
+        parent:    'api_platform.serializer.property_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
+
+    app.entity.filter.dummy_group.group:
+        parent:    'api_platform.serializer.group_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.group' } ]
+
+    app.entity.filter.dummy_group.override_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'override_groups', true ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
+
     app.related_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact' } ]
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
-
 
     logger:
         class: Psr\Log\NullLogger
 
+    api_platform.http_cache.purger:
+        class: ApiPlatform\Core\Tests\Fixtures\NullPurger

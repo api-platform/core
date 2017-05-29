@@ -69,7 +69,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             $propertyMetadata['identifier'],
             $propertyMetadata['iri'],
             null,
-            $propertyMetadata['attributes']
+            $propertyMetadata['attributes'],
+            $propertyMetadata['subresource']
         );
     }
 
@@ -113,6 +114,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             'identifier' => 'is',
             'iri' => 'get',
             'attributes' => 'get',
+            'subresource' => 'has',
         ];
 
         foreach ($metadataAccessors as $metadataKey => $accessorPrefix) {

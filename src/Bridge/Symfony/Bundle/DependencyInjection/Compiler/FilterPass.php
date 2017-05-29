@@ -38,13 +38,14 @@ final class FilterPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('api_platform.filter') as $serviceId => $tags) {
             foreach ($tags as $tag) {
                 if (!isset($tag['id'])) {
-                    throw new RuntimeException('Filter tags must have an "id" property.');
+                    $tag['id'] = $serviceId;
                 }
 
                 $filters[$tag['id']] = new Reference($serviceId);
             }
         }
 
-        $container->getDefinition('api_platform.filters')->addArgument($filters);
+        $container->getDefinition('api_platform.filter_locator')->addArgument($filters);
+        $container->getDefinition('api_platform.filter_collection_factory')->addArgument(array_keys($filters));
     }
 }

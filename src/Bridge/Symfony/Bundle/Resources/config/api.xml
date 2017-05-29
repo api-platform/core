@@ -36,6 +36,8 @@
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.resource_class_directories%</argument>
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
 
             <tag name="routing.loader" />
         </service>
@@ -51,6 +53,7 @@
             <argument type="service" id="api_platform.route_name_resolver" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
         </service>
 
         <!-- Serializer -->
@@ -58,6 +61,16 @@
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
+
+        <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Core\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.filter_locator" />
+            <argument type="service" id="api_platform.serializer.context_builder.filter.inner" />
+        </service>
+
+        <service id="api_platform.serializer.property_filter" class="ApiPlatform\Core\Serializer\Filter\PropertyFilter" public="false" abstract="true" />
+
+        <service id="api_platform.serializer.group_filter" class="ApiPlatform\Core\Serializer\Filter\GroupFilter" public="false" abstract="true" />
 
         <service id="api_platform.serializer.normalizer.item" class="ApiPlatform\Core\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -89,6 +102,7 @@
 
         <!-- Event listeners -->
 
+        <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
             <argument>%api_platform.formats%</argument>
@@ -96,10 +110,10 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
         </service>
 
-        <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.read" class="ApiPlatform\Core\EventListener\ReadListener">
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
@@ -146,6 +160,7 @@
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" />
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -165,9 +180,27 @@
             <argument>%api_platform.exception_to_status%</argument>
         </service>
 
+        <!-- Identifiers extractor -->
+
+        <service id="api_platform.identifiers_extractor" class="ApiPlatform\Core\Api\IdentifiersExtractor" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.property_accessor" />
+        </service>
+
+        <service id="api_platform.identifiers_extractor.cached" class="ApiPlatform\Core\Api\CachedIdentifiersExtractor" decorates="api_platform.identifiers_extractor" public="false">
+            <argument type="service" id="api_platform.cache.identifiers_extractor" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached.inner" />
+            <argument type="service" id="api_platform.property_accessor" />
+        </service>
+
         <!-- Cache -->
 
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="api_platform.cache.identifiers_extractor" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
     </services>

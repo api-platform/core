@@ -102,7 +102,7 @@ class SerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeCollectionOperation()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get'];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get', 'resources' => []];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::any(), 'xml', $expectedContext)->willReturn('bar')->shouldBeCalled();
 
@@ -123,7 +123,7 @@ class SerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeItemOperation()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get'];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get', 'resources' => []];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::any(), 'xml', $expectedContext)->willReturn('bar')->shouldBeCalled();
 
