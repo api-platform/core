@@ -60,7 +60,7 @@ final class AddFormatListener
         } elseif (!isset($this->formats[$routeFormat])) {
             throw new NotFoundHttpException('Not Found');
         } else {
-            $mimeTypes = $request->getMimeTypes($routeFormat);
+            $mimeTypes = [$request->getMimeType($routeFormat)];
         }
 
         // First, try to guess the format from the Accept header
