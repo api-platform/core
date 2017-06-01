@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
