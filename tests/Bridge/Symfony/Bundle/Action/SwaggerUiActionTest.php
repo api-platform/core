@@ -30,6 +30,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
 {
+    const SPEC = [
+        'paths' => [
+            '/fs' => ['get' => ['operationId' => 'getFCollection']],
+            '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],
+        ],
+    ];
+
     /**
      * @dataProvider getInvokeParameters
      */
@@ -42,7 +49,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(['Hello' => 'world'])->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(self::SPEC)->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
@@ -69,7 +76,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'formats' => [],
             'swagger_data' => [
                 'url' => '/url',
-                'spec' => ['Hello' => 'world'],
+                'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',
@@ -84,6 +91,8 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
                 'operationId' => 'getFCollection',
                 'id' => null,
                 'queryParameters' => [],
+                'path' => '/fs',
+                'method' => 'get',
             ],
         ])->shouldBeCalled();
 
@@ -94,7 +103,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'formats' => [],
             'swagger_data' => [
                 'url' => '/url',
-                'spec' => ['Hello' => 'world'],
+                'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',
@@ -109,6 +118,8 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
                 'operationId' => 'getFItem',
                 'id' => null,
                 'queryParameters' => [],
+                'path' => '/fs/{id}',
+                'method' => 'get',
             ],
         ])->shouldBeCalled();
 
@@ -128,7 +139,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(['Hello' => 'world'])->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(self::SPEC)->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(\Twig_Environment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
@@ -137,7 +148,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
             'formats' => [],
             'swagger_data' => [
                 'url' => '/url',
-                'spec' => ['Hello' => 'world'],
+                'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',

@@ -1,61 +1,59 @@
-$(function () {
-    var data = JSON.parse($('#swagger-data').html());
-    window.swaggerUi = new SwaggerUi({
-        url: data.url,
-        spec: data.spec,
-        dom_id: 'swagger-ui-container',
-        supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
-        onComplete: function() {
-            if (data.oauth.enabled && 'function' === typeof initOAuth) {
-                initOAuth({
-                    clientId: data.oauth.clientId,
-                    clientSecret: data.oauth.clientSecret,
-                    realm: data.oauth.type,
-                    appName: data.spec.info.title,
-                    scopeSeparator: ' ',
-                    additionalQueryStringParams: {}
-                });
-            }
+window.onload = () => {
+  const data = JSON.parse(document.getElementById('swagger-data').innerText);
+  const ui = SwaggerUIBundle({
+    spec: data.spec,
+    dom_id: '#swagger-ui',
+    validatorUrl: null,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: 'StandaloneLayout'
+  });
 
-            $('pre code').each(function(i, e) {
-                hljs.highlightBlock(e)
-            });
-
-            if (data.operationId !== undefined) {
-                var queryParameters = data.queryParameters;
-                var domSelector = '#' + data.shortName+'_'+data.operationId;
-
-                $(domSelector + ' form.sandbox input.parameter').each(function (i, e) {
-                    var $e = $(e);
-                    var name = $e.attr('name');
-
-                    if (name in queryParameters) {
-                        $e.val(queryParameters[name]);
-                    }
-                });
-
-                if (data.id) {
-                    $(domSelector + ' form.sandbox input[name="id"]').val(data.id);
-                }
-
-                $(domSelector + ' form.sandbox').submit();
-                document.location.hash = '#!/' + data.shortName + '/' + data.operationId;
-            }
-        },
-        onFailure: function() {
-            log('Unable to Load SwaggerUI');
-        },
-        docExpansion: 'list',
-        jsonEditor: false,
-        defaultModelRendering: 'schema',
-        showRequestHeaders: true
+  if (data.oauth.enabled) {
+    ui.initOAuth({
+      clientId: data.oauth.clientId,
+      clientSecret: data.oauth.clientSecret,
+      realm: data.oauth.type,
+      appName: data.spec.info.title,
+      scopeSeparator: ' ',
+      additionalQueryStringParams: {}
     });
+  }
 
-    window.swaggerUi.load();
+  window.ui = ui;
 
-    function log() {
-        if ('console' in window) {
-            console.log.apply(console, arguments);
-        }
+  if (!data.operationId) return;
+
+  const observer = new MutationObserver(function (mutations, self) {
+    const op = document.getElementById(`operations,${data.method}-${data.path},${data.shortName}`);
+    if (!op) return;
+
+    self.disconnect();
+
+    op.querySelector('.opblock-summary').click();
+    op.querySelector('.try-out__btn').click();
+
+    if (data.id) {
+      const inputId = op.querySelector('.parameters input[placeholder="id"]');
+      inputId.value = data.id;
+      inputId.dispatchEvent(new Event('input', { bubbles: true }));
     }
-});
+
+    for (let input of op.querySelectorAll('.parameters input')) {
+      if (input.placeholder in data.queryParameters) {
+        input.value = data.queryParameters[input.placeholder];
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+
+    op.querySelector('.execute').click();
+    op.scrollIntoView();
+  });
+
+  observer.observe(document, {childList: true, subtree: true});
+};
