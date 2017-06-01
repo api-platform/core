@@ -34,7 +34,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         'paths' => [
             '/fs' => ['get' => ['operationId' => 'getFCollection']],
             '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],
-        ]
+        ],
     ];
 
     /**
