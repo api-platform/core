@@ -39,7 +39,8 @@ window.onload = () => {
     op.querySelector('.try-out__btn').click();
 
     if (data.id) {
-      const inputId = op.querySelector('.parameters input[placeholder="id"]').value = data.id;
+      const inputId = op.querySelector('.parameters input[placeholder="id"]');
+      inputId.value = data.id;
       inputId.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
