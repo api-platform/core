@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
@@ -21,6 +25,7 @@ use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -223,6 +228,24 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         });
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(ItemDataProviderInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.item_data_provider')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(CollectionDataProviderInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.collection_data_provider')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
+
+        $containerBuilderProphecy->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.collection')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
         ])->shouldBeCalled();
