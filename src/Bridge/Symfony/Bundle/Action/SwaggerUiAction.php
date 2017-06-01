@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -117,8 +118,23 @@ final class SwaggerUiAction
             } elseif (null !== $itemOperationName = $request->attributes->get('_api_item_operation_name')) {
                 $swaggerData['operationId'] = sprintf('%s%sItem', $itemOperationName, $swaggerData['shortName']);
             }
+
+            list($swaggerData['path'], $swaggerData['method']) = $this->getPathAndMethod($swaggerData);
         }
 
         return $context + ['swagger_data' => $swaggerData];
+    }
+
+    private function getPathAndMethod(array $swaggerData): array
+    {
+        foreach ($swaggerData['spec']['paths'] as $path => $operations) {
+            foreach ($operations as $method => $operation) {
+                if ($operation['operationId'] === $swaggerData['operationId']) {
+                    return [$path, $method];
+                }
+            }
+        }
+
+        throw new RuntimeException(sprintf('The operation "%s" cannot be found in the Swagger specification.', $swaggerData['operationId']));
     }
 }
