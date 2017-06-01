@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
-use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
@@ -238,10 +237,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(CollectionDataProviderInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.collection_data_provider')->shouldBeCalledTimes(1);
-
-        $containerBuilderProphecy->registerForAutoconfiguration(FilterInterface::class)
-            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
-        $childDefinitionProphecy->addTag('api_platform.filter')->shouldBeCalledTimes(1);
 
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
