@@ -25,22 +25,22 @@ class VarnishPurgerTest extends \PHPUnit_Framework_TestCase
     public function testPurge()
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->requestAsync('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy1->requestAsync('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(ClientInterface::class);
-        $clientProphecy2->requestAsync('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy2->requestAsync('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))']])->willReturn(new Response())->shouldBeCalled();
 
         $purger = new VarnishPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);
-        $purger->purge(['/foo', '/bar']);
+        $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
     public function testEmptyTags()
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->requestAsync()->shouldNotBeCalled();
+        $clientProphecy1->request()->shouldNotBeCalled();
 
         $purger = new VarnishPurger([$clientProphecy1->reveal()]);
         $purger->purge([]);
