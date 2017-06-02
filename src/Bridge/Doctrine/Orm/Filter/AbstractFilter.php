@@ -233,7 +233,9 @@ abstract class AbstractFilter implements FilterInterface
                     @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
                 }
             }
+        }
 
+        if (!isset($resourceClass)) {
             return [
                 'associations' => array_slice($parts, 0, -1),
                 'field' => end($parts),
