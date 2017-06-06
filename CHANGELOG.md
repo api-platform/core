@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.9
+
+* Add support for Symfony 3.3
+* Disable the partial eager loading by default
+* Fix support for ignored attributes in normalizers
+* Specify the `LEFT JOIN` clause for filter associations
+* Move the metadata from validator factory to the validator.xml file
+* Throw an exception when the number of items per page is 0
+* Improve the Continuous Integration process
+
 ## 2.0.8
 
 * Leverage serialization groups to eager load data
