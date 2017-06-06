@@ -25,9 +25,11 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -84,6 +86,11 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, 'my_path_op', ['GET'], true),
             $routeCollection->get('api_dummies_my_path_op_collection')
         );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class]], 'collection' => true]),
+            $routeCollection->get('api_dummies_subresources_get_subresource')
+        );
     }
 
     /**
@@ -132,7 +139,45 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $this->getApiLoaderWithResourceMetadata(new ResourceMetadata())->load(null);
     }
 
-    private function getApiLoaderWithResourceMetadata(ResourceMetadata $resourceMetadata): ApiLoader
+    public function testRecursiveSubresource()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withShortName('dummy');
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+            'get' => ['method' => 'GET'],
+            'put' => ['method' => 'PUT'],
+            'delete' => ['method' => 'DELETE'],
+        ]);
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name'], //with controller
+            'my_second_op' => ['method' => 'POST'], //without controller, takes the default one
+            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path'], //custom path
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata, true)->load(null);
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/dummies/{id}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_dummies_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', DummyEntity::class]], 'collection' => true]),
+            $routeCollection->get('api_dummies_subresources_get_subresource')
+        );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource/{recursivesubresource}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_related_dummies_recursivesubresource_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', RelatedDummyEntity::class], ['recursivesubresource', DummyEntity::class]], 'collection' => true]),
+            $routeCollection->get('api_related_dummies_recursivesubresource_subresources_get_subresource')
+        );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_related_dummies_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class]], 'collection' => false]),
+            $routeCollection->get('api_related_dummies_recursivesubresource_get_subresource')
+        );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/dummies/{id}/subresources/{subresource}/recursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_dummies_subresources_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', DummyEntity::class], ['subresource', RelatedDummyEntity::class]], 'collection' => false]),
+            $routeCollection->get('api_dummies_subresources_recursivesubresource_get_subresource')
+        );
+    }
+
+    private function getApiLoaderWithResourceMetadata(ResourceMetadata $resourceMetadata, $recursiveSubresource = false): ApiLoader
     {
         $routingConfig = __DIR__.'/../../../../src/Bridge/Symfony/Bundle/Resources/config/routing';
 
@@ -156,15 +201,33 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->willReturn((new ResourceMetadata())->withShortName('related_dummies'));
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class]));
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class, RelatedDummyEntity::class]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->willReturn(new PropertyNameCollection(['id']));
+        $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->willReturn(new PropertyNameCollection(['id', 'subresource']));
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummyEntity::class)->willReturn(new PropertyNameCollection(['id', 'recursivesubresource']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->willReturn(new PropertyMetadata());
         $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'id')->willReturn(new PropertyMetadata());
+
+        $relatedType = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummyEntity::class);
+
+        $subResourcePropertyMetadata = (new PropertyMetadata())
+                                        ->withSubresource(true)
+                                        ->withType(new Type(Type::BUILTIN_TYPE_ARRAY, false, \ArrayObject::class, true, null, $relatedType));
+
+        if (false === $recursiveSubresource) {
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')->willReturn(new PropertyMetadata());
+        } else {
+            $dummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyEntity::class);
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')->willReturn((new PropertyMetadata())->withSubresource(true)->withType($dummyType));
+        }
+
+        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->willReturn($subResourcePropertyMetadata);
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
@@ -188,6 +251,25 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             '',
             [],
             $methods
+        );
+    }
+
+    private function getSubresourceRoute(string $path, string $controller, string $resourceClass, string $operationName, array $context): Route
+    {
+        return new Route(
+            $path,
+            [
+                '_controller' => $controller,
+                '_format' => null,
+                '_api_resource_class' => $resourceClass,
+                '_api_subresource_operation_name' => $operationName,
+                '_api_subresource_context' => $context,
+            ],
+            [],
+            [],
+            '',
+            [],
+            ['GET']
         );
     }
 }

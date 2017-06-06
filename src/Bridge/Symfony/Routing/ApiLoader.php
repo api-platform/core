@@ -125,7 +125,7 @@ final class ApiLoader extends Loader
      * @param string          $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array           $parentOperation   the previous call operation
      */
-    private function computeSubresourceOperations(RouteCollection $routeCollection, string $resourceClass, string $rootResourceClass = null, array $parentOperation = null)
+    private function computeSubresourceOperations(RouteCollection $routeCollection, string $resourceClass, string $rootResourceClass = null, array $parentOperation = null, array $visited = [])
     {
         if (null === $this->propertyNameCollectionFactory || null === $this->propertyMetadataFactory) {
             return;
@@ -152,6 +152,12 @@ final class ApiLoader extends Loader
                 'collection' => $isCollection,
             ];
 
+            $visiting = "$resourceClass$subresource";
+
+            if (in_array($visiting, $visited, true)) {
+                continue;
+            }
+
             if (null === $parentOperation) {
                 $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
                 $rootShortname = $rootResourceMetadata->getShortName();
@@ -166,6 +172,8 @@ final class ApiLoader extends Loader
                 $operation['route_name'] = str_replace(self::SUBRESOURCE_SUFFIX, "_$propertyName".self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
                 $operation['path'] = $this->operationPathResolver->resolveOperationPath($parentOperation['path'], $operation, OperationType::SUBRESOURCE);
             }
+
+            $visited[] = $visiting;
 
             $route = new Route(
                 $operation['path'],
@@ -189,7 +197,7 @@ final class ApiLoader extends Loader
 
             $routeCollection->add($operation['route_name'], $route);
 
-            $this->computeSubresourceOperations($routeCollection, $subresource, $rootResourceClass, $operation);
+            $this->computeSubresourceOperations($routeCollection, $subresource, $rootResourceClass, $operation, $visited);
         }
     }
 
