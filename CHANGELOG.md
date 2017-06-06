@@ -1,5 +1,30 @@
 # Changelog
 
+## 2.1.0
+
+* Add a builtin HTTP cache invalidation system able to store all requests in Varnish (or any other proxy supporting cache tags) and purge it instantly when needed
+* Add an authorization system configurable directly from the resource class
+* Add support for subresources (like `/posts/1/comments` or `/posts/1/comments/2`
+* Revamp the automatic documentation UI (upgraded to the React-based version of Swagger UI, added a custom stylesheet)
+* Add a new filter to select explicitly which properties to serialize
+* Add a new filter to choose which serialization group to apply
+* Add a new filter to test if a property value exists or not
+* Add support for OAuth 2 in the UI
+* Add support for embedded fields
+* Add support for customizable API resources folder's name
+* Filters's ids now defaults to the Symfony's service name
+* Add configuration option to define custom metadata loader paths
+* Make Swagger UI compatible with a strict CSP environment
+* Add nulls comparison to OrderFilter
+* Add a flag to disable all request listeners
+* Add a default order option in the configuration
+* Allow to disable all operations using the XML configuration format and deprecate the previous format
+* Allow upper cased property names
+* Improve the overall performance by optimizing `RequestAttributesExtractor`
+* Improve the perofrmance of the filters subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
+* Add compatibility with Symfony Flex and Symfony 4
+* Allow the Symfony Dependency Injection component to autoconfigure data providers and query extensions
+
 ## 2.0.9
 
 * Add support for Symfony 3.3
