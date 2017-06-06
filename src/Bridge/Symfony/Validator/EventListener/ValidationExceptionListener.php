@@ -51,7 +51,7 @@ final class ValidationExceptionListener
 
         $event->setResponse(new Response(
                 $this->serializer->serialize($exception->getConstraintViolationList(), $format['key']),
-                Response::HTTP_BAD_REQUEST,
+                $exception->hasOnlyConstraintUniqueViolation() ? Response::HTTP_CONFLICT : Response::HTTP_BAD_REQUEST,
                 [
                     'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),
                     'X-Content-Type-Options' => 'nosniff',

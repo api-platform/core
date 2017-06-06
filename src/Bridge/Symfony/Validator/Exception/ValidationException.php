@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Exception;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -39,5 +40,25 @@ final class ValidationException extends \RuntimeException
     public function getConstraintViolationList()
     {
         return $this->constraintViolationList;
+    }
+
+    /**
+     * Check if the list violation only contains Unique Violation.
+     *
+     * @return bool
+     */
+    public function hasOnlyConstraintUniqueViolation()
+    {
+        if (count($this->constraintViolationList) > 0) {
+            foreach ($this->constraintViolationList as $constraintViolation) {
+                if (UniqueEntity::NOT_UNIQUE_ERROR !== $constraintViolation->getCode()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
