@@ -22,7 +22,7 @@ use ApiPlatform\Core\Serializer\ContextTrait;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+class ItemNormalizer extends AbstractItemNormalizer
 {
     use ContextTrait;
 
