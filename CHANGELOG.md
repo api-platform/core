@@ -21,7 +21,7 @@
 * Allow to disable all operations using the XML configuration format and deprecate the previous format
 * Allow upper cased property names
 * Improve the overall performance by optimizing `RequestAttributesExtractor`
-* Improve the perofrmance of the filters subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
+* Improve the performance of the filters subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
 * Add compatibility with Symfony Flex and Symfony 4
 * Allow the Symfony Dependency Injection component to autoconfigure data providers and query extensions
 
