@@ -175,6 +175,16 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             $this->getSubresourceRoute('/dummies/{id}/subresources/{subresource}/recursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_dummies_subresources_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', DummyEntity::class], ['subresource', RelatedDummyEntity::class]], 'collection' => false]),
             $routeCollection->get('api_dummies_subresources_recursivesubresource_get_subresource')
         );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/related_dummies/{id}/secondrecursivesubresource/{secondrecursivesubresource}/subresources.{_format}', 'api_platform.action.get_subresource', RelatedDummyEntity::class, 'api_related_dummies_secondrecursivesubresource_subresources_get_subresource', ['property' => 'subresource', 'identifiers' => [['id', RelatedDummyEntity::class], ['secondrecursivesubresource', DummyEntity::class]], 'collection' => true]),
+            $routeCollection->get('api_related_dummies_secondrecursivesubresource_subresources_get_subresource')
+        );
+
+        $this->assertEquals(
+            $this->getSubresourceRoute('/related_dummies/{id}/secondrecursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_related_dummies_secondrecursivesubresource_get_subresource', ['property' => 'secondrecursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class]], 'collection' => false]),
+            $routeCollection->get('api_related_dummies_secondrecursivesubresource_get_subresource')
+        );
     }
 
     private function getApiLoaderWithResourceMetadata(ResourceMetadata $resourceMetadata, $recursiveSubresource = false): ApiLoader
@@ -208,7 +218,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->willReturn(new PropertyNameCollection(['id', 'subresource']));
-        $propertyNameCollectionFactoryProphecy->create(RelatedDummyEntity::class)->willReturn(new PropertyNameCollection(['id', 'recursivesubresource']));
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummyEntity::class)->willReturn(new PropertyNameCollection(['id', 'recursivesubresource', 'secondrecursivesubresource']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->willReturn(new PropertyMetadata());
@@ -222,9 +232,11 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
 
         if (false === $recursiveSubresource) {
             $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')->willReturn(new PropertyMetadata());
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')->willReturn(new PropertyMetadata());
         } else {
             $dummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyEntity::class);
             $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')->willReturn((new PropertyMetadata())->withSubresource(true)->withType($dummyType));
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')->willReturn((new PropertyMetadata())->withSubresource(true)->withType($dummyType));
         }
 
         $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->willReturn($subResourcePropertyMetadata);
