@@ -152,11 +152,13 @@ final class ApiLoader extends Loader
                 'collection' => $isCollection,
             ];
 
-            $visiting = "$resourceClass$subresource";
+            $visiting = "$rootResourceClass $resourceClass $propertyName $subresource";
 
             if (in_array($visiting, $visited, true)) {
                 continue;
             }
+
+            $visited[] = $visiting;
 
             if (null === $parentOperation) {
                 $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
@@ -172,8 +174,6 @@ final class ApiLoader extends Loader
                 $operation['route_name'] = str_replace(self::SUBRESOURCE_SUFFIX, "_$propertyName".self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
                 $operation['path'] = $this->operationPathResolver->resolveOperationPath($parentOperation['path'], $operation, OperationType::SUBRESOURCE);
             }
-
-            $visited[] = $visiting;
 
             $route = new Route(
                 $operation['path'],
