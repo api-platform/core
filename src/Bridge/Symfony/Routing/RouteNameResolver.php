@@ -41,7 +41,6 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $context = func_get_arg(2);
         } else {
             $context = [];
-            @trigger_error(sprintf('Method %s() will have a third `$context = []` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
         }
 
         $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
