@@ -195,8 +195,18 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 }
 
                 //the field test allows to add methods to a Resource which do not reflect real database fields
-                if (true === $targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || true === $propertyMetadata->isReadable())) {
+                if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
                     $select[] = $property;
+                }
+
+                if (array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
+                    foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+                        $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+                        $propertyName = "$property.$embeddedProperty";
+                        if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                            $select[] = $propertyName;
+                        }
+                    }
                 }
             }
 
