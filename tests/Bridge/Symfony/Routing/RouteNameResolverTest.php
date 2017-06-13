@@ -22,7 +22,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
- * @group legacy
  */
 class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,10 +50,14 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $routeNameResolver->getRouteName('AppBundle\Entity\User', false);
+        $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
     }
 
-    public function testGetRouteNameForItemRoute()
+    /**
+     * @group legacy
+     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     */
+    public function testGetRouteNameForItemRouteLegacy()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
@@ -75,6 +78,27 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('some_item_route', $actual);
     }
 
+    public function testGetRouteNameForItemRoute()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_collection_operation_name' => 'some_collection_op',
+        ]));
+        $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_item_operation_name' => 'some_item_op',
+        ]));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection);
+
+        $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
+        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
+
+        $this->assertSame('some_item_route', $actual);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
@@ -91,7 +115,32 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $routeNameResolver->getRouteName('AppBundle\Entity\User', true);
+        $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     */
+    public function testGetRouteNameForCollectionRouteLegacy()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_item_operation_name' => 'some_item_op',
+        ]));
+        $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_collection_operation_name' => 'some_collection_op',
+        ]));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection);
+
+        $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
+        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', true);
+
+        $this->assertSame('some_collection_route', $actual);
     }
 
     public function testGetRouteNameForCollectionRoute()
@@ -110,7 +159,7 @@ class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $routerProphecy->getRouteCollection()->willReturn($routeCollection);
 
         $routeNameResolver = new RouteNameResolver($routerProphecy->reveal());
-        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', true);
+        $actual = $routeNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
 
         $this->assertSame('some_collection_route', $actual);
     }
