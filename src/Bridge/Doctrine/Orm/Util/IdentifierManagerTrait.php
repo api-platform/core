@@ -50,6 +50,10 @@ trait IdentifierManagerTrait
 
             // first transform identifiers to a proper key/value array
             foreach (explode(';', $id) as $identifier) {
+                if (!$identifier) {
+                    continue;
+                }
+
                 $identifierPair = explode('=', $identifier);
                 $identifiersMap[$identifierPair[0]] = $identifierPair[1];
             }

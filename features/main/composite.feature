@@ -120,6 +120,11 @@ Feature: Retrieve data with Composite identifiers
     }
     """
 
+  Scenario: Get the first composite relation with a missing identifier
+    Given there are Composite identifier objects
+    When I send a "GET" request to "/composite_relations/compositeLabel=1;"
+    Then the response status code should be 400
+
   @dropSchema
   Scenario: Get first composite item
     Given there are Composite identifier objects
