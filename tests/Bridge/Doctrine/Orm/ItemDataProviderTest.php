@@ -121,6 +121,28 @@ class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $dataProvider->getItem(Dummy::class, 'ida=1;idb=2', 'foo'));
     }
 
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     */
+    public function testGetItemWrongCompositeIdentifier()
+    {
+        list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
+            'ida',
+            'idb',
+        ]);
+        $managerRegistry = $this->getManagerRegistry(Dummy::class, [
+            'ida' => [
+                'type' => DBALType::INTEGER,
+            ],
+            'idb' => [
+                'type' => DBALType::INTEGER,
+            ],
+        ], $this->prophesize(QueryBuilder::class)->reveal());
+
+        $dataProvider = new ItemDataProvider($managerRegistry, $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider->getItem(Dummy::class, 'ida=1;', 'foo');
+    }
+
     public function testQueryResultExtension()
     {
         $comparisonProphecy = $this->prophesize(Comparison::class);
