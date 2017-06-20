@@ -49,6 +49,10 @@ final class AddHeadersListener
 
         $response = $event->getResponse();
 
+        if (!$response->getContent()) {
+            return;
+        }
+
         if ($this->etag) {
             $response->setEtag(md5($response->getContent()));
         }
