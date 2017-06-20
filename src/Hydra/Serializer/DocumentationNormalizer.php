@@ -95,7 +95,15 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@type' => 'hydra:Link',
                 'domain' => '#Entrypoint',
                 'rdfs:label' => "The collection of $shortName resources",
-                'range' => 'hydra:PagedCollection',
+                'rdfs:range' => [
+                    'hydra:PagedCollection',
+                    [
+                        'owl:equivalentClass' => [
+                            'owl:onProperty' => 'hydra:member',
+                            'owl:allValuesFrom' => "#$shortName",
+                        ],
+                    ],
+                ],
                 'hydra:supportedOperation' => $hydraCollectionOperations,
             ],
             'hydra:title' => "The collection of $shortName resources",
@@ -423,14 +431,22 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
+        $propertyData = [
+            '@id' => $propertyMetadata->getIri() ?? "#$shortName/$propertyName",
+            '@type' => $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'hydra:Link',
+            'rdfs:label' => $propertyName,
+            'domain' => $prefixedShortName,
+        ];
+
+        $type = $propertyMetadata->getType();
+
+        if (null !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
+            $propertyData['owl:maxCardinality'] = 1;
+        }
+
         $property = [
             '@type' => 'hydra:SupportedProperty',
-            'hydra:property' => [
-                '@id' => $propertyMetadata->getIri() ?? "#$shortName/$propertyName",
-                '@type' => $propertyMetadata->isReadableLink() ? 'rdf:Property' : 'hydra:Link',
-                'rdfs:label' => $propertyName,
-                'domain' => $prefixedShortName,
-            ],
+            'hydra:property' => $propertyData,
             'hydra:title' => $propertyName,
             'hydra:required' => $propertyMetadata->isRequired(),
             'hydra:readable' => $propertyMetadata->isReadable(),
