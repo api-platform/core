@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\DataProvider\SerializerAwareDataProviderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -55,6 +56,11 @@ final class DataProviderPass implements CompilerPassInterface
             foreach ($tags as $attributes) {
                 $priority = $attributes['priority'] ?? 0;
                 $queue->insert(new Reference($serviceId), $priority);
+
+                $definition = $container->getDefinition($serviceId);
+                if (is_subclass_of($definition->getClass(), SerializerAwareDataProviderInterface::class)) {
+                    $definition->addMethodCall('setSerializerLocator', [$container->getDefinition('api_platform.serializer_locator')]);
+                }
             }
         }
 

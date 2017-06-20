@@ -5,6 +5,13 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.serializer_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
+            <tag name="container.service_locator" />
+            <argument type="collection">
+                <argument key="serializer" type="service" id="api_platform.serializer" />
+            </argument>
+        </service>
+
         <service id="api_platform.item_data_provider" class="ApiPlatform\Core\DataProvider\ChainItemDataProvider" />
 
         <service id="api_platform.collection_data_provider" class="ApiPlatform\Core\DataProvider\ChainCollectionDataProvider" />

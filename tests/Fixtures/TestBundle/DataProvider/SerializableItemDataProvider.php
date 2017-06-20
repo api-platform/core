@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SerializerAwareDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SerializerAwareDataProviderTrait;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SerializableResource;
-use Symfony\Component\Serializer\SerializerAwareInterface;
-use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * @author Vincent Chalamon <vincent@les-tilleuls.coop>
  */
-class SerializableItemDataProvider implements ItemDataProviderInterface, SerializerAwareInterface
+class SerializableItemDataProvider implements ItemDataProviderInterface, SerializerAwareDataProviderInterface
 {
-    use SerializerAwareTrait;
+    use SerializerAwareDataProviderTrait;
 
     /**
      * {@inheritdoc}
@@ -35,7 +35,7 @@ class SerializableItemDataProvider implements ItemDataProviderInterface, Seriali
             throw new ResourceClassNotSupportedException();
         }
 
-        return $this->serializer->deserialize(<<<'JSON'
+        return $this->getSerializer()->deserialize(<<<'JSON'
 {
     "id": 1,
     "foo": "Lorem",

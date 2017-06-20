@@ -102,7 +102,7 @@ services:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
         public: false
         tags:
-            -  { name: 'api_platform.item_data_provider' }
+            -  { name: 'serializer.normalizer' }
 
     app.user_manager:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
