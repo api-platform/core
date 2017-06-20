@@ -64,6 +64,9 @@
         "symfony/validator": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0"
     },
+    "conflict": {
+        "symfony/dependency-injection": "<3.3"
+    },
     "suggest": {
         "friendsofsymfony/user-bundle": "To use the FOSUserBundle bridge.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
