@@ -56,7 +56,7 @@ class AddHeadersListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testAddHeaders()
+    public function testDoNotSetHeaderWhenNoContent()
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response();
@@ -65,10 +65,25 @@ class AddHeadersListenerTest extends \PHPUnit_Framework_TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
+        $listener = new AddHeadersListener(true);
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertNull($response->getEtag());
+    }
+
+    public function testAddHeaders()
+    {
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $response = new Response('some content');
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
         $listener = new AddHeadersListener(true, 100, 200, ['Content-Type'], true);
         $listener->onKernelResponse($event->reveal());
 
-        $this->assertSame('"d41d8cd98f00b204e9800998ecf8427e"', $response->getEtag());
+        $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
         $this->assertSame(['Content-Type'], $response->getVary());
     }
