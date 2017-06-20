@@ -42,12 +42,15 @@ class RouterOperationPathResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveOperationPathWithSubresource()
     {
-        $operationPathResolverProphecy = $this->prophesize(OperationPathResolverInterface::class);
-        $operationPathResolverProphecy->resolveOperationPath('Bar', Argument::type('array'), OperationType::SUBRESOURCE, 'api_foos_bars_get_subresource')->willReturn('/foos/{id}/bars.{_format}')->shouldBeCalled();
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('api_foos_bars_get_subresource', new Route('/foos/{id}/bars'));
 
-        $operationPathResolver = new RouterOperationPathResolver($this->prophesize(RouterInterface::class)->reveal(), $operationPathResolverProphecy->reveal());
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->willReturn($routeCollection)->shouldBeCalled();
 
-        $this->assertEquals('/foos/{id}/bars.{_format}', $operationPathResolver->resolveOperationPath('Bar', [], OperationType::SUBRESOURCE, 'api_foos_bars_get_subresource'));
+        $operationPathResolver = new RouterOperationPathResolver($routerProphecy->reveal(), $this->prophesize(OperationPathResolverInterface::class)->reveal());
+
+        $this->assertEquals('/foos/{id}/bars', $operationPathResolver->resolveOperationPath('Foo', ['property' => 'bar', 'collection' => true], OperationType::SUBRESOURCE, 'get'));
     }
 
     public function testResolveOperationPathWithRouteNameGeneration()
