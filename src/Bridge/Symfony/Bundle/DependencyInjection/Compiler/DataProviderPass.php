@@ -53,14 +53,14 @@ final class DataProviderPass implements CompilerPassInterface
         $queue = new \SplPriorityQueue();
 
         foreach ($services as $serviceId => $tags) {
+            $definition = $container->getDefinition($serviceId);
+            if (is_subclass_of($definition->getClass(), SerializerAwareDataProviderInterface::class)) {
+                $definition->addMethodCall('setSerializerLocator', [$container->getDefinition('api_platform.serializer_locator')]);
+            }
+
             foreach ($tags as $attributes) {
                 $priority = $attributes['priority'] ?? 0;
                 $queue->insert(new Reference($serviceId), $priority);
-
-                $definition = $container->getDefinition($serviceId);
-                if (is_subclass_of($definition->getClass(), SerializerAwareDataProviderInterface::class)) {
-                    $definition->addMethodCall('setSerializerLocator', [$container->getDefinition('api_platform.serializer_locator')]);
-                }
             }
         }
 
