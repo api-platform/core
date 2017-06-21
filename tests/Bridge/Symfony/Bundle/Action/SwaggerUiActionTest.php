@@ -49,7 +49,7 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
@@ -138,8 +138,9 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json')->willReturn(self::SPEC)->shouldBeCalled();
+        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(\Twig_Environment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [

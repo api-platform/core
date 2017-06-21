@@ -27,8 +27,12 @@ final class DashOperationPathResolver implements OperationPathResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
+        if (func_num_args() < 4) {
+            @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
 
         if ($operationType === OperationType::SUBRESOURCE && 1 < count($operation['identifiers'])) {

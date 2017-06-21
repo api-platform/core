@@ -13,7 +13,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.operation_path_resolver" />
-            <argument type="service" id="api_platform.router" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument>%api_platform.oauth.enabled%</argument>

@@ -38,6 +38,9 @@ use Symfony\Component\Routing\RouteCollection;
  */
 final class ApiLoader extends Loader
 {
+    /**
+     * @deprecated since version 2.1, to be removed in 3.0. Use {@see RouteNameGenerator::ROUTE_NAME_PREFIX} instead.
+     */
     const ROUTE_NAME_PREFIX = 'api_';
     const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
     const SUBRESOURCE_SUFFIX = '_get_subresource';
@@ -166,13 +169,13 @@ final class ApiLoader extends Loader
                 $resourceRouteName = $this->routeNameResolver($rootShortname);
 
                 $operation['identifiers'] = [['id', $rootResourceClass]];
-                $operation['route_name'] = sprintf('%s%s_%s%s', self::ROUTE_NAME_PREFIX, $resourceRouteName, $propertyName, self::SUBRESOURCE_SUFFIX);
-                $operation['path'] = $this->operationPathResolver->resolveOperationPath($rootShortname, $operation, OperationType::SUBRESOURCE);
+                $operation['route_name'] = sprintf('%s%s_%s%s', RouteNameGenerator::ROUTE_NAME_PREFIX, $resourceRouteName, $propertyName, self::SUBRESOURCE_SUFFIX);
+                $operation['path'] = $this->operationPathResolver->resolveOperationPath($rootShortname, $operation, OperationType::SUBRESOURCE, $operation['route_name']);
             } else {
                 $operation['identifiers'] = $parentOperation['identifiers'];
                 $operation['identifiers'][] = [$parentOperation['property'], $resourceClass];
                 $operation['route_name'] = str_replace(self::SUBRESOURCE_SUFFIX, "_$propertyName".self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
-                $operation['path'] = $this->operationPathResolver->resolveOperationPath($parentOperation['path'], $operation, OperationType::SUBRESOURCE);
+                $operation['path'] = $this->operationPathResolver->resolveOperationPath($parentOperation['path'], $operation, OperationType::SUBRESOURCE, $operation['route_name']);
             }
 
             $route = new Route(
@@ -245,28 +248,16 @@ final class ApiLoader extends Loader
             throw new RuntimeException('Either a "route_name" or a "method" operation attribute must exist.');
         }
 
-        $controller = $operation['controller'] ?? null;
-        $actionName = sprintf('%s_%s', strtolower($operation['method']), $operationType);
-
-        if (null === $controller) {
-            $controller = self::DEFAULT_ACTION_PATTERN.$actionName;
+        if (null === $controller = $operation['controller'] ?? null) {
+            $controller = sprintf('%s%s_%s', self::DEFAULT_ACTION_PATTERN, strtolower($operation['method']), $operationType);
 
             if (!$this->container->has($controller)) {
                 throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', $operationType, $operation['method']));
             }
         }
 
-        if ($operationName !== strtolower($operation['method'])) {
-            $actionName = sprintf('%s_%s', $operationName, $operationType);
-        }
-
-        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType);
-
-        $resourceRouteName = $this->routeNameResolver($resourceShortName);
-        $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $resourceRouteName, $actionName);
-
         $route = new Route(
-            $path,
+            $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName),
             [
                 '_controller' => $controller,
                 '_format' => null,
@@ -280,6 +271,6 @@ final class ApiLoader extends Loader
             [$operation['method']]
         );
 
-        $routeCollection->add($routeName, $route);
+        $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);
     }
 }

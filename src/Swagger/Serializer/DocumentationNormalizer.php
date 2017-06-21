@@ -51,7 +51,6 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $operationPathResolver;
-    private $urlGenerator;
     private $nameConverter;
     private $oauthEnabled;
     private $oauthType;
@@ -63,8 +62,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
     {
+        if ($urlGenerator) {
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
+        }
+
         $this->setFilterLocator($filterLocator, true);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -73,7 +76,6 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->operationPathResolver = $operationPathResolver;
-        $this->urlGenerator = $urlGenerator;
         $this->nameConverter = $nameConverter;
         $this->oauthEnabled = $oauthEnabled;
         $this->oauthType = $oauthType;
@@ -103,7 +105,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $definitions->ksort();
         $paths->ksort();
 
-        return $this->computeDoc($object, $definitions, $paths);
+        return $this->computeDoc($object, $definitions, $paths, $context);
     }
 
     /**
@@ -124,7 +126,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         foreach ($operations as $operationName => $operation) {
-            $path = $this->getPath($resourceShortName, $operation, $operationType);
+            $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
             $method = $operationType === OperationType::ITEM ? $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
 
             $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, $operationType, $resourceClass, $resourceMetadata, $mimeTypes, $definitions);
@@ -140,14 +142,15 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @see https://github.com/OAI/OpenAPI-Specification/issues/93
      *
      * @param string $resourceShortName
+     * @param string $operationName
      * @param array  $operation
      * @param string $operationType
      *
      * @return string
      */
-    private function getPath(string $resourceShortName, array $operation, string $operationType): string
+    private function getPath(string $resourceShortName, string $operationName, array $operation, string $operationType): string
     {
-        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType);
+        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
         if ('.{_format}' === substr($path, -10)) {
             $path = substr($path, 0, -10);
         }
@@ -211,7 +214,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
 
-        if ($operationType === OperationType::COLLECTION || $operationType === OperationType::SUBRESOURCE) {
+        if ($operationType === OperationType::COLLECTION) {
             $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
             $pathOperation['responses'] ?? $pathOperation['responses'] = [
                 '200' => [
@@ -526,14 +529,15 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param Documentation $documentation
      * @param \ArrayObject  $definitions
      * @param \ArrayObject  $paths
+     * @param array         $context
      *
      * @return array
      */
-    private function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths): array
+    private function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths, array $context): array
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
-            'basePath' => $this->urlGenerator->generate('api_entrypoint'),
+            'basePath' => $context['base_url'] ?? '/',
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),

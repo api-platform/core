@@ -92,7 +92,7 @@ final class SwaggerUiAction
 
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
-            'spec' => $this->normalizer->normalize($documentation, 'json'),
+            'spec' => $this->normalizer->normalize($documentation, 'json', ['base_url' => $request->getBaseUrl()]),
         ];
 
         $swaggerData['oauth'] = [
