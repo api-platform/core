@@ -217,7 +217,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'name' => 'id',
             'in' => 'path',
             'required' => true,
-            'type' => 'integer',
+            'type' => 'string',
         ]];
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
@@ -290,7 +290,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             [
                 'name' => 'id',
                 'in' => 'path',
-                'type' => 'integer',
+                'type' => 'string',
                 'required' => true,
             ],
             [
@@ -333,7 +333,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
             'name' => 'id',
             'in' => 'path',
-            'type' => 'integer',
+            'type' => 'string',
             'required' => true,
         ]];
 
