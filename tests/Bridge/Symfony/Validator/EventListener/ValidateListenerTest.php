@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -63,6 +64,49 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $validationViewListener->onKernelView($event);
     }
 
+    public function testGetGroupsFromCallable()
+    {
+        $data = new DummyEntity();
+        $expectedValidationGroups = ['a', 'b', 'c'];
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $validator = $validatorProphecy->reveal();
+
+        $closure = function ($data) use ($expectedValidationGroups): array {
+            return $data instanceof DummyEntity ? $expectedValidationGroups : [];
+        };
+
+        list($resourceMetadataFactory, $event) = $this->createEventObject($closure, $data);
+
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
+        $validationViewListener->onKernelView($event);
+    }
+
+    public function testGetGroupsFromService()
+    {
+        $data = new DummyEntity();
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate($data, null, ['a', 'b', 'c'])->shouldBeCalled();
+        $validator = $validatorProphecy->reveal();
+
+        list($resourceMetadataFactory, $event) = $this->createEventObject('groups_builder', $data);
+
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $containerProphecy->has('groups_builder')->willReturn(true)->shouldBeCalled();
+        $containerProphecy->get('groups_builder')->willReturn(new class() {
+            public function __invoke($data): array
+            {
+                return $data instanceof DummyEntity ? ['a', 'b', 'c'] : [];
+            }
+        }
+        )->shouldBeCalled();
+
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $containerProphecy->reveal());
+        $validationViewListener->onKernelView($event);
+    }
+
     public function testDoNotCallWhenReceiveFlagIsFalse()
     {
         $data = new DummyEntity();
@@ -100,19 +144,10 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    /**
-     * @param array $expectedValidationGroups
-     * @param mixed $data
-     * @param bool  $receive
-     *
-     * @return array
-     */
-    private function createEventObject($expectedValidationGroups, $data, bool $receive = true)
+    private function createEventObject($expectedValidationGroups, $data, bool $receive = true): array
     {
         $resourceMetadata = new ResourceMetadata(null, null, null, [
-            'create' => [
-                'validation_groups' => $expectedValidationGroups,
-            ],
+            'create' => ['validation_groups' => $expectedValidationGroups],
         ]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
