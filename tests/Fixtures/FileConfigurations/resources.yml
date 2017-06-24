@@ -32,7 +32,7 @@ resources:
                 attributes:
                     'foo': ['Foo']
                     'bar':
-                        0: ['Bar']
+                        '0': ['Bar']
                         'baz': 'Baz'
                     'baz': 'Baz'
             'name':

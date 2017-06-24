@@ -18,6 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInter
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -67,7 +69,11 @@ class ItemDataProvider implements ItemDataProviderInterface
             throw new ResourceClassNotSupportedException();
         }
 
-        $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
+        try {
+            $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
+        } catch (PropertyNotFoundException $e) {
+            throw new InvalidArgumentException($e->getMessage());
+        }
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof EntityManagerInterface) {

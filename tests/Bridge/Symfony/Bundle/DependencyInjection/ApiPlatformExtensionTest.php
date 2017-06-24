@@ -23,6 +23,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Prophecy\Argument;
+use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -294,6 +295,13 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $containerBuilderProphecy->fileExists(Argument::type('string'))->shouldBeCalled();
+
+        try {
+            $containerBuilderProphecy->fileExists(Argument::type('string'))->shouldBeCalled();
+        } catch (MethodNotFoundException $e) {
+            $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
+        }
+
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
         foreach (['yaml', 'xml'] as $format) {
