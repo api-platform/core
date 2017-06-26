@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\Resource\SubResourceMetadata;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -98,6 +99,8 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             $this->addPaths($paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::COLLECTION);
             $this->addPaths($paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::ITEM);
+
+            $this->processSubResources($paths, $definitions, $resourceClass, $resourceMetadata, $mimeTypes);
         }
 
         $definitions->ksort();
@@ -109,25 +112,34 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Updates the list of entries in the paths collection.
      *
-     * @param \ArrayObject     $paths
-     * @param \ArrayObject     $definitions
-     * @param string           $resourceClass
-     * @param string           $resourceShortName
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $mimeTypes
-     * @param string           $operationType
+     * @param \ArrayObject        $paths
+     * @param \ArrayObject        $definitions
+     * @param string              $resourceClass
+     * @param string              $resourceShortName
+     * @param ResourceMetadata    $resourceMetadata
+     * @param array               $mimeTypes
+     * @param string              $operationType
+     * @param SubResourceMetadata $subResource
      */
-    private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType)
+    private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType, SubResourceMetadata $subResource = null)
     {
-        if (null === $operations = $operationType === OperationType::COLLECTION ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
+        if ($subResource) {
+            $operations = $resourceMetadata->getCollectionOperations();
+        } else if (null === $operations = $operationType === OperationType::ITEM ? $resourceMetadata->getItemOperations() : $resourceMetadata->getCollectionOperations()) {
             return;
         }
 
         foreach ($operations as $operationName => $operation) {
+            if ($subResource) {
+                $operation['identifiers'] = [['id', $subResource->getParentResourceClass()]];
+                $operation['property'] = $subResource->getProperty();
+                $operation['collection'] = $subResource->isCollection();
+            }
+
             $path = $this->getPath($resourceShortName, $operation, $operationType);
             $method = $operationType === OperationType::ITEM ? $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
 
-            $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, $operationType, $resourceClass, $resourceMetadata, $mimeTypes, $definitions);
+            $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, $operationType, $resourceClass, $resourceMetadata, $mimeTypes, $definitions, $subResource);
         }
     }
 
@@ -160,22 +172,23 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
      *
-     * @param string           $operationName
-     * @param array            $operation
-     * @param string           $method
-     * @param string           $operationType
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string[]         $mimeTypes
-     * @param \ArrayObject     $definitions
+     * @param string              $operationName
+     * @param array               $operation
+     * @param string              $method
+     * @param string              $operationType
+     * @param string              $resourceClass
+     * @param ResourceMetadata    $resourceMetadata
+     * @param string[]            $mimeTypes
+     * @param \ArrayObject        $definitions
+     * @param SubResourceMetadata $subResource
      *
      * @return \ArrayObject
      */
-    private function getPathOperation(string $operationName, array $operation, string $method, string $operationType, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, \ArrayObject $definitions): \ArrayObject
+    private function getPathOperation(string $operationName, array $operation, string $method, string $operationType, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, \ArrayObject $definitions, SubResourceMetadata $subResource = null): \ArrayObject
     {
         $pathOperation = new \ArrayObject($operation['swagger_context'] ?? []);
         $resourceShortName = $resourceMetadata->getShortName();
-        $pathOperation['tags'] ?? $pathOperation['tags'] = [$resourceShortName];
+        $pathOperation['tags'] ?? $pathOperation['tags'] = [$subResource ? $subResource->getParent()->getShortName() : $resourceShortName];
         $pathOperation['operationId'] ?? $pathOperation['operationId'] = lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
 
         switch ($method) {
@@ -635,5 +648,30 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $resourceMetadata->getItemOperationAttribute($operationName, $contextKey, null, true);
+    }
+
+    /**
+     * @param \ArrayObject     $paths
+     * @param \ArrayObject     $definitions
+     * @param string           $parentResourceClass
+     * @param ResourceMetadata $parentResourceMetadata
+     * @param array            $mimeTypes
+     */
+    private function processSubResources(\ArrayObject $paths, \ArrayObject $definitions, string $parentResourceClass, ResourceMetadata $parentResourceMetadata, array $mimeTypes)
+    {
+        $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $parentResourceMetadata, 'get');
+        $options = isset($serializerContext['groups']) ? ['serializer_groups' => $serializerContext['groups']] : [];
+        foreach ($this->propertyNameCollectionFactory->create($parentResourceClass, $options) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($parentResourceClass, $property);
+            if ($propertyMetadata->hasSubresource()) {
+                $isCollection = $propertyMetadata->getType()->isCollection();
+                $resourceClass = $isCollection ? $propertyMetadata->getType()->getCollectionValueType()->getClassName() : $propertyMetadata->getType()->getClassName();
+                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+                $subResourceMetadata = new SubResourceMetadata($parentResourceMetadata, $property, $isCollection, $parentResourceClass);
+
+                $this->addPaths($paths, $definitions, $resourceClass, $parentResourceMetadata->getShortName(), $resourceMetadata, $mimeTypes, OperationType::SUBRESOURCE, $subResourceMetadata);
+            }
+        }
     }
 }
