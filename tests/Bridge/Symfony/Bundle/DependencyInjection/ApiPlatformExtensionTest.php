@@ -84,6 +84,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getExtensionConfig('framework')->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->prependExtensionConfig('framework', Argument::type('array'))->shouldNotBeCalled();
+        $containerBuilderProphecy->prependExtensionConfig('api_platform', Argument::type('array'))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->prepend($containerBuilder);
@@ -133,6 +134,24 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->prepend($containerBuilder);
+    }
+
+    public function testPrependWhenNameConverterIsConfigured()
+    {
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true, 'name_converter' => 'foo'], 'property_info' => ['enabled' => false]]]);
+        $containerBuilderProphecy->prependExtensionConfig('api_platform', ['name_converter' => 'foo'])->shouldBeCalled();
+
+        $this->extension->prepend($containerBuilderProphecy->reveal());
+    }
+
+    public function testNotPrependWhenNameConverterIsNotConfigured()
+    {
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->getExtensionConfig('framework')->willReturn([0 => ['serializer' => ['enabled' => true], 'property_info' => ['enabled' => false]]])->shouldBeCalled();
+        $containerBuilderProphecy->prependExtensionConfig('api_platform', Argument::type('array'))->shouldNotBeCalled();
+
+        $this->extension->prepend($containerBuilderProphecy->reveal());
     }
 
     public function testLoadDefaultConfig()

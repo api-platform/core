@@ -66,6 +66,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!isset($propertyInfoConfig['enabled'])) {
             $container->prependExtensionConfig('framework', ['property_info' => ['enabled' => true]]);
         }
+
+        if (isset($serializerConfig['name_converter'])) {
+            $container->prependExtensionConfig('api_platform', ['name_converter' => $serializerConfig['name_converter']]);
+        }
     }
 
     /**
