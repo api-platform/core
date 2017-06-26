@@ -42,6 +42,25 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of ApiPlatform\Core\Api\UrlGeneratorInterface to ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::__construct() is deprecated since version 2.1 and will be removed in 3.0.
+     */
+    public function testLegacyConstruct()
+    {
+        $normalizer = new DocumentationNormalizer(
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal(),
+            $this->prophesize(OperationPathResolverInterface::class)->reveal(),
+            $this->prophesize(UrlGeneratorInterface::class)->reveal()
+        );
+
+        $this->assertInstanceOf(DocumentationNormalizer::class, $normalizer);
+    }
+
     public function testNormalize()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -67,9 +86,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -78,8 +94,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
@@ -244,7 +259,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
     public function testNormalizeWithNameConverter()
@@ -269,9 +284,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
@@ -285,7 +297,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $urlGeneratorProphecy->reveal(),
+            null,
             null,
             $nameConverterProphecy->reveal(),
             true,
@@ -298,7 +310,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $expected = [
             'swagger' => '2.0',
-            'basePath' => '/app_dev.php/',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Dummy API',
                 'description' => 'This is a dummy API',
@@ -406,9 +418,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -417,13 +426,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
             'swagger' => '2.0',
-            'basePath' => '/app_dev.php/',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -592,9 +600,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -603,13 +608,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
             'swagger' => '2.0',
-            'basePath' => '/app_dev.php/',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -781,9 +785,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -792,13 +793,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
             'swagger' => '2.0',
-            'basePath' => '/app_dev.php/',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -1004,7 +1004,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -1012,8 +1011,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -1050,9 +1048,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldNotBeCalled();
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -1061,8 +1056,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
@@ -1103,9 +1097,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('FOO');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -1114,8 +1105,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
@@ -1199,9 +1189,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/app_dev.php/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -1210,13 +1197,12 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $operationPathResolver,
-            $urlGeneratorProphecy->reveal()
+            $operationPathResolver
         );
 
         $expected = [
             'swagger' => '2.0',
-            'basePath' => '/app_dev.php/',
+            'basePath' => '/',
             'info' => [
                 'title' => 'Test API',
                 'description' => 'This is a test API.',
@@ -1385,9 +1371,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
-
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
         $normalizer = new DocumentationNormalizer(
@@ -1397,7 +1380,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            $urlGeneratorProphecy->reveal(),
+            null,
             $filterLocator
         );
 

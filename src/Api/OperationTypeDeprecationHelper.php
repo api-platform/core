@@ -22,7 +22,7 @@ namespace ApiPlatform\Core\Api;
  * Because we introduced a third type in API Platform 2.1, we're using a string with OperationType constants:
  * - OperationType::ITEM
  * - OperationType::COLLECTION
- * - OperationType::SUBCOLLECTION
+ * - OperationType::SUBRESOURCE
  *
  * @internal
  */
