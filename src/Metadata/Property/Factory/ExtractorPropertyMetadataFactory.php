@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 
 /**
  * Creates properties's metadata using an extractor.
@@ -58,7 +59,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return $this->update($parentPropertyMetadata, $propertyMetadata);
         }
 
-        return new PropertyMetadata(
+        return ($metadata = new PropertyMetadata(
             null,
             $propertyMetadata['description'],
             $propertyMetadata['readable'],
@@ -69,9 +70,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             $propertyMetadata['identifier'],
             $propertyMetadata['iri'],
             null,
-            $propertyMetadata['attributes'],
-            $propertyMetadata['subresource']
-        );
+            $propertyMetadata['attributes']
+        ))->withSubresource($this->createSubresourceMetadata($propertyMetadata['subresource'], $metadata));
     }
 
     /**
@@ -114,7 +114,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             'identifier' => 'is',
             'iri' => 'get',
             'attributes' => 'get',
-            'subresource' => 'has',
         ];
 
         foreach ($metadataAccessors as $metadataKey => $accessorPrefix) {
@@ -125,6 +124,35 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             $propertyMetadata = $propertyMetadata->{'with'.ucfirst($metadataKey)}($metadata[$metadataKey]);
         }
 
-        return $propertyMetadata;
+        return $propertyMetadata->withSubresource($this->createSubresourceMetadata($metadata['subresource'], $propertyMetadata));
+    }
+
+    /**
+     * Creates a SubresourceMetadata.
+     *
+     * @param bool|null|array  $subresource      the subresource metadata coming from XML or YAML
+     * @param PropertyMetadata $propertyMetadata the current property metadata
+     *
+     * @return SubresourceMetadata|null
+     */
+    private function createSubresourceMetadata($subresource, PropertyMetadata $propertyMetadata)
+    {
+        if (!$subresource) {
+            return null;
+        }
+
+        $type = $propertyMetadata->getType();
+
+        if (null !== $type) {
+            $isCollection = $type->isCollection();
+            $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+        } elseif (isset($subresource['resourceClass'])) {
+            $resourceClass = $subresource['resourceClass'];
+            $isCollection = $subresource['collection'] ?? true;
+        } else {
+            return null;
+        }
+
+        return new SubresourceMetadata($resourceClass, $isCollection);
     }
 }

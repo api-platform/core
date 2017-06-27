@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -227,7 +228,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $relatedType = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummyEntity::class);
 
         $subResourcePropertyMetadata = (new PropertyMetadata())
-                                        ->withSubresource(true)
+                                        ->withSubresource(new SubresourceMetadata(RelatedDummyEntity::class, true))
                                         ->withType(new Type(Type::BUILTIN_TYPE_ARRAY, false, \ArrayObject::class, true, null, $relatedType));
 
         if (false === $recursiveSubresource) {
@@ -235,8 +236,14 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')->willReturn(new PropertyMetadata());
         } else {
             $dummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyEntity::class);
-            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')->willReturn((new PropertyMetadata())->withSubresource(true)->withType($dummyType));
-            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')->willReturn((new PropertyMetadata())->withSubresource(true)->withType($dummyType));
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')
+                ->willReturn((new PropertyMetadata())
+                ->withSubresource(new SubresourceMetadata(DummyEntity::class, false))
+                ->withType($dummyType));
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')
+                ->willReturn((new PropertyMetadata())
+                ->withSubresource(new SubresourceMetadata(DummyEntity::class, false))
+                ->withType($dummyType));
         }
 
         $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->willReturn($subResourcePropertyMetadata);

@@ -49,6 +49,7 @@
                 writableLink="false"
                 required="true"
         >
+            <subresource collection="true" resourceClass="Foo" />
             <attribute name="foo">
                 <attribute>Foo</attribute>
             </attribute>

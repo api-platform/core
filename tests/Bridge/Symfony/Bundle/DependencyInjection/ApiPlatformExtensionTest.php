@@ -429,6 +429,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.metadata.resource.name_collection_factory.cached',
             'api_platform.metadata.resource.name_collection_factory.xml',
             'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.metadata.subresource.metadata_factory.annotation',
             'api_platform.identifiers_extractor',
             'api_platform.identifiers_extractor.cached',
             'api_platform.negotiator',
