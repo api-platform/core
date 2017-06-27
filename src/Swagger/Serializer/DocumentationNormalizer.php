@@ -371,11 +371,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
-        if (isset($serializerContext['groups'])) {
-            $definitionKey = sprintf('%s_%s', $resourceMetadata->getShortName(), md5(serialize($serializerContext['groups'])));
-        } else {
-            $definitionKey = $resourceMetadata->getShortName();
-        }
+        $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext['groups'] ?? []));
 
         if (!isset($definitions[$definitionKey])) {
             $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
@@ -383,6 +379,11 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $definitionKey;
+    }
+
+    private function getDefinitionKey(string $resourceShortName, array $groups): string
+    {
+        return $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName;
     }
 
     /**
