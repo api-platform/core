@@ -156,7 +156,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
@@ -178,7 +178,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                             [
@@ -327,7 +327,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                         ],
@@ -487,7 +487,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'type' => 'integer',
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
@@ -508,7 +508,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                             [
@@ -669,7 +669,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'type' => 'integer',
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
@@ -690,7 +690,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                             [
@@ -854,7 +854,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'type' => 'integer',
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
@@ -875,7 +875,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                             [
@@ -1258,7 +1258,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'parameters' => [[
                             'name' => 'id',
                             'in' => 'path',
-                            'type' => 'integer',
+                            'type' => 'string',
                             'required' => true,
                         ]],
                         'responses' => [
@@ -1279,7 +1279,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                             [
                                 'name' => 'id',
                                 'in' => 'path',
-                                'type' => 'integer',
+                                'type' => 'string',
                                 'required' => true,
                             ],
                             [
