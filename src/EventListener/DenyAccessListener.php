@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -71,7 +72,11 @@ final class DenyAccessListener
             throw new \LogicException(sprintf('The "symfony/expression-language" library must be installed to use the "is_granted" attribute on class "%s".', $attributes['resource_class']));
         }
 
-        if (!$this->authorizationChecker->isGranted(new Expression($isGranted), $request->attributes->get('data'))) {
+        try {
+            if (!$this->authorizationChecker->isGranted(new Expression($isGranted), $request->attributes->get('data'))) {
+                throw new AccessDeniedException();
+            }
+        } catch (SyntaxError $e) {
             throw new AccessDeniedException();
         }
     }
