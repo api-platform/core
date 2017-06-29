@@ -382,7 +382,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
         $groups = ['dummy', 'foo', 'bar'];
 
-        $ref = 'Dummy_'.md5(serialize($groups));
+        $ref = 'Dummy-'.implode('_', $groups);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['gerard']));
@@ -697,7 +697,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'dummy',
                                 'in' => 'body',
                                 'description' => 'The updated Dummy resource',
-                                'schema' => ['$ref' => '#/definitions/Dummy_be35824b9d92d1dfc6f78fe086649b8f'],
+                                'schema' => ['$ref' => '#/definitions/Dummy-dummy'],
                             ],
                         ],
                         'responses' => [
@@ -723,7 +723,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         ]),
                     ],
                 ]),
-                'Dummy_be35824b9d92d1dfc6f78fe086649b8f' => new \ArrayObject([
+                'Dummy-dummy' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
@@ -882,13 +882,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'dummy',
                                 'in' => 'body',
                                 'description' => 'The updated Dummy resource',
-                                'schema' => ['$ref' => '#/definitions/Dummy_be35824b9d92d1dfc6f78fe086649b8f'],
+                                'schema' => ['$ref' => '#/definitions/Dummy-dummy'],
                             ],
                         ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy resource updated',
-                                'schema' => ['$ref' => '#/definitions/Dummy_be35824b9d92d1dfc6f78fe086649b8f'],
+                                'schema' => ['$ref' => '#/definitions/Dummy-dummy'],
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
@@ -908,7 +908,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         ]),
                     ],
                 ]),
-                'Dummy_be35824b9d92d1dfc6f78fe086649b8f' => new \ArrayObject([
+                'Dummy-dummy' => new \ArrayObject([
                     'type' => 'object',
                     'description' => 'This is a dummy.',
                     'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
@@ -1136,8 +1136,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $version = '1.2.3';
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), $title, $description, $version, $formats);
         $groups = ['dummy', 'foo', 'bar'];
-        $ref = 'Dummy_'.md5(serialize($groups));
-        $relatedDummyRef = 'RelatedDummy_'.md5(serialize($groups));
+        $ref = 'Dummy-'.implode('_', $groups);
+        $relatedDummyRef = 'RelatedDummy-'.implode('_', $groups);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, ['serializer_groups' => $groups])->shouldBeCalled(1)->willReturn(new PropertyNameCollection(['name', 'relatedDummy']));
