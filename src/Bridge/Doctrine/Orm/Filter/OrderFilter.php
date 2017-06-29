@@ -108,6 +108,11 @@ class OrderFilter extends AbstractFilter
      */
     protected function extractProperties(Request $request): array
     {
-        return $request->query->get($this->orderParameterName, []);
+        $properties = $request->query->get($this->orderParameterName, []);
+        if (!is_array($properties)) {
+            return [];
+        }
+
+        return $properties;
     }
 }
