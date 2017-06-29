@@ -175,7 +175,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 '@type' => 'hydra:Link',
                                 'rdfs:label' => 'The collection of dummy resources',
                                 'domain' => '#Entrypoint',
-                                'range' => 'hydra:PagedCollection',
+                                'rdfs:range' => [
+                                    'hydra:PagedCollection',
+                                    [
+                                        'owl:equivalentClass' => [
+                                            'owl:onProperty' => 'hydra:member',
+                                            'owl:allValuesFrom' => '#dummy',
+                                        ],
+                                    ],
+                                ],
                                 'hydra:supportedOperation' => [
                                     0 => [
                                         '@type' => 'hydra:Operation',
