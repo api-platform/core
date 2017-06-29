@@ -479,6 +479,65 @@ Feature: Order filter on collections
     }
     """
 
+  Scenario: Get a collection even if the order parameter is not well-formed
+    When I send a "GET" request to "/dummies?sort=id&order=asc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   @dropSchema
   Scenario: Get collection ordered by a non valid properties and on which order filter has been enabled in whitelist mode
     When I send a "GET" request to "/dummies?order[alias]=asc"
