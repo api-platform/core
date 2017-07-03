@@ -54,7 +54,7 @@ api_platform:
             enabled: true
         max_age:        60
         shared_max_age: 3600
-        vary:           ['Content-Type', 'Cookie']
+        vary:           ['Accept', 'Cookie']
         public:         true
 
 fos_user:

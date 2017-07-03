@@ -307,7 +307,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.http_cache.etag' => true,
             'api_platform.http_cache.max_age' => null,
             'api_platform.http_cache.shared_max_age' => null,
-            'api_platform.http_cache.vary' => ['Content-Type'],
+            'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
         ];
         foreach ($parameters as $key => $value) {

@@ -114,7 +114,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'etag' => true,
                 'max_age' => null,
                 'shared_max_age' => null,
-                'vary' => ['Content-Type'],
+                'vary' => ['Accept'],
                 'public' => null,
             ],
         ], $config);
