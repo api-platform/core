@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 
 /**
  * Property metadata provider for file configured factories tests.
@@ -36,6 +37,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
             ],
+            'subresource' => new SubresourceMetadata('Foo', true),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];
@@ -52,6 +54,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
             'required' => true,
             'identifier' => false,
             'attributes' => ['Foo'],
+            'subresource' => new SubresourceMetadata('Foo', true),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];

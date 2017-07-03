@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -33,7 +33,7 @@ class Container
     private $id;
 
     /**
-     * @ApiProperty(subresource=true)
+     * @ApiSubresource
      * @ORM\OneToMany(
      *      targetEntity="Node",
      *      mappedBy="container",

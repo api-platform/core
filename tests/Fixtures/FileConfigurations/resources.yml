@@ -23,6 +23,7 @@ resources:
         iri: 'someirischema'
         properties:
             'foo':
+                subresource: {collection: true, resourceClass: 'Foo'}
                 description: 'The dummy foo'
                 readable: true
                 writable: true

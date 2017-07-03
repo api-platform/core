@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -125,7 +126,7 @@ class Dummy
      * @var ArrayCollection Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
-     * @ApiProperty(subresource=true)
+     * @ApiSubresource
      */
     public $relatedDummies;
 

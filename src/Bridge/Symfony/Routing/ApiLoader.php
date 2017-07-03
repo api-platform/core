@@ -141,21 +141,19 @@ final class ApiLoader extends Loader
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
-            if (null === $propertyMetadata->hasSubresource()) {
+            if (!$propertyMetadata->hasSubresource()) {
                 continue;
             }
 
-            $isCollection = $propertyMetadata->getType()->isCollection();
-            $subresource = $isCollection ? $propertyMetadata->getType()->getCollectionValueType()->getClassName() : $propertyMetadata->getType()->getClassName();
-
-            $propertyName = $this->routeNameResolver($property, $isCollection);
+            $subresource = $propertyMetadata->getSubresource();
+            $propertyName = $this->routeNameResolver($property, $subresource->isCollection());
 
             $operation = [
                 'property' => $property,
-                'collection' => $isCollection,
+                'collection' => $subresource->isCollection(),
             ];
 
-            $visiting = "$rootResourceClass $resourceClass $propertyName $subresource";
+            $visiting = "$rootResourceClass $resourceClass $propertyName {$subresource->getResourceClass()}";
 
             if (in_array($visiting, $visited, true)) {
                 continue;
@@ -183,12 +181,12 @@ final class ApiLoader extends Loader
                 [
                     '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
                     '_format' => null,
-                    '_api_resource_class' => $subresource,
+                    '_api_resource_class' => $subresource->getResourceClass(),
                     '_api_subresource_operation_name' => $operation['route_name'],
                     '_api_subresource_context' => [
                         'property' => $operation['property'],
                         'identifiers' => $operation['identifiers'],
-                        'collection' => $isCollection,
+                        'collection' => $subresource->isCollection(),
                     ],
                 ],
                 [],
@@ -200,7 +198,7 @@ final class ApiLoader extends Loader
 
             $routeCollection->add($operation['route_name'], $route);
 
-            $this->computeSubresourceOperations($routeCollection, $subresource, $rootResourceClass, $operation, $visited);
+            $this->computeSubresourceOperations($routeCollection, $subresource->getResourceClass(), $rootResourceClass, $operation, $visited);
         }
     }
 

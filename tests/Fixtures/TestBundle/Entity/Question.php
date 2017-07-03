@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -38,7 +38,7 @@ class Question
     /**
      * @ORM\OneToOne(targetEntity="Answer", inversedBy="question")
      * @ORM\JoinColumn(name="answer_id", referencedColumnName="id", unique=true)
-     * @ApiProperty(subresource=true)
+     * @ApiSubresource
      */
     private $answer;
 

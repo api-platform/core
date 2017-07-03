@@ -63,9 +63,15 @@
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>
 
+    <xsd:complexType name="subresource" mixed="true">
+        <xsd:attribute type="xsd:boolean" name="collection"/>
+        <xsd:attribute type="xsd:string" name="resourceClass"/>
+    </xsd:complexType>
+
     <xsd:complexType name="property">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded" type="attribute"/>
+            <xsd:element name="subresource" minOccurs="0" maxOccurs="unbounded" type="subresource"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="description"/>
