@@ -122,7 +122,7 @@ final class Configuration implements ConfigurationInterface
                         ->integerNode('max_age')->defaultNull()->info('Default value for the response max age.')->end()
                         ->integerNode('shared_max_age')->defaultNull()->info('Default value for the response shared (proxy) max age.')->end()
                         ->arrayNode('vary')
-                            ->defaultValue(['Content-Type'])
+                            ->defaultValue(['Accept'])
                             ->prototype('scalar')->end()
                             ->info('Default values of the "Vary" HTTP header.')
                         ->end()

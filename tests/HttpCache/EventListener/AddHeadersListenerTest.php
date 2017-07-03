@@ -74,17 +74,17 @@ class AddHeadersListenerTest extends \PHPUnit_Framework_TestCase
     public function testAddHeaders()
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
-        $response = new Response('some content');
+        $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
 
         $event = $this->prophesize(FilterResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $listener = new AddHeadersListener(true, 100, 200, ['Content-Type'], true);
+        $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true);
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
-        $this->assertSame(['Content-Type'], $response->getVary());
+        $this->assertSame(['Accept', 'Cookie', 'Accept-Encoding'], $response->getVary());
     }
 }

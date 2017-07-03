@@ -62,7 +62,7 @@ final class AddHeadersListener
         }
 
         if (null !== $this->vary) {
-            $response->setVary($this->vary);
+            $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
         if (null !== $this->sharedMaxage) {
