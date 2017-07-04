@@ -54,7 +54,7 @@ final class DataProviderPass implements CompilerPassInterface
 
         foreach ($services as $serviceId => $tags) {
             $definition = $container->getDefinition($serviceId);
-            if (is_subclass_of($definition->getClass(), SerializerAwareDataProviderInterface::class)) {
+            if (is_a($definition->getClass(), SerializerAwareDataProviderInterface::class, true)) {
                 $definition->addMethodCall('setSerializerLocator', [$container->getDefinition('api_platform.serializer_locator')]);
             }
 
