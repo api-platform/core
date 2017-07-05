@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -100,7 +101,12 @@ final class ReadListener
     private function getItemData(Request $request, array $attributes)
     {
         $id = $request->attributes->get('id');
-        $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name']);
+
+        try {
+            $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name']);
+        } catch (PropertyNotFoundException $e) {
+            throw new NotFoundHttpException('Not Found');
+        }
 
         if (null === $data) {
             throw new NotFoundHttpException('Not Found');
