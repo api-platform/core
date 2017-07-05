@@ -423,4 +423,70 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
             ],
         ], $actual);
     }
+
+    public function testParseRecursive()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [], []))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::cetera())->willReturn(new PropertyNameCollection([
+            'relatedDummy',
+        ]))->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, Argument::cetera())->willReturn(new PropertyNameCollection([
+            'dummy',
+        ]))->shouldBeCalled();
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relatedDummyMetadatata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class))
+            ->withDescription('A related Dummy.')
+            ->withReadable(true)
+            ->withReadableLink(true)
+            ->withWritableLink(true)
+            ->withWritable(true)
+            ->withRequired(false);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->willReturn($relatedDummyMetadatata)->shouldBeCalled();
+        $dummyMetadata = (new PropertyMetadata())
+            ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class))
+            ->withDescription('A Dummy.')
+            ->withReadable(true)
+            ->withWritable(true)
+            ->withReadableLink(true)
+            ->withWritableLink(true)
+            ->withRequired(false);
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'dummy')->willReturn($dummyMetadata)->shouldBeCalled();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $apiPlatformParser = new ApiPlatformParser($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory);
+
+        $actual = $apiPlatformParser->parse([
+            'class' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'),
+        ]);
+
+        $this->assertEquals([
+            'relatedDummy' => [
+                'dataType' => null,
+                'required' => false,
+                'description' => 'A related Dummy.',
+                'readonly' => false,
+                'actualType' => 'model',
+                'subType' => RelatedDummy::class,
+                'children' => [
+                    'dummy' => [
+                        'dataType' => null,
+                        'required' => false,
+                        'description' => 'A Dummy.',
+                        'readonly' => false,
+                        'actualType' => 'model',
+                        'subType' => Dummy::class,
+                        'children' => [],
+                    ],
+                ],
+            ],
+        ], $actual);
+    }
 }
