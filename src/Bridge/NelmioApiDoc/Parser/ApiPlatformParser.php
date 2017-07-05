@@ -279,7 +279,7 @@ final class ApiPlatformParser implements ParserInterface
 
             $data['actualType'] = DataTypes::MODEL;
             $data['subType'] = $className;
-            $data['children'] = in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io);
+            $data['children'] = in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io, $visited);
 
             return $data;
         }
