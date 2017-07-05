@@ -17,8 +17,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Denies access to the current resource if the logged user doesn't have sufficient permissions.
@@ -41,7 +41,7 @@ final class DenyAccessListener
      *
      * @param GetResponseEvent $event
      *
-     * @throws AccessDeniedException
+     * @throws AccessDeniedHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -72,7 +72,7 @@ final class DenyAccessListener
         }
 
         if (!$this->authorizationChecker->isGranted(new Expression($isGranted), $request->attributes->get('data'))) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedHttpException();
         }
     }
 }
