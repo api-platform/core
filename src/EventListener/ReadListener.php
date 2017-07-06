@@ -105,7 +105,7 @@ final class ReadListener
         try {
             $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name']);
         } catch (PropertyNotFoundException $e) {
-            throw new NotFoundHttpException('Not Found');
+            $data = null;
         }
 
         if (null === $data) {
