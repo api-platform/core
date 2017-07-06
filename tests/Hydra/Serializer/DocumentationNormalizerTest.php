@@ -82,6 +82,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
                 'xmls' => 'http://www.w3.org/2001/XMLSchema#',
                 'owl' => 'http://www.w3.org/2002/07/owl#',
+                'schema' => 'http://schema.org/',
                 'domain' => [
                     '@id' => 'rdfs:domain',
                     '@type' => '@id',
@@ -104,6 +105,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
             '@id' => '/doc',
+            '@type' => 'hydra:ApiDocumentation',
             'hydra:title' => 'Test Api',
             'hydra:description' => 'test ApiGerard',
             'hydra:supportedClass' => [
@@ -147,14 +149,14 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                     'hydra:supportedOperation' => [
                         0 => [
-                            '@type' => 'hydra:Operation',
+                            '@type' => ['hydra:Operation', 'schema:FindAction'],
                             'hydra:method' => 'GET',
                             'hydra:title' => 'Retrieves dummy resource.',
                             'rdfs:label' => 'Retrieves dummy resource.',
                             'returns' => '#dummy',
                         ],
                         1 => [
-                            '@type' => 'hydra:ReplaceResourceOperation',
+                            '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                             'expects' => '#dummy',
                             'hydra:method' => 'PUT',
                             'hydra:title' => 'Replaces the dummy resource.',
@@ -175,17 +177,17 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 '@type' => 'hydra:Link',
                                 'rdfs:label' => 'The collection of dummy resources',
                                 'domain' => '#Entrypoint',
-                                'range' => 'hydra:PagedCollection',
+                                'range' => 'hydra:Collection',
                                 'hydra:supportedOperation' => [
                                     0 => [
-                                        '@type' => 'hydra:Operation',
+                                        '@type' => ['hydra:Operation', 'schema:FindAction'],
                                         'hydra:method' => 'GET',
                                         'hydra:title' => 'Retrieves the collection of dummy resources.',
                                         'rdfs:label' => 'Retrieves the collection of dummy resources.',
-                                        'returns' => 'hydra:PagedCollection',
+                                        'returns' => 'hydra:Collection',
                                     ],
                                     1 => [
-                                        '@type' => 'hydra:CreateResourceOperation',
+                                        '@type' => ['hydra:Operation', 'schema:CreateAction'],
                                         'expects' => '#dummy',
                                         'hydra:method' => 'POST',
                                         'hydra:title' => 'Creates a dummy resource.',
