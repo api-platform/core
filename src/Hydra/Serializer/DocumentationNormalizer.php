@@ -96,7 +96,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'domain' => '#Entrypoint',
                 'rdfs:label' => "The collection of $shortName resources",
                 'rdfs:range' => [
-                    'hydra:PagedCollection',
+                    'hydra:Collection',
                     [
                         'owl:equivalentClass' => [
                             'owl:onProperty' => 'hydra:member',
@@ -241,36 +241,38 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if ('GET' === $method && $collection) {
             $hydraOperation = [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves the collection of $shortName resources.",
-                'returns' => 'hydra:PagedCollection',
+                'returns' => 'hydra:Collection',
             ] + $hydraOperation;
         } elseif ('GET' === $method) {
             $hydraOperation = [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves $shortName resource.",
                 'returns' => $prefixedShortName,
             ] + $hydraOperation;
         } elseif ('POST' === $method) {
             $hydraOperation = [
-                '@type' => 'hydra:CreateResourceOperation',
+                '@type' => ['hydra:Operation', 'schema:CreateAction'],
                 'hydra:title' => "Creates a $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
             ] + $hydraOperation;
         } elseif ('PUT' === $method) {
             $hydraOperation = [
-                '@type' => 'hydra:ReplaceResourceOperation',
+                '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                 'hydra:title' => "Replaces the $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
             ] + $hydraOperation;
         } elseif ('DELETE' === $method) {
             $hydraOperation = [
+                '@type' => ['hydra:Operation', 'schema:DeleteAction'],
                 'hydra:title' => "Deletes the $shortName resource.",
                 'returns' => 'owl:Nothing',
             ] + $hydraOperation;
         }
 
-        $hydraOperation['@type'] ?? $hydraOperation['@type'] = 'hydra:Operation';
         $hydraOperation['hydra:method'] ?? $hydraOperation['hydra:method'] = $method;
 
         if (!isset($hydraOperation['rdfs:label']) && isset($hydraOperation['hydra:title'])) {
@@ -474,7 +476,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function computeDoc(Documentation $object, array $classes): array
     {
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT]), '@type' => 'hydra:ApiDocumentation'];
 
         if ('' !== $object->getTitle()) {
             $doc['hydra:title'] = $object->getTitle();
@@ -504,6 +506,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'rdfs' => ContextBuilderInterface::RDFS_NS,
             'xmls' => ContextBuilderInterface::XML_NS,
             'owl' => ContextBuilderInterface::OWL_NS,
+            'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
             'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
             'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
             'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],

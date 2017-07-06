@@ -95,6 +95,16 @@ class HydraContext implements Context
     }
 
     /**
+     * @Then the value of the node ":node" of the operation ":operation" of the Hydra class ":class" contains ":value"
+     */
+    public function assertOperationNodeValueContains($nodeName, $operationMethod, $className, $value)
+    {
+        $property = $this->getOperation($operationMethod, $className);
+
+        \PHPUnit_Framework_Assert::assertContains($value, $this->propertyAccessor->getValue($property, $nodeName));
+    }
+
+    /**
      * @Then :nb operations are available for Hydra class ":class"
      */
     public function assertNbOperationsExist($nb, $className)
