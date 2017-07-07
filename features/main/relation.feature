@@ -173,7 +173,6 @@ Feature: Relations support
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -209,7 +208,6 @@ Feature: Relations support
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:member": {
           "type": "array",
           "items": {
