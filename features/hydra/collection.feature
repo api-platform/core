@@ -18,6 +18,9 @@ Feature: Collections support
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 0},
+        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
+        "hydra:firstPage": {"pattern": "^/dummies$"},
+        "hydra:lastPage": {"pattern": "^/dummies$"},
         "hydra:member": {
           "type": "array",
           "maxItems": 0
