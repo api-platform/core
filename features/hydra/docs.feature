@@ -70,8 +70,7 @@ Feature: Documentation support
     And the value of the node "hydra:title" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:description" of the property "name" of the Hydra class "Dummy" is "The dummy name"
     # Operations
-    And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" contains "hydra:Operation"
-    And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" contains "schema:FindAction"
+    And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" is "hydra:Operation"
     And the value of the node "hydra:method" of the operation "GET" of the Hydra class "Dummy" is "GET"
     And the value of the node "hydra:title" of the operation "GET" of the Hydra class "Dummy" is "Retrieves Dummy resource."
     And the value of the node "rdfs:label" of the operation "GET" of the Hydra class "Dummy" is "Retrieves Dummy resource."
