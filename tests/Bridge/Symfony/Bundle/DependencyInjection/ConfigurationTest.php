@@ -84,6 +84,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'authorizationUrl' => '/oauth/v2/auth',
                 'scopes' => [],
             ],
+            'swagger' => [
+                'api_keys' => [],
+            ],
             'eager_loading' => [
                 'enabled' => true,
                 'max_joins' => 30,
@@ -207,5 +210,27 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Test config for api keys.
+     */
+    public function testApiKeysConfig()
+    {
+        $exampleConfig = [
+                'name' => 'Authorization',
+                'type' => 'query',
+        ];
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'swagger' => [
+                    'api_keys' => $exampleConfig,
+               ],
+            ],
+        ]);
+
+        $this->assertTrue(isset($config['swagger']['api_keys']));
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys']);
     }
 }

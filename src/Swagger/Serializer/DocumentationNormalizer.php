@@ -59,6 +59,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $oauthTokenUrl;
     private $oauthAuthorizationUrl;
     private $oauthScopes;
+    private $apiKeys;
     private $subresourceOperationFactory;
     private $paginationEnabled;
     private $paginationPageParameterName;
@@ -68,7 +69,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage')
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page', $clientItemsPerPage = false, $itemsPerPageParameterName = 'itemsPerPage')
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -92,6 +93,8 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
+        $this->apiKeys = $apiKeys;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->clientItemsPerPage = $clientItemsPerPage;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
     }
@@ -612,19 +615,41 @@ final class DocumentationNormalizer implements NormalizerInterface
             'paths' => $paths,
         ];
 
+        $securityDefinitions = [];
+        $security = [];
+
         if ($this->oauthEnabled) {
-            $doc['securityDefinitions'] = [
-                'oauth' => [
-                    'type' => $this->oauthType,
-                    'description' => 'OAuth client_credentials Grant',
-                    'flow' => $this->oauthFlow,
-                    'tokenUrl' => $this->oauthTokenUrl,
-                    'authorizationUrl' => $this->oauthAuthorizationUrl,
-                    'scopes' => $this->oauthScopes,
-                ],
+            $securityDefinitions['oauth'] = [
+                'type' => $this->oauthType,
+                'description' => 'OAuth client_credentials Grant',
+                'flow' => $this->oauthFlow,
+                'tokenUrl' => $this->oauthTokenUrl,
+                'authorizationUrl' => $this->oauthAuthorizationUrl,
+                'scopes' => $this->oauthScopes,
             ];
 
-            $doc['security'] = [['oauth' => []]];
+            $security[] = ['oauth' => []];
+        }
+
+        if ($this->apiKeys) {
+            foreach ($this->apiKeys as $key => $apiKey) {
+                $name = $apiKey['name'];
+                $type = $apiKey['type'];
+
+                $securityDefinitions[$key] = [
+                    'type' => 'apiKey',
+                    'in' => $type,
+                    'description' => sprintf('Value for the %s %s', $name, $type === 'query' ? sprintf('%s parameter', $type) : $type),
+                    'name' => $name,
+                ];
+
+                $security[] = [$key => []];
+            }
+        }
+
+        if ($securityDefinitions && $security) {
+            $doc['securityDefinitions'] = $securityDefinitions;
+            $doc['security'] = $security;
         }
 
         if ('' !== $description = $documentation->getDescription()) {
