@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
@@ -21,6 +22,7 @@ use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Symfony\Component\PropertyInfo\Type;
@@ -210,7 +212,20 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $hydraOperations = [];
         foreach ($operations as $operationName => $operation) {
-            $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection);
+            $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection ? OperationType::COLLECTION : OperationType::ITEM);
+        }
+
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+
+            if (!$propertyMetadata->hasSubresource()) {
+                continue;
+            }
+
+            $subresourceMetadata = $this->resourceMetadataFactory->create($propertyMetadata->getSubresource()->getResourceClass());
+            $prefixedShortName = "#{$subresourceMetadata->getShortName()}";
+
+            $hydraOperations[] = $this->getHydraOperation($resourceClass, $subresourceMetadata, $operationName, $operation, $prefixedShortName, OperationType::SUBRESOURCE, $propertyMetadata->getSubresource());
         }
 
         return $hydraOperations;
@@ -219,31 +234,40 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets and populates if applicable a Hydra operation.
      *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationName
-     * @param array            $operation
-     * @param string           $prefixedShortName
-     * @param bool             $collection
+     * @param string              $resourceClass
+     * @param ResourceMetadata    $resourceMetadata
+     * @param string              $operationName
+     * @param array               $operation
+     * @param string              $prefixedShortName
+     * @param string              $operationType
+     * @param SubresourceMetadata $operationType
      *
      * @return array
      */
-    private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection): array
+    private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, string $operationType, SubresourceMetadata $subresourceMetadata = null): array
     {
-        if ($collection) {
+        if (OperationType::COLLECTION === $operationType) {
             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-        } else {
+        } elseif (OperationType::ITEM === $operationType) {
             $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+        } else {
+            $method = 'GET';
         }
 
         $hydraOperation = $operation['hydra_context'] ?? [];
         $shortName = $resourceMetadata->getShortName();
 
-        if ('GET' === $method && $collection) {
+        if ('GET' === $method && OperationType::COLLECTION === $operationType) {
             $hydraOperation = [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves the collection of $shortName resources.",
                 'returns' => 'hydra:Collection',
+            ] + $hydraOperation;
+        } elseif ('GET' === $method && OperationType::SUBRESOURCE === $operationType) {
+            $hydraOperation = [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
+                'hydra:title' => $subresourceMetadata->isCollection() ? "Retrieves the collection of $shortName resources." : "Retrieves a $shortName resource.",
+                'returns' => "#$shortName",
             ] + $hydraOperation;
         } elseif ('GET' === $method) {
             $hydraOperation = [

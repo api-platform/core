@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use Doctrine\Common\Inflector\Inflector;
+use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 
 /**
  * Generates a path with words separated by underscores.
@@ -38,7 +38,7 @@ final class UnderscoreOperationPathResolver implements OperationPathResolverInte
         if ($operationType === OperationType::SUBRESOURCE && 1 < count($operation['identifiers'])) {
             $path = str_replace('.{_format}', '', $resourceShortName);
         } else {
-            $path = '/'.Inflector::pluralize(Inflector::tableize($resourceShortName));
+            $path = '/'.RouteNameGenerator::routeNameResolver($resourceShortName, true);
         }
 
         if ($operationType === OperationType::ITEM) {
@@ -47,7 +47,7 @@ final class UnderscoreOperationPathResolver implements OperationPathResolverInte
 
         if ($operationType === OperationType::SUBRESOURCE) {
             list($key) = end($operation['identifiers']);
-            $property = true === $operation['collection'] ? Inflector::pluralize(Inflector::tableize($operation['property'])) : Inflector::tableize($operation['property']);
+            $property = RouteNameGenerator::routeNameResolver($operation['property'], $operation['collection']);
             $path .= sprintf('/{%s}/%s', $key, $property);
         }
 

@@ -28,6 +28,7 @@ use Doctrine\Common\Util\Inflector;
 class RouteNameGenerator
 {
     const ROUTE_NAME_PREFIX = 'api_';
+    const SUBRESOURCE_SUFFIX = '_subresource';
 
     private function __construct()
     {
@@ -39,23 +40,49 @@ class RouteNameGenerator
      * @param string      $operationName
      * @param string      $resourceShortName
      * @param string|bool $operationType
+     * @param array       $subresourceContext
      *
      * @throws InvalidArgumentException
      *
      * @return string
      */
-    public static function generate(string $operationName, string $resourceShortName, $operationType): string
+    public static function generate(string $operationName, string $resourceShortName, $operationType, array $subresourceContext = []): string
     {
         if (OperationType::SUBRESOURCE === $operationType = OperationTypeDeprecationHelper::getOperationType($operationType)) {
-            throw new InvalidArgumentException(sprintf('%s::SUBRESOURCE is not supported as operation type by %s().', OperationType::class, __METHOD__));
+            if (!isset($subresourceContext['property'])) {
+                throw new InvalidArgumentException('Missing "property" to generate a route name from a subresource');
+            }
+
+            return sprintf(
+              '%s%s_%s_%s%s',
+              static::ROUTE_NAME_PREFIX,
+              self::routeNameResolver($resourceShortName),
+              self::routeNameResolver($subresourceContext['property'], $subresourceContext['collection'] ?? false),
+              $operationName,
+              self::SUBRESOURCE_SUFFIX
+            );
         }
 
         return sprintf(
             '%s%s_%s_%s',
             static::ROUTE_NAME_PREFIX,
-            Inflector::pluralize(Inflector::tableize($resourceShortName)),
+            self::routeNameResolver($resourceShortName),
             $operationName,
             $operationType
         );
+    }
+
+    /**
+     * Transforms a given string to a tableized, pluralized string.
+     *
+     * @param string $name usually a ResourceMetadata shortname
+     *
+     * @return string A string that is a part of the route name
+     */
+    public static function routeNameResolver(string $name, bool $pluralize = true): string
+    {
+        $name = Inflector::tableize($name);
+
+        return $pluralize ? Inflector::pluralize($name) : $name;
     }
 }

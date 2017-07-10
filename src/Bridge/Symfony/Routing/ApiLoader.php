@@ -21,7 +21,6 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -107,20 +106,6 @@ final class ApiLoader extends Loader
     }
 
     /**
-     * Transforms a given string to a tableized, pluralized string.
-     *
-     * @param string $name usually a ResourceMetadata shortname
-     *
-     * @return string A string that is a part of the route name
-     */
-    private function routeNameResolver(string $name, bool $pluralize = true): string
-    {
-        $name = Inflector::tableize($name);
-
-        return $pluralize ? Inflector::pluralize($name) : $name;
-    }
-
-    /**
      * Handles subresource operations recursively and declare their corresponding routes.
      *
      * @param RouteCollection $routeCollection
@@ -146,14 +131,13 @@ final class ApiLoader extends Loader
             }
 
             $subresource = $propertyMetadata->getSubresource();
-            $propertyName = $this->routeNameResolver($property, $subresource->isCollection());
 
             $operation = [
                 'property' => $property,
                 'collection' => $subresource->isCollection(),
             ];
 
-            $visiting = "$rootResourceClass $resourceClass $propertyName {$subresource->getResourceClass()}";
+            $visiting = "$rootResourceClass $resourceClass $property {$subresource->isCollection()} {$subresource->getResourceClass()}";
 
             if (in_array($visiting, $visited, true)) {
                 continue;
@@ -164,15 +148,14 @@ final class ApiLoader extends Loader
             if (null === $parentOperation) {
                 $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
                 $rootShortname = $rootResourceMetadata->getShortName();
-                $resourceRouteName = $this->routeNameResolver($rootShortname);
 
                 $operation['identifiers'] = [['id', $rootResourceClass]];
-                $operation['route_name'] = sprintf('%s%s_%s%s', RouteNameGenerator::ROUTE_NAME_PREFIX, $resourceRouteName, $propertyName, self::SUBRESOURCE_SUFFIX);
+                $operation['route_name'] = RouteNameGenerator::generate('get', $rootShortname, OperationType::SUBRESOURCE, $operation);
                 $operation['path'] = $this->operationPathResolver->resolveOperationPath($rootShortname, $operation, OperationType::SUBRESOURCE, $operation['route_name']);
             } else {
                 $operation['identifiers'] = $parentOperation['identifiers'];
                 $operation['identifiers'][] = [$parentOperation['property'], $resourceClass];
-                $operation['route_name'] = str_replace(self::SUBRESOURCE_SUFFIX, "_$propertyName".self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
+                $operation['route_name'] = str_replace('get'.RouteNameGenerator::SUBRESOURCE_SUFFIX, RouteNameGenerator::routeNameResolver($property, $operation['collection']).'_get'.RouteNameGenerator::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
                 $operation['path'] = $this->operationPathResolver->resolveOperationPath($parentOperation['path'], $operation, OperationType::SUBRESOURCE, $operation['route_name']);
             }
 

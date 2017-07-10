@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
@@ -50,16 +49,12 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
             $operationName = null;
         }
 
-        if (OperationType::SUBRESOURCE === $operationType = OperationTypeDeprecationHelper::getOperationType($operationType)) {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
-        }
-
         if (isset($operation['route_name'])) {
             $routeName = $operation['route_name'];
         } elseif (null !== $operationName) {
-            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
+            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType, $operation);
         } else {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
+            return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
         }
 
         if (!$route = $this->router->getRouteCollection()->get($routeName)) {
