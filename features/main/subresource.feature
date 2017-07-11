@@ -12,12 +12,39 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-        "@context": "\/contexts\/Answer",
-        "@id": "\/answers\/1",
-        "@type": "Answer",
-        "id": 1,
-        "content": "42",
-        "question": "\/questions\/1"
+			"@context": "/contexts/Answer",
+			"@id": "/answers/1",
+			"@type": "Answer",
+			"id": 1,
+			"content": "42",
+			"question": "/questions/1",
+			"relatedQuestions": [
+				"/questions/1"
+			]
+    }
+    """
+
+  Scenario: Get subresource one to one relation
+    When I send a "GET" request to "/questions/1/answer/related_questions"
+    And print last JSON response
+    And the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Question",
+      "@id": "/questions/1/answer/related_questions",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+				{
+					"@id": "/questions/1",
+					"@type": "Question",
+					"content": "What's the answer to the Ultimate Question of Life, the Universe and Everything?",
+					"id": 1,
+					"answer": "/answers/1"
+				}
+      ],
+      "hydra:totalItems": 1
     }
     """
 

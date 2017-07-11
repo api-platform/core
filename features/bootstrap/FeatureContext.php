@@ -609,9 +609,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $question = new Question();
         $question->setContent($q);
         $question->setAnswer($answer);
+        $answer->addRelatedQuestion($question);
 
         $this->manager->persist($answer);
         $this->manager->persist($question);
+
         $this->manager->flush();
     }
 

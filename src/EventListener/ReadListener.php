@@ -133,8 +133,10 @@ final class ReadListener
         }
 
         $identifiers = [];
-        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id)) {
-            $identifiers[$id] = $request->attributes->get($id);
+        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $class, $hasIdentifier)) {
+            if (true === $hasIdentifier) {
+                $identifiers[$id] = $request->attributes->get($id);
+            }
         }
 
         $data = $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $identifiers, $attributes['subresource_context'], $attributes['subresource_operation_name']);

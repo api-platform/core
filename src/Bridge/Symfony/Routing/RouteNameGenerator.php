@@ -25,10 +25,9 @@ use Doctrine\Common\Util\Inflector;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class RouteNameGenerator
+final class RouteNameGenerator
 {
     const ROUTE_NAME_PREFIX = 'api_';
-    const SUBRESOURCE_SUFFIX = '_subresource';
 
     private function __construct()
     {
@@ -40,33 +39,21 @@ class RouteNameGenerator
      * @param string      $operationName
      * @param string      $resourceShortName
      * @param string|bool $operationType
-     * @param array       $subresourceContext
      *
      * @throws InvalidArgumentException
      *
      * @return string
      */
-    public static function generate(string $operationName, string $resourceShortName, $operationType, array $subresourceContext = []): string
+    public static function generate(string $operationName, string $resourceShortName, $operationType): string
     {
         if (OperationType::SUBRESOURCE === $operationType = OperationTypeDeprecationHelper::getOperationType($operationType)) {
-            if (!isset($subresourceContext['property'])) {
-                throw new InvalidArgumentException('Missing "property" to generate a route name from a subresource');
-            }
-
-            return sprintf(
-              '%s%s_%s_%s%s',
-              static::ROUTE_NAME_PREFIX,
-              self::routeNameResolver($resourceShortName),
-              self::routeNameResolver($subresourceContext['property'], $subresourceContext['collection'] ?? false),
-              $operationName,
-              self::SUBRESOURCE_SUFFIX
-            );
+            throw new InvalidArgumentException('Subresource operations are not supported by the RouteNameGenerator.');
         }
 
         return sprintf(
             '%s%s_%s_%s',
             static::ROUTE_NAME_PREFIX,
-            self::routeNameResolver($resourceShortName),
+            self::inflector($resourceShortName),
             $operationName,
             $operationType
         );
@@ -79,7 +66,7 @@ class RouteNameGenerator
      *
      * @return string A string that is a part of the route name
      */
-    public static function routeNameResolver(string $name, bool $pluralize = true): string
+    public static function inflector(string $name, bool $pluralize = true): string
     {
         $name = Inflector::tableize($name);
 

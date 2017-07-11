@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\PathResolver;
 
-use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
+use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 
 /**
  * Generates a path with words separated by underscores.
@@ -29,30 +27,14 @@ final class UnderscoreOperationPathResolver implements OperationPathResolverInte
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        if (func_num_args() < 4) {
-            @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
-        }
+        @trigger_error(sprintf('The use of %s is deprecated since 2.1. Please use PathSegmentNameGenerator instead.', __CLASS__), E_USER_DEPRECATED);
 
-        $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
-
-        if ($operationType === OperationType::SUBRESOURCE && 1 < count($operation['identifiers'])) {
-            $path = str_replace('.{_format}', '', $resourceShortName);
+        if (func_num_args() >= 4) {
+            $operationName = func_get_arg(3);
         } else {
-            $path = '/'.RouteNameGenerator::routeNameResolver($resourceShortName, true);
+            $operationName = null;
         }
 
-        if ($operationType === OperationType::ITEM) {
-            $path .= '/{id}';
-        }
-
-        if ($operationType === OperationType::SUBRESOURCE) {
-            list($key) = end($operation['identifiers']);
-            $property = RouteNameGenerator::routeNameResolver($operation['property'], $operation['collection']);
-            $path .= sprintf('/{%s}/%s', $key, $property);
-        }
-
-        $path .= '.{_format}';
-
-        return $path;
+        return (new OperationPathResolver(new UnderscorePathSegmentNameGenerator()))->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
     }
 }
