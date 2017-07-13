@@ -82,9 +82,6 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
         $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);
         $subresourceDataProviderDefinition->replaceArgument(4, $itemExtensions);
-
-        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
-        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
     }
 
     private function handleMongoDB(ContainerBuilder $container)
