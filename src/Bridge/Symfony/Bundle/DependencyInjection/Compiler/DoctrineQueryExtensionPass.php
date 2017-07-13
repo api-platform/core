@@ -37,17 +37,12 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
             return;
         }
 
-        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
-        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
-        $subresourceDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.subresource_data_provider');
+        if ($container->hasDefinition('api_platform.doctrine.orm.collection_data_provider')) {
+            $this->handleOrm($container);
+        } elseif ($container->hasDefinition('api_platform.doctrine.mongodb.collection_data_provider')) {
+            $this->handleMongoDB($container);
+        }
 
-        $collectionExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection');
-        $itemExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item');
-
-        $collectionDataProviderDefinition->replaceArgument(1, $collectionExtensions);
-        $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
-        $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);
-        $subresourceDataProviderDefinition->replaceArgument(4, $itemExtensions);
     }
 
     /**
@@ -71,5 +66,33 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
 
         // Flatten the array
         return empty($extensions) ? [] : call_user_func_array('array_merge', $extensions);
+    }
+
+    private function handleOrm(ContainerBuilder $container)
+    {
+        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
+
+        $subresourceDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.subresource_data_provider');
+
+        $collectionExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection');
+        $itemExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item');
+
+        $collectionDataProviderDefinition->replaceArgument(1, $collectionExtensions);
+        $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
+        $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);
+        $subresourceDataProviderDefinition->replaceArgument(4, $itemExtensions);
+
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
+    }
+
+    private function handleMongoDB(ContainerBuilder $container)
+    {
+        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.mongodb.collection_data_provider');
+        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.mongodb.item_data_provider');
+
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.mongodb.query_extension.collection'));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.mongodb.query_extension.item'));
     }
 }

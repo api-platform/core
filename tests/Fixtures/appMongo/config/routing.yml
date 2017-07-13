@@ -1,0 +1,11 @@
+api:
+    resource: '.'
+    type:     'api_platform'
+
+relation_embedded.custom_get:
+    path:  '/relation_embedders/{id}/custom'
+    methods:  ['GET', 'HEAD']
+    defaults:
+        _controller:     'TestBundle:Custom:custom'
+        _resource_class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder'
+        _operation_name: 'custom_get'

@@ -56,11 +56,12 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
+                ->booleanNode('enable_doctrine_mongodb_odm')->defaultValue(false)->info('Enable Doctrine MongoDB ODM integration.')->end()
+                ->booleanNode('enable_doctrine_orm')->defaultValue(true)->info('Enable Doctrine ORM integration.')->end()
                 ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
                 ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
-
                 ->arrayNode('oauth')
                     ->canBeEnabled()
                     ->addDefaultsIfNotSet()
