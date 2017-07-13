@@ -1,0 +1,21 @@
+security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: plaintext
+
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username_email
+
+    firewalls:
+        dev:
+            pattern:   ^/(_(profiler|wdt|error)|css|images|js)/
+            security:  false
+
+        api:
+            pattern:  ^/
+            security: false
+            stateless: true
+            anonymous: true
+
+    access_control:
+        - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }

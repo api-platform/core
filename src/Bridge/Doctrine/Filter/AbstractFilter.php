@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
-abstract class AbstractFilter implements FilterInterface
+abstract class AbstractFilter
 {
     protected $managerRegistry;
     protected $requestStack;
@@ -330,6 +330,7 @@ abstract class AbstractFilter implements FilterInterface
 
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
+        $alias = null;
 
         foreach ($propertyParts['associations'] as $association) {
             $alias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);

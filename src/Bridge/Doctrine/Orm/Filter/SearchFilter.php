@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Filter\AbstractFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -29,7 +30,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SearchFilter extends AbstractFilter
+class SearchFilter extends AbstractFilter implements FilterInterface
 {
     /**
      * @var string Exact matching
