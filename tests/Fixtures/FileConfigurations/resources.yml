@@ -19,7 +19,7 @@ resources:
                 groups: ['default']
             hydra_context:
                 '@type': 'hydra:Operation'
-                '@hydra:title': 'File config Dummy'
+                '@hydra:title': !php/const:ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::HYDRA_TITLE
         iri: 'someirischema'
         properties:
             'foo':
