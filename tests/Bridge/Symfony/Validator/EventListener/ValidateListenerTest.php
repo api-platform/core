@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -58,9 +59,12 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $containerProphecy->has(Argument::any())->shouldNotBeCalled();
+
         list($resourceMetadataFactory, $event) = $this->createEventObject($expectedValidationGroups, $data);
 
-        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory);
+        $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $containerProphecy->reveal());
         $validationViewListener->onKernelView($event);
     }
 
@@ -104,6 +108,23 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         )->shouldBeCalled();
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $containerProphecy->reveal());
+        $validationViewListener->onKernelView($event);
+    }
+
+    public function testValidatorWithScalarGroup()
+    {
+        $data = new DummyEntity();
+        $expectedValidationGroups = ['foo'];
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+        $containerProphecy->has('foo')->willReturn(false)->shouldBeCalled();
+
+        list($resourceMetadataFactory, $event) = $this->createEventObject('foo', $data);
+
+        $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal());
         $validationViewListener->onKernelView($event);
     }
 
