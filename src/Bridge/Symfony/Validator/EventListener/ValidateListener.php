@@ -74,6 +74,7 @@ final class ValidateListener
 
         if (
             $this->container &&
+            is_string($validationGroups) &&
             $this->container->has($validationGroups) &&
             ($service = $this->container->get($validationGroups)) &&
             is_callable($service)
@@ -83,7 +84,7 @@ final class ValidateListener
             $validationGroups = call_user_func_array($validationGroups, [$data]);
         }
 
-        $violations = $this->validator->validate($data, null, $validationGroups);
+        $violations = $this->validator->validate($data, null, (array) $validationGroups);
         if (0 !== count($violations)) {
             throw new ValidationException($violations);
         }
