@@ -242,26 +242,20 @@ class SearchFilter extends AbstractFilter
 
         if ($metadata->isCollectionValuedAssociation($association)) {
             $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
-
-            if (1 === count($values)) {
-                $queryBuilder
-                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
-                    ->setParameter($valueParameter, $values[0]);
-            } else {
-                $queryBuilder
-                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
-                    ->setParameter($valueParameter, $values);
-            }
+            $associationField = 'id';
         } else {
-            if (1 === count($values)) {
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s = :%s', $alias, $association, $valueParameter))
-                    ->setParameter($valueParameter, $values[0]);
-            } else {
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $association, $valueParameter))
-                    ->setParameter($valueParameter, $values);
-            }
+            $associationAlias = $alias;
+            $associationField = $field;
+        }
+
+        if (1 === count($values)) {
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
+                ->setParameter($valueParameter, $values[0]);
+        } else {
+            $queryBuilder
+                ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $associationField, $valueParameter))
+                ->setParameter($valueParameter, $values);
         }
     }
 
