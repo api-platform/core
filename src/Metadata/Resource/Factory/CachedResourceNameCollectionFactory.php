@@ -28,6 +28,7 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 
     private $cacheItemPool;
     private $decorated;
+    private $memoryCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceNameCollectionFactoryInterface $decorated)
     {
@@ -40,11 +41,15 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
      */
     public function create(): ResourceNameCollection
     {
+        if (isset($this->memoryCache[self::CACHE_KEY])) {
+            return $this->memoryCache[self::CACHE_KEY];
+        }
+
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->memoryCache[self::CACHE_KEY] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -53,12 +58,12 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
         $resourceNameCollection = $this->decorated->create();
 
         if (!isset($cacheItem)) {
-            return $resourceNameCollection;
+            return $this->memoryCache[self::CACHE_KEY] = $resourceNameCollection;
         }
 
         $cacheItem->set($resourceNameCollection);
         $this->cacheItemPool->save($cacheItem);
 
-        return $resourceNameCollection;
+        return $this->memoryCache[self::CACHE_KEY] = $resourceNameCollection;
     }
 }
