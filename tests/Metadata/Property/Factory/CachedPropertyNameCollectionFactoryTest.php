@@ -41,7 +41,10 @@ class CachedPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCas
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
         $this->assertInstanceOf(PropertyNameCollection::class, $resultedPropertyNameCollection);
-        $this->assertEquals(new PropertyNameCollection(['id', 'name', 'description', 'dummy']), $resultedPropertyNameCollection);
+
+        $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
+        $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
+        $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     public function testCreateWithItemNotHit()
@@ -63,7 +66,10 @@ class CachedPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCas
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
         $this->assertInstanceOf(PropertyNameCollection::class, $resultedPropertyNameCollection);
-        $this->assertEquals(new PropertyNameCollection(['id', 'name', 'description', 'dummy']), $resultedPropertyNameCollection);
+
+        $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
+        $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
+        $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     public function testCreateWithGetCacheItemThrowsCacheException()
@@ -81,7 +87,10 @@ class CachedPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCas
         $resultedPropertyNameCollection = $cachedPropertyNameCollectionFactory->create(Dummy::class);
 
         $this->assertInstanceOf(PropertyNameCollection::class, $resultedPropertyNameCollection);
-        $this->assertEquals(new PropertyNameCollection(['id', 'name', 'description', 'dummy']), $resultedPropertyNameCollection);
+
+        $expectedResult = new PropertyNameCollection(['id', 'name', 'description', 'dummy']);
+        $this->assertEquals($expectedResult, $resultedPropertyNameCollection);
+        $this->assertEquals($expectedResult, $cachedPropertyNameCollectionFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     private function generateCacheKey(string $resourceClass = Dummy::class, array $options = [])

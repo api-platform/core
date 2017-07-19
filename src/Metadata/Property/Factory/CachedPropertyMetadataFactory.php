@@ -28,6 +28,7 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
     private $cacheItemPool;
     private $decorated;
+    private $memoryCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyMetadataFactoryInterface $decorated)
     {
@@ -40,13 +41,18 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
      */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $property, $options]));
+        $localKey = serialize([$resourceClass, $property, $options]);
+        if (isset($this->memoryCache[$localKey])) {
+            return $this->memoryCache[$localKey];
+        }
+
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($localKey);
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->memoryCache[$localKey] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -55,12 +61,12 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
         if (!isset($cacheItem)) {
-            return $propertyMetadata;
+            return $this->memoryCache[$localKey] = $propertyMetadata;
         }
 
         $cacheItem->set($propertyMetadata);
         $this->cacheItemPool->save($cacheItem);
 
-        return $propertyMetadata;
+        return $this->memoryCache[$localKey] = $propertyMetadata;
     }
 }
