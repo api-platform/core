@@ -41,7 +41,9 @@ class CachedPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $resultedPropertyMetadata = $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy');
 
         $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
-        $this->assertEquals(new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false), $resultedPropertyMetadata);
+        $expectedResult = new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false);
+        $this->assertEquals($expectedResult, $resultedPropertyMetadata);
+        $this->assertEquals($expectedResult, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
     }
 
     public function testCreateWithItemNotHit()
@@ -63,7 +65,9 @@ class CachedPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $resultedPropertyMetadata = $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy');
 
         $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
-        $this->assertEquals(new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false), $resultedPropertyMetadata);
+        $expectedResult = new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false);
+        $this->assertEquals($expectedResult, $resultedPropertyMetadata);
+        $this->assertEquals($expectedResult, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
     }
 
     public function testCreateWithGetCacheItemThrowsCacheException()
@@ -81,7 +85,10 @@ class CachedPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $resultedPropertyMetadata = $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy');
 
         $this->assertInstanceOf(PropertyMetadata::class, $resultedPropertyMetadata);
-        $this->assertEquals(new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false), $resultedPropertyMetadata);
+
+        $expectedResult = new PropertyMetadata(null, 'A dummy', true, true, null, null, false, false);
+        $this->assertEquals($expectedResult, $resultedPropertyMetadata);
+        $this->assertEquals($expectedResult, $cachedPropertyMetadataFactory->create(Dummy::class, 'dummy'), 'Trigger the local cache');
     }
 
     private function generateCacheKey(string $resourceClass = Dummy::class, string $property = 'dummy', array $options = [])

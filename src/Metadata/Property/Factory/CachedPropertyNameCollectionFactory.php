@@ -28,6 +28,7 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
     private $cacheItemPool;
     private $decorated;
+    private $memoryCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyNameCollectionFactoryInterface $decorated)
     {
@@ -40,13 +41,18 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
+        $localKey = serialize([$resourceClass, $options]);
+        if (isset($this->memoryCache[$localKey])) {
+            return $this->memoryCache[$localKey];
+        }
+
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($localKey);
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->memoryCache[$localKey] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -55,12 +61,12 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
         $propertyNameCollection = $this->decorated->create($resourceClass, $options);
 
         if (!isset($cacheItem)) {
-            return $propertyNameCollection;
+            return $this->memoryCache[$localKey] = $propertyNameCollection;
         }
 
         $cacheItem->set($propertyNameCollection);
         $this->cacheItemPool->save($cacheItem);
 
-        return $propertyNameCollection;
+        return $this->memoryCache[$localKey] = $propertyNameCollection;
     }
 }
