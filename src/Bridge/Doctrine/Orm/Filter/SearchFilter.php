@@ -240,16 +240,28 @@ class SearchFilter extends AbstractFilter
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
-        $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+        if ($metadata->isCollectionValuedAssociation($association)) {
+            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
 
-        if (1 === count($values)) {
-            $queryBuilder
-                ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
-                ->setParameter($valueParameter, $values[0]);
+            if (1 === count($values)) {
+                $queryBuilder
+                    ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                    ->setParameter($valueParameter, $values[0]);
+            } else {
+                $queryBuilder
+                    ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                    ->setParameter($valueParameter, $values);
+            }
         } else {
-            $queryBuilder
-                ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
-                ->setParameter($valueParameter, $values);
+            if (1 === count($values)) {
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s = :%s', $alias, $association, $valueParameter))
+                    ->setParameter($valueParameter, $values[0]);
+            } else {
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $association, $valueParameter))
+                    ->setParameter($valueParameter, $values);
+            }
         }
     }
 
