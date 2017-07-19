@@ -94,8 +94,7 @@
         </service>
 
         <service id="api_platform.operation_path_resolver.custom" class="ApiPlatform\Core\PathResolver\CustomOperationPathResolver" public="false">
-            <!-- should be "api_platform.operation_path_resolver.generator" when the default is removed -->
-            <argument type="service" id="api_platform.operation_path_resolver.default" />
+            <argument type="service" id="api_platform.operation_path_resolver.generator" />
         </service>
 
         <service id="api_platform.operation_path_resolver.generator" class="ApiPlatform\Core\PathResolver\OperationPathResolver" public="false">
@@ -103,11 +102,11 @@
         </service>
 
         <service id="api_platform.operation_path_resolver.underscore" class="ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver" public="false">
-                <deprecated>The "%service_id%" service is deprecated since ApiPlatform 2.1 and will be removed in 3.0. Use PathSegmentNameGenerator instead.</deprecated>
+                <deprecated>The "%service_id%" service is deprecated since ApiPlatform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.underscore" instead.</deprecated>
         </service>
 
         <service id="api_platform.operation_path_resolver.dash" class="ApiPlatform\Core\PathResolver\DashOperationPathResolver" public="false">
-                <deprecated>The "%service_id%" service is deprecated since ApiPlatform 2.1 and will be removed in 3.0. Use PathSegmentNameGenerator instead.</deprecated>
+                <deprecated>The "%service_id%" service is deprecated since ApiPlatform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.dash" instead.</deprecated>
         </service>
 
         <!-- Path name generator -->

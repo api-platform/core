@@ -54,18 +54,14 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
             $routeName = $operation['route_name'];
         } elseif (OperationType::SUBRESOURCE === $operationType) {
             throw new InvalidArgumentException('Subresource operations are not supported by the RouterOperationPathResolver without a route name.');
+        } elseif (null === $operationName) {
+            return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
         } else {
-            if (null !== $operationName) {
-                $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
-            } else {
-                return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
-            }
+            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
         }
 
         if (!$route = $this->router->getRouteCollection()->get($routeName)) {
-            throw new InvalidArgumentException(
-                sprintf('The route "%s" of the resource "%s" was not found.', $routeName, $resourceShortName)
-            );
+            throw new InvalidArgumentException(sprintf('The route "%s" of the resource "%s" was not found.', $routeName, $resourceShortName));
         }
 
         return $route->getPath();
