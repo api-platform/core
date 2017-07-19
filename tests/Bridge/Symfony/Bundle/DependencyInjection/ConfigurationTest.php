@@ -104,12 +104,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'maximum_items_per_page' => null,
                 ],
             ],
-            'loader_paths' => [
-                'annotation' => [],
-                'yaml' => [],
-                'xml' => [],
+            'mapping' => [
+                'paths' => [],
             ],
-            'api_resources_directory' => 'Entity',
             'http_cache' => [
                 'invalidation' => ['enabled' => false, 'varnish_urls' => []],
                 'etag' => true,
@@ -141,6 +138,21 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             \InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
             \RuntimeException::class => Response::HTTP_INTERNAL_SERVER_ERROR,
         ], $config['exception_to_status']);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.
+     */
+    public function testLegacyDefaultOperationPathResolver()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'default_operation_path_resolver' => 'api_platform.operation_path_resolver.dash',
+            ],
+        ]);
+
+        $this->assertTrue(isset($config['default_operation_path_resolver']));
     }
 
     public function invalidHttpStatusCodeProvider()

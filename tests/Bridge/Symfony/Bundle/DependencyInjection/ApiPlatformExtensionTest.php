@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtens
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
@@ -26,6 +27,7 @@ use Prophecy\Argument;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,7 +48,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
         'description' => 'description',
-        'api_resources_directory' => 'Entity',
         'version' => 'version',
         'formats' => [
             'jsonld' => ['mime_types' => ['application/ld+json']],
@@ -233,6 +234,30 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedExceptionMessageRegExp /Unsupported mapping type in ".+", supported types are XML & Yaml\./
+     */
+    public function testResourcesToWatchWithUnsupportedMappingType()
+    {
+        $this->extension->load(
+            array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => [__FILE__]]]]),
+            $this->getPartialContainerBuilderProphecy()->reveal()
+        );
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedExceptionMessage Could not open file or directory "fake_file.xml".
+     */
+    public function testResourcesToWatchWithNonExistentFile()
+    {
+        $this->extension->load(
+            array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => ['fake_file.xml']]]]),
+            $this->getPartialContainerBuilderProphecy()->reveal()
+        );
+    }
+
     public function testDisableEagerLoadingExtension()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
@@ -243,7 +268,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['eager_loading' => ['enabled' => false]]]), $containerBuilder);
     }
 
-    private function getContainerBuilderProphecy()
+    private function getPartialContainerBuilderProphecy()
     {
         $definitionArgument = Argument::that(function ($argument) {
             return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
@@ -272,6 +297,18 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'DoctrineBundle' => DoctrineBundle::class,
         ])->shouldBeCalled();
 
+        $containerBuilderProphecy->getParameter('kernel.bundles_metadata')->willReturn([
+            'TestBundle' => [
+                'parent' => null,
+                'path' => realpath(__DIR__.'/../../../../Fixtures/TestBundle'),
+                'namespace' => TestBundle::class,
+            ],
+        ])->shouldBeCalled();
+
+        $containerBuilderProphecy->fileExists(Argument::type('string'), false)->will(function ($args) {
+            return file_exists($args[0]);
+        })->shouldBeCalled();
+
         $parameters = [
             'api_platform.collection.order' => 'ASC',
             'api_platform.collection.order_parameter_name' => 'order',
@@ -283,19 +320,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
             'api_platform.collection.pagination.maximum_items_per_page' => null,
             'api_platform.collection.pagination.page_parameter_name' => 'page',
-            'api_platform.api_resources_directory' => 'Entity',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
-            'api_platform.oauth.enabled' => false,
-            'api_platform.oauth.clientId' => '',
-            'api_platform.oauth.clientSecret' => '',
-            'api_platform.oauth.type' => 'oauth2',
-            'api_platform.oauth.flow' => 'application',
-            'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
-            'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
-            'api_platform.oauth.scopes' => [],
-            'api_platform.enable_swagger' => true,
-            'api_platform.enable_swagger_ui' => true,
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
             'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
             'api_platform.title' => 'title',
@@ -304,13 +330,13 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.eager_loading.max_joins' => 30,
             'api_platform.eager_loading.force_eager' => true,
             'api_platform.eager_loading.fetch_partial' => false,
-            'api_platform.resource_class_directories' => [],
             'api_platform.http_cache.etag' => true,
             'api_platform.http_cache.max_age' => null,
             'api_platform.http_cache.shared_max_age' => null,
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
         ];
+
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
         }
@@ -325,12 +351,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
-        foreach (['yaml', 'xml'] as $format) {
-            $definitionProphecy = $this->prophesize(Definition::class);
-            $definitionProphecy->addArgument([])->shouldBeCalled();
-            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
-        }
-
         $definitions = [
             'api_platform.action.documentation',
             'api_platform.action.placeholder',
@@ -343,60 +363,11 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.cache.route_name_resolver',
             'api_platform.cache.subresource_operation_factory',
             'api_platform.collection_data_provider',
-            'api_platform.doctrine.listener.view.write',
-            'api_platform.doctrine.metadata_factory',
-            'api_platform.doctrine.orm.boolean_filter',
-            'api_platform.doctrine.orm.collection_data_provider',
-            'api_platform.doctrine.orm.date_filter',
-            'api_platform.doctrine.orm.default.collection_data_provider',
-            'api_platform.doctrine.orm.default.item_data_provider',
-            'api_platform.doctrine.orm.exists_filter',
-            'api_platform.doctrine.orm.default.subresource_data_provider',
-            'api_platform.doctrine.orm.item_data_provider',
-            'api_platform.doctrine.orm.metadata.property.metadata_factory',
-            'api_platform.doctrine.orm.numeric_filter',
-            'api_platform.doctrine.orm.order_filter',
-            'api_platform.doctrine.orm.query_extension.eager_loading',
-            'api_platform.doctrine.orm.query_extension.filter',
-            'api_platform.doctrine.orm.query_extension.filter_eager_loading',
-            'api_platform.doctrine.orm.query_extension.order',
-            'api_platform.doctrine.orm.query_extension.pagination',
-            'api_platform.doctrine.orm.range_filter',
-            'api_platform.doctrine.orm.search_filter',
-            'api_platform.doctrine.orm.subresource_data_provider',
             'api_platform.filter_locator',
             'api_platform.filter_collection_factory',
-            'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.filters',
-            'api_platform.doctrine.listener.view.write',
-            'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.encoder',
-            'api_platform.jsonld.action.context',
-            'api_platform.jsonld.context_builder',
-            'api_platform.jsonld.normalizer.item',
-            'api_platform.swagger.normalizer.documentation',
-            'api_platform.swagger.command.swagger_command',
-            'api_platform.swagger.action.ui',
-            'api_platform.swagger.listener.ui',
-            'api_platform.hal.encoder',
-            'api_platform.hal.normalizer.collection',
-            'api_platform.hal.normalizer.entrypoint',
-            'api_platform.hal.normalizer.item',
-            'api_platform.hydra.listener.response.add_link_header',
-            'api_platform.hydra.normalizer.collection',
-            'api_platform.hydra.normalizer.collection_filters',
-            'api_platform.hydra.normalizer.constraint_violation_list',
-            'api_platform.hydra.normalizer.documentation',
-            'api_platform.hydra.normalizer.entrypoint',
-            'api_platform.hydra.normalizer.error',
-            'api_platform.hydra.normalizer.partial_collection_view',
             'api_platform.iri_converter',
             'api_platform.item_data_provider',
-            'api_platform.jsonld.action.context',
-            'api_platform.jsonld.context_builder',
-            'api_platform.jsonld.encoder',
-            'api_platform.jsonld.normalizer.item',
-            'api_platform.jsonld.normalizer.item',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
             'api_platform.listener.request.add_format',
@@ -405,33 +376,23 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
-            'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.extractor.xml',
-            'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.inherited',
             'api_platform.metadata.property.metadata_factory.property_info',
             'api_platform.metadata.property.metadata_factory.serializer',
             'api_platform.metadata.property.metadata_factory.validator',
             'api_platform.metadata.property.metadata_factory.xml',
-            'api_platform.metadata.property.metadata_factory.yaml',
             'api_platform.metadata.property.name_collection_factory.cached',
             'api_platform.metadata.property.name_collection_factory.inherited',
             'api_platform.metadata.property.name_collection_factory.property_info',
             'api_platform.metadata.property.name_collection_factory.xml',
-            'api_platform.metadata.property.name_collection_factory.yaml',
-            'api_platform.metadata.resource.metadata_factory.annotation',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.operation',
-            'api_platform.metadata.resource.metadata_factory.php_doc',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.xml',
-            'api_platform.metadata.resource.metadata_factory.yaml',
-            'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.cached',
             'api_platform.metadata.resource.name_collection_factory.xml',
-            'api_platform.metadata.resource.name_collection_factory.yaml',
-            'api_platform.metadata.subresource.metadata_factory.annotation',
             'api_platform.identifiers_extractor',
             'api_platform.identifiers_extractor.cached',
             'api_platform.negotiator',
@@ -443,9 +404,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.operation_path_resolver.underscore',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.path_segment_name_generator.dash',
-            'api_platform.problem.encoder',
-            'api_platform.problem.normalizer.constraint_violation_list',
-            'api_platform.problem.normalizer.error',
             'api_platform.resource_class_resolver',
             'api_platform.route_loader',
             'api_platform.route_name_resolver',
@@ -459,14 +417,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
-            'api_platform.swagger.action.ui',
-            'api_platform.swagger.command.swagger_command',
-            'api_platform.swagger.normalizer.documentation',
-            'api_platform.http_cache.listener.response.configure',
-            'api_platform.http_cache.purger.varnish',
-            'api_platform.http_cache.purger.varnish_client',
-            'api_platform.http_cache.listener.response.add_tags',
-            'api_platform.http_cache.purger.varnish_client.test',
         ];
 
         foreach ($definitions as $definition) {
@@ -490,7 +440,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
-            'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -498,8 +447,125 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
-        $containerBuilderProphecy->getParameter('api_platform.api_resources_directory')->willReturn('Entity');
         $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
+
+        return $containerBuilderProphecy;
+    }
+
+    private function getContainerBuilderProphecy()
+    {
+        $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
+
+        $definitionArgument = Argument::that(function ($argument) {
+            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
+        });
+
+        $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
+
+        $parameters = [
+            'api_platform.oauth.enabled' => false,
+            'api_platform.oauth.clientId' => '',
+            'api_platform.oauth.clientSecret' => '',
+            'api_platform.oauth.type' => 'oauth2',
+            'api_platform.oauth.flow' => 'application',
+            'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
+            'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
+            'api_platform.oauth.scopes' => [],
+            'api_platform.enable_swagger' => true,
+            'api_platform.enable_swagger_ui' => true,
+            'api_platform.resource_class_directories' => Argument::type('array'),
+        ];
+
+        foreach ($parameters as $key => $value) {
+            $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
+        }
+
+        foreach (['yaml', 'xml'] as $format) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+        }
+
+        $definitions = [
+            'api_platform.doctrine.listener.view.write',
+            'api_platform.doctrine.metadata_factory',
+            'api_platform.doctrine.orm.boolean_filter',
+            'api_platform.doctrine.orm.collection_data_provider',
+            'api_platform.doctrine.orm.date_filter',
+            'api_platform.doctrine.orm.default.collection_data_provider',
+            'api_platform.doctrine.orm.default.item_data_provider',
+            'api_platform.doctrine.orm.exists_filter',
+            'api_platform.doctrine.orm.default.subresource_data_provider',
+            'api_platform.doctrine.orm.item_data_provider',
+            'api_platform.doctrine.orm.metadata.property.metadata_factory',
+            'api_platform.doctrine.orm.numeric_filter',
+            'api_platform.doctrine.orm.order_filter',
+            'api_platform.doctrine.orm.query_extension.eager_loading',
+            'api_platform.doctrine.orm.query_extension.filter',
+            'api_platform.doctrine.orm.query_extension.filter_eager_loading',
+            'api_platform.doctrine.orm.query_extension.order',
+            'api_platform.doctrine.orm.query_extension.pagination',
+            'api_platform.doctrine.orm.range_filter',
+            'api_platform.doctrine.orm.search_filter',
+            'api_platform.doctrine.orm.subresource_data_provider',
+            'api_platform.doctrine.listener.http_cache.purge',
+            'api_platform.doctrine.listener.view.write',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.encoder',
+            'api_platform.jsonld.action.context',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.swagger.normalizer.documentation',
+            'api_platform.swagger.command.swagger_command',
+            'api_platform.swagger.action.ui',
+            'api_platform.swagger.listener.ui',
+            'api_platform.hal.encoder',
+            'api_platform.hal.normalizer.collection',
+            'api_platform.hal.normalizer.entrypoint',
+            'api_platform.hal.normalizer.item',
+            'api_platform.hydra.listener.response.add_link_header',
+            'api_platform.hydra.normalizer.collection',
+            'api_platform.hydra.normalizer.collection_filters',
+            'api_platform.hydra.normalizer.constraint_violation_list',
+            'api_platform.hydra.normalizer.documentation',
+            'api_platform.hydra.normalizer.entrypoint',
+            'api_platform.hydra.normalizer.error',
+            'api_platform.hydra.normalizer.partial_collection_view',
+            'api_platform.jsonld.action.context',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.encoder',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.metadata.extractor.yaml',
+            'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory.yaml',
+            'api_platform.metadata.property.name_collection_factory.yaml',
+            'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.resource.metadata_factory.php_doc',
+            'api_platform.metadata.resource.metadata_factory.short_name',
+            'api_platform.metadata.resource.metadata_factory.yaml',
+            'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.metadata.subresource.metadata_factory.annotation',
+            'api_platform.problem.encoder',
+            'api_platform.problem.normalizer.constraint_violation_list',
+            'api_platform.problem.normalizer.error',
+            'api_platform.swagger.action.ui',
+            'api_platform.swagger.command.swagger_command',
+            'api_platform.swagger.normalizer.documentation',
+            'api_platform.http_cache.listener.response.configure',
+            'api_platform.http_cache.purger.varnish',
+            'api_platform.http_cache.purger.varnish_client',
+            'api_platform.http_cache.listener.response.add_tags',
+            'api_platform.http_cache.purger.varnish_client.test',
+        ];
+
+        foreach ($definitions as $definition) {
+            $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
+        }
+
+        $containerBuilderProphecy->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish')->shouldBeCalled();
 
         return $containerBuilderProphecy;
     }
