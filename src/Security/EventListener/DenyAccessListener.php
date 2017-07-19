@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -106,7 +107,7 @@ final class DenyAccessListener
             'user' => $token->getUser(),
             'object' => $request->attributes->get('data'),
             'request' => $request,
-            'roles' => array_map(function ($role) {return $role->getRole(); }, $roles),
+            'roles' => array_map(function (Role $role) {return $role->getRole(); }, $roles),
             'trust_resolver' => $this->authenticationTrustResolver,
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
