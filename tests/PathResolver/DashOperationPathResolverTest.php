@@ -18,6 +18,7 @@ use ApiPlatform\Core\PathResolver\DashOperationPathResolver;
 
 /**
  * @author Guilhem N. <egetick@gmail.com>
+ * @group legacy
  */
 class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,22 +36,18 @@ class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/short-names/{id}.{_format}', $dashOperationPathResolver->resolveOperationPath('ShortName', [], OperationType::ITEM, 'get'));
     }
 
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedMessage Subresource operations are not supported by the OperationPathResolver.
+     */
     public function testResolveSubresourceOperationPath()
     {
         $dashOperationPathResolver = new DashOperationPathResolver();
 
-        $path = $dashOperationPathResolver->resolveOperationPath('ShortName', ['property' => 'relatedFoo', 'identifiers' => [['id', 'class']], 'collection' => true], OperationType::SUBRESOURCE, 'get');
-
-        $this->assertSame('/short-names/{id}/related-foos.{_format}', $path);
-
-        $next = $dashOperationPathResolver->resolveOperationPath($path, ['property' => 'bar', 'identifiers' => [['id', 'class'], ['relatedId', 'class']], 'collection' => false], OperationType::SUBRESOURCE, 'get');
-
-        $this->assertSame('/short-names/{id}/related-foos/{relatedId}/bar.{_format}', $next);
+        $dashOperationPathResolver->resolveOperationPath('ShortName', ['property' => 'bar', 'identifiers' => [['id', 'class'], ['relatedId', 'class']], 'collection' => false], OperationType::SUBRESOURCE, 'get');
     }
 
     /**
-     * @group legacy
-     * @expectedDeprecation Method ApiPlatform\Core\PathResolver\DashOperationPathResolver::resolveOperationPath() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.
      * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
     public function testLegacyResolveOperationPath()

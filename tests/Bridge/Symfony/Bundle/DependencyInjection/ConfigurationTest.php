@@ -68,6 +68,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
+            'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
             'name_converter' => null,
             'enable_fos_user' => false,
             'enable_nelmio_api_doc' => false,

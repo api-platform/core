@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -46,6 +48,18 @@ class Answer
      * @Serializer\Groups({"foobar"})
      */
     private $question;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Question", mappedBy="answer")
+     * @Serializer\Groups({"foobar"})
+     * @ApiSubresource
+     */
+    private $relatedQuestions;
+
+    public function __construct()
+    {
+        $this->relatedQuestions = new ArrayCollection();
+    }
 
     /**
      * Get id.
@@ -103,5 +117,20 @@ class Answer
     public function getQuestion()
     {
         return $this->question;
+    }
+
+    /**
+     * Get related question.
+     *
+     * @return ArrayCollection
+     */
+    public function getRelatedQuestions()
+    {
+        return $this->relatedQuestions;
+    }
+
+    public function addRelatedQuestion(Question $question)
+    {
+        $this->relatedQuestions->add($question);
     }
 }

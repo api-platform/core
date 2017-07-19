@@ -40,17 +40,17 @@ class RouterOperationPathResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foos', $operationPathResolver->resolveOperationPath('Foo', ['route_name' => 'foos'], OperationType::COLLECTION, 'get'));
     }
 
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedMessage Subresource operations are not supported by the RouterOperationPathResolver.
+     */
     public function testResolveOperationPathWithSubresource()
     {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('api_foos_bars_get_subresource', new Route('/foos/{id}/bars'));
-
         $routerProphecy = $this->prophesize(RouterInterface::class);
-        $routerProphecy->getRouteCollection()->willReturn($routeCollection)->shouldBeCalled();
 
         $operationPathResolver = new RouterOperationPathResolver($routerProphecy->reveal(), $this->prophesize(OperationPathResolverInterface::class)->reveal());
 
-        $this->assertEquals('/foos/{id}/bars', $operationPathResolver->resolveOperationPath('Foo', ['property' => 'bar', 'collection' => true], OperationType::SUBRESOURCE, 'get'));
+        $operationPathResolver->resolveOperationPath('Foo', ['property' => 'bar', 'collection' => true, 'resource_class' => 'Foo'], OperationType::SUBRESOURCE, 'get');
     }
 
     public function testResolveOperationPathWithRouteNameGeneration()

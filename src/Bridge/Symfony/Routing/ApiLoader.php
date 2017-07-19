@@ -16,10 +16,9 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -42,19 +41,17 @@ final class ApiLoader extends Loader
      */
     const ROUTE_NAME_PREFIX = 'api_';
     const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
-    const SUBRESOURCE_SUFFIX = '_get_subresource';
 
     private $fileLoader;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $operationPathResolver;
     private $container;
     private $formats;
     private $resourceClassDirectories;
+    private $subresourceOperationFactory;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory = null, PropertyMetadataFactoryInterface $propertyMetadataFactory = null)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -63,8 +60,7 @@ final class ApiLoader extends Loader
         $this->container = $container;
         $this->formats = $formats;
         $this->resourceClassDirectories = $resourceClassDirectories;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
     }
 
     /**
@@ -99,90 +95,35 @@ final class ApiLoader extends Loader
                 }
             }
 
-            $this->computeSubresourceOperations($routeCollection, $resourceClass);
+            if (null === $this->subresourceOperationFactory) {
+                continue;
+            }
+
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+                $routeCollection->add($operation['route_name'], new Route(
+                    $operation['path'],
+                    [
+                        '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
+                        '_format' => null,
+                        '_api_resource_class' => $operation['resource_class'],
+                        '_api_subresource_operation_name' => $operation['route_name'],
+                        '_api_subresource_context' => [
+                            'property' => $operation['property'],
+                            'identifiers' => $operation['identifiers'],
+                            'collection' => $operation['collection'],
+                            'operationId' => $operationId,
+                        ],
+                    ],
+                    [],
+                    [],
+                    '',
+                    [],
+                    ['GET']
+                ));
+            }
         }
 
         return $routeCollection;
-    }
-
-    /**
-     * Handles subresource operations recursively and declare their corresponding routes.
-     *
-     * @param RouteCollection $routeCollection
-     * @param string          $resourceClass
-     * @param string          $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
-     * @param array           $parentOperation   the previous call operation
-     */
-    private function computeSubresourceOperations(RouteCollection $routeCollection, string $resourceClass, string $rootResourceClass = null, array $parentOperation = null, array $visited = [])
-    {
-        if (null === $this->propertyNameCollectionFactory || null === $this->propertyMetadataFactory) {
-            return;
-        }
-
-        if (null === $rootResourceClass) {
-            $rootResourceClass = $resourceClass;
-        }
-
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-
-            if (!$propertyMetadata->hasSubresource()) {
-                continue;
-            }
-
-            $subresource = $propertyMetadata->getSubresource();
-
-            $operation = [
-                'property' => $property,
-                'collection' => $subresource->isCollection(),
-            ];
-
-            $visiting = "$rootResourceClass $resourceClass $property {$subresource->isCollection()} {$subresource->getResourceClass()}";
-
-            if (in_array($visiting, $visited, true)) {
-                continue;
-            }
-
-            $visited[] = $visiting;
-
-            if (null === $parentOperation) {
-                $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
-                $rootShortname = $rootResourceMetadata->getShortName();
-
-                $operation['identifiers'] = [['id', $rootResourceClass]];
-                $operation['route_name'] = RouteNameGenerator::generate('get', $rootShortname, OperationType::SUBRESOURCE, $operation);
-                $operation['path'] = $this->operationPathResolver->resolveOperationPath($rootShortname, $operation, OperationType::SUBRESOURCE, $operation['route_name']);
-            } else {
-                $operation['identifiers'] = $parentOperation['identifiers'];
-                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass];
-                $operation['route_name'] = str_replace('get'.RouteNameGenerator::SUBRESOURCE_SUFFIX, RouteNameGenerator::routeNameResolver($property, $operation['collection']).'_get'.RouteNameGenerator::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
-                $operation['path'] = $this->operationPathResolver->resolveOperationPath($parentOperation['path'], $operation, OperationType::SUBRESOURCE, $operation['route_name']);
-            }
-
-            $route = new Route(
-                $operation['path'],
-                [
-                    '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
-                    '_format' => null,
-                    '_api_resource_class' => $subresource->getResourceClass(),
-                    '_api_subresource_operation_name' => $operation['route_name'],
-                    '_api_subresource_context' => [
-                        'property' => $operation['property'],
-                        'identifiers' => $operation['identifiers'],
-                        'collection' => $subresource->isCollection(),
-                    ],
-                ],
-                [],
-                [],
-                '',
-                [],
-                ['GET']
-            );
-
-            $routeCollection->add($operation['route_name'], $route);
-
-            $this->computeSubresourceOperations($routeCollection, $subresource->getResourceClass(), $rootResourceClass, $operation, $visited);
-        }
     }
 
     /**

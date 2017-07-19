@@ -36,13 +36,12 @@ class RouteNameGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('api_foos_get_collection', RouteNameGenerator::generate('get', 'Foo', true));
     }
 
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedMessage Subresource operations are not supported by the RouteNameGenerator.
+     */
     public function testGenerateWithSubresource()
     {
-        $this->assertEquals('api_foos_bar_get_subresource', RouteNameGenerator::generate('get', 'Foo', OperationType::SUBRESOURCE, ['property' => 'bar', 'collection' => false]));
-    }
-
-    public function testGenerateWithSubresourceCollection()
-    {
-        $this->assertEquals('api_foos_bars_get_subresource', RouteNameGenerator::generate('get', 'Foo', OperationType::SUBRESOURCE, ['property' => 'bar', 'collection' => true]));
+        $this->assertEquals('api_foos_bar_get_subresource', RouteNameGenerator::generate('get', 'Foo', OperationType::SUBRESOURCE));
     }
 }

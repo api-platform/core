@@ -43,8 +43,15 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
                 ->scalarNode('description')->defaultValue('')->info('The description of the API.')->end()
                 ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
-                ->scalarNode('default_operation_path_resolver')->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
+                ->scalarNode('default_operation_path_resolver')
+                    ->beforeNormalization()->always(function ($v) {
+                        if (isset($v['default_operation_path_resolver'])) {
+                            @trigger_error('The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.', E_USER_DEPRECATED);
+                        }
+                    })->end()
+                ->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
                 ->scalarNode('api_resources_directory')->defaultValue('Entity')->info('The name of the directory within the bundles that contains the api resources.')->end()
                 ->arrayNode('eager_loading')
                     ->canBeDisabled()
