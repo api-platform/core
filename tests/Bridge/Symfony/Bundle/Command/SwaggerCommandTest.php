@@ -19,7 +19,6 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @group legacy
  */
 class SwaggerCommandTest extends KernelTestCase
 {
