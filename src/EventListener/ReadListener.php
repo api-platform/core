@@ -133,7 +133,7 @@ final class ReadListener
         }
 
         $identifiers = [];
-        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $class, $hasIdentifier)) {
+        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, , $hasIdentifier)) {
             if (true === $hasIdentifier) {
                 $identifiers[$id] = $request->attributes->get($id);
             }
