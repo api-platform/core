@@ -15,9 +15,14 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -307,5 +312,78 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
             false
         );
         $this->assertFalse($extension->supportsResult('Foo', 'op'));
+    }
+
+    public function testGetResult()
+    {
+        $result = $this->getPaginationExtensionResult(false);
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
+    }
+
+    public function testGetResultWithPartial()
+    {
+        $result = $this->getPaginationExtensionResult(true);
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertNotInstanceOf(PaginatorInterface::class, $result);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Method ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension::getResult() will have a 2nd `string $resourceClass` argument in version 3.0. Not defining it is deprecated since 2.2.
+     * @expectedDeprecation Method ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension::getResult() will have a 3rd `string $operationName = null` argument in version 3.0. Not defining it is deprecated since 2.2.
+     */
+    public function testLegacyGetResult()
+    {
+        $result = $this->getPaginationExtensionResult(false, true);
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
+    }
+
+    private function getPaginationExtensionResult(bool $partial = false, bool $legacy = false)
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['partial' => $partial]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        if (!$legacy) {
+            $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], ['pagination_partial' => false, 'pagination_client_partial' => true]))->shouldBeCalled();
+        }
+
+        $configuration = new Configuration();
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getConfiguration()->willReturn($configuration)->shouldBeCalled();
+
+        $query = new Query($entityManagerProphecy->reveal());
+        $query->setFirstResult(0);
+        $query->setMaxResults(42);
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootEntities()->willReturn([])->shouldBeCalled();
+        $queryBuilderProphecy->getQuery()->willReturn($query)->shouldBeCalled();
+        $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
+            return in_array($arg, ['having', 'orderBy', 'join'], true);
+        }))->willReturn('')->shouldBeCalled();
+        $queryBuilderProphecy->getMaxResults()->willReturn(42)->shouldBeCalled();
+
+        $paginationExtension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactoryProphecy->reveal()
+        );
+
+        $args = [$queryBuilderProphecy->reveal()];
+
+        if (!$legacy) {
+            $args[] = 'Foo';
+            $args[] = null;
+        }
+
+        return $paginationExtension->getResult(...$args);
     }
 }

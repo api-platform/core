@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -44,14 +45,6 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizePaginator()
     {
-        $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
-        $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
-        $paginatorProphecy->getLastPage()->willReturn(20)->shouldBeCalled();
-
-        $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedNormalizerProphecy->normalize(Argument::type(PaginatorInterface::class), null, Argument::type('array'))->willReturn(['hydra:totalItems' => 40, 'foo' => 'bar'])->shouldBeCalled();
-
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), '_page');
         $this->assertEquals(
             [
                 'hydra:totalItems' => 40,
@@ -65,8 +58,47 @@ class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
                     'hydra:next' => '/?_page=4',
                 ],
             ],
-            $normalizer->normalize($paginatorProphecy->reveal())
+            $this->normalizePaginator(false)
         );
+    }
+
+    public function testNormalizePartialaginator()
+    {
+        $this->assertEquals(
+            [
+                'foo' => 'bar',
+                'hydra:view' => [
+                    '@id' => '/?_page=3',
+                    '@type' => 'hydra:PartialCollectionView',
+                    'hydra:previous' => '/?_page=2',
+                    'hydra:next' => '/?_page=4',
+                ],
+            ],
+            $this->normalizePaginator(true)
+        );
+    }
+
+    private function normalizePaginator($partial = false)
+    {
+        $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
+        $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
+
+        $decoratedNormalize = ['foo' => 'bar'];
+
+        if ($partial) {
+            $paginatorProphecy->getItemsPerPage()->willReturn(42)->shouldBeCalled();
+            $paginatorProphecy->count()->willReturn(42)->shouldBeCalled();
+        } else {
+            $decoratedNormalize['hydra:totalItems'] = 40;
+            $paginatorProphecy->getLastPage()->willReturn(20)->shouldBeCalled();
+        }
+
+        $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedNormalizerProphecy->normalize(Argument::type($partial ? PartialPaginatorInterface::class : PaginatorInterface::class), null, Argument::type('array'))->willReturn($decoratedNormalize)->shouldBeCalled();
+
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), '_page');
+
+        return $normalizer->normalize($paginatorProphecy->reveal());
     }
 
     public function testSupportsNormalization()

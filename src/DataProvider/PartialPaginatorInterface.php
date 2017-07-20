@@ -14,23 +14,23 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 /**
- * Paginator Interface.
+ * Partial Paginator Interface.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-interface PaginatorInterface extends PartialPaginatorInterface
+interface PartialPaginatorInterface extends \Traversable, \Countable
 {
     /**
-     * Gets last page.
+     * Gets the current page number.
      *
      * @return float
      */
-    public function getLastPage(): float;
+    public function getCurrentPage(): float;
 
     /**
-     * Gets the number of items in the whole collection.
+     * Gets the number of items by page.
      *
      * @return float
      */
-    public function getTotalItems(): float;
+    public function getItemsPerPage(): float;
 }
