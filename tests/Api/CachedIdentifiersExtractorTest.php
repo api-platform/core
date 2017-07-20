@@ -45,7 +45,9 @@ class CachedIdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
 
         $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
 
-        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $expectedResult = ['id' => 1];
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
 
     public function testSecondPass()
@@ -67,7 +69,9 @@ class CachedIdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
 
         $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
 
-        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $expectedResult = ['id' => 1];
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
 
     public function testSecondPassWithRelatedNotCached()
@@ -98,7 +102,9 @@ class CachedIdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
 
         $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
 
+        $expectedResult = ['id' => 1, 'relatedDummy' => 1];
         $this->assertEquals(['id' => 1, 'relatedDummy' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
 
     public function testSecondPassWithRelatedCached()
@@ -130,6 +136,8 @@ class CachedIdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
 
         $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
 
-        $this->assertEquals(['id' => 1, 'relatedDummy' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $expectedResult = ['id' => 1, 'relatedDummy' => 1];
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
 }
