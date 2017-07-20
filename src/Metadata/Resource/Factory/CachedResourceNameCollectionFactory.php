@@ -28,7 +28,7 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 
     private $cacheItemPool;
     private $decorated;
-    private $memoryCache = [];
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceNameCollectionFactoryInterface $decorated)
     {
@@ -41,15 +41,15 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
      */
     public function create(): ResourceNameCollection
     {
-        if (isset($this->memoryCache[self::CACHE_KEY])) {
-            return $this->memoryCache[self::CACHE_KEY];
+        if (isset($this->localCache[self::CACHE_KEY])) {
+            return $this->localCache[self::CACHE_KEY];
         }
 
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY);
 
             if ($cacheItem->isHit()) {
-                return $this->memoryCache[self::CACHE_KEY] = $cacheItem->get();
+                return $this->localCache[self::CACHE_KEY] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -58,12 +58,12 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
         $resourceNameCollection = $this->decorated->create();
 
         if (!isset($cacheItem)) {
-            return $this->memoryCache[self::CACHE_KEY] = $resourceNameCollection;
+            return $this->localCache[self::CACHE_KEY] = $resourceNameCollection;
         }
 
         $cacheItem->set($resourceNameCollection);
         $this->cacheItemPool->save($cacheItem);
 
-        return $this->memoryCache[self::CACHE_KEY] = $resourceNameCollection;
+        return $this->localCache[self::CACHE_KEY] = $resourceNameCollection;
     }
 }
