@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -29,6 +30,18 @@ class ApiResourceTest extends \PHPUnit_Framework_TestCase
         $resource->itemOperations = ['foo' => ['bar']];
         $resource->collectionOperations = ['bar' => ['foo']];
         $resource->attributes = ['foo' => 'bar'];
+
+        $this->assertEquals('shortName', $resource->shortName);
+        $this->assertEquals('description', $resource->description);
+        $this->assertEquals('http://example.com/res', $resource->iri);
+        $this->assertEquals(['bar' => ['foo']], $resource->collectionOperations);
+        $this->assertEquals(['foo' => 'bar'], $resource->attributes);
+    }
+
+    public function testApiResourceAnnotation()
+    {
+        $reader = new AnnotationReader();
+        $resource = $reader->getClassAnnotation(new \ReflectionClass(AnnotatedClass::class), ApiResource::class);
 
         $this->assertEquals('shortName', $resource->shortName);
         $this->assertEquals('description', $resource->description);
