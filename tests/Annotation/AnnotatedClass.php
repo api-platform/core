@@ -12,6 +12,7 @@
 declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Annotation;
+
 use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
@@ -28,5 +29,4 @@ use ApiPlatform\Core\Annotation\ApiResource;
  */
 class AnnotatedClass
 {
-
 }

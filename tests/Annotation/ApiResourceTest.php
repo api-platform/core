@@ -18,7 +18,6 @@ use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Marcus Speight <marcus@pmconnect.co.uk>
  */
 class ApiResourceTest extends \PHPUnit_Framework_TestCase
 {
