@@ -33,7 +33,7 @@ install:
 
 script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov; else vendor/bin/phpunit; fi
-  - if [[ $coverage = 1 ]]; then for f in $(find features -name '*.feature'); do FEATURE=${f//\//_} phpdbg -qrr vendor/bin/behat --profile coverage $f || exit $?; done; else vendor/bin/behat; fi
+  - if [[ $coverage = 1 ]]; then for f in $(find features -name '*.feature'); do FEATURE=${f//\//_} phpdbg -qrr vendor/bin/behat --format=progress --profile coverage $f || exit $?; done; else vendor/bin/behat --format=progress; fi
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
