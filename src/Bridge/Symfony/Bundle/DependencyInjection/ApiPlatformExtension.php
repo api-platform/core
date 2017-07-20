@@ -344,6 +344,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('doctrine_orm.xml');
         }
 
+        //  Doctrine MongoDB ODM support
+        if ($config['enable_doctrine_mongodb_odm']) {
+            $loader->load('doctrine_mongodb.xml');
+        }
+
         // FOSUser support
         if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
             $loader->load('fos_user.xml');

@@ -12,6 +12,10 @@ install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php
   - cd c:\tools\php71
+  - cd ext
+  - appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/mongodb/1.1.8/php_mongodb-1.1.8-7.0-nts-vc14-x64.zip
+  - 7z x php_mongodb-1.1.8-7.0-nts-vc14-x64.zip -y >nul
+  - cd ..
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
@@ -19,10 +23,14 @@ install:
   - echo extension=php_mbstring.dll >> php.ini
   - echo extension=php_intl.dll >> php.ini
   - echo extension=php_pdo_sqlite.dll >> php.ini
+  - echo extension=php_mongodb.dll >> php.ini
   - echo memory_limit=1G >> php.ini
   - cd %APPVEYOR_BUILD_FOLDER%
   - php -r "readfile('http://getcomposer.org/installer');" | php
-  - php composer.phar install --no-interaction --no-progress
+  - php composer.phar install --no-interaction --no-progress --ignore-platform-reqs
+
+services:
+  - mongodb
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
