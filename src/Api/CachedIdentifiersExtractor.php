@@ -33,7 +33,7 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
     private $cacheItemPool;
     private $propertyAccessor;
     private $decorated;
-    private $memoryCache = [];
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, IdentifiersExtractorInterface $decorated, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -64,7 +64,7 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
-            if (!$relatedIdentifiers = $this->memoryCache[$relatedResourceClass] ?? false) {
+            if (!$relatedIdentifiers = $this->localCache[$relatedResourceClass] ?? false) {
                 $relatedCacheKey = self::CACHE_KEY_PREFIX.md5($relatedResourceClass);
                 try {
                     $relatedCacheItem = $this->cacheItemPool->getItem($relatedCacheKey);
@@ -87,14 +87,14 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
     private function getKeys($item, callable $retriever): array
     {
         $resourceClass = $this->getObjectClass($item);
-        if (isset($this->memoryCache[$resourceClass])) {
-            return $this->memoryCache[$resourceClass];
+        if (isset($this->localCache[$resourceClass])) {
+            return $this->localCache[$resourceClass];
         }
 
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY_PREFIX.md5($resourceClass));
             if ($cacheItem->isHit()) {
-                return $this->memoryCache[$resourceClass] = $cacheItem->get();
+                return $this->localCache[$resourceClass] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -107,6 +107,6 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
             $this->cacheItemPool->save($cacheItem);
         }
 
-        return $this->memoryCache[$resourceClass] = $keys;
+        return $this->localCache[$resourceClass] = $keys;
     }
 }
