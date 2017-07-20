@@ -133,7 +133,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     $pathOperation['parameters'] = $parameters;
                 }
 
-                foreach ($subresourceOperation['identifiers'] as list($identifier, $class, $hasIdentifier)) {
+                foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
                     if (true === $hasIdentifier) {
                         $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'type' => 'string'];
                     }
