@@ -28,7 +28,7 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
 
     private $cacheItemPool;
     private $decorated;
-    private $memoryCache = [];
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceMetadataFactoryInterface $decorated)
     {
@@ -41,8 +41,8 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
      */
     public function create(string $resourceClass): ResourceMetadata
     {
-        if (isset($this->memoryCache[$resourceClass])) {
-            return $this->memoryCache[$resourceClass];
+        if (isset($this->localCache[$resourceClass])) {
+            return $this->localCache[$resourceClass];
         }
 
         $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
@@ -51,7 +51,7 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $this->memoryCache[$resourceClass] = $cacheItem->get();
+                return $this->localCache[$resourceClass] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -60,12 +60,12 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
         $resourceMetadata = $this->decorated->create($resourceClass);
 
         if (!isset($cacheItem)) {
-            return $this->memoryCache[$resourceClass] = $resourceMetadata;
+            return $this->localCache[$resourceClass] = $resourceMetadata;
         }
 
         $cacheItem->set($resourceMetadata);
         $this->cacheItemPool->save($cacheItem);
 
-        return $this->memoryCache[$resourceClass] = $resourceMetadata;
+        return $this->localCache[$resourceClass] = $resourceMetadata;
     }
 }

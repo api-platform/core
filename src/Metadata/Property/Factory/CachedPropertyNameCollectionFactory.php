@@ -28,7 +28,7 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
     private $cacheItemPool;
     private $decorated;
-    private $memoryCache = [];
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyNameCollectionFactoryInterface $decorated)
     {
@@ -41,18 +41,18 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $localKey = serialize([$resourceClass, $options]);
-        if (isset($this->memoryCache[$localKey])) {
-            return $this->memoryCache[$localKey];
+        $localCacheKey = serialize([$resourceClass, $options]);
+        if (isset($this->localCache[$localCacheKey])) {
+            return $this->localCache[$localCacheKey];
         }
 
-        $cacheKey = self::CACHE_KEY_PREFIX.md5($localKey);
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($localCacheKey);
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $this->memoryCache[$localKey] = $cacheItem->get();
+                return $this->localCache[$localCacheKey] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -61,12 +61,12 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
         $propertyNameCollection = $this->decorated->create($resourceClass, $options);
 
         if (!isset($cacheItem)) {
-            return $this->memoryCache[$localKey] = $propertyNameCollection;
+            return $this->localCache[$localCacheKey] = $propertyNameCollection;
         }
 
         $cacheItem->set($propertyNameCollection);
         $this->cacheItemPool->save($cacheItem);
 
-        return $this->memoryCache[$localKey] = $propertyNameCollection;
+        return $this->localCache[$localCacheKey] = $propertyNameCollection;
     }
 }
