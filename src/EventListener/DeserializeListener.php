@@ -52,7 +52,7 @@ final class DeserializeListener
             || $request->isMethod(Request::METHOD_DELETE)
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || ($request->isMethod(Request::METHOD_PUT) &&  '' === $requestContent)
+            || ($request->isMethod(Request::METHOD_PUT) && '' === $requestContent)
         ) {
             return;
         }
