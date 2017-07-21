@@ -66,11 +66,11 @@ final class DenyAccessListener
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         if (isset($attributes['collection_operation_name'])) {
-            $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], 'is_granted', null, true);
+            $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], 'access_control', null, true);
         } elseif (isset($attributes['item_operation_name'])) {
-            $isGranted = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], 'is_granted', null, true);
+            $isGranted = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], 'access_control', null, true);
         } else {
-            $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['subresource_operation_name'], 'is_granted', null, true);
+            $isGranted = $resourceMetadata->getCollectionOperationAttribute($attributes['subresource_operation_name'], 'access_control', null, true);
         }
 
         if (null === $isGranted) {
@@ -78,13 +78,13 @@ final class DenyAccessListener
         }
 
         if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
-            throw new \LogicException(sprintf('The "symfony/security" library must be installed to use the "is_granted" attribute on class "%s".', $attributes['resource_class']));
+            throw new \LogicException(sprintf('The "symfony/security" library must be installed to use the "access_control" attribute on class "%s".', $attributes['resource_class']));
         }
         if (null === $this->tokenStorage->getToken()) {
-            throw new \LogicException(sprintf('The resource must be behind a firewall to use the "is_granted" attribute on class "%s".', $attributes['resource_class']));
+            throw new \LogicException(sprintf('The resource must be behind a firewall to use the "access_control" attribute on class "%s".', $attributes['resource_class']));
         }
         if (null === $this->expressionLanguage) {
-            throw new \LogicException(sprintf('The "symfony/expression-language" library must be installed to use the "is_granted" attribute on class "%s".', $attributes['resource_class']));
+            throw new \LogicException(sprintf('The "symfony/expression-language" library must be installed to use the "access_control" attribute on class "%s".', $attributes['resource_class']));
         }
 
         if (!$this->expressionLanguage->evaluate($isGranted, $this->getVariables($request))) {
@@ -107,7 +107,9 @@ final class DenyAccessListener
             'user' => $token->getUser(),
             'object' => $request->attributes->get('data'),
             'request' => $request,
-            'roles' => array_map(function (Role $role) {return $role->getRole(); }, $roles),
+            'roles' => array_map(function (Role $role) {
+                return $role->getRole();
+            }, $roles),
             'trust_resolver' => $this->authenticationTrustResolver,
             // needed for the is_granted expression function
             'auth_checker' => $this->authorizationChecker,
