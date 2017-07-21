@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInter
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -108,7 +109,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
-        $this->registerMetadataConfiguration($container, $loader, $bundles, $config['loader_paths']);
+        $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
@@ -136,7 +137,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
-        $container->setParameter('api_platform.api_resources_directory', $config['api_resources_directory']);
         $container->setParameter('api_platform.eager_loading.enabled', $config['eager_loading']['enabled']);
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
@@ -168,15 +168,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * Registers metadata configuration.
      *
      * @param ContainerBuilder $container
+     * @param array            $config
      * @param XmlFileLoader    $loader
-     * @param string[]         $bundles
      */
-    private function registerMetadataConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $bundles, array $loaderPaths)
+    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
 
-        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $bundles, $loaderPaths);
+        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config['mapping']['paths']);
+
         $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
 
         if (class_exists(Annotation::class)) {
@@ -193,48 +194,56 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function getResourcesToWatch(ContainerBuilder $container, array $bundles, array $loaderPaths): array
+    private function getBundlesResourcesPaths(ContainerBuilder $container): array
     {
-        $resourceClassDirectories = $loaderPaths['annotation'];
-        $xmlResources = $loaderPaths['xml'];
-        $yamlResources = $loaderPaths['yaml'];
-        $resourcesDirectory = $container->getParameter('api_platform.api_resources_directory');
+        $bundlesResourcesPaths = [];
 
-        foreach ($bundles as $bundle) {
-            $bundleDirectory = dirname((new \ReflectionClass($bundle))->getFileName());
-            list($newXmlResources, $newYamlResources) = $this->findResources($bundleDirectory);
+        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            $dirname = $bundle['path'];
 
-            $xmlResources = array_merge($xmlResources, $newXmlResources);
-            $yamlResources = array_merge($yamlResources, $newYamlResources);
-
-            if (file_exists($entityDirectory = $bundleDirectory.'/'.$resourcesDirectory)) {
-                $resourceClassDirectories[] = $entityDirectory;
-                $container->addResource(new DirectoryResource($entityDirectory, '/\.php$/'));
+            foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
+                $paths[] = $dirname.'/Resources/config/api_resources'.$extension;
             }
-        }
 
-        $container->setParameter('api_platform.resource_class_directories', $resourceClassDirectories);
+            $paths[] = $dirname.'/Entity';
 
-        return [$xmlResources, $yamlResources];
-    }
-
-    private function findResources(string $bundleDirectory): array
-    {
-        $xmlResources = $yamlResources = [];
-
-        try {
-            foreach (Finder::create()->files()->in($bundleDirectory.'/Resources/config/')->path('api_resources')->name('*.{yml,yaml,xml}') as $file) {
-                if ('xml' === $file->getExtension()) {
-                    $xmlResources[] = $file->getRealPath();
-                } else {
-                    $yamlResources[] = $file->getRealPath();
+            foreach ($paths as $path) {
+                if ($container->fileExists($path, false)) {
+                    $bundlesResourcesPaths[] = $path;
                 }
             }
-        } catch (\InvalidArgumentException $e) {
-            // Ignore invalid paths
         }
 
-        return [$xmlResources, $yamlResources];
+        return $bundlesResourcesPaths;
+    }
+
+    private function getResourcesToWatch(ContainerBuilder $container, array $resourcesPaths): array
+    {
+        $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
+        $resources = ['yml' => [], 'xml' => [], 'dir' => []];
+
+        foreach ($paths as $path) {
+            if (is_dir($path)) {
+                foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.(xml|ya?ml)$/') as $file) {
+                    $resources['yaml' === ($extension = $file->getExtension()) ? 'yml' : $extension][] = $file->getRealPath();
+                }
+
+                $resources['dir'][] = $path;
+                $container->addResource(new DirectoryResource($path, '/\.(xml|ya?ml|php)$/'));
+            } elseif ($container->fileExists($path, false)) {
+                if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
+                    throw new RuntimeException(sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
+                }
+
+                $resources['yaml' === $matches[1] ? 'yml' : $matches[1]][] = $path;
+            } else {
+                throw new RuntimeException(sprintf('Could not open file or directory "%s".', $path));
+            }
+        }
+
+        $container->setParameter('api_platform.resource_class_directories', $resources['dir']);
+
+        return [$resources['xml'], $resources['yml']];
     }
 
     /**
