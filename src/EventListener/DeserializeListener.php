@@ -46,12 +46,13 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
+        $requestContent = $request->getContent();
         if (
             $request->isMethodSafe(false)
             || $request->isMethod(Request::METHOD_DELETE)
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || ($request->isMethod(Request::METHOD_PUT) && $request->getContent() === '')
+            || ($request->isMethod(Request::METHOD_PUT) &&  '' === $requestContent)
         ) {
             return;
         }
@@ -67,7 +68,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $format, $context
+                $requestContent, $attributes['resource_class'], $format, $context
             )
         );
     }
