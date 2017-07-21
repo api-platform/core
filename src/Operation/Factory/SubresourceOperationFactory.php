@@ -59,7 +59,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null)
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, $parentVisiting = null)
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;
@@ -79,18 +79,13 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             if (null === $parentOperation) {
                 $visiting = "$rootResourceClass-$property-$subresourceClass";
             } else {
-                $prefix = '';
-                $visiting = "{$parentOperation['property']}-{$parentOperation['resource_class']}-$property-$subresourceClass";
+                $suffix = "$property-$subresourceClass";
 
-                foreach ($parentOperation['identifiers'] as $key => list($param, $class)) {
-                    $prefix .= 0 === $key ? $class : "-$param-$class";
-                }
-
-                if (false !== strpos($prefix, $visiting)) {
+                if (false !== strpos($parentVisiting, $suffix)) {
                     continue;
                 }
 
-                $visiting = $prefix.'-'.$visiting;
+                $visiting = "$parentVisiting-$suffix";
             }
 
             $operationName = 'get';
@@ -121,13 +116,18 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     self::FORMAT_SUFFIX
                 );
 
-                $operation['shortNames'][] = $rootShortname;
+                if (!in_array($rootShortname, $operation['shortNames'], true)) {
+                    $operation['shortNames'][] = $rootShortname;
+                }
             } else {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 $operation['identifiers'] = $parentOperation['identifiers'];
                 $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $parentOperation['collection']];
                 $operation['route_name'] = str_replace('get'.self::SUBRESOURCE_SUFFIX, RouteNameGenerator::inflector($property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
-                $operation['shortNames'][] = $resourceMetadata->getShortName();
+
+                if (!in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
+                    $operation['shortNames'][] = $resourceMetadata->getShortName();
+                }
 
                 $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
                 if ($parentOperation['collection']) {
@@ -138,7 +138,8 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             }
 
             $tree[$visiting] = $operation;
-            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation);
+
+            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visiting);
         }
     }
 }

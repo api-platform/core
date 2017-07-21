@@ -664,6 +664,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $product->setName('Dummy product');
         $product->addOffer($aggregate);
 
+        $relatedProduct = new DummyProduct();
+        $relatedProduct->setName('Dummy related product');
+        $relatedProduct->setParent($product);
+
+        $product->addRelatedProduct($relatedProduct);
+
+        $this->manager->persist($relatedProduct);
         $this->manager->persist($product);
         $this->manager->flush();
     }

@@ -129,13 +129,22 @@ final class DocumentationNormalizer implements NormalizerInterface
                     '404' => ['description' => 'Resource not found'],
                 ];
 
-                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
-                    $pathOperation['parameters'] = $parameters;
-                }
+                // Avoid duplicates parameters when there is a filter on a subresource identifier
+                $parametersMemory = [];
+                $pathOperation['parameters'] = [];
 
                 foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
                     if (true === $hasIdentifier) {
                         $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'type' => 'string'];
+                        $parametersMemory[] = $identifier;
+                    }
+                }
+
+                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
+                    foreach ($parameters as $parameter) {
+                        if (!in_array($parameter['name'], $parametersMemory, true)) {
+                            $pathOperation['parameters'][] = $parameter;
+                        }
                     }
                 }
 

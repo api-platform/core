@@ -43,7 +43,7 @@ class DummyProduct
      * @var Collection
      *
      * @ApiSubresource
-     * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="id", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
      */
     private $offers;
 
@@ -54,9 +54,23 @@ class DummyProduct
      */
     private $name;
 
+    /**
+     * @var Collection
+     *
+     * @ApiSubresource
+     * @ORM\OneToMany(targetEntity="DummyProduct", mappedBy="parent")
+     */
+    private $relatedProducts;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="relatedProducts")
+     */
+    private $parent;
+
     public function __construct()
     {
         $this->offers = new ArrayCollection();
+        $this->relatedProducts = new ArrayCollection();
     }
 
     public function getOffers(): Collection
@@ -72,6 +86,7 @@ class DummyProduct
     public function addOffer(DummyAggregateOffer $offer)
     {
         $this->offers->add($offer);
+        $offer->setProduct($this);
     }
 
     public function getId()
@@ -87,5 +102,31 @@ class DummyProduct
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    public function getRelatedProducts(): Collection
+    {
+        return $this->relatedProducts;
+    }
+
+    public function setRelatedProducts(Collection $relatedProducts)
+    {
+        $this->relatedProducts = $relatedProducts;
+    }
+
+    public function addRelatedProduct(DummyProduct $relatedProduct)
+    {
+        $this->relatedProducts->add($relatedProduct);
+        $relatedProduct->setParent($this);
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function setParent(DummyProduct $product)
+    {
+        $this->parent = $product;
     }
 }

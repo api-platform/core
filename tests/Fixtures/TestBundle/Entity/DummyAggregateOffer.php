@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -43,9 +42,16 @@ class DummyAggregateOffer
      * @var ArrayCollection
      *
      * @ApiSubresource
-     * @ORM\OneToMany(targetEntity="DummyOffer", mappedBy="id", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="DummyOffer", mappedBy="aggregate", cascade={"persist"})
      */
     private $offers;
+
+    /**
+     * @var DummyProduct The dummy product
+     *
+     * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="offers")
+     */
+    private $product;
 
     /**
      * @var int The dummy aggregate offer value
@@ -59,7 +65,7 @@ class DummyAggregateOffer
         $this->offers = new ArrayCollection();
     }
 
-    public function getOffers(): Collection
+    public function getOffers()
     {
         return $this->offers;
     }
@@ -72,6 +78,7 @@ class DummyAggregateOffer
     public function addOffer(DummyOffer $offer)
     {
         $this->offers->add($offer);
+        $offer->setAggregate($this);
     }
 
     public function getId()
@@ -79,13 +86,23 @@ class DummyAggregateOffer
         return $this->id;
     }
 
-    public function getValue(): int
+    public function getValue()
     {
         return $this->value;
     }
 
-    public function setValue(int $value)
+    public function setValue($value)
     {
         $this->value = $value;
+    }
+
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    public function setProduct(DummyProduct $product)
+    {
+        $this->product = $product;
     }
 }
