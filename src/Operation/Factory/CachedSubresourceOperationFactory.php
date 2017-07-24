@@ -37,7 +37,7 @@ final class CachedSubresourceOperationFactory implements SubresourceOperationFac
      */
     public function create(string $resourceClass): array
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.str_replace('\\', '', $resourceClass);
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
