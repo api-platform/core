@@ -60,7 +60,7 @@ class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
         $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal());
 
         $this->assertEquals([
-            'ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subresource-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity' => [
+            'api_dummy_entities_subresource_get_subresource' => [
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
@@ -71,7 +71,7 @@ class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
             ],
-            'ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subresource-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity-anotherSubresource-ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity' => [
+            'api_dummy_entities_subresource_another_subresource_get_subresource' => [
                 'property' => 'anotherSubresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
@@ -83,7 +83,7 @@ class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource.{_format}',
             ],
-            'ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subresource-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity-anotherSubresource-ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subcollection-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity' => [
+            'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource' => [
                 'property' => 'subcollection',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
@@ -96,7 +96,7 @@ class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource/subcollections.{_format}',
             ],
-            'ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subcollection-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity' => [
+            'api_dummy_entities_subcollections_get_subresource' => [
                 'property' => 'subcollection',
                 'collection' => true,
                 'resource_class' => RelatedDummyEntity::class,
@@ -107,7 +107,7 @@ class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
                 'route_name' => 'api_dummy_entities_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections.{_format}',
             ],
-            'ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subcollection-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity-anotherSubresource-ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity' => [
+            'api_dummy_entities_subcollections_another_subresource_get_subresource' => [
                 'property' => 'anotherSubresource',
                 'collection' => false,
                 'resource_class' => DummyEntity::class,
@@ -119,7 +119,7 @@ class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections/{subcollection}/another_subresource.{_format}',
             ],
-            'ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subcollection-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity-anotherSubresource-ApiPlatform\\Core\\Tests\\Fixtures\\DummyEntity-subresource-ApiPlatform\\Core\\Tests\\Fixtures\\RelatedDummyEntity' => [
+            'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource' => [
                 'property' => 'subresource',
                 'collection' => false,
                 'resource_class' => RelatedDummyEntity::class,
