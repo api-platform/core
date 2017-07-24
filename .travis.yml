@@ -23,7 +23,7 @@ before_install:
   - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
   - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
   - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.3.1/php-cs-fixer.phar; fi
-  - if [[ $lint = 1 ]]; then composer global require phpstan/phpstan; fi
+  - if [[ $lint = 1 ]]; then composer global require --dev 'phpstan/phpstan:^0.8'; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
