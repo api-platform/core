@@ -81,6 +81,6 @@ class CachedSubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
 
     private function generateCacheKey(string $resourceClass = Dummy::class)
     {
-        return CachedSubresourceOperationFactory::CACHE_KEY_PREFIX.str_replace('\\', '', $resourceClass);
+        return CachedSubresourceOperationFactory::CACHE_KEY_PREFIX.md5($resourceClass);
     }
 }

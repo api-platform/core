@@ -58,8 +58,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param array  $tree
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
+     * @param array  $visited
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, $parentVisiting = null)
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [])
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;
@@ -76,16 +77,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
 
-            if (null === $parentOperation) {
-                $visiting = "$rootResourceClass-$property-$subresourceClass";
-            } else {
-                $suffix = "$property-$subresourceClass";
-
-                if (false !== strpos($parentVisiting, $suffix)) {
-                    continue;
-                }
-
-                $visiting = "$parentVisiting-$suffix";
+            $visiting = "$resourceClass $property $subresourceClass";
+            if (isset($visited[$visiting])) {
+                continue;
             }
 
             $operationName = 'get';
@@ -137,9 +131,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
             }
 
-            $tree[$visiting] = $operation;
+            $tree[$operation['route_name']] = $operation;
 
-            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visiting);
+            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true]);
         }
     }
 }
