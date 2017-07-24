@@ -1572,7 +1572,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 '/api/questions/{id}/answer' => new \ArrayObject([
                     'get' => new \ArrayObject([
                         'tags' => ['Answer', 'Question'],
-                        'operationId' => 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question-answer-ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer',
+                        'operationId' => 'api_questions_answer_get_subresource',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Answer resource.',
                         'responses' => [
