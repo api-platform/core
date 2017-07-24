@@ -322,7 +322,7 @@ class ExistsFilterTest extends KernelTestCase
                 sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
             ],
 
-            'related association exists' => [
+            'related association does not exist' => [
                 [
                     'description' => null,
                     'relatedDummy' => null,
