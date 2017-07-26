@@ -71,7 +71,7 @@ class PurgeHttpCacheListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $listener->onFlush($eventArgs);
-        $listener->postFlush();
+        $listener->onKernelTerminate();
     }
 
     public function testPreUpdate()
@@ -108,6 +108,6 @@ class PurgeHttpCacheListenerTest extends \PHPUnit_Framework_TestCase
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $listener->preUpdate($eventArgs);
-        $listener->postFlush();
+        $listener->onKernelTerminate();
     }
 }

@@ -97,7 +97,7 @@ final class PurgeHttpCacheListener
     /**
      * Purges tags collected during this request, and clears the tag list.
      */
-    public function postFlush()
+    public function onKernelTerminate()
     {
         $this->purger->purge($this->tags);
         $this->tags = [];
