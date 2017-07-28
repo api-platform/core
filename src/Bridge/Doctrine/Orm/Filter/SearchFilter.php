@@ -241,15 +241,21 @@ class SearchFilter extends AbstractFilter implements FilterInterface
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
-        $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+        if ($metadata->isCollectionValuedAssociation($association)) {
+            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+            $associationField = 'id';
+        } else {
+            $associationAlias = $alias;
+            $associationField = $field;
+        }
 
         if (1 === count($values)) {
             $queryBuilder
-                ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values[0]);
         } else {
             $queryBuilder
-                ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values);
         }
     }

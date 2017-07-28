@@ -17,23 +17,34 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
+use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
+use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -61,6 +72,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DocumentationNormalizer::class, $normalizer);
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testNormalize()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -262,6 +277,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testNormalizeWithNameConverter()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -373,6 +392,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testNormalizeWithOnlyNormalizationGroups()
     {
         $title = 'Test API';
@@ -558,6 +581,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testNormalizeWithOnlyDenormalizationGroups()
     {
         $title = 'Test API';
@@ -740,6 +767,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testNormalizeWithNormalizationAndDenormalizationGroups()
     {
         $title = 'Test API';
@@ -925,6 +956,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testFilters()
     {
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -1072,6 +1107,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testWithCustomMethod()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
@@ -1128,6 +1167,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
+     */
     public function testNormalizeWithNestedNormalizationGroups()
     {
         $title = 'Test API';
@@ -1433,6 +1476,145 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'name' => new \ArrayObject([
                             'description' => 'This is a name.',
                             'type' => 'string',
+                        ]),
+                    ],
+                ]),
+            ]),
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    public function testNormalizeWithSubResource()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Question::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Question::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['answer']));
+        $propertyNameCollectionFactoryProphecy->create(Answer::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['content']));
+
+        $questionMetadata = new ResourceMetadata('Question', 'This is a question.', 'http://schema.example.com/Question', ['get' => ['method' => 'GET']]);
+        $answerMetadata = new ResourceMetadata('Answer', 'This is an answer.', 'http://schema.example.com/Answer', [], ['get' => ['method' => 'GET']]);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
+        $resourceMetadataFactoryProphecy->create(Answer::class)->shouldBeCalled()->willReturn($answerMetadata);
+
+        $subresourceMetadata = new SubresourceMetadata(Answer::class, false);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Question::class, 'answer')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, [], $subresourceMetadata));
+
+        $propertyMetadataFactoryProphecy->create(Answer::class, 'content')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, Question::class, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, Answer::class)), 'This is a name.', true, true, true, true, false, false, null, null, []));
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Question::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Answer::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Question::class, 'get')->shouldBeCalled()->willReturn('GET');
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('api_questions_answer_get_subresource', new Route('/api/questions/{id}/answer.{_format}'));
+        $routeCollection->add('api_questions_get_item', new Route('/api/questions/{id}.{_format}'));
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->getRouteCollection()->shouldBeCalled()->willReturn($routeCollection);
+
+        $operationPathResolver = new RouterOperationPathResolver($routerProphecy->reveal(), new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator())));
+
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new UnderscorePathSegmentNameGenerator());
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            null, null, null, false, '', '', '', '', [],
+            $subresourceOperationFactory
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+            ],
+            'paths' => new \ArrayObject([
+                '/api/questions/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Question'],
+                        'operationId' => 'getQuestionItem',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Question resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Question resource response',
+                                'schema' => ['$ref' => '#/definitions/Question'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+                '/api/questions/{id}/answer' => new \ArrayObject([
+                    'get' => new \ArrayObject([
+                        'tags' => ['Answer', 'Question'],
+                        'operationId' => 'api_questions_answer_get_subresource',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Answer resource.',
+                        'responses' => [
+                            200 => [
+                                'description' => 'Answer resource response',
+                                'schema' => ['$ref' => '#/definitions/Answer'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                    ]),
+                ]),
+            ]),
+            'definitions' => new \ArrayObject([
+                'Question' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a question.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Question'],
+                    'properties' => [
+                        'answer' => new \ArrayObject([
+                            'type' => 'array',
+                            'description' => 'This is a name.',
+                            'items' => ['$ref' => '#/definitions/Answer'],
+                        ]),
+                    ],
+                ]),
+                'Answer' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is an answer.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
+                    'properties' => [
+                        'content' => new \ArrayObject([
+                            'type' => 'array',
+                            'description' => 'This is a name.',
+                            'items' => ['$ref' => '#/definitions/Answer'],
                         ]),
                     ],
                 ]),

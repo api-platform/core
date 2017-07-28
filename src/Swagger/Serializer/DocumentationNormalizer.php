@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -58,11 +59,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $oauthTokenUrl;
     private $oauthAuthorizationUrl;
     private $oauthScopes;
+    private $subresourceOperationFactory;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -83,6 +85,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->oauthTokenUrl = $oauthTokenUrl;
         $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
         $this->oauthScopes = $oauthScopes;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
     }
 
     /**
@@ -100,6 +103,53 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             $this->addPaths($paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::COLLECTION);
             $this->addPaths($paths, $definitions, $resourceClass, $resourceShortName, $resourceMetadata, $mimeTypes, OperationType::ITEM);
+
+            if (null === $this->subresourceOperationFactory) {
+                continue;
+            }
+
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $subresourceOperation) {
+                $operationName = 'get';
+                $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $resourceMetadata, $operationName);
+                $responseDefinitionKey = $this->getDefinition($definitions, $this->resourceMetadataFactory->create($subresourceOperation['resource_class']), $subresourceOperation['resource_class'], $serializerContext);
+
+                $pathOperation = new \ArrayObject([]);
+                $pathOperation['tags'] = $subresourceOperation['shortNames'];
+                $pathOperation['operationId'] = $operationId;
+                $pathOperation['produces'] = $mimeTypes;
+                $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
+                $pathOperation['responses'] = [
+                    '200' => $subresourceOperation['collection'] ? [
+                        'description' => sprintf('%s colletion response', $subresourceOperation['shortNames'][0]),
+                        'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
+                    ] : [
+                        'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
+                        'schema' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+                    ],
+                    '404' => ['description' => 'Resource not found'],
+                ];
+
+                // Avoid duplicates parameters when there is a filter on a subresource identifier
+                $parametersMemory = [];
+                $pathOperation['parameters'] = [];
+
+                foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
+                    if (true === $hasIdentifier) {
+                        $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'type' => 'string'];
+                        $parametersMemory[] = $identifier;
+                    }
+                }
+
+                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
+                    foreach ($parameters as $parameter) {
+                        if (!in_array($parameter['name'], $parametersMemory, true)) {
+                            $pathOperation['parameters'][] = $parameter;
+                        }
+                    }
+                }
+
+                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] = new \ArrayObject(['get' => $pathOperation]);
+            }
         }
 
         $definitions->ksort();

@@ -145,9 +145,9 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = [new \stdClass()];
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
-        $subresourceDataProvider->getSubresource('Foo', ['id' => 1], ['identifiers' => [['id', 'Bar']], 'property' => 'bar'], 'get')->willReturn($data)->shouldBeCalled();
+        $subresourceDataProvider->getSubresource('Foo', ['id' => 1], ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar'], 'get')->willReturn($data)->shouldBeCalled();
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar']], 'property' => 'bar']]);
+        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
         $request->setMethod(Request::METHOD_GET);
 
         $event = $this->prophesize(GetResponseEvent::class);

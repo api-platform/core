@@ -12,12 +12,38 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-        "@context": "\/contexts\/Answer",
-        "@id": "\/answers\/1",
-        "@type": "Answer",
-        "id": 1,
-        "content": "42",
-        "question": "\/questions\/1"
+			"@context": "/contexts/Answer",
+			"@id": "/answers/1",
+			"@type": "Answer",
+			"id": 1,
+			"content": "42",
+			"question": "/questions/1",
+			"relatedQuestions": [
+				"/questions/1"
+			]
+    }
+    """
+
+  Scenario: Get subresource one to one relation
+    When I send a "GET" request to "/questions/1/answer/related_questions"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Question",
+      "@id": "/questions/1/answer/related_questions",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+				{
+					"@id": "/questions/1",
+					"@type": "Question",
+					"content": "What's the answer to the Ultimate Question of Life, the Universe and Everything?",
+					"id": 1,
+					"answer": "/answers/1"
+				}
+      ],
+      "hydra:totalItems": 1
     }
     """
 
@@ -226,7 +252,7 @@ Feature: Subresource support
 
   Scenario: Get offers subresource from aggregate offers subresource
     Given I have a product with offers
-    When I send a "GET" request to "/dummy_products/1/offers/1/offers"
+    When I send a "GET" request to "/dummy_products/2/offers/1/offers"
     And the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -234,21 +260,21 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/DummyOffer",
-      "@id": "/dummy_products/1/offers/1/offers",
+      "@id": "/dummy_products/2/offers/1/offers",
       "@type": "hydra:Collection",
       "hydra:member": [
         {
           "@id": "/dummy_offers/1",
           "@type": "DummyOffer",
           "id": 1,
-          "value": 2
+          "value": 2,
+          "aggregate": "/dummy_aggregate_offers/1"
         }
       ],
       "hydra:totalItems": 1
     }
     """
 
-  @dropSchema
   Scenario: Get offers subresource from aggregate offers subresource
     When I send a "GET" request to "/dummy_aggregate_offers/1/offers"
     And the response status code should be 200
@@ -265,9 +291,34 @@ Feature: Subresource support
           "@id": "/dummy_offers/1",
           "@type": "DummyOffer",
           "id": 1,
-          "value": 2
+          "value": 2,
+          "aggregate": "/dummy_aggregate_offers/1"
         }
       ],
       "hydra:totalItems": 1
+    }
+    """
+
+  @dropSchema
+  Scenario: test
+    When I send a "GET" request to "/dummy_products/2"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/DummyProduct",
+      "@id": "/dummy_products/2",
+      "@type": "DummyProduct",
+      "offers": [
+        "/dummy_aggregate_offers/1"
+      ],
+      "id": 2,
+      "name": "Dummy product",
+      "relatedProducts": [
+        "/dummy_products/1"
+      ],
+      "parent": null
     }
     """

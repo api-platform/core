@@ -45,6 +45,25 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
+    public function testDoNotCallWhenPutAndEmptyRequestContent()
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'put'], [], [], [], '');
+        $request->setMethod(Request::METHOD_PUT);
+        $request->headers->set('Content-Type', 'application/json');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize()->shouldNotBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
+
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
     public function testDoNotCallWhenRequestNotManaged()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);

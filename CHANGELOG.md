@@ -24,6 +24,17 @@
 * Improve the performance of the filters subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
 * Add compatibility with Symfony Flex and Symfony 4
 * Allow the Symfony Dependency Injection component to autoconfigure data providers and query extensions
+* Allow to use service for dynamic validation groups
+* Allow using PHP constants in YAML resources files
+* Upgrade to the latest version of the Hydra spec
+
+## 2.0.10
+
+* Performance improvement
+* Swagger: Allow non-numeric IDs (such as UUIDs) in URLs
+* Fix a bug when a composite identifier is missing
+* `ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter::extractProperties` now always return an array
+* Fix NelmioApiDocParser recursive relations
 
 ## 2.0.9
 

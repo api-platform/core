@@ -117,6 +117,8 @@ final class SwaggerUiAction
                 $swaggerData['operationId'] = sprintf('%s%sCollection', $collectionOperationName, $swaggerData['shortName']);
             } elseif (null !== $itemOperationName = $request->attributes->get('_api_item_operation_name')) {
                 $swaggerData['operationId'] = sprintf('%s%sItem', $itemOperationName, $swaggerData['shortName']);
+            } elseif (null !== $subresourceOperationContext = $request->attributes->get('_api_subresource_context')) {
+                $swaggerData['operationId'] = $subresourceOperationContext['operationId'];
             }
 
             list($swaggerData['path'], $swaggerData['method']) = $this->getPathAndMethod($swaggerData);

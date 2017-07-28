@@ -36,6 +36,9 @@ use Doctrine\ORM\QueryBuilder;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -316,9 +319,9 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.
+     * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary, or use the "max_depth" option of the Symfony serializer.
      */
-    public function testMaxDepthReached()
+    public function testMaxJoinsReached()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
@@ -364,6 +367,74 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy->addSelect(Argument::type('string'))->shouldBeCalled();
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true);
+        $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class);
+    }
+
+    public function testMaxDepth()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withAttributes(['normalization_context' => ['enable_max_depth' => 'true']]);
+
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $relatedNameCollection = new PropertyNameCollection(['dummy']);
+        $dummyNameCollection = new PropertyNameCollection(['relatedDummy']);
+
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
+
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+
+        $relatedPropertyMetadata = new PropertyMetadata();
+        $relatedPropertyMetadata = $relatedPropertyMetadata->withReadableLink(true);
+
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'dummy', [])->willReturn($relatedPropertyMetadata)->shouldBeCalled();
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->associationMappings = [
+            'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+        ];
+
+        $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $relatedClassMetadataProphecy->associationMappings = [
+            'dummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => Dummy::class],
+        ];
+
+        $dummyClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $relatedClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $classMetadataFactoryProphecy = $this->prophesize(ClassMetadataFactoryInterface::class);
+
+        $dummyAttributeMetadata = new AttributeMetadata('dummy');
+        $dummyAttributeMetadata->setMaxDepth(2);
+
+        $relatedAttributeMetadata = new AttributeMetadata('relatedDummy');
+        $relatedAttributeMetadata->setMaxDepth(4);
+
+        $dummyClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn(['relatedDummy' => $dummyAttributeMetadata]);
+        $relatedClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn(['dummy' => $relatedAttributeMetadata]);
+
+        $classMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedClassMetadataInterfaceProphecy->reveal());
+        $classMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummyClassMetadataInterfaceProphecy->reveal());
+
+        $emProphecy = $this->prophesize(EntityManager::class);
+        $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+        $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
+
+        $queryBuilderProphecy->innerJoin(Argument::type('string'), Argument::type('string'))->shouldBeCalledTimes(2);
+        $queryBuilderProphecy->addSelect(Argument::type('string'))->shouldBeCalled();
+
+        $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true, $classMetadataFactoryProphecy->reveal());
         $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class);
     }
 

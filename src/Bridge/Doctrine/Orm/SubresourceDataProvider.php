@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
@@ -105,7 +106,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             $qb = $manager->createQueryBuilder();
             $alias = $queryNameGenerator->generateJoinAlias($identifier);
             $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
-            $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);
+            $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass) : [];
 
             switch ($relationType) {
                 //MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
@@ -169,6 +170,11 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         if (true === $context['collection']) {
             foreach ($this->collectionExtensions as $extension) {
+                // We don't need this anymore because we already made sub queries to ensure correct results
+                if ($extension instanceof FilterEagerLoadingExtension) {
+                    continue;
+                }
+
                 $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
 
                 if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {

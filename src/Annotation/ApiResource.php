@@ -29,7 +29,7 @@ final class ApiResource
     public $shortName;
 
     /**
-     * @var string|null
+     * @var string
      */
     public $description;
 

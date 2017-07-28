@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\PathResolver;
 
-use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use Doctrine\Common\Inflector\Inflector;
+use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator;
 
 /**
- * Generates a path with words separated by dashes.
+ * Generates a path with words separated by underscores.
  *
  * @author Paul Le Corre <paul@lecorre.me>
  */
@@ -29,35 +27,14 @@ final class DashOperationPathResolver implements OperationPathResolverInterface
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        if (func_num_args() < 4) {
-            @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
-        }
+        @trigger_error(sprintf('The use of %s is deprecated since 2.1. Please use PathSegmentNameGenerator instead.', __CLASS__), E_USER_DEPRECATED);
 
-        $operationType = OperationTypeDeprecationHelper::getOperationType($operationType);
-
-        if ($operationType === OperationType::SUBRESOURCE && 1 < count($operation['identifiers'])) {
-            $path = str_replace('.{_format}', '', $resourceShortName);
+        if (func_num_args() >= 4) {
+            $operationName = func_get_arg(3);
         } else {
-            $path = '/'.Inflector::pluralize($this->dashize($resourceShortName));
+            $operationName = null;
         }
 
-        if ($operationType === OperationType::ITEM) {
-            $path .= '/{id}';
-        }
-
-        if ($operationType === OperationType::SUBRESOURCE) {
-            list($key) = end($operation['identifiers']);
-            $property = true === $operation['collection'] ? Inflector::pluralize($this->dashize($operation['property'])) : $this->dashize($operation['property']);
-            $path .= sprintf('/{%s}/%s', $key, $property);
-        }
-
-        $path .= '.{_format}';
-
-        return $path;
-    }
-
-    private function dashize(string $string): string
-    {
-        return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $string));
+        return (new OperationPathResolver(new DashPathSegmentNameGenerator()))->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
     }
 }

@@ -609,9 +609,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $question = new Question();
         $question->setContent($q);
         $question->setAnswer($answer);
+        $answer->addRelatedQuestion($question);
 
         $this->manager->persist($answer);
         $this->manager->persist($question);
+
         $this->manager->flush();
     }
 
@@ -662,6 +664,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $product->setName('Dummy product');
         $product->addOffer($aggregate);
 
+        $relatedProduct = new DummyProduct();
+        $relatedProduct->setName('Dummy related product');
+        $relatedProduct->setParent($product);
+
+        $product->addRelatedProduct($relatedProduct);
+
+        $this->manager->persist($relatedProduct);
         $this->manager->persist($product);
         $this->manager->flush();
     }

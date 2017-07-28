@@ -51,6 +51,7 @@ final class DeserializeListener
             || $request->isMethod(Request::METHOD_DELETE)
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
+            || ('' === ($requestContent = $request->getContent()) && $request->isMethod(Request::METHOD_PUT))
         ) {
             return;
         }
@@ -66,7 +67,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $format, $context
+                $requestContent, $attributes['resource_class'], $format, $context
             )
         );
     }

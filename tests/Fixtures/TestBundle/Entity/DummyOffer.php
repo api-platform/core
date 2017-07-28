@@ -43,6 +43,13 @@ class DummyOffer
      */
     private $value;
 
+    /**
+     * @var DummyAggregateOffer The dummy aggregate offer value
+     *
+     * @ORM\ManyToOne(targetEntity="DummyAggregateOffer", inversedBy="offers")
+     */
+    private $aggregate;
+
     public function getId()
     {
         return $this->id;
@@ -56,5 +63,15 @@ class DummyOffer
     public function setValue(int $value)
     {
         $this->value = $value;
+    }
+
+    public function getAggregate()
+    {
+        return $this->aggregate;
+    }
+
+    public function setAggregate(DummyAggregateOffer $aggregate)
+    {
+        $this->aggregate = $aggregate;
     }
 }

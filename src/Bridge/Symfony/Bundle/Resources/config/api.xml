@@ -36,8 +36,7 @@
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.resource_class_directories%</argument>
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.subresource_operation_factory" />
 
             <tag name="routing.loader" />
         </service>
@@ -91,14 +90,30 @@
         <service id="api_platform.operation_path_resolver.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver" public="false">
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.operation_path_resolver.custom" />
+            <argument type="service" id="api_platform.subresource_operation_factory" />
         </service>
 
         <service id="api_platform.operation_path_resolver.custom" class="ApiPlatform\Core\PathResolver\CustomOperationPathResolver" public="false">
-            <argument type="service" id="api_platform.operation_path_resolver.default" />
+            <argument type="service" id="api_platform.operation_path_resolver.generator" />
         </service>
 
-        <service id="api_platform.operation_path_resolver.underscore" class="ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver" public="false" />
-        <service id="api_platform.operation_path_resolver.dash" class="ApiPlatform\Core\PathResolver\DashOperationPathResolver" public="false" />
+        <service id="api_platform.operation_path_resolver.generator" class="ApiPlatform\Core\PathResolver\OperationPathResolver" public="false">
+            <argument type="service" id="api_platform.path_segment_name_generator" />
+        </service>
+
+        <service id="api_platform.operation_path_resolver.underscore" class="ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver" public="false">
+                <deprecated>The "%service_id%" service is deprecated since ApiPlatform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.underscore" instead.</deprecated>
+        </service>
+
+        <service id="api_platform.operation_path_resolver.dash" class="ApiPlatform\Core\PathResolver\DashOperationPathResolver" public="false">
+                <deprecated>The "%service_id%" service is deprecated since ApiPlatform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.dash" instead.</deprecated>
+        </service>
+
+        <!-- Path name generator -->
+
+        <service id="api_platform.path_segment_name_generator" alias="api_platform.path_segment_name_generator.underscore" public="false" />
+        <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator" public="false" />
+        <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Core\Operation\DashPathSegmentNameGenerator" public="false" />
 
         <!-- Event listeners -->
 
@@ -194,6 +209,20 @@
             <argument type="service" id="api_platform.property_accessor" />
         </service>
 
+        <!-- Subresources -->
+
+        <service id="api_platform.subresource_operation_factory" class="ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.path_segment_name_generator" />
+        </service>
+
+        <service id="api_platform.subresource_operation_factory.cached" class="ApiPlatform\Core\Operation\Factory\CachedSubresourceOperationFactory" decorates="api_platform.subresource_operation_factory" decoration-priority="-10" public="false">
+            <argument type="service" id="api_platform.cache.subresource_operation_factory" />
+            <argument type="service" id="api_platform.subresource_operation_factory.cached.inner" />
+        </service>
+
         <!-- Cache -->
 
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">
@@ -201,6 +230,10 @@
         </service>
 
         <service id="api_platform.cache.identifiers_extractor" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="api_platform.cache.subresource_operation_factory" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
     </services>
