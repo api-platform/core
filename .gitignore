@@ -5,4 +5,6 @@
 /phpunit.xml
 /vendor/
 /tests/Fixtures/app/cache/*
+/tests/Fixtures/appMongo/cache/*
 /tests/Fixtures/app/logs/*
+/tests/Fixtures/appMongo/logs/*

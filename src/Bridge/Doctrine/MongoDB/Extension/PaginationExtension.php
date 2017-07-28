@@ -9,6 +9,16 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDB\Paginator;
@@ -80,7 +90,7 @@ class PaginationExtension implements QueryResultExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName = null) : bool
+    public function supportsResult(string $resourceClass, string $operationName = null): bool
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -100,7 +110,7 @@ class PaginationExtension implements QueryResultExtensionInterface
         return new Paginator($queryBuilder->getQuery()->execute());
     }
 
-    private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null) : bool
+    private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool
     {
         $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
         $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);

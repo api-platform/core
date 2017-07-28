@@ -11,7 +11,7 @@ HEADER;
 
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
-    ->exclude('tests/Fixtures/app/cache')
+    ->exclude(['tests/Fixtures/app/cache', 'tests/Fixtures/appMongo/cache'])
 ;
 
 return PhpCsFixer\Config::create()

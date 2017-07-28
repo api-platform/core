@@ -9,6 +9,16 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -33,7 +43,7 @@ final class DoctrineMongoDBPropertyMetadataFactory implements PropertyMetadataFa
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $itemMetadata = $this->decorated->create($resourceClass, $property, $options);
 

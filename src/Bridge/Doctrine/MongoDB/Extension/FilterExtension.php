@@ -9,6 +9,16 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDB\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
@@ -46,7 +56,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
         }
 
         foreach ($this->filters as $filterName => $filter) {
-            if (in_array($filterName, $resourceFilters) && $filter instanceof FilterInterface) {
+            if (in_array($filterName, $resourceFilters, true) && $filter instanceof FilterInterface) {
                 $filter->apply($queryBuilder, $resourceClass, $operationName);
             }
         }

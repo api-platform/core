@@ -10,11 +10,12 @@ framework:
         enable_annotations:            true
     serializer:
         enable_annotations:            true
-    trusted_proxies:                   ~
     test:                              ~
     session:
         storage_id:                    'session.storage.mock_file'
     form:                              ~ # For FOSUser
+    templating:
+        engines:                       ['twig'] # For Swagger UI
 
 doctrine:
     dbal:
@@ -44,6 +45,7 @@ api_platform:
         jsonhal:                       ['application/hal+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
+        html:                          ['text/html']
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:
@@ -53,6 +55,20 @@ api_platform:
             client_enabled:            true
             client_items_per_page:     true
             items_per_page:            3
+    enable_nelmio_api_doc: true
+    exception_to_status:
+        Symfony\Component\Serializer\Exception\ExceptionInterface: 400
+        ApiPlatform\Core\Exception\InvalidArgumentException: !php/const:Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+    http_cache:
+        invalidation:
+            enabled: true
+        max_age:        60
+        shared_max_age: 3600
+        vary:           ['Accept', 'Cookie']
+        public:         true
+    doctrine:
+        enable_mongodb_odm: true
+        enable_orm: false
 
 fos_user:
     db_driver:        'mongodb'
@@ -60,54 +76,106 @@ fos_user:
     service:
         user_manager: 'app.user_manager'
     user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
+    from_email:
+        address:      'no-reply@les-tilleuls.coop'
+        sender_name:  'Kévin Dunglas'
+
+nelmio_api_doc:
+    sandbox:
+        accept_type:        'application/json'
+        body_format:
+            formats:        [ 'json' ]
+            default_format: 'json'
+        request_format:
+            formats:
+                json:       'application/json'
 
 services:
+    contain_non_resource.item_data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+
     app.user_manager:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
         arguments:
-            -  '@security.encoder_factory'
-            -  '@fos_user.util.username_canonicalizer'
-            -  '@fos_user.util.email_canonicalizer'
+            -  '@fos_user.util.password_updater'
+            -  '@fos_user.util.canonical_fields_updater'
             -  '@fos_user.object_manager'
             -  '%fos_user.model.user.class%'
 
     fos_user.mailer.default:
-        class: 'ApiPlatform\Core\Bridge\Symfony\Bundle\Tests\Mock\MailerMock'
+        class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
 
     app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
     app.my_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial' } ]
+        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
 
-    app.my_dummy_resource.order_filter:
+    # Tests if the id default to the service name, do not add id attributes here
+    my_dummy.order:
         parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.symfony': ~ } ]
+        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
     app.my_dummy_resource.date_filter:
         parent:    'api_platform.doctrine.orm.date_filter'
-        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~ } ]
+        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
 
     app.my_dummy_resource.range_filter:
         parent:    'api_platform.doctrine.orm.range_filter'
-        arguments: [ { 'dummyPrice': ~ } ]
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
 
     app.my_dummy_resource.boolean_filter:
         parent:    'api_platform.doctrine.orm.boolean_filter'
-        arguments: [ { 'dummyBoolean': ~ } ]
+        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
 
     app.my_dummy_resource.numeric_filter:
         parent:    'api_platform.doctrine.orm.numeric_filter'
-        arguments: [ { 'dummyPrice': ~ } ]
+        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
 
-    app.config_dummy_resource.controller:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\ConfigCustomController'
+    app.my_dummy_resource.exists_filter:
+        parent:    'api_platform.doctrine.orm.exists_filter'
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
+
+    app.config_dummy_resource.action:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
 
+    app.entity.filter.dummy_car:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'colors.prop': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
+
+    app.entity.filter.dummy_property.property:
+        parent:    'api_platform.serializer.property_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
+
+    app.entity.filter.dummy_group.group:
+        parent:    'api_platform.serializer.group_filter'
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.group' } ]
+
+    app.entity.filter.dummy_group.override_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'override_groups', true ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
+
+    app.related_dummy_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
+
+    logger:
+        class: Psr\Log\NullLogger
+
+    api_platform.http_cache.purger:
+        class: ApiPlatform\Core\Tests\Fixtures\NullPurger

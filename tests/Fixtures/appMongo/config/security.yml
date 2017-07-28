@@ -1,21 +1,36 @@
 security:
     encoders:
+        ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User: bcrypt
+        Symfony\Component\Security\Core\User\UserInterface: plaintext
         FOS\UserBundle\Model\UserInterface: plaintext
 
     providers:
+        chain_provider:
+            chain:
+                providers: [in_memory, fos_userbundle]
+
+        in_memory:
+            memory:
+                users:
+                    dunglas:
+                        password: kevin
+                        roles: 'ROLE_USER'
+                    admin:
+                        password: kitten
+                        roles: 'ROLE_ADMIN'
+
         fos_userbundle:
             id: fos_user.user_provider.username_email
 
     firewalls:
         dev:
-            pattern:   ^/(_(profiler|wdt|error)|css|images|js)/
-            security:  false
-
-        api:
-            pattern:  ^/
+            pattern: ^/(_(profiler|wdt|error)|css|images|js)/
             security: false
-            stateless: true
-            anonymous: true
+
+        default:
+            provider: chain_provider
+            http_basic: ~
+            anonymous: ~
 
     access_control:
         - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }

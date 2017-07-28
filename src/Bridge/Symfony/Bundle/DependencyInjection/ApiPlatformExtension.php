@@ -354,7 +354,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         //  Doctrine MongoDB ODM support
-        if ($config['enable_doctrine_mongodb_odm']) {
+        if ($config['doctrine']['enable_mongodb_odm']) {
             $loader->load('doctrine_mongodb.xml');
         }
 
