@@ -232,34 +232,34 @@ final class DocumentationNormalizer implements NormalizerInterface
         $shortName = $resourceMetadata->getShortName();
 
         if ('GET' === $method && $collection) {
-            $hydraOperation = [
+            $hydraOperation += [
                 'hydra:title' => "Retrieves the collection of $shortName resources.",
                 'returns' => 'hydra:PagedCollection',
-            ] + $hydraOperation;
+            ];
         } elseif ('GET' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 'hydra:title' => "Retrieves $shortName resource.",
                 'returns' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('POST' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => 'hydra:CreateResourceOperation',
                 'hydra:title' => "Creates a $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('PUT' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => 'hydra:ReplaceResourceOperation',
                 'hydra:title' => "Replaces the $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('DELETE' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 'hydra:title' => "Deletes the $shortName resource.",
                 'returns' => 'owl:Nothing',
-            ] + $hydraOperation;
+            ];
         }
 
         $hydraOperation['@type'] ?? $hydraOperation['@type'] = 'hydra:Operation';
