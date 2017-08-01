@@ -156,7 +156,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            if (false === $propertyMetadata->isReadableLink() || false === $propertyMetadata->isReadable()) {
+            if ((false === $propertyMetadata->isReadableLink() || false === $propertyMetadata->isReadable()) && false === $propertyMetadata->getAttribute('fetchEager', false)) {
                 continue;
             }
 
