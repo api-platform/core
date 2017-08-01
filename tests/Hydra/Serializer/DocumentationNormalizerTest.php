@@ -43,7 +43,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description']));
 
-        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
+        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET', 'hydra_context' => ['hydra:foo' => 'bar', 'hydra:title' => 'foobar']], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -149,9 +149,10 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         0 => [
                             '@type' => 'hydra:Operation',
                             'hydra:method' => 'GET',
-                            'hydra:title' => 'Retrieves dummy resource.',
-                            'rdfs:label' => 'Retrieves dummy resource.',
+                            'hydra:title' => 'foobar',
+                            'rdfs:label' => 'foobar',
                             'returns' => '#dummy',
+                            'hydra:foo' => 'bar',
                         ],
                         1 => [
                             '@type' => 'hydra:ReplaceResourceOperation',
