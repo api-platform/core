@@ -59,10 +59,12 @@ final class QueryJoinParser
 
                 $pos = strpos($relationship, '.');
 
-                $aliasMap[$alias] = [
-                    'parentAlias' => substr($relationship, 0, $pos),
-                    'association' => substr($relationship, $pos + 1),
-                ];
+                if (false !== $pos) {
+                    $aliasMap[$alias] = [
+                        'parentAlias' => substr($relationship, 0, $pos),
+                        'association' => substr($relationship, $pos + 1),
+                    ];
+                }
             }
         }
 
