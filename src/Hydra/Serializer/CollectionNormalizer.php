@@ -90,6 +90,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         if (is_array($object) || $object instanceof \Countable) {
             $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
+            $data['itemsPerPage'] = $object instanceof PaginatorInterface ? $object->getItemsPerPage() : null;
         }
 
         return $data;
