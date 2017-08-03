@@ -99,9 +99,15 @@ final class IriConverter implements IriConverterInterface
 
             return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $referenceType);
         } catch (RuntimeException $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+            throw new InvalidArgumentException(sprintf(
+                'Unable to generate an IRI for the item of type "%s"',
+                $resourceClass
+            ), $e->getCode(), $e);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+            throw new InvalidArgumentException(sprintf(
+                'Unable to generate an IRI for the item of type "%s"',
+                $resourceClass
+            ), $e->getCode(), $e);
         }
     }
 
