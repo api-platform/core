@@ -59,13 +59,17 @@ final class SerializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-        $resources = [];
+        $resources = new class() extends \ArrayObject {
+            public function serialize()
+            {
+            }
+        };
         $context['resources'] = &$resources;
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
         $request->attributes->set('_api_respond', true);
-        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + $resources);
+        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
     }
 
     /**
