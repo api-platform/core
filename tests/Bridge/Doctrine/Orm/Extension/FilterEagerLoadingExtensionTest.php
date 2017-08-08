@@ -315,6 +315,7 @@ SQL;
             ->from(CompositeRelation::class, 'o')
             ->innerJoin('o.compositeItem', 'item')
             ->innerJoin('o.compositeLabel', 'label')
+            ->leftJoin('o.foo', 'foo', 'WITH', 'o.bar = item.foo')
             ->where('item.field1 = :foo')
             ->setParameter('foo', 1);
 
@@ -322,6 +323,8 @@ SQL;
         $queryNameGenerator->generateJoinAlias('item')->shouldBeCalled()->willReturn('item_2');
         $queryNameGenerator->generateJoinAlias('label')->shouldBeCalled()->willReturn('label_2');
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
+
+        $queryNameGenerator->generateJoinAlias('foo')->shouldBeCalled()->willReturn('foo_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), false);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, 'get');
@@ -331,15 +334,18 @@ SELECT o
 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
 INNER JOIN o.compositeItem item
 INNER JOIN o.compositeLabel label
+LEFT JOIN o.foo foo WITH o.bar = item.foo
 WHERE o.item IN(
     SELECT IDENTITY(o_2.item) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
     INNER JOIN o_2.compositeItem item_2
     INNER JOIN o_2.compositeLabel label_2
+    LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
     WHERE item_2.field1 = :foo
 ) AND o.label IN(
     SELECT IDENTITY(o_2.label) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
     INNER JOIN o_2.compositeItem item_2
     INNER JOIN o_2.compositeLabel label_2
+    LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
     WHERE item_2.field1 = :foo
 )
 SQL;
