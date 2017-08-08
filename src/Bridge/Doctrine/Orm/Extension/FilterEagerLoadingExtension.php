@@ -118,7 +118,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
             $aliases[] = "{$joinPart->getAlias()}.";
             $alias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
             $replacements[] = "$alias.";
-            $join = new Join($joinPart->getJoinType(), str_replace($aliases, $replacements, $joinPart->getJoin()), $alias, $joinPart->getConditionType(), $joinPart->getCondition(), $joinPart->getIndexBy());
+            $join = new Join($joinPart->getJoinType(), str_replace($aliases, $replacements, $joinPart->getJoin()), $alias, $joinPart->getConditionType(), str_replace($aliases, $replacements, $joinPart->getCondition()), $joinPart->getIndexBy());
 
             $queryBuilderClone->add('join', [$join], true);
         }
