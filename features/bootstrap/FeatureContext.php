@@ -29,6 +29,9 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
@@ -672,6 +675,32 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
         $this->manager->persist($relatedProduct);
         $this->manager->persist($product);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are people having pets
+     */
+    public function createPeopleWithPets()
+    {
+        $personToPet = new PersonToPet();
+
+        $person = new Person();
+        $person->name = 'foo';
+
+        $pet = new Pet();
+        $pet->name = 'bar';
+
+        $personToPet->person = $person;
+        $personToPet->pet = $pet;
+
+        $this->manager->persist($person);
+        $this->manager->persist($pet);
+        $this->manager->persist($personToPet);
+
+        $person->pets->add($personToPet);
+        $this->manager->persist($person);
+
         $this->manager->flush();
     }
 }
