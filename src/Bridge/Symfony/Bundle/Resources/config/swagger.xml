@@ -23,6 +23,8 @@
             <argument>%api_platform.oauth.authorizationUrl%</argument>
             <argument>%api_platform.oauth.scopes%</argument>
             <argument type="service" id="api_platform.subresource_operation_factory"></argument>
+            <argument>%api_platform.collection.pagination.enabled%</argument>
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <tag name="serializer.normalizer" priority="16" />
         </service>
 
