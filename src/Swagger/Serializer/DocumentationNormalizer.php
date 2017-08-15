@@ -120,7 +120,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
                 $pathOperation['responses'] = [
                     '200' => $subresourceOperation['collection'] ? [
-                        'description' => sprintf('%s colletion response', $subresourceOperation['shortNames'][0]),
+                        'description' => sprintf('%s collection response', $subresourceOperation['shortNames'][0]),
                         'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
                     ] : [
                         'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
