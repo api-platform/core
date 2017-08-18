@@ -28,6 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -127,6 +128,23 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setDescription($descriptions[($i - 1) % 2]);
 
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb foo objects with fake names
+     */
+    public function thereAreFooObjectsWithFakeNames($nb)
+    {
+        $names = ['Hawsepipe', 'Sthenelus', 'Ephesian', 'Separativeness', 'Balbo'];
+
+        for ($i = 0; $i < $nb; ++$i) {
+            $foo = new Foo();
+            $foo->setName($names[$i]);
+
+            $this->manager->persist($foo);
         }
 
         $this->manager->flush();
