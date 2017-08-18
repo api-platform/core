@@ -292,7 +292,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!$this->resourceClassResolver->isResourceClass($className) || $propertyMetadata->isWritableLink()) {
-            return $this->serializer->denormalize($value, $className, $format, $this->createRelationSerializationContext($className, $context));
+            $context['resource_class'] = $className;
+
+            return $this->serializer->denormalize($value, $className, $format, $context);
         }
 
         if (!is_array($value)) {
@@ -358,8 +360,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function createRelationSerializationContext(string $resourceClass, array $context): array
     {
-        $context['resource_class'] = $resourceClass;
-        unset($context['item_operation_name'], $context['collection_operation_name']);
+        @trigger_error(sprintf('The method %s() is deprecated since 2.1 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
 
         return $context;
     }
@@ -434,7 +435,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
         if ($propertyMetadata->isReadableLink()) {
-            return $this->serializer->normalize($relatedObject, $format, $this->createRelationSerializationContext($resourceClass, $context));
+            $context['resource_class'] = $resourceClass;
+
+            return $this->serializer->normalize($relatedObject, $format, $context);
         }
 
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
