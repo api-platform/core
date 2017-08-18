@@ -3,6 +3,7 @@ parameters:
         - tests/Fixtures/app/AppKernel.php
     excludes_analyse:
         - tests/Fixtures/app/cache
+        - tests/Fixtures/appMongo/cache
     ignoreErrors:
         - '#Call to an undefined method Symfony\\Component\\Routing\\Exception\\ExceptionInterface::getCode\(\)#'
         - '#Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy::[a-zA-Z0-9_]+\(\)#'

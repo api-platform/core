@@ -15,6 +15,9 @@ matrix:
     - php: '7.1'
       env: deps='low'
 
+service:
+  - mongodb
+
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
@@ -26,6 +29,7 @@ before_install:
   - if [[ $lint = 1 ]]; then composer global require --dev 'phpstan/phpstan:^0.8'; fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension=mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi
@@ -36,6 +40,8 @@ script:
   - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov; else vendor/bin/phpunit; fi
   - if [[ $coverage = 1 ]]; then for f in $(find features -name '*.feature'); do FEATURE=${f//\//_} phpdbg -qrr vendor/bin/behat --format=progress --profile coverage $f || exit $?; done; else vendor/bin/behat --format=progress; fi
   - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
+  - vendor/bin/behat -c behat.mongo.yml --tags '~@filter&&~@orm-only'
+  - vendor/bin/phpunit -c phpunit.mongo.xml
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
   - if [[ $lint = 1 ]]; then phpstan analyse -c phpstan.neon -l5 --ansi src tests; fi

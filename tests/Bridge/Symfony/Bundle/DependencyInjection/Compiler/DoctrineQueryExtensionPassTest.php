@@ -51,6 +51,7 @@ class DoctrineQueryExtensionPassTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.collection_data_provider')->willReturn($collectionDataProviderDefinition)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.item_data_provider')->willReturn($itemDataProviderDefinition)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.subresource_data_provider')->willReturn($subresourceDataProviderDefinition)->shouldBeCalled();
+        $containerBuilderProphecy->hasDefinition('api_platform.doctrine.orm.collection_data_provider')->willReturn(true);
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $dataProviderPass->process($containerBuilder);

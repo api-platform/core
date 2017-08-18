@@ -115,6 +115,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'vary' => ['Accept'],
                 'public' => null,
             ],
+            'doctrine' => [
+                'enable_mongodb_odm' => false,
+                'enable_orm' => true,
+            ],
         ], $config);
     }
 

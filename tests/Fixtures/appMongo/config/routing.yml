@@ -1,0 +1,17 @@
+api:
+    resource: '.'
+    type:     'api_platform'
+
+NelmioApiDocBundle:
+    resource: '@NelmioApiDocBundle/Resources/config/routing.yml'
+    prefix:   '/nelmioapidoc'
+
+relation_embedded.custom_get:
+    path:  '/relation_embedders/{id}/custom'
+    methods:  ['GET', 'HEAD']
+    defaults:
+        _controller:     'TestBundle:Custom:custom'
+
+controller:
+    resource: "@TestBundle/Controller"
+    type:     annotation
