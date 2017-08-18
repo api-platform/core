@@ -127,6 +127,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'operationId' => 'getDummyCollection',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
+                            ],
+                        ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
@@ -219,6 +228,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'operationId' => 'customDummyCollection',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
+                            ],
+                        ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
@@ -469,6 +487,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'operationId' => 'getDummyCollection',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
+                            ],
+                        ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
@@ -655,6 +682,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'operationId' => 'getDummyCollection',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
+                            ],
+                        ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
@@ -844,6 +880,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'operationId' => 'getDummyCollection',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
+                            ],
+                        ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
@@ -1260,6 +1305,15 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                         'operationId' => 'getDummyCollection',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves the collection of Dummy resources.',
+                        'parameters' => [
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
+                            ],
+                        ],
                         'responses' => [
                             200 => [
                                 'description' => 'Dummy collection response',
@@ -1463,6 +1517,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'in' => 'query',
                                 'required' => false,
                                 'type' => 'integer',
+                            ],
+                            [
+                                'name' => 'page',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The collection page number',
                             ],
                         ],
                     ]),

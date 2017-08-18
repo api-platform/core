@@ -60,11 +60,13 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $oauthAuthorizationUrl;
     private $oauthScopes;
     private $subresourceOperationFactory;
+    private $paginationEnabled;
+    private $paginationPageParameterName;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, OperationPathResolverInterface $operationPathResolver, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, $oauthEnabled = false, $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, $paginationEnabled = true, $paginationPageParameterName = 'page')
     {
         if ($urlGenerator) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
@@ -86,6 +88,8 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->oauthAuthorizationUrl = $oauthAuthorizationUrl;
         $this->oauthScopes = $oauthScopes;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->paginationEnabled = $paginationEnabled;
+        $this->paginationPageParameterName = $paginationPageParameterName;
     }
 
     /**
@@ -278,6 +282,10 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             if (!isset($pathOperation['parameters']) && $parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
                 $pathOperation['parameters'] = $parameters;
+            }
+
+            if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
+                $pathOperation['parameters'][] = $this->getPaginationParameters();
             }
 
             return $pathOperation;
@@ -663,6 +671,22 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $parameters;
+    }
+
+    /**
+     * Returns pagination parameters for the "get" collection operation.
+     *
+     * @return array
+     */
+    private function getPaginationParameters(): array
+    {
+        return [
+            'name' => $this->paginationPageParameterName,
+            'in' => 'query',
+            'required' => false,
+            'type' => 'integer',
+            'description' => 'The collection page number',
+        ];
     }
 
     /**
