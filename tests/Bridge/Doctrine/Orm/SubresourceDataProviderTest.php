@@ -68,8 +68,8 @@ class SubresourceDataProviderTest extends \PHPUnit_Framework_TestCase
                 $nameCollection[] = $identifier;
             }
 
-          //random property to prevent the use of non-identifiers metadata while looping
-          $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new PropertyMetadata());
+            //random property to prevent the use of non-identifiers metadata while looping
+            $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new PropertyMetadata());
 
             $propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection($nameCollection));
         }
