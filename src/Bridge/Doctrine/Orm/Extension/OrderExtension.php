@@ -46,6 +46,10 @@ final class OrderExtension implements QueryCollectionExtensionInterface
             $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
             if (null !== $defaultOrder) {
                 foreach ($defaultOrder as $field => $order) {
+                    if (is_int($field)) {
+                        $field = $order;
+                        $order = 'ASC';
+                    }
                     $queryBuilder->addOrderBy('o.'.$field, $order);
                 }
 

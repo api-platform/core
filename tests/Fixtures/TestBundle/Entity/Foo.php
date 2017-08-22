@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(attributes={
- *     "order"={"bar": "ASC", "name": "DESC"}
+ *     "order"={"bar", "name": "DESC"}
  * })
  * @ORM\Entity
  */
