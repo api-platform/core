@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Foo.
@@ -42,7 +41,6 @@ class Foo
      * @var string The foo name
      *
      * @ORM\Column
-     * @Assert\NotBlank
      */
     private $name;
 
@@ -50,7 +48,6 @@ class Foo
      * @var string The foo bar
      *
      * @ORM\Column
-     * @Assert\NotBlank
      */
     private $bar;
 
