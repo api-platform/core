@@ -75,7 +75,7 @@ class OrderExtensionTest extends \PHPUnit_Framework_TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo', 'DESC']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo' => 'DESC']]));
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
@@ -93,11 +93,12 @@ class OrderExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
         $queryBuilderProphecy->addOrderBy('o.foo', 'ASC')->shouldBeCalled();
+        $queryBuilderProphecy->addOrderBy('o.bar', 'DESC')->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo']]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata(null, null, null, null, null, ['order' => ['foo', 'bar' => 'DESC']]));
 
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());

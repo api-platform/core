@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(attributes={
- *     "order"={"name", "DESC"}
+ *     "order"={"bar", "name": "DESC"}
  * })
  * @ORM\Entity
  */
@@ -40,13 +39,20 @@ class Foo
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string The foo name
      *
      * @ORM\Column
      * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
+
+    /**
+     * @var string The foo bar
+     *
+     * @ORM\Column
+     * @Assert\NotBlank
+     */
+    private $bar;
 
     public function getId()
     {
@@ -61,5 +67,15 @@ class Foo
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getBar()
+    {
+        return $this->bar;
+    }
+
+    public function setBar($bar)
+    {
+        $this->bar = $bar;
     }
 }

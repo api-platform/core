@@ -18,34 +18,39 @@ Feature: Default order
       "@type": "hydra:Collection",
       "hydra:member": [
         {
+          "@id": "/foos/5",
+          "@type": "Foo",
+          "id": 5,
+          "name": "Balbo",
+          "bar": "Amet"
+        },
+        {
           "@id": "/foos/2",
           "@type": "Foo",
           "id": 2,
-          "name": "Sthenelus"
-        },
-        {
-          "@id": "/foos/4",
-          "@type": "Foo",
-          "id": 4,
-          "name": "Separativeness"
-        },
-        {
-          "@id": "/foos/1",
-          "@type": "Foo",
-          "id": 1,
-          "name": "Hawsepipe"
+          "name": "Sthenelus",
+          "bar": "Dolor"
         },
         {
           "@id": "/foos/3",
           "@type": "Foo",
           "id": 3,
-          "name": "Ephesian"
+          "name": "Ephesian",
+          "bar": "Dolor"
         },
         {
-          "@id": "/foos/5",
+          "@id": "/foos/1",
           "@type": "Foo",
-          "id": 5,
-          "name": "Balbo"
+          "id": 1,
+          "name": "Hawsepipe",
+          "bar": "Lorem"
+        },
+        {
+          "@id": "/foos/4",
+          "@type": "Foo",
+          "id": 4,
+          "name": "Separativeness",
+          "bar": "Sit"
         }
       ],
       "hydra:totalItems": 5,

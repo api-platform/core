@@ -139,10 +139,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreFooObjectsWithFakeNames($nb)
     {
         $names = ['Hawsepipe', 'Sthenelus', 'Ephesian', 'Separativeness', 'Balbo'];
+        $bars = ['Lorem', 'Dolor', 'Dolor', 'Sit', 'Amet'];
 
         for ($i = 0; $i < $nb; ++$i) {
             $foo = new Foo();
             $foo->setName($names[$i]);
+            $foo->setBar($bars[$i]);
 
             $this->manager->persist($foo);
         }
