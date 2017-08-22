@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "my_dummy.order",
  *         "my_dummy.range",
  *         "my_dummy.search",
- *     },
+ *     }
  * })
  * @ORM\Entity
  */
