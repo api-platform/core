@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
@@ -48,12 +49,17 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3')->willThrow(new RouteNotFoundException())->shouldBeCalledTimes(1);
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -75,12 +81,17 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3')->willReturn([])->shouldBeCalledTimes(1);
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -106,12 +117,17 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
             'id' => 3,
         ])->shouldBeCalledTimes(1);
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -135,12 +151,17 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
             'id' => 3,
         ])->shouldBeCalledTimes(1);
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
         $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
     }
@@ -159,14 +180,18 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('dummies', [], UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies');
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
-
         $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), '/dummies');
     }
 
@@ -188,14 +213,18 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('dummies', [], UrlGeneratorInterface::ABS_PATH)->willThrow(new RouteNotFoundException());
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
-
         $converter->getIriFromResourceClass(Dummy::class);
     }
 
@@ -213,14 +242,18 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('api_dummies_related_dummies_get_subresource', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies/1/related_dummies');
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
-
         $this->assertEquals($converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]), '/dummies/1/related_dummies');
     }
 
@@ -242,14 +275,18 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('dummies', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willThrow(new RouteNotFoundException());
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
-
         $converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]);
     }
 
@@ -267,14 +304,18 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('api_dummies_get_item', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies/1');
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
-
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
 
@@ -296,14 +337,18 @@ class IriConverterTest extends \PHPUnit_Framework_TestCase
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->generate('dummies', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willThrow(new RouteNotFoundException());
 
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
         $converter = new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
-            $routerProphecy->reveal()
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
         );
-
         $converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]);
     }
 }
