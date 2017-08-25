@@ -57,7 +57,7 @@ final class IriConverter implements IriConverterInterface
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
 
         if (null === $identifiersExtractor) {
-            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3');
+            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
             $this->identifiersExtractor = new IdentifiersExtractor($this->propertyNameCollectionFactory, $this->propertyMetadataFactory, $this->propertyAccessor);
         } else {
             $this->identifiersExtractor = $identifiersExtractor;
