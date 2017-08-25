@@ -258,43 +258,43 @@ final class DocumentationNormalizer implements NormalizerInterface
         $shortName = $resourceMetadata->getShortName();
 
         if ('GET' === $method && OperationType::COLLECTION === $operationType) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves the collection of $shortName resources.",
                 'returns' => 'hydra:Collection',
-            ] + $hydraOperation;
+            ];
         } elseif ('GET' === $method && OperationType::SUBRESOURCE === $operationType) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => $subresourceMetadata->isCollection() ? "Retrieves the collection of $shortName resources." : "Retrieves a $shortName resource.",
                 'returns' => "#$shortName",
-            ] + $hydraOperation;
+            ];
         } elseif ('GET' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves $shortName resource.",
                 'returns' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('POST' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:CreateAction'],
                 'hydra:title' => "Creates a $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('PUT' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                 'hydra:title' => "Replaces the $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('DELETE' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:DeleteAction'],
                 'hydra:title' => "Deletes the $shortName resource.",
                 'returns' => 'owl:Nothing',
-            ] + $hydraOperation;
+            ];
         }
 
         $hydraOperation['hydra:method'] ?? $hydraOperation['hydra:method'] = $method;
