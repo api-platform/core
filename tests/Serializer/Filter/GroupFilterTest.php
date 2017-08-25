@@ -54,6 +54,28 @@ class GroupFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['groups' => ['foo', 'bar']], $context);
     }
 
+    public function testApplyWithGroupsWhitelist()
+    {
+        $request = new Request(['groups' => ['foo', 'bar', 'baz']]);
+        $context = ['groups' => 'qux'];
+
+        $groupFilter = new GroupFilter('groups', false, ['foo', 'baz']);
+        $groupFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['groups' => ['qux', 'foo', 'baz']], $context);
+    }
+
+    public function testApplyWithGroupsWhitelistWithOverriding()
+    {
+        $request = new Request(['groups' => ['foo', 'bar', 'baz']]);
+        $context = ['groups' => 'qux'];
+
+        $groupFilter = new GroupFilter('groups', true, ['foo', 'baz']);
+        $groupFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['groups' => ['foo', 'baz']], $context);
+    }
+
     public function testApplyWithInvalidGroupsInRequest()
     {
         $request = new Request(['groups' => 'foo,bar,baz']);

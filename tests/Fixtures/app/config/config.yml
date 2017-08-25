@@ -156,6 +156,16 @@ services:
         arguments: [ 'override_groups', true ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
 
+    app.entity.filter.dummy_group.whitelist_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'whitelisted_groups', false, ['dummy_foo', 'dummy_baz'] ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.whitelist_group' } ]
+
+    app.entity.filter.dummy_group.override_whitelist_group:
+        parent:    'api_platform.serializer.group_filter'
+        arguments: [ 'override_whitelisted_groups', true, ['dummy_foo', 'dummy_baz'] ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_whitelist_group' } ]
+
     app.related_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
