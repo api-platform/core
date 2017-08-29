@@ -24,11 +24,13 @@ final class GroupFilter implements FilterInterface
 {
     private $overrideDefaultGroups;
     private $parameterName;
+    private $whitelist;
 
-    public function __construct(string $parameterName = 'groups', bool $overrideDefaultGroups = false)
+    public function __construct(string $parameterName = 'groups', bool $overrideDefaultGroups = false, array $whitelist = null)
     {
         $this->overrideDefaultGroups = $overrideDefaultGroups;
         $this->parameterName = $parameterName;
+        $this->whitelist = $whitelist;
     }
 
     /**
@@ -39,7 +41,9 @@ final class GroupFilter implements FilterInterface
         if (!is_array($groups = $request->query->get($this->parameterName))) {
             return;
         }
-
+        if (null !== $this->whitelist) {
+            $groups = array_intersect($this->whitelist, $groups);
+        }
         if (!$this->overrideDefaultGroups && isset($context['groups'])) {
             $groups = array_merge((array) $context['groups'], $groups);
         }
