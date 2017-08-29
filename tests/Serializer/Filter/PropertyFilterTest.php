@@ -54,6 +54,28 @@ class PropertyFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['attributes' => ['foo', 'bar']], $context);
     }
 
+    public function testApplyWithPropertiesWhitelist()
+    {
+        $request = new Request(['properties' => ['foo', 'bar', 'group' => ['baz' => ['baz', 'qux'], 'qux']]]);
+        $context = ['attributes' => ['qux']];
+
+        $propertyFilter = new PropertyFilter('properties', false, ['foo', 'group' => ['baz' => ['qux']]]);
+        $propertyFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['attributes' => ['qux', 'foo',  'group' => ['baz' => ['qux']]]], $context);
+    }
+
+    public function testApplyWithoutPropertiesWhitelistWithOverriding()
+    {
+        $request = new Request(['properties' => ['foo', 'bar', 'baz']]);
+        $context = ['attributes' => ['qux']];
+
+        $propertyFilter = new PropertyFilter('properties', true, ['foo', 'baz']);
+        $propertyFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['attributes' => ['foo', 'baz']], $context);
+    }
+
     public function testApplyWithInvalidPropertiesInRequest()
     {
         $request = new Request(['properties' => 'foo,bar,baz']);

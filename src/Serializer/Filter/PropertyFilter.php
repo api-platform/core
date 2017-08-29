@@ -24,11 +24,13 @@ final class PropertyFilter implements FilterInterface
 {
     private $overrideDefaultProperties;
     private $parameterName;
+    private $whitelist;
 
-    public function __construct(string $parameterName = 'properties', bool $overrideDefaultProperties = false)
+    public function __construct(string $parameterName = 'properties', bool $overrideDefaultProperties = false, array $whitelist = null)
     {
         $this->overrideDefaultProperties = $overrideDefaultProperties;
         $this->parameterName = $parameterName;
+        $this->whitelist = $whitelist;
     }
 
     /**
@@ -38,6 +40,10 @@ final class PropertyFilter implements FilterInterface
     {
         if (!is_array($properties = $request->query->get($this->parameterName))) {
             return;
+        }
+
+        if (null !== $this->whitelist) {
+            $properties = array_intersect_key($this->whitelist, $properties);
         }
 
         if (!$this->overrideDefaultProperties && isset($context['attributes'])) {
