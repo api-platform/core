@@ -44,7 +44,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context)
     {
         try {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => false]);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
             $identifier = null;
             foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $context) as $propertyName) {
@@ -58,7 +58,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw $e;
             }
 
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => false]);
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => true]);
         }
     }
 }
