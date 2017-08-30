@@ -293,6 +293,36 @@ Feature: Relations support
     }
     """
 
+  Scenario: Update the relation with a new one
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/relation_embedders/2" with body:
+    """
+    {
+      "anotherRelated": {
+        "symfony": "laravel2"
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelationEmbedder",
+      "@id": "/relation_embedders/2",
+      "@type": "RelationEmbedder",
+      "krondstadt": "Krondstadt",
+      "anotherRelated": {
+        "@id": "/related_dummies/3",
+        "@type": "https://schema.org/Product",
+        "symfony": "laravel2",
+        "thirdLevel": null
+      },
+      "related": null
+    }
+    """
+
   Scenario: Post a wrong relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
@@ -320,6 +350,66 @@ Feature: Relations support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  Scenario: Create a new relation (json)
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/relation_embedders" with body:
+    """
+    {
+      "anotherRelated": {
+        "symfony": "laravel"
+      }
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelationEmbedder",
+      "@id": "/relation_embedders/3",
+      "@type": "RelationEmbedder",
+      "krondstadt": "Krondstadt",
+      "anotherRelated": {
+        "@id": "/related_dummies/4",
+        "@type": "https://schema.org/Product",
+        "symfony": "laravel",
+        "thirdLevel": null
+      },
+      "related": null
+    }
+    """
+
+  Scenario: Update the relation with a new one (json)
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "PUT" request to "/relation_embedders/3" with body:
+    """
+    {
+      "anotherRelated": {
+        "symfony": "laravel2"
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelationEmbedder",
+      "@id": "/relation_embedders/3",
+      "@type": "RelationEmbedder",
+      "krondstadt": "Krondstadt",
+      "anotherRelated": {
+        "@id": "/related_dummies/5",
+        "@type": "https://schema.org/Product",
+        "symfony": "laravel2",
+        "thirdLevel": null
+      },
+      "related": null
+    }
+    """
 
   @dropSchema
   Scenario: Update an embedded relation
