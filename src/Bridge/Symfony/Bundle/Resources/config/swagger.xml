@@ -25,6 +25,8 @@
             <argument type="service" id="api_platform.subresource_operation_factory"></argument>
             <argument>%api_platform.collection.pagination.enabled%</argument>
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.client_items_per_page%</argument>
+            <argument>%api_platform.collection.pagination.items_per_page_parameter_name%</argument>
             <tag name="serializer.normalizer" priority="16" />
         </service>
 
