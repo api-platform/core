@@ -13,7 +13,9 @@ matrix:
     - php: '7.1'
       env: coverage=1 lint=1
     - php: '7.1'
+    - php: '7.2'
       env: deps='low'
+      
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
