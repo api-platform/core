@@ -54,6 +54,9 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
             if (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass)) {
                 return $type;
             }
+            if ($this->isResourceClass($typeToFind)) {
+                return $typeToFind;
+            }
 
             throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $typeToFind));
         }
