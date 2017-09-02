@@ -57,7 +57,7 @@ class ContextBuilderTest extends \PHPUnit_Framework_TestCase
         $expected = [
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
-            'dummyPropertyA' => '#DummyEntity/dummyPropertyA',
+            'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
         ];
 
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
@@ -96,7 +96,7 @@ class ContextBuilderTest extends \PHPUnit_Framework_TestCase
             '@vocab' => '#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'dummyPropertyA' => [
-                '@id' => '#DummyEntity/dummyPropertyA',
+                '@id' => 'DummyEntity/dummyPropertyA',
                 '@reverse' => 'parent',
             ],
         ];
