@@ -56,7 +56,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
@@ -74,7 +75,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         $closure = function ($data) use ($expectedValidationGroups): array {
@@ -92,7 +94,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $data = new DummyEntity();
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, ['a', 'b', 'c'])->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, ['a', 'b', 'c'])->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
         list($resourceMetadataFactory, $event) = $this->createEventObject('groups_builder', $data);
@@ -117,7 +120,8 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
         $expectedValidationGroups = ['foo'];
 
         $validatorProphecy = $this->prophesize(ValidatorInterface::class);
-        $validatorProphecy->validate($data, null, $expectedValidationGroups)->shouldBeCalled();
+        $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $validatorProphecy->validate($data, null, $expectedValidationGroups)->willreturn($constraintViolationList)->shouldBeCalled();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('foo')->willReturn(false)->shouldBeCalled();
