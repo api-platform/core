@@ -426,6 +426,131 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator
+     */
+    public function testNormalizeWithApiKeysEnabled()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+
+        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', null, ['get' => ['method' => 'GET']], [], []);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, null, null, false));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $apiKeysConfiguration = [
+            'header' => [
+                'type' => 'header',
+                'name' => 'Authorization',
+            ],
+            'query' => [
+                'type' => 'query',
+                'name' => 'key',
+            ],
+        ];
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            null,
+            null,
+            null,
+            false,
+            null,
+            null,
+            null,
+            null,
+            [],
+            $apiKeysConfiguration
+        );
+
+        $expected = [
+            'swagger' => '2.0',
+            'basePath' => '/app_dev.php/',
+            'info' => [
+                'title' => 'Test API',
+                'description' => 'This is a test API.',
+                'version' => '1.2.3',
+            ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'type' => 'string',
+                                'required' => true,
+                            ],
+                        ],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'properties' => [
+                        'name' => new \ArrayObject([
+                            'type' => 'string',
+                            'description' => 'This is a name.',
+                        ]),
+                    ],
+                ]),
+            ]),
+            'securityDefinitions' => [
+                'header' => [
+                    'type' => 'apiKey',
+                    'in' => 'header',
+                    'description' => 'Value for the Authorization header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'apiKey',
+                    'in' => 'query',
+                    'description' => 'Value for the key query parameter',
+                    'name' => 'key',
+                ],
+            ],
+            'security' => [
+                ['header' => []],
+                ['query' => []],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
+    }
+
+    /**
+     * @group legacy
      * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
      */
     public function testNormalizeWithOnlyNormalizationGroups()
@@ -1608,7 +1733,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $operationPathResolver,
-            null, null, null, false, '', '', '', '', [],
+            null, null, null, false, '', '', '', '', [], [],
             $subresourceOperationFactory
         );
 

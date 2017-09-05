@@ -111,6 +111,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config, $loader);
+        $this->registerApiKeysConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
@@ -267,6 +268,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.oauth.tokenUrl', $config['oauth']['tokenUrl']);
         $container->setParameter('api_platform.oauth.authorizationUrl', $config['oauth']['authorizationUrl']);
         $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
+    }
+
+    /**
+     * Registers the api keys configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
     }
 
     /**
