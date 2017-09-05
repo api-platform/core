@@ -83,7 +83,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], []);
+        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], ['pagination_client_items_per_page' => true]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -134,6 +134,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'required' => false,
                                 'type' => 'integer',
                                 'description' => 'The collection page number',
+                            ],
+                            [
+                                'name' => 'itemsPerPage',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The number of items per page',
                             ],
                         ],
                         'responses' => [
@@ -235,6 +242,13 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                                 'required' => false,
                                 'type' => 'integer',
                                 'description' => 'The collection page number',
+                            ],
+                            [
+                                'name' => 'itemsPerPage',
+                                'in' => 'query',
+                                'required' => false,
+                                'type' => 'integer',
+                                'description' => 'The number of items per page',
                             ],
                         ],
                         'responses' => [
