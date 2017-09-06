@@ -225,12 +225,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
-                    'api_keys' => $exampleConfig,
+                    'api_keys' => [$exampleConfig],
                ],
             ],
         ]);
 
         $this->assertTrue(isset($config['swagger']['api_keys']));
-        $this->assertSame($exampleConfig, $config['swagger']['api_keys']);
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
     }
 }
