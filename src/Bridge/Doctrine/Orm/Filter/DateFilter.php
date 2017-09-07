@@ -36,6 +36,10 @@ class DateFilter extends AbstractFilter
         'datetime' => true,
         'datetimetz' => true,
         'time' => true,
+        'date_immutable' => true,
+        'datetime_immutable' => true,
+        'datetimetz_immutable' => true,
+        'time_immutable' => true,
     ];
 
     /**
