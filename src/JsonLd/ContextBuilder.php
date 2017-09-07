@@ -89,7 +89,7 @@ final class ContextBuilder implements ContextBuilderInterface
     {
         $context = $this->getBaseContext($referenceType);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $prefixedShortName = sprintf('#%s', $resourceMetadata->getShortName());
+        $shortName = $resourceMetadata->getShortName();
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
@@ -102,7 +102,7 @@ final class ContextBuilder implements ContextBuilderInterface
             $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
 
             if (!$id = $propertyMetadata->getIri()) {
-                $id = sprintf('%s/%s', $prefixedShortName, $convertedName);
+                $id = sprintf('%s/%s', $shortName, $convertedName);
             }
 
             if (true !== $propertyMetadata->isReadableLink()) {

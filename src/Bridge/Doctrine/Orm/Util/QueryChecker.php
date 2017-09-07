@@ -135,19 +135,41 @@ final class QueryChecker
             }
         }
 
-        if (!empty($orderByAliases)) {
-            foreach ($joinParts as $joins) {
-                foreach ($joins as $join) {
-                    $alias = QueryJoinParser::getJoinAlias($join);
+        if (!$orderByAliases) {
+            return false;
+        }
 
-                    if (isset($orderByAliases[$alias])) {
-                        $relationship = QueryJoinParser::getJoinRelationship($join);
-                        list($parentAlias, $association) = explode('.', $relationship);
+        foreach ($joinParts as $joins) {
+            foreach ($joins as $join) {
+                $alias = QueryJoinParser::getJoinAlias($join);
 
-                        $parentMetadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
+                if (!isset($orderByAliases[$alias])) {
+                    continue;
+                }
 
-                        if ($parentMetadata->isCollectionValuedAssociation($association)) {
-                            return true;
+                $relationship = QueryJoinParser::getJoinRelationship($join);
+
+                if (false !== strpos($relationship, '.')) {
+                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($alias, $queryBuilder, $managerRegistry);
+                    if ($metadata->isCollectionValuedAssociation($relationship)) {
+                        return true;
+                    }
+                } else {
+                    $parentMetadata = $managerRegistry->getManagerForClass($relationship)->getClassMetadata($relationship);
+
+                    foreach ($queryBuilder->getRootEntities() as $rootEntity) {
+                        $rootMetadata = $managerRegistry
+                            ->getManagerForClass($rootEntity)
+                            ->getClassMetadata($rootEntity);
+
+                        if (!$rootMetadata instanceof ClassMetadata) {
+                            continue;
+                        }
+
+                        foreach ($rootMetadata->getAssociationsByTargetClass($relationship) as $association => $mapping) {
+                            if ($parentMetadata->isCollectionValuedAssociation($association)) {
+                                return true;
+                            }
                         }
                     }
                 }
