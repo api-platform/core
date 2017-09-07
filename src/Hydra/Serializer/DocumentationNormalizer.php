@@ -150,7 +150,9 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if (isset($attributes['denormalization_context']['groups'])) {
             if (isset($context['serializer_groups'])) {
-                $context['serializer_groups'] += $attributes['denormalization_context']['groups'];
+                foreach ($attributes['denormalization_context']['groups'] as $groupName) {
+                    $context['serializer_groups'][] = $groupName;
+                }
             } else {
                 $context['serializer_groups'] = $attributes['denormalization_context']['groups'];
             }
