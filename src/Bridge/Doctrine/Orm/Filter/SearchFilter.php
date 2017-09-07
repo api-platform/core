@@ -157,6 +157,16 @@ class SearchFilter extends AbstractFilter
                 return 'float';
         }
 
+        if (defined(Type::class.'::DATE_IMMUTABLE')) {
+            switch ($doctrineType) {
+                case Type::DATE_IMMUTABLE:
+                case Type::TIME_IMMUTABLE:
+                case Type::DATETIME_IMMUTABLE:
+                case Type::DATETIMETZ_IMMUTABLE:
+                    return \DateTimeInterface::class;
+            }
+        }
+
         return 'string';
     }
 
