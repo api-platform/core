@@ -322,7 +322,6 @@ Feature: Relations support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  @dropSchema
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
@@ -353,3 +352,37 @@ Feature: Relations support
       "related": null
     }
     """
+
+  @dropSchema
+  Scenario: Issue #1222
+    Given there are people having pets
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/people"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Person",
+      "@id": "/people",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/people/1",
+          "@type": "Person",
+          "name": "foo",
+          "pets": [
+            {
+              "pet": {
+                "@id": "/pets/1",
+                "@type": "Pet",
+                "name": "bar"
+              }
+            }
+          ]
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
+

@@ -418,6 +418,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
+        unset($context['resource_class']);
+
         return $this->serializer->normalize($attributeValue, $format, $context);
     }
 
