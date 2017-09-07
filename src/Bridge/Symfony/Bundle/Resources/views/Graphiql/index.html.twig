@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
+
+    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql/graphiql.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphiql-style.css') }}">
+
+    <script src="{{ asset('bundles/apiplatform/es6-promise/es6-promise.auto.min.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/fetch/fetch.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/react/react.min.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/react/react-dom.min.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/graphiql/graphiql.min.js') }}"></script>
+</head>
+
+<body>
+<div id="graphiql">Loading...</div>
+
+<script>var debug = {{ debug }};</script>
+<script src="{{ asset('bundles/apiplatform/init-graphiql.js') }}"></script>
+
+</body>
+</html>

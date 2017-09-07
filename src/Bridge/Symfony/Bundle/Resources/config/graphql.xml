@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.graphql.executor" class="ApiPlatform\Core\Bridge\Graphql\Executor" public="false" />
+
+        <service id="api_platform.graphql.collection_resolver_factory" class="ApiPlatform\Core\Bridge\Graphql\Resolver\CollectionResolverFactory" public="false">
+            <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="request_stack" />
+            <argument>%api_platform.collection.pagination.enabled%</argument>
+        </service>
+
+        <service id="api_platform.graphql.item_resolver_factory" class="ApiPlatform\Core\Bridge\Graphql\Resolver\ItemResolverFactory" public="false">
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+        </service>
+
+        <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilder" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.graphql.collection_resolver_factory" />
+            <argument type="service" id="api_platform.graphql.item_resolver_factory" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument>%api_platform.collection.pagination.enabled%</argument>
+        </service>
+
+        <!-- Action -->
+
+        <service id="api_platform.action.graphql_entrypoint" class="ApiPlatform\Core\Action\GraphqlEntrypointAction">
+            <argument type="service" id="api_platform.graphql.schema_builder" />
+            <argument type="service" id="api_platform.graphql.executor" />
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
+            <argument>%api_platform.graphql.graphiql.enabled%</argument>
+            <argument>%api_platform.title%</argument>
+        </service>
+    </services>
+
+</container>

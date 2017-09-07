@@ -224,6 +224,21 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_nelmio_api_doc' => true]]), $containerBuilder);
     }
 
+    public function testDisableGraphql()
+    {
+        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy->setDefinition('api_platform.action.graphql_entrypoint')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.collection_resolver_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.item_resolver_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder')->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['graphql' => ['enabled' => false]]]), $containerBuilder);
+    }
+
     public function testEnableSecurity()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
@@ -481,6 +496,8 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.swagger.api_keys' => [],
             'api_platform.enable_swagger' => true,
             'api_platform.enable_swagger_ui' => true,
+            'api_platform.graphql.enabled' => true,
+            'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => false,
         ];
@@ -496,6 +513,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $definitions = [
+            'api_platform.action.graphql_entrypoint',
             'api_platform.doctrine.listener.view.write',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
@@ -519,6 +537,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.doctrine.orm.subresource_data_provider',
             'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.doctrine.listener.view.write',
+            'api_platform.graphql.collection_resolver_factory',
+            'api_platform.graphql.executor',
+            'api_platform.graphql.item_resolver_factory',
+            'api_platform.graphql.schema_builder',
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.action.context',

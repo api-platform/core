@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use FOS\UserBundle\FOSUserBundle;
+use GraphQL\GraphQL;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -99,6 +100,21 @@ final class Configuration implements ConfigurationInterface
                         ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
                         ->arrayNode('scopes')
                             ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('graphql')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class))->info('To enable or disable GraphQL.')->end()
+                        ->arrayNode('graphiql')
+                            ->canBeEnabled()
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class) && class_exists(TwigBundle::class))->info('To enable or disable GraphiQL.')->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

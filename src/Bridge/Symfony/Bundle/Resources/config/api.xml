@@ -37,6 +37,7 @@
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.resource_class_directories%</argument>
             <argument type="service" id="api_platform.subresource_operation_factory" />
+            <argument>%api_platform.graphql.enabled%</argument>
 
             <tag name="routing.loader" />
         </service>

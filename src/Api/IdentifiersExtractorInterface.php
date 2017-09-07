@@ -23,6 +23,11 @@ use ApiPlatform\Core\Exception\RuntimeException;
 interface IdentifiersExtractorInterface
 {
     /**
+     * Finds identifiers from a Resource class.
+     */
+    public function getIdentifiersFromResourceClass(string $resourceClass): array;
+
+    /**
      * Finds identifiers from an Item (object).
      *
      * @param object $item
