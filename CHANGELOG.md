@@ -28,6 +28,15 @@
 * Allow using PHP constants in YAML resources files
 * Upgrade to the latest version of the Hydra spec
 
+## 2.0.11
+
+* Ensure PHP 7.2 compatibility
+* Fix some bug regarding Doctrine joins
+* Let the `hydra_context` option take precedence over operation metadata
+* Fix relations handling by the non-hypermedia `ItemNormalizer` (raw JSON, XML)
+* Fix a bug in the JSON-LD context: should not be prefixed by `#`
+* Fix a bug regarding serialization groups in Hydra docs
+
 ## 2.0.10
 
 * Performance improvement
