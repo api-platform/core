@@ -179,6 +179,18 @@ class HydraContext implements Context
     }
 
     /**
+     * @Then ":prop" property is not required for Hydra class ":class"
+     */
+    public function assertPropertyIsNotRequired($propertyName, $className)
+    {
+        $properties = $this->getProperty($propertyName, $className);
+
+        if (!empty($properties->{'hydra:required'})) {
+            throw new \Exception(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+        }
+    }
+
+    /**
      * @param string $propertyName
      * @param string $className
      *
