@@ -27,6 +27,10 @@
 * Allow to use service for dynamic validation groups
 * Allow using PHP constants in YAML resources files
 * Upgrade to the latest version of the Hydra spec
+* Add `pagination` and `itemPerPage` parameters in the Swagger/Open API documentation
+* Add support for API key authentication in Swagger UI
+* Allow to specify a whitelist of serialization groups
+* Allow to use the new immutable date and time types of Doctrine in filters
 
 ## 2.0.11
 
