@@ -32,6 +32,9 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @group legacy
+ * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
  */
 class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
 {

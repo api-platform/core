@@ -53,6 +53,8 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
         $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->operationMethodResolver = $operationMethodResolver;
+
+        @trigger_error('The '.__NAMESPACE__.'\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
     }
 
     /**
