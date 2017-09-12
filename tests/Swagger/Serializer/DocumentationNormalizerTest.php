@@ -48,6 +48,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
+ * @author Philippe Guilbault <philippe.guilbault@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -1820,6 +1821,131 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]),
             ]),
         ];
+
+        $this->assertEquals($expected, $normalizer->normalize($documentation));
+    }
+
+    /**
+     *
+     * @group yourmom
+     */
+    public function testNormalizeWithIdentifierName()
+    {
+        $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            ['get' => ['method' => 'GET']],
+            [],
+            []
+        );
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->shouldBeCalled()->willReturn(new PropertyMetadata(
+            new Type(Type::BUILTIN_TYPE_INT),
+            'This is an id.',
+            true,
+            false,
+            null,
+            null,
+            false
+        ));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(
+            new Type(Type::BUILTIN_TYPE_STRING),
+            'This is a name.',
+            true,
+            false,
+            null,
+            null,
+            true,
+            true
+        ));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(
+            new Type(Type::BUILTIN_TYPE_STRING),
+            'This is a description.',
+            true,
+            true
+        ));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        //$urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
+
+        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $operationMethodResolverProphecy->reveal(),
+            $operationPathResolver,
+            $urlGeneratorProphecy->reveal()
+        );
+
+        $expected = array (
+            'swagger' => '2.0',
+            'basePath' => '/',
+            'info' => ['title' => '', 'version' => '0.0.0', ],
+            'paths' => new \ArrayObject([
+                '/dummies/{id}' => [
+                    'get' => new \ArrayObject([
+                        'tags' => ['Dummy'],
+                        'operationId' => 'getDummyItem',
+                        'produces' => ['application/ld+json'],
+                        'summary' => 'Retrieves a Dummy resource.',
+                        'parameters' => [[
+                                'name' => 'name',
+                                'type' => 'string',
+                                'in' => 'path',
+                                'required' => true,
+                        ]],
+                        'responses' => [
+                            200 => [
+                                'description' => 'Dummy resource response',
+                                'schema' => ['$ref' => '#/definitions/Dummy'],
+                            ],
+                            404 => ['description' => 'Resource not found'],
+                        ],
+                    ]),
+                ],
+            ]),
+            'definitions' => new \ArrayObject([
+                'Dummy' => new \ArrayObject([
+                    'type' => 'object',
+                    'description' => 'This is a dummy.',
+                    'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+                    'properties' => [
+                        'id' => new \ArrayObject([
+                            'readOnly' => true,
+                            'description' => 'This is an id.',
+                            'type' => 'integer',
+                        ]),
+                        'name' => new \ArrayObject([
+                            'readOnly' => true,
+                            'description' => 'This is a name.',
+                            'type' => 'string',
+                        ]),
+                        'description' => new \ArrayObject([
+                            'description' => 'This is a description.',
+                            'type' => 'string',
+                        ]),
+                    ],
+                ]),
+            ]),
+        );
 
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }

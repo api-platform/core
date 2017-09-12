@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Creates a machine readable Swagger API documentation.
  *
+ * @author Philippe Guilbault <philippe.guilbault@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -302,12 +303,22 @@ final class DocumentationNormalizer implements NormalizerInterface
             return $pathOperation;
         }
 
+        $pathIdentifier = 'id';
+        $pathType = 'string';
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, []) as $propertyName) {
+            $property = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            if ($property->isIdentifier()) {
+                $pathIdentifier = $propertyName;
+                $pathType = $property->getType()->getBuiltinType();
+            }
+        }
+
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
-            'name' => 'id',
+            'name' => $pathIdentifier,
             'in' => 'path',
             'required' => true,
-            'type' => 'string',
+            'type' => $pathType,
         ]];
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
@@ -373,14 +384,24 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function updatePutOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
     {
+        $pathIdentifier = 'id';
+        $pathType = 'string';
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, []) as $propertyName) {
+            $property = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            if ($property->isIdentifier()) {
+                $pathIdentifier = $propertyName;
+                $pathType = $property->getType()->getBuiltinType();
+            }
+        }
+
         $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
         $pathOperation['parameters'] ?? $pathOperation['parameters'] = [
             [
-                'name' => 'id',
+                'name' => $pathIdentifier,
                 'in' => 'path',
-                'type' => 'string',
+                'type' => $pathType,
                 'required' => true,
             ],
             [
