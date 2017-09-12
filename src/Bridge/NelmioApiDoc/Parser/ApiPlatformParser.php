@@ -53,6 +53,8 @@ final class ApiPlatformParser implements ParserInterface
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->nameConverter = $nameConverter;
+
+        @trigger_error('The '.__NAMESPACE__.'\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 2 has native support for API Platform.', E_USER_DEPRECATED);
     }
 
     /**
