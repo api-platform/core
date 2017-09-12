@@ -475,6 +475,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.enable_swagger' => true,
             'api_platform.enable_swagger_ui' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
+            'api_platform.validator.serialize_payload_fields' => false,
         ];
 
         foreach ($parameters as $key => $value) {
