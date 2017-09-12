@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -44,8 +45,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $resourceClassResolver;
     protected $propertyAccessor;
     protected $localCache = [];
+    protected $itemDataProvider;
+    protected $allowPlainIdentifiers;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
@@ -54,6 +57,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->itemDataProvider = $itemDataProvider;
+        $this->allowPlainIdentifiers = $allowPlainIdentifiers;
 
         $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
@@ -299,6 +304,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!is_array($value)) {
+            // repeat the code so that IRIs keep working with the json format
+            if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
+                try {
+                    return $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
+                } catch (ItemNotFoundException $e) {
+                    throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+                } catch (InvalidArgumentException $e) {
+                    // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
+                }
+            }
+
             throw new InvalidArgumentException(sprintf(
                 'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, gettype($value)
             ));

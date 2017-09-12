@@ -30,6 +30,7 @@ doctrine:
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'
+    allow_plain_identifiers:           true
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']

@@ -130,6 +130,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'vary' => ['Accept'],
                 'public' => null,
             ],
+            'allow_plain_identifiers' => false,
         ], $config);
     }
 

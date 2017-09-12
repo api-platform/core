@@ -443,6 +443,34 @@ Feature: Relations support
     }
     """
 
+  Scenario: Create a related dummy with a relation (json)
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/related_dummies" with body:
+    """
+    {"thirdLevel": "1"}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedDummy",
+      "@id": "/related_dummies/6",
+      "@type": "https://schema.org/Product",
+      "id": 6,
+      "name": null,
+      "symfony": "symfony",
+      "dummyDate": null,
+      "thirdLevel": "/third_levels/1",
+      "relatedToDummyFriend": [],
+      "dummyBoolean": null,
+      "embeddedDummy": null,
+      "symfony": "symfony",
+      "age": null
+    }
+    """
+
   @dropSchema
   Scenario: Issue #1222
     Given there are people having pets
