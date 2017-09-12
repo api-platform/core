@@ -73,7 +73,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
-     * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      * @group legacy
      * @dataProvider legacyOperationsResourceMetadataProvider
      */
