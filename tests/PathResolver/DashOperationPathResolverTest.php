@@ -18,10 +18,14 @@ use ApiPlatform\Core\PathResolver\DashOperationPathResolver;
 
 /**
  * @author Guilhem N. <egetick@gmail.com>
+ *
  * @group legacy
  */
 class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\DashOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator instead.
+     */
     public function testResolveCollectionOperationPath()
     {
         $dashOperationPathResolver = new DashOperationPathResolver();
@@ -29,6 +33,9 @@ class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/short-names.{_format}', $dashOperationPathResolver->resolveOperationPath('ShortName', [], OperationType::COLLECTION, 'get'));
     }
 
+    /**
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\DashOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator instead.
+     */
     public function testResolveItemOperationPath()
     {
         $dashOperationPathResolver = new DashOperationPathResolver();
@@ -37,6 +44,8 @@ class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\DashOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator instead.
+     *
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedMessage Subresource operations are not supported by the OperationPathResolver.
      */
@@ -48,7 +57,8 @@ class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\DashOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator instead.
+     * @expectedDeprecation Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      */
     public function testLegacyResolveOperationPath()
     {

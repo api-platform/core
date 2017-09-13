@@ -32,6 +32,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @deprecated since version 2.2, to be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
  */
 final class ApiPlatformProvider implements AnnotationsProviderInterface
 {
@@ -47,14 +49,14 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, NormalizerInterface $documentationNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, $filterLocator, OperationMethodResolverInterface $operationMethodResolver)
     {
+        @trigger_error('The '.__CLASS__.' class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
+
         $this->setFilterLocator($filterLocator);
 
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->operationMethodResolver = $operationMethodResolver;
-
-        @trigger_error('The '.__NAMESPACE__.'\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
     }
 
     /**
