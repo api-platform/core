@@ -66,7 +66,17 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
-                ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
+                ->booleanNode('enable_nelmio_api_doc')
+                    ->beforeNormalization()->always(function ($v) {
+                        if ($v) {
+                            @trigger_error('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
+                        }
+
+                        return $v;
+                    })->end()
+                    ->defaultValue(false)
+                    ->info('[Deprecated] Enable the NelmioApiDocBundle integration.')
+                ->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
 

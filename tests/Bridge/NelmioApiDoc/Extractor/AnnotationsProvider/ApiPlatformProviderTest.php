@@ -34,10 +34,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  *
  * @group legacy
- * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
  */
 class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testConstruct()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -60,6 +62,9 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(AnnotationsProviderInterface::class, $apiPlatformProvider);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testGetAnnotations()
     {
         $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
@@ -80,7 +85,7 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
      */
     public function testGetAnnotationsWithDeprecatedFilterCollection()
@@ -99,7 +104,8 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     *
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
      */
