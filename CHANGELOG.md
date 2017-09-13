@@ -31,6 +31,7 @@
 * Add support for API key authentication in Swagger UI
 * Allow to specify a whitelist of serialization groups
 * Allow to use the new immutable date and time types of Doctrine in filters
+* Update swagger definition keys to more verbose ones (ie `Resource-md5($groups)` => `Resource-groupa_groupb`) - see https://github.com/api-platform/core/pull/1207
 
 ## 2.0.11
 

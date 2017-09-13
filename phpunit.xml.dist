@@ -8,6 +8,7 @@
          colors="true"
 >
     <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak_vendors" />
         <ini name="error_reporting" value="-1" />
         <ini name="memory_limit" value="-1" />
         <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
@@ -29,4 +30,8 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+    </listeners>
 </phpunit>

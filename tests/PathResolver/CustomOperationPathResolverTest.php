@@ -41,7 +41,7 @@ class CustomOperationPathResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Method ApiPlatform\Core\PathResolver\CustomOperationPathResolver::resolveOperationPath() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.
      */
     public function testLegacyResolveOperationPath()
     {

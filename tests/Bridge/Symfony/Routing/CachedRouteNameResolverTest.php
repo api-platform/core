@@ -59,10 +59,6 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::ITEM);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
-     */
     public function testGetRouteNameForItemRouteOnCacheMiss()
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
@@ -123,10 +119,6 @@ class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
         $cachedRouteNameResolver->getRouteName('AppBundle\Entity\User', OperationType::COLLECTION);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using a boolean for the Operation Type is deprecrated since API Platform 2.1 and will not be possible anymore in API Platform 3
-     */
     public function testGetRouteNameForCollectionRouteOnCacheMiss()
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
