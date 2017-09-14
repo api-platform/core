@@ -14,3 +14,4 @@ parameters:
         - '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects Doctrine\\ORM\\Query\\Expr\\Base, Doctrine\\ORM\\Query\\Expr\\Join\[\] given#' # Fixed in Doctrine's master
         - '#Call to an undefined method Doctrine\\Common\\Persistence\\ObjectManager::getConnection\(\)#'
         - '#Parameter \#1 \$callable of static method Doctrine\\Common\\Annotations\\AnnotationRegistry::registerLoader\(\) expects callable, mixed\[\] given#'
+        - '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 3 parameters, 1 required#'

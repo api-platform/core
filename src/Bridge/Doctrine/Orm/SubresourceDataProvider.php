@@ -178,7 +178,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
 
                 if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
-                    return $extension->getResult($queryBuilder);
+                    return $extension->getResult($queryBuilder, $resourceClass, $operationName);
                 }
             }
         } else {
@@ -186,7 +186,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
 
                 if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
-                    return $extension->getResult($queryBuilder);
+                    return $extension->getResult($queryBuilder, $resourceClass, $operationName);
                 }
             }
         }

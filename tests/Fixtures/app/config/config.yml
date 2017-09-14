@@ -44,6 +44,7 @@ api_platform:
         pagination:
             client_enabled:            true
             client_items_per_page:     true
+            client_partial:            true
             items_per_page:            3
     enable_nelmio_api_doc: true
     exception_to_status:
