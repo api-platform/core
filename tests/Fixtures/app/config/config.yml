@@ -149,7 +149,7 @@ services:
 
     app.entity.filter.dummy_property.whitelist_property:
         parent:    'api_platform.serializer.property_filter'
-        arguments: [ 'whitelisted_properties', false, ['foo', {'group': ['baz', 'qux']}] ]
+        arguments: [ 'whitelisted_properties', false, ['foo', 'group.baz', 'group.qux'] ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelist_property' } ]
 
     app.entity.filter.dummy_group.group:
