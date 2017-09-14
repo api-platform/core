@@ -213,7 +213,7 @@ class SearchFilter extends AbstractFilter
             $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
             // prefixing the strategy with i makes it case insensitive
-            if (strpos($strategy, 'i') === 0) {
+            if (0 === strpos($strategy, 'i')) {
                 $strategy = substr($strategy, 1);
                 $caseSensitive = false;
             }
