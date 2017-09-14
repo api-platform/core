@@ -354,7 +354,7 @@ final class PropertyMetadata
      */
     public function hasSubresource(): bool
     {
-        return $this->subresource !== null;
+        return null !== $this->subresource;
     }
 
     /**

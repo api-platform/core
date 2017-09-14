@@ -51,7 +51,7 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $methods = $route->getMethods();
 
             if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods, true))) {
-                if ($operationType === OperationType::SUBRESOURCE && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
+                if (OperationType::SUBRESOURCE === $operationType && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
                     continue;
                 }
 

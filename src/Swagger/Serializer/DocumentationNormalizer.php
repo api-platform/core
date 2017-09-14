@@ -182,13 +182,13 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType)
     {
-        if (null === $operations = $operationType === OperationType::COLLECTION ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
+        if (null === $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
             return;
         }
 
         foreach ($operations as $operationName => $operation) {
             $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
-            $method = $operationType === OperationType::ITEM ? $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
+            $method = OperationType::ITEM === $operationType ? $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
 
             $paths[$path][strtolower($method)] = $this->getPathOperation($operationName, $operation, $method, $operationType, $resourceClass, $resourceMetadata, $mimeTypes, $definitions);
         }
@@ -275,7 +275,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
 
-        if ($operationType === OperationType::COLLECTION) {
+        if (OperationType::COLLECTION === $operationType) {
             $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
             $pathOperation['responses'] ?? $pathOperation['responses'] = [
                 '200' => [
@@ -639,7 +639,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $securityDefinitions[$key] = [
                     'type' => 'apiKey',
                     'in' => $type,
-                    'description' => sprintf('Value for the %s %s', $name, $type === 'query' ? sprintf('%s parameter', $type) : $type),
+                    'description' => sprintf('Value for the %s %s', $name, 'query' === $type ? sprintf('%s parameter', $type) : $type),
                     'name' => $name,
                 ];
 
