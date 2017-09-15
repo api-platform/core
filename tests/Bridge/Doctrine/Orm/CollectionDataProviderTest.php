@@ -73,7 +73,7 @@ class CollectionDataProviderTest extends \PHPUnit_Framework_TestCase
         $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
         $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, 'foo')->shouldBeCalled();
         $extensionProphecy->supportsResult(Dummy::class, 'foo')->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder)->willReturn([])->shouldBeCalled();
+        $extensionProphecy->getResult($queryBuilder, Dummy::class, 'foo')->willReturn([])->shouldBeCalled();
 
         $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));

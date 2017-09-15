@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Hal\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -68,15 +69,17 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
-        $paginated = $isPaginator = $object instanceof PaginatorInterface;
 
-        $currentPage = $lastPage = $itemsPerPage = null;
-        if ($isPaginator) {
+        $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = null;
+        if ($paginated = $isPaginator = $object instanceof PartialPaginatorInterface) {
+            if ($object instanceof PaginatorInterface) {
+                $paginated = 1. !== $lastPage = $object->getLastPage();
+            } else {
+                $pageTotalItems = (float) count($object);
+            }
+
             $currentPage = $object->getCurrentPage();
-            $lastPage = $object->getLastPage();
             $itemsPerPage = $object->getItemsPerPage();
-
-            $paginated = 1. !== $lastPage;
         }
 
         $data = [
@@ -86,14 +89,16 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         ];
 
         if ($paginated) {
-            $data['_links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-            $data['_links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            if (null !== $lastPage) {
+                $data['_links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+                $data['_links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            }
 
             if (1. !== $currentPage) {
                 $data['_links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
-            if ($currentPage !== $lastPage) {
+            if (null !== $lastPage && $currentPage !== $lastPage || null === $lastPage && $pageTotalItems >= $itemsPerPage) {
                 $data['_links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
@@ -105,8 +110,13 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['_links']['item'][] = $item['_links']['self'];
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
+        $paginated = null;
+        if (
+            is_array($object) ||
+            ($paginated = $object instanceof PaginatorInterface) ||
+            $object instanceof \Countable && !$object instanceof PartialPaginatorInterface
+        ) {
+            $data['totalItems'] = $paginated ? (int) $object->getTotalItems() : count($object);
         }
 
         if ($isPaginator) {

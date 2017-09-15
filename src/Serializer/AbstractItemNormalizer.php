@@ -357,6 +357,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @param array  $context
      *
      * @return array
+     *
+     * @deprecated since version 2.1, to be removed in 3.0.
      */
     protected function createRelationSerializationContext(string $resourceClass, array $context): array
     {

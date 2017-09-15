@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -44,8 +45,11 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     private $enabledParameterName;
     private $itemsPerPageParameterName;
     private $maximumItemPerPage;
+    private $partial;
+    private $clientPartial;
+    private $partialParameterName;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $enabled = true, bool $clientEnabled = false, bool $clientItemsPerPage = false, int $itemsPerPage = 30, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', string $itemsPerPageParameterName = 'itemsPerPage', int $maximumItemPerPage = null, bool $partial = false, bool $clientPartial = false, string $partialParameterName = 'partial')
     {
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
@@ -58,6 +62,9 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         $this->enabledParameterName = $enabledParameterName;
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
         $this->maximumItemPerPage = $maximumItemPerPage;
+        $this->partial = $partial;
+        $this->clientPartial = $clientPartial;
+        $this->partialParameterName = $partialParameterName;
     }
 
     /**
@@ -108,12 +115,53 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function getResult(QueryBuilder $queryBuilder)
+    public function getResult(QueryBuilder $queryBuilder/*, string $resourceClass, string $operationName = null*/)
     {
+        $resourceClass = $operationName = null;
+
+        if (func_num_args() >= 2) {
+            $resourceClass = func_get_arg(1);
+        } else {
+            @trigger_error(sprintf('Method %s() will have a 2nd `string $resourceClass` argument in version 3.0. Not defining it is deprecated since 2.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        if (func_num_args() >= 3) {
+            $operationName = func_get_arg(2);
+        } else {
+            @trigger_error(sprintf('Method %s() will have a 3rd `string $operationName = null` argument in version 3.0. Not defining it is deprecated since 2.2.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
+        $resourceMetadata = null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass);
+
+        if ($this->isPartialPaginationEnabled($this->requestStack->getCurrentRequest(), $resourceMetadata, $operationName)) {
+            return new class($doctrineOrmPaginator) extends AbstractPaginator {
+            };
+        }
+
         return new Paginator($doctrineOrmPaginator);
+    }
+
+    private function isPartialPaginationEnabled(Request $request = null, ResourceMetadata $resourceMetadata = null, string $operationName = null): bool
+    {
+        $enabled = $this->partial;
+        $clientEnabled = $this->clientPartial;
+
+        if ($resourceMetadata) {
+            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_partial', $enabled, true);
+
+            if ($request) {
+                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_partial', $clientEnabled, true);
+            }
+        }
+
+        if ($clientEnabled && $request) {
+            $enabled = filter_var($request->query->get($this->partialParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return $enabled;
     }
 
     private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool

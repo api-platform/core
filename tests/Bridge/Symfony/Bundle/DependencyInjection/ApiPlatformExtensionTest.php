@@ -206,6 +206,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testEnableNelmioApiDoc()
     {
         $containerBuilderProphecy = $this->getContainerBuilderProphecy();
@@ -320,6 +324,9 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.collection.pagination.items_per_page_parameter_name' => 'itemsPerPage',
             'api_platform.collection.pagination.maximum_items_per_page' => null,
             'api_platform.collection.pagination.page_parameter_name' => 'page',
+            'api_platform.collection.pagination.partial' => false,
+            'api_platform.collection.pagination.client_partial' => false,
+            'api_platform.collection.pagination.partial_parameter_name' => 'partial',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],

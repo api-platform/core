@@ -101,12 +101,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
+                    'partial' => false,
                     'client_enabled' => false,
                     'client_items_per_page' => false,
+                    'client_partial' => false,
                     'items_per_page' => 30,
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
+                    'partial_parameter_name' => 'partial',
                     'maximum_items_per_page' => null,
                 ],
             ],
@@ -126,7 +129,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST").
+     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
      */
     public function testLegacyExceptionToStatusConfig()
     {

@@ -32,7 +32,6 @@ use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
-use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
@@ -72,10 +71,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DocumentationNormalizer::class, $normalizer);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testNormalize()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -101,7 +96,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'custom2')->shouldBeCalled()->willReturn('POST');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -309,10 +304,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testNormalizeWithNameConverter()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Dummy API', 'This is a dummy API', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -339,7 +330,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $nameConverterProphecy->normalize('name')->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('nameConverted')->willReturn('name_converted')->shouldBeCalled();
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -424,10 +415,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator
-     */
     public function testNormalizeWithApiKeysEnabled()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
@@ -449,7 +436,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $apiKeysConfiguration = [
             'header' => [
@@ -549,10 +536,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/app_dev.php/']));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testNormalizeWithOnlyNormalizationGroups()
     {
         $title = 'Test API';
@@ -598,7 +581,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -747,10 +730,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testNormalizeWithOnlyDenormalizationGroups()
     {
         $title = 'Test API';
@@ -793,7 +772,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -942,10 +921,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testNormalizeWithNormalizationAndDenormalizationGroups()
     {
         $title = 'Test API';
@@ -991,7 +966,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -1140,10 +1115,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testFilters()
     {
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -1197,7 +1168,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface or null.
      */
@@ -1210,7 +1180,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             $this->prophesize(OperationMethodResolverInterface::class)->reveal(),
             $this->prophesize(OperationPathResolverInterface::class)->reveal(),
-            $this->prophesize(UrlGeneratorInterface::class)->reveal(),
+            null,
             new \ArrayObject()
         );
     }
@@ -1222,7 +1192,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -1267,7 +1237,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldNotBeCalled();
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -1291,10 +1261,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testWithCustomMethod()
     {
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), '', '', '0.0.0', ['jsonld' => ['application/ld+json']]);
@@ -1320,7 +1286,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('FOO');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -1351,10 +1317,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use PathSegmentNameGenerator instead
-     */
     public function testNormalizeWithNestedNormalizationGroups()
     {
         $title = 'Test API';
@@ -1416,7 +1378,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'post')->shouldBeCalled()->willReturn('POST');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
@@ -1607,7 +1569,7 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
-        $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
+        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
         $normalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),

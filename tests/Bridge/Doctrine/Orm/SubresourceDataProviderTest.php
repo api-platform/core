@@ -316,7 +316,7 @@ class SubresourceDataProviderTest extends \PHPUnit_Framework_TestCase
         $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
         $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), RelatedDummy::class, null)->shouldBeCalled();
         $extensionProphecy->supportsResult(RelatedDummy::class, null)->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder)->willReturn([])->shouldBeCalled();
+        $extensionProphecy->getResult($queryBuilder, RelatedDummy::class, null)->willReturn([])->shouldBeCalled();
 
         $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
 
