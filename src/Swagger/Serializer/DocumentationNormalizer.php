@@ -303,23 +303,8 @@ final class DocumentationNormalizer implements NormalizerInterface
             return $pathOperation;
         }
 
-        $pathIdentifier = 'id';
-        $pathType = 'string';
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass, []) as $propertyName) {
-            $property = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            if ($property->isIdentifier()) {
-                $pathIdentifier = $propertyName;
-                $pathType = $property->getType()->getBuiltinType();
-            }
-        }
-
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [[
-            'name' => $pathIdentifier,
-            'in' => 'path',
-            'required' => true,
-            'type' => $pathType,
-        ]];
+        $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getPathParameters($resourceClass);
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
                 'description' => sprintf('%s resource response', $resourceShortName),
@@ -329,6 +314,56 @@ final class DocumentationNormalizer implements NormalizerInterface
         ];
 
         return $pathOperation;
+    }
+
+    /**
+     * Returns an array of swagger path parameters according to the provided class' identifiers
+     *
+     * @param string $resourceClass
+     * @return array
+     */
+    private function getPathParameters(string $resourceClass)
+    {
+        $parameters = [];
+        $properties = $this->getClassIdentifiers($resourceClass);
+        foreach ($properties as $propertyName => $property) {
+            $parameters[] = [
+                'name' => $propertyName,
+                'in' => 'path',
+                'required' => true,
+                'type' => $property->getType()->getBuiltinType(),
+            ];
+        }
+
+        if (empty($parameters)) {
+            $parameters = [[
+                'name' => "id",
+                'in' => 'path',
+                'required' => true,
+                'type' => "string",
+            ]];
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Returns all the identifier properties for the given class
+     *
+     * @param string $resourceClass
+     * @return PropertyMetadata[]
+     */
+    private function getClassIdentifiers(string $resourceClass)
+    {
+        $identifiers = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass, []) as $propertyName) {
+            $property = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            if ($property->isIdentifier()) {
+                $identifiers[$propertyName] = $property;
+            }
+        }
+
+        return $identifiers;
     }
 
     /**
@@ -384,26 +419,10 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function updatePutOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
     {
-        $pathIdentifier = 'id';
-        $pathType = 'string';
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass, []) as $propertyName) {
-            $property = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            if ($property->isIdentifier()) {
-                $pathIdentifier = $propertyName;
-                $pathType = $property->getType()->getBuiltinType();
-            }
-        }
-
         $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
-        $pathOperation['parameters'] ?? $pathOperation['parameters'] = [
-            [
-                'name' => $pathIdentifier,
-                'in' => 'path',
-                'type' => $pathType,
-                'required' => true,
-            ],
+        $pathOperation['parameters'] ?? $pathOperation['parameters'] = array_merge($this->getPathParameters($resourceClass), [
             [
                 'name' => lcfirst($resourceShortName),
                 'in' => 'body',
@@ -412,7 +431,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                     $this->getSerializerContext($operationType, true, $resourceMetadata, $operationName)
                 ))],
             ],
-        ];
+        ]);
+
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
             '200' => [
                 'description' => sprintf('%s resource updated', $resourceShortName),

@@ -1827,7 +1827,8 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @group yourmom
+     * @group legacy
+     * @expectedDeprecation Passing an instance of ApiPlatform\Core\Api\UrlGeneratorInterface to ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::__construct() is deprecated since version 2.1 and will be removed in 3.0.
      */
     public function testNormalizeWithIdentifierName()
     {
@@ -1881,7 +1882,6 @@ class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->shouldBeCalled()->willReturn('GET');
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        //$urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/')->shouldBeCalled();
 
         $operationPathResolver = new CustomOperationPathResolver(new UnderscoreOperationPathResolver());
 
