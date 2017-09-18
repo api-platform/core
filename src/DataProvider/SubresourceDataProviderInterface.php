@@ -34,5 +34,5 @@ interface SubresourceDataProviderInterface
      *
      * @return object|null
      */
-    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName);
+    public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null);
 }
