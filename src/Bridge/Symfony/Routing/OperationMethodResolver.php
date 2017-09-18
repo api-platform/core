@@ -82,7 +82,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
         } else {
             $method = $resourceMetadata->getCollectionOperationAttribute($operationName, 'method');
@@ -149,7 +149,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType)
     {
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
         }
 

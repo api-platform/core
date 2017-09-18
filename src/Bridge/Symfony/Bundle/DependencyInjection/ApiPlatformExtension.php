@@ -120,6 +120,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
+        $this->registerValidatorConfiguration($container, $config, $loader);
     }
 
     /**
@@ -463,5 +464,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         return $formats;
+    }
+
+    /**
+     * Registers the Validator configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['validator']) {
+            return;
+        }
+
+        $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
     }
 }

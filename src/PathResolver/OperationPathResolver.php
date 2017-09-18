@@ -49,7 +49,7 @@ final class OperationPathResolver implements OperationPathResolverInterface
 
         $path = '/'.$this->pathSegmentNameGenerator->getSegmentName($resourceShortName, true);
 
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             $path .= '/{id}';
         }
 
