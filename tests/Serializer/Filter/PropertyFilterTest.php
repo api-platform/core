@@ -56,21 +56,35 @@ class PropertyFilterTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyWithPropertiesWhitelist()
     {
+        $request = new Request(['properties' => ['foo', 'bar', 'baz']]);
+        $context = ['attributes' => ['qux']];
+
+        $propertyFilter = new PropertyFilter('properties', false, ['bar', 'fuz', 'foo']);
+        $propertyFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['attributes' => ['qux', 'foo', 'bar']], $context);
+    }
+
+    public function testApplyWithPropertiesWhitelistWithNestedProperty()
+    {
         $request = new Request(['properties' => ['foo', 'bar', 'group' => ['baz' => ['baz', 'qux'], 'qux']]]);
         $context = ['attributes' => ['qux']];
 
-        $propertyFilter = new PropertyFilter('properties', false, ['foo', 'group.baz.qux']);
+        $propertyFilter = new PropertyFilter('properties', false, ['foo' => null, 'group' => ['baz' => ['qux']]]);
         $propertyFilter->apply($request, true, [], $context);
 
         $this->assertEquals(['attributes' => ['qux', 'foo', 'group' => ['baz' => ['qux']]]], $context);
+    }
 
-        $request = new Request(['properties' => ['bar', 'group' => ['baz', 'fiz', 'fuz']]]);
-        $context = ['attributes' => ['tuc']];
+    public function testApplyWithPropertiesWhitelistNotMatchingAnyProperty()
+    {
+        $request = new Request(['properties' => ['foo', 'bar', 'group' => ['baz' => ['baz', 'qux'], 'qux']]]);
+        $context = ['attributes' => ['qux']];
 
-        $propertyFilter = new PropertyFilter('properties', false, ['group.baz', 'foo', 'group.fuz']);
+        $propertyFilter = new PropertyFilter('properties', false, ['fuz', 'fiz']);
         $propertyFilter->apply($request, true, [], $context);
 
-        $this->assertEquals(['attributes' => ['tuc', 'group' => ['baz', 'fuz']]], $context);
+        $this->assertEquals(['attributes' => ['qux']], $context);
     }
 
     public function testApplyWithoutPropertiesWhitelistWithOverriding()
