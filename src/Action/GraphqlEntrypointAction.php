@@ -72,7 +72,7 @@ final class GraphqlEntrypointAction
     {
         $query = $request->query->get('query');
         $operation = $request->query->get('operation');
-        if ([] !== $variables = $request->query->get('variables', [])) {
+        if ($variables = $request->query->get('variables', [])) {
             $variables = \json_decode($variables, true);
         }
 

@@ -22,7 +22,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
  *
  * @internal
  */
-class AbstractResolverFactory
+abstract class AbstractResolverFactory
 {
     protected $subresourceDataProvider;
 
@@ -37,15 +37,18 @@ class AbstractResolverFactory
     protected function getSubresource(string $rootClass, array $rootResolvedFields, array $rootIdentifiers, string $rootProperty, string $subresourceClass, bool $isCollection)
     {
         $identifiers = [];
+        $resolvedIdentifiers = [];
         foreach ($rootIdentifiers as $rootIdentifier) {
             if (isset($rootResolvedFields[$rootIdentifier])) {
                 $identifiers[$rootIdentifier] = $rootResolvedFields[$rootIdentifier];
             }
+
+            $resolvedIdentifiers[] = [$rootIdentifier, $rootClass];
         }
 
         return $this->subresourceDataProvider->getSubresource($subresourceClass, $identifiers, [
             'property' => $rootProperty,
-            'identifiers' => array_map(function ($rootIdentifier) use ($rootClass) {return [$rootIdentifier, $rootClass]; }, $rootIdentifiers),
+            'identifiers' => $resolvedIdentifiers,
             'collection' => $isCollection,
         ]);
     }

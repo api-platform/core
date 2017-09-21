@@ -47,12 +47,9 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     {
         $identifiers = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-            $propertyIsIdentifier = $propertyMetadata->isIdentifier() ?? false;
-            if (!$propertyIsIdentifier) {
-                continue;
+            if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
+                $identifiers[] = $property;
             }
-            $identifiers[] = $property;
         }
 
         return $identifiers;

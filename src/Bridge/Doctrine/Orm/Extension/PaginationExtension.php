@@ -87,6 +87,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
         }
+
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
             $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);

@@ -49,7 +49,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function createCollectionResolver(string $resourceClass, string $rootClass): callable
     {
@@ -86,8 +86,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
                 if (false === $after) {
                     throw new InvalidArgumentException(sprintf('Cursor %s is invalid', $args['after']));
                 }
-                $offset = (int) $after;
-                ++$offset;
+                $offset = 1 + (int) $after;
             }
 
             $data = ['edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
