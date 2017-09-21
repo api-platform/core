@@ -65,12 +65,12 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
                             throw new InvalidArgumentException('Composite identifiers are not allowed for a resource already used as a composite identifier');
                         }
 
-                        $identifiers[] = $rootIdentifier.'='.current($args[$rootIdentifier]);
+                        $identifiers[] = $rootIdentifier.'='.\current($args[$rootIdentifier]);
 
                         continue;
                     }
 
-                    $identifiers[] = $rootIdentifier.'='.$args[$rootIdentifier];
+                    $identifiers[] = "{$rootIdentifier}={$args[$rootIdentifier]}";
                     $uniqueIdentifier[] = $args[$rootIdentifier];
                 }
 
@@ -78,7 +78,7 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
                     return null;
                 }
 
-                $item = $this->itemDataProvider->getItem($resourceClass, \count($identifiers) > 1 ? implode(';', $identifiers) : $uniqueIdentifier[0]);
+                $item = $this->itemDataProvider->getItem($resourceClass, \count($identifiers) > 1 ? \implode(';', $identifiers) : $uniqueIdentifier[0]);
             }
 
             return $item ? $this->normalizer->normalize($item, null, ['graphql' => true]) : null;
