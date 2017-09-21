@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -36,7 +37,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
     private $requestStack;
     private $paginationEnabled;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, RequestStack $requestStack, bool $paginationEnabled)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, RequestStack $requestStack = null, bool $paginationEnabled = false)
     {
         parent::__construct($subresourceDataProvider);
 
@@ -53,9 +54,12 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
     public function createCollectionResolver(string $resourceClass, string $rootClass): callable
     {
         return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
-            $request = $this->requestStack->getCurrentRequest();
+            $request = $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
             if (null !== $request) {
-                $request->attributes->set('_graphql_collections_args', [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', []));
+                $request->attributes->set(
+                    '_graphql_collections_args',
+                    [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', [])
+                );
             }
 
             $rootProperty = $info->fieldName;
@@ -67,32 +71,36 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
                 $collection = $this->collectionDataProvider->getCollection($resourceClass);
             }
 
-            if ($this->paginationEnabled) {
-                $offset = 0;
-                if (isset($args['after'])) {
-                    $after = base64_decode($args['after'], true);
-                    if (false === $after) {
-                        throw new \InvalidArgumentException(sprintf('Cursor %s is invalid', $args['after']));
-                    }
-                    $offset = (int) $after;
-                    ++$offset;
-                }
-                $data = ['edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
-                if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
-                    $data['pageInfo']['endCursor'] = base64_encode((string) ($totalItems - 1));
-                    $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $collection->count() === $collection->getItemsPerPage();
-                }
-                foreach ($collection as $index => $object) {
-                    $data['edges'][$index] = [
-                        'node' => $this->normalizer->normalize($object, null, ['graphql' => true]),
-                        'cursor' => base64_encode((string) ($index + $offset)),
-                    ];
-                }
-            } else {
+            if (!$this->paginationEnabled) {
                 $data = [];
                 foreach ($collection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, null, ['graphql' => true]);
                 }
+
+                return $data;
+            }
+
+            $offset = 0;
+            if (isset($args['after'])) {
+                $after = \base64_decode($args['after'], true);
+                if (false === $after) {
+                    throw new InvalidArgumentException(sprintf('Cursor %s is invalid', $args['after']));
+                }
+                $offset = (int) $after;
+                ++$offset;
+            }
+
+            $data = ['edges' => [], 'pageInfo' => ['endCursor' => null, 'hasNextPage' => false]];
+            if ($collection instanceof PaginatorInterface && ($totalItems = $collection->getTotalItems()) > 0) {
+                $data['pageInfo']['endCursor'] = \base64_encode((string) ($totalItems - 1));
+                $data['pageInfo']['hasNextPage'] = $collection->getCurrentPage() !== $collection->getLastPage() && (float) $collection->count() === $collection->getItemsPerPage();
+            }
+
+            foreach ($collection as $index => $object) {
+                $data['edges'][$index] = [
+                    'node' => $this->normalizer->normalize($object, null, ['graphql' => true]),
+                    'cursor' => \base64_encode((string) ($index + $offset)),
+                ];
             }
 
             return $data;

@@ -112,11 +112,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
      *
-     * @param string|null $fieldDescription
-     *
      * @return array|null
      */
-    private function getResourceFieldConfiguration($fieldDescription, Type $type, string $rootResource, bool $isInput = false)
+    private function getResourceFieldConfiguration(string $fieldDescription = null, Type $type, string $rootResource, bool $isInput = false)
     {
         try {
             $graphqlType = $this->convertType($type, $isInput);
@@ -124,10 +122,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $isInternalGraphqlType = in_array($graphqlWrappedType, GraphQLType::getInternalTypes(), true);
             $className = $isInternalGraphqlType ? '' : ($type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName());
 
-            return [
-                'type' => $graphqlType,
-                'description' => $fieldDescription,
-                'args' => !$isInternalGraphqlType && $type->isCollection() && !$isInput ? ($this->paginationEnabled ? [
+            $args = [];
+            if ($this->paginationEnabled && !$isInternalGraphqlType && $type->isCollection() && !$isInput) {
+                $args = [
                     'first' => [
                         'type' => GraphQLType::int(),
                         'description' => 'Returns the first n elements from the list.',
@@ -136,12 +133,20 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         'type' => GraphQLType::string(),
                         'description' => 'Returns the elements in the list that come after the specified cursor.',
                     ],
-                ] : []) : [],
-                'resolve' => !$isInternalGraphqlType && !$isInput ?
-                    ($type->isCollection() ?
-                        $this->collectionResolverFactory->createCollectionResolver($className, $rootResource) :
-                        $this->itemResolverFactory->createItemResolver($className, $rootResource)
-                    ) : null,
+                ];
+            }
+
+            if ($isInternalGraphqlType || $isInput) {
+                $resolve = null;
+            } else {
+                $resolve = $type->isCollection() ? $this->collectionResolverFactory->createCollectionResolver($className, $rootResource) : $this->itemResolverFactory->createItemResolver($className, $rootResource);
+            }
+
+            return [
+                'type' => $graphqlType,
+                'description' => $fieldDescription,
+                'args' => $args,
+                'resolve' => $resolve,
             ];
         } catch (InvalidTypeException $e) {
             return null;
@@ -166,7 +171,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
             $arguments[$identifier] = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, true);
         }
-        if (empty($arguments)) {
+        if (!$arguments) {
             throw new \LogicException("Missing identifier field for resource \"$resource\".");
         }
 
@@ -212,9 +217,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 throw new InvalidTypeException();
         }
 
-        return $type->isCollection() ?
-            ($this->paginationEnabled ? $this->getResourcePaginatedCollectionType($graphqlType, $isInput) : GraphQLType::listOf($graphqlType)) :
-            ($type->isNullable() ? $graphqlType : GraphQLType::nonNull($graphqlType));
+        if ($type->isCollection()) {
+            return $this->paginationEnabled ? $this->getResourcePaginatedCollectionType($graphqlType, $isInput) : GraphQLType::listOf($graphqlType);
+        }
+
+        return $type->isNullable() ? $graphqlType : GraphQLType::nonNull($graphqlType);
     }
 
     /**
@@ -250,10 +257,12 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
         foreach ($this->propertyNameCollectionFactory->create($resource) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resource, $property);
-            if (null !== $propertyType = $propertyMetadata->getType()) {
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $isInput)) {
-                    $fields[$property] = $fieldConfiguration;
-                }
+            if (null === $propertyType = $propertyMetadata->getType()) {
+                continue;
+            }
+
+            if ($fieldConfiguration = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $isInput)) {
+                $fields[$property] = $fieldConfiguration;
             }
         }
 
@@ -271,8 +280,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $shortName = $resourceType->name.($isInput ? 'Input' : '');
 
-        if (isset($this->resourceTypesCache[$shortName.'Connection'])) {
-            return $this->resourceTypesCache[$shortName.'Connection'];
+        if (isset($this->resourceTypesCache["{$shortName}Connection"])) {
+            return $this->resourceTypesCache["{$shortName}Connection"];
         }
 
         $edgeObjectTypeConfiguration = [

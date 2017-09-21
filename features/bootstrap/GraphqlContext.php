@@ -34,6 +34,7 @@ class GraphqlContext implements Context
      * @var array
      */
     private $graphqlRequest;
+
     /**
      * @var int
      */

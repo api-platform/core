@@ -34,7 +34,7 @@ final class GraphqlEntrypointAction
     private $title;
     private $graphiqlEnabled;
 
-    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, \Twig_Environment $twig, bool $debug, bool $graphiqlEnabled, string $title)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, \Twig_Environment $twig, bool $debug = false, bool $graphiqlEnabled = false, string $title = '')
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;
@@ -49,31 +49,16 @@ final class GraphqlEntrypointAction
      */
     public function __invoke(Request $request): Response
     {
-        $query = $request->query->get('query');
-        $variables = json_decode($request->query->get('variables', '[]'), true);
-        $operation = $request->query->get('operation');
-        if ($request->isMethod('GET')) {
-            if ($this->graphiqlEnabled && 'html' === $request->getRequestFormat()) {
-                return new Response($this->twig->render('@ApiPlatform/Graphiql/index.html.twig', ['debug' => $this->debug, 'title' => $this->title]));
-            }
-        } elseif ($request->isMethod('POST')) {
-            if ('json' === $request->getContentType()) {
-                $input = json_decode($request->getContent(), true);
-                $query = $input['query'] ?? $query;
-                $variables = isset($input['variables']) ? (is_array($input['variables']) ? $input['variables'] : json_decode($input['variables'], true)) : [];
-                $operation = $input['operation'] ?? null;
-            } elseif ('application/graphql' === $request->headers->get('CONTENT_TYPE')) {
-                $query = $request->getContent();
-            } else {
-                $query = null;
-            }
-        } else {
-            $query = null;
+        if ($this->graphiqlEnabled && $request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
+            return new Response($this->twig->render('@ApiPlatform/Graphiql/index.html.twig', ['debug' => $this->debug, 'title' => $this->title]));
         }
+
+        list($query, $operation, $variables) = $this->parseRequest($request);
 
         if (null === $query) {
             return new JsonResponse(['error' => 'GraphQL query is not valid'], Response::HTTP_BAD_REQUEST);
         }
+
         if (null === $variables) {
             return new JsonResponse(['error' => 'GraphQL variables are not valid JSON'], Response::HTTP_BAD_REQUEST);
         }
@@ -81,5 +66,42 @@ final class GraphqlEntrypointAction
         $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
 
         return new JsonResponse($executionResult->toArray($this->debug));
+    }
+
+    private function parseRequest(Request $request): array
+    {
+        $query = $request->query->get('query');
+        $operation = $request->query->get('operation');
+        if ([] !== $variables = $request->query->get('variables', [])) {
+            $variables = \json_decode($variables, true);
+        }
+
+        if (!$request->isMethod('POST')) {
+            return [$query, $operation, $variables];
+        }
+
+        if ('json' === $request->getContentType()) {
+            $input = \json_decode($request->getContent(), true);
+
+            if (isset($input['query'])) {
+                $query = $input['query'];
+            }
+
+            if (isset($input['variables'])) {
+                $variables = \is_array($input['variables']) ? $input['variables'] : \json_decode($input['variables'], true);
+            }
+
+            if (isset($input['operation'])) {
+                $operation = $input['operation'];
+            }
+
+            return [$query, $operation, $variables];
+        }
+
+        if ('application/graphql' === $request->headers->get('CONTENT_TYPE')) {
+            $query = $request->getContent();
+        }
+
+        return [$query, $operation, $variables];
     }
 }
