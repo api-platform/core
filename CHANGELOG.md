@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.1
+
+* Fix path generators
+* Fix some method signatures related to subresources
+* Improve performance of the deserialization mechanism
+
 ## 2.1.0
 
 * Add a builtin HTTP cache invalidation system able to store all requests in Varnish (or any other proxy supporting cache tags) and purge it instantly when needed
