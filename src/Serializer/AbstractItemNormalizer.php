@@ -43,6 +43,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $iriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
+    protected $localCache = [];
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
@@ -99,7 +100,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $this->resourceClassResolver->isResourceClass($type);
+        return $this->localCache[$type] ?? $this->localCache[$type] = $this->resourceClassResolver->isResourceClass($type);
     }
 
     /**
