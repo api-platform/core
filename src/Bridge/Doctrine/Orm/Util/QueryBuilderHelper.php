@@ -36,7 +36,7 @@ final class QueryBuilderHelper
      *
      * @return string the new association alias
      */
-    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, ?string $joinType = null, ?string $conditionType = null, ?string $condition = null): string
+    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, $joinType = null, $conditionType = null, $condition = null): string
     {
         $join = self::getExistingJoin($queryBuilder, $alias, $association);
 
