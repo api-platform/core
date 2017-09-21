@@ -163,6 +163,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.public', $config['http_cache']['public']);
 
         $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
+        $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
 
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
