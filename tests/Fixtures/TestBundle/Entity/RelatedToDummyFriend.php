@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Related To Dummy Friend represent an association table for a manytomany relation.
  *
- * @ApiResource(attributes={"normalization_context"={"groups": {"fakemanytomany"}}})
+ * @ApiResource(attributes={"normalization_context"={"groups": {"fakemanytomany"}}, "filters"={"related_to_dummy_friend.name"}})
  * @ORM\Entity
  */
 class RelatedToDummyFriend
