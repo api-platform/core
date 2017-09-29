@@ -49,7 +49,7 @@ function updateURL() {
 
 // Defines a GraphQL fetcher using the fetch API.
 function graphQLFetcher(graphQLParams) {
-    return fetch((debug ? '/app_dev.php' : '') + '/graphql', {
+    return fetch(window.location.pathname, {
         method: 'post',
         headers: {
             'Accept': 'application/json',

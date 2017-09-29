@@ -50,7 +50,7 @@ final class GraphqlEntrypointAction
     public function __invoke(Request $request): Response
     {
         if ($this->graphiqlEnabled && $request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
-            return new Response($this->twig->render('@ApiPlatform/Graphiql/index.html.twig', ['debug' => $this->debug, 'title' => $this->title]));
+            return new Response($this->twig->render('@ApiPlatform/Graphiql/index.html.twig', ['title' => $this->title]));
         }
 
         list($query, $operation, $variables) = $this->parseRequest($request);
