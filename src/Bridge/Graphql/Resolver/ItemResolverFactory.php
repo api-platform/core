@@ -65,7 +65,7 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
                             throw new InvalidArgumentException('Composite identifiers are not allowed for a resource already used as a composite identifier');
                         }
 
-                        $identifiers[] = $rootIdentifier.'='.\current($args[$rootIdentifier]);
+                        $identifiers[] = $rootIdentifier.'='.\reset($args[$rootIdentifier]);
 
                         continue;
                     }
