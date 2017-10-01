@@ -17,7 +17,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -49,7 +49,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \Exception
      */
     public function createCollectionResolver(string $resourceClass, string $rootClass): callable
     {
@@ -84,7 +84,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
             if (isset($args['after'])) {
                 $after = \base64_decode($args['after'], true);
                 if (false === $after) {
-                    throw new InvalidArgumentException(sprintf('Cursor %s is invalid', $args['after']));
+                    throw Error::createLocatedError(sprintf('Cursor %s is invalid', $args['after']), $info->fieldNodes, $info->path);
                 }
                 $offset = 1 + (int) $after;
             }

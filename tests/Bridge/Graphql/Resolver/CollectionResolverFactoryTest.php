@@ -85,7 +85,7 @@ class CollectionResolverFactoryTest extends \PHPUnit_Framework_TestCase
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
         if ('$bad$' === $cursor) {
-            $this->expectException('\InvalidArgumentException');
+            $this->expectException('\Exception');
             $this->expectExceptionMessage('Cursor $bad$ is invalid');
         }
         $this->assertEquals(

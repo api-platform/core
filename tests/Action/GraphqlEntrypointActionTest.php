@@ -64,7 +64,7 @@ class GraphqlEntrypointActionTest extends \PHPUnit_Framework_TestCase
         $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"error":"GraphQL query is not valid"}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
     }
 
     public function testBadMethodAction()
@@ -74,7 +74,7 @@ class GraphqlEntrypointActionTest extends \PHPUnit_Framework_TestCase
         $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"error":"GraphQL query is not valid"}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
     }
 
     public function testBadVariablesAction()
@@ -84,7 +84,7 @@ class GraphqlEntrypointActionTest extends \PHPUnit_Framework_TestCase
         $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
-        $this->assertEquals('{"error":"GraphQL variables are not valid JSON"}', $mockedEntrypoint($request)->getContent());
+        $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
     }
 
     private function mockGraphqlEntrypointAction(Request $request): GraphqlEntrypointAction

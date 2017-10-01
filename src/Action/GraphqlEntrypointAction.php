@@ -15,10 +15,11 @@ namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\Bridge\Graphql\ExecutorInterface;
 use ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilderInterface;
+use GraphQL\Error\Error;
+use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * GraphQL API entrypoint.
@@ -44,9 +45,6 @@ final class GraphqlEntrypointAction
         $this->title = $title;
     }
 
-    /**
-     * @throws BadRequestHttpException
-     */
     public function __invoke(Request $request): Response
     {
         if ($this->graphiqlEnabled && $request->isMethod('GET') && 'html' === $request->getRequestFormat()) {
@@ -56,16 +54,20 @@ final class GraphqlEntrypointAction
         list($query, $operation, $variables) = $this->parseRequest($request);
 
         if (null === $query) {
-            return new JsonResponse(['error' => 'GraphQL query is not valid'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(new ExecutionResult(null, [new Error('GraphQL query is not valid')]), Response::HTTP_BAD_REQUEST);
         }
 
         if (null === $variables) {
-            return new JsonResponse(['error' => 'GraphQL variables are not valid JSON'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(new ExecutionResult(null, [new Error('GraphQL variables are not valid JSON')]), Response::HTTP_BAD_REQUEST);
         }
 
-        $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
+        try {
+            $executionResult = $this->executor->executeQuery($this->schemaBuilder->getSchema(), $query, null, null, $variables, $operation);
+        } catch (\Exception $e) {
+            $executionResult = new ExecutionResult(null, [$e]);
+        }
 
-        return new JsonResponse($executionResult->toArray($this->debug));
+        return new JsonResponse($executionResult->toArray($this->debug), !$executionResult->errors ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
     }
 
     private function parseRequest(Request $request): array

@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -62,7 +62,7 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
 
                     if (\is_array($args[$rootIdentifier])) {
                         if (\count($args[$rootIdentifier]) > 1) {
-                            throw new InvalidArgumentException('Composite identifiers are not allowed for a resource already used as a composite identifier');
+                            throw Error::createLocatedError('Composite identifiers are not allowed for a resource already used as a composite identifier', $info->fieldNodes, $info->path);
                         }
 
                         $identifiers[] = $rootIdentifier.'='.\reset($args[$rootIdentifier]);
