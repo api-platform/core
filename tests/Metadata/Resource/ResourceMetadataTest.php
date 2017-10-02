@@ -22,10 +22,11 @@ class ResourceMetadataTest extends \PHPUnit_Framework_TestCase
 {
     public function testValueObject()
     {
-        $metadata = new ResourceMetadata('shortName', 'desc', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar']);
+        $metadata = new ResourceMetadata('shortName', 'desc', 'http://example.com/foo', 'http://example.com/foo', ['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], ['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], ['baz' => 'bar']);
         $this->assertEquals('shortName', $metadata->getShortName());
         $this->assertEquals('desc', $metadata->getDescription());
         $this->assertEquals('http://example.com/foo', $metadata->getIri());
+        $this->assertEquals('http://example.com/foo', $metadata->getType());
         $this->assertEquals(['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], $metadata->getItemOperations());
         $this->assertEquals('a', $metadata->getItemOperationAttribute('iop1', 'foo', 'z', false));
         $this->assertEquals('bar', $metadata->getItemOperationAttribute('iop1', 'baz', 'z', true));
@@ -53,6 +54,10 @@ class ResourceMetadataTest extends \PHPUnit_Framework_TestCase
         $newMetadata = $metadata->withIri('foo:bar');
         $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('foo:bar', $newMetadata->getIri());
+
+        $newMetadata = $metadata->withType('foo:bar');
+        $this->assertNotSame($metadata, $newMetadata);
+        $this->assertEquals('foo:bar', $newMetadata->getType());
 
         $newMetadata = $metadata->withItemOperations(['a' => ['b' => 'c']]);
         $this->assertNotSame($metadata, $newMetadata);

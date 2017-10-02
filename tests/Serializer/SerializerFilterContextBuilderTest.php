@@ -42,6 +42,7 @@ class SerializerFilterContextBuilderTest extends \PHPUnit_Framework_TestCase
             null,
             null,
             null,
+            null,
             ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]
         );
 
@@ -79,6 +80,7 @@ class SerializerFilterContextBuilderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $resourceMetadata = new ResourceMetadata(
+            null,
             null,
             null,
             null,
@@ -124,6 +126,7 @@ class SerializerFilterContextBuilderTest extends \PHPUnit_Framework_TestCase
             null,
             null,
             null,
+            null,
             ['get' => []]
         );
 
@@ -155,6 +158,7 @@ class SerializerFilterContextBuilderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $resourceMetadata = new ResourceMetadata(
+            null,
             null,
             null,
             null,

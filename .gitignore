@@ -6,3 +6,4 @@
 /vendor/
 /tests/Fixtures/app/cache/*
 /tests/Fixtures/app/logs/*
+composer.phar

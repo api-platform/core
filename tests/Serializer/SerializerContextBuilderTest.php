@@ -34,6 +34,7 @@ class SerializerContextBuilderTest extends \PHPUnit_Framework_TestCase
             null,
             null,
             null,
+            null,
             [],
             [],
             ['normalization_context' => ['foo' => 'bar'], 'denormalization_context' => ['bar' => 'baz']]

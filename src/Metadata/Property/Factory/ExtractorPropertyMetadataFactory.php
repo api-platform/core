@@ -69,6 +69,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             $propertyMetadata['required'],
             $propertyMetadata['identifier'],
             $propertyMetadata['iri'],
+            $propertyMetadata['vocabType'],
             null,
             $propertyMetadata['attributes']
         ))->withSubresource($this->createSubresourceMetadata($propertyMetadata['subresource'], $metadata));
@@ -113,6 +114,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             'required' => 'is',
             'identifier' => 'is',
             'iri' => 'get',
+            'vocabType' => 'get',
             'attributes' => 'get',
         ];
 

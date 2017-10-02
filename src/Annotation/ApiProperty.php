@@ -59,6 +59,11 @@ final class ApiProperty
     public $iri;
 
     /**
+     * @var string
+     */
+    public $vocabType;
+
+    /**
      * @var bool
      */
     public $identifier;

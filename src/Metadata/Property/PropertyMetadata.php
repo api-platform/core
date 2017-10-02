@@ -30,12 +30,13 @@ final class PropertyMetadata
     private $writableLink;
     private $required;
     private $iri;
+    private $vocabType;
     private $identifier;
     private $childInherited;
     private $attributes;
     private $subresource;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, string $vocabType = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -46,6 +47,7 @@ final class PropertyMetadata
         $this->required = $required;
         $this->identifier = $identifier;
         $this->iri = $iri;
+        $this->vocabType = $vocabType;
         $this->childInherited = $childInherited;
         $this->attributes = $attributes;
         $this->subresource = $subresource;
@@ -251,6 +253,31 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->iri = $iri;
+
+        return $metadata;
+    }
+
+    /**
+     * Gets IRI of this property.
+     *
+     * @return string|null
+     */
+    public function getVocabType()
+    {
+        return $this->vocabType;
+    }
+
+    /**
+     * Returns a new instance with the given IRI.
+     *
+     * @param string|null $iri
+     *
+     * @return self
+     */
+    public function withVocabType(string $vocabType = null): self
+    {
+        $metadata = clone $this;
+        $metadata->vocabType = $vocabType;
 
         return $metadata;
     }

@@ -171,7 +171,7 @@ class ValidateListenerTest extends \PHPUnit_Framework_TestCase
 
     private function createEventObject($expectedValidationGroups, $data, bool $receive = true): array
     {
-        $resourceMetadata = new ResourceMetadata(null, null, null, [
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, [
             'create' => ['validation_groups' => $expectedValidationGroups],
         ]);
 

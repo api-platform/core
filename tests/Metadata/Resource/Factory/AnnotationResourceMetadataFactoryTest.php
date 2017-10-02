@@ -39,6 +39,7 @@ class AnnotationResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedShortName, $metadata->getShortName());
         $this->assertEquals($expectedDescription, $metadata->getDescription());
         $this->assertEquals('http://example.com', $metadata->getIri());
+        $this->assertEquals('http://example.com', $metadata->getType());
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
         $this->assertEquals(['a' => 1], $metadata->getAttributes());
@@ -50,6 +51,7 @@ class AnnotationResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $annotation->shortName = 'shortName';
         $annotation->description = 'description';
         $annotation->iri = 'http://example.com';
+        $annotation->type = 'http://example.com';
         $annotation->itemOperations = ['foo' => ['bar' => true]];
         $annotation->collectionOperations = ['baz' => ['tab' => false]];
         $annotation->attributes = ['a' => 1];

@@ -24,7 +24,7 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
     public function testValueObject()
     {
         $type = new Type(Type::BUILTIN_TYPE_STRING);
-        $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', null, ['foo' => 'bar']);
+        $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', 'http://example.com/foo', null, ['foo' => 'bar']);
         $this->assertEquals($type, $metadata->getType());
         $this->assertEquals('desc', $metadata->getDescription());
         $this->assertTrue($metadata->isReadable());
@@ -34,6 +34,7 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($metadata->isRequired());
         $this->assertFalse($metadata->isIdentifier());
         $this->assertEquals('http://example.com/foo', $metadata->getIri());
+        $this->assertEquals('http://example.com/foo', $metadata->getVocabType());
         $this->assertEquals(['foo' => 'bar'], $metadata->getAttributes());
 
         $newType = new Type(Type::BUILTIN_TYPE_BOOL);
@@ -72,6 +73,10 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $newMetadata = $metadata->withIri('foo:bar');
         $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('foo:bar', $newMetadata->getIri());
+
+        $newMetadata = $metadata->withVocabType('foo:bar');
+        $this->assertNotSame($metadata, $newMetadata);
+        $this->assertEquals('foo:bar', $newMetadata->getVocabType());
 
         $newMetadata = $metadata->withAttributes(['a' => 'b']);
         $this->assertNotSame($metadata, $newMetadata);

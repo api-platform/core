@@ -45,6 +45,7 @@ final class XmlExtractor extends AbstractExtractor
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),
                 'description' => $this->phpize($resource, 'description', 'string'),
                 'iri' => $this->phpize($resource, 'iri', 'string'),
+                'type' => $this->phpize($resource, 'type', 'string'),
                 'itemOperations' => $this->getOperations($resource, 'itemOperation'),
                 'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
@@ -129,6 +130,7 @@ final class XmlExtractor extends AbstractExtractor
                 'required' => $this->phpize($property, 'required', 'bool'),
                 'identifier' => $this->phpize($property, 'identifier', 'bool'),
                 'iri' => $this->phpize($property, 'iri', 'string'),
+                'vocabType' => $this->phpize($property, 'vocabType', 'string'),
                 'attributes' => $this->getAttributes($property, 'attribute'),
                 'subresource' => $property->subresource ? [
                     'collection' => $this->phpize($property->subresource, 'collection', 'bool'),

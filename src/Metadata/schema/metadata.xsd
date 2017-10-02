@@ -27,6 +27,7 @@
             <xsd:attribute type="xsd:string" name="class" use="required"/>
             <xsd:attribute type="xsd:string" name="shortName"/>
             <xsd:attribute type="xsd:string" name="description"/>
+            <xsd:attribute type="xsd:string" name="type"/>
             <xsd:attribute type="xsd:string" name="iri"/>
     </xsd:complexType>
 
@@ -76,6 +77,7 @@
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="description"/>
         <xsd:attribute type="xsd:string" name="iri"/>
+        <xsd:attribute type="xsd:string" name="vocabType"/>
         <xsd:attribute type="xsd:boolean" name="readable"/>
         <xsd:attribute type="xsd:boolean" name="writable"/>
         <xsd:attribute type="xsd:boolean" name="readableLink"/>
