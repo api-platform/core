@@ -270,7 +270,7 @@ final class PropertyMetadata
     /**
      * Returns a new instance with the given IRI.
      *
-     * @param string|null $iri
+     * @param string|null $vocabType
      *
      * @return self
      */
