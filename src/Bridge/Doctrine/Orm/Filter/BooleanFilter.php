@@ -9,80 +9,33 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Filter by a boolean value.
+ * Filters the collection by boolean values.
+ *
+ * Filters collection on equality of boolean properties. The value is specified
+ * as one of ( "true" | "false" | "1" | "0" ) in the query.
+ *
+ * For each property passed, if the resource does not have such property or if
+ * the value is not one of ( "true" | "false" | "1" | "0" ) the property is ignored.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
 class BooleanFilter extends AbstractFilter
 {
-    private $requestStack;
-
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $properties);
-
-        $this->requestStack = $requestStack;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * Check whether a value is equal to 1, 0, true, false, on, off (case insensitive)
-     *
-     * For each property passed, if the resource does not have such property or if the order value is different from
-     * 1, 0, true, false, on, off (case insensitive) the property is ignored.
-     */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
-        }
-
-        $properties = $this->extractProperties($request);
-
-        foreach ($properties as $property => $boolean) {
-            if (!$this->isPropertyEnabled($property) || !$this->isPropertyMapped($property, $resourceClass)) {
-                continue;
-            }
-
-            if (empty($boolean) && isset($this->properties[$property])) {
-                $boolean = $this->properties[$property];
-            }
-
-            $filterBoolean = filter_var($boolean, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-            if (is_null($filterBoolean) && !empty($boolean)) {
-                continue;
-            }
-
-            $alias = 'o';
-            $field = $property;
-
-            if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
-            }
-            $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-            $queryBuilder
-                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-                ->setParameter($valueParameter, $filterBoolean);
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -91,14 +44,14 @@ class BooleanFilter extends AbstractFilter
             $properties = array_fill_keys($this->getClassMetadata($resourceClass)->getFieldNames(), null);
         }
 
-        foreach ($properties as $property => $boolean) {
+        foreach ($properties as $property => $unused) {
             if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isBooleanField($property, $resourceClass)) {
                 continue;
             }
 
             $description[$property] = [
                 'property' => $property,
-                'type' => 'boolean',
+                'type' => 'bool',
                 'required' => false,
             ];
         }
@@ -107,16 +60,60 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * Determines whether the given property is a boolean or not.
+     * {@inheritdoc}
+     */
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        if (
+            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyMapped($property, $resourceClass) ||
+            !$this->isBooleanField($property, $resourceClass)
+        ) {
+            return;
+        }
+
+        if (in_array($value, ['true', '1'], true)) {
+            $value = true;
+        } elseif (in_array($value, ['false', '0'], true)) {
+            $value = false;
+        } else {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
+                    'true',
+                    'false',
+                    '1',
+                    '0',
+                ]))),
+            ]);
+
+            return;
+        }
+
+        $alias = 'o';
+        $field = $property;
+
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+        }
+
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
+
+        $queryBuilder
+            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+            ->setParameter($valueParameter, $value);
+    }
+
+    /**
+     * Determines whether the given property refers to a boolean field.
      *
      * @param string $property
      * @param string $resourceClass
      *
      * @return bool
      */
-    private function isBooleanField(string $property, string $resourceClass) : bool
+    protected function isBooleanField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property);
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
         return DBALType::BOOLEAN === $metadata->getTypeOfField($propertyParts['field']);

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Api;
 
 /**
@@ -26,11 +28,12 @@ interface FilterInterface
      *   - type: the type of the filter
      *   - required: if this filter is required
      *   - strategy: the used strategy
+     *   - swagger (optional): additional parameters for the path operation, e.g. 'swagger' => ['description' => 'My Description']
      * The description can contain additional data specific to a filter.
      *
      * @param string $resourceClass
      *
      * @return array
      */
-    public function getDescription(string $resourceClass) : array;
+    public function getDescription(string $resourceClass): array;
 }

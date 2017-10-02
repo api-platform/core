@@ -9,10 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -30,12 +33,34 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
-        $request = new Request();
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn(new Request())->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
+        $listener->onKernelRequest($event->reveal());
+    }
+
+    public function testDoNotCallWhenReceiveFlagIsFalse()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
+
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
+        $request->setMethod('PUT');
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
@@ -47,13 +72,16 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], [], '{}');
         $request->setMethod(Request::METHOD_POST);
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertTrue($request->attributes->has('data'));
@@ -68,13 +96,16 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame([], $request->attributes->get('data'));
@@ -87,7 +118,10 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
 
         $data = new \stdClass();
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', 1, 'get', true)->willReturn($data)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', 1, 'get')->willReturn($data)->shouldBeCalled();
+
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
@@ -95,7 +129,31 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
+        $listener->onKernelRequest($event->reveal());
+
+        $this->assertSame($data, $request->attributes->get('data'));
+    }
+
+    public function testRetrieveSubresource()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $data = [new \stdClass()];
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource('Foo', ['id' => 1], ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar'], 'get')->willReturn($data)->shouldBeCalled();
+
+        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request->setMethod(Request::METHOD_GET);
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
@@ -109,7 +167,9 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', 22, 'get', true)->willReturn(null)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', 22, 'get')->willReturn(null)->shouldBeCalled();
+
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 
         $request = new Request([], [], ['id' => 22, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
@@ -117,7 +177,7 @@ class ReadListenerTest extends \PHPUnit_Framework_TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 }

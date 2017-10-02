@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Action;
 
 use ApiPlatform\Core\Api\Entrypoint;
@@ -28,7 +30,7 @@ final class EntrypointAction
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
     }
 
-    public function __invoke() : Entrypoint
+    public function __invoke(): Entrypoint
     {
         return new Entrypoint($this->resourceNameCollectionFactory->create());
     }

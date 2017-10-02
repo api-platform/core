@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.security.expression_language" class="ApiPlatform\Core\Security\ExpressionLanguage" public="false" />
+
+        <!-- This listener must be executed only when the current object is available -->
+        <service id="api_platform.security.listener.request.deny_access" class="ApiPlatform\Core\Security\EventListener\DenyAccessListener">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.expression_language" on-invalid="null" />
+            <argument type="service" id="security.authentication.trust_resolver" on-invalid="null" />
+            <argument type="service" id="security.role_hierarchy" on-invalid="null" />
+            <argument type="service" id="security.token_storage" on-invalid="null" />
+            <argument type="service" id="security.authorization_checker" on-invalid="null" />
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="1" />
+        </service>
+    </services>
+
+</container>

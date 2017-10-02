@@ -9,9 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -20,8 +24,12 @@ use Doctrine\ORM\QueryBuilder;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class QueryChecker
+final class QueryChecker
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Determines whether the query builder uses a HAVING clause.
      *
@@ -29,7 +37,7 @@ abstract class QueryChecker
      *
      * @return bool
      */
-    public static function hasHavingClause(QueryBuilder $queryBuilder) : bool
+    public static function hasHavingClause(QueryBuilder $queryBuilder): bool
     {
         return !empty($queryBuilder->getDQLPart('having'));
     }
@@ -42,7 +50,7 @@ abstract class QueryChecker
      *
      * @return bool
      */
-    public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    public static function hasRootEntityWithForeignKeyIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         return self::hasRootEntityWithIdentifier($queryBuilder, $managerRegistry, true);
     }
@@ -55,7 +63,7 @@ abstract class QueryChecker
      *
      * @return bool
      */
-    public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    public static function hasRootEntityWithCompositeIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         return self::hasRootEntityWithIdentifier($queryBuilder, $managerRegistry, false);
     }
@@ -69,14 +77,14 @@ abstract class QueryChecker
      *
      * @return bool
      */
-    private static function hasRootEntityWithIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry, bool $isForeign) : bool
+    private static function hasRootEntityWithIdentifier(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry, bool $isForeign): bool
     {
         foreach ($queryBuilder->getRootEntities() as $rootEntity) {
             $rootMetadata = $managerRegistry
                 ->getManagerForClass($rootEntity)
                 ->getClassMetadata($rootEntity);
 
-            if ($isForeign ? $rootMetadata->isIdentifierComposite : $rootMetadata->containsForeignIdentifier) {
+            if ($rootMetadata instanceof ClassMetadata && ($isForeign ? $rootMetadata->isIdentifierComposite : $rootMetadata->containsForeignIdentifier)) {
                 return true;
             }
         }
@@ -91,7 +99,7 @@ abstract class QueryChecker
      *
      * @return bool
      */
-    public static function hasMaxResults(QueryBuilder $queryBuilder) : bool
+    public static function hasMaxResults(QueryBuilder $queryBuilder): bool
     {
         return null !== $queryBuilder->getMaxResults();
     }
@@ -105,7 +113,7 @@ abstract class QueryChecker
      *
      * @return bool
      */
-    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : bool
+    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
     {
         if (
             empty($orderByParts = $queryBuilder->getDQLPart('orderBy')) ||
@@ -127,24 +135,63 @@ abstract class QueryChecker
             }
         }
 
-        if (!empty($orderByAliases)) {
-            foreach ($joinParts as $rootAlias => $joins) {
-                foreach ($joins as $join) {
-                    $alias = QueryJoinParser::getJoinAlias($join);
+        if (!$orderByAliases) {
+            return false;
+        }
 
-                    if (isset($orderByAliases[$alias])) {
-                        $relationship = QueryJoinParser::getJoinRelationship($join);
+        foreach ($joinParts as $joins) {
+            foreach ($joins as $join) {
+                $alias = QueryJoinParser::getJoinAlias($join);
 
-                        $relationshipParts = explode('.', $relationship);
-                        $parentAlias = $relationshipParts[0];
-                        $association = $relationshipParts[1];
+                if (!isset($orderByAliases[$alias])) {
+                    continue;
+                }
 
-                        $parentMetadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
+                $relationship = QueryJoinParser::getJoinRelationship($join);
 
-                        if ($parentMetadata->isCollectionValuedAssociation($association)) {
-                            return true;
+                if (false !== strpos($relationship, '.')) {
+                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($alias, $queryBuilder, $managerRegistry);
+                    if ($metadata->isCollectionValuedAssociation($relationship)) {
+                        return true;
+                    }
+                } else {
+                    $parentMetadata = $managerRegistry->getManagerForClass($relationship)->getClassMetadata($relationship);
+
+                    foreach ($queryBuilder->getRootEntities() as $rootEntity) {
+                        $rootMetadata = $managerRegistry
+                            ->getManagerForClass($rootEntity)
+                            ->getClassMetadata($rootEntity);
+
+                        if (!$rootMetadata instanceof ClassMetadata) {
+                            continue;
+                        }
+
+                        foreach ($rootMetadata->getAssociationsByTargetClass($relationship) as $association => $mapping) {
+                            if ($parentMetadata->isCollectionValuedAssociation($association)) {
+                                return true;
+                            }
                         }
                     }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether the query builder already has a left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return bool
+     */
+    public static function hasLeftJoin(QueryBuilder $queryBuilder): bool
+    {
+        foreach ($queryBuilder->getDQLPart('join') as $dqlParts) {
+            foreach ($dqlParts as $dqlPart) {
+                if (Join::LEFT_JOIN === $dqlPart->getJoinType()) {
+                    return true;
                 }
             }
         }

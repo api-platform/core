@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -28,7 +30,7 @@ interface OperationMethodResolverInterface
      *
      * @return string
      */
-    public function getCollectionOperationMethod(string $resourceClass, string $operationName) : string;
+    public function getCollectionOperationMethod(string $resourceClass, string $operationName): string;
 
     /**
      * @param string $resourceClass
@@ -38,5 +40,5 @@ interface OperationMethodResolverInterface
      *
      * @return string
      */
-    public function getItemOperationMethod(string $resourceClass, string $operationName) : string;
+    public function getItemOperationMethod(string $resourceClass, string $operationName): string;
 }

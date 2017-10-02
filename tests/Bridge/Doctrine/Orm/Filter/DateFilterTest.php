@@ -9,14 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +29,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class DateFilterTest extends KernelTestCase
 {
-    use PHPMock;
-
     /**
      * @var ManagerRegistry
      */
@@ -58,143 +57,201 @@ class DateFilterTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider filterProvider
+     * @dataProvider provideApplyTestData
      */
-    public function testApply(array $filterParameters, array $query, $expected)
+    public function testApply($properties, array $filterParameters, string $expected)
     {
-        $request = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $filterParameters);
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
         $queryBuilder = $this->repository->createQueryBuilder('o');
+
         $filter = new DateFilter(
             $this->managerRegistry,
             $requestStack,
-            $filterParameters['properties']
+            null,
+            $properties
         );
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower($expected);
+        $actual = $queryBuilder->getQuery()->getDQL();
 
-        $this->assertEquals(
-            $expected,
-            $actual,
-            sprintf('Expected `%s` for this `%s %s` request', $expected, 'GET', $request->getUri())
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetDescription()
     {
-        $filter = new DateFilter($this->managerRegistry,
-            new RequestStack());
+        $filter = new DateFilter(
+            $this->managerRegistry,
+            new RequestStack()
+        );
+
         $this->assertEquals([
             'dummyDate[before]' => [
                 'property' => 'dummyDate',
-                'type' => '\DateTime',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+            ],
+            'dummyDate[strictly_before]' => [
+                'property' => 'dummyDate',
+                'type' => 'DateTimeInterface',
                 'required' => false,
             ],
             'dummyDate[after]' => [
                 'property' => 'dummyDate',
-                'type' => '\DateTime',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+            ],
+            'dummyDate[strictly_after]' => [
+                'property' => 'dummyDate',
+                'type' => 'DateTimeInterface',
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));
     }
 
     /**
-     * Providers 3 parameters:
-     *  - filter parameters.
-     *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
-     *    otherwise not.
-     *  - expected DQL query.
+     * Provides test data.
+     *
+     * Provides 3 parameters:
+     *  - configuration of filterable properties
+     *  - filter parameters
+     *  - expected DQL query
      *
      * @return array
      */
-    public function filterProvider()
+    public function provideApplyTestData(): array
     {
         return [
-            // Properties enabled with valid values
-            // Test after
-            [
+            'after (all properties enabled)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyDate' => [
+                        'after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
+            ],
+            'after but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+            ],
+            'after' => [
+                [
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate >= :dummydate_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
-            [
+            'after but not equals' => [
                 [
-                    'properties' => [
-                        'dummyDate' => true,
-                    ],
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
-                        'after' => '2015-04-05',
+                        'strictly_after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate >= :dummydate_p1 AND o.dummydate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
             ],
-            // Test before
-            [
+            'before (all properties enabled)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyDate' => [
+                        'before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
+            ],
+            'before but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
+            ],
+            'before' => [
+                [
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
                         'before' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate <= :dummydate_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
             ],
-            [
+            'before but not equals' => [
                 [
-                    'properties' => [
-                        'dummyDate' => true,
-                    ],
+                    'dummyDate' => null,
                 ],
                 [
                     'dummyDate' => [
-                        'before' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate <= :dummydate_p1 AND o.dummydate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
             ],
-            // with both after and before
-            [
-                [
-                    'properties' => null,
-                ],
-                [
-                    'dummyDate' => [
-                        'after' => '2015-04-05',
-                        'before' => '2015-04-05',
-                    ],
-                ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate <= :dummydate_p1 AND o.dummydate >= :dummydate_p2', Dummy::class),
-            ],
-            [
-                [
-                    'properties' => [
-                        'dummyDate' => true,
-                    ],
-                ],
+            'before + after (all properties enabled)' => [
+                null,
                 [
                     'dummyDate' => [
                         'after' => '2015-04-05',
                         'before' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE (o.dummydate <= :dummydate_p1 AND o.dummydate IS NOT NULL) AND (o.dummydate >= :dummydate_p2 AND o.dummydate IS NOT NULL)', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
             ],
-            // with no property enabled
-            [
+            'before but not equals + after but not equals (all properties enabled)' => [
+                null,
                 [
-                    'properties' => ['unkown'],
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
+            ],
+            'before + after' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'after' => '2015-04-05',
+                        'before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+            ],
+            'before but not equals + after but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
+            ],
+            'property not enabled' => [
+                [
+                    'unknown' => null,
                 ],
                 [
                     'dummyDate' => [
@@ -204,47 +261,38 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            // Test with association
-            [
+            'nested property' => [
                 [
-                    'properties' => [
-                        'relatedDummy.dummyDate' => true,
-                    ],
+                    'relatedDummy.dummyDate' => null,
                 ],
                 [
                     'relatedDummy.dummyDate' => [
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relateddummy_a1 WHERE relateddummy_a1.dummydate >= :dummydate_p1 AND relateddummy_a1.dummydate IS NOT NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
-            // Test with exclude_null
-            [
+            'after (exclude_null)' => [
                 [
-                    'properties' => [
-                        'dummyDate' => 'exclude_null',
-                    ],
+                    'dummyDate' => 'exclude_null',
                 ],
                 [
                     'dummyDate' => [
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate IS NOT NULL AND o.dummydate >= :dummydate_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate IS NOT NULL AND o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
-            // Test with include_null_before
-            [
+            'after (include_null_after)' => [
                 [
-                    'properties' => [
-                        'dummyDate' => 'include_null_after',
-                    ],
+                    'dummyDate' => 'include_null_after',
                 ],
                 [
                     'dummyDate' => [
                         'after' => '2015-04-05',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummydate >= :dummydate_p1 OR o.dummydate IS NULL', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
             ],
         ];
     }

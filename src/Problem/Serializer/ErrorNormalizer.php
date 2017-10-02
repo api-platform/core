@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Problem\Serializer;
 
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -25,6 +27,8 @@ final class ErrorNormalizer implements NormalizerInterface
 {
     const FORMAT = 'jsonproblem';
 
+    use ErrorNormalizerTrait;
+
     private $debug;
 
     public function __construct(bool $debug = false)
@@ -37,7 +41,6 @@ final class ErrorNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $message = $object->getMessage();
         if ($this->debug) {
             $trace = $object->getTrace();
         }
@@ -45,7 +48,7 @@ final class ErrorNormalizer implements NormalizerInterface
         $data = [
             'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => $context['title'] ?? 'An error occurred',
-            'detail' => $message ?? (string) $object,
+            'detail' => $this->getErrorMessage($object, $context, $this->debug),
         ];
 
         if (isset($trace)) {

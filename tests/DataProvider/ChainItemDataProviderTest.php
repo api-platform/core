@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
@@ -29,13 +31,13 @@ class ChainItemDataProviderTest extends \PHPUnit_Framework_TestCase
         $dummy->setName('Lucie');
 
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $firstDataProvider->getItem(Dummy::class, 1, null, false)->willThrow(ResourceClassNotSupportedException::class);
+        $firstDataProvider->getItem(Dummy::class, 1, null, [])->willThrow(ResourceClassNotSupportedException::class);
 
         $secondDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $secondDataProvider->getItem(Dummy::class, 1, null, false)->willReturn($dummy);
+        $secondDataProvider->getItem(Dummy::class, 1, null, [])->willReturn($dummy);
 
         $thirdDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $thirdDataProvider->getItem(Dummy::class, 1, null, false)->willReturn(new \stdClass());
+        $thirdDataProvider->getItem(Dummy::class, 1, null, [])->willReturn(new \stdClass());
 
         $chainItemDataProvider = new ChainItemDataProvider([$firstDataProvider->reveal(), $secondDataProvider->reveal(), $thirdDataProvider->reveal()]);
 
@@ -45,7 +47,7 @@ class ChainItemDataProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetItemExeptions()
     {
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $firstDataProvider->getItem('notfound', 1, null, false)->willThrow(ResourceClassNotSupportedException::class);
+        $firstDataProvider->getItem('notfound', 1, null, [])->willThrow(ResourceClassNotSupportedException::class);
 
         $chainItemDataProvider = new ChainItemDataProvider([$firstDataProvider->reveal()]);
 

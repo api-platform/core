@@ -1,16 +1,17 @@
 build: false
 platform: x86
-clone_folder: c:\projects\dunglas\api-bundle
+clone_folder: c:\projects\api-platform\core
 
 cache:
   - '%LOCALAPPDATA%\Composer\files'
 
 init:
-  - SET PATH=c:\tools\php;%PATH%
+  - SET PATH=c:\tools\php71;%PATH%
 
 install:
+  - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php
-  - cd c:\tools\php
+  - cd c:\tools\php71
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
@@ -25,5 +26,5 @@ install:
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - php vendor\behat\behat\bin\behat
+  - php vendor\behat\behat\bin\behat --format=progress
   - php vendor\phpunit\phpunit\phpunit

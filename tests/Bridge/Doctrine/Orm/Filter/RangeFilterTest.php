@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use phpmock\phpunit\PHPMock;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +28,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RangeFilterTest extends KernelTestCase
 {
-    use PHPMock;
-
     /**
      * @var ManagerRegistry
      */
@@ -58,39 +56,37 @@ class RangeFilterTest extends KernelTestCase
     }
 
     /**
-     * @dataProvider filterProvider
+     * @dataProvider provideApplyTestData
      */
-    public function testApply(array $filterParameters, array $query, $expected)
+    public function testApply($properties, array $filterParameters, string $expected)
     {
-        $request = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $filterParameters);
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
         $queryBuilder = $this->repository->createQueryBuilder('o');
+
         $filter = new RangeFilter(
             $this->managerRegistry,
             $requestStack,
-            $filterParameters['properties']
+            null,
+            $properties
         );
 
-        try {
-            $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        } catch (InvalidArgumentException $e) {
-        }
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
+        $actual = $queryBuilder->getQuery()->getDQL();
 
-        $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower($expected);
-
-        $this->assertEquals(
-            $expected,
-            $actual,
-            sprintf('Expected `%s` for this `%s %s` request', $expected, 'GET', $request->getUri())
-        );
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetDescription()
     {
-        $filter = new RangeFilter($this->managerRegistry,
-            new RequestStack());
+        $filter = new RangeFilter(
+            $this->managerRegistry,
+            new RequestStack()
+        );
+
         $this->assertEquals([
             'id[between]' => [
                 'property' => 'id',
@@ -242,6 +238,31 @@ class RangeFilterTest extends KernelTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummyFloat[between]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[gt]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[gte]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[lt]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyFloat[lte]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyPrice[between]' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
@@ -346,33 +367,29 @@ class RangeFilterTest extends KernelTestCase
     }
 
     /**
-     * Providers 3 parameters:
-     *  - filter parameters.
-     *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
-     *    otherwise not.
-     *  - expected DQL query.
+     * Provides test data.
+     *
+     * Provides 3 parameters:
+     *  - configuration of filterable properties
+     *  - filter parameters
+     *  - expected DQL query
      *
      * @return array
      */
-    public function filterProvider()
+    public function provideApplyTestData(): array
     {
         return [
-            [
-                [
-                    'properties' => null,
-                ],
+            'between' => [
+                null,
                 [
                     'dummyPrice' => [
                         'between' => '9.99..15.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyprice_p1_1 AND :dummyprice_p1_2', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
             ],
-            // Invalid value
-            [
-                [
-                    'properties' => null,
-                ],
+            'between (too many operands)' => [
+                null,
                 [
                     'dummyPrice' => [
                         'between' => '9.99..15.99..99.99',
@@ -380,10 +397,8 @@ class RangeFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            [
-                [
-                    'properties' => null,
-                ],
+            'between (too few operands)' => [
+                null,
                 [
                     'dummyPrice' => [
                         'between' => '15.99',
@@ -391,61 +406,96 @@ class RangeFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
             ],
-            [
+            'between (non-numeric operands)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyPrice' => [
+                        'between' => 'abc..def',
+                    ],
                 ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'lt' => [
+                null,
                 [
                     'dummyPrice' => [
                         'lt' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_p1', Dummy::class),
             ],
-            [
+            'lt (non-numeric)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyPrice' => [
+                        'lt' => '127.0.0.1',
+                    ],
                 ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'lte' => [
+                null,
                 [
                     'dummyPrice' => [
                         'lte' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
             ],
-            [
+            'lte (non-numeric)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyPrice' => [
+                        'lte' => '127.0.0.1',
+                    ],
                 ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'gt' => [
+                null,
                 [
                     'dummyPrice' => [
                         'gt' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_p1', Dummy::class),
             ],
-            [
+            'gt (non-numeric)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyPrice' => [
+                        'gt' => '127.0.0.1',
+                    ],
                 ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'gte' => [
+                null,
                 [
                     'dummyPrice' => [
                         'gte' => '9.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyprice_p1', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1', Dummy::class),
             ],
-            [
+            'gte (non-numeric)' => [
+                null,
                 [
-                    'properties' => null,
+                    'dummyPrice' => [
+                        'gte' => '127.0.0.1',
+                    ],
                 ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'lte + gte' => [
+                null,
                 [
                     'dummyPrice' => [
                         'gte' => '9.99',
                         'lte' => '19.99',
                     ],
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyprice_p1 AND o.dummyPrice <= :dummyprice_p2', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
             ],
         ];
     }

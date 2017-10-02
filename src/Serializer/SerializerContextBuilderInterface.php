@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -32,5 +34,5 @@ interface SerializerContextBuilderInterface
      *
      * @return array
      */
-    public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null) : array;
+    public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array;
 }

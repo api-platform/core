@@ -9,104 +9,37 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 
 /**
  * Decorates the Doctrine ORM paginator.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class Paginator implements \IteratorAggregate, PaginatorInterface
+final class Paginator extends AbstractPaginator implements PaginatorInterface
 {
-    private $paginator;
-
-    /**
-     * @var Query
-     */
-    private $query;
-
-    /**
-     * @var int
-     */
-    private $firstResult;
-
-    /**
-     * @var int
-     */
-    private $maxResults;
-
     /**
      * @var int
      */
     private $totalItems;
 
     /**
-     * @var \Traversable
+     * {@inheritdoc}
      */
-    private $iterator;
-
-    public function __construct(DoctrineOrmPaginator $paginator)
+    public function getLastPage(): float
     {
-        $this->paginator = $paginator;
-        $this->query = $paginator->getQuery();
-        $this->firstResult = $this->query->getFirstResult();
-        $this->maxResults = $this->query->getMaxResults();
-        $this->totalItems = count($paginator);
+        return ceil($this->getTotalItems() / $this->maxResults) ?: 1.;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCurrentPage() : float
+    public function getTotalItems(): float
     {
-        return floor($this->firstResult / $this->maxResults) + 1.;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLastPage() : float
-    {
-        return ceil($this->totalItems / $this->maxResults) ?: 1.;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getItemsPerPage() : float
-    {
-        return (float) $this->maxResults;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTotalItems() : float
-    {
-        return (float) $this->totalItems;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator()
-    {
-        if (null === $this->iterator) {
-            $this->iterator = $this->paginator->getIterator();
-        }
-
-        return $this->iterator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count()
-    {
-        return count($this->getIterator());
+        return (float) ($this->totalItems ?? $this->totalItems = count($this->paginator));
     }
 }

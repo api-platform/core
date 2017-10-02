@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -30,7 +32,7 @@ final class ShortNameResourceMetadataFactory implements ResourceMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
         $resourceMetadata = $this->decorated->create($resourceClass);
 

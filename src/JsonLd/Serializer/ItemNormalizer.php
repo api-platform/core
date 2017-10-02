@@ -9,10 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -20,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -37,9 +41,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $resourceMetadataFactory;
     private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->contextBuilder = $contextBuilder;
@@ -62,15 +66,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
+        // Use resolved resource class instead of given resource class to support multiple inheritance child types
+        $context['resource_class'] = $resourceClass;
+        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+
         $rawData = parent::normalize($object, $format, $context);
         if (!is_array($rawData)) {
             return $rawData;
         }
 
-        $data['@id'] = $this->iriConverter->getIriFromItem($object);
-        $data['@type'] = ($iri = $resourceMetadata->getIri()) ? $iri : $resourceMetadata->getShortName();
+        $data['@id'] = $context['iri'];
+        $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
 
-        return array_merge($data, $rawData);
+        return $data + $rawData;
     }
 
     /**
@@ -83,12 +91,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context['object_to_populate'])) {
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], true);
+            if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
+                throw new InvalidArgumentException('Update is not allowed for this operation.');
+            }
+
+            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
         }
 
         return parent::denormalize($data, $class, $format, $context);

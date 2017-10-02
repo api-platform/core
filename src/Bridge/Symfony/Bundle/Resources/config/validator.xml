@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.metadata.property.metadata_factory.validator" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
+            <argument type="service" id="validator" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.validator.inner" />
+        </service>
+
+        <service id="api_platform.listener.view.validate" class="ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener">
+            <argument type="service" id="validator" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="service_container" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
+        </service>
+    </services>
+
+</container>

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
@@ -32,5 +34,5 @@ interface PropertyMetadataFactoryInterface
      *
      * @return PropertyMetadata
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata;
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata;
 }

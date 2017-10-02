@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Sanpi\Behatch\Context\RestContext;
+use Behatch\Context\RestContext;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class SwaggerContext implements Context
@@ -132,12 +134,12 @@ final class SwaggerContext implements Context
     public function assertPropertyIsRequired(string $propertyName, string $className)
     {
         $classInfo = $this->getClassInfos($className);
-        if (!in_array($propertyName, $classInfo->required)) {
+        if (!in_array($propertyName, $classInfo->required, true)) {
             throw new \Exception(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
 
-    private function getProperty(string $propertyName, string $className) : stdClass
+    private function getProperty(string $propertyName, string $className): stdClass
     {
         $properties = $this->getProperties($className);
         $propertyInfos = null;
@@ -160,7 +162,7 @@ final class SwaggerContext implements Context
      *
      * @return array | stdClass
      */
-    private function getOperation(string $method, string $className) : stdClass
+    private function getOperation(string $method, string $className): stdClass
     {
         foreach ($this->getOperations($className) as $classMethod => $operation) {
             if ($classMethod === $method) {
@@ -174,7 +176,7 @@ final class SwaggerContext implements Context
     /**
      * Gets all operations of a given class.
      */
-    private function getOperations(string $className) : stdClass
+    private function getOperations(string $className): stdClass
     {
         $classInfos = $this->getClassInfos($className);
 
@@ -184,14 +186,14 @@ final class SwaggerContext implements Context
     /**
      * Gets all properties of a given class.
      */
-    private function getProperties(string $className) : stdClass
+    private function getProperties(string $className): stdClass
     {
         $classInfos = $this->getClassInfos($className);
 
         return $classInfos->{'properties'} ?? new stdClass();
     }
 
-    private function getClassInfos(string $className) : stdClass
+    private function getClassInfos(string $className): stdClass
     {
         $json = $this->getLastJsonResponse();
         $classInfos = null;
@@ -209,7 +211,7 @@ final class SwaggerContext implements Context
         return $classInfos;
     }
 
-    private function getLastJsonResponse() : stdClass
+    private function getLastJsonResponse(): stdClass
     {
         $content = $this->restContext->getMink()->getSession()->getDriver()->getContent();
         if (null === ($decoded = json_decode($content))) {

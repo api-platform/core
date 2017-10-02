@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\Hydra\Serializer;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -24,7 +26,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Prophecy\Argument;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -101,6 +102,7 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class, true)->willReturn(Dummy::class)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
@@ -122,7 +124,6 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
                      '@id' => '/dummies/1988',
                      '@type' => 'Dummy',
                      'name' => 'hello',
-
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }

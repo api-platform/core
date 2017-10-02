@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 
 use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;
 use ApiPlatform\Core\Documentation\Documentation;
@@ -20,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -28,28 +32,37 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @deprecated since version 2.2, to be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
  */
 final class ApiPlatformProvider implements AnnotationsProviderInterface
 {
+    use FilterLocatorTrait;
+
     private $resourceNameCollectionFactory;
     private $documentationNormalizer;
     private $resourceMetadataFactory;
-    private $filters;
     private $operationMethodResolver;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, NormalizerInterface $documentationNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, FilterCollection $filters, OperationMethodResolverInterface $operationMethodResolver)
+    /**
+     * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
+     */
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, NormalizerInterface $documentationNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, $filterLocator, OperationMethodResolverInterface $operationMethodResolver)
     {
+        @trigger_error('The '.__CLASS__.' class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
+
+        $this->setFilterLocator($filterLocator);
+
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->documentationNormalizer = $documentationNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->filters = $filters;
         $this->operationMethodResolver = $operationMethodResolver;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAnnotations() : array
+    public function getAnnotations(): array
     {
         $hydraDoc = $this->documentationNormalizer->normalize(new Documentation($this->resourceNameCollectionFactory->create()));
         $entrypointHydraDoc = $this->getResourceHydraDoc($hydraDoc, '#Entrypoint');
@@ -96,7 +109,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      *
      * @return ApiDoc
      */
-    private function getApiDoc(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $resourceHydraDoc, array $entrypointHydraDoc = []) : ApiDoc
+    private function getApiDoc(bool $collection, string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $resourceHydraDoc, array $entrypointHydraDoc = []): ApiDoc
     {
         if ($collection) {
             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
@@ -127,8 +140,8 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
 
             $data['filters'] = [];
-            foreach ($this->filters as $filterName => $filter) {
-                if (in_array($filterName, $resourceFilters)) {
+            foreach ($resourceFilters as $filterId) {
+                if ($filter = $this->getFilter($filterId)) {
                     foreach ($filter->getDescription($resourceClass) as $name => $definition) {
                         $data['filters'][] = ['name' => $name] + $definition;
                     }

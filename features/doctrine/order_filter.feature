@@ -54,8 +54,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[id\\]=asc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bid%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -110,8 +113,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[id\\]=desc"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bid%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -166,8 +172,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[name\\]=asc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bname%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -222,8 +231,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[name\\]=desc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bname%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -278,8 +290,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[name\\]$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bname%5D="},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -335,8 +350,189 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[relatedDummy\\]=asc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5BrelatedDummy%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get collection ordered in ascending order on an embedded and on which order filter has been enabled in whitelist mode
+    Given there is "30" dummy objects with embeddedDummy
+    When I send a "GET" request to "/embedded_dummies?order[embeddedDummy]=asc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/3$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?order%5BembeddedDummy%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get collection ordered by default configured order on a embedded string property and on which order filter has been enabled in whitelist mode with default descending order
+    When I send a "GET" request to "/embedded_dummies?order[embeddedDummy.dummyName]"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
+        "@id": {"pattern": "^/embedded_dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/9"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/8"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/embedded_dummies/7"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/embedded_dummies\\?order%5BembeddedDummy\\.dummyName%5D="},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get a collection even if the order parameter is not well-formed
+    When I send a "GET" request to "/dummies?sort=id&order=asc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/3$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -392,8 +588,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[alias\\]=asc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Balias%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -447,8 +646,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[alias\\]=desc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Balias%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -502,8 +704,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=asc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bunknown%5D=asc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -557,8 +762,11 @@ Feature: Order filter on collections
           "minItems": 3
         },
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?order\\[unknown\\]=desc$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5Bunknown%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }

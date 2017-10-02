@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Mock;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Mock\FosUser;
 
 use FOS\UserBundle\Mailer\MailerInterface;
 use FOS\UserBundle\Model\UserInterface;
@@ -20,7 +22,7 @@ use FOS\UserBundle\Model\UserInterface;
 class MailerMock implements MailerInterface
 {
     /**
-     * Send an email to a user to confirm the account creation.
+     * Sends an email to a user to confirm the account creation.
      *
      * @param UserInterface $user
      */
@@ -29,7 +31,7 @@ class MailerMock implements MailerInterface
     }
 
     /**
-     * Send an email to a user to confirm the password reset.
+     * Sends an email to a user to confirm the password reset.
      *
      * @param UserInterface $user
      */

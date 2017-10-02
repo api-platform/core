@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -26,6 +28,7 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
 
     private $cacheItemPool;
     private $decorated;
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceMetadataFactoryInterface $decorated)
     {
@@ -36,15 +39,19 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass) : ResourceMetadata
+    public function create(string $resourceClass): ResourceMetadata
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass]));
+        if (isset($this->localCache[$resourceClass])) {
+            return $this->localCache[$resourceClass];
+        }
+
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->localCache[$resourceClass] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -52,15 +59,13 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
 
         $resourceMetadata = $this->decorated->create($resourceClass);
 
-        if (isset($cacheItem)) {
-            try {
-                $cacheItem->set($resourceMetadata);
-                $this->cacheItemPool->save($cacheItem);
-            } catch (CacheException $e) {
-                // do nothing
-            }
+        if (!isset($cacheItem)) {
+            return $this->localCache[$resourceClass] = $resourceMetadata;
         }
 
-        return $resourceMetadata;
+        $cacheItem->set($resourceMetadata);
+        $this->cacheItemPool->save($cacheItem);
+
+        return $this->localCache[$resourceClass] = $resourceMetadata;
     }
 }

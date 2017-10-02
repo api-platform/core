@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -21,7 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class CustomController extends Controller
 {
-    public function customAction(int $id) : JsonResponse
+    public function customAction(int $id): JsonResponse
     {
         return new JsonResponse(sprintf('This is a custom action for %d.', $id), 200, ['Content-Type' => 'application/ld+json; charset=utf-8']);
     }

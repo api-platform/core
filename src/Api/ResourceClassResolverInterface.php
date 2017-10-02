@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -31,7 +33,7 @@ interface ResourceClassResolverInterface
      *
      * @return string
      */
-    public function getResourceClass($value, string $resourceClass = null, bool $strict = false) : string;
+    public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string;
 
     /**
      * Is the given class a resource class?
@@ -40,5 +42,5 @@ interface ResourceClassResolverInterface
      *
      * @return bool
      */
-    public function isResourceClass(string $type) : bool;
+    public function isResourceClass(string $type): bool;
 }

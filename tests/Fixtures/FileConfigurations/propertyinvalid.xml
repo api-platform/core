@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata
+           https://api-platform.com/schema/metadata/metadata-2.0.xsd">
+    <resource class="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy">
+        <property name="foo">
+            <foo>Foo</foo>
+        </property>
+    </resource>
+</resources>

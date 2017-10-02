@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -29,9 +31,15 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
      */
     private $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    /**
+     * @var bool|array
+     */
+    private $serializePayloadFields;
+
+    public function __construct(UrlGeneratorInterface $urlGenerator, $serializePayloadFields = false)
     {
         $this->urlGenerator = $urlGenerator;
+        $this->serializePayloadFields = $serializePayloadFields;
     }
 
     /**
@@ -43,15 +51,28 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         $messages = [];
 
         foreach ($object as $violation) {
-            $violations[] = [
+            $violationData = [
                 'propertyPath' => $violation->getPropertyPath(),
                 'message' => $violation->getMessage(),
             ];
+            $constraint = $violation->getConstraint();
+            if ($this->serializePayloadFields && $constraint && $constraint->payload) {
+                if (true === $this->serializePayloadFields) {
+                    $violationData['payload'] = $constraint->payload;
+                } elseif (is_array($this->serializePayloadFields)) {
+                    // We add only fields defined in the config
+                    $payloadFields = array_intersect_key($constraint->payload, array_flip($this->serializePayloadFields));
+                    if (!empty($payloadFields)) {    // prevent the case where in the config there are fields which are not in the payload
+                        $violationData['payload'] = $payloadFields;
+                    }
+                }
+            }
+            $violations[] = $violationData;
 
             $propertyPath = $violation->getPropertyPath();
             $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
 
-            $messages [] = $prefix.$violation->getMessage();
+            $messages[] = $prefix.$violation->getMessage();
         }
 
         return [

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property;
 
 use Symfony\Component\PropertyInfo\Type;
@@ -31,8 +33,9 @@ final class PropertyMetadata
     private $identifier;
     private $childInherited;
     private $attributes;
+    private $subresource;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -45,6 +48,7 @@ final class PropertyMetadata
         $this->iri = $iri;
         $this->childInherited = $childInherited;
         $this->attributes = $attributes;
+        $this->subresource = $subresource;
     }
 
     /**
@@ -64,7 +68,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withType(Type $type) : self
+    public function withType(Type $type): self
     {
         $metadata = clone $this;
         $metadata->type = $type;
@@ -89,7 +93,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withDescription($description) : self
+    public function withDescription($description): self
     {
         $metadata = clone $this;
         $metadata->description = $description;
@@ -114,7 +118,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withReadable(bool $readable) : self
+    public function withReadable(bool $readable): self
     {
         $metadata = clone $this;
         $metadata->readable = $readable;
@@ -139,7 +143,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withWritable(bool $writable) : self
+    public function withWritable(bool $writable): self
     {
         $metadata = clone $this;
         $metadata->writable = $writable;
@@ -154,6 +158,10 @@ final class PropertyMetadata
      */
     public function isRequired()
     {
+        if (true === $this->required && false === $this->writable) {
+            return false;
+        }
+
         return $this->required;
     }
 
@@ -164,7 +172,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withRequired(bool $required) : self
+    public function withRequired(bool $required): self
     {
         $metadata = clone $this;
         $metadata->required = $required;
@@ -189,7 +197,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withWritableLink(bool $writableLink) : self
+    public function withWritableLink(bool $writableLink): self
     {
         $metadata = clone $this;
         $metadata->writableLink = $writableLink;
@@ -214,7 +222,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withReadableLink(bool $readableLink) : self
+    public function withReadableLink(bool $readableLink): self
     {
         $metadata = clone $this;
         $metadata->readableLink = $readableLink;
@@ -239,7 +247,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withIri(string $iri = null) : self
+    public function withIri(string $iri = null): self
     {
         $metadata = clone $this;
         $metadata->iri = $iri;
@@ -264,7 +272,7 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withIdentifier(bool $identifier) : self
+    public function withIdentifier(bool $identifier): self
     {
         $metadata = clone $this;
         $metadata->identifier = $identifier;
@@ -283,13 +291,30 @@ final class PropertyMetadata
     }
 
     /**
+     * Gets an attribute.
+     *
+     * @param string $key
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $key, $defaultValue = null)
+    {
+        if (isset($this->attributes[$key])) {
+            return $this->attributes[$key];
+        }
+
+        return $defaultValue;
+    }
+
+    /**
      * Returns a new instance with the given attribute.
      *
      * @param array $attributes
      *
      * @return self
      */
-    public function withAttributes(array $attributes) : self
+    public function withAttributes(array $attributes): self
     {
         $metadata = clone $this;
         $metadata->attributes = $attributes;
@@ -314,10 +339,45 @@ final class PropertyMetadata
      *
      * @return self
      */
-    public function withChildInherited(string $childInherited) : self
+    public function withChildInherited(string $childInherited): self
     {
         $metadata = clone $this;
         $metadata->childInherited = $childInherited;
+
+        return $metadata;
+    }
+
+    /**
+     * Represents whether the property has a subresource.
+     *
+     * @return bool
+     */
+    public function hasSubresource(): bool
+    {
+        return null !== $this->subresource;
+    }
+
+    /**
+     * Gets the subresource metadata.
+     *
+     * @return SubresourceMetadata|null
+     */
+    public function getSubresource()
+    {
+        return $this->subresource;
+    }
+
+    /**
+     * Returns a new instance with the given subresource.
+     *
+     * @param SubresourceMetadata $subresource
+     *
+     * @return self
+     */
+    public function withSubresource(SubresourceMetadata $subresource = null): self
+    {
+        $metadata = clone $this;
+        $metadata->subresource = $subresource;
 
         return $metadata;
     }

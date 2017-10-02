@@ -2,9 +2,6 @@ api:
     resource: '.'
     type:     'api_platform'
 
-doc:
-    resource: '@ApiPlatformBundle/Resources/config/routing/swagger-ui.xml'
-
 NelmioApiDocBundle:
     resource: '@NelmioApiDocBundle/Resources/config/routing.yml'
     prefix:   '/nelmioapidoc'
@@ -14,3 +11,7 @@ relation_embedded.custom_get:
     methods:  ['GET', 'HEAD']
     defaults:
         _controller:     'TestBundle:Custom:custom'
+
+controller:
+    resource: "@TestBundle/Controller"
+    type:     annotation

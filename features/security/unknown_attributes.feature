@@ -27,11 +27,13 @@ Feature: Ignore unknown attributes
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": null,
+      "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Not existing",
       "alias": null
     }

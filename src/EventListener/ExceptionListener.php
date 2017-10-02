@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -26,7 +28,10 @@ final class ExceptionListener extends BaseExceptionListener
     {
         $request = $event->getRequest();
         // Normalize exceptions only for routes managed by API Platform
-        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond')) {
+        if (
+            'html' === $request->getRequestFormat('') ||
+            (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond'))
+        ) {
             return;
         }
 

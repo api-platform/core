@@ -9,9 +9,11 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Util;
 
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Api\OperationType;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -21,15 +23,17 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @internal
  */
-abstract class RequestAttributesExtractor
+final class RequestAttributesExtractor
 {
+    private function __construct()
+    {
+    }
+
     /**
-     * Extracts resource class, operation name and format request attributes. Throws an exception if the request does not
-     * contain required attributes.
+     * Extracts resource class, operation name and format request attributes. Returns an empty array if the request does
+     * not contain required attributes.
      *
      * @param Request $request
-     *
-     * @throws RuntimeException
      *
      * @return array
      */
@@ -37,19 +41,32 @@ abstract class RequestAttributesExtractor
     {
         $result = ['resource_class' => $request->attributes->get('_api_resource_class')];
 
-        if (null === $result['resource_class']) {
-            throw new RuntimeException('The request attribute "_api_resource_class" must be defined.');
+        if ($subresourceContext = $request->attributes->get('_api_subresource_context')) {
+            $result['subresource_context'] = $subresourceContext;
         }
 
-        $collectionOperationName = $request->attributes->get('_api_collection_operation_name');
-        $itemOperationName = $request->attributes->get('_api_item_operation_name');
+        if (null === $result['resource_class']) {
+            return [];
+        }
 
-        if ($collectionOperationName) {
-            $result['collection_operation_name'] = $collectionOperationName;
-        } elseif ($itemOperationName) {
-            $result['item_operation_name'] = $itemOperationName;
+        $hasRequestAttributeKey = false;
+        foreach (OperationType::TYPES as $operationType) {
+            $attribute = "_api_{$operationType}_operation_name";
+            if ($request->attributes->has($attribute)) {
+                $result["{$operationType}_operation_name"] = $request->attributes->get($attribute);
+                $hasRequestAttributeKey = true;
+                break;
+            }
+        }
+
+        if (false === $hasRequestAttributeKey) {
+            return [];
+        }
+
+        if (null === $apiRequest = $request->attributes->get('_api_receive')) {
+            $result['receive'] = true;
         } else {
-            throw new RuntimeException('One of the request attribute "_api_collection_operation_name" or "_api_item_operation_name" must be defined.');
+            $result['receive'] = (bool) $apiRequest;
         }
 
         return $result;

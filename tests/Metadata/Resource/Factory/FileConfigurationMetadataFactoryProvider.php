@@ -9,12 +9,14 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 /**
- * Resource metadata provider for file configurated factories tests.
+ * Resource metadata provider for file configured factories tests.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
@@ -60,8 +62,37 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
     public function optionalResourceMetadataProvider()
     {
         $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withItemOperations(['my_op_name' => ['method' => 'POST']]);
 
+        return [[$resourceMetadata]];
+    }
+
+    public function noCollectionOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withItemOperations(['my_op_name' => ['method' => 'POST']]);
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([]);
+
+        return [[$resourceMetadata]];
+    }
+
+    public function noItemOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withCollectionOperations(['my_op_name' => ['method' => 'POST']]);
+        $resourceMetadata = $resourceMetadata->withItemOperations([]);
+
+        return [[$resourceMetadata]];
+    }
+
+    public function legacyOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withItemOperations([
+          'my_op_name' => ['method' => 'POST'],
+          'my_other_op_name' => ['method' => 'GET'],
+        ]);
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([
             'my_op_name' => ['method' => 'POST'],
         ]);
 

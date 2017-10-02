@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -37,7 +39,7 @@ class HydraContext implements Context
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext('Sanpi\Behatch\Context\RestContext');
+        $this->restContext = $environment->getContext('Behatch\Context\RestContext');
     }
 
     /**
@@ -90,6 +92,16 @@ class HydraContext implements Context
         $property = $this->getOperation($operationMethod, $className);
 
         \PHPUnit_Framework_Assert::assertEquals($this->propertyAccessor->getValue($property, $nodeName), $value);
+    }
+
+    /**
+     * @Then the value of the node ":node" of the operation ":operation" of the Hydra class ":class" contains ":value"
+     */
+    public function assertOperationNodeValueContains($nodeName, $operationMethod, $className, $value)
+    {
+        $property = $this->getOperation($operationMethod, $className);
+
+        \PHPUnit_Framework_Assert::assertContains($value, $this->propertyAccessor->getValue($property, $nodeName));
     }
 
     /**
@@ -177,6 +189,18 @@ class HydraContext implements Context
     }
 
     /**
+     * @Then ":prop" property is not required for Hydra class ":class"
+     */
+    public function assertPropertyIsNotRequired($propertyName, $className)
+    {
+        $properties = $this->getProperty($propertyName, $className);
+
+        if (!empty($properties->{'hydra:required'})) {
+            throw new \Exception(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+        }
+    }
+
+    /**
      * @param string $propertyName
      * @param string $className
      *
@@ -235,7 +259,7 @@ class HydraContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return isset($classInfos->{'hydra:supportedOperation'}) ? $classInfos->{'hydra:supportedOperation'} : [];
+        return $classInfos->{'hydra:supportedOperation'} ?? [];
     }
 
     /**
@@ -251,7 +275,7 @@ class HydraContext implements Context
     {
         $classInfos = $this->getClassInfos($className);
 
-        return isset($classInfos->{'hydra:supportedProperty'}) ? $classInfos->{'hydra:supportedProperty'} : [];
+        return $classInfos->{'hydra:supportedProperty'} ?? [];
     }
 
     /**

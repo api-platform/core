@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -74,16 +76,20 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $dummy = new Dummy();
         $dummy->setName('foo');
+        $dummy->setAlias('ignored');
         $dummy->setRelatedDummy($relatedDummy);
         $dummy->relatedDummies->add(new RelatedDummy());
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
-            new PropertyNameCollection(['name', 'relatedDummy', 'relatedDummies'])
+            new PropertyNameCollection(['name', 'alias', 'relatedDummy', 'relatedDummies'])
         )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'alias', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
         )->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
@@ -106,12 +112,13 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($relatedDummy)->willReturn('/dummies/2')->shouldBeCalled();
 
-        $propertyAccesorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccesorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
-        $propertyAccesorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy)->shouldBeCalled();
-        $propertyAccesorProphecy->getValue($dummy, 'relatedDummies')->willReturn(
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
+        $propertyAccessorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy)->shouldBeCalled();
+        $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn(
             new ArrayCollection([$relatedDummy])
         )->shouldBeCalled();
 
@@ -129,15 +136,16 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $propertyAccesorProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
+        $normalizer->setIgnoredAttributes(['alias']);
 
         $this->assertEquals([
             'name' => 'foo',
             'relatedDummy' => '/dummies/2',
             'relatedDummies' => ['/dummies/2'],
-        ], $normalizer->normalize($dummy));
+        ], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
     public function testNormalizeReadableLinks()
@@ -175,6 +183,7 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy)->shouldBeCalled();
@@ -202,7 +211,7 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'relatedDummy' => ['foo' => 'hello'],
             'relatedDummies' => [['foo' => 'hello']],
-        ], $normalizer->normalize($dummy));
+        ], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
     public function testDenormalize()
@@ -247,8 +256,8 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getItemFromIri('/dummies/1', true)->willReturn($relatedDummy1)->shouldBeCalled();
-        $iriConverterProphecy->getItemFromIri('/dummies/2', true)->willReturn($relatedDummy2)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/dummies/1', Argument::type('array'))->willReturn($relatedDummy1)->shouldBeCalled();
+        $iriConverterProphecy->getItemFromIri('/dummies/2', Argument::type('array'))->willReturn($relatedDummy2)->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
@@ -607,10 +616,11 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
         )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
-        $propertyAccesorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccesorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
-        $propertyAccesorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
+        $propertyAccessorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class, true)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
@@ -625,13 +635,13 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $propertyAccesorProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $this->assertEquals([
             'name' => 'foo',
             'nickname' => null,
-        ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class]));
+        ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class, 'resources' => []]));
     }
 }

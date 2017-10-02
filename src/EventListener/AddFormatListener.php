@@ -9,12 +9,15 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\EventListener;
 
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Chooses the format to user according to the Accept header and supported formats.
@@ -36,12 +39,15 @@ final class AddFormatListener
     /**
      * Sets the applicable format to the HttpFoundation Request.
      *
-     * @param $event GetResponseEvent
+     * @param GetResponseEvent $event
+     *
+     * @throws NotFoundHttpException
+     * @throws NotAcceptableHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (null === $request->attributes->get('_api_resource_class') && !$request->attributes->get('_api_respond')) {
+        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond')) {
             return;
         }
 
@@ -49,8 +55,13 @@ final class AddFormatListener
         $this->addRequestFormats($request, $this->formats);
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
-        $routeFormat = $request->attributes->get('_format') ?: null;
-        $mimeTypes = $routeFormat ? $request->getMimeTypes($routeFormat) : array_keys($this->mimeTypes);
+        if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
+            $mimeTypes = array_keys($this->mimeTypes);
+        } elseif (!isset($this->formats[$routeFormat])) {
+            throw new NotFoundHttpException('Not Found');
+        } else {
+            $mimeTypes = Request::getMimeTypes($routeFormat);
+        }
 
         // First, try to guess the format from the Accept header
         $accept = $request->headers->get('Accept');
@@ -65,7 +76,7 @@ final class AddFormatListener
         }
 
         // Then use the Symfony request format if available and applicable
-        $requestFormat = $request->getRequestFormat(null) ?: null;
+        $requestFormat = $request->getRequestFormat('') ?: null;
         if (null !== $requestFormat) {
             $mimeType = $request->getMimeType($requestFormat);
 
@@ -77,8 +88,11 @@ final class AddFormatListener
         }
 
         // Finally, if no Accept header nor Symfony request format is set, return the default format
-        reset($this->formats);
-        $request->setRequestFormat(each($this->formats)['key']);
+        foreach ($this->formats as $format => $mimeType) {
+            $request->setRequestFormat($format);
+
+            return;
+        }
     }
 
     /**
@@ -119,7 +133,7 @@ final class AddFormatListener
      *
      * @return NotAcceptableHttpException
      */
-    private function getNotAcceptableHttpException(string $accept, array $mimeTypes = null) : NotAcceptableHttpException
+    private function getNotAcceptableHttpException(string $accept, array $mimeTypes = null): NotAcceptableHttpException
     {
         if (null === $mimeTypes) {
             $mimeTypes = array_keys($this->mimeTypes);

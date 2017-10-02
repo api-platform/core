@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -31,5 +33,5 @@ interface PropertyNameCollectionFactoryInterface
      *
      * @return PropertyNameCollection
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection;
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection;
 }

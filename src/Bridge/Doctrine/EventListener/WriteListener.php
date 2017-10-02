@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -40,7 +42,7 @@ final class WriteListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe()) {
+        if ($request->isMethodSafe(false)) {
             return;
         }
 
@@ -58,7 +60,6 @@ final class WriteListener
             case Request::METHOD_POST:
                 $objectManager->persist($controllerResult);
                 break;
-
             case Request::METHOD_DELETE:
                 $objectManager->remove($controllerResult);
                 $event->setControllerResult(null);
@@ -79,9 +80,8 @@ final class WriteListener
     private function getManager(string $resourceClass, $data)
     {
         $objectManager = $this->managerRegistry->getManagerForClass($resourceClass);
-
         if (null === $objectManager || !is_object($data)) {
-            return;
+            return null;
         }
 
         return $objectManager;

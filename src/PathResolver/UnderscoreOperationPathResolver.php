@@ -9,30 +9,37 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\PathResolver;
 
-use Doctrine\Common\Inflector\Inflector;
+use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 
 /**
  * Generates a path with words separated by underscores.
  *
  * @author Paul Le Corre <paul@lecorre.me>
+ *
+ * @deprecated since version 2.1, to be removed in 3.0. Use {@see \ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator} instead.
  */
 final class UnderscoreOperationPathResolver implements OperationPathResolverInterface
 {
+    public function __construct()
+    {
+        @trigger_error(sprintf('The use of %s is deprecated since 2.1. Please use %s instead.', __CLASS__, UnderscorePathSegmentNameGenerator::class), E_USER_DEPRECATED);
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection) : string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        $path = '/'.Inflector::pluralize(Inflector::tableize($resourceShortName));
-
-        if (!$collection) {
-            $path .= '/{id}';
+        if (func_num_args() >= 4) {
+            $operationName = func_get_arg(3);
+        } else {
+            $operationName = null;
         }
 
-        $path .= '.{_format}';
-
-        return $path;
+        return (new OperationPathResolver(new UnderscorePathSegmentNameGenerator()))->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
     }
 }

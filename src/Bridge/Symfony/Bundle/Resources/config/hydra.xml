@@ -17,7 +17,7 @@
         </service>
 
 
-        <!-- Event listeners -->
+        <!-- Event listener -->
 
         <service id="api_platform.hydra.listener.response.add_link_header" class="ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener">
             <argument type="service" id="api_platform.router" />
@@ -29,6 +29,7 @@
 
         <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument type="service" id="api_platform.router" />
+            <argument>%api_platform.validator.serialize_payload_fields%</argument>
 
             <tag name="serializer.normalizer" priority="64" />
         </service>
@@ -66,14 +67,8 @@
             <argument type="service" id="api_platform.hydra.normalizer.collection_filters.inner" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.filters" />
+            <argument type="service" id="api_platform.filter_locator" />
         </service>
-
-        <!-- Action -->
-
-        <service id="api_platform.hydra.action.exception" class="ApiPlatform\Core\Hydra\Action\ExceptionAction">
-            <argument type="service" id="api_platform.hydra.normalizer.error" />
-       </service>
 
     </services>
 

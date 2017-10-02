@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Util;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -18,8 +20,12 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class ErrorFormatGuesser
+final class ErrorFormatGuesser
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Get the error format and its associated MIME type.
      *
@@ -28,15 +34,17 @@ abstract class ErrorFormatGuesser
      *
      * @return array
      */
-    public static function guessErrorFormat(Request $request, array $errorFormats) : array
+    public static function guessErrorFormat(Request $request, array $errorFormats): array
     {
-        $requestFormat = $request->getRequestFormat(null);
-        if (null !== $requestFormat && isset($errorFormats[$requestFormat])) {
+        $requestFormat = $request->getRequestFormat('');
+        if ('' !== $requestFormat && isset($errorFormats[$requestFormat])) {
             return ['key' => $requestFormat, 'value' => $errorFormats[$requestFormat]];
         }
 
-        reset($errorFormats);
+        foreach ($errorFormats as $key => $value) {
+            return ['key' => $key, 'value' => $value];
+        }
 
-        return each($errorFormats);
+        return [];
     }
 }

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -17,6 +19,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as ValidatorMetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\PropertyMetadataInterface as ValidatorPropertyMetadataInterface;
 
 /**
  * Decorates a metadata loader using the validator.
@@ -26,7 +29,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface as Vali
 final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     /**
-     * @var string[] A list of constraint classes making the entity required.
+     * @var string[] A list of constraint classes making the entity required
      */
     const REQUIRED_CONSTRAINTS = [NotBlank::class, NotNull::class];
 
@@ -40,27 +43,9 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     }
 
     /**
-     * Is this constraint making the related property required?
-     *
-     * @param Constraint $constraint
-     *
-     * @return bool
-     */
-    private function isRequired(Constraint $constraint) : bool
-    {
-        foreach (self::REQUIRED_CONSTRAINTS as $requiredConstraint) {
-            if ($constraint instanceof $requiredConstraint) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $name, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $name, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $name, $options);
         if (null !== $propertyMetadata->isRequired()) {
@@ -68,22 +53,9 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         $validatorClassMetadata = $this->validatorMetadataFactory->getMetadataFor($resourceClass);
-
         foreach ($validatorClassMetadata->getPropertyMetadata($name) as $validatorPropertyMetadata) {
             if (isset($options['validation_groups'])) {
-                foreach ($options['validation_groups'] as $validationGroup) {
-                    if (!is_string($validationGroup)) {
-                        continue;
-                    }
-
-                    foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $constraint) {
-                        if ($this->isRequired($constraint)) {
-                            return $propertyMetadata->withRequired(true);
-                        }
-                    }
-                }
-
-                return $propertyMetadata->withRequired(false);
+                return $propertyMetadata->withRequired($this->isRequiredByGroups($validatorPropertyMetadata, $options));
             }
 
             foreach ($validatorPropertyMetadata->findConstraints($validatorClassMetadata->getDefaultGroup()) as $constraint) {
@@ -96,5 +68,48 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         return $propertyMetadata->withRequired(false);
+    }
+
+    /**
+     * Tests if the property is required because of its validation groups.
+     *
+     * @param ValidatorPropertyMetadataInterface $validatorPropertyMetadata
+     * @param array                              $options
+     *
+     * @return bool
+     */
+    private function isRequiredByGroups(ValidatorPropertyMetadataInterface $validatorPropertyMetadata, array $options): bool
+    {
+        foreach ($options['validation_groups'] as $validationGroup) {
+            if (!is_string($validationGroup)) {
+                continue;
+            }
+
+            foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $constraint) {
+                if ($this->isRequired($constraint)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Is this constraint making the related property required?
+     *
+     * @param Constraint $constraint
+     *
+     * @return bool
+     */
+    private function isRequired(Constraint $constraint): bool
+    {
+        foreach (self::REQUIRED_CONSTRAINTS as $requiredConstraint) {
+            if ($constraint instanceof $requiredConstraint) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

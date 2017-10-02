@@ -9,13 +9,17 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -27,18 +31,22 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use JsonLdContextTrait;
+    use FilterLocatorTrait;
 
     private $collectionNormalizer;
     private $resourceMetadataFactory;
     private $resourceClassResolver;
-    private $filters;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, FilterCollection $filters)
+    /**
+     * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
+     */
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, $filterLocator)
     {
+        $this->setFilterLocator($filterLocator);
+
         $this->collectionNormalizer = $collectionNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        $this->filters = $filters;
     }
 
     /**
@@ -63,14 +71,13 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         $operationName = $context['collection_operation_name'] ?? null;
-
         if (null === $operationName) {
             $resourceFilters = $resourceMetadata->getAttribute('filters', []);
         } else {
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         }
 
-        if ([] === $resourceFilters) {
+        if (!$resourceFilters) {
             return $data;
         }
 
@@ -80,13 +87,13 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         $currentFilters = [];
-        foreach ($this->filters as $filterName => $filter) {
-            if (in_array($filterName, $resourceFilters)) {
+        foreach ($resourceFilters as $filterId) {
+            if ($filter = $this->getFilter($filterId)) {
                 $currentFilters[] = $filter;
             }
         }
 
-        if ([] !== $currentFilters) {
+        if ($currentFilters) {
             $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters);
         }
 
@@ -112,7 +119,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      *
      * @return array
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters) : array
+    private function getSearch(string $resourceClass, array $parts, array $filters): array
     {
         $variables = [];
         $mapping = [];

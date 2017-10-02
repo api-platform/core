@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -17,9 +19,10 @@ use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyNameCollectionF
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UpperCaseIdentifierDummy;
 use Doctrine\Common\Annotations\Reader;
 use Prophecy\Argument;
-use Prophecy\Prophecy\ProphecyInterface;
+use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -29,16 +32,17 @@ class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Tes
     /**
      * @dataProvider getDependencies
      */
-    public function testCreate(ProphecyInterface $decorated = null, array $results)
+    public function testCreate(PropertyNameCollectionFactoryInterface $decorated = null, array $results)
     {
         $reader = $this->prophesize(Reader::class);
         $reader->getPropertyAnnotation(new \ReflectionProperty(Dummy::class, 'name'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
         $reader->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
         $reader->getMethodAnnotation(new \ReflectionMethod(Dummy::class, 'getName'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
         $reader->getMethodAnnotation(new \ReflectionMethod(Dummy::class, 'getAlias'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getMethodAnnotation(new \ReflectionMethod(Dummy::class, 'staticMethod'), ApiProperty::class)->shouldNotBeCalled();
         $reader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
 
-        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
+        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal(), $decorated);
         $metadata = $factory->create(Dummy::class, []);
 
         $this->assertEquals($results, iterator_to_array($metadata));
@@ -54,8 +58,38 @@ class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_Tes
 
         return [
             [null, ['name', 'alias']],
-            [$decoratedThrowsNotFound, ['name', 'alias']],
-            [$decoratedReturnParent, ['name', 'alias', 'foo']],
+            [$decoratedThrowsNotFound->reveal(), ['name', 'alias']],
+            [$decoratedReturnParent->reveal(), ['name', 'alias', 'foo']],
+        ];
+    }
+
+    /**
+     * @dataProvider getUpperCaseDependencies
+     */
+    public function testUpperCaseCreate(ObjectProphecy $decorated = null, array $results)
+    {
+        $reader = $this->prophesize(Reader::class);
+        $reader->getPropertyAnnotation(new \ReflectionProperty(UpperCaseIdentifierDummy::class, 'name'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getPropertyAnnotation(new \ReflectionProperty(UpperCaseIdentifierDummy::class, 'Uuid'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
+        $reader->getMethodAnnotation(new \ReflectionMethod(UpperCaseIdentifierDummy::class, 'getName'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getMethodAnnotation(new \ReflectionMethod(UpperCaseIdentifierDummy::class, 'getUuid'), ApiProperty::class)->willReturn(new ApiProperty())->shouldBeCalled();
+        $reader->getMethodAnnotation(Argument::type(\ReflectionMethod::class), ApiProperty::class)->willReturn(null)->shouldBeCalled();
+
+        $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal(), $decorated ? $decorated->reveal() : null);
+        $metadata = $factory->create(UpperCaseIdentifierDummy::class, []);
+
+        $this->assertEquals($results, iterator_to_array($metadata));
+    }
+
+    public function getUpperCaseDependencies()
+    {
+        $decoratedThrowsNotFound = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $decoratedThrowsNotFound->create(UpperCaseIdentifierDummy::class, [])->willThrow(new ResourceClassNotFoundException())->shouldBeCalled();
+
+        return [
+            [null, ['Uuid', 'name']],
+            [$decoratedThrowsNotFound, ['Uuid', 'name']],
         ];
     }
 

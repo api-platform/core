@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Documentation\Action;
 
 use ApiPlatform\Core\Documentation\Documentation;
@@ -36,7 +38,7 @@ final class DocumentationAction
         $this->formats = $formats;
     }
 
-    public function __invoke() : Documentation
+    public function __invoke(): Documentation
     {
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
     }

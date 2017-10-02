@@ -1,10 +1,8 @@
 resources:
-    dummy:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy'
-    configdummy:
+    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy': ~
+    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
         shortName: 'thedummyshortname'
         description: 'Dummy resource'
-        class:  'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy'
         itemOperations:
             my_op_name:
                 method: 'GET'
@@ -21,5 +19,22 @@ resources:
                 groups: ['default']
             hydra_context:
                 '@type': 'hydra:Operation'
-                '@hydra:title': 'File config Dummy'
+                '@hydra:title': !php/const:ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::HYDRA_TITLE
         iri: 'someirischema'
+        properties:
+            'foo':
+                subresource: {collection: true, resourceClass: 'Foo'}
+                description: 'The dummy foo'
+                readable: true
+                writable: true
+                readableLink: false
+                writableLink: false
+                required: true
+                attributes:
+                    'foo': ['Foo']
+                    'bar':
+                        '0': ['Bar']
+                        'baz': 'Baz'
+                    'baz': 'Baz'
+            'name':
+                description: 'The dummy name'

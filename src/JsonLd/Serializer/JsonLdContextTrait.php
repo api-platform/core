@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -32,7 +34,7 @@ trait JsonLdContextTrait
      *
      * @return array
      */
-    private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []) : array
+    private function addJsonLdContext(ContextBuilderInterface $contextBuilder, string $resourceClass, array &$context, array $data = []): array
     {
         if (isset($context['jsonld_has_context'])) {
             return $data;

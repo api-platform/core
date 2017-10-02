@@ -9,17 +9,30 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
+use Doctrine\Common\Annotations\Annotation;
+use Doctrine\ORM\Version;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * The extension of this bundle.
@@ -33,16 +46,30 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     public function prepend(ContainerBuilder $container)
     {
-        if (empty($frameworkConfiguration = $container->getExtensionConfig('framework'))) {
+        if (!$frameworkConfiguration = $container->getExtensionConfig('framework')) {
             return;
         }
 
-        if (!isset($frameworkConfiguration['serializer']) || !isset($frameworkConfiguration['serializer']['enabled'])) {
+        foreach ($frameworkConfiguration as $frameworkParameters) {
+            if (isset($frameworkParameters['serializer'])) {
+                $serializerConfig = $serializerConfig ?? $frameworkParameters['serializer'];
+            }
+
+            if (isset($frameworkParameters['property_info'])) {
+                $propertyInfoConfig = $propertyInfoConfig ?? $frameworkParameters['property_info'];
+            }
+        }
+
+        if (!isset($serializerConfig['enabled'])) {
             $container->prependExtensionConfig('framework', ['serializer' => ['enabled' => true]]);
         }
 
-        if (!isset($frameworkConfiguration['property_info']) || !isset($frameworkConfiguration['property_info']['enabled'])) {
+        if (!isset($propertyInfoConfig['enabled'])) {
             $container->prependExtensionConfig('framework', ['property_info' => ['enabled' => true]]);
+        }
+
+        if (isset($serializerConfig['name_converter'])) {
+            $container->prependExtensionConfig('api_platform', ['name_converter' => $serializerConfig['name_converter']]);
         }
     }
 
@@ -53,71 +80,299 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-
-        $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
-
-        if ($config['name_converter']) {
-            $container->setAlias('api_platform.name_converter', $config['name_converter']);
-        }
-
         $formats = $this->getFormats($config['formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
+        $this->handleConfig($container, $config, $formats, $errorFormats);
 
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('api.xml');
+        $loader->load('data_provider.xml');
+        $loader->load('filter.xml');
+
+        $container->registerForAutoconfiguration(ItemDataProviderInterface::class)
+            ->addTag('api_platform.item_data_provider');
+        $container->registerForAutoconfiguration(CollectionDataProviderInterface::class)
+            ->addTag('api_platform.collection_data_provider');
+        $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
+            ->addTag('api_platform.doctrine.orm.query_extension.item');
+        $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
+            ->addTag('api_platform.doctrine.orm.query_extension.collection');
+
+        if (interface_exists(ValidatorInterface::class)) {
+            $loader->load('validator.xml');
+        }
+
+        $bundles = $container->getParameter('kernel.bundles');
+        if (isset($bundles['SecurityBundle'])) {
+            $loader->load('security.xml');
+        }
+
+        $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
+
+        $this->registerMetadataConfiguration($container, $config, $loader);
+        $this->registerOAuthConfiguration($container, $config, $loader);
+        $this->registerApiKeysConfiguration($container, $config, $loader);
+        $this->registerSwaggerConfiguration($container, $config, $loader);
+        $this->registerJsonLdConfiguration($formats, $loader);
+        $this->registerJsonHalConfiguration($formats, $loader);
+        $this->registerJsonProblemConfiguration($errorFormats, $loader);
+        $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
+        $this->registerCacheConfiguration($container);
+        $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
+        $this->registerHttpCache($container, $config, $loader, $useDoctrine);
+        $this->registerValidatorConfiguration($container, $config, $loader);
+    }
+
+    /**
+     * Handles configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param array            $formats
+     * @param array            $errorFormats
+     */
+    private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats)
+    {
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
+        $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
+        $container->setParameter('api_platform.eager_loading.enabled', $config['eager_loading']['enabled']);
+        $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
+        $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
+        $container->setParameter('api_platform.eager_loading.force_eager', $config['eager_loading']['force_eager']);
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
         $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
+        $container->setParameter('api_platform.collection.pagination.partial', $config['collection']['pagination']['partial']);
         $container->setParameter('api_platform.collection.pagination.client_enabled', $config['collection']['pagination']['client_enabled']);
         $container->setParameter('api_platform.collection.pagination.client_items_per_page', $config['collection']['pagination']['client_items_per_page']);
+        $container->setParameter('api_platform.collection.pagination.client_partial', $config['collection']['pagination']['client_partial']);
         $container->setParameter('api_platform.collection.pagination.items_per_page', $config['collection']['pagination']['items_per_page']);
         $container->setParameter('api_platform.collection.pagination.maximum_items_per_page', $config['collection']['pagination']['maximum_items_per_page']);
         $container->setParameter('api_platform.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled_parameter_name', $config['collection']['pagination']['enabled_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.items_per_page_parameter_name', $config['collection']['pagination']['items_per_page_parameter_name']);
+        $container->setParameter('api_platform.collection.pagination.partial_parameter_name', $config['collection']['pagination']['partial_parameter_name']);
+        $container->setParameter('api_platform.http_cache.etag', $config['http_cache']['etag']);
+        $container->setParameter('api_platform.http_cache.max_age', $config['http_cache']['max_age']);
+        $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
+        $container->setParameter('api_platform.http_cache.vary', $config['http_cache']['vary']);
+        $container->setParameter('api_platform.http_cache.public', $config['http_cache']['public']);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('api.xml');
-        $loader->load('metadata.xml');
-        $loader->load('data_provider.xml');
+        $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
+        $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
 
-        if ($config['enable_swagger']) {
-            $loader->load('swagger.xml');
-            $container->setParameter('api_platform.enable_swagger', (string) $config['enable_swagger']);
+        if ($config['name_converter']) {
+            $container->setAlias('api_platform.name_converter', $config['name_converter']);
+        }
+    }
+
+    /**
+     * Registers metadata configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        $loader->load('metadata/metadata.xml');
+        $loader->load('metadata/xml.xml');
+
+        list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config['mapping']['paths']);
+
+        $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
+
+        if (class_exists(Annotation::class)) {
+            $loader->load('metadata/annotation.xml');
         }
 
-        if (isset($formats['jsonld'])) {
-            $loader->load('jsonld.xml');
-            $loader->load('hydra.xml');
+        if (class_exists(Yaml::class)) {
+            $loader->load('metadata/yaml.xml');
+            $container->getDefinition('api_platform.metadata.extractor.yaml')->addArgument($yamlResources);
         }
 
-        if (isset($formats['jsonhal'])) {
-            $loader->load('hal.xml');
+        if (interface_exists(DocBlockFactoryInterface::class)) {
+            $loader->load('metadata/php_doc.xml');
+        }
+    }
+
+    private function getBundlesResourcesPaths(ContainerBuilder $container): array
+    {
+        $bundlesResourcesPaths = [];
+
+        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            $dirname = $bundle['path'];
+
+            foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
+                $paths[] = $dirname.'/Resources/config/api_resources'.$extension;
+            }
+
+            $paths[] = $dirname.'/Entity';
+
+            foreach ($paths as $path) {
+                if ($container->fileExists($path, false)) {
+                    $bundlesResourcesPaths[] = $path;
+                }
+            }
         }
 
-        if (isset($errorFormats['jsonproblem'])) {
-            $loader->load('problem.xml');
+        return $bundlesResourcesPaths;
+    }
+
+    private function getResourcesToWatch(ContainerBuilder $container, array $resourcesPaths): array
+    {
+        $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
+        $resources = ['yml' => [], 'xml' => [], 'dir' => []];
+
+        foreach ($paths as $path) {
+            if (is_dir($path)) {
+                foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.(xml|ya?ml)$/') as $file) {
+                    $resources['yaml' === ($extension = $file->getExtension()) ? 'yml' : $extension][] = $file->getRealPath();
+                }
+
+                $resources['dir'][] = $path;
+                $container->addResource(new DirectoryResource($path, '/\.(xml|ya?ml|php)$/'));
+            } elseif ($container->fileExists($path, false)) {
+                if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
+                    throw new RuntimeException(sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
+                }
+
+                $resources['yaml' === $matches[1] ? 'yml' : $matches[1]][] = $path;
+            } else {
+                throw new RuntimeException(sprintf('Could not open file or directory "%s".', $path));
+            }
         }
 
-        $this->registerAnnotationLoaders($container);
-        $this->registerFileLoaders($container);
+        $container->setParameter('api_platform.resource_class_directories', $resources['dir']);
 
-        if (!interface_exists(DocBlockFactoryInterface::class)) {
-            $container->removeDefinition('api_platform.metadata.resource.metadata_factory.php_doc');
+        return [$resources['xml'], $resources['yml']];
+    }
+
+    /**
+     * Registers the OAuth configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerOAuthConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['oauth']) {
+            return;
         }
 
-        $bundles = $container->getParameter('kernel.bundles');
+        $container->setParameter('api_platform.oauth.enabled', $config['oauth']['enabled']);
+        $container->setParameter('api_platform.oauth.clientId', $config['oauth']['clientId']);
+        $container->setParameter('api_platform.oauth.clientSecret', $config['oauth']['clientSecret']);
+        $container->setParameter('api_platform.oauth.type', $config['oauth']['type']);
+        $container->setParameter('api_platform.oauth.flow', $config['oauth']['flow']);
+        $container->setParameter('api_platform.oauth.tokenUrl', $config['oauth']['tokenUrl']);
+        $container->setParameter('api_platform.oauth.authorizationUrl', $config['oauth']['authorizationUrl']);
+        $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
+    }
 
+    /**
+     * Registers the api keys configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerApiKeysConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
+    }
+
+    /**
+     * Registers the Swagger and Swagger UI configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['enable_swagger']) {
+            return;
+        }
+
+        $loader->load('swagger.xml');
+
+        if ($config['enable_swagger_ui']) {
+            $loader->load('swagger-ui.xml');
+            $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+        }
+
+        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+    }
+
+    /**
+     * Registers the JSON-LD and Hydra configuration.
+     *
+     * @param array         $formats
+     * @param XmlFileLoader $loader
+     */
+    private function registerJsonLdConfiguration(array $formats, XmlFileLoader $loader)
+    {
+        if (!isset($formats['jsonld'])) {
+            return;
+        }
+
+        $loader->load('jsonld.xml');
+        $loader->load('hydra.xml');
+    }
+
+    /**
+     * Registers the HAL configuration.
+     *
+     * @param array         $formats
+     * @param XmlFileLoader $loader
+     */
+    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader)
+    {
+        if (!isset($formats['jsonhal'])) {
+            return;
+        }
+
+        $loader->load('hal.xml');
+    }
+
+    /**
+     * Registers the JSON Problem configuration.
+     *
+     * @param array         $errorFormats
+     * @param XmlFileLoader $loader
+     */
+    private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader)
+    {
+        if (!isset($errorFormats['jsonproblem'])) {
+            return;
+        }
+
+        $loader->load('problem.xml');
+    }
+
+    /**
+     * Registers configuration for integration with third-party bundles.
+     *
+     * @param string[]      $bundles
+     * @param array         $config
+     * @param XmlFileLoader $loader
+     * @param bool          $useDoctrine
+     */
+    private function registerBundlesConfiguration(array $bundles, array $config, XmlFileLoader $loader, bool $useDoctrine)
+    {
         // Doctrine ORM support
-        if (isset($bundles['DoctrineBundle']) && class_exists('Doctrine\ORM\Version')) {
+        if ($useDoctrine) {
             $loader->load('doctrine_orm.xml');
         }
 
         // FOSUser support
-        if ($config['enable_fos_user']) {
+        if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
             $loader->load('fos_user.xml');
         }
 
@@ -125,68 +380,72 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
             $loader->load('nelmio_api_doc.xml');
         }
+    }
 
+    /**
+     * Registers the cache configuration.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function registerCacheConfiguration(ContainerBuilder $container)
+    {
         // Don't use system cache pool in dev
-        if ($container->getParameter('kernel.debug')) {
-            $container->register('api_platform.metadata.resource.cache', ArrayAdapter::class);
-            $container->register('api_platform.metadata.property.cache', ArrayAdapter::class);
+        if (!$container->getParameter('kernel.debug')) {
+            return;
         }
+
+        $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
+        $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
+        $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
     }
 
     /**
-     * Registers annotations loaders.
+     * Manipulate doctrine extension services according to the configuration.
      *
      * @param ContainerBuilder $container
+     * @param array            $config
+     * @param bool             $useDoctrine
      */
-    private function registerAnnotationLoaders(ContainerBuilder $container)
+    private function registerDoctrineExtensionConfiguration(ContainerBuilder $container, array $config, bool $useDoctrine)
     {
-        $paths = [];
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflectionClass = new \ReflectionClass($bundle);
-            $bundleDirectory = dirname($reflectionClass->getFileName());
-            $entityDirectory = $bundleDirectory.DIRECTORY_SEPARATOR.'Entity';
-
-            if (file_exists($entityDirectory)) {
-                $paths[] = $entityDirectory;
-                $container->addResource(new DirectoryResource($entityDirectory, '/\.php$/'));
-            }
+        if (!$useDoctrine || $config['eager_loading']['enabled']) {
+            return;
         }
 
-        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.annotation')->addArgument($paths);
+        $container->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading');
+        $container->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading');
     }
 
-    /**
-     * Registers configuration file loaders.
-     *
-     * @param ContainerBuilder $container
-     */
-    private function registerFileLoaders(ContainerBuilder $container)
+    private function registerHttpCache(ContainerBuilder $container, array $config, XmlFileLoader $loader, bool $useDoctrine)
     {
-        $yamlResources = [];
-        $xmlResources = [];
+        $loader->load('http_cache.xml');
 
-        foreach ($container->getParameter('kernel.bundles') as $bundle) {
-            $reflectionClass = new \ReflectionClass($bundle);
-            $configDirectory = dirname($reflectionClass->getFileName()).'/Resources/config/';
-
-            try {
-                foreach (Finder::create()->files()->in($configDirectory)->path('api_resources')->name('*.{yml,yaml,xml}') as $file) {
-                    if ('xml' === $file->getExtension()) {
-                        $xmlResources[] = $file->getRealPath();
-                    } else {
-                        $yamlResources[] = $file->getRealPath();
-                    }
-                }
-            } catch (\InvalidArgumentException $e) {
-                // Ignore invalid paths
-            }
+        if (!$config['http_cache']['invalidation']['enabled']) {
+            return;
         }
 
-        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.yaml')->replaceArgument(0, $yamlResources);
-        $container->getDefinition('api_platform.metadata.resource.metadata_factory.yaml')->replaceArgument(0, $yamlResources);
+        if ($useDoctrine) {
+            $loader->load('doctrine_orm_http_cache_purger.xml');
+        }
 
-        $container->getDefinition('api_platform.metadata.resource.name_collection_factory.xml')->replaceArgument(0, $xmlResources);
-        $container->getDefinition('api_platform.metadata.resource.metadata_factory.xml')->replaceArgument(0, $xmlResources);
+        $loader->load('http_cache_tags.xml');
+
+        if (!$config['http_cache']['invalidation']['varnish_urls']) {
+            return;
+        }
+
+        $references = [];
+        foreach ($config['http_cache']['invalidation']['varnish_urls'] as $url) {
+            $id = sprintf('api_platform.http_cache.purger.varnish_client.%s', $url);
+            $references[] = new Reference($id);
+
+            $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
+            $definition->addArgument(['base_uri' => $url]);
+            $container->setDefinition($id, $definition);
+        }
+
+        $container->getDefinition('api_platform.http_cache.purger.varnish')->addArgument($references);
+        $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish');
     }
 
     /**
@@ -196,7 +455,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      *
      * @return array
      */
-    private function getFormats(array $configFormats) : array
+    private function getFormats(array $configFormats): array
     {
         $formats = [];
         foreach ($configFormats as $format => $value) {
@@ -206,5 +465,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         return $formats;
+    }
+
+    /**
+     * Registers the Validator configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['validator']) {
+            return;
+        }
+
+        $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
     }
 }

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\Router;
@@ -51,7 +53,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $mockedRouter = $this->prophesize('Symfony\Component\Routing\RouterInterface');
         $mockedRouter->generate('foo', [], RouterInterface::ABSOLUTE_PATH)->willReturn('/bar')->shouldBeCalled();
 
-        $router = new \ApiPlatform\Core\Bridge\Symfony\Routing\Router($mockedRouter->reveal());
+        $router = new Router($mockedRouter->reveal());
         $this->assertSame('/bar', $router->generate('foo'));
     }
 

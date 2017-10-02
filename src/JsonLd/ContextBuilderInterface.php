@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\JsonLd;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -26,6 +28,7 @@ interface ContextBuilderInterface
     const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
     const XML_NS = 'http://www.w3.org/2001/XMLSchema#';
     const OWL_NS = 'http://www.w3.org/2002/07/owl#';
+    const SCHEMA_ORG_NS = 'http://schema.org/';
 
     /**
      * Gets the base context.
@@ -34,7 +37,7 @@ interface ContextBuilderInterface
      *
      * @return array
      */
-    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_PATH) : array;
+    public function getBaseContext(int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
 
     /**
      * Builds the JSON-LD context for the entrypoint.
@@ -43,7 +46,7 @@ interface ContextBuilderInterface
      *
      * @return array
      */
-    public function getEntrypointContext(int $referenceType = UrlGeneratorInterface::ABS_PATH) : array;
+    public function getEntrypointContext(int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
 
     /**
      * Builds the JSON-LD context for the given resource.
@@ -55,7 +58,7 @@ interface ContextBuilderInterface
      *
      * @return array
      */
-    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : array;
+    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array;
 
     /**
      * Gets the URI of the given resource context.
@@ -65,5 +68,5 @@ interface ContextBuilderInterface
      *
      * @return string
      */
-    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH) : string;
+    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
 }

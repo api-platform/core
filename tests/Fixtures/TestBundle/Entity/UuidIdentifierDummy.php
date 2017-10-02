@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -23,7 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
 class UuidIdentifierDummy
 {
     /**
-     * @var string The custom identifier.
+     * @var string The custom identifier
      *
      * @ORM\Column(type="guid")
      * @ORM\Id
@@ -31,7 +33,7 @@ class UuidIdentifierDummy
     private $uuid;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column(length=30)
      */

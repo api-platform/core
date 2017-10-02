@@ -9,15 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Doctrine\Orm\Filter;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use phpmock\phpunit\PHPMock;
+use Prophecy\Argument;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +34,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SearchFilterTest extends KernelTestCase
 {
-    use PHPMock;
-
     /**
      * @var ManagerRegistry
      */
@@ -65,47 +67,70 @@ class SearchFilterTest extends KernelTestCase
         self::bootKernel();
         $manager = DoctrineTestHelper::createTestEntityManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->iriConverter = self::$kernel->getContainer()->get('api_platform.iri_converter');
+
+        $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+            if (false !== strpos($args[0], '/related_dummies')) {
+                $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
+
+                return $relatedDummyProphecy->reveal();
+            }
+
+            throw new InvalidArgumentException();
+        });
+
+        $this->iriConverter = $iriConverterProphecy->reveal();
+
         $this->propertyAccessor = self::$kernel->getContainer()->get('property_accessor');
         $this->repository = $manager->getRepository(Dummy::class);
         $this->resourceClass = Dummy::class;
     }
 
     /**
-     * @dataProvider filterProvider
+     * @dataProvider provideApplyTestData
      */
-    public function testApply(array $filterParameters, array $query, $expected)
+    public function testApply($properties, array $filterParameters, array $expected)
     {
-        $request = Request::create('/api/dummies', 'GET', $query);
+        $request = Request::create('/api/dummies', 'GET', $filterParameters);
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
+
         $queryBuilder = $this->repository->createQueryBuilder('o');
+
         $filter = new SearchFilter(
             $this->managerRegistry,
             $requestStack,
             $this->iriConverter,
             $this->propertyAccessor,
-            $filterParameters['properties']
+            null,
+            $properties
         );
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
-        $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expectedDql = strtolower($expected['dql']);
+        $actualDql = $queryBuilder->getQuery()->getDQL();
+        $expectedDql = $expected['dql'];
 
-        $this->assertEquals(
-            $expectedDql,
-            $actual,
-            sprintf('Expected `%s` for this `%s %s` request', $expectedDql, 'GET', $request->getUri())
-        );
+        $this->assertEquals($expectedDql, $actualDql);
 
         if (!empty($expected['parameters'])) {
-            foreach ($expected['parameters'] as $parameter => $expectedValue) {
-                $actualValue = $queryBuilder->getQuery()->getParameter($parameter)->getValue();
+            foreach ($expected['parameters'] as $parameterName => $expectedParameterValue) {
+                $queryParameter = $queryBuilder->getQuery()->getParameter($parameterName);
+
+                $this->assertNotNull(
+                    $queryParameter,
+                    sprintf('Expected query parameter "%s" to be set', $parameterName)
+                );
+
+                $actualParameterValue = $queryParameter->getValue();
 
                 $this->assertEquals(
-                    $expectedValue,
-                    $actualValue,
-                    sprintf('Expected `%s` for this `%s %s` request', var_export($expectedValue, true), 'GET', $request->getUri())
+                    $expectedParameterValue,
+                    $actualParameterValue,
+                    sprintf('Expected query parameter "%s" to be "%s"', $parameterName, var_export($expectedParameterValue, true))
                 );
             }
         }
@@ -119,16 +144,17 @@ class SearchFilterTest extends KernelTestCase
             $this->iriConverter,
             $this->propertyAccessor
         );
+
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
-                'type' => 'integer',
+                'type' => 'int',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'id[]' => [
                 'property' => 'id',
-                'type' => 'integer',
+                'type' => 'int',
                 'required' => false,
                 'strategy' => 'exact',
             ],
@@ -182,37 +208,49 @@ class SearchFilterTest extends KernelTestCase
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'datetime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'datetime',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'dummyFloat' => [
+                'property' => 'dummyFloat',
+                'type' => 'float',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'dummyFloat[]' => [
+                'property' => 'dummyFloat',
+                'type' => 'float',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'dummyPrice' => [
                 'property' => 'dummyPrice',
-                'type' => 'decimal',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'dummyPrice[]' => [
                 'property' => 'dummyPrice',
-                'type' => 'decimal',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'jsonData' => [
                 'property' => 'jsonData',
-                'type' => 'json_array',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'jsonData[]' => [
                 'property' => 'jsonData',
-                'type' => 'json_array',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
@@ -230,13 +268,13 @@ class SearchFilterTest extends KernelTestCase
             ],
             'dummyBoolean' => [
                 'property' => 'dummyBoolean',
-                'type' => 'boolean',
+                'type' => 'bool',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'dummyBoolean[]' => [
                 'property' => 'dummyBoolean',
-                'type' => 'boolean',
+                'type' => 'bool',
                 'required' => false,
                 'strategy' => 'exact',
             ],
@@ -247,6 +285,7 @@ class SearchFilterTest extends KernelTestCase
             new RequestStack(),
             $this->iriConverter,
             $this->propertyAccessor,
+            null,
             [
                 'id' => null,
                 'name' => null,
@@ -260,16 +299,17 @@ class SearchFilterTest extends KernelTestCase
                 'relatedDummy' => null,
             ]
         );
+
         $this->assertEquals([
             'id' => [
                 'property' => 'id',
-                'type' => 'integer',
+                'type' => 'int',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'id[]' => [
                 'property' => 'id',
-                'type' => 'integer',
+                'type' => 'int',
                 'required' => false,
                 'strategy' => 'exact',
             ],
@@ -311,25 +351,25 @@ class SearchFilterTest extends KernelTestCase
             ],
             'dummyDate' => [
                 'property' => 'dummyDate',
-                'type' => 'datetime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'dummyDate[]' => [
                 'property' => 'dummyDate',
-                'type' => 'datetime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'jsonData' => [
                 'property' => 'jsonData',
-                'type' => 'json_array',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'jsonData[]' => [
                 'property' => 'jsonData',
-                'type' => 'json_array',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
@@ -347,25 +387,25 @@ class SearchFilterTest extends KernelTestCase
             ],
             'relatedDummies.dummyDate' => [
                 'property' => 'relatedDummies.dummyDate',
-                'type' => 'datetime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'relatedDummies.dummyDate[]' => [
                 'property' => 'relatedDummies.dummyDate',
-                'type' => 'datetime',
+                'type' => 'DateTimeInterface',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'relatedDummy' => [
                 'property' => 'relatedDummy',
-                'type' => 'iri',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
             'relatedDummy[]' => [
                 'property' => 'relatedDummy',
-                'type' => 'iri',
+                'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',
             ],
@@ -373,21 +413,22 @@ class SearchFilterTest extends KernelTestCase
     }
 
     /**
-     * Providers 3 parameters:
-     *  - filter parameters.
-     *  - properties to test. Keys are the property name. If the value is true, the filter should work on the property,
-     *    otherwise not.
-     *  - expected DQL query and parameters value.
+     * Provides test data.
+     *
+     * Provides 3 parameters:
+     *  - configuration of filterable properties
+     *  - filter parameters
+     *  - expected DQL query and parameter values
      *
      * @return array
      */
-    public function filterProvider()
+    public function provideApplyTestData(): array
     {
         return [
-            // Exact values
-            [
+            'exact' => [
                 [
-                    'properties' => ['id' => null, 'name' => null],
+                    'id' => null,
+                    'name' => null,
                 ],
                 [
                     'name' => 'exact',
@@ -399,10 +440,10 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
-            // Exact case insensitive
-            [
+            'exact (case insensitive)' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'iexact'],
+                    'id' => null,
+                    'name' => 'iexact',
                 ],
                 [
                     'name' => 'exact',
@@ -414,10 +455,52 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
             ],
-            // invalid values
-            [
+            'exact (multiple values)' => [
                 [
-                    'properties' => ['id' => null, 'name' => null],
+                    'id' => null,
+                    'name' => 'exact',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'SENSitive',
+                    ],
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name IN (:name_p1)', Dummy::class),
+                    'parameters' => [
+                        'name_p1' => [
+                            'CaSE',
+                            'SENSitive',
+                        ],
+                    ],
+                ],
+            ],
+            'exact (multiple values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'iexact',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'inSENSitive',
+                    ],
+                ],
+                [
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) IN (:name_p1)', Dummy::class),
+                    'parameters' => [
+                        'name_p1' => [
+                            'case',
+                            'insensitive',
+                        ],
+                    ],
+                ],
+            ],
+            'invalid property' => [
+                [
+                    'id' => null,
+                    'name' => null,
                 ],
                 [
                     'foo' => 'exact',
@@ -427,9 +510,12 @@ class SearchFilterTest extends KernelTestCase
                     'parameters' => [],
                 ],
             ],
-            [
+            'invalid values for relations' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy' => null, 'relatedDummies' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy' => null,
+                    'relatedDummies' => null,
                 ],
                 [
                     'name' => ['foo'],
@@ -437,185 +523,195 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relateddummy relateddummy_a1 WHERE o.name = :name_p1 AND relateddummy_a1.id = :relateddummy_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_p1 AND o.relatedDummy = :relatedDummy_p2', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p2' => 'foo',
                     ],
                 ],
             ],
-            // partial values
-            [
+            'partial' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'partial'],
+                    'id' => null,
+                    'name' => 'partial',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', Dummy::class),
                     'parameters' => [
-                        'name_p1' => '%partial%',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            // partial case insensitive
-            [
+            'partial (case insensitive)' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'ipartial'],
+                    'id' => null,
+                    'name' => 'ipartial',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', Dummy::class),
                     'parameters' => [
-                        'name_p1' => '%partial%',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            [
+            'start' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'start'],
+                    'id' => null,
+                    'name' => 'start',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(:name_p1, \'%%\')', Dummy::class),
                     'parameters' => [
-                        'name_p1' => 'partial%',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            // start case insensitive
-            [
+            'start (case insensitive)' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'istart'],
+                    'id' => null,
+                    'name' => 'istart',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(:name_p1, \'%%\'))', Dummy::class),
                     'parameters' => [
-                        'name_p1' => 'partial%',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            [
+            'end' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'end'],
+                    'id' => null,
+                    'name' => 'end',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(\'%%\', :name_p1)', Dummy::class),
                     'parameters' => [
-                        'name_p1' => '%partial',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            // end case insensitive
-            [
+            'end (case insensitive)' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'iend'],
+                    'id' => null,
+                    'name' => 'iend',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(\'%%\', :name_p1))', Dummy::class),
                     'parameters' => [
-                        'name_p1' => '%partial',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            [
+            'word_start' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'word_start'],
+                    'id' => null,
+                    'name' => 'word_start',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name like :name_p1_1 OR o.name like :name_p1_2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(:name_p1, \'%%\') OR o.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', Dummy::class),
                     'parameters' => [
-                        'name_p1_1' => 'partial%',
-                        'name_p1_2' => '% partial%',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            [
+            'word_start (case insensitive)' => [
                 [
-                    'properties' => ['id' => null, 'name' => 'iword_start'],
+                    'id' => null,
+                    'name' => 'iword_start',
                 ],
                 [
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) like LOWER(:name_p1_1) OR LOWER(o.name) like LOWER(:name_p1_2)', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(o.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', Dummy::class),
                     'parameters' => [
-                        'name_p1_1' => 'partial%',
-                        'name_p1_2' => '% partial%',
+                        'name_p1' => 'partial',
                     ],
                 ],
             ],
-            // relations
-            [
+            'invalid value for relation' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy' => null,
                 ],
                 [
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 WHERE relateddummy_a1.id = :relateddummy_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.relatedDummy = :relatedDummy_p1', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => 'exact',
                     ],
                 ],
             ],
-            [
+            'IRI value for relation' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy.id' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy.id' => null,
                 ],
                 [
                     'relatedDummy.id' => '/related_dummies/1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 WHERE relateddummy_a1.id = :id_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
                     'parameters' => [
                         'id_p1' => 1,
                     ],
                 ],
             ],
-            [
+            'mixed IRI and entity ID values for relations' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy' => null, 'relatedDummies' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy' => null,
+                    'relatedDummies' => null,
                 ],
                 [
                     'relatedDummy' => ['/related_dummies/1', '2'],
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 inner join o.relatedDummies relatedDummies_a2 WHERE relateddummy_a1.id IN (:relateddummy_p1) AND relatedDummies_a2.id = :relatedDummies_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummies relatedDummies_a1 WHERE o.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => [1, 2],
                         'relatedDummies_p2' => 1,
                     ],
                 ],
             ],
-            [
+            'nested property' => [
                 [
-                    'properties' => ['id' => null, 'name' => null, 'relatedDummy.symfony' => null],
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy.symfony' => null,
                 ],
                 [
                     'name' => 'exact',
                     'relatedDummy.symfony' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 WHERE o.name = :name_p1 AND relateddummy_a1.symfony = :symfony_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', Dummy::class),
                     'parameters' => [
                         'name_p1' => 'exact',
                         'symfony_p2' => 'exact',
@@ -623,5 +719,75 @@ class SearchFilterTest extends KernelTestCase
                 ],
             ],
         ];
+    }
+
+    public function testDoubleJoin()
+    {
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo']);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $filter = new SearchFilter(
+            $this->managerRegistry,
+            $requestStack,
+            $this->iriConverter,
+            $this->propertyAccessor,
+            null,
+            ['relatedDummy.symfony' => null]
+        );
+
+        $queryBuilder->innerJoin('o.relatedDummy', 'relateddummy_a1');
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
+        $actual = strtolower($queryBuilder->getQuery()->getDQL());
+        $expected = strtolower(sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', Dummy::class));
+        $this->assertEquals($actual, $expected);
+    }
+
+    public function testTripleJoin()
+    {
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $filter = new SearchFilter(
+            $this->managerRegistry,
+            $requestStack,
+            $this->iriConverter,
+            $this->propertyAccessor,
+            null,
+            ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]
+        );
+
+        $queryBuilder->innerJoin('o.relatedDummy', 'relateddummy_a1');
+        $queryBuilder->innerJoin('relateddummy_a1.thirdLevel', 'thirdLevel_a1');
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
+        $actual = strtolower($queryBuilder->getQuery()->getDQL());
+        $expected = strtolower(sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', Dummy::class));
+        $this->assertEquals($actual, $expected);
+    }
+
+    public function testJoinLeft()
+    {
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $queryBuilder->leftJoin('o.relatedDummy', 'relateddummy_a1');
+
+        $filter = new SearchFilter(
+            $this->managerRegistry,
+            $requestStack,
+            $this->iriConverter,
+            $this->propertyAccessor,
+            null,
+            ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]
+        );
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
+        $actual = strtolower($queryBuilder->getQuery()->getDQL());
+        $expected = strtolower(sprintf('SELECT o FROM %s o left join o.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', Dummy::class));
+        $this->assertEquals($actual, $expected);
     }
 }

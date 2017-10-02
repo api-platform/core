@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Problem\Serializer;
 
 use ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -22,7 +25,7 @@ class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportNormalization()
     {
-        $normalizer = new ConstraintViolationListNormalizer();
+        $normalizer = new ConstraintViolationListNormalizer(false);
 
         $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));
@@ -31,10 +34,13 @@ class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalize()
     {
-        $normalizer = new ConstraintViolationListNormalizer();
+        $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1']);
 
+        // Note : we use NotNull constraint and not Constraint class because Constraint is abstract
+        $constraint = new NotNull();
+        $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];
         $list = new ConstraintViolationList([
-            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e'),
+            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, null, $constraint),
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
         ]);
 
@@ -47,6 +53,9 @@ class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
                     [
                         'propertyPath' => 'd',
                         'message' => 'a',
+                        'payload' => [
+                            'severity' => 'warning',
+                        ],
                     ],
                     [
                         'propertyPath' => '4',

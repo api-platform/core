@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
@@ -33,11 +35,11 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem(string $resourceClass, $id, string $operationName = null, bool $fetchData = false)
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         foreach ($this->dataProviders as $dataProviders) {
             try {
-                return $dataProviders->getItem($resourceClass, $id, $operationName, $fetchData);
+                return $dataProviders->getItem($resourceClass, $id, $operationName, $context);
             } catch (ResourceClassNotSupportedException $e) {
                 continue;
             }

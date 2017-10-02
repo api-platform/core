@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,13 +46,13 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if ($request->isMethodSafe() || $request->isMethod(Request::METHOD_DELETE)) {
-            return;
-        }
-
-        try {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if (
+            $request->isMethodSafe(false)
+            || $request->isMethod(Request::METHOD_DELETE)
+            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || !$attributes['receive']
+            || ('' === ($requestContent = $request->getContent()) && $request->isMethod(Request::METHOD_PUT))
+        ) {
             return;
         }
 
@@ -66,7 +67,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $request->getContent(), $attributes['resource_class'], $format, $context
+                $requestContent, $attributes['resource_class'], $format, $context
             )
         );
     }
@@ -80,7 +81,7 @@ final class DeserializeListener
      *
      * @return string
      */
-    private function getFormat(Request $request) : string
+    private function getFormat(Request $request): string
     {
         $contentType = $request->headers->get('CONTENT_TYPE');
         if (null === $contentType) {
@@ -88,7 +89,7 @@ final class DeserializeListener
         }
 
         $format = $request->getFormat($contentType);
-        if (!isset($this->formats[$format])) {
+        if (null === $format || !isset($this->formats[$format])) {
             $supportedMimeTypes = [];
             foreach ($this->formats as $mimeTypes) {
                 foreach ($mimeTypes as $mimeType) {

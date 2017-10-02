@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\Action;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Action;
 
 use ApiPlatform\Core\Action\EntrypointAction;
 use ApiPlatform\Core\Api\Entrypoint;

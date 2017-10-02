@@ -1,0 +1,37 @@
+default:
+  suites:
+    default:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+        - 'Behatch\Context\JsonContext'
+  extensions:
+    'Behat\Symfony2Extension':
+      kernel:
+        env:       'test'
+        debug:     'true'
+        path:      'tests/Fixtures/app/AppKernel.php'
+        bootstrap: 'tests/Fixtures/app/bootstrap.php'
+    'Behat\MinkExtension':
+      base_url: "http://example.com/"
+      sessions:
+        default:
+          symfony2: ~
+    'Behatch\Extension': ~
+
+coverage:
+  suites:
+    default:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'CoverageContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+        - 'Behatch\Context\JsonContext'

@@ -9,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -19,13 +22,16 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-class OrderExtension implements QueryCollectionExtensionInterface
+final class OrderExtension implements QueryCollectionExtensionInterface
 {
     private $order;
+    private $resourceMetadataFactory;
 
-    public function __construct(string $order = null)
+    public function __construct(string $order = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->order = $order;
     }
 
@@ -36,6 +42,20 @@ class OrderExtension implements QueryCollectionExtensionInterface
     {
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
+        if (null !== $this->resourceMetadataFactory) {
+            $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
+            if (null !== $defaultOrder) {
+                foreach ($defaultOrder as $field => $order) {
+                    if (is_int($field)) {
+                        $field = $order;
+                        $order = 'ASC';
+                    }
+                    $queryBuilder->addOrderBy('o.'.$field, $order);
+                }
+
+                return;
+            }
+        }
 
         if (null !== $this->order) {
             foreach ($identifiers as $identifier) {

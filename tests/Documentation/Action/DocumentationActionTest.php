@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\Action;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Documentation\Action;
 
 use ApiPlatform\Core\Documentation\Action\DocumentationAction;
 use ApiPlatform\Core\Documentation\Documentation;

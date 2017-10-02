@@ -9,17 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Hal\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts between objects and array including HAL metadata.
@@ -33,11 +29,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
     const FORMAT = 'jsonhal';
 
     private $componentsCache = [];
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null)
-    {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
-    }
 
     /**
      * {@inheritdoc}
@@ -53,13 +44,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $context['cache_key'] = $this->getHalCacheKey($format, $context);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
+        $context = $this->initContext($resourceClass, $context);
+        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+        $context['api_normalize'] = true;
 
         $rawData = parent::normalize($object, $format, $context);
         if (!is_array($rawData)) {
             return $rawData;
         }
 
-        $data = ['_links' => ['self' => ['href' => $this->iriConverter->getIriFromItem($object)]]];
+        $data = ['_links' => ['self' => ['href' => $context['iri']]]];
         $components = $this->getComponents($object, $format, $context);
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'links');
         $data = $this->populateRelation($data, $object, $format, $context, $components, 'embedded');
@@ -77,6 +72,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -102,7 +99,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getComponents($object, string $format = null, array $context)
     {
-        if (isset($this->componentsCache[$context['cache_key']])) {
+        if (false !== $context['cache_key'] && isset($this->componentsCache[$context['cache_key']])) {
             return $this->componentsCache[$context['cache_key']];
         }
 
@@ -144,7 +141,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $components['links'][] = $relation;
         }
 
-        return $this->componentsCache[$context['cache_key']] = $components;
+        if (false !== $context['cache_key']) {
+            $this->componentsCache[$context['cache_key']] = $components;
+        }
+
+        return $components;
     }
 
     /**
@@ -159,7 +160,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return array
      */
-    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type) : array
+    private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
         $key = '_'.$type;
         foreach ($components[$type] as $relation) {
@@ -199,9 +200,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @return string
      */
-    private function getRelationIri($rel) : string
+    private function getRelationIri($rel): string
     {
-        return isset($rel['_links']['self']['href']) ? $rel['_links']['self']['href'] : $rel;
+        return $rel['_links']['self']['href'] ?? $rel;
     }
 
     /**

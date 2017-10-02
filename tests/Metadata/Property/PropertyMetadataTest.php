@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -36,43 +38,65 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
 
         $newType = new Type(Type::BUILTIN_TYPE_BOOL);
         $newMetadata = $metadata->withType($newType);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals($newType, $newMetadata->getType());
 
         $newMetadata = $metadata->withDescription('description');
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('description', $newMetadata->getDescription());
 
         $newMetadata = $metadata->withReadable(false);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertFalse($newMetadata->isReadable());
 
         $newMetadata = $metadata->withWritable(false);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertFalse($newMetadata->isWritable());
 
         $newMetadata = $metadata->withReadableLink(true);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertTrue($newMetadata->isReadableLink());
 
         $newMetadata = $metadata->withWritableLink(true);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertTrue($newMetadata->isWritableLink());
 
         $newMetadata = $metadata->withRequired(false);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertFalse($newMetadata->isRequired());
 
         $newMetadata = $metadata->withIdentifier(true);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertTrue($newMetadata->isIdentifier());
 
         $newMetadata = $metadata->withIri('foo:bar');
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals('foo:bar', $newMetadata->getIri());
 
         $newMetadata = $metadata->withAttributes(['a' => 'b']);
-        $this->assertFalse($newMetadata === $metadata);
+        $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals(['a' => 'b'], $newMetadata->getAttributes());
+        $this->assertEquals('b', $newMetadata->getAttribute('a'));
+    }
+
+    public function testShouldReturnRequiredFalseWhenRequiredTrueIsSetButMaskedByWritableFalse()
+    {
+        $metadata = new PropertyMetadata();
+
+        $metadata = $metadata->withRequired(true);
+        $metadata = $metadata->withWritable(false);
+
+        $this->assertFalse($metadata->isRequired());
+    }
+
+    public function testShouldReturnPreviouslySetRequiredTrueWhenWritableFalseUnmasked()
+    {
+        $metadata = new PropertyMetadata();
+
+        $metadata = $metadata->withRequired(true);
+        $metadata = $metadata->withWritable(false);
+        $metadata = $metadata->withWritable(true);
+
+        $this->assertTrue($metadata->isRequired());
     }
 }

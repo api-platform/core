@@ -26,11 +26,13 @@ Feature: Handle properly invalid data submitted to the API
       "dummy": null,
       "dummyBoolean": null,
       "dummyDate": null,
+      "dummyFloat": null,
       "dummyPrice": null,
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": [],
       "name_converted": null,
+      "id": 1,
       "name": "Not existing",
       "alias": null
     }
@@ -49,7 +51,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'Expected IRI or nested document for attribute "relatedDummy", "string" given.'
     And the JSON node "trace" should exist
@@ -80,7 +82,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'The type of the "relatedDummies" attribute must be "array", "string" given.'
     And the JSON node "trace" should exist
@@ -98,7 +100,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'The type of the key "a" must be "int", "string" given.'
 
@@ -114,7 +116,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
 
@@ -125,7 +127,7 @@ Feature: Handle properly invalid data submitted to the API
     """
     {
       "name": "foo",
-      "dummyPrice": 42
+      "dummyFloat": 42
     }
     """
     Then the response status code should be 201

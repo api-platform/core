@@ -1,4 +1,3 @@
-@rangeFilter
 Feature: Range filter on collections
   In order to filter results from large collections of resources
   As a client software developer
@@ -45,11 +44,54 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 15
+          "maxItems": 15,
+          "uniqueItems": true
         },
+        "hydra:totalItems": {"pattern": "^15$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[between\\]=12.99..15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bbetween%5D=12.99..15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Filter by range (between) with invalid format
+    When I send a "GET" request to "/dummies?dummyPrice[between]=9.99..12.99..15.99"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "pattern": "^/dummies/([1-9]|[12][0-9]|30)$"
+              }
+            }
+          },
+          "maxItems": 30,
+          "uniqueItems": true
+        },
+        "hydra:totalItems": {"pattern": "^30$"},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bbetween%5D=9.99..12.99..15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -87,11 +129,16 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 8
+          "maxItems": 8,
+          "uniqueItems": true
         },
+        "hydra:totalItems": {"pattern": "^8$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[lt\\]=12.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Blt%5D=12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -137,11 +184,16 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 16
+          "maxItems": 16,
+          "uniqueItems": true
         },
+        "hydra:totalItems": {"pattern": "^16$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[lte\\]=12.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Blte%5D=12.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -178,11 +230,16 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 7
+          "maxItems": 7,
+          "uniqueItems": true
         },
+        "hydra:totalItems": {"pattern": "^7$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgt%5D=15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -226,11 +283,16 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 14
+          "maxItems": 14,
+          "uniqueItems": true
         },
+        "hydra:totalItems": {"pattern": "^14$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gte\\]=15.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgte%5D=15.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -267,11 +329,16 @@ Feature: Range filter on collections
               }
             }
           },
-          "maxItems": 7
+          "maxItems": 7,
+          "uniqueItems": true
         },
+        "hydra:totalItems": {"pattern": "^7$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=12.99\\&dummyPrice\\[lt\\]=19.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgt%5D=12.99&dummyPrice%5Blt%5D=19.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }
@@ -295,9 +362,13 @@ Feature: Range filter on collections
           "type": "array",
           "maxItems": 0
         },
+        "hydra:totalItems": {"pattern": "^0$"},
         "hydra:view": {
-          "@id": {"pattern": "^/dummies\\?dummyPrice\\[gt\\]=19.99$"},
-          "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice%5Bgt%5D=19.99$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
         }
       }
     }

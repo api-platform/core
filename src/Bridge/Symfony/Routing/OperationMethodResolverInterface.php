@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface as BaseOperationMethodResolverInterface;
@@ -30,7 +32,7 @@ interface OperationMethodResolverInterface extends BaseOperationMethodResolverIn
      *
      * @return Route
      */
-    public function getCollectionOperationRoute(string $resourceClass, string $operationName) : Route;
+    public function getCollectionOperationRoute(string $resourceClass, string $operationName): Route;
 
     /**
      * @param string $resourceClass
@@ -40,5 +42,5 @@ interface OperationMethodResolverInterface extends BaseOperationMethodResolverIn
      *
      * @return Route
      */
-    public function getItemOperationRoute(string $resourceClass, string $operationName) : Route;
+    public function getItemOperationRoute(string $resourceClass, string $operationName): Route;
 }

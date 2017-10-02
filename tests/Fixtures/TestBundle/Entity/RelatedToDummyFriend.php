@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -26,20 +28,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedToDummyFriend
 {
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
      * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany"})
+     * @Groups({"fakemanytomany", "friends"})
      */
     private $name;
 
     /**
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="DummyFriend", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="DummyFriend")
      * @ORM\JoinColumn(name="dummyfriend_id", referencedColumnName="id", nullable=false)
-     * @Groups({"fakemanytomany"})
+     * @Groups({"fakemanytomany", "friends"})
      */
     private $dummyFriend;
 
@@ -73,7 +75,7 @@ class RelatedToDummyFriend
     /**
      * Sets dummyFriend.
      *
-     * @param $dummyFriend the value to set.
+     * @param $dummyFriend the value to set
      */
     public function setDummyFriend($dummyFriend)
     {
@@ -93,7 +95,7 @@ class RelatedToDummyFriend
     /**
      * Sets relatedDummy.
      *
-     * @param $relatedDummy the value to set.
+     * @param $relatedDummy the value to set
      */
     public function setRelatedDummy($relatedDummy)
     {

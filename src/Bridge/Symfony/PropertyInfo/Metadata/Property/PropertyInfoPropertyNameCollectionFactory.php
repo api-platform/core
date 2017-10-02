@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -34,8 +36,10 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
 
     /**
      * {@inheritdoc}
+     *
+     * @throws RuntimeException
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
         $properties = $this->propertyInfo->getProperties($resourceClass, $options);
         if (null === $properties) {

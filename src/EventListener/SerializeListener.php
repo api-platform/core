@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -50,18 +52,24 @@ final class SerializeListener
             return;
         }
 
-        try {
-            $attributes = RequestAttributesExtractor::extractAttributes($request);
-        } catch (RuntimeException $e) {
+        if (!$attributes = RequestAttributesExtractor::extractAttributes($request)) {
             $this->serializeRawData($event, $request, $controllerResult);
 
             return;
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-        $request->attributes->set('_api_respond', true);
+        $resources = new class() extends \ArrayObject {
+            public function serialize()
+            {
+            }
+        };
+        $context['resources'] = &$resources;
 
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
+
+        $request->attributes->set('_api_respond', true);
+        $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
     }
 
     /**
@@ -70,6 +78,8 @@ final class SerializeListener
      * @param GetResponseForControllerResultEvent $event
      * @param Request                             $request
      * @param object                              $controllerResult
+     *
+     * @throws RuntimeException
      */
     private function serializeRawData(GetResponseForControllerResultEvent $event, Request $request, $controllerResult)
     {
@@ -84,7 +94,7 @@ final class SerializeListener
         }
 
         if (!$this->serializer instanceof EncoderInterface) {
-            throw new RuntimeException('The serializer instance must implements the "%s" interface.', EncoderInterface::class);
+            throw new RuntimeException(sprintf('The serializer instance must implements the "%s" interface.', EncoderInterface::class));
         }
 
         $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
@@ -28,7 +30,7 @@ interface CollectionDataProviderInterface
      *
      * @throws ResourceClassNotSupportedException
      *
-     * @return array|PaginatorInterface|\Traversable
+     * @return array|\Traversable
      */
     public function getCollection(string $resourceClass, string $operationName = null);
 }

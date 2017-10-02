@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
@@ -26,6 +28,7 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
     private $cacheItemPool;
     private $decorated;
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyNameCollectionFactoryInterface $decorated)
     {
@@ -36,15 +39,20 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, array $options = []) : PropertyNameCollection
+    public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
+        $localCacheKey = serialize([$resourceClass, $options]);
+        if (isset($this->localCache[$localCacheKey])) {
+            return $this->localCache[$localCacheKey];
+        }
+
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($localCacheKey);
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->localCache[$localCacheKey] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -52,15 +60,13 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
 
         $propertyNameCollection = $this->decorated->create($resourceClass, $options);
 
-        if (isset($cacheItem)) {
-            try {
-                $cacheItem->set($propertyNameCollection);
-                $this->cacheItemPool->save($cacheItem);
-            } catch (CacheException $e) {
-                // do nothing
-            }
+        if (!isset($cacheItem)) {
+            return $this->localCache[$localCacheKey] = $propertyNameCollection;
         }
 
-        return $propertyNameCollection;
+        $cacheItem->set($propertyNameCollection);
+        $this->cacheItemPool->save($cacheItem);
+
+        return $this->localCache[$localCacheKey] = $propertyNameCollection;
     }
 }

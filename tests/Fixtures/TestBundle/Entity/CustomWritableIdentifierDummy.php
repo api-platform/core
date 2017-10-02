@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -23,7 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CustomWritableIdentifierDummy
 {
     /**
-     * @var string The special identifier.
+     * @var string The special identifier
      *
      * @ORM\Column(name="slug", type="string", length=30)
      * @ORM\Id
@@ -31,7 +33,7 @@ class CustomWritableIdentifierDummy
     private $slug;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column(name="name", type="string", length=30)
      */

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -31,16 +33,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CustomNormalizedDummy
 {
     /**
-     * @var int The id.
+     * @var int The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Groups({"input", "output"})
      */
     private $id;
 
     /**
-     * @var string The dummy name.
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -50,7 +53,7 @@ class CustomNormalizedDummy
     private $name;
 
     /**
-     * @var string The dummy name alias.
+     * @var string The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")

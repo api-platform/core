@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\JsonLd\Action;
 
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -48,7 +50,7 @@ final class ContextAction
      *
      * @return array
      */
-    public function __invoke(string $shortName) : array
+    public function __invoke(string $shortName): array
     {
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -35,7 +37,7 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []) : PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
@@ -57,6 +59,11 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         foreach ($identifiers as $identifier) {
             if ($identifier === $property) {
                 $propertyMetadata = $propertyMetadata->withIdentifier(true);
+
+                if (null !== $propertyMetadata->isWritable()) {
+                    break;
+                }
+
                 if ($doctrineClassMetadata instanceof ClassMetadataInfo) {
                     $writable = $doctrineClassMetadata->isIdentifierNatural();
                 } else {

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -37,9 +39,15 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
 
         $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
         $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
+        $subresourceDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.subresource_data_provider');
 
-        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
-        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
+        $collectionExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection');
+        $itemExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item');
+
+        $collectionDataProviderDefinition->replaceArgument(1, $collectionExtensions);
+        $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
+        $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);
+        $subresourceDataProviderDefinition->replaceArgument(4, $itemExtensions);
     }
 
     /**
@@ -55,7 +63,7 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         $extensions = [];
         foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
+                $priority = $tag['priority'] ?? 0;
                 $extensions[$priority][] = new Reference($serviceId);
             }
         }

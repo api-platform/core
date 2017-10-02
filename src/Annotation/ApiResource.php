@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Annotation;
 
 /**
@@ -27,7 +29,7 @@ final class ApiResource
     public $shortName;
 
     /**
-     * @var string|null
+     * @var string
      */
     public $description;
 

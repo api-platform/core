@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
@@ -26,6 +28,7 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 
     private $cacheItemPool;
     private $decorated;
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceNameCollectionFactoryInterface $decorated)
     {
@@ -36,13 +39,17 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
     /**
      * {@inheritdoc}
      */
-    public function create() : ResourceNameCollection
+    public function create(): ResourceNameCollection
     {
+        if (isset($this->localCache[self::CACHE_KEY])) {
+            return $this->localCache[self::CACHE_KEY];
+        }
+
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->localCache[self::CACHE_KEY] = $cacheItem->get();
             }
         } catch (CacheException $e) {
             // do nothing
@@ -50,15 +57,13 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
 
         $resourceNameCollection = $this->decorated->create();
 
-        if (isset($cacheItem)) {
-            try {
-                $cacheItem->set($resourceNameCollection);
-                $this->cacheItemPool->save($cacheItem);
-            } catch (CacheException $e) {
-                // do nothing
-            }
+        if (!isset($cacheItem)) {
+            return $this->localCache[self::CACHE_KEY] = $resourceNameCollection;
         }
 
-        return $resourceNameCollection;
+        $cacheItem->set($resourceNameCollection);
+        $this->cacheItemPool->save($cacheItem);
+
+        return $this->localCache[self::CACHE_KEY] = $resourceNameCollection;
     }
 }

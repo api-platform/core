@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Documentation;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
@@ -32,7 +34,7 @@ final class Documentation
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
-        foreach ($formats as $format => $mimeTypes) {
+        foreach ($formats as $mimeTypes) {
             foreach ($mimeTypes as $mimeType) {
                 $this->mimeTypes[] = $mimeType;
             }
@@ -44,7 +46,7 @@ final class Documentation
         return $this->mimeTypes;
     }
 
-    public function getVersion() : string
+    public function getVersion(): string
     {
         return $this->version;
     }

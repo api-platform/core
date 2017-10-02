@@ -9,16 +9,20 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\XmlFileLoader;
@@ -32,6 +36,9 @@ use Symfony\Component\Routing\RouteCollection;
  */
 final class ApiLoader extends Loader
 {
+    /**
+     * @deprecated since version 2.1, to be removed in 3.0. Use {@see RouteNameGenerator::ROUTE_NAME_PREFIX} instead.
+     */
     const ROUTE_NAME_PREFIX = 'api_';
     const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
@@ -41,8 +48,10 @@ final class ApiLoader extends Loader
     private $operationPathResolver;
     private $container;
     private $formats;
+    private $resourceClassDirectories;
+    private $subresourceOperationFactory;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -50,14 +59,19 @@ final class ApiLoader extends Loader
         $this->operationPathResolver = $operationPathResolver;
         $this->container = $container;
         $this->formats = $formats;
+        $this->resourceClassDirectories = $resourceClassDirectories;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function load($data, $type = null)
+    public function load($data, $type = null): RouteCollection
     {
         $routeCollection = new RouteCollection();
+        foreach ($this->resourceClassDirectories as $directory) {
+            $routeCollection->addResource(new DirectoryResource($directory, '/\.php$/'));
+        }
 
         $this->loadExternalFiles($routeCollection);
 
@@ -71,14 +85,41 @@ final class ApiLoader extends Loader
 
             if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
                 foreach ($collectionOperations as $operationName => $operation) {
-                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, true);
+                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, OperationType::COLLECTION);
                 }
             }
 
             if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
                 foreach ($itemOperations as $operationName => $operation) {
-                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, false);
+                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, OperationType::ITEM);
                 }
+            }
+
+            if (null === $this->subresourceOperationFactory) {
+                continue;
+            }
+
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+                $routeCollection->add($operation['route_name'], new Route(
+                    $operation['path'],
+                    [
+                        '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
+                        '_format' => null,
+                        '_api_resource_class' => $operation['resource_class'],
+                        '_api_subresource_operation_name' => $operation['route_name'],
+                        '_api_subresource_context' => [
+                            'property' => $operation['property'],
+                            'identifiers' => $operation['identifiers'],
+                            'collection' => $operation['collection'],
+                            'operationId' => $operationId,
+                        ],
+                    ],
+                    [],
+                    [],
+                    '',
+                    [],
+                    ['GET']
+                ));
             }
         }
 
@@ -115,11 +156,11 @@ final class ApiLoader extends Loader
      * @param string          $operationName
      * @param array           $operation
      * @param string          $resourceShortName
-     * @param bool            $collection
+     * @param string          $operationType
      *
      * @throws RuntimeException
      */
-    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, string $resourceShortName, bool $collection)
+    private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, string $resourceShortName, string $operationType)
     {
         if (isset($operation['route_name'])) {
             return;
@@ -129,34 +170,21 @@ final class ApiLoader extends Loader
             throw new RuntimeException('Either a "route_name" or a "method" operation attribute must exist.');
         }
 
-        $controller = $operation['controller'] ?? null;
-        $collectionType = $collection ? 'collection' : 'item';
-        $actionName = sprintf('%s_%s', strtolower($operation['method']), $collectionType);
-
-        if (null === $controller) {
-            $controller = self::DEFAULT_ACTION_PATTERN.$actionName;
+        if (null === $controller = $operation['controller'] ?? null) {
+            $controller = sprintf('%s%s_%s', self::DEFAULT_ACTION_PATTERN, strtolower($operation['method']), $operationType);
 
             if (!$this->container->has($controller)) {
-                throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', $collectionType, $operation['method']));
+                throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', $operationType, $operation['method']));
             }
         }
 
-        if ($operationName !== strtolower($operation['method'])) {
-            $actionName = sprintf('%s_%s', $operationName, $collection ? 'collection' : 'item');
-        }
-
-        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $collection);
-
-        $resourceRouteName = Inflector::pluralize(Inflector::tableize($resourceShortName));
-        $routeName = sprintf('%s%s_%s', self::ROUTE_NAME_PREFIX, $resourceRouteName, $actionName);
-
         $route = new Route(
-            $path,
+            $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName),
             [
                 '_controller' => $controller,
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
-                sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
+                sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ],
             [],
             [],
@@ -165,6 +193,6 @@ final class ApiLoader extends Loader
             [$operation['method']]
         );
 
-        $routeCollection->add($routeName, $route);
+        $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);
     }
 }

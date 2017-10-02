@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Metadata\Resource;
 
 /**
@@ -54,7 +56,7 @@ final class ResourceMetadata
      *
      * @return self
      */
-    public function withShortName(string $shortName) : self
+    public function withShortName(string $shortName): self
     {
         $metadata = clone $this;
         $metadata->shortName = $shortName;
@@ -79,7 +81,7 @@ final class ResourceMetadata
      *
      * @return self
      */
-    public function withDescription(string $description) : self
+    public function withDescription(string $description): self
     {
         $metadata = clone $this;
         $metadata->description = $description;
@@ -104,7 +106,7 @@ final class ResourceMetadata
      *
      * @return self
      */
-    public function withIri(string $iri) : self
+    public function withIri(string $iri): self
     {
         $metadata = clone $this;
         $metadata->iri = $iri;
@@ -154,7 +156,7 @@ final class ResourceMetadata
      *
      * @return self
      */
-    public function withItemOperations(array $itemOperations) : self
+    public function withItemOperations(array $itemOperations): self
     {
         $metadata = clone $this;
         $metadata->itemOperations = $itemOperations;
@@ -179,7 +181,7 @@ final class ResourceMetadata
      *
      * @return self
      */
-    public function withCollectionOperations(array $collectionOperations) : self
+    public function withCollectionOperations(array $collectionOperations): self
     {
         $metadata = clone $this;
         $metadata->collectionOperations = $collectionOperations;
@@ -190,14 +192,14 @@ final class ResourceMetadata
     /**
      * Gets a collection operation attribute, optionally fallback to a resource attribute.
      *
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
+     * @param string|null $operationName
+     * @param string      $key
+     * @param mixed       $defaultValue
+     * @param bool        $resourceFallback
      *
      * @return mixed
      */
-    public function getCollectionOperationAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
+    public function getCollectionOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         return $this->getOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
@@ -205,14 +207,14 @@ final class ResourceMetadata
     /**
      * Gets an item operation attribute, optionally fallback to a resource attribute.
      *
-     * @param string $operationName
-     * @param string $key
-     * @param mixed  $defaultValue
-     * @param bool   $resourceFallback
+     * @param string|null $operationName
+     * @param string      $key
+     * @param mixed       $defaultValue
+     * @param bool        $resourceFallback
      *
      * @return mixed
      */
-    public function getItemOperationAttribute(string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
+    public function getItemOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         return $this->getOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
@@ -220,17 +222,17 @@ final class ResourceMetadata
     /**
      * Gets an operation attribute, optionally fallback to a resource attribute.
      *
-     * @param array|null $operations
-     * @param string     $operationName
-     * @param string     $key
-     * @param mixed      $defaultValue
-     * @param bool       $resourceFallback
+     * @param array|null  $operations
+     * @param string|null $operationName
+     * @param string      $key
+     * @param mixed       $defaultValue
+     * @param bool        $resourceFallback
      *
      * @return mixed
      */
-    private function getOperationAttribute(array $operations = null, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
+    private function getOperationAttribute(array $operations = null, string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        if (isset($operations[$operationName][$key])) {
+        if (null !== $operationName && isset($operations[$operationName][$key])) {
             return $operations[$operationName][$key];
         }
 
@@ -275,7 +277,7 @@ final class ResourceMetadata
      *
      * @return self
      */
-    public function withAttributes(array $attributes) : self
+    public function withAttributes(array $attributes): self
     {
         $metadata = clone $this;
         $metadata->attributes = $attributes;

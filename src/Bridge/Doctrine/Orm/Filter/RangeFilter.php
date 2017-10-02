@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Filters the collection by range.
@@ -30,122 +30,10 @@ class RangeFilter extends AbstractFilter
     const PARAMETER_LESS_THAN = 'lt';
     const PARAMETER_LESS_THAN_OR_EQUAL = 'lte';
 
-    private $requestStack;
-
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param RequestStack    $requestStack
-     * @param array|null      $properties
-     */
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, array $properties = null)
-    {
-        parent::__construct($managerRegistry, $properties);
-
-        $this->requestStack = $requestStack;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
-            return;
-        }
-
-        foreach ($this->extractProperties($request) as $property => $values) {
-            if (
-                !is_array($values) ||
-                !$this->isPropertyEnabled($property) ||
-                !$this->isPropertyMapped($property, $resourceClass)
-            ) {
-                continue;
-            }
-
-            $alias = 'o';
-            $field = $property;
-
-            if ($this->isPropertyNested($property)) {
-                list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
-            }
-
-            foreach ($values as $operator => $value) {
-                $this->addWhere(
-                    $queryBuilder,
-                    $queryNameGenerator,
-                    $alias,
-                    $field,
-                    $operator,
-                    $value
-                );
-            }
-        }
-    }
-
-    /**
-     * Adds the where clause according to the operator.
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $field
-     * @param string                      $operator
-     * @param string                      $value
-     */
-    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
-    {
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
-
-        switch ($operator) {
-            case self::PARAMETER_BETWEEN:
-                $rangeValue = explode('..', $value);
-
-                if (2 !== count($rangeValue)) {
-                    throw new InvalidArgumentException(sprintf('Invalid format for [%s], expected to be <min>..<max>', $operator));
-                }
-
-                $queryBuilder
-                    ->andWhere(sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $field, $valueParameter))
-                    ->setParameter(sprintf('%s_1', $valueParameter), $rangeValue[0])
-                    ->setParameter(sprintf('%s_2', $valueParameter), $rangeValue[1]);
-
-                break;
-
-            case self::PARAMETER_GREATER_THAN:
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s > :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-
-                break;
-
-            case self::PARAMETER_GREATER_THAN_OR_EQUAL:
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s >= :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-
-                break;
-
-            case self::PARAMETER_LESS_THAN:
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s < :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-
-                break;
-
-            case self::PARAMETER_LESS_THAN_OR_EQUAL:
-                $queryBuilder
-                    ->andWhere(sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
-                    ->setParameter($valueParameter, $value);
-
-                break;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription(string $resourceClass) : array
+    public function getDescription(string $resourceClass): array
     {
         $description = [];
 
@@ -170,6 +58,137 @@ class RangeFilter extends AbstractFilter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    {
+        if (
+            !is_array($values) ||
+            !$this->isPropertyEnabled($property, $resourceClass) ||
+            !$this->isPropertyMapped($property, $resourceClass)
+        ) {
+            return;
+        }
+
+        $alias = 'o';
+        $field = $property;
+
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+        }
+
+        foreach ($values as $operator => $value) {
+            $this->addWhere(
+                $queryBuilder,
+                $queryNameGenerator,
+                $alias,
+                $field,
+                $operator,
+                $value
+            );
+        }
+    }
+
+    /**
+     * Adds the where clause according to the operator.
+     *
+     * @param QueryBuilder                $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string                      $alias
+     * @param string                      $field
+     * @param string                      $operator
+     * @param string                      $value
+     */
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
+    {
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
+
+        switch ($operator) {
+            case self::PARAMETER_BETWEEN:
+                $rangeValue = explode('..', $value);
+
+                if (2 !== count($rangeValue)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid format for "[%s]", expected "<min>..<max>"', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                if (!is_numeric($rangeValue[0]) || !is_numeric($rangeValue[1])) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid values for "[%s]" range, expected numbers', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $field, $valueParameter))
+                    ->setParameter(sprintf('%s_1', $valueParameter), $rangeValue[0])
+                    ->setParameter(sprintf('%s_2', $valueParameter), $rangeValue[1]);
+
+                break;
+            case self::PARAMETER_GREATER_THAN:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s > :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+
+                break;
+            case self::PARAMETER_GREATER_THAN_OR_EQUAL:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s >= :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+
+                break;
+            case self::PARAMETER_LESS_THAN:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s < :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+
+                break;
+            case self::PARAMETER_LESS_THAN_OR_EQUAL:
+                if (!is_numeric($value)) {
+                    $this->logger->notice('Invalid filter ignored', [
+                        'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                    ]);
+
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+
+                break;
+        }
+    }
+
+    /**
      * Gets filter description.
      *
      * @param string $fieldName
@@ -177,7 +196,7 @@ class RangeFilter extends AbstractFilter
      *
      * @return array
      */
-    private function getFilterDescription(string $fieldName, string $operator) : array
+    protected function getFilterDescription(string $fieldName, string $operator): array
     {
         return [
             sprintf('%s[%s]', $fieldName, $operator) => [

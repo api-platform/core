@@ -9,39 +9,69 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\tests\Action;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Action;
 
 use ApiPlatform\Core\Action\ExceptionAction;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 class ExceptionActionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetException()
+    public function testActionWithCatchableException()
     {
-        $flattenException = $this->prophesize(FlattenException::class);
-        $flattenException->getClass()->willReturn(InvalidArgumentException::class);
-        $flattenException->setStatusCode(Response::HTTP_BAD_REQUEST)->willReturn();
-        $flattenException->getHeaders()->willReturn(['Content-Type' => 'application/problem+json']);
+        $serializerException = $this->prophesize(ExceptionInterface::class);
+        $serializerException->willExtend(\Exception::class);
 
-        $flattenException->getStatusCode()->willReturn(Response::HTTP_BAD_REQUEST);
+        $flattenException = FlattenException::create($serializerException->reveal());
+
         $serializer = $this->prophesize(SerializerInterface::class);
-        $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']]);
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn();
+
+        $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']], [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST]);
+
         $request = new Request();
         $request->setFormat('jsonproblem', 'application/problem+json');
-        $serializer->serialize($flattenException, 'jsonproblem')->willReturn();
+
         $expected = new Response('', Response::HTTP_BAD_REQUEST, [
             'Content-Type' => 'application/problem+json; charset=utf-8',
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'deny',
         ]);
 
-        $this->assertEquals($expected, $exceptionAction($flattenException->reveal(), $request));
+        $this->assertEquals($expected, $exceptionAction($flattenException, $request));
+    }
+
+    public function testActionWithUncatchableException()
+    {
+        $serializerException = $this->prophesize(ExceptionInterface::class);
+        $serializerException->willExtend(\Exception::class);
+
+        $flattenException = FlattenException::create($serializerException->reveal());
+
+        $serializer = $this->prophesize(SerializerInterface::class);
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $flattenException->getStatusCode()])->willReturn();
+
+        $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']]);
+
+        $request = new Request();
+        $request->setFormat('jsonproblem', 'application/problem+json');
+
+        $expected = new Response('', Response::HTTP_INTERNAL_SERVER_ERROR, [
+            'Content-Type' => 'application/problem+json; charset=utf-8',
+            'X-Content-Type-Options' => 'nosniff',
+            'X-Frame-Options' => 'deny',
+        ]);
+
+        $this->assertEquals($expected, $exceptionAction($flattenException, $request));
     }
 }

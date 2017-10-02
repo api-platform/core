@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 /**
@@ -23,7 +25,7 @@ interface QueryNameGeneratorInterface
      *
      * @return string
      */
-    public function generateJoinAlias(string $association) : string;
+    public function generateJoinAlias(string $association): string;
 
     /**
      * Generates a cacheable parameter name for DQL query.
@@ -32,5 +34,5 @@ interface QueryNameGeneratorInterface
      *
      * @return string
      */
-    public function generateParameterName(string $name) : string;
+    public function generateParameterName(string $name): string;
 }

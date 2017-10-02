@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
@@ -23,8 +25,12 @@ use Doctrine\ORM\QueryBuilder;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class QueryJoinParser
+final class QueryJoinParser
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Gets the class metadata from a given join alias.
      *
@@ -34,7 +40,7 @@ abstract class QueryJoinParser
      *
      * @return ClassMetadata
      */
-    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry) : ClassMetadata
+    public static function getClassMetadataFromJoinAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): ClassMetadata
     {
         $rootEntities = $queryBuilder->getRootEntities();
         $rootAliases = $queryBuilder->getRootAliases();
@@ -53,10 +59,12 @@ abstract class QueryJoinParser
 
                 $pos = strpos($relationship, '.');
 
-                $aliasMap[$alias] = [
-                    'parentAlias' => substr($relationship, 0, $pos),
-                    'association' => substr($relationship, $pos + 1),
-                ];
+                if (false !== $pos) {
+                    $aliasMap[$alias] = [
+                        'parentAlias' => substr($relationship, 0, $pos),
+                        'association' => substr($relationship, $pos + 1),
+                    ];
+                }
             }
         }
 
@@ -74,7 +82,7 @@ abstract class QueryJoinParser
             }
         }
 
-        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases)];
+        $rootEntity = $rootEntities[array_search($rootAlias, $rootAliases, true)];
 
         $rootMetadata = $managerRegistry
             ->getManagerForClass($rootEntity)
@@ -100,7 +108,7 @@ abstract class QueryJoinParser
      *
      * @return string
      */
-    public static function getJoinRelationship(Join $join) : string
+    public static function getJoinRelationship(Join $join): string
     {
         static $relationshipProperty = null;
         static $initialized = false;
@@ -122,7 +130,7 @@ abstract class QueryJoinParser
      *
      * @return string
      */
-    public static function getJoinAlias(Join $join) : string
+    public static function getJoinAlias(Join $join): string
     {
         static $aliasProperty = null;
         static $initialized = false;
@@ -144,7 +152,7 @@ abstract class QueryJoinParser
      *
      * @return string[]
      */
-    public static function getOrderByParts(OrderBy $orderBy) : array
+    public static function getOrderByParts(OrderBy $orderBy): array
     {
         static $partsProperty = null;
         static $initialized = false;

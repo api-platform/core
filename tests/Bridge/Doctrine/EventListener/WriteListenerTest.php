@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Tests\Doctrine;
+declare(strict_types=1);
+
+namespace ApiPlatform\Core\Tests\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;

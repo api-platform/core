@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace ApiPlatform\Core\Bridge\NelmioApiDoc\Parser;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -20,12 +22,15 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Extract input and output information for the NelmioApiDocBundle.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @deprecated since version 2.2, to be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
  */
 final class ApiPlatformParser implements ParserInterface
 {
@@ -42,12 +47,16 @@ final class ApiPlatformParser implements ParserInterface
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
+    private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
     {
+        @trigger_error('The '.__CLASS__.' class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -56,7 +65,7 @@ final class ApiPlatformParser implements ParserInterface
     public function supports(array $item)
     {
         $data = explode(':', $item['class'], 3);
-        if (!in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX])) {
+        if (!in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX], true)) {
             return false;
         }
         if (!isset($data[1])) {
@@ -77,12 +86,13 @@ final class ApiPlatformParser implements ParserInterface
     /**
      * {@inheritdoc}
      */
-    public function parse(array $item) : array
+    public function parse(array $item): array
     {
         list($io, $resourceClass, $operationName) = explode(':', $item['class'], 3);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $operationName);
+        $classOperations = $this->getGroupsForItemAndCollectionOperation($resourceMetadata, $operationName, $io);
+
         if (!empty($classOperations['serializer_groups'])) {
             return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, [], $classOperations);
         }
@@ -100,7 +110,7 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function parseResource(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []) : array
+    private function parseResource(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited = []): array
     {
         $visited[] = $resourceClass;
 
@@ -112,10 +122,27 @@ final class ApiPlatformParser implements ParserInterface
         }
 
         if (isset($attributes['denormalization_context']['groups'])) {
-            $options['serializer_groups'] = isset($options['serializer_groups']) ? array_merge($options['serializer_groups'], $attributes['denormalization_context']['groups']) : $options['serializer_groups'];
+            if (isset($options['serializer_groups'])) {
+                $options['serializer_groups'] += $attributes['denormalization_context']['groups'];
+            } else {
+                $options['serializer_groups'] = $attributes['denormalization_context']['groups'];
+            }
         }
 
         return $this->getPropertyMetadata($resourceMetadata, $resourceClass, $io, $visited, $options);
+    }
+
+    private function getGroupsContext(ResourceMetadata $resourceMetadata, string $operationName, bool $isNormalization)
+    {
+        $groupsContext = $isNormalization ? 'normalization_context' : 'denormalization_context';
+        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
+        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
+
+        return [
+            $groupsContext => [
+                'groups' => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
+            ],
+        ];
     }
 
     /**
@@ -123,26 +150,28 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @param ResourceMetadata $resourceMetadata
      * @param string           $operationName
+     * @param string           $io
      *
      * @return array
      */
-    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName) : array
+    private function getGroupsForItemAndCollectionOperation(ResourceMetadata $resourceMetadata, string $operationName, string $io): array
     {
-        $operation = [
-            'denormalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'denormalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'denormalization_context', [])),
-            'normalization_context' => array_merge($resourceMetadata->getItemOperationAttribute($operationName, 'normalization_context', []), $resourceMetadata->getCollectionOperationAttribute($operationName, 'normalization_context', [])),
-        ];
+        $operation = $this->getGroupsContext($resourceMetadata, $operationName, true);
+        $operation += $this->getGroupsContext($resourceMetadata, $operationName, false);
 
-        $options = [
-            'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
-        ];
+        if (self::OUT_PREFIX === $io) {
+            return [
+                'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
+            ];
+        }
 
-        $options['serializer_groups'] = array_merge(
-            $options['serializer_groups'],
-            !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : []
-        );
+        if (self::IN_PREFIX === $io) {
+            return [
+                'serializer_groups' => !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : [],
+            ];
+        }
 
-        return $options;
+        return [];
     }
 
     /**
@@ -156,18 +185,18 @@ final class ApiPlatformParser implements ParserInterface
      *
      * @return array
      */
-    private function getPropertyMetadata(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited, array $options) : array
+    private function getPropertyMetadata(ResourceMetadata $resourceMetadata, string $resourceClass, string $io, array $visited, array $options): array
     {
         $data = [];
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
             if (
                 ($propertyMetadata->isReadable() && self::OUT_PREFIX === $io) ||
                 ($propertyMetadata->isWritable() && self::IN_PREFIX === $io)
             ) {
-                $data[$propertyName] = $this->parseProperty($resourceMetadata, $propertyMetadata, $io, null, $visited);
+                $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
+                $data[$normalizedPropertyName] = $this->parseProperty($resourceMetadata, $propertyMetadata, $io, null, $visited);
             }
         }
 
@@ -194,15 +223,11 @@ final class ApiPlatformParser implements ParserInterface
             'readonly' => !$propertyMetadata->isWritable(),
         ];
 
-        if (null === $type) {
-            $type = $propertyMetadata->getType();
+        if (null === $type && null === $type = $propertyMetadata->getType()) {
+            // Default to string
+            $data['dataType'] = DataTypes::STRING;
 
-            if (null === $type) {
-                // Default to string
-                $data['dataType'] = DataTypes::STRING;
-
-                return $data;
-            }
+            return $data;
         }
 
         if ($type->isCollection()) {
@@ -217,7 +242,7 @@ final class ApiPlatformParser implements ParserInterface
                     return $data;
                 }
 
-                $data['subType'] = $subProperty['subType'];
+                $data['subType'] = $subProperty['subType'] ?? null;
                 if (isset($subProperty['children'])) {
                     $data['children'] = $subProperty['children'];
                 }
@@ -258,7 +283,7 @@ final class ApiPlatformParser implements ParserInterface
 
             $data['actualType'] = DataTypes::MODEL;
             $data['subType'] = $className;
-            $data['children'] = in_array($className, $visited) ? [] : $this->parseResource($resourceMetadata, $className, $io);
+            $data['children'] = in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io, $visited);
 
             return $data;
         }
