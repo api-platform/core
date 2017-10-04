@@ -257,7 +257,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
         foreach ($this->propertyNameCollectionFactory->create($resource) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resource, $property);
-            if (null === $propertyType = $propertyMetadata->getType()) {
+            if (null === ($propertyType = $propertyMetadata->getType())
+                || !$propertyMetadata->isReadable()) {
                 continue;
             }
 

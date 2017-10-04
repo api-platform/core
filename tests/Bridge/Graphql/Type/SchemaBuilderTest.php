@@ -102,7 +102,7 @@ class SchemaBuilderTest extends \PHPUnit_Framework_TestCase
                     Type::BUILTIN_TYPE_OBJECT === $builtinType ? new Type(Type::BUILTIN_TYPE_STRING, false, $resourceClassName) : null
                 ),
                 $builtinType.'Description',
-                null,
+                true,
                 null,
                 null,
                 null,
