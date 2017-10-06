@@ -173,6 +173,40 @@ class PaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
+    public function testApplyToCollectionWithGraphql()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['pagination' => true], [], [
+            '_graphql' => true,
+            '_graphql_collections_args' => ['Foo' => ['first' => 5, 'after' => 'OQ==']], // base64_encode('9')
+        ]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_client_items_per_page' => 20,
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(10)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(5)->shouldBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactory,
+            true,
+            false,
+            false,
+            30
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
+    }
+
     public function testApplyToCollectionNoRequest()
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);

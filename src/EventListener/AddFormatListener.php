@@ -47,7 +47,7 @@ final class AddFormatListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond')) {
+        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond') && !$request->attributes->has('_graphql')) {
             return;
         }
 

@@ -83,6 +83,11 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         }
 
         $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
+        if ($request->attributes->get('_graphql')) {
+            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+            $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
+        }
+
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
             $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
@@ -92,8 +97,18 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             throw new InvalidArgumentException('Item per page parameter should not be less than or equal to 0');
         }
 
+        $firstResult = ($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage;
+        if ($request->attributes->get('_graphql')) {
+            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+            if (isset($collectionArgs[$resourceClass]['after'])) {
+                $after = \base64_decode($collectionArgs[$resourceClass]['after'], true);
+                $firstResult = (int) $after;
+                $firstResult = false === $after ? $firstResult : ++$firstResult;
+            }
+        }
+
         $queryBuilder
-            ->setFirstResult(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
+            ->setFirstResult($firstResult)
             ->setMaxResults($itemsPerPage);
     }
 

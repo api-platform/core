@@ -3,6 +3,7 @@ default:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'GraphqlContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
@@ -28,6 +29,7 @@ coverage:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'GraphqlContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'

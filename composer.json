@@ -62,7 +62,8 @@
         "symfony/security-bundle": "^3.0 || ^4.0",
         "symfony/twig-bundle": "^3.1 || ^4.0",
         "symfony/validator": "^3.3 || ^4.0",
-        "symfony/yaml": "^3.3 || ^4.0"
+        "symfony/yaml": "^3.3 || ^4.0",
+        "webonyx/graphql-php": "^0.10.2"
     },
     "conflict": {
         "symfony/dependency-injection": "<3.3"
@@ -76,7 +77,8 @@
         "symfony/expression-language": "To use authorization features.",
         "symfony/config": "To load XML configuration files.",
         "symfony/security": "To use authorization features.",
-        "symfony/twig-bundle": "To use the Swagger UI integration."
+        "symfony/twig-bundle": "To use the Swagger UI integration.",
+        "webonyx/graphql-php": "To support GraphQL."
     },
     "autoload": {
         "psr-4": { "ApiPlatform\\Core\\": "src/" }

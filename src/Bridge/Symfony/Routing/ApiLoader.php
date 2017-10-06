@@ -50,8 +50,9 @@ final class ApiLoader extends Loader
     private $formats;
     private $resourceClassDirectories;
     private $subresourceOperationFactory;
+    private $graphqlEnabled;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -61,6 +62,7 @@ final class ApiLoader extends Loader
         $this->formats = $formats;
         $this->resourceClassDirectories = $resourceClassDirectories;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->graphqlEnabled = $graphqlEnabled;
     }
 
     /**
@@ -142,6 +144,12 @@ final class ApiLoader extends Loader
     private function loadExternalFiles(RouteCollection $routeCollection)
     {
         $routeCollection->addCollection($this->fileLoader->load('api.xml'));
+
+        if ($this->graphqlEnabled) {
+            $graphqlCollection = $this->fileLoader->load('graphql.xml');
+            $graphqlCollection->addDefaults(['_graphql' => true]);
+            $routeCollection->addCollection($graphqlCollection);
+        }
 
         if (isset($this->formats['jsonld'])) {
             $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));

@@ -14,6 +14,7 @@ declare(strict_types=1);
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Container;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -37,6 +38,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
@@ -228,6 +230,31 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setRelatedDummy($relatedDummy);
 
+            $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummy objects with relatedDummy and its thirdLevel
+     */
+    public function thereIsDummyObjectsWithRelatedDummyAndItsThirdLevel($nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $thirdLevel = new ThirdLevel();
+
+            $relatedDummy = new RelatedDummy();
+            $relatedDummy->setName('RelatedDummy #'.$i);
+            $relatedDummy->setThirdLevel($thirdLevel);
+
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setRelatedDummy($relatedDummy);
+
+            $this->manager->persist($thirdLevel);
             $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
         }
@@ -548,6 +575,23 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $this->manager->persist($label);
             $this->manager->persist($rel);
         }
+
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there are composite primitive identifiers objects
+     */
+    public function thereAreCompositePrimitiveIdentifiersObjects()
+    {
+        $foo = new CompositePrimitiveItem('Foo', 2016);
+        $foo->setDescription('This is foo.');
+        $this->manager->persist($foo);
+
+        $bar = new CompositePrimitiveItem('Bar', 2017);
+        $bar->setDescription('This is bar.');
+        $this->manager->persist($bar);
 
         $this->manager->flush();
         $this->manager->clear();

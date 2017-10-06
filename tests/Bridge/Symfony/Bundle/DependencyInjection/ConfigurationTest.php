@@ -77,6 +77,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
+            'graphql' => [
+                'enabled' => true,
+                'graphiql' => [
+                    'enabled' => true,
+                ],
+            ],
             'oauth' => [
                 'enabled' => false,
                 'clientId' => '',
