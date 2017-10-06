@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
-use ApiPlatform\Core\JsonApi\EventListener\FlattenPaginationParametersListener;
+use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
@@ -26,7 +26,7 @@ class FlattenPaginationParametersListenerTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        $this->listener = new FlattenPaginationParametersListener();
+        $this->listener = new TransformPaginationParametersListener();
     }
 
     public function testOnKernelRequestWithInvalidFormat()

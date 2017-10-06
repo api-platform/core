@@ -16,44 +16,29 @@ namespace ApiPlatform\Core\JsonApi\EventListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
- * Converts pagination parameters from JSON API recommended convention to
- * api-platform convention.
- *
  * @see http://jsonapi.org/format/#fetching-sorting
  * @see https://api-platform.com/docs/core/filters#order-filter
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class TransformSortingParametersListener
 {
-    private $orderParameterName;
-
-    public function __construct(string $orderParameterName)
-    {
-        $this->orderParameterName = $orderParameterName;
-    }
-
-    /**
-     * @param GetResponseEvent $event
-     */
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
 
-        // This applies only to jsonapi request format
-        if ('jsonapi' !== $request->getRequestFormat()) {
-            return;
-        }
-
-        // If order query parameter is not defined or is already an array, never mind
-        $orderParameter = $request->query->get($this->orderParameterName);
-        if (null === $orderParameter || is_array($orderParameter)) {
+        if (
+            'jsonapi' !== $request->getRequestFormat() ||
+            null === ($orderParameter = $request->query->get('sort')) ||
+            is_array($orderParameter)
+        ) {
             return;
         }
 
         $orderParametersArray = explode(',', $orderParameter);
-
         $transformedOrderParametersArray = [];
+
         foreach ($orderParametersArray as $orderParameter) {
             $sorting = 'asc';
 
@@ -65,6 +50,6 @@ final class TransformSortingParametersListener
             $transformedOrderParametersArray[$orderParameter] = $sorting;
         }
 
-        $request->query->set($this->orderParameterName, $transformedOrderParametersArray);
+        $request->attributes->set('_api_filter_order', $transformedOrderParametersArray);
     }
 }

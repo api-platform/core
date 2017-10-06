@@ -143,11 +143,14 @@ class OrderFilter extends AbstractFilter
      */
     protected function extractProperties(Request $request/*, string $resourceClass*/): array
     {
-        $properties = $request->query->get($this->orderParameterName, []);
-        if (!is_array($properties)) {
-            return [];
+        if (null !== $orderAttribute = $request->attributes->get('_api_filter_order')) {
+            $properties = $orderAttribute;
+        } elseif (array_key_exists($this->orderParameterName, $commonAttribute = $request->attributes->get('_api_filter_common', []))) {
+            $properties = $commonAttribute[$this->orderParameterName];
+        } else {
+            $properties = $request->query->get($this->orderParameterName);
         }
 
-        return $properties;
+        return is_array($properties) ? $properties : [];
     }
 }

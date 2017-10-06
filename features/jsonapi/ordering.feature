@@ -10,7 +10,7 @@ Feature: JSON API order handling
   @createSchema
   Scenario: Get collection ordered in ascending order on an integer property and on which order filter has been enabled in whitelist mode
     Given there is "30" dummy objects
-    When I send a "GET" request to "/dummies?order=id"
+    When I send a "GET" request to "/dummies?sort=id"
     Then the response status code should be 200
     And the JSON should be valid according to the JSON API schema
     And the JSON should be valid according to this schema:
@@ -55,7 +55,7 @@ Feature: JSON API order handling
     """
 
   Scenario: Get collection ordered in descending order on an integer property and on which order filter has been enabled in whitelist mode
-    When I send a "GET" request to "/dummies?order=-id"
+    When I send a "GET" request to "/dummies?sort=-id"
     Then the response status code should be 200
     And the JSON should be valid according to the JSON API schema
     And the JSON should be valid according to this schema:
@@ -101,7 +101,7 @@ Feature: JSON API order handling
 
   @dropSchema
   Scenario: Get collection ordered on two properties previously whitelisted
-    When I send a "GET" request to "/dummies?order=description,-id"
+    When I send a "GET" request to "/dummies?sort=description,-id"
     Then the JSON should be valid according to the JSON API schema
     Then the JSON should be valid according to this schema:
     """

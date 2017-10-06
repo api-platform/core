@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kevin Dunglas <dunglas@gmail.com>
  * @author Hamza Amrouche <hamza@les-tilleuls.coop>
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class CollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {

@@ -19,14 +19,14 @@ Feature: JSON API pagination handling
     And the JSON node "meta.currentPage" should be equal to the number 1
 
   Scenario: Get the fourth page of a paginated collection according to basic config
-    When I send a "GET" request to "/dummies?page=4"
+    When I send a "GET" request to "/dummies?page[page]=4"
     Then the JSON should be valid according to the JSON API schema
     And the JSON node "data" should have 1 elements
     And the JSON node "meta.currentPage" should be equal to the number 4
 
   @dropSchema
   Scenario: Get a paginated collection according to custom items per page in request
-    When I send a "GET" request to "/dummies?itemsPerPage=15"
+    When I send a "GET" request to "/dummies?page[itemsPerPage]=15"
     Then the response status code should be 200
     And the JSON should be valid according to the JSON API schema
     And the JSON node "data" should have 10 elements
