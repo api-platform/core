@@ -426,10 +426,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('http_cache_tags.xml');
 
-        if (!$config['http_cache']['invalidation']['varnish_urls']) {
-            return;
-        }
-
         $references = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $url) {
             $id = sprintf('api_platform.http_cache.purger.varnish_client.%s', $url);
