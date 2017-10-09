@@ -149,8 +149,13 @@ services:
 
     app.entity.filter.dummy_property.whitelist_property:
         parent:    'api_platform.serializer.property_filter'
-        arguments: [ 'whitelisted_properties', false, ['foo', {'group': ['baz', 'qux']}] ]
+        arguments: [ 'whitelisted_properties', false, [foo] ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelist_property' } ]
+
+    app.entity.filter.dummy_property.whitelist_nested_property:
+        parent:    'api_platform.serializer.property_filter'
+        arguments: [ 'whitelisted_nested_properties', false, {foo: ~, group: [baz, qux]} ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelisted_properties' } ]
 
     app.entity.filter.dummy_group.group:
         parent:    'api_platform.serializer.group_filter'
