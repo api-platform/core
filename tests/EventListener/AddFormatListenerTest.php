@@ -171,7 +171,7 @@ class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Not Found
+     * @expectedExceptionMessage Format "invalid" is not supported
      */
     public function testInvalidRouteFormat()
     {
