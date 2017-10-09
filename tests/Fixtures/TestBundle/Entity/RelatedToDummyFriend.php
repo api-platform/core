@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Related To Dummy Friend represent an association table for a manytomany relation.
  *
- * @ApiResource(attributes={"normalization_context"={"groups": {"fakemanytomany"}}})
+ * @ApiResource(attributes={"normalization_context"={"groups": {"fakemanytomany"}}, "filters"={"related_to_dummy_friend.name"}})
  * @ORM\Entity
  */
 class RelatedToDummyFriend
