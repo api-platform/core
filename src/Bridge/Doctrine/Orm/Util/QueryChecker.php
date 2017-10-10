@@ -150,8 +150,14 @@ final class QueryChecker
                 $relationship = QueryJoinParser::getJoinRelationship($join);
 
                 if (false !== strpos($relationship, '.')) {
-                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($alias, $queryBuilder, $managerRegistry);
-                    if ($metadata->isCollectionValuedAssociation($relationship)) {
+                    /*
+                     * (Cannot select distinct identifiers from query with LIMIT and ORDER BY on a column from a fetch joined to-many association. Use output walkers)
+                     *
+                     * @see https://github.com/api-platform/core/issues/1313
+                     */
+                    list($parentAlias, $association) = explode('.', $relationship);
+                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
+                    if ($metadata->isCollectionValuedAssociation($association)) {
                         return true;
                     }
                 } else {
