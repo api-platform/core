@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
-use ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener;
+use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class TransformSortingParametersListenerTest extends \PHPUnit_Framework_TestCase
+class TransformPaginationParametersListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $listener;
 
     protected function setUp()
     {
-        $this->listener = new TransformSortingParametersListener();
+        $this->listener = new TransformPaginationParametersListener();
     }
 
     public function testOnKernelRequestWithInvalidFormat()
@@ -44,7 +44,7 @@ class TransformSortingParametersListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidFilter()
+    public function testOnKernelRequestWithInvalidPage()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -57,7 +57,7 @@ class TransformSortingParametersListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedRequest, $request);
 
-        $expectedRequest = $expectedRequest->duplicate(['sort' => ['foo', '-bar']]);
+        $expectedRequest = $expectedRequest->duplicate(['page' => 'foo']);
 
         $request = $expectedRequest->duplicate();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -68,7 +68,7 @@ class TransformSortingParametersListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnKernelRequest()
     {
-        $request = new Request(['sort' => 'foo,-bar,-baz,qux']);
+        $request = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]]);
         $request->setRequestFormat('jsonapi');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -76,7 +76,7 @@ class TransformSortingParametersListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['sort' => 'foo,-bar,-baz,qux'], [], ['_api_filter_order' => ['foo' => 'asc', 'bar' => 'desc', 'baz' => 'desc', 'qux' => 'asc']]);
+        $expectedRequest = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]], [], ['_api_pagination' => ['size' => 5, 'number' => 3, 'error' => -1]]);
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

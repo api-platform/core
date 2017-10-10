@@ -13,20 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
-use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
+use ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-/**
- * @author Baptiste Meyer <baptiste.meyer@gmail.com>
- */
-class FlattenPaginationParametersListenerTest extends \PHPUnit_Framework_TestCase
+class TransformFieldsetsParametersListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $listener;
 
     protected function setUp()
     {
-        $this->listener = new TransformPaginationParametersListener();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy'));
+
+        $this->listener = new TransformFieldsetsParametersListener($resourceMetadataFactoryProphecy->reveal());
     }
 
     public function testOnKernelRequestWithInvalidFormat()
@@ -44,7 +47,7 @@ class FlattenPaginationParametersListenerTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidPage()
+    public function testOnKernelRequestWithInvalidFilter()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
@@ -57,7 +60,7 @@ class FlattenPaginationParametersListenerTest extends \PHPUnit_Framework_TestCas
 
         $this->assertEquals($expectedRequest, $request);
 
-        $expectedRequest = $expectedRequest->duplicate(['page' => 'foo']);
+        $expectedRequest = $expectedRequest->duplicate(['fields' => 'foo']);
 
         $request = $expectedRequest->duplicate();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -68,7 +71,11 @@ class FlattenPaginationParametersListenerTest extends \PHPUnit_Framework_TestCas
 
     public function testOnKernelRequest()
     {
-        $request = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]]);
+        $request = new Request(
+            ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name']],
+            [],
+            ['_api_resource_class' => Dummy::class]
+        );
         $request->setRequestFormat('jsonapi');
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -76,7 +83,14 @@ class FlattenPaginationParametersListenerTest extends \PHPUnit_Framework_TestCas
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['page.size' => 5, 'page.number' => 3, 'page.error' => -1]);
+        $expectedRequest = new Request(
+            ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name']],
+            [],
+            [
+                '_api_resource_class' => Dummy::class,
+                '_api_filter_property' => ['id', 'name', 'dummyFloat', 'relatedDummy' => ['id', 'name']],
+            ]
+        );
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

@@ -121,12 +121,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['data']['id']) && !isset($context['object_to_populate'])) {
+        if (isset($data['data']['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri(
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
                 $data['data']['id'],
                 $context + ['fetch_data' => false]
             );
@@ -554,12 +554,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @param object $item
      *
+     * @throws InvalidArgumentException
+     *
      * @return string {@see http://jsonapi.org/format/#document-resource-object-identification}
      */
     private function getIdentifierFromItem($item): string
     {
         if (1 !== count($identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item))) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException('JSON API does not support multiple identifiers.');
         }
 
         return (string) array_values($identifiers)[0];

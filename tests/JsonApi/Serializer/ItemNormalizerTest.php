@@ -226,8 +226,8 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage Multiple identifiers are not supported during serialization of relationships.
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage JSON API does not support multiple identifiers.
      */
     public function testNormalizeWithSeveralIdentifiersThrowsRuntimeException()
     {

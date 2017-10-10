@@ -151,27 +151,6 @@ Feature: JSON API basic support
     And the JSON node "data.relationships.relatedDummies.data" should have 1 elements
     And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "1"
 
-  Scenario: Create a related dummy with an empty relationship
-    When I send a "POST" request to "/related_dummies" with body:
-    """
-    {
-      "data": {
-        "type": "related-dummy",
-        "attributes": {
-          "name": "John Doe"
-        },
-        "relationships": {
-          "thirdLevel": {
-            "data": null
-          }
-        }
-      }
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the JSON should be valid according to the JSON API schema
-
   Scenario: Retrieve a collection with relationships
     When I send a "GET" request to "/related_dummies"
     Then the response status code should be 200
