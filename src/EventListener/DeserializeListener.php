@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ final class DeserializeListener
 
         $data = $request->attributes->get('data');
         if (null !== $data) {
-            $context['object_to_populate'] = $data;
+            $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
         $request->attributes->set(
