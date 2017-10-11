@@ -157,7 +157,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadDefaultConfig()
     {
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -167,7 +167,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $nameConverterId = 'test.name_converter';
 
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -176,7 +176,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableFosUser()
     {
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'FOSUserBundle' => FOSUserBundle::class,
@@ -212,7 +212,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testEnableNelmioApiDoc()
     {
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'NelmioApiDocBundle' => NelmioApiDocBundle::class,
@@ -241,7 +241,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableSecurity()
     {
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'SecurityBundle' => SecurityBundle::class,
@@ -279,12 +279,23 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testDisableEagerLoadingExtension()
     {
-        $containerBuilderProphecy = $this->getContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading')->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['eager_loading' => ['enabled' => false]]]), $containerBuilder);
+    }
+
+    public function testNotRegisterHttpCacheWhenEnabledWithNoVarnishServer()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['varnish_urls'] = [];
+
+        $this->extension->load($config, $containerBuilder);
     }
 
     private function getPartialContainerBuilderProphecy()
@@ -474,13 +485,11 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         return $containerBuilderProphecy;
     }
 
-    private function getContainerBuilderProphecy()
+    private function getBaseContainerBuilderProphecy()
     {
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
 
-        $definitionArgument = Argument::that(function ($argument) {
-            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
-        });
+        $definitionArgument = $this->getDefinitionArgumentToken();
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
@@ -589,7 +598,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.http_cache.purger.varnish',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.listener.response.add_tags',
-            'api_platform.http_cache.purger.varnish_client.test',
         ];
 
         foreach ($definitions as $definition) {
@@ -599,5 +607,24 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish')->shouldBeCalled();
 
         return $containerBuilderProphecy;
+    }
+
+    private function getDefaultContainerBuilderProphecy()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+
+        $containerBuilderProphecy
+            ->setDefinition('api_platform.http_cache.purger.varnish_client.test', $this->getDefinitionArgumentToken())
+            ->shouldBeCalled()
+        ;
+
+        return $containerBuilderProphecy;
+    }
+
+    private function getDefinitionArgumentToken()
+    {
+        return Argument::that(function ($argument) {
+            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
+        });
     }
 }

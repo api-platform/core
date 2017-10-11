@@ -36,8 +36,6 @@ final class WriteListener
      * Persists, updates or delete data return by the controller if applicable.
      *
      * @param GetResponseForControllerResultEvent $event
-     *
-     * @return mixed
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {

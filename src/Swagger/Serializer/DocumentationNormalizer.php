@@ -121,8 +121,9 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $subresourceOperation) {
                 $operationName = 'get';
-                $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $resourceMetadata, $operationName);
-                $responseDefinitionKey = $this->getDefinition($definitions, $this->resourceMetadataFactory->create($subresourceOperation['resource_class']), $subresourceOperation['resource_class'], $serializerContext);
+                $subResourceMetadata = $this->resourceMetadataFactory->create($subresourceOperation['resource_class']);
+                $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $subResourceMetadata, $operationName);
+                $responseDefinitionKey = $this->getDefinition($definitions, $subResourceMetadata, $subresourceOperation['resource_class'], $serializerContext);
 
                 $pathOperation = new \ArrayObject([]);
                 $pathOperation['tags'] = $subresourceOperation['shortNames'];
@@ -151,7 +152,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     }
                 }
 
-                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $resourceMetadata, $definitions, $serializerContext)) {
+                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
                         if (!in_array($parameter['name'], $parametersMemory, true)) {
                             $pathOperation['parameters'][] = $parameter;
