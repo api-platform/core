@@ -25,7 +25,7 @@ class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupportNormalization()
     {
-        $normalizer = new ConstraintViolationListNormalizer(false);
+        $normalizer = new ConstraintViolationListNormalizer([]);
 
         $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));

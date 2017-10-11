@@ -508,7 +508,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
             'api_platform.graphql.enabled' => true,
             'api_platform.graphql.graphiql.enabled' => true,
             'api_platform.resource_class_directories' => Argument::type('array'),
-            'api_platform.validator.serialize_payload_fields' => false,
+            'api_platform.validator.serialize_payload_fields' => [],
         ];
 
         foreach ($parameters as $key => $value) {
