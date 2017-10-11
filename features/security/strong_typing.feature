@@ -102,7 +102,7 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "hydra:title" should be equal to "An error occurred"
-    And the JSON node "hydra:description" should be equal to 'The type of the key "a" must be "int", "string" given.'
+    And the JSON node "hydra:description" should be equal to 'The type of the key(s) "a, b" must be "int", "string, string" given.'
 
   Scenario: Send a scalar having the bad type
     When I add "Content-Type" header equal to "application/ld+json"
