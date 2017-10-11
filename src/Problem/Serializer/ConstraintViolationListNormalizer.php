@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Problem\Serializer;
 
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
@@ -23,52 +22,16 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ConstraintViolationListNormalizer implements NormalizerInterface
+final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
     const FORMAT = 'jsonproblem';
-
-    /**
-     * @var bool|array
-     */
-    private $serializePayloadFields;
-
-    public function __construct($serializePayloadFields = false)
-    {
-        $this->serializePayloadFields = $serializePayloadFields;
-    }
 
     /**
      * {@inheritdoc}
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $violations = [];
-        $messages = [];
-
-        foreach ($object as $violation) {
-            $violationData = [
-                'propertyPath' => $violation->getPropertyPath(),
-                'message' => $violation->getMessage(),
-            ];
-            $constraint = $violation->getConstraint();
-            if ($this->serializePayloadFields && $constraint && $constraint->payload) {
-                if (true === $this->serializePayloadFields) {
-                    $violationData['payload'] = $constraint->payload;
-                } elseif (is_array($this->serializePayloadFields)) {
-                    // We add only fields defined in the config
-                    $payloadFields = array_intersect_key($constraint->payload, array_flip($this->serializePayloadFields));
-                    if (!empty($payloadFields)) {    // prevent the case where in the config there are fields which are not in the payload
-                        $violationData['payload'] = $payloadFields;
-                    }
-                }
-            }
-            $violations[] = $violationData;
-
-            $propertyPath = $violation->getPropertyPath();
-            $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
-
-            $messages[] = $prefix.$violation->getMessage();
-        }
+        list($messages, $violations) = $this->getMessagesAndViolations($object);
 
         return [
             'type' => $context['type'] ?? 'https://tools.ietf.org/html/rfc2616#section-10',
@@ -76,13 +39,5 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             'detail' => $messages ? implode("\n", $messages) : (string) $object,
             'violations' => $violations,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null)
-    {
-        return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 }
