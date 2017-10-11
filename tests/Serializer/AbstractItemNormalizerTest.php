@@ -514,13 +514,17 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type of the key "a" must be "int", "string" given.
+     * @expectedExceptionMessage The type of the key(s) "a" must be "int", "string" given.
      */
     public function testDenormalizeBadKeyType()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
             new PropertyNameCollection(['relatedDummies'])
+        )->shouldBeCalled();
+
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, [])->willReturn(
+            new PropertyNameCollection(['id', 'name', 'symfony'])
         )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -563,6 +567,60 @@ class AbstractItemNormalizerTest extends \PHPUnit_Framework_TestCase
             'name' => 'foo',
             'relatedDummy' => ['foo' => 'bar'],
             'relatedDummies' => ['a' => ['bar' => 'baz']],
+        ], Dummy::class);
+    }
+
+
+    public function testDenormalizeAcceptableKeyType()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['relatedDummies'])
+        )->shouldBeCalled();
+
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, [])->willReturn(
+            new PropertyNameCollection(['id', 'name', 'symfony'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
+            new PropertyMetadata(
+                new Type(
+                    Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    ArrayCollection::class,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_INT),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+                ),
+                '',
+                false,
+                true,
+                false,
+                true
+            )
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->denormalize([
+            'relatedDummies' => ['name' => 'baz', 'id' => 1, 'symfony' => 'yes'],
         ], Dummy::class);
     }
 

@@ -30,7 +30,7 @@ final class PropertyFilter implements FilterInterface
     {
         $this->overrideDefaultProperties = $overrideDefaultProperties;
         $this->parameterName = $parameterName;
-        $this->whitelist = $whitelist;
+        $this->whitelist = null === $whitelist ? null : $this->formatWhitelist($whitelist);
     }
 
     /**
@@ -43,7 +43,7 @@ final class PropertyFilter implements FilterInterface
         }
 
         if (null !== $this->whitelist) {
-            $properties = array_intersect_key($this->whitelist, $properties);
+            $properties = $this->getProperties($properties, $this->whitelist);
         }
 
         if (!$this->overrideDefaultProperties && isset($context['attributes'])) {
@@ -65,5 +65,50 @@ final class PropertyFilter implements FilterInterface
                 'required' => false,
             ],
         ];
+    }
+
+    /**
+     * Generate an array of whitelist properties to match the format that properties
+     * will have in the request.
+     *
+     * @param array $whitelist the whitelist to format
+     *
+     * @return array An array containing the whitelist ready to match request parameters
+     */
+    private function formatWhitelist(array $whitelist): array
+    {
+        if (array_values($whitelist) === $whitelist) {
+            return $whitelist;
+        }
+        foreach ($whitelist as $name => $value) {
+            if (null === $value) {
+                unset($whitelist[$name]);
+                $whitelist[] = $name;
+            }
+        }
+
+        return $whitelist;
+    }
+
+    private function getProperties(array $properties, array $whitelist = null): array
+    {
+        $whitelist = $whitelist ?? $this->whitelist;
+        $result = [];
+
+        foreach ($properties as $key => $value) {
+            if (is_numeric($key)) {
+                if (in_array($value, $whitelist, true)) {
+                    $result[] = $value;
+                }
+
+                continue;
+            }
+
+            if (isset($whitelist[$key]) && is_array($value) && $recursiveResult = $this->getProperties($value, $whitelist[$key])) {
+                $result[$key] = $recursiveResult;
+            }
+        }
+
+        return $result;
     }
 }

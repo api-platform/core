@@ -58,7 +58,7 @@ final class AddFormatListener
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
             $mimeTypes = array_keys($this->mimeTypes);
         } elseif (!isset($this->formats[$routeFormat])) {
-            throw new NotFoundHttpException('Not Found');
+            throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
         } else {
             $mimeTypes = Request::getMimeTypes($routeFormat);
         }

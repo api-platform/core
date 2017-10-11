@@ -28,11 +28,11 @@ Feature: Validate response types
     And I send a "GET" request to "/dummies/1.invalid"
     Then the response status code should be 404
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "detail" should be equal to "Not Found"
+    And the JSON node "detail" should be equal to 'Format "invalid" is not supported'
 
   Scenario: Requesting an invalid format in the Accept header and in the URL should throw an error
     When I add "Accept" header equal to "text/invalid"
     And I send a "GET" request to "/dummies/1.invalid"
     Then the response status code should be 404
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "detail" should be equal to "Not Found"
+    And the JSON node "detail" should be equal to 'Format "invalid" is not supported'

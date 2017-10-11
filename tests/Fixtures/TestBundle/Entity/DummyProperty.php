@@ -29,7 +29,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "denormalization_context"={"groups"={"dummy_write"}},
  *     "filters"={
  *         "dummy_property.property",
- *          "dummy_property.whitelist_property"
+ *         "dummy_property.whitelist_property",
+ *         "dummy_property.whitelisted_properties"
  *     }
  * })
  */

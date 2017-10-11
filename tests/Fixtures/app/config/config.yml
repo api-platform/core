@@ -151,8 +151,13 @@ services:
 
     app.entity.filter.dummy_property.whitelist_property:
         parent:    'api_platform.serializer.property_filter'
-        arguments: [ 'whitelisted_properties', false, ['foo', {'group': ['baz', 'qux']}] ]
+        arguments: [ 'whitelisted_properties', false, [foo] ]
         tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelist_property' } ]
+
+    app.entity.filter.dummy_property.whitelist_nested_property:
+        parent:    'api_platform.serializer.property_filter'
+        arguments: [ 'whitelisted_nested_properties', false, {foo: ~, group: [baz, qux]} ]
+        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.whitelisted_properties' } ]
 
     app.entity.filter.dummy_group.group:
         parent:    'api_platform.serializer.group_filter'
@@ -177,6 +182,11 @@ services:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
+
+    app.related_dummy_to_friend_resource.search_filter:
+        parent:    'api_platform.doctrine.orm.search_filter'
+        arguments: [ { 'name': 'ipartial' } ]
+        tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
 
     logger:
         class: Psr\Log\NullLogger

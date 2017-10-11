@@ -47,13 +47,13 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
         //default operation based on OperationResourceMetadataFactory
         $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET'],
+            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+']],
             'put' => ['method' => 'PUT'],
             'delete' => ['method' => 'DELETE'],
         ]);
         //custom operations
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name'], //with controller
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format']], //with controller
             'my_second_op' => ['method' => 'POST'], //without controller, takes the default one
             'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path'], //custom path
         ]);
@@ -61,7 +61,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+']),
             $routeCollection->get('api_dummies_get_item')
         );
 
@@ -76,7 +76,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true),
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format']),
             $routeCollection->get('api_dummies_my_op_collection')
         );
 
@@ -261,7 +261,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         return $apiLoader;
     }
 
-    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false): Route
+    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = []): Route
     {
         return new Route(
             $path,
@@ -271,7 +271,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
                 '_api_resource_class' => $resourceClass,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
             ],
-            [],
+            $requirements,
             [],
             '',
             [],
@@ -279,7 +279,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    private function getSubresourceRoute(string $path, string $controller, string $resourceClass, string $operationName, array $context): Route
+    private function getSubresourceRoute(string $path, string $controller, string $resourceClass, string $operationName, array $context, array $requirements = []): Route
     {
         return new Route(
             $path,
@@ -290,7 +290,7 @@ class ApiLoaderTest extends \PHPUnit_Framework_TestCase
                 '_api_subresource_operation_name' => $operationName,
                 '_api_subresource_context' => $context,
             ],
-            [],
+            $requirements,
             [],
             '',
             [],
