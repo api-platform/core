@@ -66,7 +66,7 @@ Feature: JSON API basic support
           "thirdLevel": {
             "data": {
               "type": "third-level",
-              "id": "1"
+              "id": "/third_levels/1"
             }
           }
         }
@@ -95,18 +95,18 @@ Feature: JSON API basic support
           "relatedDummy": {
             "data": {
               "type": "related-dummy",
-              "id": "2"
+              "id": "/related_dummies/2"
             }
           },
           "relatedDummies": {
             "data": [
               {
                 "type": "related-dummy",
-                "id": "1"
+                "id": "/related_dummies/1"
               },
               {
                 "type": "related-dummy",
-                "id": "2"
+                "id": "/related_dummies/2"
               }
             ]
           }
@@ -118,7 +118,7 @@ Feature: JSON API basic support
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
     And the JSON node "data.relationships.relatedDummies.data" should have 2 elements
-    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "2"
+    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "/related_dummies/2"
 
   Scenario: Update a resource with a many-to-many relationship via PATCH
     When I send a "PATCH" request to "/dummies/1" with body:
@@ -130,14 +130,14 @@ Feature: JSON API basic support
           "relatedDummy": {
             "data": {
               "type": "related-dummy",
-              "id": "1"
+              "id": "/related_dummies/1"
             }
           },
           "relatedDummies": {
             "data": [
               {
                 "type": "related-dummy",
-                "id": "2"
+                "id": "/related_dummies/2"
               }
             ]
           }
@@ -149,14 +149,35 @@ Feature: JSON API basic support
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
     And the JSON node "data.relationships.relatedDummies.data" should have 1 elements
-    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "1"
+    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "/related_dummies/1"
+
+  Scenario: Create a related dummy with an empty relationship
+    When I send a "POST" request to "/related_dummies" with body:
+    """
+    {
+      "data": {
+        "type": "related-dummy",
+        "attributes": {
+          "name": "John Doe"
+        },
+        "relationships": {
+          "thirdLevel": {
+            "data": null
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON API schema
 
   Scenario: Retrieve a collection with relationships
     When I send a "GET" request to "/related_dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
-    And the JSON node "data[0].relationships.thirdLevel.data.id" should be equal to "1"
+    And the JSON node "data[0].relationships.thirdLevel.data.id" should be equal to "/third_levels/1"
 
   Scenario: Retrieve the related dummy
     When I send a "GET" request to "/related_dummies/1"
@@ -167,7 +188,7 @@ Feature: JSON API basic support
     """
     {
       "data": {
-        "id": "1",
+        "id": "/related_dummies/1",
         "type": "RelatedDummy",
         "attributes": {
           "_id": 1,
@@ -182,7 +203,7 @@ Feature: JSON API basic support
           "thirdLevel": {
             "data": {
               "type": "ThirdLevel",
-              "id": "1"
+              "id": "/third_levels/1"
             }
           }
         }
@@ -219,7 +240,7 @@ Feature: JSON API basic support
           "related": {
             "data": {
               "type": "related-dummy",
-              "id": "1"
+              "id": "/related_dummies/1"
             }
           }
         }
@@ -231,4 +252,4 @@ Feature: JSON API basic support
     And the JSON should be valid according to the JSON API schema
     And the JSON node "data.id" should not be an empty string
     And the JSON node "data.attributes.krondstadt" should be equal to "Krondstadt"
-    And the JSON node "data.relationships.related.data.id" should be equal to "1"
+    And the JSON node "data.relationships.related.data.id" should be equal to "/related_dummies/1"

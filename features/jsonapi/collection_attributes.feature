@@ -19,24 +19,24 @@ Feature: JSON API collections support
     """
     {
       "data": {
-        "id": "1",
+        "id": "/circular_references/1",
         "type": "CircularReference",
         "relationships": {
           "parent": {
             "data": {
               "type": "CircularReference",
-              "id": "1"
+              "id": "/circular_references/1"
             }
           },
           "children": {
             "data": [
               {
                 "type": "CircularReference",
-                "id": "1"
+                "id": "/circular_references/1"
               },
               {
                 "type": "CircularReference",
-                "id": "2"
+                "id": "/circular_references/2"
               }
             ]
           }
