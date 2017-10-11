@@ -275,7 +275,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if(!empty($arrKeyInvalid)) {
             throw new InvalidArgumentException(sprintf(
                     'The type of the key(s) "%s" must be "%s", "%s" given.',
-                    implode(", ", $arrKeyInvalid), $collectionKeyBuiltinType, implode(",", array_map(
+                    implode(", ", $arrKeyInvalid), $collectionKeyBuiltinType, implode(", ", array_map(
                         function($type) { return gettype($type); }, $arrKeyInvalid)
                 ))
             );
