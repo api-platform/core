@@ -258,13 +258,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if(!empty($arrKeyInvalid)) { /** Try again if array is acceptable */
+        if (!empty($arrKeyInvalid)) { /** Try again if array is acceptable */
             $childContext = $context;
             $childContext['resource_class'] = $className;
             $arrChildOption = $this->getFactoryOptions($childContext);
             $objChildPropertyNameCollection = $this->propertyNameCollectionFactory->create($className, $arrChildOption);
 
-            if(count(array_intersect($arrKeyInvalid, $objChildPropertyNameCollection->getArrProperty())) === count($arrKeyInvalid)) {
+            if (count(array_intersect($arrKeyInvalid, $objChildPropertyNameCollection->getArrProperty())) === count($arrKeyInvalid)) {
                 $value = [$value];
 
                 // arr key not invalid anymore
@@ -272,11 +272,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if(!empty($arrKeyInvalid)) {
+        if (!empty($arrKeyInvalid)) {
             throw new InvalidArgumentException(sprintf(
                     'The type of the key(s) "%s" must be "%s", "%s" given.',
-                    implode(", ", $arrKeyInvalid), $collectionKeyBuiltinType, implode(", ", array_map(
-                        function($type) { return gettype($type); }, $arrKeyInvalid)
+                    implode(', ', $arrKeyInvalid), $collectionKeyBuiltinType, implode(', ', array_map(
+                        function ($type) { return gettype($type); }, $arrKeyInvalid)
                 ))
             );
         }
