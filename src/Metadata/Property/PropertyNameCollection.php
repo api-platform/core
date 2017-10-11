@@ -48,4 +48,13 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     {
         return count($this->properties);
     }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getArrProperty()
+    {
+        return $this->properties;
+    }
 }
