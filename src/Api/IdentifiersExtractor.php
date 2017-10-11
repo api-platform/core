@@ -43,6 +43,21 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     /**
      * {@inheritdoc}
      */
+    public function getIdentifiersFromResourceClass(string $resourceClass): array
+    {
+        $identifiers = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
+                $identifiers[] = $property;
+            }
+        }
+
+        return $identifiers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getIdentifiersFromItem($item): array
     {
         $identifiers = [];

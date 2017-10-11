@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -50,15 +51,16 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
-        $currentPage = $lastPage = null;
-        if ($paginated = $object instanceof PaginatorInterface) {
-            $currentPage = $object->getCurrentPage();
-            $lastPage = $object->getLastPage();
-
-            if (1. === $currentPage && 1. === $lastPage) {
-                // Consider the collection not paginated if there is only one page
-                $paginated = false;
+        $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = null;
+        if ($paginated = $object instanceof PartialPaginatorInterface) {
+            if ($object instanceof PaginatorInterface) {
+                $paginated = 1. !== $lastPage = $object->getLastPage();
+            } else {
+                $itemsPerPage = $object->getItemsPerPage();
+                $pageTotalItems = (float) count($object);
             }
+
+            $currentPage = $object->getCurrentPage();
         }
 
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
@@ -75,14 +77,16 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         ];
 
         if ($paginated) {
-            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            if (null !== $lastPage) {
+                $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+                $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            }
 
             if (1. !== $currentPage) {
                 $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
-            if ($currentPage !== $lastPage) {
+            if (null !== $lastPage && $currentPage !== $lastPage || null === $lastPage && $pageTotalItems >= $itemsPerPage) {
                 $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }

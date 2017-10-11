@@ -253,7 +253,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $request = $this->requestStack->getCurrentRequest();
         }
 
-        if (null !== $this->serializerContextBuilder && null !== $request) {
+        if (null !== $this->serializerContextBuilder && null !== $request && !$request->attributes->get('_graphql')) {
             return $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
         }
 

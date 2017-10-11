@@ -48,6 +48,12 @@ class CachedIdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
         $expectedResult = ['id' => 1];
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
+
+        $decoration->getIdentifiersFromResourceClass(Dummy::class)->shouldBeCalled()->willReturn(['id']);
+
+        $expectedResult = ['id'];
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+        $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class), 'Trigger the local cache');
     }
 
     public function testSecondPass()

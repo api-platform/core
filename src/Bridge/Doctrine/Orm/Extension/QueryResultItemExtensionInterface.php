@@ -33,8 +33,10 @@ interface QueryResultItemExtensionInterface extends QueryItemExtensionInterface
 
     /**
      * @param QueryBuilder $queryBuilder
+     * @param string       $resourceClass
+     * @param string|null  $operationName
      *
      * @return mixed
      */
-    public function getResult(QueryBuilder $queryBuilder);
+    public function getResult(QueryBuilder $queryBuilder/*, string $resourceClass, string $operationName = null*/);
 }

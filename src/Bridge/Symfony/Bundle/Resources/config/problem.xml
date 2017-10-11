@@ -13,6 +13,8 @@
         </service>
 
         <service id="api_platform.problem.normalizer.constraint_violation_list" class="ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer" public="false">
+            <argument>%api_platform.validator.serialize_payload_fields%</argument>
+            
             <tag name="serializer.normalizer" priority="16" />
         </service>
 

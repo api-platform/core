@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
@@ -88,8 +89,13 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
+        $paginated = null;
+        if (
+            is_array($object) ||
+            ($paginated = $object instanceof PaginatorInterface) ||
+            $object instanceof \Countable && !$object instanceof PartialPaginatorInterface
+        ) {
+            $data['hydra:totalItems'] = $paginated ? $object->getTotalItems() : count($object);
         }
 
         return $data;

@@ -164,6 +164,50 @@ Feature: Collections support
     }
     """
 
+  Scenario: Enable the partial pagination client side
+    When I send a "GET" request to "/dummies?page=7&partial=1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/19$"},
+                  {"pattern": "^/dummies/20$"},
+                  {"pattern": "^/dummies/21$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?partial=1&page=7$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:next": {"pattern": "^/dummies\\?partial=1&page=8$"},
+            "hydra:previous": {"pattern": "^/dummies\\?partial=1&page=6$"}
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+    """
+
   Scenario: Disable the pagination client side
     When I send a "GET" request to "/dummies?pagination=0"
     Then the response status code should be 200

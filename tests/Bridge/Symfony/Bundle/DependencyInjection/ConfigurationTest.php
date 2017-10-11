@@ -69,11 +69,20 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
+            'validator' => [
+                'serialize_payload_fields' => false,
+            ],
             'name_converter' => null,
-            'enable_fos_user' => false,
+            'enable_fos_user' => true,
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
+            'graphql' => [
+                'enabled' => true,
+                'graphiql' => [
+                    'enabled' => true,
+                ],
+            ],
             'oauth' => [
                 'enabled' => false,
                 'clientId' => '',
@@ -98,12 +107,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
+                    'partial' => false,
                     'client_enabled' => false,
                     'client_items_per_page' => false,
+                    'client_partial' => false,
                     'items_per_page' => 30,
                     'page_parameter_name' => 'page',
                     'enabled_parameter_name' => 'pagination',
                     'items_per_page_parameter_name' => 'itemsPerPage',
+                    'partial_parameter_name' => 'partial',
                     'maximum_items_per_page' => null,
                 ],
             ],

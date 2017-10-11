@@ -420,6 +420,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
+            if (isset($context['graphql'])) {
+                return [];
+            }
+
             $value = [];
             foreach ($attributeValue as $index => $obj) {
                 $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $className, $format, $this->createChildContext($context, $attribute));
@@ -433,6 +437,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
+            if (isset($context['graphql'])) {
+                return false;
+            }
+
             /*
              * On a subresource, we know the value of the identifiers.
              * If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri

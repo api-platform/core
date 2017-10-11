@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use FOS\UserBundle\FOSUserBundle;
+use GraphQL\GraphQL;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -54,6 +56,12 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
+                ->arrayNode('validator')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->variableNode('serialize_payload_fields')->defaultFalse()->info('Enable the serialization of payload fields when a validation error is thrown.')->end()
+                    ->end()
+                ->end()
                 ->arrayNode('eager_loading')
                     ->canBeDisabled()
                     ->addDefaultsIfNotSet()
@@ -64,8 +72,18 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
-                ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
-                ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
+                ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('enable_nelmio_api_doc')
+                    ->beforeNormalization()->always(function ($v) {
+                        if ($v) {
+                            @trigger_error('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.', E_USER_DEPRECATED);
+                        }
+
+                        return $v;
+                    })->end()
+                    ->defaultValue(false)
+                    ->info('[Deprecated] Enable the NelmioApiDocBundle integration.')
+                ->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
 
@@ -82,6 +100,21 @@ final class Configuration implements ConfigurationInterface
                         ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
                         ->arrayNode('scopes')
                             ->prototype('scalar')->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('graphql')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class))->info('To enable or disable GraphQL.')->end()
+                        ->arrayNode('graphiql')
+                            ->canBeEnabled()
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class) && class_exists(TwigBundle::class))->info('To enable or disable GraphiQL.')->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -115,13 +148,16 @@ final class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->booleanNode('enabled')->defaultTrue()->info('To enable or disable pagination for all resource collections by default.')->end()
+                                ->booleanNode('partial')->defaultFalse()->info('To enable or disable partial pagination for all resource collections by default when pagination is enabled.')->end()
                                 ->booleanNode('client_enabled')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
                                 ->booleanNode('client_items_per_page')->defaultFalse()->info('To allow the client to set the number of items per page.')->end()
+                                ->booleanNode('client_partial')->defaultFalse()->info('To allow the client to enable or disable partial pagination.')->end()
                                 ->integerNode('items_per_page')->defaultValue(30)->info('The default number of items per page.')->end()
                                 ->integerNode('maximum_items_per_page')->defaultNull()->info('The maximum number of items per page.')->end()
                                 ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The default name of the parameter handling the page number.')->end()
                                 ->scalarNode('enabled_parameter_name')->defaultValue('pagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
                                 ->scalarNode('items_per_page_parameter_name')->defaultValue('itemsPerPage')->cannotBeEmpty()->info('The name of the query parameter to set the number of items per page.')->end()
+                                ->scalarNode('partial_parameter_name')->defaultValue('partial')->cannotBeEmpty()->info('The name of the query parameter to enable or disable partial pagination.')->end()
                             ->end()
                         ->end()
                     ->end()

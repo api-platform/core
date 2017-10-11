@@ -116,10 +116,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
+        $this->registerGraphqlConfiguration($container, $config, $loader);
         $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
+        $this->registerValidatorConfiguration($container, $config, $loader);
     }
 
     /**
@@ -145,13 +147,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.collection.order', $config['collection']['order']);
         $container->setParameter('api_platform.collection.order_parameter_name', $config['collection']['order_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled', $config['collection']['pagination']['enabled']);
+        $container->setParameter('api_platform.collection.pagination.partial', $config['collection']['pagination']['partial']);
         $container->setParameter('api_platform.collection.pagination.client_enabled', $config['collection']['pagination']['client_enabled']);
         $container->setParameter('api_platform.collection.pagination.client_items_per_page', $config['collection']['pagination']['client_items_per_page']);
+        $container->setParameter('api_platform.collection.pagination.client_partial', $config['collection']['pagination']['client_partial']);
         $container->setParameter('api_platform.collection.pagination.items_per_page', $config['collection']['pagination']['items_per_page']);
         $container->setParameter('api_platform.collection.pagination.maximum_items_per_page', $config['collection']['pagination']['maximum_items_per_page']);
         $container->setParameter('api_platform.collection.pagination.page_parameter_name', $config['collection']['pagination']['page_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.enabled_parameter_name', $config['collection']['pagination']['enabled_parameter_name']);
         $container->setParameter('api_platform.collection.pagination.items_per_page_parameter_name', $config['collection']['pagination']['items_per_page_parameter_name']);
+        $container->setParameter('api_platform.collection.pagination.partial_parameter_name', $config['collection']['pagination']['partial_parameter_name']);
         $container->setParameter('api_platform.http_cache.etag', $config['http_cache']['etag']);
         $container->setParameter('api_platform.http_cache.max_age', $config['http_cache']['max_age']);
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['http_cache']['shared_max_age']);
@@ -353,6 +358,25 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     }
 
     /**
+     * Registers the GraphQL configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['graphql']) {
+            return;
+        }
+
+        $container->setParameter('api_platform.graphql.enabled', $config['graphql']['enabled']);
+        $container->setParameter('api_platform.graphql.graphiql.enabled', $config['graphql']['graphiql']['enabled']);
+
+        $loader->load('graphql.xml');
+    }
+
+    /**
      * Registers configuration for integration with third-party bundles.
      *
      * @param string[]      $bundles
@@ -457,5 +481,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         return $formats;
+    }
+
+    /**
+     * Registers the Validator configuration.
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     */
+    private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['validator']) {
+            return;
+        }
+
+        $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
     }
 }

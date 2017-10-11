@@ -32,9 +32,14 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @group legacy
  */
 class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testConstruct()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -51,6 +56,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ParserInterface::class, $apiPlatformParser);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testSupports()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -70,6 +78,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testNoOnDataFirstArray()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -89,6 +100,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testSupportsAttributeNormalization()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -146,6 +160,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ], $actual);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testSupportsUnknownResource()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -165,6 +182,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testSupportsUnsupportedClassFormat()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -184,6 +204,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ]));
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testParse()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -255,6 +278,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ], $actual);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testParseDateTime()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -294,6 +320,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ], $actual);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testParseRelation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -382,6 +411,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ], $actual);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testParseWithNameConverter()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -424,6 +456,9 @@ class ApiPlatformParserTest extends \PHPUnit_Framework_TestCase
         ], $actual);
     }
 
+    /**
+     * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
+     */
     public function testParseRecursive()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

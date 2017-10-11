@@ -47,6 +47,24 @@ class IdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
         return [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy];
     }
 
+    public function testGetIdentifiersFromResourceClass()
+    {
+        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
+
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal());
+
+        $this->assertEquals(['id'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+    }
+
+    public function testGetCompositeIdentifiersFromResourceClass()
+    {
+        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
+
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal());
+
+        $this->assertEquals(['id', 'name'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+    }
+
     public function testGetIdentifiersFromItem()
     {
         list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);

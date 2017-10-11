@@ -36,6 +36,7 @@ api_platform:
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
         html:                          ['text/html']
+    graphql:                           true
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
     collection:
@@ -44,6 +45,7 @@ api_platform:
         pagination:
             client_enabled:            true
             client_items_per_page:     true
+            client_partial:            true
             items_per_page:            3
     enable_nelmio_api_doc: true
     exception_to_status:

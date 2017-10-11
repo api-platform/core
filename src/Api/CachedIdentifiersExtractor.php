@@ -34,12 +34,25 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
     private $propertyAccessor;
     private $decorated;
     private $localCache = [];
+    private $localResourceCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, IdentifiersExtractorInterface $decorated, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->cacheItemPool = $cacheItemPool;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
         $this->decorated = $decorated;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifiersFromResourceClass(string $resourceClass): array
+    {
+        if (isset($this->localResourceCache[$resourceClass])) {
+            return $this->localResourceCache[$resourceClass];
+        }
+
+        return $this->localResourceCache[$resourceClass] = $this->decorated->getIdentifiersFromResourceClass($resourceClass);
     }
 
     /**
