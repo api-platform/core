@@ -264,7 +264,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $arrChildOption = $this->getFactoryOptions($childContext);
             $objChildPropertyNameCollection = $this->propertyNameCollectionFactory->create($className, $arrChildOption);
 
-            if (count(array_intersect($arrKeyInvalid, $objChildPropertyNameCollection->getArrProperty())) === count($arrKeyInvalid)) {
+            if (count(array_intersect($arrKeyInvalid, $objChildPropertyNameCollection->getIterator()->getArrayCopy())) === count($arrKeyInvalid)) {
                 $value = [$value];
 
                 // arr key not invalid anymore
