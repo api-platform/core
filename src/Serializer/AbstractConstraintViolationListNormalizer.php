@@ -25,6 +25,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 abstract class AbstractConstraintViolationListNormalizer implements NormalizerInterface
 {
+    const FORMAT = null; // Must be overrode
+
     private $serializePayloadFields;
 
     public function __construct(array $serializePayloadFields = null)

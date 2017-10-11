@@ -39,7 +39,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        [$messages, $violations] = $this->getMessagesAndViolations($object);
+        list($messages, $violations) = $this->getMessagesAndViolations($object);
 
         return [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),
