@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
+use Psr\Container\ContainerInterface;
 
 /**
  * Applies filters on a resource query.
@@ -27,13 +29,18 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterExtension implements QueryCollectionExtensionInterface
 {
-    private $resourceMetadataFactory;
-    private $filters;
+    use FilterLocatorTrait;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, FilterCollection $filters)
+    private $resourceMetadataFactory;
+
+    /**
+     * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
+     */
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $filterLocator)
     {
+        $this->setFilterLocator($filterLocator);
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->filters = $filters;
     }
 
     /**
@@ -48,10 +55,12 @@ final class FilterExtension implements QueryCollectionExtensionInterface
             return;
         }
 
-        foreach ($this->filters as $filterName => $filter) {
-            if ($filter instanceof FilterInterface && in_array($filterName, $resourceFilters, true)) {
-                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+        foreach ($resourceFilters as $filterId) {
+            if (!($filter = $this->getFilter($filterId)) instanceof FilterInterface) {
+                continue;
             }
+
+            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
         }
     }
 }

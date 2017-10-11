@@ -45,12 +45,40 @@ final class XmlExtractor extends AbstractExtractor
                 'shortName' => $this->phpize($resource, 'shortName', 'string'),
                 'description' => $this->phpize($resource, 'description', 'string'),
                 'iri' => $this->phpize($resource, 'iri', 'string'),
-                'itemOperations' => $this->getAttributes($resource, 'itemOperation') ?: null,
-                'collectionOperations' => $this->getAttributes($resource, 'collectionOperation') ?: null,
+                'itemOperations' => $this->getOperations($resource, 'itemOperation'),
+                'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
                 'properties' => $this->getProperties($resource) ?: null,
             ];
         }
+    }
+
+    /**
+     * Return the array containing configured operations. Returns NULL if there is no operation configuration.
+     *
+     * @param \SimpleXMLElement $resource
+     * @param string            $operationType
+     *
+     * @return array|null
+     */
+    private function getOperations(\SimpleXMLElement $resource, string $operationType)
+    {
+        if ($legacyOperations = $this->getAttributes($resource, $operationType)) {
+            @trigger_error(
+                sprintf('Configuring "%1$s" tags without using a parent "%1$ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', $operationType),
+                E_USER_DEPRECATED
+            );
+
+            return $legacyOperations;
+        }
+
+        $operationsParent = $operationType.'s';
+
+        if (!isset($resource->$operationsParent)) {
+            return null;
+        }
+
+        return $this->getAttributes($resource->$operationsParent, $operationType);
     }
 
     /**
@@ -102,6 +130,10 @@ final class XmlExtractor extends AbstractExtractor
                 'identifier' => $this->phpize($property, 'identifier', 'bool'),
                 'iri' => $this->phpize($property, 'iri', 'string'),
                 'attributes' => $this->getAttributes($property, 'attribute'),
+                'subresource' => $property->subresource ? [
+                    'collection' => $this->phpize($property->subresource, 'collection', 'bool'),
+                    'resourceClass' => $this->phpize($property->subresource, 'resourceClass', 'string'),
+                ] : null,
             ];
         }
 

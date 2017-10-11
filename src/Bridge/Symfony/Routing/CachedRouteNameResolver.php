@@ -37,9 +37,9 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteName(string $resourceClass, bool $collection): string
+    public function getRouteName(string $resourceClass, $operationType /**, array $context = []**/): string
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $collection]));
+        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $operationType]));
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
@@ -51,7 +51,13 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
             // do nothing
         }
 
-        $routeName = $this->decorated->getRouteName($resourceClass, $collection);
+        if (func_num_args() > 2) {
+            $context = func_get_arg(2);
+        } else {
+            $context = [];
+        }
+
+        $routeName = $this->decorated->getRouteName($resourceClass, $operationType, $context);
 
         if (!isset($cacheItem)) {
             return $routeName;

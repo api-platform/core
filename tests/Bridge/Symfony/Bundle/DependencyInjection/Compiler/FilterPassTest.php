@@ -18,6 +18,7 @@ use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -30,32 +31,41 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $definitionProphecy = $this->prophesize(Definition::class);
-        $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
-        $definition = $definitionProphecy->reveal();
+        $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
+            return !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference;
+        }))->shouldBeCalled();
+
+        $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterCollectionFactoryDefinitionProphecy->addArgument(['my_id'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [0 => ['id' => 'my_id']]])->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.filters')->willReturn($definition)->shouldBeCalled();
-        $containerBuilder = $containerBuilderProphecy->reveal();
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $dataProviderPass->process($containerBuilder);
+        $dataProviderPass->process($containerBuilderProphecy->reveal());
     }
 
-    /**
-     * @expectedException        \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage Filter tags must have an "id" property.
-     */
     public function testIdNotExist()
     {
         $dataProviderPass = new FilterPass();
 
         $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [0 => ['hi' => 'hello']]])->shouldBeCalled();
-        $containerBuilder = $containerBuilderProphecy->reveal();
+        $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
+            return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
+        }))->shouldBeCalled();
 
-        $dataProviderPass->process($containerBuilder);
+        $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
+        $filterCollectionFactoryDefinitionProphecy->addArgument(['bar'])->shouldBeCalled();
+
+        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
+
+        $dataProviderPass->process($containerBuilderProphecy->reveal());
     }
 }

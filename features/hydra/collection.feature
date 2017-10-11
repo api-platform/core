@@ -18,9 +18,6 @@ Feature: Collections support
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 0},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
-        "hydra:firstPage": {"pattern": "^/dummies$"},
-        "hydra:lastPage": {"pattern": "^/dummies$"},
         "hydra:member": {
           "type": "array",
           "maxItems": 0
@@ -235,12 +232,12 @@ Feature: Collections support
     And the JSON should be valid according to this schema:
   """
   {
-    "@id":"\/dummies?page=3",
+    "@id":"/dummies?page=3",
     "@type":"hydra:PartialCollectionView",
-    "hydra:first":"\/dummies?page=1",
-    "hydra:last":"\/dummies?page=10",
-    "hydra:previous":"\/dummies?page=2",
-    "hydra:next":"\/dummies?page=4"
+    "hydra:first":"/dummies?page=1",
+    "hydra:last":"/dummies?page=10",
+    "hydra:previous":"/dummies?page=2",
+    "hydra:next":"/dummies?page=4"
   }
   """
   Scenario: Filter with exact match

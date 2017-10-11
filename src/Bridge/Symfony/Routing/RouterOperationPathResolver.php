@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -38,15 +40,28 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      *
      * @throws InvalidArgumentException
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, bool $collection): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        if (!isset($operation['route_name'])) {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $collection);
+        if (func_num_args() >= 4) {
+            $operationName = func_get_arg(3);
+        } else {
+            @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
+
+            $operationName = null;
         }
 
-        $route = $this->router->getRouteCollection()->get($operation['route_name']);
-        if (null === $route) {
-            throw new InvalidArgumentException(sprintf('The route "%s" of the resource "%s" was not found.', $operation['route_name'], $resourceShortName));
+        if (isset($operation['route_name'])) {
+            $routeName = $operation['route_name'];
+        } elseif (OperationType::SUBRESOURCE === $operationType) {
+            throw new InvalidArgumentException('Subresource operations are not supported by the RouterOperationPathResolver without a route name.');
+        } elseif (null === $operationName) {
+            return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
+        } else {
+            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
+        }
+
+        if (!$route = $this->router->getRouteCollection()->get($routeName)) {
+            throw new InvalidArgumentException(sprintf('The route "%s" of the resource "%s" was not found.', $routeName, $resourceShortName));
         }
 
         return $route->getPath();

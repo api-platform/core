@@ -28,6 +28,11 @@
             <argument type="service" id="annotation_reader" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.annotation.inner" />
         </service>
+
+        <service id="api_platform.metadata.subresource.metadata_factory.annotation" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="30" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationSubresourceMetadataFactory" public="false">
+            <argument type="service" id="annotation_reader" />
+            <argument type="service" id="api_platform.metadata.subresource.metadata_factory.annotation.inner" />
+        </service>
     </services>
 
 </container>

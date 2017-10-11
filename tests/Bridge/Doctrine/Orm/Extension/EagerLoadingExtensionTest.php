@@ -27,6 +27,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
 use Doctrine\ORM\EntityManager;
@@ -35,6 +36,9 @@ use Doctrine\ORM\QueryBuilder;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -49,7 +53,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
-        $relatedNameCollection = new PropertyNameCollection(['id', 'name', 'notindatabase', 'notreadable']);
+        $relatedNameCollection = new PropertyNameCollection(['id', 'name', 'notindatabase', 'notreadable', 'embeddedDummy']);
+        $relatedEmbedableCollection = new PropertyNameCollection(['name']);
 
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
 
@@ -59,11 +64,14 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(EmbeddableDummy::class)->willReturn($relatedEmbedableCollection)->shouldBeCalled();
 
         $idPropertyMetadata = new PropertyMetadata();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
         $namePropertyMetadata = new PropertyMetadata();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
+        $embeddedPropertyMetadata = new PropertyMetadata();
+        $embeddedPropertyMetadata = $embeddedPropertyMetadata->withReadable(true);
         $notInDatabasePropertyMetadata = new PropertyMetadata();
         $notInDatabasePropertyMetadata = $notInDatabasePropertyMetadata->withReadable(true);
         $notReadablePropertyMetadata = new PropertyMetadata();
@@ -71,6 +79,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', [])->willReturn($idPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', [])->willReturn($namePropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'embeddedDummy', [])->willReturn($embeddedPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'notindatabase', [])->willReturn($notInDatabasePropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'notreadable', [])->willReturn($notReadablePropertyMetadata)->shouldBeCalled();
 
@@ -85,10 +94,13 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ($property !== 'id') {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn($property !== 'notindatabase')->shouldBeCalled();
+            if ('id' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(!in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
             }
         }
+        $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
+
+        $relatedClassMetadataProphecy->embeddedClasses = ['embeddedDummy' => ['class' => EmbeddableDummy::class]];
 
         $relatedClassMetadataProphecy->associationMappings = [];
 
@@ -101,8 +113,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalled(1);
         $queryBuilderProphecy->innerJoin('o.relatedDummy2', 'relatedDummy2_a2')->shouldBeCalled(1);
-        $queryBuilderProphecy->addSelect('partial relatedDummy_a1.{id,name}')->shouldBeCalled(1);
-        $queryBuilderProphecy->addSelect('partial relatedDummy2_a2.{id,name}')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('partial relatedDummy_a1.{id,name,embeddedDummy.name}')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('partial relatedDummy2_a2.{id,name,embeddedDummy.name}')->shouldBeCalled(1);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true);
@@ -116,9 +128,11 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
-        $relatedNameCollection = new PropertyNameCollection(['id', 'name', 'notindatabase', 'notreadable', 'relation']);
+        $relatedNameCollection = new PropertyNameCollection(['id', 'name', 'embeddedDummy', 'notindatabase', 'notreadable', 'relation']);
+        $relatedEmbedableCollection = new PropertyNameCollection(['name']);
 
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(EmbeddableDummy::class)->willReturn($relatedEmbedableCollection)->shouldBeCalled();
         $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -136,6 +150,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
         $namePropertyMetadata = new PropertyMetadata();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
+        $embeddedDummyPropertyMetadata = new PropertyMetadata();
+        $embeddedDummyPropertyMetadata = $embeddedDummyPropertyMetadata->withReadable(true);
         $notInDatabasePropertyMetadata = new PropertyMetadata();
         $notInDatabasePropertyMetadata = $notInDatabasePropertyMetadata->withReadable(true);
         $notReadablePropertyMetadata = new PropertyMetadata();
@@ -143,6 +159,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', [])->willReturn($idPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', [])->willReturn($namePropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'embeddedDummy', [])->willReturn($embeddedDummyPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'notindatabase', [])->willReturn($notInDatabasePropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'notreadable', [])->willReturn($notReadablePropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'relation', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
@@ -163,14 +180,17 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ($property !== 'id') {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn($property !== 'notindatabase')->shouldBeCalled();
+            if ('id' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(!in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
             }
         }
+        $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
 
         $relatedClassMetadataProphecy->associationMappings = [
             'relation' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => UnknownDummy::class],
         ];
+
+        $relatedClassMetadataProphecy->embeddedClasses = ['embeddedDummy' => ['class' => EmbeddableDummy::class]];
 
         $singleInheritanceClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $singleInheritanceClassMetadataProphecy->subClasses = [ConcreteDummy::class];
@@ -192,7 +212,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy->leftJoin('o.relatedDummy3', 'relatedDummy3_a4')->shouldBeCalled(1);
         $queryBuilderProphecy->leftJoin('o.relatedDummy4', 'relatedDummy4_a5')->shouldBeCalled(1);
         $queryBuilderProphecy->leftJoin('o.singleInheritanceRelation', 'singleInheritanceRelation_a6')->shouldBeCalled(1);
-        $queryBuilderProphecy->addSelect('partial relatedDummy_a1.{id,name}')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('partial relatedDummy_a1.{id,name,embeddedDummy.name}')->shouldBeCalled(1);
         $queryBuilderProphecy->addSelect('partial relation_a2.{id}')->shouldBeCalled(1);
         $queryBuilderProphecy->addSelect('partial relatedDummy2_a3.{id}')->shouldBeCalled(1);
         $queryBuilderProphecy->addSelect('partial relatedDummy3_a4.{id}')->shouldBeCalled(1);
@@ -299,9 +319,9 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary.
+     * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary, or use the "max_depth" option of the Symfony serializer.
      */
-    public function testMaxDepthReached()
+    public function testMaxJoinsReached()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
@@ -347,6 +367,74 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $queryBuilderProphecy->addSelect(Argument::type('string'))->shouldBeCalled();
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true);
+        $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class);
+    }
+
+    public function testMaxDepth()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadata = new ResourceMetadata();
+        $resourceMetadata = $resourceMetadata->withAttributes(['normalization_context' => ['enable_max_depth' => 'true']]);
+
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $relatedNameCollection = new PropertyNameCollection(['dummy']);
+        $dummyNameCollection = new PropertyNameCollection(['relatedDummy']);
+
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
+
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+
+        $relatedPropertyMetadata = new PropertyMetadata();
+        $relatedPropertyMetadata = $relatedPropertyMetadata->withReadableLink(true);
+
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'dummy', [])->willReturn($relatedPropertyMetadata)->shouldBeCalled();
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->associationMappings = [
+            'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+        ];
+
+        $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $relatedClassMetadataProphecy->associationMappings = [
+            'dummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => Dummy::class],
+        ];
+
+        $dummyClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $relatedClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $classMetadataFactoryProphecy = $this->prophesize(ClassMetadataFactoryInterface::class);
+
+        $dummyAttributeMetadata = new AttributeMetadata('dummy');
+        $dummyAttributeMetadata->setMaxDepth(2);
+
+        $relatedAttributeMetadata = new AttributeMetadata('relatedDummy');
+        $relatedAttributeMetadata->setMaxDepth(4);
+
+        $dummyClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn(['relatedDummy' => $dummyAttributeMetadata]);
+        $relatedClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn(['dummy' => $relatedAttributeMetadata]);
+
+        $classMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedClassMetadataInterfaceProphecy->reveal());
+        $classMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummyClassMetadataInterfaceProphecy->reveal());
+
+        $emProphecy = $this->prophesize(EntityManager::class);
+        $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+        $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
+
+        $queryBuilderProphecy->innerJoin(Argument::type('string'), Argument::type('string'))->shouldBeCalledTimes(2);
+        $queryBuilderProphecy->addSelect(Argument::type('string'))->shouldBeCalled();
+
+        $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true, $classMetadataFactoryProphecy->reveal());
         $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class);
     }
 
@@ -505,7 +593,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ($property !== 'id') {
+            if ('id' !== $property) {
                 $relatedClassMetadataProphecy->hasField($property)->willReturn(true)->shouldBeCalled();
             }
         }
@@ -547,6 +635,51 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $relationPropertyMetadata = new PropertyMetadata();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
+
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->associationMappings = [
+            'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => RelatedDummy::class],
+        ];
+
+        $emProphecy = $this->prophesize(EntityManager::class);
+        $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $relatedClassMetadataProphecy->associationMappings = [];
+        $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+        $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
+
+        $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
+
+        $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalled(1);
+        $queryBuilderProphecy->innerJoin('o.relatedDummy2', 'relatedDummy2_a2')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('relatedDummy_a1')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('relatedDummy2_a2')->shouldBeCalled(1);
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+        $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30);
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
+    }
+
+    public function testApplyToCollectionWithANonRedableButFetchEagerProperty()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $relatedNameCollection = new PropertyNameCollection(['id', 'name', 'notindatabase', 'notreadable']);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => true]);
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadable(false);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2', [])->willReturn($relationPropertyMetadata)->shouldBeCalled();

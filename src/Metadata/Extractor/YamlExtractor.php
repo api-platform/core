@@ -32,7 +32,7 @@ final class YamlExtractor extends AbstractExtractor
     protected function extractPath(string $path)
     {
         try {
-            $resourcesYaml = Yaml::parse(file_get_contents($path));
+            $resourcesYaml = Yaml::parse(file_get_contents($path), Yaml::PARSE_KEYS_AS_STRINGS | Yaml::PARSE_CONSTANT);
         } catch (ParseException $e) {
             $e->setParsedFile($path);
 
@@ -107,6 +107,7 @@ final class YamlExtractor extends AbstractExtractor
                 'identifier' => $this->phpize($propertyValues, 'identifier', 'bool'),
                 'iri' => $this->phpize($propertyValues, 'iri', 'string'),
                 'attributes' => $propertyValues['attributes'] ?? null,
+                'subresource' => $propertyValues['subresource'] ?? null,
             ];
         }
     }

@@ -523,7 +523,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.name = :name_p1 AND relatedDummy_a1.id = :relatedDummy_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_p1 AND o.relatedDummy = :relatedDummy_p2', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p2' => 'foo',
                     ],
@@ -659,7 +659,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :relatedDummy_p1', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o WHERE o.relatedDummy = :relatedDummy_p1', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => 'exact',
                     ],
@@ -693,7 +693,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 INNER JOIN o.relatedDummies relatedDummies_a2 WHERE relatedDummy_a1.id IN (:relatedDummy_p1) AND relatedDummies_a2.id = :relatedDummies_p2', Dummy::class),
+                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummies relatedDummies_a1 WHERE o.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => [1, 2],
                         'relatedDummies_p2' => 1,

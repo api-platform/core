@@ -94,7 +94,17 @@ class DateFilterTest extends KernelTestCase
                 'type' => 'DateTimeInterface',
                 'required' => false,
             ],
+            'dummyDate[strictly_before]' => [
+                'property' => 'dummyDate',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+            ],
             'dummyDate[after]' => [
+                'property' => 'dummyDate',
+                'type' => 'DateTimeInterface',
+                'required' => false,
+            ],
+            'dummyDate[strictly_after]' => [
                 'property' => 'dummyDate',
                 'type' => 'DateTimeInterface',
                 'required' => false,
@@ -124,6 +134,15 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
+            'after but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+            ],
             'after' => [
                 [
                     'dummyDate' => null,
@@ -135,6 +154,17 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
             ],
+            'after but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+            ],
             'before (all properties enabled)' => [
                 null,
                 [
@@ -143,6 +173,15 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
+            ],
+            'before but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
             ],
             'before' => [
                 [
@@ -155,6 +194,17 @@ class DateFilterTest extends KernelTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
             ],
+            'before but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
+            ],
             'before + after (all properties enabled)' => [
                 null,
                 [
@@ -164,6 +214,16 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+            ],
+            'before but not equals + after but not equals (all properties enabled)' => [
+                null,
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
             ],
             'before + after' => [
                 [
@@ -176,6 +236,18 @@ class DateFilterTest extends KernelTestCase
                     ],
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+            ],
+            'before but not equals + after but not equals' => [
+                [
+                    'dummyDate' => null,
+                ],
+                [
+                    'dummyDate' => [
+                        'strictly_after' => '2015-04-05',
+                        'strictly_before' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
             ],
             'property not enabled' => [
                 [

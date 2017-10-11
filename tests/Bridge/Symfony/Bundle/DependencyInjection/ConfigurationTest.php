@@ -68,11 +68,25 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
+            'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
             'name_converter' => null,
             'enable_fos_user' => false,
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
+            'oauth' => [
+                'enabled' => false,
+                'clientId' => '',
+                'clientSecret' => '',
+                'type' => 'oauth2',
+                'flow' => 'application',
+                'tokenUrl' => '/oauth/v2/token',
+                'authorizationUrl' => '/oauth/v2/auth',
+                'scopes' => [],
+            ],
+            'swagger' => [
+                'api_keys' => [],
+            ],
             'eager_loading' => [
                 'enabled' => true,
                 'max_joins' => 30,
@@ -80,7 +94,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'fetch_partial' => false,
             ],
             'collection' => [
-                'order' => null,
+                'order' => 'ASC',
                 'order_parameter_name' => 'order',
                 'pagination' => [
                     'enabled' => true,
@@ -93,10 +107,25 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'maximum_items_per_page' => null,
                 ],
             ],
+            'mapping' => [
+                'paths' => [],
+            ],
+            'http_cache' => [
+                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
+                'etag' => true,
+                'max_age' => null,
+                'shared_max_age' => null,
+                'vary' => ['Accept'],
+                'public' => null,
+            ],
         ], $config);
     }
 
-    public function testExceptionToStatusConfig()
+    /**
+     * @group legacy
+     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const:Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
+     */
+    public function testLegacyExceptionToStatusConfig()
     {
         $config = $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
@@ -112,6 +141,21 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             \InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
             \RuntimeException::class => Response::HTTP_INTERNAL_SERVER_ERROR,
         ], $config['exception_to_status']);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.
+     */
+    public function testLegacyDefaultOperationPathResolver()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'default_operation_path_resolver' => 'api_platform.operation_path_resolver.dash',
+            ],
+        ]);
+
+        $this->assertTrue(isset($config['default_operation_path_resolver']));
     }
 
     public function invalidHttpStatusCodeProvider()
@@ -166,5 +210,27 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Test config for api keys.
+     */
+    public function testApiKeysConfig()
+    {
+        $exampleConfig = [
+                'name' => 'Authorization',
+                'type' => 'query',
+        ];
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'swagger' => [
+                    'api_keys' => [$exampleConfig],
+               ],
+            ],
+        ]);
+
+        $this->assertTrue(isset($config['swagger']['api_keys']));
+        $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
     }
 }

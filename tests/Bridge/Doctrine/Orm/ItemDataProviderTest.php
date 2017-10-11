@@ -122,7 +122,7 @@ class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedException \ApiPlatform\Core\Exception\PropertyNotFoundException
      */
     public function testGetItemWrongCompositeIdentifier()
     {

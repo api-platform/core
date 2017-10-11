@@ -84,8 +84,8 @@ class SearchFilter extends AbstractFilter
                 continue;
             }
 
-            if ($this->isPropertyNested($property)) {
-                $propertyParts = $this->splitPropertyParts($property);
+            if ($this->isPropertyNested($property, $resourceClass)) {
+                $propertyParts = $this->splitPropertyParts($property, $resourceClass);
                 $field = $propertyParts['field'];
                 $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
             } else {
@@ -157,6 +157,16 @@ class SearchFilter extends AbstractFilter
                 return 'float';
         }
 
+        if (defined(Type::class.'::DATE_IMMUTABLE')) {
+            switch ($doctrineType) {
+                case Type::DATE_IMMUTABLE:
+                case Type::TIME_IMMUTABLE:
+                case Type::DATETIME_IMMUTABLE:
+                case Type::DATETIMETZ_IMMUTABLE:
+                    return \DateTimeInterface::class;
+            }
+        }
+
         return 'string';
     }
 
@@ -167,7 +177,7 @@ class SearchFilter extends AbstractFilter
     {
         if (
             null === $value ||
-            !$this->isPropertyEnabled($property) ||
+            !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass, true)
         ) {
             return;
@@ -176,8 +186,8 @@ class SearchFilter extends AbstractFilter
         $alias = 'o';
         $field = $property;
 
-        if ($this->isPropertyNested($property)) {
-            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator);
+        if ($this->isPropertyNested($property, $resourceClass)) {
+            list($alias, $field, $associations) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
             $metadata = $this->getNestedMetadata($resourceClass, $associations);
         } else {
             $metadata = $this->getClassMetadata($resourceClass);
@@ -203,7 +213,7 @@ class SearchFilter extends AbstractFilter
             $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
             // prefixing the strategy with i makes it case insensitive
-            if (strpos($strategy, 'i') === 0) {
+            if (0 === strpos($strategy, 'i')) {
                 $strategy = substr($strategy, 1);
                 $caseSensitive = false;
             }
@@ -240,15 +250,21 @@ class SearchFilter extends AbstractFilter
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
-        $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+        if ($metadata->isCollectionValuedAssociation($association)) {
+            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+            $associationField = 'id';
+        } else {
+            $associationAlias = $alias;
+            $associationField = $field;
+        }
 
         if (1 === count($values)) {
             $queryBuilder
-                ->andWhere(sprintf('%s.id = :%s', $associationAlias, $valueParameter))
+                ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values[0]);
         } else {
             $queryBuilder
-                ->andWhere(sprintf('%s.id IN (:%s)', $associationAlias, $valueParameter))
+                ->andWhere(sprintf('%s.%s IN (:%s)', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values);
         }
     }

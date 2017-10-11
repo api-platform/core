@@ -76,7 +76,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
             }
 
             $propertyName = $this->reflection->getProperty($reflectionMethod->name);
-            if (null !== $propertyName && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
+            if (null !== $propertyName && !$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName)) {
                 $propertyName = lcfirst($propertyName);
             }
 

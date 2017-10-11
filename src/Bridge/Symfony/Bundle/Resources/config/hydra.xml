@@ -66,7 +66,7 @@
             <argument type="service" id="api_platform.hydra.normalizer.collection_filters.inner" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.filters" />
+            <argument type="service" id="api_platform.filter_locator" />
         </service>
 
     </services>

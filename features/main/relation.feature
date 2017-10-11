@@ -67,6 +67,9 @@ Feature: Relations support
       "thirdLevel": "/third_levels/1",
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
+      "embeddedDummy": null,
+      "id": 1,
+      "symfony": "symfony",
       "age": null
     }
     """
@@ -173,7 +176,6 @@ Feature: Relations support
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -209,7 +211,6 @@ Feature: Relations support
         "@id": {"pattern": "^/dummies$"},
         "@type": {"pattern": "^hydra:Collection$"},
         "hydra:totalItems": {"type":"number", "maximum": 1},
-        "hydra:itemsPerPage": {"type":"number", "maximum": 3},
         "hydra:member": {
           "type": "array",
           "items": {
@@ -411,7 +412,6 @@ Feature: Relations support
     }
     """
 
-  @dropSchema
   Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation_embedders/2" with body:
@@ -440,5 +440,38 @@ Feature: Relations support
         "thirdLevel": null
       },
       "related": null
+    }
+    """
+
+  @dropSchema
+  Scenario: Issue #1222
+    Given there are people having pets
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/people"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Person",
+      "@id": "/people",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/people/1",
+          "@type": "Person",
+          "name": "foo",
+          "pets": [
+            {
+              "pet": {
+                "@id": "/pets/1",
+                "@type": "Pet",
+                "name": "bar"
+              }
+            }
+          ]
+        }
+      ],
+      "hydra:totalItems": 1
     }
     """

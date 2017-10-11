@@ -22,13 +22,21 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ProphecyInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
 {
+    const SPEC = [
+        'paths' => [
+            '/fs' => ['get' => ['operationId' => 'getFCollection']],
+            '/fs/{id}' => ['get' => ['operationId' => 'getFItem']],
+        ],
+    ];
+
     /**
      * @dataProvider getInvokeParameters
      */
@@ -40,14 +48,18 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
 
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize(Argument::type(Documentation::class), 'json')->willReturn('hello')->shouldBeCalled();
+        $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
+        $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
         $action = new SwaggerUiAction(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            $serializerProphecy->reveal(),
-            $twigProphecy->reveal()
+            $normalizerProphecy->reveal(),
+            $twigProphecy->reveal(),
+            $urlGeneratorProphecy->reveal()
         );
         $action($request);
     }
@@ -59,22 +71,56 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
 
         $twigCollectionProphecy = $this->prophesize(\Twig_Environment::class);
         $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'spec' => 'hello',
-            'shortName' => 'F',
-            'operationId' => 'getFCollection',
             'title' => '',
             'description' => '',
             'formats' => [],
+            'swagger_data' => [
+                'url' => '/url',
+                'spec' => self::SPEC,
+                'oauth' => [
+                    'enabled' => false,
+                    'clientId' => '',
+                    'clientSecret' => '',
+                    'type' => '',
+                    'flow' => '',
+                    'tokenUrl' => '',
+                    'authorizationUrl' => '',
+                    'scopes' => [],
+                ],
+                'shortName' => 'F',
+                'operationId' => 'getFCollection',
+                'id' => null,
+                'queryParameters' => [],
+                'path' => '/fs',
+                'method' => 'get',
+            ],
         ])->shouldBeCalled();
 
         $twigItemProphecy = $this->prophesize(\Twig_Environment::class);
         $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'spec' => 'hello',
-            'shortName' => 'F',
-            'operationId' => 'getFItem',
             'title' => '',
             'description' => '',
             'formats' => [],
+            'swagger_data' => [
+                'url' => '/url',
+                'spec' => self::SPEC,
+                'oauth' => [
+                    'enabled' => false,
+                    'clientId' => '',
+                    'clientSecret' => '',
+                    'type' => '',
+                    'flow' => '',
+                    'tokenUrl' => '',
+                    'authorizationUrl' => '',
+                    'scopes' => [],
+                ],
+                'shortName' => 'F',
+                'operationId' => 'getFItem',
+                'id' => null,
+                'queryParameters' => [],
+                'path' => '/fs/{id}',
+                'method' => 'get',
+            ],
         ])->shouldBeCalled();
 
         return [
@@ -92,24 +138,40 @@ class SwaggerUiActionTest extends \PHPUnit_Framework_TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['Foo', 'Bar']))->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize(Argument::type(Documentation::class), 'json')->willReturn('hello')->shouldBeCalled();
+
+        $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $normalizerProphecy->normalize(Argument::type(Documentation::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
 
         $twigProphecy = $this->prophesize(\Twig_Environment::class);
         $twigProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'spec' => 'hello',
-            'shortName' => null,
-            'operationId' => null,
             'title' => '',
             'description' => '',
             'formats' => [],
+            'swagger_data' => [
+                'url' => '/url',
+                'spec' => self::SPEC,
+                'oauth' => [
+                    'enabled' => false,
+                    'clientId' => '',
+                    'clientSecret' => '',
+                    'type' => '',
+                    'flow' => '',
+                    'tokenUrl' => '',
+                    'authorizationUrl' => '',
+                    'scopes' => [],
+                ],
+            ],
         ])->shouldBeCalled();
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
+        $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
         $action = new SwaggerUiAction(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            $serializerProphecy->reveal(),
-            $twigProphecy->reveal()
+            $normalizerProphecy->reveal(),
+            $twigProphecy->reveal(),
+            $urlGeneratorProphecy->reveal()
         );
         $action($request);
     }
