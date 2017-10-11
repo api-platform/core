@@ -47,7 +47,7 @@ final class DataProviderPass implements CompilerPassInterface
      */
     private function registerDataProviders(ContainerBuilder $container, string $type)
     {
-        $services = $container->findTaggedServiceIds('api_platform.'.$type.'_data_provider');
+        $services = $container->findTaggedServiceIds("api_platform.{$type}_data_provider", true);
 
         $queue = new \SplPriorityQueue();
 
@@ -58,6 +58,6 @@ final class DataProviderPass implements CompilerPassInterface
             }
         }
 
-        $container->getDefinition('api_platform.'.$type.'_data_provider')->addArgument(iterator_to_array($queue, false));
+        $container->getDefinition("api_platform.{$type}_data_provider")->addArgument(iterator_to_array($queue, false));
     }
 }
