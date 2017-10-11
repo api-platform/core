@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Injects query extensions.
@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class DoctrineQueryExtensionPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -40,30 +42,7 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
         $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
 
-        $collectionDataProviderDefinition->replaceArgument(1, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection'));
-        $itemDataProviderDefinition->replaceArgument(3, $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item'));
-    }
-
-    /**
-     * Finds services having the given tag and sorts them by their priority attribute.
-     *
-     * @param ContainerBuilder $container
-     * @param string           $tag
-     *
-     * @return Reference[]
-     */
-    private function findSortedServices(ContainerBuilder $container, $tag)
-    {
-        $extensions = [];
-        foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                $priority = $tag['priority'] ?? 0;
-                $extensions[$priority][] = new Reference($serviceId);
-            }
-        }
-        krsort($extensions);
-
-        // Flatten the array
-        return empty($extensions) ? [] : call_user_func_array('array_merge', $extensions);
+        $collectionDataProviderDefinition->replaceArgument(1, $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.collection', $container));
+        $itemDataProviderDefinition->replaceArgument(3, $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.item', $container));
     }
 }
