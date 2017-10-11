@@ -55,15 +55,17 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
     private function findSortedServices(ContainerBuilder $container, $tag)
     {
         $extensions = [];
-        foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                $priority = $tag['priority'] ?? 0;
-                $extensions[$priority][] = new Reference($serviceId);
-            }
-        }
-        krsort($extensions);
 
-        // Flatten the array
-        return empty($extensions) ? [] : call_user_func_array('array_merge', $extensions);
+        foreach ($container->findTaggedServiceIds($tag, true) as $serviceId => $tags) {
+            $priority = $tags[0]['priority'] ?? 0;
+            $extensions[$priority][] = new Reference($serviceId);
+        }
+
+        if ($extensions) {
+            krsort($extensions);
+            $extensions = call_user_func_array('array_merge', $extensions);
+        }
+
+        return $extensions;
     }
 }
