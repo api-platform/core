@@ -28,7 +28,7 @@ class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
-        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), false);
+        $normalizer = new ConstraintViolationListNormalizer($urlGeneratorProphecy->reveal(), []);
 
         $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));

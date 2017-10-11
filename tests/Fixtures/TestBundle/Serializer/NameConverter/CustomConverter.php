@@ -28,6 +28,6 @@ class CustomConverter extends CamelCaseToSnakeCaseNameConverter
 
     public function denormalize($propertyName)
     {
-        return 'nameConverted' === $propertyName ? parent::denormalize($propertyName) : $propertyName;
+        return 'name_converted' === $propertyName ? parent::denormalize($propertyName) : $propertyName;
     }
 }

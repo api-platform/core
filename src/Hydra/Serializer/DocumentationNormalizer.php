@@ -219,7 +219,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
             if (!$propertyMetadata->hasSubresource()) {
                 continue;
             }
@@ -276,6 +275,13 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves $shortName resource.",
                 'returns' => $prefixedShortName,
+            ];
+        } elseif ('PATCH' === $method) {
+            $hydraOperation += [
+                '@type' => 'hydra:Operation',
+                'hydra:title' => "Updates the $shortName resource.",
+                'returns' => $prefixedShortName,
+                'expects' => $prefixedShortName,
             ];
         } elseif ('POST' === $method) {
             $hydraOperation += [
@@ -470,6 +476,15 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if (null !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
             $propertyData['owl:maxCardinality'] = 1;
+        }
+        // Add extended JSON-LD context informations
+        // @see https://api-platform.com/docs/core/extending-jsonld-context
+        $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
+        foreach ($jsonldContext as $contextKey => $contextValue) {
+            if ($contextKey === '@id' || $contextKey === '@type') {
+                continue;
+            }
+            $propertyData[$contextKey] = $contextValue;
         }
 
         $property = [

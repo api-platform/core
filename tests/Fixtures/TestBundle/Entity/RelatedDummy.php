@@ -153,7 +153,7 @@ class RelatedDummy extends ParentDummy
     }
 
     /**
-     * @return ThirdLevel
+     * @return ThirdLevel|null
      */
     public function getThirdLevel()
     {
@@ -161,9 +161,9 @@ class RelatedDummy extends ParentDummy
     }
 
     /**
-     * @param ThirdLevel $thirdLevel
+     * @param ThirdLevel|null $thirdLevel
      */
-    public function setThirdLevel(ThirdLevel $thirdLevel)
+    public function setThirdLevel(ThirdLevel $thirdLevel = null)
     {
         $this->thirdLevel = $thirdLevel;
     }

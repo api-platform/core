@@ -113,6 +113,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerApiKeysConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
+        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
@@ -140,6 +141,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
+        $container->setParameter('api_platform.allow_plain_identifiers', $config['allow_plain_identifiers']);
         $container->setParameter('api_platform.eager_loading.enabled', $config['eager_loading']['enabled']);
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
@@ -206,12 +208,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundlesResourcesPaths = [];
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            $paths = [];
             $dirname = $bundle['path'];
-
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = $dirname.'/Resources/config/api_resources'.$extension;
             }
-
             $paths[] = $dirname.'/Entity';
 
             foreach ($paths as $path) {
@@ -309,6 +310,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+    }
+
+    /**
+     * Registers the JsonApi configuration.
+     *
+     * @param array         $formats
+     * @param XmlFileLoader $loader
+     */
+    private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader)
+    {
+        if (!isset($formats['jsonapi'])) {
+            return;
+        }
+
+        $loader->load('jsonapi.xml');
     }
 
     /**

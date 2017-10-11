@@ -144,4 +144,25 @@ class AddTagsListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
     }
+
+    public function testAddCollectionIriWhenCollectionIsEmpty()
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+
+        $request = new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
+
+        $response = new Response();
+        $response->setPublic();
+        $response->setEtag('foo');
+
+        $event = $this->prophesize(FilterResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event->getResponse()->willReturn($response)->shouldBeCalled();
+
+        $listener = new AddTagsListener($iriConverterProphecy->reveal());
+        $listener->onKernelResponse($event->reveal());
+
+        $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
+    }
 }

@@ -30,12 +30,18 @@ doctrine:
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'
+    allow_plain_identifiers:           true
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
         html:                          ['text/html']
+    error_formats:
+        jsonproblem:                   ['application/problem+json']
+        jsonld:                        ['application/ld+json']
+        jsonapi:                       ['application/vnd.api+json']
     graphql:                           true
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
@@ -108,7 +114,7 @@ services:
     # Tests if the id default to the service name, do not add id attributes here
     my_dummy.order:
         parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
+        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
     app.my_dummy_resource.date_filter:
@@ -139,11 +145,6 @@ services:
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
-
-    app.entity.filter.dummy_car:
-        parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'colors.prop': 'ipartial' } ]
-        tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
 
     app.entity.filter.dummy_property.property:
         parent:    'api_platform.serializer.property_filter'

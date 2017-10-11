@@ -37,4 +37,9 @@ class ParentDummy
     {
         return $this->age;
     }
+
+    public function setAge($age)
+    {
+        return $this->age = $age;
+    }
 }

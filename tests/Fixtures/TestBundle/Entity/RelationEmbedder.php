@@ -22,18 +22,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"barcelona"}},
- *     "denormalization_context"={"groups"={"chicago"}},
- *     "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
- * }, itemOperations={
- *     "get"={"method"="GET"},
- *     "put"={"method"="PUT"},
- *     "delete"={"method"="DELETE"},
- *     "custom_get"={"route_name"="relation_embedded.custom_get"},
- *     "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
- *     "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
- * })
+ * @ApiResource(
+ *     attributes={
+ *        "normalization_context"={"groups"={"barcelona"}},
+ *        "denormalization_context"={"groups"={"chicago"}},
+ *        "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
+ *     },
+ *     itemOperations={
+ *         "get"={"method"="GET"},
+ *         "put"={"method"="PUT"},
+ *         "delete"={"method"="DELETE"},
+ *         "custom_get"={"route_name"="relation_embedded.custom_get"},
+ *         "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
+ *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
+ *    }
+ * )
  * @ORM\Entity
  */
 class RelationEmbedder

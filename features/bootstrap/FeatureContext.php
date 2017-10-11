@@ -344,7 +344,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
@@ -453,7 +453,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -481,7 +481,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
@@ -508,7 +508,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
-            throw new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
+            throw new \InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $bool, implode('" | "', $expected)));
         }
 
         for ($i = 1; $i <= $nb; ++$i) {
@@ -616,6 +616,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function thereIsAFooEntityWithRelatedBars()
     {
         $foo = new DummyCar();
+        $foo->setName('mustli');
+        $foo->setCanSell(true);
+        $foo->setAvailableAt(new \DateTime());
         $this->manager->persist($foo);
 
         $bar1 = new DummyCarColor();
