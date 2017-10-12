@@ -206,12 +206,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $bundlesResourcesPaths = [];
 
         foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            $paths = [];
             $dirname = $bundle['path'];
-
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = $dirname.'/Resources/config/api_resources'.$extension;
             }
-
             $paths[] = $dirname.'/Entity';
 
             foreach ($paths as $path) {

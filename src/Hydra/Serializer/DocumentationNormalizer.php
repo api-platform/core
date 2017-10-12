@@ -219,7 +219,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-
             if (!$propertyMetadata->hasSubresource()) {
                 continue;
             }
