@@ -11,7 +11,7 @@ matrix:
   include:
     - php: '7.0'
     - php: '7.1'
-      env: coverage=0 lint=1
+      env: coverage=1 lint=1
     - php: '7.1'
       env: deps='low'
 
