@@ -15,6 +15,7 @@
     "require": {
         "php": ">=7.0",
 
+        "doctrine/common": "~2.8.1",
         "doctrine/inflector": "^1.0",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
