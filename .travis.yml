@@ -14,6 +14,10 @@ matrix:
       env: coverage=1 lint=1
     - php: '7.1'
       env: deps='low'
+    - php: '7.1'
+      env: SYMFONY_DEPRECATIONS_HELPER=0
+  allow_failures:
+      env: SYMFONY_DEPRECATIONS_HELPER=0
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
