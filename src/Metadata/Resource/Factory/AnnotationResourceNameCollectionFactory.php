@@ -47,7 +47,6 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
     public function create(): ResourceNameCollection
     {
         $classes = [];
-        $includedFiles = [];
 
         if ($this->decorated) {
             foreach ($this->decorated->create() as $resourceClass) {
