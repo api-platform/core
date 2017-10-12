@@ -33,7 +33,7 @@ class ChainCollectionDataProviderTest extends \PHPUnit_Framework_TestCase
         $dummy2->setName('Parks');
 
         $firstDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
-        $firstDataProvider->getCollection(Dummy::class, null)->willReturn([$dummy, $dummy2])->willThrow(ResourceClassNotSupportedException::class);
+        $firstDataProvider->getCollection(Dummy::class, null)->willThrow(ResourceClassNotSupportedException::class);
 
         $secondDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $secondDataProvider->getCollection(Dummy::class, null)->willReturn([$dummy, $dummy2]);
