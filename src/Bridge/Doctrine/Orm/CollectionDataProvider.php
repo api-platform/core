@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInter
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -27,7 +27,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class CollectionDataProvider implements CollectionDataProviderInterface
+class CollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
     private $managerRegistry;
     private $collectionExtensions;
@@ -42,6 +42,11 @@ class CollectionDataProvider implements CollectionDataProviderInterface
         $this->collectionExtensions = $collectionExtensions;
     }
 
+    public function supports(string $resourceClass, string $operationName = null): bool
+    {
+        return null !== $this->managerRegistry->getManagerForClass($resourceClass);
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -50,9 +55,6 @@ class CollectionDataProvider implements CollectionDataProviderInterface
     public function getCollection(string $resourceClass, string $operationName = null)
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
-        if (null === $manager) {
-            throw new ResourceClassNotSupportedException();
-        }
 
         $repository = $manager->getRepository($resourceClass);
         if (!method_exists($repository, 'createQueryBuilder')) {

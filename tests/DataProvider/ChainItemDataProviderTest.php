@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
@@ -26,6 +27,49 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 class ChainItemDataProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetItem()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Lucie');
+
+        $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $firstDataProvider->supports(Dummy::class, null)->willReturn(false);
+
+        $secondDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $secondDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $secondDataProvider->supports(Dummy::class, null)->willReturn(true);
+        $secondDataProvider->getItem(Dummy::class, 1, null, [])->willReturn($dummy);
+
+        $thirdDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $thirdDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $thirdDataProvider->supports(Dummy::class, null)->willReturn(true);
+        $thirdDataProvider->getItem(Dummy::class, 1, null, [])->willReturn(new \stdClass());
+
+        $chainItemDataProvider = new ChainItemDataProvider([
+            $firstDataProvider->reveal(),
+            $secondDataProvider->reveal(),
+            $thirdDataProvider->reveal(),
+        ]);
+
+        $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, 1));
+    }
+
+    public function testGetItemExceptions()
+    {
+        $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $firstDataProvider->supports('notfound', null)->willReturn(false);
+
+        $chainItemDataProvider = new ChainItemDataProvider([$firstDataProvider->reveal()]);
+
+        $this->assertEquals('', $chainItemDataProvider->getItem('notfound', 1));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
+     */
+    public function testLegacyGetItem()
     {
         $dummy = new Dummy();
         $dummy->setName('Lucie');
@@ -44,7 +88,11 @@ class ChainItemDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, 1));
     }
 
-    public function testGetItemExeptions()
+    /**
+     * @group legacy
+     * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
+     */
+    public function testLegacyGetItemExceptions()
     {
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $firstDataProvider->getItem('notfound', 1, null, [])->willThrow(ResourceClassNotSupportedException::class);

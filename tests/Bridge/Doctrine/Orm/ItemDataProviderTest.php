@@ -177,10 +177,7 @@ class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $dataProvider->getItem(Dummy::class, 1, 'foo'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotSupportedException
-     */
-    public function testThrowResourceClassNotSupportedException()
+    public function testUnsupportedClass()
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
@@ -192,7 +189,7 @@ class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $dataProvider = new ItemDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
-        $dataProvider->getItem(Dummy::class, 'foo');
+        $this->assertFalse($dataProvider->supports(Dummy::class, 'foo'));
     }
 
     /**
