@@ -140,11 +140,6 @@ services:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
 
-    app.entity.filter.dummy_car:
-        parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'colors.prop': 'ipartial' } ]
-        tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
-
     app.entity.filter.dummy_property.property:
         parent:    'api_platform.serializer.property_filter'
         tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
