@@ -21,6 +21,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\AnotherDummyFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -47,7 +48,7 @@ class AnnotationFilterPassTest extends \PHPUnit_Framework_TestCase
         $reader = $this->prophesize(Reader::class);
 
         $reader->getPropertyAnnotations(Argument::type(\ReflectionProperty::class))->will(function ($args) {
-            if ($args[0]->class === 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy' && $args[0]->name === 'dummyDate') {
+            if (Dummy::class === $args[0]->class && 'dummyDate' === $args[0]->name) {
                 return [new ApiFilter(['value' => DateFilter::class]), new ApiProperty()];
             }
 
@@ -55,7 +56,7 @@ class AnnotationFilterPassTest extends \PHPUnit_Framework_TestCase
         });
 
         $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->will(function ($args) {
-            if ($args[0]->name === 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy') {
+            if (Dummy::class === $args[0]->name) {
                 return [new ApiFilter(['value' => SearchFilter::class, 'strategy' => 'exact', 'properties' => ['description', 'relatedDummy.name', 'name']]), new ApiResource(), new ApiFilter(['value' => GroupFilter::class, 'arguments' => ['parameterName' => 'foobar']])];
             }
 
@@ -118,7 +119,7 @@ class AnnotationFilterPassTest extends \PHPUnit_Framework_TestCase
         });
 
         $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->will(function ($args) {
-            if ($args[0]->name === 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy') {
+            if (Dummy::class === $args[0]->name) {
                 return [new ApiFilter(['value' => AnotherDummyFilter::class])];
             }
 
@@ -149,7 +150,7 @@ class AnnotationFilterPassTest extends \PHPUnit_Framework_TestCase
         });
 
         $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->will(function ($args) {
-            if ($args[0]->name === 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy') {
+            if (Dummy::class === $args[0]->name) {
                 return [new ApiFilter(['value' => SearchFilter::class])];
             }
 

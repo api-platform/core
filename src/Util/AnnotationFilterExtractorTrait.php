@@ -36,7 +36,7 @@ trait AnnotationFilterExtractorTrait
     private function getFilterAnnotations(array $miscAnnotations): \Iterator
     {
         foreach ($miscAnnotations as $miscAnnotation) {
-            if (get_class($miscAnnotation) === ApiFilter::class) {
+            if (ApiFilter::class === get_class($miscAnnotation)) {
                 yield $miscAnnotation;
             }
         }
