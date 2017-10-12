@@ -40,7 +40,7 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
         $filterCollectionFactoryDefinitionProphecy->addArgument(['my_id'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
@@ -62,7 +62,7 @@ class FilterPassTest extends \PHPUnit_Framework_TestCase
         $filterCollectionFactoryDefinitionProphecy->addArgument(['bar'])->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter')->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();
+        $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
