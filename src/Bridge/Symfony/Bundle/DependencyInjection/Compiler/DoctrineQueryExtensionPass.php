@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Injects query extensions.
@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class DoctrineQueryExtensionPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -41,35 +43,12 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
         $subresourceDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.subresource_data_provider');
 
-        $collectionExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.collection');
-        $itemExtensions = $this->findSortedServices($container, 'api_platform.doctrine.orm.query_extension.item');
+        $collectionExtensions = $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.collection', $container);
+        $itemExtensions = $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.item', $container);
 
         $collectionDataProviderDefinition->replaceArgument(1, $collectionExtensions);
         $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
         $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);
         $subresourceDataProviderDefinition->replaceArgument(4, $itemExtensions);
-    }
-
-    /**
-     * Finds services having the given tag and sorts them by their priority attribute.
-     *
-     * @param ContainerBuilder $container
-     * @param string           $tag
-     *
-     * @return Reference[]
-     */
-    private function findSortedServices(ContainerBuilder $container, $tag)
-    {
-        $extensions = [];
-        foreach ($container->findTaggedServiceIds($tag) as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                $priority = $tag['priority'] ?? 0;
-                $extensions[$priority][] = new Reference($serviceId);
-            }
-        }
-        krsort($extensions);
-
-        // Flatten the array
-        return empty($extensions) ? [] : call_user_func_array('array_merge', $extensions);
     }
 }
