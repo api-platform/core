@@ -276,6 +276,13 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'hydra:title' => "Retrieves $shortName resource.",
                 'returns' => $prefixedShortName,
             ];
+        } elseif ('PATCH' === $method) {
+            $hydraOperation += [
+                '@type' => 'hydra:Operation',
+                'hydra:title' => "Updates the $shortName resource.",
+                'returns' => $prefixedShortName,
+                'expects' => $prefixedShortName,
+            ];
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:CreateAction'],

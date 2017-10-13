@@ -283,6 +283,10 @@ abstract class AbstractFilter implements FilterInterface
             $resourceClass = null;
         }
 
+        if (null !== $properties = $request->attributes->get('_api_filter_common')) {
+            return $properties;
+        }
+
         $needsFixing = false;
 
         if (null !== $this->properties) {

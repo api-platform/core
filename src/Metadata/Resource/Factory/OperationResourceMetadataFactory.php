@@ -23,10 +23,12 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 final class OperationResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
     private $decorated;
+    private $formats;
 
-    public function __construct(ResourceMetadataFactoryInterface $decorated)
+    public function __construct(ResourceMetadataFactoryInterface $decorated, array $formats = [])
     {
         $this->decorated = $decorated;
+        $this->formats = $formats;
     }
 
     /**
@@ -45,9 +47,17 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         }
 
         if (null === $resourceMetadata->getItemOperations()) {
-            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations(
-                $isAbstract ? ['GET', 'DELETE'] : ['GET', 'PUT', 'DELETE']
-            ));
+            $methods = ['GET', 'DELETE'];
+
+            if (!$isAbstract) {
+                $methods[] = 'PUT';
+
+                if (isset($this->formats['jsonapi'])) {
+                    $methods[] = 'PATCH';
+                }
+            }
+
+            $resourceMetadata = $resourceMetadata->withItemOperations($this->createOperations($methods));
         }
 
         return $resourceMetadata;

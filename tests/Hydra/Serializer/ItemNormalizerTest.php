@@ -44,12 +44,10 @@ class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceClassResolverProphecy->getResourceClass(['dummy'], 'Dummy')->willReturn(Dummy::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name' => 'name']));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata())->shouldBeCalled(1);
 
         $normalizer = new ItemNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $contextBuilderProphecy->reveal());
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', ItemNormalizer::FORMAT));
-        $normalizer->denormalize(['foo'], Dummy::class, 'jsonld', ['jsonld_has_context' => true, 'jsonld_sub_level' => true, 'resource_class' => Dummy::class]);
     }
 
     public function testSupportNormalization()

@@ -113,6 +113,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerApiKeysConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
+        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
@@ -309,6 +310,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+    }
+
+    /**
+     * Registers the JsonApi configuration.
+     *
+     * @param array         $formats
+     * @param XmlFileLoader $loader
+     */
+    private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader)
+    {
+        if (!isset($formats['jsonapi'])) {
+            return;
+        }
+
+        $loader->load('jsonapi.xml');
     }
 
     /**

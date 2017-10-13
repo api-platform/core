@@ -274,4 +274,9 @@ class Dummy
     {
         return $this->dummy;
     }
+
+    public function getRelatedDummies()
+    {
+        return $this->relatedDummies;
+    }
 }

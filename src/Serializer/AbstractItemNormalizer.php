@@ -245,7 +245,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return array
      */
-    private function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
+    protected function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
     {
         if (!is_array($value)) {
             throw new InvalidArgumentException(sprintf(
@@ -285,7 +285,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return object|null
      */
-    private function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
+    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
     {
         if (is_string($value)) {
             try {
@@ -434,15 +434,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return false;
             }
 
-            /*
-             * On a subresource, we know the value of the identifiers.
-             * If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri
-             */
-            if (null === $attributeValue && isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] && isset($context['subresource_resources'][$className])) {
-                return $this->iriConverter->getItemIriFromResourceClass($className, $context['subresource_resources'][$className]);
-            } elseif ($attributeValue) {
-                return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
-            }
+            return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
         }
 
         unset($context['resource_class']);
@@ -451,7 +443,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Normalizes a relation as an URI if is a Link or as a JSON-LD object.
+     * Normalizes a relation as an object if is a Link or as an URI.
      *
      * @param PropertyMetadata $propertyMetadata
      * @param mixed            $relatedObject
@@ -461,10 +453,20 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return string|array
      */
-    private function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
+    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
-        if ($propertyMetadata->isReadableLink()) {
-            $context['resource_class'] = $resourceClass;
+        // On a subresource, we know the value of the identifiers.
+        // If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri
+        if (null === $relatedObject && isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] && isset($context['subresource_resources'][$resourceClass])) {
+            return $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
+        }
+
+        if (null === $relatedObject || $propertyMetadata->isReadableLink()) {
+            if (null === $relatedObject) {
+                unset($context['resource_class']);
+            } else {
+                $context['resource_class'] = $resourceClass;
+            }
 
             return $this->serializer->normalize($relatedObject, $format, $context);
         }

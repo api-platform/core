@@ -151,7 +151,7 @@ Feature: Using custom normalized entity
     Then the response status code should be 200
     And the response should be in JSON
     And the hydra class "CustomNormalizedDummy" exist
-    And 3 operations are available for hydra class "CustomNormalizedDummy"
+    And 4 operations are available for hydra class "CustomNormalizedDummy"
     And 2 properties are available for hydra class "CustomNormalizedDummy"
     And "name" property is readable for hydra class "CustomNormalizedDummy"
     And "name" property is writable for hydra class "CustomNormalizedDummy"

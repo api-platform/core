@@ -76,6 +76,17 @@ class GroupFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['groups' => ['foo', 'baz']], $context);
     }
 
+    public function testApplyWithGroupsInCommonFilterAttribute()
+    {
+        $request = new Request(['groups' => ['foo', 'bar', 'baz']], [], ['_api_filter_common' => ['groups' => ['fooz']]]);
+        $context = ['groups' => ['foo', 'qux']];
+
+        $groupFilter = new GroupFilter();
+        $groupFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['groups' => ['foo', 'qux', 'fooz']], $context);
+    }
+
     public function testApplyWithInvalidGroupsInRequest()
     {
         $request = new Request(['groups' => 'foo,bar,baz']);

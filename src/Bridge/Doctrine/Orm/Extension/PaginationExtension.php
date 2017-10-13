@@ -89,7 +89,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         }
 
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-            $itemsPerPage = (int) $request->query->get($this->itemsPerPageParameterName, $itemsPerPage);
+            $itemsPerPage = (int) $this->getPaginationParameter($request, $this->itemsPerPageParameterName, $itemsPerPage);
             $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
         }
 
@@ -97,7 +97,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             throw new InvalidArgumentException('Item per page parameter should not be less than or equal to 0');
         }
 
-        $firstResult = ($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage;
+        $firstResult = ($this->getPaginationParameter($request, $this->pageParameterName, 1) - 1) * $itemsPerPage;
         if ($request->attributes->get('_graphql')) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             if (isset($collectionArgs[$resourceClass]['after'])) {
@@ -173,7 +173,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         }
 
         if ($clientEnabled && $request) {
-            $enabled = filter_var($request->query->get($this->partialParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
+            $enabled = filter_var($this->getPaginationParameter($request, $this->partialParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
         }
 
         return $enabled;
@@ -185,7 +185,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
         $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
 
         if ($clientEnabled) {
-            $enabled = filter_var($request->query->get($this->enabledParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
+            $enabled = filter_var($this->getPaginationParameter($request, $this->enabledParameterName, $enabled), FILTER_VALIDATE_BOOLEAN);
         }
 
         return $enabled;
@@ -253,5 +253,14 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
 
         // Disable output walkers by default (performance)
         return false;
+    }
+
+    private function getPaginationParameter(Request $request, string $parameterName, $default = null)
+    {
+        if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
+            return array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
+        }
+
+        return $request->query->get($parameterName, $default);
     }
 }

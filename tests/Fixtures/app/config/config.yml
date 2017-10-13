@@ -34,9 +34,14 @@ api_platform:
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
         html:                          ['text/html']
+    error_formats:
+        jsonproblem:                   ['application/problem+json']
+        jsonld:                        ['application/ld+json']
+        jsonapi:                       ['application/vnd.api+json']
     graphql:                           true
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
@@ -109,7 +114,7 @@ services:
     # Tests if the id default to the service name, do not add id attributes here
     my_dummy.order:
         parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
+        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
     app.my_dummy_resource.date_filter:
