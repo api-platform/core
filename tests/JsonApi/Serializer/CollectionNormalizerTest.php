@@ -59,7 +59,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 'foo',
                 CollectionNormalizer::FORMAT,
                 [
-                    'uri' => 'http://localhost/foos?page=3',
+                    'request_uri' => '/foos?page=3',
                     'api_sub_level' => true,
                     'resource_class' => 'Foo',
                 ]
@@ -80,11 +80,11 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $expected = [
             'links' => [
-                'self' => 'http://localhost/foos?page=3',
-                'first' => 'http://localhost/foos?page=1',
-                'last' => 'http://localhost/foos?page=7',
-                'prev' => 'http://localhost/foos?page=2',
-                'next' => 'http://localhost/foos?page=4',
+                'self' => '/foos?page=3',
+                'first' => '/foos?page=1',
+                'last' => '/foos?page=7',
+                'prev' => '/foos?page=2',
+                'next' => '/foos?page=4',
             ],
             'data' => [
                 [
@@ -103,7 +103,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, ['uri' => 'http://localhost/foos?page=3']));
+        $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, ['request_uri' => '/foos?page=3']));
     }
 
     public function testNormalizeArray()
@@ -119,7 +119,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 'foo',
                 CollectionNormalizer::FORMAT,
                 [
-                    'uri' => 'http://localhost/foos',
+                    'request_uri' => '/foos',
                     'api_sub_level' => true,
                     'resource_class' => 'Foo',
                 ]
@@ -139,7 +139,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $expected = [
-            'links' => ['self' => 'http://localhost/foos'],
+            'links' => ['self' => '/foos'],
             'data' => [
                 [
                     'type' => 'Foo',
@@ -153,7 +153,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
             'meta' => ['totalItems' => 1],
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['uri' => 'http://localhost/foos']));
+        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
     }
 
     /**
@@ -173,7 +173,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
                 'foo',
                 CollectionNormalizer::FORMAT,
                 [
-                    'uri' => 'http://localhost/foos',
+                    'request_uri' => '/foos',
                     'api_sub_level' => true,
                     'resource_class' => 'Foo',
                 ]
@@ -183,6 +183,6 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
-        $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['uri' => 'http://localhost/foos']);
+        $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']);
     }
 }
