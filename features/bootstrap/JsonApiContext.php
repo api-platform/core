@@ -77,9 +77,7 @@ final class JsonApiContext implements Context
     public function theJsonNodeShouldBeAnEmptyArray($node)
     {
         if (!is_array($actual = $this->getValueOfNode($node)) || !empty($actual)) {
-            throw new \Exception(
-                sprintf("The node value is '%s'", json_encode($actual))
-            );
+            throw new \Exception(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 
@@ -91,9 +89,7 @@ final class JsonApiContext implements Context
     public function theJsonNodeShouldBeANumber($node)
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
-            throw new \Exception(
-                sprintf('The node value is `%s`', json_encode($actual))
-            );
+            throw new \Exception(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 
@@ -105,9 +101,7 @@ final class JsonApiContext implements Context
     public function theJsonNodeShouldNotBeAnEmptyString($node)
     {
         if ('' === $actual = $this->getValueOfNode($node)) {
-            throw new \Exception(
-                sprintf('The node value is `%s`', json_encode($actual))
-            );
+            throw new \Exception(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 

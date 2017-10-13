@@ -443,7 +443,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * Normalizes a relation as a JSON-LD object if is a Link or as an URI.
+     * Normalizes a relation as an object if is a Link or as an URI.
      *
      * @param PropertyMetadata $propertyMetadata
      * @param mixed            $relatedObject

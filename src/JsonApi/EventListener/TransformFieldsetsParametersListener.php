@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class TransformFieldsetsParametersListener
+final class TransformFieldsetsParametersListener
 {
     private $resourceMetadataFactory;
 
