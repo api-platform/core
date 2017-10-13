@@ -98,6 +98,28 @@ class PropertyFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['attributes' => ['foo', 'baz']], $context);
     }
 
+    public function testApplyWithPropertiesInPropertyFilterAttribute()
+    {
+        $request = new Request(['properties' => ['foo', 'bar', 'baz']], [], ['_api_filter_property' => ['fooz']]);
+        $context = ['attributes' => ['foo', 'qux']];
+
+        $propertyFilter = new PropertyFilter();
+        $propertyFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['attributes' => ['foo', 'qux', 'fooz']], $context);
+    }
+
+    public function testApplyWithPropertiesInCommonFilterAttribute()
+    {
+        $request = new Request(['properties' => ['foo', 'bar', 'baz']], [], ['_api_filter_common' => ['properties' => ['fooz']]]);
+        $context = ['attributes' => ['foo', 'qux']];
+
+        $propertyFilter = new PropertyFilter();
+        $propertyFilter->apply($request, true, [], $context);
+
+        $this->assertEquals(['attributes' => ['foo', 'qux', 'fooz']], $context);
+    }
+
     public function testApplyWithInvalidPropertiesInRequest()
     {
         $request = new Request(['properties' => 'foo,bar,baz']);

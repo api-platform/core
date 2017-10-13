@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -98,6 +99,72 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             'meta' => [
                 'totalItems' => 1312,
+                'itemsPerPage' => 12,
+                'currentPage' => 3,
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, ['request_uri' => '/foos?page=3']));
+    }
+
+    public function testNormalizePartialPaginator()
+    {
+        $paginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
+        $paginatorProphecy->getCurrentPage()->willReturn(3.)->shouldBeCalled();
+        $paginatorProphecy->getItemsPerPage()->willReturn(12.)->shouldBeCalled();
+        $paginatorProphecy->rewind()->shouldBeCalled();
+        $paginatorProphecy->next()->willReturn()->shouldBeCalled();
+        $paginatorProphecy->current()->willReturn('foo')->shouldBeCalled();
+        $paginatorProphecy->valid()->willReturn(true, false)->shouldBeCalled();
+        $paginatorProphecy->count()->willReturn(1312)->shouldBeCalled();
+
+        $paginator = $paginatorProphecy->reveal();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($paginator, null, true)->willReturn('Foo')->shouldBeCalled();
+
+        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
+        $itemNormalizer
+            ->normalize(
+                'foo',
+                CollectionNormalizer::FORMAT,
+                [
+                    'request_uri' => '/foos?page=3',
+                    'api_sub_level' => true,
+                    'resource_class' => 'Foo',
+                ]
+            )
+            ->willReturn([
+                'data' => [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Kévin',
+                    ],
+                ],
+            ]);
+
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer->setNormalizer($itemNormalizer->reveal());
+
+        $expected = [
+            'links' => [
+                'self' => '/foos?page=3',
+                'prev' => '/foos?page=2',
+                'next' => '/foos?page=4',
+            ],
+            'data' => [
+                [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Kévin',
+                    ],
+                ],
+            ],
+            'meta' => [
                 'itemsPerPage' => 12,
                 'currentPage' => 3,
             ],
