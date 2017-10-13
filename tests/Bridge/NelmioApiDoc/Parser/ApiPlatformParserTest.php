@@ -30,6 +30,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
@@ -94,8 +95,8 @@ class ApiPlatformParserTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Acme\CustomAttributeDummy')->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
-            'get' => ['method' => 'GET', 'normalization_context' => ['groups' => ['custom_attr_dummy_get']]],
-            'put' => ['method' => 'PUT', 'denormalization_context' => ['groups' => ['custom_attr_dummy_put']]],
+            'get' => ['method' => 'GET', 'normalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_get']]],
+            'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_put']]],
             'delete' => ['method' => 'DELETE'],
         ], []))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
@@ -189,9 +190,9 @@ class ApiPlatformParserTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', 'dummy', null, [
-            'get' => ['method' => 'GET', 'normalization_context' => ['groups' => ['custom_attr_dummy_get']]],
-            'put' => ['method' => 'PUT', 'denormalization_context' => ['groups' => ['custom_attr_dummy_put']]],
-            'gerard' => ['method' => 'get', 'path' => '/gerard', 'denormalization_context' => ['groups' => ['custom_attr_dummy_put']]],
+            'get' => ['method' => 'GET', 'normalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_get']]],
+            'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_put']]],
+            'gerard' => ['method' => 'get', 'path' => '/gerard', 'denormalization_context' => [AbstractNormalizer::GROUPS => ['custom_attr_dummy_put']]],
             'delete' => ['method' => 'DELETE'],
         ], []))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
