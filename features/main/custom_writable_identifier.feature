@@ -93,13 +93,13 @@ Feature: Using custom writable identifier on resource
     When I send a "GET" request to "/docs.jsonld"
     Then the response status code should be 200
     And the response should be in JSON
-    And the hydra class "CustomWritableIdentifierDummy" exist
-    And 3 operations are available for hydra class "CustomWritableIdentifierDummy"
-    And 2 properties are available for hydra class "CustomWritableIdentifierDummy"
-    And "name" property is readable for hydra class "CustomWritableIdentifierDummy"
-    And "name" property is writable for hydra class "CustomWritableIdentifierDummy"
-    And "slug" property is readable for hydra class "CustomWritableIdentifierDummy"
-    And "slug" property is writable for hydra class "CustomWritableIdentifierDummy"
+    And the Hydra class "CustomWritableIdentifierDummy" exists
+    And 3 operations are available for Hydra class "CustomWritableIdentifierDummy"
+    And 2 properties are available for Hydra class "CustomWritableIdentifierDummy"
+    And "name" property is readable for Hydra class "CustomWritableIdentifierDummy"
+    And "name" property is writable for Hydra class "CustomWritableIdentifierDummy"
+    And "slug" property is readable for Hydra class "CustomWritableIdentifierDummy"
+    And "slug" property is writable for Hydra class "CustomWritableIdentifierDummy"
 
   @dropSchema
   Scenario: Delete a resource

@@ -75,9 +75,9 @@ class RelatedToDummyFriend
     /**
      * Sets dummyFriend.
      *
-     * @param $dummyFriend the value to set
+     * @param DummyFriend $dummyFriend the value to set
      */
-    public function setDummyFriend($dummyFriend)
+    public function setDummyFriend(DummyFriend $dummyFriend)
     {
         $this->dummyFriend = $dummyFriend;
     }
@@ -95,9 +95,9 @@ class RelatedToDummyFriend
     /**
      * Sets relatedDummy.
      *
-     * @param $relatedDummy the value to set
+     * @param RelatedDummy $relatedDummy the value to set
      */
-    public function setRelatedDummy($relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummy = $relatedDummy;
     }

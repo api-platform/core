@@ -85,8 +85,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ($property !== 'id') {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn($property !== 'notindatabase')->shouldBeCalled();
+            if ('id' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn('notindatabase' !== $property)->shouldBeCalled();
             }
         }
 
@@ -163,8 +163,8 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ($property !== 'id') {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn($property !== 'notindatabase')->shouldBeCalled();
+            if ('id' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn('notindatabase' !== $property)->shouldBeCalled();
             }
         }
 
@@ -505,7 +505,7 @@ class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ($property !== 'id') {
+            if ('id' !== $property) {
                 $relatedClassMetadataProphecy->hasField($property)->willReturn(true)->shouldBeCalled();
             }
         }

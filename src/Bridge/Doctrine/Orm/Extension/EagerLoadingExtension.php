@@ -174,7 +174,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $propertyMetadataOptions, $method === 'leftJoin', $joinCount);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $propertyMetadataOptions, 'leftJoin' === $method, $joinCount);
         }
     }
 
@@ -222,7 +222,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         if (null !== $this->serializerContextBuilder && null !== $request) {
-            $contextFromRequest = $this->serializerContextBuilder->createFromRequest($request, $context === 'normalization_context');
+            $contextFromRequest = $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $context);
 
             if (isset($contextFromRequest['groups'])) {
                 return ['serializer_groups' => $contextFromRequest['groups']];
