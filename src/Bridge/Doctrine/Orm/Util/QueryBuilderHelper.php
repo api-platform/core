@@ -23,6 +23,10 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class QueryBuilderHelper
 {
+    private function __construct()
+    {
+    }
+
     /**
      * Adds a join to the queryBuilder if none exists.
      *
