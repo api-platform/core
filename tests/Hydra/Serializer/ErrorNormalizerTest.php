@@ -41,11 +41,11 @@ class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerStatusCode
      *
-     * @param $status            http status code of the Exception
-     * @param $originalMessage   original message of the Exception
-     * @param $debug             simulates kernel debug variable
+     * @param int    $status          http status code of the Exception
+     * @param string $originalMessage original message of the Exception
+     * @param bool   $debug           simulates kernel debug variable
      */
-    public function testErrorServerNormalize($status, $originalMessage, $debug)
+    public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug)
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();
