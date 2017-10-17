@@ -324,6 +324,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 }
                 break;
         }
+
+        return null;
     }
 
     /**

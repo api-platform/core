@@ -24,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
 use Symfony\Component\Routing\Route;
@@ -36,37 +37,27 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
     {
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactory = $resourceNameCollectionFactoryProphecy->reveal();
-
-        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $documentationNormalizer = $documentationNormalizerProphecy->reveal();
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
-
-        $filters = new FilterCollection();
-
-        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
-        $operationMethodResolver = $operationMethodResolverProphecy->reveal();
-
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactory, $documentationNormalizer, $resourceMetadataFactory, $filters, $operationMethodResolver);
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(NormalizerInterface::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new FilterCollection(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
 
         $this->assertInstanceOf(AnnotationsProviderInterface::class, $apiPlatformProvider);
     }
 
     public function testGetAnnotations()
     {
+        $resourceNameCollection = new ResourceNameCollection([Dummy::class, RelatedDummy::class]);
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
-        $resourceNameCollectionFactory = $resourceNameCollectionFactoryProphecy->reveal();
+        $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection)->shouldBeCalled();
 
         $apiDocumentationBuilderProphecy = $this->prophesize(NormalizerInterface::class);
-        $hydraDoc = $this->getHydraDoc();
-        $apiDocumentationBuilderProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
-        $apiDocumentationBuilder = $apiDocumentationBuilderProphecy->reveal();
+        $apiDocumentationBuilderProphecy->normalize(new Documentation($resourceNameCollection))->willReturn($this->getHydraDoc())->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $dummyResourceMetadata = (new ResourceMetadata())
             ->withShortName('Dummy')
             ->withItemOperations([
@@ -91,8 +82,13 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
                     'method' => 'POST',
                 ],
             ]);
+
+        $relatedDummyResourceMetadata = (new ResourceMetadata())
+            ->withShortName('RelatedDummy');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
-        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedDummyResourceMetadata)->shouldBeCalled();
 
         $dummySearchFilterProphecy = $this->prophesize(FilterInterface::class);
         $dummySearchFilterProphecy->getDescription(Dummy::class)->willReturn([
@@ -103,9 +99,9 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
                 'strategy' => 'partial',
             ],
         ])->shouldBeCalled();
-        $dummySearchFilter = $dummySearchFilterProphecy->reveal();
+
         $filters = new FilterCollection([
-            'my_dummy.search' => $dummySearchFilter,
+            'my_dummy.search' => $dummySearchFilterProphecy->reveal(),
         ]);
 
         $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
@@ -119,78 +115,105 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'get')->willReturn((new Route('/dummies/{id}'))->setMethods(['GET']))->shouldBeCalled();
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'put')->willReturn((new Route('/dummies/{id}'))->setMethods(['PUT']))->shouldBeCalled();
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'delete')->willReturn((new Route('/dummies/{id}'))->setMethods(['DELETE']))->shouldBeCalled();
-        $operationMethodResolver = $operationMethodResolverProphecy->reveal();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactory, $apiDocumentationBuilder, $resourceMetadataFactory, $filters, $operationMethodResolver);
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $apiDocumentationBuilderProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(), $filters,
+            $operationMethodResolverProphecy->reveal()
+        );
 
-        $actual = $apiPlatformProvider->getAnnotations();
+        $annotations = $apiPlatformProvider->getAnnotations();
 
-        $this->assertInternalType('array', $actual);
-        $this->assertCount(5, $actual);
+        $this->assertInternalType('array', $annotations);
+        $this->assertCount(5, $annotations);
 
-        $this->assertInstanceOf(ApiDoc::class, $actual[0]);
-        $this->assertEquals('/dummies', $actual[0]->getResource());
-        $this->assertEquals('Retrieves the collection of Dummy resources.', $actual[0]->getDescription());
-        $this->assertEquals('Dummy', $actual[0]->getResourceDescription());
-        $this->assertEquals('Dummy', $actual[0]->getSection());
-        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'), $actual[0]->getOutput());
-        $this->assertEquals([
-            'name' => [
-                'property' => 'name',
-                'type' => 'string',
-                'required' => 'false',
-                'strategy' => 'partial',
+        $expectedResults = [
+            [
+                'resource' => '/dummies',
+                'description' => 'Retrieves the collection of Dummy resources.',
+                'resource_description' => 'Dummy',
+                'section' => 'Dummy',
+                'input' => null,
+                'output' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'),
+                'filters' => [
+                    'name' => [
+                        'property' => 'name',
+                        'type' => 'string',
+                        'required' => 'false',
+                        'strategy' => 'partial',
+                    ],
+                ],
+                'path' => '/dummies',
+                'methods' => ['GET'],
             ],
-        ], $actual[0]->getFilters());
-        $this->assertInstanceOf(Route::class, $actual[0]->getRoute());
-        $this->assertEquals('/dummies', $actual[0]->getRoute()->getPath());
-        $this->assertEquals(['GET'], $actual[0]->getRoute()->getMethods());
+            [
+                'resource' => '/dummies',
+                'description' => 'Creates a Dummy resource.',
+                'resource_description' => 'Dummy',
+                'section' => 'Dummy',
+                'input' => sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class, 'post'),
+                'output' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'post'),
+                'filters' => [],
+                'path' => '/dummies',
+                'methods' => ['POST'],
+            ],
+            [
+                'resource' => '/dummies/{id}',
+                'description' => 'Retrieves Dummy resource.',
+                'resource_description' => 'Dummy',
+                'section' => 'Dummy',
+                'input' => null,
+                'output' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'),
+                'filters' => [],
+                'path' => '/dummies/{id}',
+                'methods' => ['GET'],
+            ],
+            [
+                'resource' => '/dummies/{id}',
+                'description' => 'Replaces the Dummy resource.',
+                'resource_description' => 'Dummy',
+                'section' => 'Dummy',
+                'input' => sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class, 'put'),
+                'output' => sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'put'),
+                'filters' => [],
+                'path' => '/dummies/{id}',
+                'methods' => ['PUT'],
+            ],
+            [
+                'resource' => '/dummies/{id}',
+                'description' => 'Deletes the Dummy resource.',
+                'resource_description' => 'Dummy',
+                'section' => 'Dummy',
+                'input' => null,
+                'output' => null,
+                'filters' => [],
+                'path' => '/dummies/{id}',
+                'methods' => ['DELETE'],
+            ],
+        ];
 
-        $this->assertInstanceOf(ApiDoc::class, $actual[1]);
-        $this->assertEquals('/dummies', $actual[1]->getResource());
-        $this->assertEquals('Creates a Dummy resource.', $actual[1]->getDescription());
-        $this->assertEquals('Dummy', $actual[1]->getResourceDescription());
-        $this->assertEquals('Dummy', $actual[1]->getSection());
-        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class, 'post'), $actual[1]->getInput());
-        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'post'), $actual[1]->getOutput());
-        $this->assertInstanceOf(Route::class, $actual[1]->getRoute());
-        $this->assertEquals('/dummies', $actual[1]->getRoute()->getPath());
-        $this->assertEquals(['POST'], $actual[1]->getRoute()->getMethods());
+        foreach ($expectedResults as $i => $expected) {
+            /** @var ApiDoc $apiDoc */
+            $apiDoc = $annotations[$i];
 
-        $this->assertInstanceOf(ApiDoc::class, $actual[2]);
-        $this->assertEquals('/dummies/{id}', $actual[2]->getResource());
-        $this->assertEquals('Retrieves Dummy resource.', $actual[2]->getDescription());
-        $this->assertEquals('Dummy', $actual[2]->getResourceDescription());
-        $this->assertEquals('Dummy', $actual[2]->getSection());
-        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'get'), $actual[2]->getOutput());
-        $this->assertInstanceOf(Route::class, $actual[2]->getRoute());
-        $this->assertEquals('/dummies/{id}', $actual[2]->getRoute()->getPath());
-        $this->assertEquals(['GET'], $actual[2]->getRoute()->getMethods());
-
-        $this->assertInstanceOf(ApiDoc::class, $actual[3]);
-        $this->assertEquals('/dummies/{id}', $actual[3]->getResource());
-        $this->assertEquals('Replaces the Dummy resource.', $actual[3]->getDescription());
-        $this->assertEquals('Dummy', $actual[3]->getResourceDescription());
-        $this->assertEquals('Dummy', $actual[3]->getSection());
-        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::IN_PREFIX, Dummy::class, 'put'), $actual[3]->getInput());
-        $this->assertEquals(sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, Dummy::class, 'put'), $actual[3]->getOutput());
-        $this->assertInstanceOf(Route::class, $actual[3]->getRoute());
-        $this->assertEquals('/dummies/{id}', $actual[3]->getRoute()->getPath());
-        $this->assertEquals(['PUT'], $actual[3]->getRoute()->getMethods());
-
-        $this->assertInstanceOf(ApiDoc::class, $actual[4]);
-        $this->assertEquals('/dummies/{id}', $actual[4]->getResource());
-        $this->assertEquals('Deletes the Dummy resource.', $actual[4]->getDescription());
-        $this->assertEquals('Dummy', $actual[4]->getResourceDescription());
-        $this->assertEquals('Dummy', $actual[4]->getSection());
-        $this->assertInstanceOf(Route::class, $actual[4]->getRoute());
-        $this->assertEquals('/dummies/{id}', $actual[4]->getRoute()->getPath());
-        $this->assertEquals(['DELETE'], $actual[4]->getRoute()->getMethods());
+            $this->assertInstanceOf(ApiDoc::class, $apiDoc);
+            $this->assertEquals($expected['resource'], $apiDoc->getResource());
+            $this->assertEquals($expected['description'], $apiDoc->getDescription());
+            $this->assertEquals($expected['resource_description'], $apiDoc->getResourceDescription());
+            $this->assertEquals($expected['section'], $apiDoc->getSection());
+            $this->assertEquals($expected['input'], $apiDoc->getInput());
+            $this->assertEquals($expected['output'], $apiDoc->getOutput());
+            $this->assertEquals($expected['filters'], $apiDoc->getFilters());
+            $this->assertInstanceOf(Route::class, $apiDoc->getRoute());
+            $this->assertEquals($expected['path'], $apiDoc->getRoute()->getPath());
+            $this->assertEquals($expected['methods'], $apiDoc->getRoute()->getMethods());
+        }
     }
 
     private function getHydraDoc()
     {
-        $hydraDocJson = <<<JSON
+        $hydraDocJson = <<<'JSON'
             {
                 "hydra:supportedClass": [
                     {
@@ -243,5 +266,242 @@ class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
 JSON;
 
         return json_decode($hydraDocJson, true);
+    }
+
+    public function testGetAnnotationsWithEmptyHydraDoc()
+    {
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn([])->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new FilterCollection(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
+
+        $this->assertEquals([], $apiPlatformProvider->getAnnotations());
+    }
+
+    public function testGetAnnotationsWithInvalidHydraSupportedClass()
+    {
+        $hydraDoc = ['hydra:supportedClass' => 'not an array'];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new FilterCollection(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
+
+        $this->assertEquals([], $apiPlatformProvider->getAnnotations());
+    }
+
+    public function testGetAnnotationsWithEmptyHydraSupportedClass()
+    {
+        $hydraDoc = ['hydra:supportedClass' => []];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new FilterCollection(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
+
+        $this->assertEquals([], $apiPlatformProvider->getAnnotations());
+    }
+
+    public function testGetAnnotationsWithInvalidHydraSupportedOperation()
+    {
+        $hydraDoc = ['hydra:supportedClass' => [
+            ['@id' => '#Entrypoint'],
+            ['@id' => '#Dummy', 'hydra:supportedOperation' => 'not an array'],
+        ]];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $dummyResourceMetadata = (new ResourceMetadata())
+            ->withShortName('Dummy')
+            ->withItemOperations([
+                'get' => [
+                    'method' => 'GET',
+                ],
+            ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
+
+        $route = (new Route('/dummies/{id}'))->setMethods(['GET']);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
+        $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            new FilterCollection(),
+            $operationMethodResolverProphecy->reveal()
+        );
+
+        $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '']);
+        $apiDoc->setRoute($route);
+
+        $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
+    }
+
+    public function testGetAnnotationsWithEmptyHydraSupportedOperation()
+    {
+        $hydraDoc = ['hydra:supportedClass' => [
+            ['@id' => '#Entrypoint'],
+            ['@id' => '#Dummy', 'hydra:supportedOperation' => []],
+        ]];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $dummyResourceMetadata = (new ResourceMetadata())
+            ->withShortName('Dummy')
+            ->withItemOperations([
+                'get' => [
+                    'method' => 'GET',
+                ],
+            ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
+
+        $route = (new Route('/dummies/{id}'))->setMethods(['GET']);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
+        $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            new FilterCollection(),
+            $operationMethodResolverProphecy->reveal()
+        );
+
+        $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '']);
+        $apiDoc->setRoute($route);
+
+        $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
+    }
+
+    public function testGetAnnotationsWithInvalidHydraSupportedProperty()
+    {
+        $hydraDoc = ['hydra:supportedClass' => [
+            ['@id' => '#Entrypoint', 'hydra:supportedProperty' => 'not an array'],
+            ['@id' => '#Dummy'],
+        ]];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $dummyResourceMetadata = (new ResourceMetadata())
+            ->withShortName('Dummy')
+            ->withCollectionOperations([
+                'get' => [
+                    'method' => 'GET',
+                ],
+            ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
+
+        $route = (new Route('/dummies'))->setMethods(['GET']);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
+        $operationMethodResolverProphecy->getCollectionOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            new FilterCollection(),
+            $operationMethodResolverProphecy->reveal()
+        );
+
+        $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '', 'filters' => []]);
+        $apiDoc->setRoute($route);
+
+        $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
+    }
+
+    public function testGetAnnotationsWithEmptyHydraSupportedProperty()
+    {
+        $hydraDoc = ['hydra:supportedClass' => [
+            ['@id' => '#Entrypoint', 'hydra:supportedProperty' => []],
+            ['@id' => '#Dummy'],
+        ]];
+
+        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $documentationNormalizerProphecy->normalize(new Documentation(new ResourceNameCollection([Dummy::class])))->willReturn($hydraDoc)->shouldBeCalled();
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $dummyResourceMetadata = (new ResourceMetadata())
+            ->withShortName('Dummy')
+            ->withCollectionOperations([
+                'get' => [
+                    'method' => 'GET',
+                ],
+            ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();
+
+        $route = (new Route('/dummies'))->setMethods(['GET']);
+
+        $operationMethodResolverProphecy = $this->prophesize(OperationMethodResolverInterface::class);
+        $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
+        $operationMethodResolverProphecy->getCollectionOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
+
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            new FilterCollection(),
+            $operationMethodResolverProphecy->reveal()
+        );
+
+        $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '', 'filters' => []]);
+        $apiDoc->setRoute($route);
+
+        $this->assertEquals([$apiDoc], $apiPlatformProvider->getAnnotations());
     }
 }

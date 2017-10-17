@@ -43,7 +43,6 @@ return PhpCsFixer\Config::create()
             'throw',
             'use',
         ],
-        'no_unreachable_default_argument_value' => true,
         'no_useless_else' => true,
         'no_useless_return' => true,
         'ordered_imports' => true,
