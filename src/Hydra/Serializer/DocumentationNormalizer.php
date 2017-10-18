@@ -481,7 +481,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         // @see https://api-platform.com/docs/core/extending-jsonld-context
         $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
         foreach ($jsonldContext as $contextKey => $contextValue) {
-            if ($contextKey === '@id' || $contextKey === '@type') {
+            if ('@id' === $contextKey || '@type' === $contextKey) {
                 continue;
             }
             $propertyData[$contextKey] = $contextValue;
