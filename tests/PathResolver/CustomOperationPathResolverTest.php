@@ -16,11 +16,12 @@ namespace ApiPlatform\Core\Tests\PathResolver;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class CustomOperationPathResolverTest extends \PHPUnit_Framework_TestCase
+class CustomOperationPathResolverTest extends TestCase
 {
     public function testResolveOperationPath()
     {

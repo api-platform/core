@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -25,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class RouterOperationPathResolverTest extends \PHPUnit_Framework_TestCase
+class RouterOperationPathResolverTest extends TestCase
 {
     public function testResolveOperationPath()
     {

@@ -25,8 +25,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\TestCase;
 
-class IdentifierManagerTraitTest extends \PHPUnit_Framework_TestCase
+class IdentifierManagerTraitTest extends TestCase
 {
     private function getIdentifierManagerTraitImpl(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {

@@ -57,7 +57,7 @@ class CompositeItem
     /**
      * Gets field1.
      *
-     * @return string
+     * @return string|null
      */
     public function getField1()
     {
@@ -67,9 +67,9 @@ class CompositeItem
     /**
      * Sets field1.
      *
-     * @param string the value to set
+     * @param string|null $field1 the value to set
      */
-    public function setField1($field1)
+    public function setField1($field1 = null)
     {
         $this->field1 = $field1;
     }

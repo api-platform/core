@@ -24,11 +24,12 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class SubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
+class SubresourceOperationFactoryTest extends TestCase
 {
     public function testCreate()
     {

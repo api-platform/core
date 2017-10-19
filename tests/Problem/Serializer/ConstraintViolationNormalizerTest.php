@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Problem\Serializer;
 
 use ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
+class ConstraintViolationNormalizerTest extends TestCase
 {
     public function testSupportNormalization()
     {

@@ -15,12 +15,13 @@ namespace ApiPlatform\Core\Tests\Serializer\Filter;
 
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class PropertyFilterTest extends \PHPUnit_Framework_TestCase
+class PropertyFilterTest extends TestCase
 {
     public function testApply()
     {

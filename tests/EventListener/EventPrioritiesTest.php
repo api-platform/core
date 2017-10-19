@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\EventPriorities;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class EventPrioritiesTest extends \PHPUnit_Framework_TestCase
+class EventPrioritiesTest extends TestCase
 {
     public function testConstants()
     {

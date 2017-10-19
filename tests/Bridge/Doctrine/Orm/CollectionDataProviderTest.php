@@ -24,12 +24,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CollectionDataProviderTest extends \PHPUnit_Framework_TestCase
+class CollectionDataProviderTest extends TestCase
 {
     public function testGetCollection()
     {

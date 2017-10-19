@@ -18,6 +18,6 @@ date_default_timezone_set('UTC');
 $loader = require __DIR__.'/../../../vendor/autoload.php';
 require __DIR__.'/AppKernel.php';
 
-AnnotationRegistry::registerLoader([$loader, 'loadClass']);
+AnnotationRegistry::registerLoader('class_exists');
 
 return $loader;
