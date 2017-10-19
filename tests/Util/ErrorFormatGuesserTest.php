@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Util;
 
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ErrorFormatGuesserTest extends \PHPUnit_Framework_TestCase
+class ErrorFormatGuesserTest extends TestCase
 {
     public function testGuessErrorFormat()
     {

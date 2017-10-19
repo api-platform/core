@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class RouteNameResolverTest extends \PHPUnit_Framework_TestCase
+class RouteNameResolverTest extends TestCase
 {
     public function testConstruct()
     {

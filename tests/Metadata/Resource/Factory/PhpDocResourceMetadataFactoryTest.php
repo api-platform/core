@@ -18,8 +18,9 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\ClassWithNoDocBlock;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use PHPUnit\Framework\TestCase;
 
-class PhpDocResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class PhpDocResourceMetadataFactoryTest extends TestCase
 {
     public function testExistingDescription()
     {

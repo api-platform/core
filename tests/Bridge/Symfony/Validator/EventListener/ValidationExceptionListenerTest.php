@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ValidationExceptionListenerTest extends \PHPUnit_Framework_TestCase
+class ValidationExceptionListenerTest extends TestCase
 {
     public function testNotValidationException()
     {

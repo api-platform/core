@@ -17,11 +17,12 @@ use ApiPlatform\Core\Action\EntrypointAction;
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class EntrypointActionTest extends \PHPUnit_Framework_TestCase
+class EntrypointActionTest extends TestCase
 {
     public function testGetEntrypoint()
     {

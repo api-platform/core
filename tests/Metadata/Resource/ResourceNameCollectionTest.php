@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Resource;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ResourceNameCollectionTest extends \PHPUnit_Framework_TestCase
+class ResourceNameCollectionTest extends TestCase
 {
     public function testValueObject()
     {
