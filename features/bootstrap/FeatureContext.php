@@ -28,33 +28,21 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behatch\HttpCall\Request;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * Defines application features from the specific context.
  */
-class FeatureContext implements Context, SnippetAcceptingContext
+final class FeatureContext implements Context, SnippetAcceptingContext
 {
-    private $doctrine;
-
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var EntityManagerInterface
      */
     private $manager;
-
-    /**
-     * @var SchemaTool
-     */
+    private $doctrine;
     private $schemaTool;
-
-    /**
-     * @var array
-     */
     private $classes;
-
-    /**
-     * @var Request
-     */
     private $request;
 
     /**
@@ -103,7 +91,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects
      */
-    public function thereIsDummyObjects($nb)
+    public function thereIsDummyObjects(int $nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -123,7 +111,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects with relatedDummy
      */
-    public function thereIsDummyObjectsWithRelatedDummy($nb)
+    public function thereIsDummyObjectsWithRelatedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = new RelatedDummy();
@@ -144,7 +132,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects having each :nbrelated relatedDummies
      */
-    public function thereIsDummyObjectsWithRelatedDummies($nb, $nbrelated)
+    public function thereIsDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();
@@ -154,11 +142,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
             for ($j = 1; $j <= $nbrelated; ++$j) {
                 $relatedDummy = new RelatedDummy();
                 $relatedDummy->setName('RelatedDummy'.$j.$i);
+
                 $this->manager->persist($relatedDummy);
+
                 $dummy->addRelatedDummy($relatedDummy);
             }
 
-            $this->manager->persist($relatedDummy);
             $this->manager->persist($dummy);
         }
 
@@ -168,7 +157,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects with dummyDate
      */
-    public function thereIsDummyObjectsWithDummyDate($nb)
+    public function thereIsDummyObjectsWithDummyDate(int $nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -194,7 +183,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects with dummyDate and dummyBoolean :bool
      */
-    public function thereIsDummyObjectsWithDummyDateAndDummyBoolean($nb, $bool)
+    public function thereIsDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -230,7 +219,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects with dummyDate and relatedDummy
      */
-    public function thereIsDummyObjectsWithDummyDateAndRelatedDummy($nb)
+    public function thereIsDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -258,7 +247,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects with dummyPrice
      */
-    public function thereIsDummyObjectsWithDummyPrice($nb)
+    public function thereIsDummyObjectsWithDummyPrice(int $nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
         $prices = ['9.99', '12.99', '15.99', '19.99'];
@@ -279,7 +268,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is :nb dummy objects with dummyBoolean :bool
      */
-    public function thereIsDummyObjectsWithDummyBoolean($nb, $bool)
+    public function thereIsDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
         if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -394,7 +383,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a RelatedDummy with :nb friends
      */
-    public function thereIsARelatedDummyWithFriends($nb)
+    public function thereIsARelatedDummyWithFriends(int $nb)
     {
         $relatedDummy = new RelatedDummy();
         $relatedDummy->setName('RelatedDummy with friends');
@@ -426,10 +415,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Then the password :password for user :user should be hashed
      */
-    public function thePasswordForUserShouldBeHashed($password, $user)
+    public function thePasswordForUserShouldBeHashed(string $password, string $user)
     {
-        $repository = $this->doctrine->getRepository(User::class);
-        $user = $repository->find($user);
+        $user = $this->doctrine->getRepository(User::class)->find($user);
 
         if (!password_verify($password, $user->getPassword())) {
             throw new \Exception('User password mismatch');

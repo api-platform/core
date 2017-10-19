@@ -14,13 +14,15 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behatch\Context\RestContext;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class HydraContext implements Context
+final class HydraContext implements Context
 {
     /**
-     * @var PropertyAccessor
+     * @var RestContext
      */
+    private $restContext;
     private $propertyAccessor;
 
     public function __construct()
@@ -31,201 +33,176 @@ class HydraContext implements Context
     /**
      * Gives access to the Behatch context.
      *
-     * @param BeforeScenarioScope $scope
-     *
      * @BeforeScenario
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext('Behatch\Context\RestContext');
+        $this->restContext = $environment->getContext(RestContext::class);
     }
 
     /**
-     * @Then the Hydra class ":class" exist
+     * @Then the Hydra class :class exists
      */
-    public function assertTheHydraClassExist($className)
-    {
-        $this->getClassInfos($className);
-    }
-
-    /**
-     * @Then the Hydra class ":class" not exist
-     */
-    public function assertTheHydraClassNotExist($className)
+    public function assertTheHydraClassExist(string $className)
     {
         try {
-            $this->getClassInfos($className);
-
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exist.', $className));
-        } catch (\Exception $exception) {
-            // an exception must be catched
+            $this->getClassInfo($className);
+        } catch (\InvalidArgumentException $e) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
         }
     }
 
     /**
-     * @Then the value of the node ":node" of the Hydra class ":class" is ":value"
+     * @Then the Hydra class :class doesn't exist
      */
-    public function assertNodeValueIs($nodeName, $className, $value)
-    {
-        $classInfos = $this->getClassInfos($className);
-
-        \PHPUnit_Framework_Assert::assertEquals($this->propertyAccessor->getValue($classInfos, $nodeName), $value);
-    }
-
-    /**
-     * @Then the value of the node ":node" of the property ":prop" of the Hydra class ":class" is ":value"
-     */
-    public function assertPropertyNodeValueIs($nodeName, $propertyName, $className, $value)
-    {
-        $property = $this->getProperty($propertyName, $className);
-
-        \PHPUnit_Framework_Assert::assertEquals($this->propertyAccessor->getValue($property, $nodeName), $value);
-    }
-
-    /**
-     * @Then the value of the node ":node" of the operation ":operation" of the Hydra class ":class" is ":value"
-     */
-    public function assertOperationNodeValueIs($nodeName, $operationMethod, $className, $value)
-    {
-        $property = $this->getOperation($operationMethod, $className);
-
-        \PHPUnit_Framework_Assert::assertEquals($this->propertyAccessor->getValue($property, $nodeName), $value);
-    }
-
-    /**
-     * @Then :nb operations are available for Hydra class ":class"
-     */
-    public function assertNbOperationsExist($nb, $className)
-    {
-        $operations = $this->getOperations($className);
-
-        \PHPUnit_Framework_Assert::assertEquals($nb, count($operations));
-    }
-
-    /**
-     * @Then :nb properties are available for Hydra class ":class"
-     */
-    public function assertNbPropertiesExist($nb, $className)
-    {
-        $properties = $this->getProperties($className);
-
-        \PHPUnit_Framework_Assert::assertEquals($nb, count($properties));
-    }
-
-    /**
-     * @Then ":prop" property doesn't exist for the Hydra class ":class"
-     */
-    public function assertPropertyNotExist($propertyName, $className)
+    public function assertTheHydraClassNotExist(string $className)
     {
         try {
-            $this->getProperty($propertyName, $className);
-
-            throw new \PHPUnit_Framework_ExpectationFailedException(
-                sprintf('The property "%s" for the class "%s" exist.', $propertyName, $className)
-            );
-        } catch (\Exception $exception) {
-            // an exception must be catched
+            $this->getClassInfo($className);
+        } catch (\InvalidArgumentException $exception) {
+            return;
         }
+
+        throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exists.', $className));
     }
 
     /**
-     * @Then ":prop" property is readable for Hydra class ":class"
+     * @Then the value of the node :node of the Hydra class :class is :value
      */
-    public function assertPropertyIsReadable($propertyName, $className)
+    public function assertNodeValueIs(string $nodeName, string $className, string $value)
     {
-        $properties = $this->getProperty($propertyName, $className);
-
-        if (empty($properties->{'hydra:readable'})) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
-        }
+        \PHPUnit_Framework_Assert::assertEquals(
+            $this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName),
+            $value
+        );
     }
 
     /**
-     * @Then ":prop" property is not readable for Hydra class ":class"
+     * @Then the value of the node :node of the property :prop of the Hydra class :class is :value
      */
-    public function assertPropertyIsNotReadable($propertyName, $className)
+    public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value)
     {
-        $properties = $this->getProperty($propertyName, $className);
-
-        if (!empty($properties->{'hydra:readable'})) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
-        }
+        \PHPUnit_Framework_Assert::assertEquals(
+            $this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName),
+            $value
+        );
     }
 
     /**
-     * @Then ":prop" property is writable for Hydra class ":class"
+     * @Then the value of the node :node of the operation :operation of the Hydra class :class is :value
      */
-    public function assertPropertyIsWritable($propertyName, $className)
+    public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value)
     {
-        $properties = $this->getProperty($propertyName, $className);
-
-        if (empty($properties->{'hydra:writable'})) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
-        }
+        \PHPUnit_Framework_Assert::assertEquals(
+            $this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName),
+            $value
+        );
     }
 
     /**
-     * @Then ":prop" property is required for Hydra class ":class"
+     * @Then :nb operations are available for Hydra class :class
      */
-    public function assertPropertyIsRequired($propertyName, $className)
+    public function assertNbOperationsExist(int $nb, string $className)
     {
-        $properties = $this->getProperty($propertyName, $className);
-
-        if (empty($properties->{'hydra:required'})) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
-        }
+        \PHPUnit_Framework_Assert::assertEquals($nb, count($this->getOperations($className)));
     }
 
     /**
-     * @Then ":prop" property is not required for Hydra class ":class"
+     * @Then :nb properties are available for Hydra class :class
      */
-    public function assertPropertyIsNotRequired($propertyName, $className)
+    public function assertNbPropertiesExist(int $nb, string $className)
     {
-        $properties = $this->getProperty($propertyName, $className);
+        \PHPUnit_Framework_Assert::assertEquals($nb, count($this->getProperties($className)));
+    }
 
-        if (!empty($properties->{'hydra:required'})) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+    /**
+     * @Then :prop property doesn't exist for the Hydra class :class
+     */
+    public function assertPropertyNotExist(string $propertyName, string $className)
+    {
+        try {
+            $this->getPropertyInfo($propertyName, $className);
+        } catch (\InvalidArgumentException $exception) {
+            return;
+        }
+
+        throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className));
+    }
+
+    /**
+     * @Then :prop property is readable for Hydra class :class
+     */
+    public function assertPropertyIsReadable(string $propertyName, string $className)
+    {
+        if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
         }
     }
 
     /**
-     * @param string $propertyName
-     * @param string $className
+     * @Then :prop property is not readable for Hydra class :class
+     */
+    public function assertPropertyIsNotReadable(string $propertyName, string $className)
+    {
+        if ($this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then :prop property is writable for Hydra class :class
+     */
+    public function assertPropertyIsWritable(string $propertyName, string $className)
+    {
+        if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writable'}) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then :prop property is required for Hydra class :class
+     */
+    public function assertPropertyIsRequired(string $propertyName, string $className)
+    {
+        if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then :prop property is not required for Hydra class :class
+     */
+    public function assertPropertyIsNotRequired(string $propertyName, string $className)
+    {
+        if ($this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
+            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is required', $propertyName, $className));
+        }
+    }
+
+    /**
+     * Gets information about a property.
      *
-     * @throws Exception
-     *
-     * @return array
+     * @throws \InvalidArgumentException
      */
-    private function getProperty($propertyName, $className)
+    private function getPropertyInfo(string $propertyName, string $className): \stdClass
     {
-        $properties = $this->getProperties($className);
-        $propertyInfos = null;
-        foreach ($properties as $property) {
+        foreach ($this->getProperties($className) as $property) {
             if ($property->{'hydra:title'} === $propertyName) {
-                $propertyInfos = $property;
+                return $property;
             }
         }
 
-        if (empty($propertyInfos)) {
-            throw new \Exception(sprintf('Property "%s" of class "%s" does\'nt exist', $propertyName, $className));
-        }
-
-        return $propertyInfos;
+        throw new \InvalidArgumentException(sprintf('Property "%s" of class "%s" does\'nt exist', $propertyName, $className));
     }
 
     /**
      * Gets an operation by its method name.
      *
-     * @param string $className
-     * @param string $method
-     *
-     * @throws Exception
-     *
-     * @return array
+     * @throws \InvalidArgumentException
      */
-    private function getOperation($method, $className)
+    private function getOperation(string $method, string $className): \stdClass
     {
         foreach ($this->getOperations($className) as $operation) {
             if ($operation->{'hydra:method'} === $method) {
@@ -233,79 +210,53 @@ class HydraContext implements Context
             }
         }
 
-        throw new \Exception(sprintf('Operation "%s" of class "%s" doesn\'t exist.', $method, $className));
+        throw new \InvalidArgumentException(sprintf('Operation "%s" of class "%s" doesn\'t exist.', $method, $className));
     }
 
     /**
      * Gets all operations of a given class.
-     *
-     * @param string $className
-     *
-     * @throws Exception
-     *
-     * @return array
      */
-    private function getOperations($className)
+    private function getOperations(string $className): array
     {
-        $classInfos = $this->getClassInfos($className);
-
-        return $classInfos->{'hydra:supportedOperation'} ?? [];
+        return $this->getClassInfo($className)->{'hydra:supportedOperation'} ?? [];
     }
 
     /**
      * Gets all properties of a given class.
-     *
-     * @param string $className
-     *
-     * @throws Exception
-     *
-     * @return array
      */
-    private function getProperties($className)
+    private function getProperties(string $className): array
     {
-        $classInfos = $this->getClassInfos($className);
-
-        return $classInfos->{'hydra:supportedProperty'} ?? [];
+        return $this->getClassInfo($className)->{'hydra:supportedProperty'} ?? [];
     }
 
     /**
      * Gets information about a class.
      *
-     * @param string $className
-     *
-     * @throws Exception
-     *
-     * @return array
+     * @throws \InvalidArgumentException
      */
-    private function getClassInfos($className)
+    private function getClassInfo(string $className): \stdClass
     {
         $json = $this->getLastJsonResponse();
-        $classInfos = null;
 
         if (isset($json->{'hydra:supportedClass'})) {
             foreach ($json->{'hydra:supportedClass'} as $classData) {
                 if ($classData->{'hydra:title'} === $className) {
-                    $classInfos = $classData;
+                    return $classData;
                 }
             }
         }
 
-        if (empty($classInfos)) {
-            throw new \Exception(sprintf('Class %s cannot be found in the vocabulary', $className));
-        }
-
-        return $classInfos;
+        throw new \InvalidArgumentException(sprintf('Class %s cannot be found in the vocabulary', $className));
     }
 
     /**
      * Gets the last JSON response.
      *
-     * @return array
+     * @throws \RuntimeException
      */
-    private function getLastJsonResponse()
+    private function getLastJsonResponse(): \stdClass
     {
-        $content = $this->restContext->getMink()->getSession()->getDriver()->getContent();
-        if (null === ($decoded = json_decode($content))) {
+        if (null === $decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent())) {
             throw new \RuntimeException('JSON response seems to be invalid');
         }
 
