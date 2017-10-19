@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Problem\Serializer;
 
 use ApiPlatform\Core\Problem\Serializer\ErrorNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
+class ErrorNormalizerTest extends TestCase
 {
     public function testSupportNormalization()
     {

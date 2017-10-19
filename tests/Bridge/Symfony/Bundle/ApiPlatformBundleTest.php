@@ -17,13 +17,14 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DoctrineQueryExtensionPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiPlatformBundleTest extends \PHPUnit_Framework_TestCase
+class ApiPlatformBundleTest extends TestCase
 {
     public function testBuild()
     {

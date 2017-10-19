@@ -18,6 +18,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Component\Config\FileLocator;
@@ -34,7 +35,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
+class ApiPlatformExtensionTest extends TestCase
 {
     const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',

@@ -16,11 +16,12 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class EntrypointTest extends \PHPUnit_Framework_TestCase
+class EntrypointTest extends TestCase
 {
     public function testGetResourceNameCollection()
     {

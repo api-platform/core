@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-class ValidateListenerTest extends \PHPUnit_Framework_TestCase
+class ValidateListenerTest extends TestCase
 {
     public function testValidatorIsCalled()
     {

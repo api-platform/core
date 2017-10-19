@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
+use PHPUnit\Framework\TestCase;
 
-class UnderscoreOperationPathResolverTest extends \PHPUnit_Framework_TestCase
+class UnderscoreOperationPathResolverTest extends TestCase
 {
     public function testResolveCollectionOperationPath()
     {

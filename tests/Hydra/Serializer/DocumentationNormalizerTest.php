@@ -25,13 +25,14 @@ use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
+class DocumentationNormalizerTest extends TestCase
 {
     public function testNormalize()
     {

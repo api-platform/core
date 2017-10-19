@@ -21,11 +21,12 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class FilterExtensionTest extends \PHPUnit_Framework_TestCase
+class FilterExtensionTest extends TestCase
 {
     public function testApplyToCollectionWithValidFilters()
     {

@@ -19,11 +19,12 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ContextActionTest extends \PHPUnit_Framework_TestCase
+class ContextActionTest extends TestCase
 {
     public function testContextActionWithEntrypoint()
     {

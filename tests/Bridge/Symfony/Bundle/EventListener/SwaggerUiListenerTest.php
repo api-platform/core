@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SwaggerUiListenerTest extends \PHPUnit_Framework_TestCase
+class SwaggerUiListenerTest extends TestCase
 {
     /**
      * @dataProvider getParameters
