@@ -24,7 +24,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -201,10 +200,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
     private function getContainerBuilderProphecy()
     {
-        $definitionArgument = Argument::that(function ($argument) {
-            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
-        });
-
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
@@ -368,7 +363,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($definitions as $definition) {
-            $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
 
         $aliases = [

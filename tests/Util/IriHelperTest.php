@@ -34,6 +34,6 @@ class IriHelperTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($parsed, IriHelper::parseIri('/hello.json?foo=bar&page=2&bar=3', 'page'));
-        $this->assertEquals('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2));
+        $this->assertEquals('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2.));
     }
 }
