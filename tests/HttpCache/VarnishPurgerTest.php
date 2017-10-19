@@ -16,11 +16,12 @@ namespace ApiPlatform\Core\Tests\HttpCache;
 use ApiPlatform\Core\HttpCache\VarnishPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class VarnishPurgerTest extends \PHPUnit_Framework_TestCase
+class VarnishPurgerTest extends TestCase
 {
     public function testPurge()
     {

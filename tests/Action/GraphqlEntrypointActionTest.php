@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Graphql\ExecutorInterface;
 use ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilderInterface;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class GraphqlEntrypointActionTest extends \PHPUnit_Framework_TestCase
+class GraphqlEntrypointActionTest extends TestCase
 {
     public function testGetAction()
     {

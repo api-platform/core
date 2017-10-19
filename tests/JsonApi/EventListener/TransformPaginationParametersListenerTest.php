@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
 
 use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class TransformPaginationParametersListenerTest extends \PHPUnit_Framework_TestCase
+class TransformPaginationParametersListenerTest extends TestCase
 {
     private $listener;
 

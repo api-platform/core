@@ -23,6 +23,7 @@ use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\AnotherDummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,7 +32,7 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class AnnotationFilterPassTest extends \PHPUnit_Framework_TestCase
+class AnnotationFilterPassTest extends TestCase
 {
     public function testProcess()
     {

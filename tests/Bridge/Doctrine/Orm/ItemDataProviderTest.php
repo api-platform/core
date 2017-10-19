@@ -34,12 +34,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ItemDataProviderTest extends \PHPUnit_Framework_TestCase
+class ItemDataProviderTest extends TestCase
 {
     public function testGetItemSingleIdentifier()
     {

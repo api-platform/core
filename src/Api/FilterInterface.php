@@ -28,8 +28,15 @@ interface FilterInterface
      *   - type: the type of the filter
      *   - required: if this filter is required
      *   - strategy: the used strategy
-     *   - swagger (optional): additional parameters for the path operation, e.g. 'swagger' => ['description' => 'My Description']
+     *   - swagger (optional): additional parameters for the path operation,
+     *     e.g. 'swagger' => [
+     *       'description' => 'My Description',
+     *       'name' => 'My Name',
+     *       'type' => 'integer',
+     *     ]
      * The description can contain additional data specific to a filter.
+     *
+     * @see ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
      *
      * @param string $resourceClass
      *

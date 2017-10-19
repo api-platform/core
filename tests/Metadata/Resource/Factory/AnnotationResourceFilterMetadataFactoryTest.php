@@ -20,12 +20,13 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class AnnotationResourceFilterMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class AnnotationResourceFilterMetadataFactoryTest extends TestCase
 {
     public function testCreate()
     {

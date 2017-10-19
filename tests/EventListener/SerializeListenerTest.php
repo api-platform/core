@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\SerializeListener;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SerializeListenerTest extends \PHPUnit_Framework_TestCase
+class SerializeListenerTest extends TestCase
 {
     public function testDoNotSerializeResponse()
     {

@@ -19,13 +19,14 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFa
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests extractor resource name collection factory.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ExtractorResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class ExtractorResourceNameCollectionFactoryTest extends TestCase
 {
     public function testXmlResourceName()
     {

@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Util;
 
 use ApiPlatform\Core\Util\RequestParser;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class RequestParserTest extends \PHPUnit_Framework_TestCase
+class RequestParserTest extends TestCase
 {
     public function testParseAndDupplicateRequest()
     {

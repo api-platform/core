@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ConstraintViolationNormalizerTest extends \PHPUnit_Framework_TestCase
+class ConstraintViolationNormalizerTest extends TestCase
 {
     public function testSupportNormalization()
     {

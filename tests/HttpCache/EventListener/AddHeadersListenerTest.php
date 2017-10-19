@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AddHeadersListenerTest extends \PHPUnit_Framework_TestCase
+class AddHeadersListenerTest extends TestCase
 {
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {

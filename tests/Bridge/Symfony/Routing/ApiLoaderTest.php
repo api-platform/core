@@ -29,6 +29,7 @@ use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -39,7 +40,7 @@ use Symfony\Component\Routing\Route;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ApiLoaderTest extends \PHPUnit_Framework_TestCase
+class ApiLoaderTest extends TestCase
 {
     public function testApiLoader()
     {

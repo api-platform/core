@@ -17,13 +17,14 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ReadListenerTest extends \PHPUnit_Framework_TestCase
+class ReadListenerTest extends TestCase
 {
     public function testNotAnApiPlatformRequest()
     {

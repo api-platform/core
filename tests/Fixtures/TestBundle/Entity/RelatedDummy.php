@@ -171,7 +171,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Get relatedToDummyFriend.
      *
-     * @return RelatedToDummyFriend
+     * @return RelatedToDummyFriend[]
      */
     public function getRelatedToDummyFriend()
     {
@@ -181,7 +181,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Set relatedToDummyFriend.
      *
-     * @param RelatedToDummyFriend the value to set
+     * @param RelatedToDummyFriend $relatedToDummyFriend the value to set
      */
     public function addRelatedToDummyFriend(RelatedToDummyFriend $relatedToDummyFriend)
     {

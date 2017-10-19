@@ -15,13 +15,14 @@ namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Guilhem N. <egetick@gmail.com>
  *
  * @group legacy
  */
-class UnderscoreOperationPathResolverTest extends \PHPUnit_Framework_TestCase
+class UnderscoreOperationPathResolverTest extends TestCase
 {
     /**
      * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator instead.

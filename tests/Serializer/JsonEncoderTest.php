@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\Serializer\JsonEncoder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class JsonEncoderTest extends \PHPUnit_Framework_TestCase
+class JsonEncoderTest extends TestCase
 {
     /**
      * @var JsonEncoder

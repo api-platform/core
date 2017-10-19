@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\RespondListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class RespondListenerTest extends \PHPUnit_Framework_TestCase
+class RespondListenerTest extends TestCase
 {
     public function testDoNotHandleResponse()
     {
