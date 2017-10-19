@@ -15,11 +15,12 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ReservedAttributeNameConverterTest extends \PHPUnit_Framework_TestCase
+class ReservedAttributeNameConverterTest extends TestCase
 {
     private $reservedAttributeNameConverter;
 

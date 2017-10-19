@@ -15,6 +15,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Behat\Behat\Context\Context;
+use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use Behatch\Json\Json;
@@ -24,12 +25,16 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use JsonSchema\RefResolver;
 use JsonSchema\Uri\UriRetriever;
 use JsonSchema\Validator;
+use PHPUnit\Framework\ExpectationFailedException;
 
 final class JsonApiContext implements Context
 {
+    /**
+     * @var RestContext
+     */
+    private $restContext;
     private $inspector;
     private $jsonApiSchemaFile;
-    private $restContext;
     private $manager;
 
     public function __construct(ManagerRegistry $doctrine, string $jsonApiSchemaFile)
@@ -46,13 +51,13 @@ final class JsonApiContext implements Context
     /**
      * Gives access to the Behatch context.
      *
-     * @param BeforeScenarioScope $scope
-     *
      * @BeforeScenario
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        $this->restContext = $scope->getEnvironment()->getContext(RestContext::class);
+        /** @var InitializedContextEnvironment $environment */
+        $environment = $scope->getEnvironment();
+        $this->restContext = $environment->getContext(RestContext::class);
     }
 
     /**
@@ -70,38 +75,32 @@ final class JsonApiContext implements Context
     }
 
     /**
-     * Checks that given JSON node is equal to an empty array.
-     *
      * @Then the JSON node :node should be an empty array
      */
     public function theJsonNodeShouldBeAnEmptyArray($node)
     {
         if (!is_array($actual = $this->getValueOfNode($node)) || !empty($actual)) {
-            throw new \Exception(sprintf('The node value is `%s`', json_encode($actual)));
+            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 
     /**
-     * Checks that given JSON node is a number.
-     *
      * @Then the JSON node :node should be a number
      */
     public function theJsonNodeShouldBeANumber($node)
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
-            throw new \Exception(sprintf('The node value is `%s`', json_encode($actual)));
+            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 
     /**
-     * Checks that given JSON node is not an empty string.
-     *
      * @Then the JSON node :node should not be an empty string
      */
     public function theJsonNodeShouldNotBeAnEmptyString($node)
     {
         if ('' === $actual = $this->getValueOfNode($node)) {
-            throw new \Exception(sprintf('The node value is `%s`', json_encode($actual)));
+            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 

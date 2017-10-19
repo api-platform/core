@@ -20,13 +20,14 @@ use ApiPlatform\Core\Serializer\Filter\FilterInterface as SerializerFilterInterf
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Serializer\SerializerFilterContextBuilder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class SerializerFilterContextBuilderTest extends \PHPUnit_Framework_TestCase
+class SerializerFilterContextBuilderTest extends TestCase
 {
     public function testCreateFromRequestWithCollectionOperation()
     {

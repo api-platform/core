@@ -20,11 +20,12 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class IdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
+class IdentifiersExtractorTest extends TestCase
 {
     private function getMetadataFactoryProphecies($class, $identifiers, array $prophecies = null)
     {

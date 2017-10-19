@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AddTagsListenerTest extends \PHPUnit_Framework_TestCase
+class AddTagsListenerTest extends TestCase
 {
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {

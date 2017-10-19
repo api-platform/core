@@ -15,13 +15,14 @@ namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\PathResolver\DashOperationPathResolver;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Guilhem N. <egetick@gmail.com>
  *
  * @group legacy
  */
-class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
+class DashOperationPathResolverTest extends TestCase
 {
     /**
      * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\DashOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator instead.

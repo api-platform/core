@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Action;
 
 use ApiPlatform\Core\Action\ExceptionAction;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ExceptionActionTest extends \PHPUnit_Framework_TestCase
+class ExceptionActionTest extends TestCase
 {
     public function testActionWithCatchableException()
     {

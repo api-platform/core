@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class YamlExtractorTest extends \PHPUnit_Framework_TestCase
+class YamlExtractorTest extends TestCase
 {
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException

@@ -17,11 +17,12 @@ use ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Retrieves items from a persistence layer.
  */
-class ChainSubresourcedataProviderTest extends \PHPUnit_Framework_TestCase
+class ChainSubresourcedataProviderTest extends TestCase
 {
     public function testGetSubresource()
     {

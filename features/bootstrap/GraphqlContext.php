@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class GraphqlContext implements Context
+final class GraphqlContext implements Context
 {
     /**
      * @var RestContext
@@ -43,15 +43,13 @@ class GraphqlContext implements Context
     /**
      * Gives access to the Behatch context.
      *
-     * @param BeforeScenarioScope $scope
-     *
      * @BeforeScenario
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
         /** @var InitializedContextEnvironment $environment */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext('Behatch\Context\RestContext');
+        $this->restContext = $environment->getContext(RestContext::class);
     }
 
     /**

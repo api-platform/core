@@ -44,5 +44,7 @@ final class ChainCollectionDataProvider implements CollectionDataProviderInterfa
                 continue;
             }
         }
+
+        return [];
     }
 }

@@ -15,11 +15,12 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class RouteNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class RouteNameGeneratorTest extends TestCase
 {
     public function testGenerate()
     {

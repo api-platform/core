@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
@@ -30,7 +31,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-class IriConverterTest extends \PHPUnit_Framework_TestCase
+class IriConverterTest extends TestCase
 {
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
