@@ -51,8 +51,17 @@ class ChainCollectionDataProviderTest extends \PHPUnit_Framework_TestCase
         $firstDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $firstDataProvider->getCollection('notfound', 'op')->willThrow(ResourceClassNotSupportedException::class);
 
-        $chainItemDataProvider = new ChainCollectionDataProvider([$firstDataProvider->reveal()]);
+        $collection = (new ChainCollectionDataProvider([$firstDataProvider->reveal()]))->getCollection('notfound', 'op');
 
-        $this->assertEquals('', $chainItemDataProvider->getCollection('notfound', 'op'));
+        $this->assertTrue(is_array($collection) || $collection instanceof \Traversable);
+        $this->assertEmpty($collection);
+    }
+
+    public function testGetCollectionWithEmptyDataProviders()
+    {
+        $collection = (new ChainCollectionDataProvider([]))->getCollection(Dummy::class);
+
+        $this->assertTrue(is_array($collection) || $collection instanceof \Traversable);
+        $this->assertEmpty($collection);
     }
 }

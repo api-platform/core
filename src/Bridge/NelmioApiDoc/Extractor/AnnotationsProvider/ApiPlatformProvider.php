@@ -53,15 +53,19 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     public function getAnnotations(): array
     {
-        $hydraDoc = $this->documentationNormalizer->normalize(new Documentation($this->resourceNameCollectionFactory->create()));
-        $entrypointHydraDoc = $this->getResourceHydraDoc($hydraDoc, '#Entrypoint');
+        $resourceNameCollection = $this->resourceNameCollectionFactory->create();
+        $hydraDoc = $this->documentationNormalizer->normalize(new Documentation($resourceNameCollection));
+        if (empty($hydraDoc)) {
+            return [];
+        }
 
-        if (empty($hydraDoc) || null === $entrypointHydraDoc) {
+        $entrypointHydraDoc = $this->getResourceHydraDoc($hydraDoc, '#Entrypoint');
+        if (null === $entrypointHydraDoc) {
             return [];
         }
 
         $annotations = [];
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+        foreach ($resourceNameCollection as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             $prefixedShortName = ($iri = $resourceMetadata->getIri()) ? $iri : '#'.$resourceMetadata->getShortName();
@@ -112,9 +116,9 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
 
         $data = [
             'resource' => $route->getPath(),
-            'description' => $operationHydraDoc['hydra:title'],
-            'resourceDescription' => $resourceHydraDoc['hydra:title'],
-            'section' => $resourceHydraDoc['hydra:title'],
+            'description' => $operationHydraDoc['hydra:title'] ?? '',
+            'resourceDescription' => $resourceHydraDoc['hydra:title'] ?? '',
+            'section' => $resourceHydraDoc['hydra:title'] ?? '',
         ];
 
         if (isset($operationHydraDoc['expects']) && 'owl:Nothing' !== $operationHydraDoc['expects']) {
@@ -154,11 +158,17 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getResourceHydraDoc(array $hydraApiDoc, string $prefixedShortName)
     {
+        if (!isset($hydraApiDoc['hydra:supportedClass']) || !is_array($hydraApiDoc['hydra:supportedClass'])) {
+            return null;
+        }
+
         foreach ($hydraApiDoc['hydra:supportedClass'] as $supportedClass) {
-            if ($supportedClass['@id'] === $prefixedShortName) {
+            if (isset($supportedClass['@id']) && $supportedClass['@id'] === $prefixedShortName) {
                 return $supportedClass;
             }
         }
+
+        return null;
     }
 
     /**
@@ -167,15 +177,21 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      * @param string $method
      * @param array  $hydraDoc
      *
-     * @return array|null
+     * @return array
      */
-    private function getOperationHydraDoc(string $method, array $hydraDoc)
+    private function getOperationHydraDoc(string $method, array $hydraDoc): array
     {
+        if (!isset($hydraDoc['hydra:supportedOperation']) || !is_array($hydraDoc['hydra:supportedOperation'])) {
+            return [];
+        }
+
         foreach ($hydraDoc['hydra:supportedOperation'] as $supportedOperation) {
             if ($supportedOperation['hydra:method'] === $method) {
                 return $supportedOperation;
             }
         }
+
+        return [];
     }
 
     /**
@@ -185,17 +201,23 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      * @param string $method
      * @param array  $hydraEntrypointDoc
      *
-     * @return array|null
+     * @return array
      */
-    private function getCollectionOperationHydraDoc(string $shortName, string $method, array $hydraEntrypointDoc)
+    private function getCollectionOperationHydraDoc(string $shortName, string $method, array $hydraEntrypointDoc): array
     {
+        if (!isset($hydraEntrypointDoc['hydra:supportedProperty']) || !is_array($hydraEntrypointDoc['hydra:supportedProperty'])) {
+            return [];
+        }
+
         $propertyName = '#Entrypoint/'.lcfirst($shortName);
 
         foreach ($hydraEntrypointDoc['hydra:supportedProperty'] as $supportedProperty) {
-            $hydraProperty = $supportedProperty['hydra:property'];
-            if ($hydraProperty['@id'] === $propertyName) {
-                return $this->getOperationHydraDoc($method, $hydraProperty);
+            if (isset($supportedProperty['hydra:property']['@id'])
+                && $supportedProperty['hydra:property']['@id'] === $propertyName) {
+                return $this->getOperationHydraDoc($method, $supportedProperty['hydra:property']);
             }
         }
+
+        return [];
     }
 }
