@@ -19,6 +19,7 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -26,7 +27,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
+class CollectionNormalizerTest extends TestCase
 {
     public function testSupportsNormalize()
     {

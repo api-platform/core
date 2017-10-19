@@ -23,12 +23,13 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Markus Mächler <markus.maechler@bithost.ch>
  */
-class ContextBuilderTest extends \PHPUnit_Framework_TestCase
+class ContextBuilderTest extends TestCase
 {
     private $entityClass;
     private $resourceNameCollectionFactoryProphecy;

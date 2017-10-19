@@ -16,12 +16,13 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class FilterLocatorTraitTest extends \PHPUnit_Framework_TestCase
+class FilterLocatorTraitTest extends TestCase
 {
     public function testSetFilterLocator()
     {

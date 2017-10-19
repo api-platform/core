@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Operation\Factory;
 use ApiPlatform\Core\Operation\Factory\CachedSubresourceOperationFactory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -23,7 +24,7 @@ use Psr\Cache\CacheItemPoolInterface;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class CachedSubresourceOperationFactoryTest extends \PHPUnit_Framework_TestCase
+class CachedSubresourceOperationFactoryTest extends TestCase
 {
     public function testCreateWithItemHit()
     {

@@ -38,6 +38,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -50,7 +51,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DocumentationNormalizerTest extends \PHPUnit_Framework_TestCase
+class DocumentationNormalizerTest extends TestCase
 {
     /**
      * @group legacy

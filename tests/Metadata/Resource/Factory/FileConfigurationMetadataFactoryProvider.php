@@ -14,13 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Resource metadata provider for file configured factories tests.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framework_TestCase
+abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 {
     public function resourceMetadataProvider()
     {

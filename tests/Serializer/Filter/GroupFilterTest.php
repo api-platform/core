@@ -15,12 +15,13 @@ namespace ApiPlatform\Core\Tests\Serializer\Filter;
 
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class GroupFilterTest extends \PHPUnit_Framework_TestCase
+class GroupFilterTest extends TestCase
 {
     public function testApply()
     {

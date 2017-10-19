@@ -16,12 +16,13 @@ namespace ApiPlatform\Core\Tests\Api;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterCollectionFactory;
 use ApiPlatform\Core\Api\FilterInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class FilterCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class FilterCollectionFactoryTest extends TestCase
 {
     /**
      * @group legacy
