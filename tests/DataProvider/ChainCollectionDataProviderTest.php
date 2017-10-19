@@ -17,13 +17,14 @@ use ApiPlatform\Core\DataProvider\ChainCollectionDataProvider;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Retrieves items from a persistence layer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainCollectionDataProviderTest extends \PHPUnit_Framework_TestCase
+class ChainCollectionDataProviderTest extends TestCase
 {
     public function testGetCollection()
     {

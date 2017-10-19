@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Util;
 
 use ApiPlatform\Core\Util\IriHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class IriHelperTest extends \PHPUnit_Framework_TestCase
+class IriHelperTest extends TestCase
 {
     public function testHelpers()
     {

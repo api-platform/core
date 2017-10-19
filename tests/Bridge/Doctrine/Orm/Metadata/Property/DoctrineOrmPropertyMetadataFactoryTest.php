@@ -21,11 +21,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class DoctrineOrmPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 {
     public function testCreateNoManager()
     {

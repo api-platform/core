@@ -16,12 +16,13 @@ namespace ApiPlatform\Core\Tests\Hal\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Hal\Serializer\CollectionNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
+class CollectionNormalizerTest extends TestCase
 {
     public function testSupportsNormalize()
     {

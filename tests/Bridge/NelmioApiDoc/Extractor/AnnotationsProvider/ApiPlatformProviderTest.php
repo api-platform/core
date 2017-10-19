@@ -26,13 +26,14 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class ApiPlatformProviderTest extends \PHPUnit_Framework_TestCase
+class ApiPlatformProviderTest extends TestCase
 {
     public function testConstruct()
     {

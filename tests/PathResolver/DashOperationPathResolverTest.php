@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\PathResolver\DashOperationPathResolver;
+use PHPUnit\Framework\TestCase;
 
-class DashOperationPathResolverTest extends \PHPUnit_Framework_TestCase
+class DashOperationPathResolverTest extends TestCase
 {
     public function testResolveCollectionOperationPath()
     {

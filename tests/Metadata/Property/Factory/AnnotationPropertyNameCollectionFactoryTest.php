@@ -20,12 +20,13 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AnnotationPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class AnnotationPropertyNameCollectionFactoryTest extends TestCase
 {
     /**
      * @dataProvider getDependencies

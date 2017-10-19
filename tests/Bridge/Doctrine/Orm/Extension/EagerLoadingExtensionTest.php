@@ -32,6 +32,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -40,7 +41,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class EagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
+class EagerLoadingExtensionTest extends TestCase
 {
     public function testApplyToCollection()
     {

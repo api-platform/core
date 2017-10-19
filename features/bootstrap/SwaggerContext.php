@@ -15,6 +15,8 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class SwaggerContext implements Context
@@ -50,7 +52,7 @@ final class SwaggerContext implements Context
         try {
             $this->getClassInfo($className);
         } catch (\InvalidArgumentException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
+            throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
         }
     }
 
@@ -65,7 +67,7 @@ final class SwaggerContext implements Context
             return;
         }
 
-        throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exists.', $className));
+        throw new ExpectationFailedException(sprintf('The class "%s" exists.', $className));
     }
 
     /**
@@ -75,7 +77,7 @@ final class SwaggerContext implements Context
     {
         $json = $this->getLastJsonResponse();
 
-        \PHPUnit_Framework_Assert::assertTrue(isset($json->paths) && isset($json->paths->{$path}));
+        Assert::assertTrue(isset($json->paths) && isset($json->paths->{$path}));
     }
 
     /**
@@ -86,7 +88,7 @@ final class SwaggerContext implements Context
         try {
             $this->getPropertyInfo($propertyName, $className);
         } catch (\InvalidArgumentException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className), null, $e);
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className), null, $e);
         }
     }
 
@@ -96,7 +98,7 @@ final class SwaggerContext implements Context
     public function assertPropertyIsRequired(string $propertyName, string $className)
     {
         if (!in_array($propertyName, $this->getClassInfo($className)->required, true)) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
 

@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\DocParser;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ValidatorPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class ValidatorPropertyMetadataFactoryTest extends TestCase
 {
     private $validatorClassMetadata;
 

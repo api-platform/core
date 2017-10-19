@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Util;
 
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class RequestAttributesExtractorTest extends \PHPUnit_Framework_TestCase
+class RequestAttributesExtractorTest extends TestCase
 {
     public function testExtractCollectionAttributes()
     {

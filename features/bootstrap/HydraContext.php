@@ -15,6 +15,8 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class HydraContext implements Context
@@ -50,7 +52,7 @@ final class HydraContext implements Context
         try {
             $this->getClassInfo($className);
         } catch (\InvalidArgumentException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
+            throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
         }
     }
 
@@ -65,7 +67,7 @@ final class HydraContext implements Context
             return;
         }
 
-        throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('The class "%s" exists.', $className));
+        throw new ExpectationFailedException(sprintf('The class "%s" exists.', $className));
     }
 
     /**
@@ -73,7 +75,7 @@ final class HydraContext implements Context
      */
     public function assertNodeValueIs(string $nodeName, string $className, string $value)
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName),
             $value
         );
@@ -84,7 +86,7 @@ final class HydraContext implements Context
      */
     public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value)
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName),
             $value
         );
@@ -95,7 +97,7 @@ final class HydraContext implements Context
      */
     public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value)
     {
-        \PHPUnit_Framework_Assert::assertEquals(
+        Assert::assertEquals(
             $this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName),
             $value
         );
@@ -106,7 +108,7 @@ final class HydraContext implements Context
      */
     public function assertNbOperationsExist(int $nb, string $className)
     {
-        \PHPUnit_Framework_Assert::assertEquals($nb, count($this->getOperations($className)));
+        Assert::assertEquals($nb, count($this->getOperations($className)));
     }
 
     /**
@@ -114,7 +116,7 @@ final class HydraContext implements Context
      */
     public function assertNbPropertiesExist(int $nb, string $className)
     {
-        \PHPUnit_Framework_Assert::assertEquals($nb, count($this->getProperties($className)));
+        Assert::assertEquals($nb, count($this->getProperties($className)));
     }
 
     /**
@@ -128,7 +130,7 @@ final class HydraContext implements Context
             return;
         }
 
-        throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className));
+        throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className));
     }
 
     /**
@@ -137,7 +139,7 @@ final class HydraContext implements Context
     public function assertPropertyIsReadable(string $propertyName, string $className)
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
         }
     }
 
@@ -147,7 +149,7 @@ final class HydraContext implements Context
     public function assertPropertyIsNotReadable(string $propertyName, string $className)
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
         }
     }
 
@@ -157,7 +159,7 @@ final class HydraContext implements Context
     public function assertPropertyIsWritable(string $propertyName, string $className)
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writable'}) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
         }
     }
 
@@ -167,7 +169,7 @@ final class HydraContext implements Context
     public function assertPropertyIsRequired(string $propertyName, string $className)
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
         }
     }
 
@@ -177,7 +179,7 @@ final class HydraContext implements Context
     public function assertPropertyIsNotRequired(string $propertyName, string $className)
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(sprintf('Property "%s" of class "%s" is required', $propertyName, $className));
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is required', $propertyName, $className));
         }
     }
 

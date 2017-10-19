@@ -15,13 +15,14 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\AddFormatListener;
 use Negotiation\Negotiator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AddFormatListenerTest extends \PHPUnit_Framework_TestCase
+class AddFormatListenerTest extends TestCase
 {
     public function testNoResourceClass()
     {
