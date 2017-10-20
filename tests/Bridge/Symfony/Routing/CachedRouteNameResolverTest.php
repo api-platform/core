@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\CachedRouteNameResolver;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -24,7 +25,7 @@ use Psr\Cache\CacheItemPoolInterface;
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class CachedRouteNameResolverTest extends \PHPUnit_Framework_TestCase
+class CachedRouteNameResolverTest extends TestCase
 {
     public function testConstruct()
     {

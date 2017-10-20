@@ -19,11 +19,12 @@ use ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFa
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class ExtractorPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class ExtractorPropertyNameCollectionFactoryTest extends TestCase
 {
     public function testCreateXml()
     {

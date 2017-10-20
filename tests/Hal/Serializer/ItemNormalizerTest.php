@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -29,7 +30,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemNormalizerTest extends \PHPUnit_Framework_TestCase
+class ItemNormalizerTest extends TestCase
 {
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException

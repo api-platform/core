@@ -29,13 +29,14 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class SchemaBuilderTest extends \PHPUnit_Framework_TestCase
+class SchemaBuilderTest extends TestCase
 {
     /**
      * @expectedException \LogicException

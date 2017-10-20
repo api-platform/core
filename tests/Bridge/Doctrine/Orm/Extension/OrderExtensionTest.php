@@ -21,11 +21,12 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class OrderExtensionTest extends \PHPUnit_Framework_TestCase
+class OrderExtensionTest extends TestCase
 {
     public function testApplyToCollectionWithValidOrder()
     {

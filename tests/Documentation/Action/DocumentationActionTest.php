@@ -17,11 +17,12 @@ use ApiPlatform\Core\Documentation\Action\DocumentationAction;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class DocumentationActionTest extends \PHPUnit_Framework_TestCase
+class DocumentationActionTest extends TestCase
 {
     public function testDocumentationAction()
     {

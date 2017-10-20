@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFacto
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -24,7 +25,7 @@ use Psr\Cache\CacheItemPoolInterface;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class CachedPropertyNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class CachedPropertyNameCollectionFactoryTest extends TestCase
 {
     public function testCreateWithItemHit()
     {

@@ -50,5 +50,7 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
                 continue;
             }
         }
+
+        return null;
     }
 }

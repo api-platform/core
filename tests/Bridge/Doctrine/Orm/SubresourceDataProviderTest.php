@@ -35,12 +35,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SubresourceDataProviderTest extends \PHPUnit_Framework_TestCase
+class SubresourceDataProviderTest extends TestCase
 {
     private function assertIdentifierManagerMethodCalls($managerProphecy)
     {

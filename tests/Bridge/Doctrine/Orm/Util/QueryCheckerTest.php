@@ -21,8 +21,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 
-class QueryCheckerTest extends \PHPUnit_Framework_TestCase
+class QueryCheckerTest extends TestCase
 {
     public function testHasHavingClauseWithHavingClause()
     {

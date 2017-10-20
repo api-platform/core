@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class AbstractFilterTest extends \PHPUnit_Framework_TestCase
+class AbstractFilterTest extends TestCase
 {
     public function testSplitPropertiesWithoutResourceClass()
     {

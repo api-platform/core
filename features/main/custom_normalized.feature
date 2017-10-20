@@ -150,13 +150,13 @@ Feature: Using custom normalized entity
     When I send a "GET" request to "/docs.jsonld"
     Then the response status code should be 200
     And the response should be in JSON
-    And the hydra class "CustomNormalizedDummy" exist
-    And 4 operations are available for hydra class "CustomNormalizedDummy"
-    And 2 properties are available for hydra class "CustomNormalizedDummy"
-    And "name" property is readable for hydra class "CustomNormalizedDummy"
-    And "name" property is writable for hydra class "CustomNormalizedDummy"
-    And "alias" property is readable for hydra class "CustomNormalizedDummy"
-    And "alias" property is writable for hydra class "CustomNormalizedDummy"
+    And the Hydra class "CustomNormalizedDummy" exists
+    And 4 operations are available for Hydra class "CustomNormalizedDummy"
+    And 2 properties are available for Hydra class "CustomNormalizedDummy"
+    And "name" property is readable for Hydra class "CustomNormalizedDummy"
+    And "name" property is writable for Hydra class "CustomNormalizedDummy"
+    And "alias" property is readable for Hydra class "CustomNormalizedDummy"
+    And "alias" property is writable for Hydra class "CustomNormalizedDummy"
 
   @dropSchema
   Scenario: Delete a resource

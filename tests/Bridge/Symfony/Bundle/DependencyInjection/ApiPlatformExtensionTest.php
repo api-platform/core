@@ -23,6 +23,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -32,7 +33,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -43,7 +43,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
+class ApiPlatformExtensionTest extends TestCase
 {
     const DEFAULT_CONFIG = ['api_platform' => [
         'title' => 'title',
@@ -300,10 +300,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
 
     private function getPartialContainerBuilderProphecy()
     {
-        $definitionArgument = Argument::that(function ($argument) {
-            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
-        });
-
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
 
@@ -454,7 +450,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($definitions as $definition) {
-            $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
 
         $aliases = [
@@ -490,8 +486,6 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
     private function getBaseContainerBuilderProphecy()
     {
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
-
-        $definitionArgument = $this->getDefinitionArgumentToken();
 
         $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
 
@@ -604,7 +598,7 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($definitions as $definition) {
-            $containerBuilderProphecy->setDefinition($definition, $definitionArgument)->shouldBeCalled();
+            $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
 
         $containerBuilderProphecy->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish')->shouldBeCalled();
@@ -617,17 +611,10 @@ class ApiPlatformExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
 
         $containerBuilderProphecy
-            ->setDefinition('api_platform.http_cache.purger.varnish_client.test', $this->getDefinitionArgumentToken())
+            ->setDefinition('api_platform.http_cache.purger.varnish_client.test', Argument::type(Definition::class))
             ->shouldBeCalled()
         ;
 
         return $containerBuilderProphecy;
-    }
-
-    private function getDefinitionArgumentToken()
-    {
-        return Argument::that(function ($argument) {
-            return $argument instanceof Definition || $argument instanceof DefinitionDecorator;
-        });
     }
 }

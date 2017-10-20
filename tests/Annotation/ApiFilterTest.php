@@ -16,11 +16,12 @@ namespace ApiPlatform\Core\Tests\Annotation;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ApiFilterTest extends \PHPUnit_Framework_TestCase
+class ApiFilterTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

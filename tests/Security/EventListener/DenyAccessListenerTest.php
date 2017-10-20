@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\EventListener\DenyAccessListener;
 use ApiPlatform\Core\Security\ExpressionLanguage;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -29,7 +30,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DenyAccessListenerTest extends \PHPUnit_Framework_TestCase
+class DenyAccessListenerTest extends TestCase
 {
     public function testNoResourceClass()
     {

@@ -15,13 +15,14 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
+class ErrorNormalizerTest extends TestCase
 {
     public function testSupportsNormalization()
     {
@@ -45,7 +46,7 @@ class ErrorNormalizerTest extends \PHPUnit_Framework_TestCase
      * @param string $originalMessage original message of the Exception
      * @param bool   $debug           simulates kernel debug variable
      */
-    public function testErrorServerNormalize($status, $originalMessage, $debug)
+    public function testErrorServerNormalize(int $status, string $originalMessage, bool $debug)
     {
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Error'])->willReturn('/context/foo')->shouldBeCalled();

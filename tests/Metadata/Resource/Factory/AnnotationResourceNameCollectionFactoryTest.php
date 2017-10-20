@@ -17,11 +17,12 @@ use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceNameCollectionF
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class AnnotationResourceNameCollectionFactoryTest extends \PHPUnit_Framework_TestCase
+class AnnotationResourceNameCollectionFactoryTest extends TestCase
 {
     public function testCreate()
     {
