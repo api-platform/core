@@ -471,6 +471,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
+            'ApiPlatform\Core\Serializer\SerializerContextBuilder' => 'api_platform.serializer.context_builder.filter.inner',
+            'ApiPlatform\Core\EventListener\DeserializeListener' => 'api_platform.listener.request.deserialize',
         ];
 
         foreach ($aliases as $alias => $service) {
