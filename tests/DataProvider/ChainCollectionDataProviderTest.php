@@ -71,10 +71,10 @@ class ChainCollectionDataProviderTest extends TestCase
             [$firstDataProvider->reveal()]
         );
 
-        $this->assertEquals(
-            '',
-            $chainItemDataProvider->getCollection('notfound', 'op')
-        );
+        $collection = (new ChainCollectionDataProvider([$firstDataProvider->reveal()]))->getCollection('notfound', 'op');
+
+        $this->assertTrue(is_array($collection) || $collection instanceof \Traversable);
+        $this->assertEmpty($collection);
     }
 
     /**
