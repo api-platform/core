@@ -98,10 +98,7 @@ class CollectionDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotSupportedException
-     */
-    public function testThrowResourceClassNotSupportedException()
+    public function testUnsupportedClass()
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
@@ -109,6 +106,6 @@ class CollectionDataProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
 
         $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $dataProvider->getCollection(Dummy::class, 'foo');
+        $this->assertFalse($dataProvider->supports(Dummy::class, 'foo'));
     }
 }

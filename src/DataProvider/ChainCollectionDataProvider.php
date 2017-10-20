@@ -39,8 +39,14 @@ final class ChainCollectionDataProvider implements CollectionDataProviderInterfa
     {
         foreach ($this->dataProviders as $dataProvider) {
             try {
+                if ($dataProvider instanceof RestrictedDataProviderInterface
+                    && !$dataProvider->supports($resourceClass, $operationName)) {
+                    continue;
+                }
+
                 return $dataProvider->getCollection($resourceClass, $operationName);
             } catch (ResourceClassNotSupportedException $e) {
+                @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
                 continue;
             }
         }

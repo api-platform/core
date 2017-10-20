@@ -37,10 +37,16 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        foreach ($this->dataProviders as $dataProviders) {
+        foreach ($this->dataProviders as $dataProvider) {
             try {
-                return $dataProviders->getItem($resourceClass, $id, $operationName, $context);
+                if ($dataProvider instanceof RestrictedDataProviderInterface
+                    && !$dataProvider->supports($resourceClass, $operationName)) {
+                    continue;
+                }
+
+                return $dataProvider->getItem($resourceClass, $id, $operationName, $context);
             } catch (ResourceClassNotSupportedException $e) {
+                @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', get_class($e), RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
                 continue;
             }
         }
