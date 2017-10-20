@@ -533,7 +533,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitions, $serializerContext);
 
-        return new \ArrayObject((array) $propertySchema + $valueSchema);
+        return new \ArrayObject((array) $propertySchema + $valueSchema + ($propertyMetadata->getAttributes()['swagger_context'] ?? []));
     }
 
     /**
