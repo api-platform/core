@@ -67,10 +67,6 @@ class ChainCollectionDataProviderTest extends TestCase
         $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
         $firstDataProvider->supports('notfound', 'op')->willReturn(false);
 
-        $chainItemDataProvider = new ChainCollectionDataProvider(
-            [$firstDataProvider->reveal()]
-        );
-
         $collection = (new ChainCollectionDataProvider([$firstDataProvider->reveal()]))->getCollection('notfound', 'op');
 
         $this->assertTrue(is_array($collection) || $collection instanceof \Traversable);
