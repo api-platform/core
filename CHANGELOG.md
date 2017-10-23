@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.2
+
+* PHP 7.2 compatibility
+* Symfony 4 compatibility
+* Fix the Swagger UI documentation for specific routes (the API request wasn't executed automatically anymore)
+* Add a missing cache tag on empty collections
+* Fix a missing service when no Varnish URL is defined
+* Fix the whitelist comparison in the property filer
+* Fix some bugs regarding subresources in the Swagger and Hydra normalizers
+* Make route requirements configurable
+* Make possible to configure the Swagger context for properties
+* Better exception messages when there is a content negotiation error
+* Use the `PriorityTaggedServiceTrait` provided by Symfony instead of a custom implementation
+* Test upstream libs deprecations
+* Various quality fixes and tests cleanup
+
 ## 2.1.1
 
 * Fix path generators
