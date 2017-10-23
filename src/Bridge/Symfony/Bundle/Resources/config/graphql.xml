@@ -36,7 +36,7 @@
 
         <!-- Action -->
 
-        <service id="api_platform.action.graphql_entrypoint" class="ApiPlatform\Core\Action\GraphqlEntrypointAction">
+        <service id="api_platform.action.graphql_entrypoint" class="ApiPlatform\Core\Action\GraphqlEntrypointAction" public="true">
             <argument type="service" id="api_platform.graphql.schema_builder" />
             <argument type="service" id="api_platform.graphql.executor" />
             <argument type="service" id="twig" />
