@@ -26,6 +26,7 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
@@ -71,13 +72,29 @@ class DocumentationNormalizerTest extends TestCase
 
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalled(1);
 
+        $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
+        $subresourceOperationFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn([
+            'api_dummies_subresource_get_related_dummy' => [
+                'property' => 'relatedDummy',
+                'collection' => false,
+                'resource_class' => 'relatedDummy',
+                'shortNames' => ['relatedDummy'],
+                'identifiers' => [
+                    ['id', 'dummy', true],
+                ],
+                'route_name' => 'api_dummies_subresource_get_related_dummy',
+                'path' => '/dummies/{id}/related_dummy.{_format}',
+            ],
+        ]);
+
         $apiDocumentationBuilder = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
-            $urlGenerator->reveal());
+            $urlGenerator->reveal(),
+            $subresourceOperationFactoryProphecy->reveal());
 
         $expected = [
             '@context' => [
