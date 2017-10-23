@@ -225,7 +225,7 @@ class CollectionNormalizerTest extends TestCase
     }
 
     /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage The JSON API document must contain a "data" key.
      */
     public function testNormalizeWithoutDataKey()
