@@ -192,6 +192,8 @@ Feature: HAL support
           }
         ]
       },
+      "totalItems": 1,
+      "itemsPerPage": 3,
       "_embedded": {
         "item": [
           {
@@ -221,8 +223,6 @@ Feature: HAL support
             "alias": null
           }
         ]
-      },
-      "totalItems": 1,
-      "itemsPerPage": 3
+      }
     }
     """
