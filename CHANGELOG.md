@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.0
+
+* Add GraphQL support
+* Add JSONAPI support
+* Add a new `@ApiFilter` annotation to directly configure filters from resource classes
+* Add a partial paginator that prevents `COUNT()` SQL queries
+* Add an option to serialize Validator's payloads (e.g. error levels)
+* Add support for generators in data providers
+* Add a new `allow_plain_identifiers` option to allow using plain IDs as identifier instead of IRIs
+* Add support for resource names without namespace
+* Automatically enable FOSUser support if the bundle is installed
+* Add an `AbstractCollectionNormalizer` to help supporting custom formats
+* Deprecate NelmioApiDocBundle 2 support (upgrade to v3, it has native API Platform support)
+
 ## 2.1.2
 
 * PHP 7.2 compatibility
