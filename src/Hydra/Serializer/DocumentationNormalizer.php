@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -43,8 +44,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $urlGenerator;
+    private $subresourceOperationFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -52,6 +54,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
     }
 
     /**
@@ -217,16 +220,12 @@ final class DocumentationNormalizer implements NormalizerInterface
             $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection ? OperationType::COLLECTION : OperationType::ITEM);
         }
 
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass, $this->getPropertyNameCollectionFactoryContext($resourceMetadata)) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            if (!$propertyMetadata->hasSubresource()) {
-                continue;
+        if (null !== $this->subresourceOperationFactory) {
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+                $subresourceMetadata = $this->resourceMetadataFactory->create($operation['resource_class']);
+                $propertyMetadata = $this->propertyMetadataFactory->create(end($operation['identifiers'])[1], $operation['property']);
+                $hydraOperations[] = $this->getHydraOperation($resourceClass, $subresourceMetadata, $operation['route_name'], $operation, "#{$subresourceMetadata->getShortName()}", OperationType::SUBRESOURCE, $propertyMetadata->getSubresource());
             }
-
-            $subresourceMetadata = $this->resourceMetadataFactory->create($propertyMetadata->getSubresource()->getResourceClass());
-            $prefixedShortName = "#{$subresourceMetadata->getShortName()}";
-
-            $hydraOperations[] = $this->getHydraOperation($resourceClass, $subresourceMetadata, $operationName, $operation, $prefixedShortName, OperationType::SUBRESOURCE, $propertyMetadata->getSubresource());
         }
 
         return $hydraOperations;
@@ -241,7 +240,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param array               $operation
      * @param string              $prefixedShortName
      * @param string              $operationType
-     * @param SubresourceMetadata $operationType
+     * @param SubresourceMetadata $subresourceMetadata
      *
      * @return array
      */
