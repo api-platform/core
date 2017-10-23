@@ -168,19 +168,19 @@
 
         <!-- Action -->
 
-        <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" />
-        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" public="true" />
+        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
 
-        <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
+        <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
@@ -188,7 +188,7 @@
             <argument>%api_platform.formats%</argument>
         </service>
 
-        <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction">
+        <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.error_formats%</argument>
             <argument>%api_platform.exception_to_status%</argument>
