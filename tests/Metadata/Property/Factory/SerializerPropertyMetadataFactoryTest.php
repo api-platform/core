@@ -22,6 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata as SerializerAttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadata;
@@ -30,7 +31,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface a
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class SerializerPropertyMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class SerializerPropertyMetadataFactoryTest extends TestCase
 {
     public function testConstruct()
     {

@@ -50,7 +50,7 @@ class CompositeRelation
     /**
      * Gets value.
      *
-     * @return string
+     * @return string|null
      */
     public function getValue()
     {
@@ -60,9 +60,9 @@ class CompositeRelation
     /**
      * Sets value.
      *
-     * @param string the value to set
+     * @param string|null $value the value to set
      */
-    public function setValue($value)
+    public function setValue($value = null)
     {
         $this->value = $value;
     }
@@ -80,9 +80,9 @@ class CompositeRelation
     /**
      * Sets compositeItem.
      *
-     * @param CompositeItem the value to set
+     * @param CompositeItem $compositeItem the value to set
      */
-    public function setCompositeItem($compositeItem)
+    public function setCompositeItem(CompositeItem $compositeItem)
     {
         $this->compositeItem = $compositeItem;
     }
@@ -100,9 +100,9 @@ class CompositeRelation
     /**
      * Sets compositeLabel.
      *
-     * @param CompositeLabel the value to set
+     * @param CompositeLabel $compositeLabel the value to set
      */
-    public function setCompositeLabel($compositeLabel)
+    public function setCompositeLabel(CompositeLabel $compositeLabel)
     {
         $this->compositeLabel = $compositeLabel;
     }

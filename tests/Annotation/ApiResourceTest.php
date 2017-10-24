@@ -15,11 +15,12 @@ namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Annotations\AnnotationReader;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ApiResourceTest extends \PHPUnit_Framework_TestCase
+class ApiResourceTest extends TestCase
 {
     public function testAssignation()
     {

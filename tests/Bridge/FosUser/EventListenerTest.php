@@ -17,13 +17,14 @@ use ApiPlatform\Core\Bridge\FosUser\EventListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class EventListenerTest extends \PHPUnit_Framework_TestCase
+class EventListenerTest extends TestCase
 {
     public function testDelete()
     {

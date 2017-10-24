@@ -24,12 +24,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CollectionDataProviderTest extends \PHPUnit_Framework_TestCase
+class CollectionDataProviderTest extends TestCase
 {
     public function testGetCollection()
     {
@@ -97,10 +98,7 @@ class CollectionDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotSupportedException
-     */
-    public function testThrowResourceClassNotSupportedException()
+    public function testUnsupportedClass()
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
@@ -108,6 +106,6 @@ class CollectionDataProviderTest extends \PHPUnit_Framework_TestCase
         $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
 
         $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $dataProvider->getCollection(Dummy::class, 'foo');
+        $this->assertFalse($dataProvider->supports(Dummy::class, 'foo'));
     }
 }

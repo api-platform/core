@@ -17,13 +17,14 @@ use ApiPlatform\Core\Api\CachedIdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class CachedIdentifiersExtractorTest extends \PHPUnit_Framework_TestCase
+class CachedIdentifiersExtractorTest extends TestCase
 {
     public function testFirstPass()
     {

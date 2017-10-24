@@ -1,3 +1,5 @@
+'use strict';
+
 window.onload = () => {
   const data = JSON.parse(document.getElementById('swagger-data').innerText);
   const ui = SwaggerUIBundle({
@@ -6,12 +8,12 @@ window.onload = () => {
     validatorUrl: null,
     presets: [
       SwaggerUIBundle.presets.apis,
-      SwaggerUIStandalonePreset
+      SwaggerUIStandalonePreset,
     ],
     plugins: [
-      SwaggerUIBundle.plugins.DownloadUrl
+      SwaggerUIBundle.plugins.DownloadUrl,
     ],
-    layout: 'StandaloneLayout'
+    layout: 'StandaloneLayout',
   });
 
   if (data.oauth.enabled) {
@@ -30,7 +32,7 @@ window.onload = () => {
   if (!data.operationId) return;
 
   const observer = new MutationObserver(function (mutations, self) {
-    const op = document.getElementById(`operations,${data.method}-${data.path},${data.shortName}`);
+    const op = document.getElementById(`operations-${data.shortName}-${data.operationId}`);
     if (!op) return;
 
     self.disconnect();
@@ -41,19 +43,81 @@ window.onload = () => {
     if (data.id) {
       const inputId = op.querySelector('.parameters input[placeholder="id"]');
       inputId.value = data.id;
-      inputId.dispatchEvent(new Event('input', { bubbles: true }));
+      reactTriggerChange(inputId);
     }
 
-    for (let input of op.querySelectorAll('.parameters input')) {
+    for (const input of op.querySelectorAll('.parameters input')) {
       if (input.placeholder in data.queryParameters) {
         input.value = data.queryParameters[input.placeholder];
-        input.dispatchEvent(new Event('input', { bubbles: true }));
+        reactTriggerChange(input);
       }
     }
 
-    op.querySelector('.execute').click();
-    op.scrollIntoView();
+      op.querySelector('.execute').click();
+      op.scrollIntoView();
   });
 
   observer.observe(document, {childList: true, subtree: true});
+
+  // Workaround for https://github.com/swagger-api/swagger-ui/issues/3028
+  // Adapted from https://github.com/vitalyq/react-trigger-change/blob/master/lib/change.js
+  // Copyright (c) 2017 Vitaly Kuznetsov
+  // MIT License
+  function reactTriggerChange(node) {
+    // Do not try to delete non-configurable properties.
+    // Value and checked properties on DOM elements are non-configurable in PhantomJS.
+    function deletePropertySafe(elem, prop) {
+      const desc = Object.getOwnPropertyDescriptor(elem, prop);
+      if (desc && desc.configurable) {
+        delete elem[prop];
+      }
+    }
+
+    // React 16
+    // Cache artificial value property descriptor.
+    // Property doesn't exist in React <16, descriptor is undefined.
+    const descriptor = Object.getOwnPropertyDescriptor(node, 'value');
+
+    // React 0.14: IE9
+    // React 15: IE9-IE11
+    // React 16: IE9
+    // Dispatch focus.
+    const focusEvent = document.createEvent('UIEvents');
+    focusEvent.initEvent('focus', false, false);
+    node.dispatchEvent(focusEvent);
+
+    // React 0.14: IE9
+    // React 15: IE9-IE11
+    // React 16
+    // In IE9-10 imperative change of node value triggers propertychange event.
+    // Update inputValueTracking cached value.
+    // Remove artificial value property.
+    // Restore initial value to trigger event with it.
+    const initialValue = node.value;
+    node.value = initialValue + '#';
+    deletePropertySafe(node, 'value');
+    node.value = initialValue;
+
+    // React 15: IE11
+    // For unknown reason React 15 added listener for propertychange with addEventListener.
+    // This doesn't work, propertychange events are deprecated in IE11,
+    // but allows us to dispatch fake propertychange which is handled by IE11.
+    const propertychangeEvent = document.createEvent('HTMLEvents');
+    propertychangeEvent.initEvent('propertychange', false, false);
+    propertychangeEvent.propertyName = 'value';
+    node.dispatchEvent(propertychangeEvent);
+
+    // React 0.14: IE10-IE11, non-IE
+    // React 15: non-IE
+    // React 16: IE10-IE11, non-IE
+    const inputEvent = document.createEvent('HTMLEvents');
+    inputEvent.initEvent('input', true, false);
+    node.dispatchEvent(inputEvent);
+
+    // React 16
+    // Restore artificial value property descriptor.
+    if (descriptor) {
+      Object.defineProperty(node, 'value', descriptor);
+    }
+  }
 };

@@ -12,6 +12,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.operation_method_resolver" />
             <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.subresource_operation_factory" />
 
             <tag name="serializer.normalizer" priority="32" />
         </service>

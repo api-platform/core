@@ -15,13 +15,14 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Property metadata provider for file configured factories tests.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framework_TestCase
+abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 {
     public function propertyMetadataProvider()
     {

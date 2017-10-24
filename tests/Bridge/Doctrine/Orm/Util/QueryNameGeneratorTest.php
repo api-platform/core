@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class QueryNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class QueryNameGeneratorTest extends TestCase
 {
     public function testGenerateJoinAlias()
     {

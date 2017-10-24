@@ -17,13 +17,14 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
+class CollectionNormalizerTest extends TestCase
 {
     public function testSupportsNormalize()
     {
@@ -224,7 +225,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage The JSON API document must contain a "data" key.
      */
     public function testNormalizeWithoutDataKey()

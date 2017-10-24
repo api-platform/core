@@ -61,7 +61,7 @@ class DummyFriend
     /**
      * Set id.
      *
-     * @param id the value to set
+     * @param int $id the value to set
      */
     public function setId($id)
     {
@@ -81,7 +81,7 @@ class DummyFriend
     /**
      * Set name.
      *
-     * @param string the value to set
+     * @param string $name the value to set
      */
     public function setName($name)
     {

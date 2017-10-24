@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 
@@ -276,5 +277,17 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/bad_declaration.yml';
 
         (new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class);
+    }
+
+    public function testCreateShortNameResourceMetadataForClassWithoutNamespace()
+    {
+        $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resourceswithoutnamespace.yml';
+
+        $resourceMetadataFactory = new ExtractorResourceMetadataFactory(new YamlExtractor([$configPath]));
+        $shortNameResourceMetadataFactory = new ShortNameResourceMetadataFactory($resourceMetadataFactory);
+
+        $resourceMetadata = $shortNameResourceMetadataFactory->create(\DateTime::class);
+        $this->assertInstanceOf(ResourceMetadata::class, $resourceMetadata);
+        $this->assertSame(\DateTime::class, $resourceMetadata->getShortName());
     }
 }

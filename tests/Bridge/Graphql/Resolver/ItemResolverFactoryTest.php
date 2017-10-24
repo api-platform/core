@@ -18,13 +18,14 @@ use ApiPlatform\Core\Bridge\Graphql\Resolver\ItemResolverFactory;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class ItemResolverFactoryTest extends \PHPUnit_Framework_TestCase
+class ItemResolverFactoryTest extends TestCase
 {
     public function testCreateItemResolverNoItem()
     {

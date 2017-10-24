@@ -13,15 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Serializer\ContextTrait;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalizes collections in the JSON API format.
@@ -30,62 +24,19 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Hamza Amrouche <hamza@les-tilleuls.coop>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class CollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
-    use ContextTrait;
-    use NormalizerAwareTrait;
-
     const FORMAT = 'jsonapi';
 
-    private $resourceClassResolver;
-    private $pageParameterName;
-
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName)
-    {
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->pageParameterName = $pageParameterName;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    protected function getPaginationData($object, array $context = []): array
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($object, $format = null, array $context = [])
-    {
-        $data = [];
-        if (isset($context['api_sub_level'])) {
-            foreach ($object as $index => $obj) {
-                $data[$index] = $this->normalizer->normalize($obj, $format, $context);
-            }
-
-            return $data;
-        }
-
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $context = $this->initContext($resourceClass, $context);
+        list($paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems) = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
 
-        $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = null;
-        if ($paginated = $isPaginator = $object instanceof PartialPaginatorInterface) {
-            if ($object instanceof PaginatorInterface) {
-                $paginated = 1. !== $lastPage = $object->getLastPage();
-            } else {
-                $pageTotalItems = (float) count($object);
-            }
-
-            $currentPage = $object->getCurrentPage();
-            $itemsPerPage = $object->getItemsPerPage();
-        }
-
         $data = [
-            'data' => [],
             'links' => [
                 'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             ],
@@ -106,27 +57,37 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             }
         }
 
+        if (null !== $totalItems) {
+            $data['meta']['totalItems'] = $totalItems;
+        }
+
+        if ($paginator) {
+            $data['meta']['itemsPerPage'] = (int) $itemsPerPage;
+            $data['meta']['currentPage'] = (int) $currentPage;
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function getItemsData($object, string $format = null, array $context = []): array
+    {
+        $data = [
+            'data' => [],
+        ];
+
         foreach ($object as $obj) {
             $item = $this->normalizer->normalize($obj, $format, $context);
 
             if (!isset($item['data'])) {
-                throw new RuntimeException('The JSON API document must contain a "data" key.');
+                throw new InvalidArgumentException('The JSON API document must contain a "data" key.');
             }
 
             $data['data'][] = $item['data'];
-        }
-
-        if (
-            is_array($object) ||
-            ($paginated = $object instanceof PaginatorInterface) ||
-            $object instanceof \Countable && !$object instanceof PartialPaginatorInterface
-        ) {
-            $data['meta']['totalItems'] = $paginated ? (int) $object->getTotalItems() : count($object);
-        }
-
-        if ($isPaginator) {
-            $data['meta']['itemsPerPage'] = (int) $itemsPerPage;
-            $data['meta']['currentPage'] = (int) $currentPage;
         }
 
         return $data;

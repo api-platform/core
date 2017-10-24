@@ -20,13 +20,14 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Annotations\Reader;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ProphecyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AnnotationResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class AnnotationResourceMetadataFactoryTest extends TestCase
 {
     /**
      * @dataProvider getCreateDependencies

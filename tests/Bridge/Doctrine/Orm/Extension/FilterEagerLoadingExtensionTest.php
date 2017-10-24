@@ -21,16 +21,16 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class FilterEagerLoadingExtensionTest extends \PHPUnit_Framework_TestCase
+class FilterEagerLoadingExtensionTest extends TestCase
 {
     public function testIsNoForceEagerCollectionAttributes()
     {

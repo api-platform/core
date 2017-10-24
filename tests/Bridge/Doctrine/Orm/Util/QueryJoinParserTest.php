@@ -22,8 +22,9 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\TestCase;
 
-class QueryJoinParserTest extends \PHPUnit_Framework_TestCase
+class QueryJoinParserTest extends TestCase
 {
     use PHPMock;
 

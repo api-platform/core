@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PartialCollectionViewNormalizerTest extends \PHPUnit_Framework_TestCase
+class PartialCollectionViewNormalizerTest extends TestCase
 {
     public function testNormalizeDoesNotChangeSubLevel()
     {

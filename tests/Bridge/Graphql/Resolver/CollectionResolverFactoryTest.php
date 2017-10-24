@@ -19,6 +19,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,7 +28,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class CollectionResolverFactoryTest extends \PHPUnit_Framework_TestCase
+class CollectionResolverFactoryTest extends TestCase
 {
     /**
      * @dataProvider paginationProvider

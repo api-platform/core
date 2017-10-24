@@ -16,8 +16,9 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Tests\Fixtures\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
+use PHPUnit\Framework\TestCase;
 
-class PaginatorTest extends \PHPUnit_Framework_TestCase
+class PaginatorTest extends TestCase
 {
     /**
      * @dataProvider initializeProvider

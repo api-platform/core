@@ -16,12 +16,13 @@ namespace ApiPlatform\Core\Tests\Serializer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SerializerContextBuilderTest extends \PHPUnit_Framework_TestCase
+class SerializerContextBuilderTest extends TestCase
 {
     /**
      * @var SerializerContextBuilder
