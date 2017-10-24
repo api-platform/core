@@ -478,14 +478,13 @@ final class DocumentationNormalizer implements NormalizerInterface
         if (null !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
             $propertyData['owl:maxCardinality'] = 1;
         }
-        // Add extended JSON-LD context informations
-        // @see https://api-platform.com/docs/core/extending-jsonld-context
-        $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
-        foreach ($jsonldContext as $contextKey => $contextValue) {
-            if ('@id' === $contextKey || '@type' === $contextKey) {
+        // Add doc informations
+        $docInformations = $propertyMetadata->getAttributes()['doc_informations'] ?? [];
+        foreach ($docInformations as $infoKey => $infoValue) {
+            if ('@id' === $infoKey || '@type' === $infoKey) {
                 continue;
             }
-            $propertyData[$contextKey] = $contextValue;
+            $propertyData[$infotKey] = $infoValue;
         }
 
         $property = [
