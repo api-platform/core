@@ -28,9 +28,9 @@ class FilterPassTest extends TestCase
 {
     public function testProcess()
     {
-        $dataProviderPass = new FilterPass();
+        $filterPass = new FilterPass();
 
-        $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
+        $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
         $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
@@ -45,14 +45,14 @@ class FilterPassTest extends TestCase
         $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $dataProviderPass->process($containerBuilderProphecy->reveal());
+        $filterPass->process($containerBuilderProphecy->reveal());
     }
 
     public function testIdNotExist()
     {
-        $dataProviderPass = new FilterPass();
+        $filterPass = new FilterPass();
 
-        $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
+        $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
         $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
@@ -67,6 +67,6 @@ class FilterPassTest extends TestCase
         $containerBuilderProphecy->getDefinition('api_platform.filter_locator')->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.filter_collection_factory')->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
-        $dataProviderPass->process($containerBuilderProphecy->reveal());
+        $filterPass->process($containerBuilderProphecy->reveal());
     }
 }
