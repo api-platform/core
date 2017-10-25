@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Graphql\Type;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Bridge\Graphql\Resolver\CollectionResolverFactoryInterface;
+use ApiPlatform\Core\Bridge\Graphql\Resolver\ItemMutationResolverFactoryInterface;
 use ApiPlatform\Core\Bridge\Graphql\Resolver\ItemResolverFactoryInterface;
 use ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilder;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -201,6 +202,7 @@ class SchemaBuilderTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $collectionResolverFactoryProphecy = $this->prophesize(CollectionResolverFactoryInterface::class);
         $itemResolverFactoryProphecy = $this->prophesize(ItemResolverFactoryInterface::class);
+        $itemMutationResolverFactoryProphecy = $this->prophesize(ItemMutationResolverFactoryInterface::class);
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
 
         $resourceClassNames = [];
@@ -236,6 +238,7 @@ class SchemaBuilderTest extends TestCase
 
         $collectionResolverFactoryProphecy->createCollectionResolver(Argument::cetera())->willReturn(function () {});
         $itemResolverFactoryProphecy->createItemResolver(Argument::cetera())->willReturn(function () {});
+        $itemMutationResolverFactoryProphecy->createItemMutationResolver(Argument::cetera())->willReturn(function () {});
 
         return new SchemaBuilder(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -244,6 +247,7 @@ class SchemaBuilderTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $collectionResolverFactoryProphecy->reveal(),
             $itemResolverFactoryProphecy->reveal(),
+            $itemMutationResolverFactoryProphecy->reveal(),
             $identifiersExtractorProphecy->reveal(),
             $paginationEnabled
         );
