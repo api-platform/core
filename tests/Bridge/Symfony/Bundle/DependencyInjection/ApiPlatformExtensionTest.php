@@ -526,6 +526,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $definitions = [
             'api_platform.action.graphql_entrypoint',
+            'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
             'api_platform.doctrine.orm.collection_data_provider',
@@ -547,7 +548,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.range_filter',
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.subresource_data_provider',
-            'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.graphql.collection_resolver_factory',
             'api_platform.graphql.executor',
             'api_platform.graphql.item_resolver_factory',

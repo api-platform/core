@@ -13,6 +13,9 @@
 * Automatically enable FOSUser support if the bundle is installed
 * Add an `AbstractCollectionNormalizer` to help supporting custom formats
 * Deprecate NelmioApiDocBundle 2 support (upgrade to v3, it has native API Platform support)
+* Deprecate the `ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener` class in favor of the new `ApiPlatform\Core\EventListener\WriteListener` class.
+* Delete the `api_platform.doctrine.listener.view.write` event listener service.
+* Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
 
 ## 2.1.2
 

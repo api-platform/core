@@ -36,7 +36,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->persist($dummy)->shouldBeCalled();
 
         $request = new Request();
-        $request->attributes->set('_api_resource_class', 'Dummy');
+        $request->attributes->set('_api_resource_class', Dummy::class);
 
         $event = new GetResponseForControllerResultEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -63,7 +63,7 @@ class WriteListenerTest extends TestCase
 
         $request = new Request();
         $request->setMethod(Request::METHOD_DELETE);
-        $request->attributes->set('_api_resource_class', 'Dummy');
+        $request->attributes->set('_api_resource_class', Dummy::class);
 
         $event = new GetResponseForControllerResultEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -87,6 +87,7 @@ class WriteListenerTest extends TestCase
 
         $request = new Request();
         $request->setMethod(Request::METHOD_HEAD);
+        $request->attributes->set('_api_resource_class', Dummy::class);
 
         $event = new GetResponseForControllerResultEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -110,6 +111,30 @@ class WriteListenerTest extends TestCase
 
         $request = new Request();
         $request->setMethod(Request::METHOD_POST);
+
+        $event = new GetResponseForControllerResultEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
+
+        (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
+    }
+
+    public function testOnKernelViewWithNoDataPersisterSupport()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Dummyrino');
+
+        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $dataPersisterProphecy->supports($dummy)->willReturn(false)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy)->shouldNotBeCalled();
+        $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
+
+        $request = new Request();
+        $request->setMethod(Request::METHOD_POST);
+        $request->attributes->set('_api_resource_class', 'Dummy');
 
         $event = new GetResponseForControllerResultEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
