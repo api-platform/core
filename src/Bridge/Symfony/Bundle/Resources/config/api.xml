@@ -135,6 +135,12 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
 
+        <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
+            <argument type="service" id="api_platform.data_persister" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
+        </service>
+
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />

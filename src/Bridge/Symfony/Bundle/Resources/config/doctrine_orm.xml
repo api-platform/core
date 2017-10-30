@@ -9,6 +9,12 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
+        <service id="api_platform.doctrine.orm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
+            <argument type="service" id="doctrine" />
+
+            <tag name="api_platform.data_persister" />
+        </service>
+
         <service id="api_platform.doctrine.orm.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument type="collection" /> <!-- extensions -->
@@ -93,14 +99,6 @@
         <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="doctrine" />
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
-        </service>
-
-        <!-- Event listener -->
-
-        <service id="api_platform.doctrine.listener.view.write" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener">
-            <argument type="service" id="doctrine" />
-
-            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
 
         <!-- Doctrine Query extensions -->

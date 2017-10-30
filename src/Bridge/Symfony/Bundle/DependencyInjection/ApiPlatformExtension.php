@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -86,9 +87,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
+        $loader->load('data_persister.xml');
         $loader->load('data_provider.xml');
         $loader->load('filter.xml');
 
+        $container->registerForAutoconfiguration(DataPersisterInterface::class)
+            ->addTag('api_platform.data_persister');
         $container->registerForAutoconfiguration(ItemDataProviderInterface::class)
             ->addTag('api_platform.item_data_provider');
         $container->registerForAutoconfiguration(CollectionDataProviderInterface::class)
