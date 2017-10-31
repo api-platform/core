@@ -25,11 +25,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *     attributes={"access_control"="has_role('ROLE_USER')"},
  *     collectionOperations={
- *         "get"={"method"="GET"},
- *         "post"={"method"="POST", "access_control"="has_role('ROLE_ADMIN')"}
+ *         "get",
+ *         "post"={"access_control"="has_role('ROLE_ADMIN')"}
  *     },
  *     itemOperations={
- *         "get"={"method"="GET", "access_control"="has_role('ROLE_USER') and object.getOwner() == user"}
+ *         "get"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"}
  *     }
  * )
  * @ORM\Entity

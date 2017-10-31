@@ -19,10 +19,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  * @ApiResource(itemOperations={
- *     "get"={"method"="GET"},
+ *     "get",
  *     "custom_normalization"={"route_name"="custom_normalization"}
  * }, collectionOperations={
- *     "get"={"method"="GET"},
+ *     "get",
  *     "custom_denormalization"={"route_name"="custom_denormalization"}
  * })
  *
