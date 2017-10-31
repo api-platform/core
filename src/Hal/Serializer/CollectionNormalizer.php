@@ -105,7 +105,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['_links']['item'][] = $item['_links']['self'];
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
+        if (is_array($object) || $object instanceof PaginatorInterface|| $object instanceof \Countable) {
             $data['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
         }
 

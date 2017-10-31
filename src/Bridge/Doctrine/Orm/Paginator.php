@@ -21,7 +21,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class Paginator implements \IteratorAggregate, PaginatorInterface
+final class Paginator implements \Countable, \IteratorAggregate, PaginatorInterface
 {
     private $paginator;
 
