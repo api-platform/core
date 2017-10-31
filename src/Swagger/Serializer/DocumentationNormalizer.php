@@ -508,7 +508,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getPropertySchema(PropertyMetadata $propertyMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
     {
-        $propertySchema = new \ArrayObject();
+        $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
 
         if (false === $propertyMetadata->isWritable()) {
             $propertySchema['readOnly'] = true;
@@ -533,7 +533,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitions, $serializerContext);
 
-        return new \ArrayObject((array) $propertySchema + $valueSchema + ($propertyMetadata->getAttributes()['swagger_context'] ?? []));
+        return new \ArrayObject((array) $propertySchema + $valueSchema);
     }
 
     /**
