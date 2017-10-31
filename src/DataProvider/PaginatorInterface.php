@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 /**
- * Paginator Interface.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
