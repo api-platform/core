@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,8 +37,9 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
     private $identifiersExtractor;
     private $requestStack;
     private $paginationEnabled;
+    private $resourceMetadataFactory;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, RequestStack $requestStack = null, bool $paginationEnabled = false)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestStack $requestStack = null, bool $paginationEnabled = false)
     {
         parent::__construct($subresourceDataProvider);
 
@@ -46,24 +48,23 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
         $this->identifiersExtractor = $identifiersExtractor;
         $this->requestStack = $requestStack;
         $this->paginationEnabled = $paginationEnabled;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
      * @throws \Exception
      */
-    public function createCollectionResolver(string $resourceClass, string $rootClass): callable
+    public function createCollectionResolver(string $resourceClass, string $rootClass, string $operationName): callable
     {
-        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
-            $request = $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
-            if (null !== $request) {
+        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+            if (null !== $request = $this->requestStack->getCurrentRequest()) {
                 $request->attributes->set(
                     '_graphql_collections_args',
                     [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', [])
                 );
             }
 
-            $rootProperty = $info->fieldName;
-            if (isset($root[$rootProperty])) {
+            if (isset($root[$rootProperty = $info->fieldName])) {
                 $rootIdentifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($rootClass);
                 $subresource = $this->getSubresource($rootClass, $root, $rootIdentifiers, $rootProperty, $resourceClass, true);
                 $collection = $subresource ?? [];
@@ -71,10 +72,14 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
                 $collection = $this->collectionDataProvider->getCollection($resourceClass);
             }
 
+            $context = $this->resourceMetadataFactory
+                ->create($resourceClass)
+                ->getCollectionOperationAttribute($operationName, 'normalization_context', [], true);
+
             if (!$this->paginationEnabled) {
                 $data = [];
                 foreach ($collection as $index => $object) {
-                    $data[$index] = $this->normalizer->normalize($object, null, ['graphql' => true]);
+                    $data[$index] = $this->normalizer->normalize($object, null, ['graphql' => true] + $context);
                 }
 
                 return $data;
@@ -97,7 +102,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
 
             foreach ($collection as $index => $object) {
                 $data['edges'][$index] = [
-                    'node' => $this->normalizer->normalize($object, null, ['graphql' => true]),
+                    'node' => $this->normalizer->normalize($object, null, ['graphql' => true] + $context),
                     'cursor' => \base64_encode((string) ($index + $offset)),
                 ];
             }

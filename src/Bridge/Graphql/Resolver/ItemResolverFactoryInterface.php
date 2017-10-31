@@ -22,5 +22,5 @@ namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
  */
 interface ItemResolverFactoryInterface
 {
-    public function createItemResolver(string $resourceClass, string $rootClass): callable;
+    public function createItemResolver(string $resourceClass, string $rootClass, string $operationName): callable;
 }

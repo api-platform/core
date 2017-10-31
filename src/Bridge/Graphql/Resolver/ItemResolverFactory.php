@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -32,22 +33,24 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
     private $itemDataProvider;
     private $normalizer;
     private $identifiersExtractor;
+    private $resourceMetadataFactory;
 
-    public function __construct(ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         parent::__construct($subresourceDataProvider);
 
         $this->itemDataProvider = $itemDataProvider;
         $this->normalizer = $normalizer;
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
      * @throws \Exception
      */
-    public function createItemResolver(string $resourceClass, string $rootClass): callable
+    public function createItemResolver(string $resourceClass, string $rootClass, string $operationName): callable
     {
-        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
+        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
             $rootProperty = $info->fieldName;
             $rootIdentifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($rootClass);
             if (isset($root[$rootProperty])) {
@@ -81,7 +84,13 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
                 $item = $this->itemDataProvider->getItem($resourceClass, \count($identifiers) > 1 ? \implode(';', $identifiers) : $uniqueIdentifier[0]);
             }
 
-            return $item ? $this->normalizer->normalize($item, null, ['graphql' => true]) : null;
+            return $item ? $this->normalizer->normalize(
+                $item,
+                null,
+                ['graphql' => true] + $this->resourceMetadataFactory
+                    ->create($resourceClass)
+                    ->getItemOperationAttribute($operationName, 'normalization_context', [], true)
+            ) : null;
         };
     }
 }
