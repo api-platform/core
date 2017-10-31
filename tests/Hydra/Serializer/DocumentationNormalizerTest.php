@@ -131,14 +131,14 @@ class DocumentationNormalizerTest extends TestCase
             'hydra:title' => 'Test Api',
             'hydra:description' => 'test ApiGerard',
             'hydra:supportedClass' => [
-                0 => [
+                [
                     '@id' => '#dummy',
                     '@type' => 'hydra:Class',
                     'rdfs:label' => 'dummy',
                     'hydra:title' => 'dummy',
                     'hydra:description' => 'dummy',
                     'hydra:supportedProperty' => [
-                        0 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#dummy/name',
@@ -153,7 +153,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:writable' => true,
                             'hydra:description' => 'name',
                         ],
-                        1 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#dummy/description',
@@ -168,7 +168,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:writable' => true,
                             'hydra:description' => 'description',
                         ],
-                        2 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#dummy/relatedDummy',
@@ -185,7 +185,7 @@ class DocumentationNormalizerTest extends TestCase
                         ],
                     ],
                     'hydra:supportedOperation' => [
-                        0 => [
+                        [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
                             'hydra:method' => 'GET',
                             'hydra:title' => 'foobar',
@@ -193,7 +193,7 @@ class DocumentationNormalizerTest extends TestCase
                             'returns' => '#dummy',
                             'hydra:foo' => 'bar',
                         ],
-                        1 => [
+                        [
                             '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                             'expects' => '#dummy',
                             'hydra:method' => 'PUT',
@@ -201,7 +201,7 @@ class DocumentationNormalizerTest extends TestCase
                             'rdfs:label' => 'Replaces the dummy resource.',
                             'returns' => '#dummy',
                         ],
-                        2 => [
+                        [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
                             'hydra:method' => 'GET',
                             'hydra:title' => 'Retrieves a relatedDummy resource.',
@@ -210,12 +210,12 @@ class DocumentationNormalizerTest extends TestCase
                         ],
                     ],
                 ],
-                1 => [
+                [
                     '@id' => '#Entrypoint',
                     '@type' => 'hydra:Class',
                     'hydra:title' => 'The API entrypoint',
                     'hydra:supportedProperty' => [
-                        0 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#Entrypoint/dummy',
@@ -223,23 +223,23 @@ class DocumentationNormalizerTest extends TestCase
                                 'rdfs:label' => 'The collection of dummy resources',
                                 'domain' => '#Entrypoint',
                                 'rdfs:range' => [
-                                    'hydra:Collection',
+                                    ['@id' => 'hydra:Collection'],
                                     [
                                         'owl:equivalentClass' => [
-                                            'owl:onProperty' => 'hydra:member',
-                                            'owl:allValuesFrom' => '#dummy',
+                                            'owl:onProperty' => ['@id' => 'hydra:member'],
+                                            'owl:allValuesFrom' => ['@id' => '#dummy'],
                                         ],
                                     ],
                                 ],
                                 'hydra:supportedOperation' => [
-                                    0 => [
+                                    [
                                         '@type' => ['hydra:Operation', 'schema:FindAction'],
                                         'hydra:method' => 'GET',
                                         'hydra:title' => 'Retrieves the collection of dummy resources.',
                                         'rdfs:label' => 'Retrieves the collection of dummy resources.',
                                         'returns' => 'hydra:Collection',
                                     ],
-                                    1 => [
+                                    [
                                         '@type' => ['hydra:Operation', 'schema:CreateAction'],
                                         'expects' => '#dummy',
                                         'hydra:method' => 'POST',
@@ -247,7 +247,7 @@ class DocumentationNormalizerTest extends TestCase
                                         'rdfs:label' => 'Creates a dummy resource.',
                                         'returns' => '#dummy',
                                     ],
-                                    2 => [
+                                    [
                                         '@type' => ['hydra:Operation', 'schema:FindAction'],
                                         'hydra:method' => 'GET',
                                         'hydra:title' => 'Retrieves a relatedDummy resource.',
@@ -268,12 +268,12 @@ class DocumentationNormalizerTest extends TestCase
                         'returns' => '#EntryPoint',
                     ],
                 ],
-                2 => [
+                [
                     '@id' => '#ConstraintViolation',
                     '@type' => 'hydra:Class',
                     'hydra:title' => 'A constraint violation',
                     'hydra:supportedProperty' => [
-                        0 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#ConstraintViolation/propertyPath',
@@ -287,7 +287,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:readable' => true,
                             'hydra:writable' => false,
                         ],
-                        1 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#ConstraintViolation/message',
@@ -303,13 +303,13 @@ class DocumentationNormalizerTest extends TestCase
                         ],
                     ],
                 ],
-                3 => [
+                [
                     '@id' => '#ConstraintViolationList',
                     '@type' => 'hydra:Class',
                     'subClassOf' => 'hydra:Error',
                     'hydra:title' => 'A constraint violation list',
                     'hydra:supportedProperty' => [
-                        0 => [
+                        [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#ConstraintViolationList/violations',
