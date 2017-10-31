@@ -18,7 +18,7 @@ namespace ApiPlatform\Core\DataProvider;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface PaginatorInterface extends \Traversable, \Countable
+interface PaginatorInterface extends \Traversable
 {
     /**
      * Gets the current page number.

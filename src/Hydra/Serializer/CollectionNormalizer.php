@@ -88,7 +88,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
+        if (is_array($object) || $object instanceof PaginatorInterface || $object instanceof \Countable) {
             $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
         }
 
