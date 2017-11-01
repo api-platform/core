@@ -29,9 +29,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *        "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
  *     },
  *     itemOperations={
- *         "get"={"method"="GET"},
- *         "put"={"method"="PUT"},
- *         "delete"={"method"="DELETE"},
+ *         "get",
+ *         "put"={},
+ *         "delete",
  *         "custom_get"={"route_name"="relation_embedded.custom_get"},
  *         "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
  *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},

@@ -175,7 +175,7 @@ final class ApiLoader extends Loader
         }
 
         if (!isset($operation['method'])) {
-            throw new RuntimeException('Either a "route_name" or a "method" operation attribute must exist.');
+            throw new RuntimeException(sprintf('Either a "route_name" or a "method" operation attribute must exist for the operation "%s" of the resource "%s".', $operationName, $resourceClass));
         }
 
         if (null === $controller = $operation['controller'] ?? null) {
