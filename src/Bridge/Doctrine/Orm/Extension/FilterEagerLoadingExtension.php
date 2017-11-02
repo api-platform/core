@@ -69,7 +69,11 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
             $queryBuilderClone->andWhere($queryBuilderClone->expr()->in($originAlias, $in->getDQL()));
         } else {
             // Because Doctrine doesn't support WHERE ( foo, bar ) IN () (https://github.com/doctrine/doctrine2/issues/5238), we are building as many subqueries as they are identifiers
-            foreach ($classMetadata->identifier as $identifier) {
+            foreach ($classMetadata->getIdentifier() as $identifier) {
+                if (!$classMetadata->hasAssociation($identifier)) {
+                    continue;
+                }
+
                 $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
                 $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
                 $in->select("IDENTITY($replacementAlias.$identifier)");
