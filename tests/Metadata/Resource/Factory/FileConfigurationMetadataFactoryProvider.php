@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Resource metadata provider for file configured factories tests.
@@ -40,10 +41,10 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'iri' => 'someirischema',
             'attributes' => [
                 'normalization_context' => [
-                    'groups' => ['default'],
+                    AbstractNormalizer::GROUPS => ['default'],
                 ],
                 'denormalization_context' => [
-                    'groups' => ['default'],
+                    AbstractNormalizer::GROUPS => ['default'],
                 ],
                 'hydra_context' => [
                     '@type' => 'hydra:Operation',

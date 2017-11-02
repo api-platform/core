@@ -46,6 +46,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -558,7 +559,7 @@ class DocumentationNormalizerTest extends TestCase
             'http://schema.example.com/Dummy',
             [
                 'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'normalization_context' => ['groups' => $groups]],
+                'put' => ['method' => 'PUT', 'normalization_context' => [AbstractNormalizer::GROUPS => $groups]],
             ],
             [
                 'get' => ['method' => 'GET'],
@@ -749,7 +750,7 @@ class DocumentationNormalizerTest extends TestCase
             'http://schema.example.com/Dummy',
             [
                 'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'denormalization_context' => ['groups' => 'dummy']],
+                'put' => ['method' => 'PUT', 'denormalization_context' => [AbstractNormalizer::GROUPS => 'dummy']],
             ],
             [
                 'get' => ['method' => 'GET'],
@@ -942,7 +943,7 @@ class DocumentationNormalizerTest extends TestCase
                 'get' => ['method' => 'GET'],
                 'put' => [
                     'method' => 'PUT',
-                    'normalization_context' => ['groups' => 'dummy'], 'denormalization_context' => ['groups' => 'dummy'],
+                    'normalization_context' => [AbstractNormalizer::GROUPS => 'dummy'], 'denormalization_context' => [AbstractNormalizer::GROUPS => 'dummy'],
                 ],
             ],
             [
@@ -1340,7 +1341,7 @@ class DocumentationNormalizerTest extends TestCase
             'http://schema.example.com/Dummy',
             [
                 'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'normalization_context' => ['groups' => $groups]],
+                'put' => ['method' => 'PUT', 'normalization_context' => [AbstractNormalizer::GROUPS => $groups]],
             ],
             [
                 'get' => ['method' => 'GET'],
