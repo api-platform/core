@@ -146,17 +146,15 @@ final class QueryChecker
                 if (!isset($orderByAliases[$alias])) {
                     continue;
                 }
-
                 $relationship = QueryJoinParser::getJoinRelationship($join);
 
                 if (false !== strpos($relationship, '.')) {
                     /*
-                     * (Cannot select distinct identifiers from query with LIMIT and ORDER BY on a column from a fetch joined to-many association. Use output walkers)
-                     *
+                     * We select the parent alias because it may differ from the origin alias given above
                      * @see https://github.com/api-platform/core/issues/1313
                      */
-                    list($parentAlias, $association) = explode('.', $relationship);
-                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($parentAlias, $queryBuilder, $managerRegistry);
+                    list($relationAlias, $association) = explode('.', $relationship);
+                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($relationAlias, $queryBuilder, $managerRegistry);
                     if ($metadata->isCollectionValuedAssociation($association)) {
                         return true;
                     }
