@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.3
+
+* Don't use dynamic values in Varnish-related service keys (improves Symfony 3.3 compatibility)
+* Hydra: Fix the value of `owl:allValuesFrom` in the API documentation
+* Swagger: Include the context even when the type is `null`
+* Minor code and PHPDoc cleanups
+
 ## 2.1.2
 
 * PHP 7.2 compatibility
