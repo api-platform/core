@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -77,7 +79,11 @@ trait IdentifierManagerTrait
             $doctrineTypeName = $doctrineClassMetadata->getTypeOfField($propertyName);
 
             if ($isOrm && null !== $doctrineTypeName && DBALType::hasType($doctrineTypeName)) {
-                $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
+                try {
+                    $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
+                } catch (ConversionException $e) {
+                    throw new InvalidArgumentException(sprintf('Invalid identifier "%s" value provided.', $propertyName), $e->getCode(), $e);
+                }
             }
 
             $identifiers[$propertyName] = $identifier;
