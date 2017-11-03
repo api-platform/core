@@ -146,12 +146,16 @@ final class QueryChecker
                 if (!isset($orderByAliases[$alias])) {
                     continue;
                 }
-
                 $relationship = QueryJoinParser::getJoinRelationship($join);
 
                 if (false !== strpos($relationship, '.')) {
-                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($alias, $queryBuilder, $managerRegistry);
-                    if ($metadata->isCollectionValuedAssociation($relationship)) {
+                    /*
+                     * We select the parent alias because it may differ from the origin alias given above
+                     * @see https://github.com/api-platform/core/issues/1313
+                     */
+                    list($relationAlias, $association) = explode('.', $relationship);
+                    $metadata = QueryJoinParser::getClassMetadataFromJoinAlias($relationAlias, $queryBuilder, $managerRegistry);
+                    if ($metadata->isCollectionValuedAssociation($association)) {
                         return true;
                     }
                 } else {

@@ -33,7 +33,7 @@ class QueryJoinParserTest extends TestCase
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
         $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name')]);
+        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => [new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name')]]);
         $classMetadata = $this->prophesize(ClassMetadata::class);
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
