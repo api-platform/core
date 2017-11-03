@@ -23,6 +23,7 @@ use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Extract input and output information for the NelmioApiDocBundle.
@@ -117,15 +118,15 @@ final class ApiPlatformParser implements ParserInterface
         $options = [];
         $attributes = $resourceMetadata->getAttributes();
 
-        if (isset($attributes['normalization_context']['groups'])) {
-            $options['serializer_groups'] = $attributes['normalization_context']['groups'];
+        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
+            $options['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
-        if (isset($attributes['denormalization_context']['groups'])) {
+        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
             if (isset($options['serializer_groups'])) {
-                $options['serializer_groups'] += $attributes['denormalization_context']['groups'];
+                $options['serializer_groups'] += $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             } else {
-                $options['serializer_groups'] = $attributes['denormalization_context']['groups'];
+                $options['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             }
         }
 
@@ -135,12 +136,12 @@ final class ApiPlatformParser implements ParserInterface
     private function getGroupsContext(ResourceMetadata $resourceMetadata, string $operationName, bool $isNormalization)
     {
         $groupsContext = $isNormalization ? 'normalization_context' : 'denormalization_context';
-        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
-        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, ['groups' => []], true)['groups'];
+        $itemOperationAttribute = $resourceMetadata->getItemOperationAttribute($operationName, $groupsContext, [AbstractNormalizer::GROUPS => []], true)[AbstractNormalizer::GROUPS];
+        $collectionOperationAttribute = $resourceMetadata->getCollectionOperationAttribute($operationName, $groupsContext, [AbstractNormalizer::GROUPS => []], true)[AbstractNormalizer::GROUPS];
 
         return [
             $groupsContext => [
-                'groups' => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
+                AbstractNormalizer::GROUPS => array_merge($itemOperationAttribute ?? [], $collectionOperationAttribute ?? []),
             ],
         ];
     }
@@ -161,13 +162,13 @@ final class ApiPlatformParser implements ParserInterface
 
         if (self::OUT_PREFIX === $io) {
             return [
-                'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context']['groups'] : [],
+                'serializer_groups' => !empty($operation['normalization_context']) ? $operation['normalization_context'][AbstractNormalizer::GROUPS] : [],
             ];
         }
 
         if (self::IN_PREFIX === $io) {
             return [
-                'serializer_groups' => !empty($operation['denormalization_context']) ? $operation['denormalization_context']['groups'] : [],
+                'serializer_groups' => !empty($operation['denormalization_context']) ? $operation['denormalization_context'][AbstractNormalizer::GROUPS] : [],
             ];
         }
 

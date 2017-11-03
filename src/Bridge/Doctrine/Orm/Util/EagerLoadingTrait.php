@@ -91,7 +91,7 @@ trait EagerLoadingTrait
     {
         $checked[] = $classMetadata->name;
 
-        foreach ($classMetadata->associationMappings as $mapping) {
+        foreach ($classMetadata->getAssociationMappings() as $mapping) {
             if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
                 return true;
             }

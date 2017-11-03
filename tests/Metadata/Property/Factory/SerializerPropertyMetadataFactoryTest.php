@@ -27,6 +27,7 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata as SerializerAttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * @author Teoh Han Hui <teohhanhui@gmail.com>
@@ -55,10 +56,10 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $dummyResourceMetadata = (new ResourceMetadata())
             ->withAttributes([
                 'normalization_context' => [
-                    'groups' => ['dummy_read'],
+                    AbstractNormalizer::GROUPS => ['dummy_read'],
                 ],
                 'denormalization_context' => [
-                    'groups' => ['dummy_write'],
+                    AbstractNormalizer::GROUPS => ['dummy_write'],
                 ],
             ]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata)->shouldBeCalled();

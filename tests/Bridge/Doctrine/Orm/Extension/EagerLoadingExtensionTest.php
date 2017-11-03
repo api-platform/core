@@ -40,6 +40,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -315,7 +316,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true);
-        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], 'item_operation', ['groups' => 'some_groups']);
+        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], 'item_operation', [AbstractNormalizer::GROUPS => 'some_groups']);
     }
 
     /**
@@ -442,7 +443,7 @@ class EagerLoadingExtensionTest extends TestCase
     public function testForceEager()
     {
         $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withAttributes(['normalization_context' => ['groups' => 'foobar']]);
+        $resourceMetadata = $resourceMetadata->withAttributes(['normalization_context' => [AbstractNormalizer::GROUPS => 'foobar']]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
 
@@ -617,7 +618,7 @@ class EagerLoadingExtensionTest extends TestCase
         $requestStack->push($request);
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-        $serializerContextBuilderProphecy->createFromRequest($request, true)->shouldBeCalled()->willReturn(['groups' => ['foo']]);
+        $serializerContextBuilderProphecy->createFromRequest($request, true)->shouldBeCalled()->willReturn([AbstractNormalizer::GROUPS => ['foo']]);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, $requestStack, $serializerContextBuilderProphecy->reveal(), true);

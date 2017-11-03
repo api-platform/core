@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 /**
- * Paginator Interface.
+ * The \Countable implementation should return the number of items on the
+ * current page, as an integer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

@@ -176,4 +176,25 @@ class QueryCheckerTest extends TestCase
 
         $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
+
+    /**
+     * Adds a test on the fix referenced in https://github.com/api-platform/core/pull/1449.
+     */
+    public function testOrderByOnToManyWithRelationAsBasis()
+    {
+        $queryBuilder = $this->prophesize(QueryBuilder::class);
+        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootAliases()->willReturn(['d']);
+        $queryBuilder->getDQLPart('join')->willReturn(['d' => [new Join('LEFT_JOIN', 'd.relatedDummy', 'a_1')]]);
+        $queryBuilder->getDQLPart('orderBy')->willReturn(['a_1.name' => new OrderBy('a_1.name', 'asc')]);
+        $classMetadata = $this->prophesize(ClassMetadata::class);
+        $classMetadata = $this->prophesize(ClassMetadata::class);
+        $classMetadata->isCollectionValuedAssociation('relatedDummy')->willReturn(true);
+        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+
+        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+    }
 }

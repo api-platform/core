@@ -26,6 +26,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * Eager loads relations.
@@ -99,8 +101,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
         $serializerContext = $this->getSerializerContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
 
-        if (isset($context['groups'])) {
-            $groups = ['serializer_groups' => $context['groups']];
+        if (isset($context[AbstractNormalizer::GROUPS])) {
+            $groups = ['serializer_groups' => $context[AbstractNormalizer::GROUPS]];
         } else {
             $groups = $this->getSerializerGroups($options, $serializerContext);
         }
@@ -137,7 +139,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             //Don't join if max depth is enabled and the current depth limit is reached
-            if (isset($context['enable_max_depth']) && 0 === $currentDepth) {
+            if (isset($context[AbstractObjectNormalizer::ENABLE_MAX_DEPTH]) && 0 === $currentDepth) {
                 continue;
             }
 
@@ -280,10 +282,10 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     private function getSerializerGroups(array $options, array $context): array
     {
-        if (empty($context['groups'])) {
+        if (empty($context[AbstractNormalizer::GROUPS])) {
             return $options;
         }
 
-        return ['serializer_groups' => $context['groups']];
+        return ['serializer_groups' => $context[AbstractNormalizer::GROUPS]];
     }
 }

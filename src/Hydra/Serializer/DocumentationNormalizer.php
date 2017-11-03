@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -101,11 +102,11 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'domain' => '#Entrypoint',
                 'rdfs:label' => "The collection of $shortName resources",
                 'rdfs:range' => [
-                    'hydra:Collection',
+                    ['@id' => 'hydra:Collection'],
                     [
                         'owl:equivalentClass' => [
-                            'owl:onProperty' => 'hydra:member',
-                            'owl:allValuesFrom' => "#$shortName",
+                            'owl:onProperty' => ['@id' => 'hydra:member'],
+                            'owl:allValuesFrom' => ['@id' => $prefixedShortName],
                         ],
                     ],
                 ],
@@ -157,17 +158,17 @@ final class DocumentationNormalizer implements NormalizerInterface
         $attributes = $resourceMetadata->getAttributes();
         $context = [];
 
-        if (isset($attributes['normalization_context']['groups'])) {
-            $context['serializer_groups'] = $attributes['normalization_context']['groups'];
+        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
+            $context['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
-        if (isset($attributes['denormalization_context']['groups'])) {
+        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
             if (isset($context['serializer_groups'])) {
-                foreach ($attributes['denormalization_context']['groups'] as $groupName) {
+                foreach ($attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
                     $context['serializer_groups'][] = $groupName;
                 }
             } else {
-                $context['serializer_groups'] = $attributes['denormalization_context']['groups'];
+                $context['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             }
         }
 
