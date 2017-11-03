@@ -227,7 +227,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testDisableGraphql()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.action.graphql_entrypoint')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.collection_resolver_factory')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
