@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer\Filter;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Property filter.
@@ -54,11 +55,11 @@ final class PropertyFilter implements FilterInterface
             $properties = $this->getProperties($properties, $this->whitelist);
         }
 
-        if (!$this->overrideDefaultProperties && isset($context['attributes'])) {
-            $properties = array_merge_recursive((array) $context['attributes'], $properties);
+        if (!$this->overrideDefaultProperties && isset($context[AbstractNormalizer::ATTRIBUTES])) {
+            $properties = array_merge_recursive((array) $context[AbstractNormalizer::ATTRIBUTES], $properties);
         }
 
-        $context['attributes'] = $properties;
+        $context[AbstractNormalizer::ATTRIBUTES] = $properties;
     }
 
     /**

@@ -30,6 +30,7 @@ use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -444,7 +445,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
-        $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext['groups'] ?? []));
+        $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
 
         if (!isset($definitions[$definitionKey])) {
             $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
@@ -483,7 +484,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $definitionSchema['externalDocs'] = ['url' => $iri];
         }
 
-        $options = isset($serializerContext['groups']) ? ['serializer_groups' => $serializerContext['groups']] : [];
+        $options = isset($serializerContext[AbstractNormalizer::GROUPS]) ? ['serializer_groups' => $serializerContext[AbstractNormalizer::GROUPS]] : [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName) : $propertyName;
@@ -511,7 +512,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getPropertySchema(PropertyMetadata $propertyMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
     {
-        $propertySchema = new \ArrayObject();
+        $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
 
         if (false === $propertyMetadata->isWritable()) {
             $propertySchema['readOnly'] = true;
@@ -536,7 +537,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitions, $serializerContext);
 
-        return new \ArrayObject((array) $propertySchema + $valueSchema + ($propertyMetadata->getAttributes()['swagger_context'] ?? []));
+        return new \ArrayObject((array) $propertySchema + $valueSchema);
     }
 
     /**

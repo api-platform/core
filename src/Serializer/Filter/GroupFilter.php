@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer\Filter;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Group filter.
@@ -52,11 +53,11 @@ final class GroupFilter implements FilterInterface
             $groups = array_intersect($this->whitelist, $groups);
         }
 
-        if (!$this->overrideDefaultGroups && isset($context['groups'])) {
-            $groups = array_merge((array) $context['groups'], $groups);
+        if (!$this->overrideDefaultGroups && isset($context[AbstractNormalizer::GROUPS])) {
+            $groups = array_merge((array) $context[AbstractNormalizer::GROUPS], $groups);
         }
 
-        $context['groups'] = $groups;
+        $context[AbstractNormalizer::GROUPS] = $groups;
     }
 
     /**

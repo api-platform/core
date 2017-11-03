@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -115,7 +116,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $context = $populateObject ? ['object_to_populate' => $populateObject] : [];
+        $context = $populateObject ? [AbstractNormalizer::OBJECT_TO_POPULATE => $populateObject] : [];
         $serializerProphecy->deserialize('{}', 'Foo', 'json', $context)->willReturn($result)->shouldBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);

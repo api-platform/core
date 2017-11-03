@@ -158,7 +158,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testLoadDefaultConfig()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
@@ -168,7 +168,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $nameConverterId = 'test.name_converter';
 
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -177,7 +177,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testEnableFosUser()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'FOSUserBundle' => FOSUserBundle::class,
@@ -213,7 +213,7 @@ class ApiPlatformExtensionTest extends TestCase
      */
     public function testEnableNelmioApiDoc()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'NelmioApiDocBundle' => NelmioApiDocBundle::class,
@@ -227,7 +227,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testDisableGraphql()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.action.graphql_entrypoint')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.collection_resolver_factory')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
@@ -242,7 +242,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testEnableSecurity()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'SecurityBundle' => SecurityBundle::class,
@@ -280,7 +280,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testDisableEagerLoadingExtension()
     {
-        $containerBuilderProphecy = $this->getDefaultContainerBuilderProphecy();
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading')->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading')->shouldBeCalled();
@@ -608,18 +608,6 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $containerBuilderProphecy->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish')->shouldBeCalled();
-
-        return $containerBuilderProphecy;
-    }
-
-    private function getDefaultContainerBuilderProphecy()
-    {
-        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
-
-        $containerBuilderProphecy
-            ->setDefinition('api_platform.http_cache.purger.varnish_client.test', Argument::type(Definition::class))
-            ->shouldBeCalled()
-        ;
 
         return $containerBuilderProphecy;
     }
