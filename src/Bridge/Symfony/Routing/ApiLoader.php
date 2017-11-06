@@ -190,7 +190,8 @@ final class ApiLoader extends Loader
             $operation['options'] ?? [],
             $operation['host'] ?? '',
             $operation['schemes'] ?? [],
-            [$operation['method']]
+            [$operation['method']],
+            $operation['condition'] ?? ''
         );
 
         $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);

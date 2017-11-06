@@ -54,7 +54,7 @@ class ApiLoaderTest extends TestCase
         ]);
         //custom operations
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value']], //with controller
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'"], //with controller
             'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https']], //without controller, takes the default one
             'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path'], //custom path
         ]);
@@ -77,7 +77,7 @@ class ApiLoaderTest extends TestCase
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value']),
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value'], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
             $routeCollection->get('api_dummies_my_op_collection')
         );
 
@@ -262,7 +262,7 @@ class ApiLoaderTest extends TestCase
         return $apiLoader;
     }
 
-    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = []): Route
+    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
         return new Route(
             $path,
@@ -276,7 +276,8 @@ class ApiLoaderTest extends TestCase
             $options,
             $host,
             $schemes,
-            $methods
+            $methods,
+            $condition
         );
     }
 
