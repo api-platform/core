@@ -18,6 +18,8 @@ use ApiPlatform\Core\Bridge\Graphql\Resolver\CollectionResolverFactory;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -37,9 +39,11 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $mockedCollectionResolverFactory = $this->mockCollectionResolverFactory([], [], [], $paginationEnabled);
 
-        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass');
+        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass', 'foo');
+
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
+
         $this->assertEquals($expected, $resolver(null, [], null, $resolveInfoProphecy->reveal()));
     }
 
@@ -50,9 +54,11 @@ class CollectionResolverFactoryTest extends TestCase
             'Object2',
         ], [], [], false);
 
-        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass');
+        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass', 'foo');
+
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
+
         $this->assertEquals(['normalizedObject1', 'normalizedObject2'], $resolver(null, [], null, $resolveInfoProphecy->reveal()));
     }
 
@@ -66,9 +72,11 @@ class CollectionResolverFactoryTest extends TestCase
             'Object2',
         ], $subresource, ['rootIdentifier' => 'valueRootIdentifier'], false);
 
-        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('subresourceClass', 'rootClass');
+        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('subresourceClass', 'rootClass', 'foo');
+
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
+
         $this->assertEquals($expected, $resolver(['rootProperty' => true, 'rootIdentifier' => 'valueRootIdentifier'], [], null, $resolveInfoProphecy->reveal()));
     }
 
@@ -82,13 +90,16 @@ class CollectionResolverFactoryTest extends TestCase
             'Object2',
         ], [], [], true);
 
-        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass');
+        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass', 'foo');
+
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
+
         if ('$bad$' === $cursor) {
             $this->expectException('\Exception');
             $this->expectExceptionMessage('Cursor $bad$ is invalid');
         }
+
         $this->assertEquals(
             [
                 'edges' => [['node' => 'normalizedObject1', 'cursor' => $expectedCursors[0]], ['node' => 'normalizedObject2', 'cursor' => $expectedCursors[1]]],
@@ -114,9 +125,11 @@ class CollectionResolverFactoryTest extends TestCase
 
         $mockedCollectionResolverFactory = $this->mockCollectionResolverFactory($collectionPaginatorProphecy->reveal(), [], [], true);
 
-        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass');
+        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass', 'foo');
+
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
+
         $this->assertEquals(
             ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'MTY=', 'hasNextPage' => true]],
             $resolver(null, ['after' => 'MQ=='], null, $resolveInfoProphecy->reveal())
@@ -142,13 +155,16 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProviderProphecy->getCollection('resourceClass')->willReturn($collection);
+
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource('subresourceClass', $identifiers, [
             'property' => 'rootProperty',
             'identifiers' => [['rootIdentifier', 'rootClass']],
             'collection' => true,
         ])->willReturn($subcollection);
+
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+
         if (!is_array($collection)) {
             $normalizerProphecy->normalize($collection->current(), Argument::cetera())->willReturn('normalized'.$collection->current());
         } else {
@@ -156,12 +172,20 @@ class CollectionResolverFactoryTest extends TestCase
                 $normalizerProphecy->normalize($object, Argument::cetera())->willReturn('normalized'.$object);
             }
         }
+
         foreach ($subcollection as $object) {
             $normalizerProphecy->normalize($object, Argument::cetera())->willReturn('normalized'.$object);
         }
+
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass('rootClass')->willReturn(array_keys($identifiers));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('resourceClass')->willReturn(new ResourceMetadata('resourceClass', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
+        $resourceMetadataFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadata('subresourceClass', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
+
         $request = new Request();
+
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
@@ -170,6 +194,7 @@ class CollectionResolverFactoryTest extends TestCase
             $subresourceDataProviderProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $identifiersExtractorProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
             $requestStack,
             $paginationEnabled
         );
