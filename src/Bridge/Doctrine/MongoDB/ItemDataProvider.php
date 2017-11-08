@@ -96,7 +96,8 @@ class ItemDataProvider implements ItemDataProviderInterface
             ++$i;
         }
 
-        if (!$context['fetch_data'] || $manager instanceof DocumentManager) {
+        $fetchData = $context['fetch_data'] ?? true;
+        if (!$fetchData || $manager instanceof DocumentManager) {
             return $manager->getReference($resourceClass, reset($identifiers));
         }
 

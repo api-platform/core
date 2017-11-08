@@ -205,7 +205,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 $paths[] = $dirname.'/Resources/config/api_resources'.$extension;
             }
 
-            $paths[] = $dirname.'/Entity';
+//            $paths[] = $dirname.'/Entity';
+            $paths[] = $dirname.'/Document';
 
             foreach ($paths as $path) {
                 if ($container->fileExists($path, false)) {

@@ -30,7 +30,7 @@ doctrine:
 doctrine_mongodb:
     connections:
         default:
-            server: mongodb://localhost:27017
+            server: mongodb://mongodb:27017
             options: {}
     default_database: apiplatform
     document_managers:
@@ -111,68 +111,68 @@ services:
     app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
-    app.my_dummy_resource.search_filter:
-        parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
-
-    # Tests if the id default to the service name, do not add id attributes here
-    my_dummy.order:
-        parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
-
-    app.my_dummy_resource.date_filter:
-        parent:    'api_platform.doctrine.orm.date_filter'
-        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
-
-    app.my_dummy_resource.range_filter:
-        parent:    'api_platform.doctrine.orm.range_filter'
-        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
-
-    app.my_dummy_resource.boolean_filter:
-        parent:    'api_platform.doctrine.orm.boolean_filter'
-        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
-
-    app.my_dummy_resource.numeric_filter:
-        parent:    'api_platform.doctrine.orm.numeric_filter'
-        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
-
-    app.my_dummy_resource.exists_filter:
-        parent:    'api_platform.doctrine.orm.exists_filter'
-        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~ } ]
-        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
-
-    app.config_dummy_resource.action:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
-        arguments: ['@api_platform.item_data_provider']
-
-    app.entity.filter.dummy_car:
-        parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'colors.prop': 'ipartial' } ]
-        tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
-
-    app.entity.filter.dummy_property.property:
-        parent:    'api_platform.serializer.property_filter'
-        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
-
-    app.entity.filter.dummy_group.group:
-        parent:    'api_platform.serializer.group_filter'
-        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.group' } ]
-
-    app.entity.filter.dummy_group.override_group:
-        parent:    'api_platform.serializer.group_filter'
-        arguments: [ 'override_groups', true ]
-        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
-
-    app.related_dummy_resource.search_filter:
-        parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
-        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
+#    app.my_dummy_resource.search_filter:
+#        parent:    'api_platform.doctrine.orm.search_filter'
+#        arguments: [ { 'id': 'exact', 'name': 'partial', 'alias': 'start', 'description': 'word_start', 'relatedDummy.name': 'exact', 'relatedDummies': 'exact', 'dummy': 'ipartial', 'relatedDummies.name': 'start', 'embeddedDummy.dummyName': 'partial' } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.search' } ]
+#
+#    # Tests if the id default to the service name, do not add id attributes here
+#    my_dummy.order:
+#        parent:    'api_platform.doctrine.orm.order_filter'
+#        arguments: [ { 'id': ~, 'name': 'desc', 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
+#
+#    app.my_dummy_resource.date_filter:
+#        parent:    'api_platform.doctrine.orm.date_filter'
+#        arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
+#
+#    app.my_dummy_resource.range_filter:
+#        parent:    'api_platform.doctrine.orm.range_filter'
+#        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
+#
+#    app.my_dummy_resource.boolean_filter:
+#        parent:    'api_platform.doctrine.orm.boolean_filter'
+#        arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.boolean' } ]
+#
+#    app.my_dummy_resource.numeric_filter:
+#        parent:    'api_platform.doctrine.orm.numeric_filter'
+#        arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.numeric' } ]
+#
+#    app.my_dummy_resource.exists_filter:
+#        parent:    'api_platform.doctrine.orm.exists_filter'
+#        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~ } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
+#
+#    app.config_dummy_resource.action:
+#        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
+#        arguments: ['@api_platform.item_data_provider']
+#
+#    app.entity.filter.dummy_car:
+#        parent:    'api_platform.doctrine.orm.search_filter'
+#        arguments: [ { 'colors.prop': 'ipartial' } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'dummy_car_colors.search_filter' } ]
+#
+#    app.entity.filter.dummy_property.property:
+#        parent:    'api_platform.serializer.property_filter'
+#        tags:      [ { name: 'api_platform.filter', id: 'dummy_property.property' } ]
+#
+#    app.entity.filter.dummy_group.group:
+#        parent:    'api_platform.serializer.group_filter'
+#        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.group' } ]
+#
+#    app.entity.filter.dummy_group.override_group:
+#        parent:    'api_platform.serializer.group_filter'
+#        arguments: [ 'override_groups', true ]
+#        tags:      [ { name: 'api_platform.filter', id: 'dummy_group.override_group' } ]
+#
+#    app.related_dummy_resource.search_filter:
+#        parent:    'api_platform.doctrine.orm.search_filter'
+#        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+#        tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
 
     logger:
         class: Psr\Log\NullLogger
