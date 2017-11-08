@@ -87,6 +87,9 @@ final class ApiLoader extends Loader
 
             if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
                 foreach ($collectionOperations as $operationName => $operation) {
+                    if ('subresource' === substr($operationName, -11)) {
+                        continue;
+                    }
                     $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceShortName, OperationType::COLLECTION);
                 }
             }
@@ -115,12 +118,13 @@ final class ApiLoader extends Loader
                             'collection' => $operation['collection'],
                             'operationId' => $operationId,
                         ],
-                    ],
-                    $operation['requirements'] ?? [],
-                    [],
-                    '',
-                    [],
-                    ['GET']
+                    ] + $operations['defaults'],
+                    $operation['requirements'],
+                    $operation['options'],
+                    $operation['host'],
+                    $operation['schemes'],
+                    ['GET'],
+                    $operation['condition']
                 ));
             }
         }

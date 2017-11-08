@@ -26,6 +26,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 {
     const SUBRESOURCE_SUFFIX = '_subresource';
     const FORMAT_SUFFIX = '.{_format}';
+    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => ''];
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -82,6 +83,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 continue;
             }
 
+            $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
             $operationName = 'get';
             $operation = [
                 'property' => $property,
@@ -91,19 +93,25 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             ];
 
             if (null === $parentOperation) {
-                $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
                 $rootShortname = $rootResourceMetadata->getShortName();
                 $operation['identifiers'] = [['id', $rootResourceClass, true]];
-                $operation['route_name'] = sprintf(
-                    '%s%s_%s_%s%s',
-                    RouteNameGenerator::ROUTE_NAME_PREFIX,
-                    RouteNameGenerator::inflector($rootShortname),
+                $operation['operation_name'] = sprintf(
+                    '%s_%s%s',
                     RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
                     $operationName,
                     self::SUBRESOURCE_SUFFIX
                 );
 
-                $operation['path'] = sprintf(
+                $collectionOperation = $rootResourceMetadata->getCollectionOperations()[$operation['operation_name']] ?? [];
+
+                $operation['route_name'] = sprintf(
+                    '%s%s_%s',
+                    RouteNameGenerator::ROUTE_NAME_PREFIX,
+                    RouteNameGenerator::inflector($rootShortname),
+                    $operation['operation_name']
+                );
+
+                $operation['path'] = $collectionOperation['path'] ?? sprintf(
                     '/%s/{id}/%s%s',
                     $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
@@ -117,18 +125,31 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 $operation['identifiers'] = $parentOperation['identifiers'];
                 $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $parentOperation['collection']];
-                $operation['route_name'] = str_replace('get'.self::SUBRESOURCE_SUFFIX, RouteNameGenerator::inflector($property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX, $parentOperation['route_name']);
+
+                $operation['operation_name'] = str_replace('get'.self::SUBRESOURCE_SUFFIX, RouteNameGenerator::inflector($property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX, $parentOperation['operation_name']);
+
+                $operation['route_name'] = str_replace($parentOperation['operation_name'], $operation['operation_name'], $parentOperation['route_name']);
 
                 if (!in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
                     $operation['shortNames'][] = $resourceMetadata->getShortName();
                 }
 
-                $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
-                if ($parentOperation['collection']) {
-                    list($key) = end($operation['identifiers']);
-                    $operation['path'] .= sprintf('/{%s}', $key);
+                $collectionOperation = $rootResourceMetadata->getCollectionOperations()[$operation['operation_name']] ?? [];
+
+                if (isset($collectionOperation['path'])) {
+                    $operation['path'] = $collectionOperation['path'];
+                } else {
+                    $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
+                    if ($parentOperation['collection']) {
+                        list($key) = end($operation['identifiers']);
+                        $operation['path'] .= sprintf('/{%s}', $key);
+                    }
+                    $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
                 }
-                $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
+            }
+
+            foreach (self::ROUTE_OPTIONS as $routeOption => $defaultValue) {
+                $operation[$routeOption] = $collectionOperation[$routeOption] ?? $defaultValue;
             }
 
             $tree[$operation['route_name']] = $operation;
