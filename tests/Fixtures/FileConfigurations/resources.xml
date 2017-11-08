@@ -25,6 +25,11 @@
                 <attribute name="path">the/collection/path</attribute>
             </collectionOperation>
         </collectionOperations>
+        <subresourceOperations>
+            <subresourceOperation name="my_collection_subresource">
+                <attribute name="path">the/subresource/path</attribute>
+            </subresourceOperation>
+        </subresourceOperations>
         <attribute name="normalization_context">
             <attribute name="groups">
                 <attribute>default</attribute>

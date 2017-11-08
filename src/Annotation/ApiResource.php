@@ -51,5 +51,10 @@ final class ApiResource
     /**
      * @var array
      */
+    public $subresourceOperations;
+
+    /**
+     * @var array
+     */
     public $attributes = [];
 }

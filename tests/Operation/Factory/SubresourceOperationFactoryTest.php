@@ -146,9 +146,12 @@ class SubresourceOperationFactoryTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
-        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn((new ResourceMetadata('dummyEntity'))->withCollectionOperations([
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn((new ResourceMetadata('dummyEntity'))->withSubresourceOperations([
             'subcollections_get_subresource' => [
                 'path' => '/dummy_entities/{id}/foobars',
+            ],
+            'subcollections_another_subresource_get_subresource' => [
+                'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar.{_format}',
             ],
         ]));
 
@@ -237,7 +240,7 @@ class SubresourceOperationFactoryTest extends TestCase
                     ['subcollection', RelatedDummyEntity::class, true],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_get_subresource',
-                'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_subresource.{_format}',
+                'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar.{_format}',
                 'operation_name' => 'subcollections_another_subresource_get_subresource',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
             'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource' => [
@@ -251,7 +254,7 @@ class SubresourceOperationFactoryTest extends TestCase
                     ['anotherSubresource', DummyEntity::class, false],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource',
-                'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_subresource/subresource.{_format}',
+                'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar/subresource.{_format}',
                 'operation_name' => 'subcollections_another_subresource_subresource_get_subresource',
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));

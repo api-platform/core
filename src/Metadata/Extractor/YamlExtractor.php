@@ -67,6 +67,7 @@ final class YamlExtractor extends AbstractExtractor
                 'iri' => $this->phpize($resourceYaml, 'iri', 'string'),
                 'itemOperations' => $resourceYaml['itemOperations'] ?? null,
                 'collectionOperations' => $resourceYaml['collectionOperations'] ?? null,
+                'subresourceOperations' => $resourceYaml['subresourceOperations'] ?? null,
                 'attributes' => $resourceYaml['attributes'] ?? null,
             ];
 
