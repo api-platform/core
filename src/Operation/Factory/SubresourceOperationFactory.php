@@ -102,7 +102,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     self::SUBRESOURCE_SUFFIX
                 );
 
-                $collectionOperation = $rootResourceMetadata->getCollectionOperations()[$operation['operation_name']] ?? [];
+                $subresourceOperation = $rootResourceMetadata->getSubresourceOperations()[$operation['operation_name']] ?? [];
 
                 $operation['route_name'] = sprintf(
                     '%s%s_%s',
@@ -111,7 +111,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     $operation['operation_name']
                 );
 
-                $operation['path'] = $collectionOperation['path'] ?? sprintf(
+                $operation['path'] = $subresourceOperation['path'] ?? sprintf(
                     '/%s/{id}/%s%s',
                     $this->pathSegmentNameGenerator->getSegmentName($rootShortname, true),
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
@@ -134,10 +134,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     $operation['shortNames'][] = $resourceMetadata->getShortName();
                 }
 
-                $collectionOperation = $rootResourceMetadata->getCollectionOperations()[$operation['operation_name']] ?? [];
+                $subresourceOperation = $rootResourceMetadata->getSubresourceOperations()[$operation['operation_name']] ?? [];
 
-                if (isset($collectionOperation['path'])) {
-                    $operation['path'] = $collectionOperation['path'];
+                if (isset($subresourceOperation['path'])) {
+                    $operation['path'] = $subresourceOperation['path'];
                 } else {
                     $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
                     if ($parentOperation['collection']) {
@@ -149,7 +149,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             }
 
             foreach (self::ROUTE_OPTIONS as $routeOption => $defaultValue) {
-                $operation[$routeOption] = $collectionOperation[$routeOption] ?? $defaultValue;
+                $operation[$routeOption] = $subresourceOperation[$routeOption] ?? $defaultValue;
             }
 
             $tree[$operation['route_name']] = $operation;
