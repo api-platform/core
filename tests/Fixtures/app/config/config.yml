@@ -92,6 +92,18 @@ services:
         tags:
             -  { name: 'api_platform.item_data_provider' }
 
+    serializable.item_data_provider:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.item_data_provider' }
+
+    app.serializer.denormalizer.serializable_resource:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
+        public: false
+        tags:
+            -  { name: 'serializer.normalizer' }
+
     app.user_manager:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Manager\UserManager'
         arguments:

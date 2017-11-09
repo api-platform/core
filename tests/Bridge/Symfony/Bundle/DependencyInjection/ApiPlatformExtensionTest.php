@@ -454,6 +454,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
+            'api_platform.serializer_locator',
         ];
 
         foreach ($definitions as $definition) {
