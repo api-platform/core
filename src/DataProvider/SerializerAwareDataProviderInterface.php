@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\DataProvider;
 use Psr\Container\ContainerInterface;
 
 /**
- * Inject serializer in data providers.
+ * Injects serializer in data providers.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */

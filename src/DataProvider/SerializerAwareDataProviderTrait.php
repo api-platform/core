@@ -17,7 +17,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Inject serializer in data providers.
+ * Injects serializer in data providers.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */

@@ -55,7 +55,7 @@ final class DataProviderPass implements CompilerPassInterface
         $services = $this->findAndSortTaggedServices("api_platform.{$type}_data_provider", $container);
 
         foreach ($services as $reference) {
-            $definition = $container->getDefinition((string)$reference);
+            $definition = $container->getDefinition((string) $reference);
             if (is_a($definition->getClass(), SerializerAwareDataProviderInterface::class, true)) {
                 $definition->addMethodCall('setSerializerLocator', [new Reference('api_platform.serializer_locator')]);
             }
