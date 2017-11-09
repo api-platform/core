@@ -19,26 +19,22 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * Inject serializer in data providers.
  *
- * @author Vincent Chalamon <vincent@les-tilleuls.coop>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 trait SerializerAwareDataProviderTrait
 {
     /**
+     * @internal
+     *
      * @var ContainerInterface
      */
     private $serializerLocator;
 
-    /**
-     * @param ContainerInterface $serializerLocator
-     */
     public function setSerializerLocator(ContainerInterface $serializerLocator)
     {
         $this->serializerLocator = $serializerLocator;
     }
 
-    /**
-     * @return SerializerInterface
-     */
     private function getSerializer(): SerializerInterface
     {
         return $this->serializerLocator->get('serializer');

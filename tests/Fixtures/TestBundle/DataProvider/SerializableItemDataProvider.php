@@ -20,7 +20,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SerializableResource;
 
 /**
- * @author Vincent Chalamon <vincent@les-tilleuls.coop>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class SerializableItemDataProvider implements ItemDataProviderInterface, SerializerAwareDataProviderInterface
 {

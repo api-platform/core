@@ -18,12 +18,9 @@ use Psr\Container\ContainerInterface;
 /**
  * Inject serializer in data providers.
  *
- * @author Vincent Chalamon <vincent@les-tilleuls.coop>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 interface SerializerAwareDataProviderInterface
 {
-    /**
-     * @param ContainerInterface $serializerLocator
-     */
     public function setSerializerLocator(ContainerInterface $serializerLocator);
 }

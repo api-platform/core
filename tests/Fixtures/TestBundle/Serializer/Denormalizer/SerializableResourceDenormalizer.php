@@ -17,7 +17,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SerializableResource;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * @author Vincent Chalamon <vincent@les-tilleuls.coop>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class SerializableResourceDenormalizer implements DenormalizerInterface
 {

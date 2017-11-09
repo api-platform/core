@@ -21,7 +21,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *
  * @ApiResource
  *
- * @author Vincent Chalamon <vincent@les-tilleuls.coop>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 class SerializableResource
 {
