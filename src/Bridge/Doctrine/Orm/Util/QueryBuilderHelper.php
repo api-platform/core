@@ -29,32 +29,22 @@ final class QueryBuilderHelper
 
     /**
      * Adds a join to the queryBuilder if none exists.
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $association        the association field
-     * @param string|null                 $joinType           the join type (left join / inner join)
-     * @param string|null                 $conditionType
-     * @param string|null                 $condition
-     *
-     * @return string the new association alias
      */
-    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, $joinType = null, $conditionType = null, $condition = null): string
+    public static function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association, string $joinType = null, string $conditionType = null, string $condition = null): string
     {
         $join = self::getExistingJoin($queryBuilder, $alias, $association);
 
-        if (null === $join) {
-            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
-            $query = sprintf('%s.%s', $alias, $association);
+        if (null !== $join) {
+            return $join->getAlias();
+        }
 
-            if (Join::LEFT_JOIN === $joinType || true === QueryChecker::hasLeftJoin($queryBuilder)) {
-                $queryBuilder->leftJoin($query, $associationAlias, $conditionType, $condition);
-            } else {
-                $queryBuilder->innerJoin($query, $associationAlias, $conditionType, $condition);
-            }
+        $associationAlias = $queryNameGenerator->generateJoinAlias($association);
+        $query = "$alias.$association";
+
+        if (Join::LEFT_JOIN === $joinType || QueryChecker::hasLeftJoin($queryBuilder)) {
+            $queryBuilder->leftJoin($query, $associationAlias, $conditionType, $condition);
         } else {
-            $associationAlias = $join->getAlias();
+            $queryBuilder->innerJoin($query, $associationAlias, $conditionType, $condition);
         }
 
         return $associationAlias;
@@ -62,10 +52,6 @@ final class QueryBuilderHelper
 
     /**
      * Get the existing join from queryBuilder DQL parts.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $association  the association field
      *
      * @return Join|null
      */
