@@ -48,21 +48,21 @@ class ApiLoaderTest extends TestCase
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
         //default operation based on OperationResourceMetadataFactory
         $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+']],
+            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden']],
             'put' => ['method' => 'PUT'],
             'delete' => ['method' => 'DELETE'],
         ]);
         //custom operations
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format']], //with controller
-            'my_second_op' => ['method' => 'POST'], //without controller, takes the default one
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'"], //with controller
+            'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https']], //without controller, takes the default one
             'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path'], //custom path
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
             $routeCollection->get('api_dummies_get_item')
         );
 
@@ -77,12 +77,12 @@ class ApiLoaderTest extends TestCase
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format']),
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value'], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
             $routeCollection->get('api_dummies_my_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true, [], [], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
             $routeCollection->get('api_dummies_my_second_op_collection')
         );
 
@@ -262,7 +262,7 @@ class ApiLoaderTest extends TestCase
         return $apiLoader;
     }
 
-    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = []): Route
+    private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
         return new Route(
             $path,
@@ -271,12 +271,13 @@ class ApiLoaderTest extends TestCase
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
                 sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
-            ],
+            ] + $extraDefaults,
             $requirements,
-            [],
-            '',
-            [],
-            $methods
+            $options,
+            $host,
+            $schemes,
+            $methods,
+            $condition
         );
     }
 

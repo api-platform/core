@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -47,10 +48,18 @@ final class OrderExtension implements QueryCollectionExtensionInterface
             if (null !== $defaultOrder) {
                 foreach ($defaultOrder as $field => $order) {
                     if (is_int($field)) {
+                        // Default direction
                         $field = $order;
                         $order = 'ASC';
                     }
-                    $queryBuilder->addOrderBy('o.'.$field, $order);
+                    if (false === ($pos = strpos($field, '.'))) {
+                        // Configure default filter with property
+                        $field = 'o.'.$field;
+                    } else {
+                        $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, 'o', substr($field, 0, $pos));
+                        $field = sprintf('%s.%s', $alias, substr($field, $pos + 1));
+                    }
+                    $queryBuilder->addOrderBy($field, $order);
                 }
 
                 return;

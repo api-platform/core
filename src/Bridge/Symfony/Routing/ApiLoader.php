@@ -193,12 +193,13 @@ final class ApiLoader extends Loader
                 '_format' => null,
                 '_api_resource_class' => $resourceClass,
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
-            ],
+            ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],
-            [],
-            '',
-            [],
-            [$operation['method']]
+            $operation['options'] ?? [],
+            $operation['host'] ?? '',
+            $operation['schemes'] ?? [],
+            [$operation['method']],
+            $operation['condition'] ?? ''
         );
 
         $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);
