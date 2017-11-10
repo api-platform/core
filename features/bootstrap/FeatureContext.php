@@ -30,6 +30,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -137,6 +138,28 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $foo = new Foo();
             $foo->setName($names[$i]);
             $foo->setBar($bars[$i]);
+
+            $this->manager->persist($foo);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb fooDummy objects with fake names
+     */
+    public function thereAreFooDummyObjectsWithFakeNames($nb)
+    {
+        $names = ['Hawsepipe', 'Ephesian', 'Sthenelus', 'Separativeness', 'Balbo'];
+        $dummies = ['Lorem', 'Dolor', 'Dolor', 'Sit', 'Amet'];
+
+        for ($i = 0; $i < $nb; ++$i) {
+            $dummy = new Dummy();
+            $dummy->setName($dummies[$i]);
+
+            $foo = new FooDummy();
+            $foo->setName($names[$i]);
+            $foo->setDummy($dummy);
 
             $this->manager->persist($foo);
         }

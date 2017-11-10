@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -336,7 +335,7 @@ abstract class AbstractFilter implements FilterInterface
         $parentAlias = $rootAlias;
 
         foreach ($propertyParts['associations'] as $association) {
-            $alias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
+            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
             $parentAlias = $alias;
         }
 
@@ -345,62 +344,5 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return [$alias, $propertyParts['field'], $propertyParts['associations']];
-    }
-
-    /**
-     * Get the existing join from queryBuilder DQL parts.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     * @param string       $association  the association field
-     *
-     * @return Join|null
-     */
-    private function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association)
-    {
-        $parts = $queryBuilder->getDQLPart('join');
-
-        if (!isset($parts['o'])) {
-            return null;
-        }
-
-        foreach ($parts['o'] as $join) {
-            if (sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
-                return $join;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Adds a join to the queryBuilder if none exists.
-     *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $alias
-     * @param string                      $association        the association field
-     *
-     * @return string the new association alias
-     */
-    protected function addJoinOnce(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $association): string
-    {
-        $join = $this->getExistingJoin($queryBuilder, $alias, $association);
-
-        if (null === $join) {
-            $associationAlias = $queryNameGenerator->generateJoinAlias($association);
-
-            if (true === QueryChecker::hasLeftJoin($queryBuilder)) {
-                $queryBuilder
-                    ->leftJoin(sprintf('%s.%s', $alias, $association), $associationAlias);
-            } else {
-                $queryBuilder
-                    ->innerJoin(sprintf('%s.%s', $alias, $association), $associationAlias);
-            }
-        } else {
-            $associationAlias = $join->getAlias();
-        }
-
-        return $associationAlias;
     }
 }

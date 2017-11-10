@@ -17,16 +17,16 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Foo.
+ * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(attributes={
- *     "order"={"bar", "name": "DESC"}
+ *     "order"={"dummy.name"}
  * })
  * @ORM\Entity
  */
-class Foo
+class FooDummy
 {
     /**
      * @var int The id
@@ -45,11 +45,11 @@ class Foo
     private $name;
 
     /**
-     * @var string The foo bar
+     * @var Dummy The foo dummy
      *
-     * @ORM\Column
+     * @ORM\ManyToOne(targetEntity="Dummy", cascade={"persist"})
      */
-    private $bar;
+    private $dummy;
 
     public function getId()
     {
@@ -66,13 +66,13 @@ class Foo
         return $this->name;
     }
 
-    public function getBar()
+    public function getDummy()
     {
-        return $this->bar;
+        return $this->dummy;
     }
 
-    public function setBar($bar)
+    public function setDummy(Dummy $dummy)
     {
-        $this->bar = $bar;
+        $this->dummy = $dummy;
     }
 }
