@@ -269,8 +269,8 @@ SQL;
             ->setParameter('foo', 1);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
-        $queryNameGenerator->generateJoinAlias('item')->shouldBeCalled()->willReturn('item_2');
-        $queryNameGenerator->generateJoinAlias('label')->shouldBeCalled()->willReturn('label_2');
+        $queryNameGenerator->generateJoinAlias('compositeItem')->shouldBeCalled()->willReturn('item_2');
+        $queryNameGenerator->generateJoinAlias('compositeLabel')->shouldBeCalled()->willReturn('label_2');
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
@@ -325,8 +325,8 @@ SQL;
             ->setParameter('foo', 1);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
-        $queryNameGenerator->generateJoinAlias('item')->shouldBeCalled()->willReturn('item_2');
-        $queryNameGenerator->generateJoinAlias('label')->shouldBeCalled()->willReturn('label_2');
+        $queryNameGenerator->generateJoinAlias('compositeItem')->shouldBeCalled()->willReturn('item_2');
+        $queryNameGenerator->generateJoinAlias('compositeLabel')->shouldBeCalled()->willReturn('label_2');
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $queryNameGenerator->generateJoinAlias('foo')->shouldBeCalled()->willReturn('foo_2');
@@ -388,8 +388,8 @@ SQL;
             ->setParameter('bar', 2);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
-        $queryNameGenerator->generateJoinAlias('item')->shouldBeCalled()->willReturn('item_2');
-        $queryNameGenerator->generateJoinAlias('label')->shouldBeCalled()->willReturn('label_2');
+        $queryNameGenerator->generateJoinAlias('compositeItem')->shouldBeCalled()->willReturn('item_2');
+        $queryNameGenerator->generateJoinAlias('compositeLabel')->shouldBeCalled()->willReturn('label_2');
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);

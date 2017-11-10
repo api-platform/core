@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -251,7 +252,7 @@ class SearchFilter extends AbstractFilter
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
         if ($metadata->isCollectionValuedAssociation($association)) {
-            $associationAlias = $this->addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
+            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
             $associationField = 'id';
         } else {
             $associationAlias = $alias;

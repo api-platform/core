@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\Query\Expr\Join;
@@ -119,12 +120,15 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
         //Change join aliases
         foreach ($joinParts[$originAlias] as $joinPart) {
+            /** @var Join $joinPart */
+            $joinString = str_replace($aliases, $replacements, $joinPart->getJoin());
+            $pos = strpos($joinString, '.');
+            $alias = substr($joinString, 0, $pos);
+            $association = substr($joinString, $pos + 1);
+            $condition = str_replace($aliases, $replacements, $joinPart->getCondition());
+            $newAlias = QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition);
             $aliases[] = "{$joinPart->getAlias()}.";
-            $alias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
-            $replacements[] = "$alias.";
-            $join = new Join($joinPart->getJoinType(), str_replace($aliases, $replacements, $joinPart->getJoin()), $alias, $joinPart->getConditionType(), str_replace($aliases, $replacements, $joinPart->getCondition()), $joinPart->getIndexBy());
-
-            $queryBuilderClone->add('join', [$join], true);
+            $replacements[] = "$newAlias.";
         }
 
         $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));
