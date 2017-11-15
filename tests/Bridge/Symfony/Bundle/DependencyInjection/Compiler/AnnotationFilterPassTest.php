@@ -73,7 +73,7 @@ class AnnotationFilterPassTest extends TestCase
         $containerBuilderProphecy->setDefinition('annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_api_platform_core_bridge_doctrine_orm_filter_search_filter', Argument::that(function ($def) {
             $this->assertInstanceOf(Definition::class, $def);
             $this->assertEquals(SearchFilter::class, $def->getClass());
-            $this->assertEquals($def->getArguments(), ['$properties' => ['description', 'relatedDummy.name', 'name']]);
+            $this->assertEquals(['$properties' => ['description' => null, 'relatedDummy.name' => null, 'name' => null]], $def->getArguments());
 
             return true;
         }))->shouldBeCalled();
@@ -81,7 +81,7 @@ class AnnotationFilterPassTest extends TestCase
         $containerBuilderProphecy->setDefinition('annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_api_platform_core_serializer_filter_group_filter', Argument::that(function ($def) {
             $this->assertInstanceOf(Definition::class, $def);
             $this->assertEquals(GroupFilter::class, $def->getClass());
-            $this->assertEquals($def->getArguments(), ['$parameterName' => 'foobar']);
+            $this->assertEquals(['$parameterName' => 'foobar'], $def->getArguments());
 
             return true;
         }))->shouldBeCalled();
@@ -89,7 +89,7 @@ class AnnotationFilterPassTest extends TestCase
         $containerBuilderProphecy->setDefinition('annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_api_platform_core_bridge_doctrine_orm_filter_date_filter', Argument::that(function ($def) {
             $this->assertInstanceOf(Definition::class, $def);
             $this->assertEquals(DateFilter::class, $def->getClass());
-            $this->assertEquals($def->getArguments(), []);
+            $this->assertEquals(['$properties' => ['dummyDate' => null]], $def->getArguments());
 
             return true;
         }))->shouldBeCalled();
