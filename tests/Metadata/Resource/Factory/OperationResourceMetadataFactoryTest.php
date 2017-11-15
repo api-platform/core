@@ -41,19 +41,19 @@ class OperationResourceMetadataFactoryTest extends TestCase
 
         return [
             // Item operations
-            [new ResourceMetadata(null, null, null, null, []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT'], 'delete' => ['method' => 'DELETE']], [])],
-            [new ResourceMetadata(null, null, null, null, []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT'], 'patch' => ['method' => 'PATCH'], 'delete' => ['method' => 'DELETE']], []), $jsonapi],
-            [new ResourceMetadata(null, null, null, ['get'], []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET']], [])],
-            [new ResourceMetadata(null, null, null, ['put'], []), new ResourceMetadata(null, null, null, ['put' => ['method' => 'PUT']], [])],
-            [new ResourceMetadata(null, null, null, ['delete'], []), new ResourceMetadata(null, null, null, ['delete' => ['method' => 'DELETE']], [])],
-            [new ResourceMetadata(null, null, null, ['patch'], []), new ResourceMetadata(null, null, null, ['patch' => []], [])],
-            [new ResourceMetadata(null, null, null, ['patch'], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH']], []), $jsonapi],
+            [new ResourceMetadata(null, null, null, null, [], null, [], []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT'], 'delete' => ['method' => 'DELETE']], [], null, [], [])],
+            [new ResourceMetadata(null, null, null, null, [], null, [], []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT'], 'patch' => ['method' => 'PATCH'], 'delete' => ['method' => 'DELETE']], [], null, [], []), $jsonapi],
+            [new ResourceMetadata(null, null, null, ['get'], [], null, [], []), new ResourceMetadata(null, null, null, ['get' => ['method' => 'GET']], [], null, [], [])],
+            [new ResourceMetadata(null, null, null, ['put'], [], null, [], []), new ResourceMetadata(null, null, null, ['put' => ['method' => 'PUT']], [], null, [], [])],
+            [new ResourceMetadata(null, null, null, ['delete'], [], null, [], []), new ResourceMetadata(null, null, null, ['delete' => ['method' => 'DELETE']], [], null, [], [])],
+            [new ResourceMetadata(null, null, null, ['patch'], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => []], [], null, [], [])],
+            [new ResourceMetadata(null, null, null, ['patch'], [], null, [], []), new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH']], [], null, [], []), $jsonapi],
 
             // Collection operations
-            [new ResourceMetadata(null, null, null, []), new ResourceMetadata(null, null, null, [], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']])],
-            [new ResourceMetadata(null, null, null, [], ['get']), new ResourceMetadata(null, null, null, [], ['get' => ['method' => 'GET']])],
-            [new ResourceMetadata(null, null, null, [], ['post']), new ResourceMetadata(null, null, null, [], ['post' => ['method' => 'POST']])],
-            [new ResourceMetadata(null, null, null, [], ['options']), new ResourceMetadata(null, null, null, [], ['options' => []])],
+            [new ResourceMetadata(null, null, null, [], null, null, [], []), new ResourceMetadata(null, null, null, [], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], null, [], [])],
+            [new ResourceMetadata(null, null, null, [], ['get'], null, [], []), new ResourceMetadata(null, null, null, [], ['get' => ['method' => 'GET']], null, [], [])],
+            [new ResourceMetadata(null, null, null, [], ['post'], null, [], []), new ResourceMetadata(null, null, null, [], ['post' => ['method' => 'POST']], null, [], [])],
+            [new ResourceMetadata(null, null, null, [], ['options'], null, [], []), new ResourceMetadata(null, null, null, [], ['options' => []], null, [], [])],
         ];
     }
 }

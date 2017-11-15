@@ -54,9 +54,9 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
     /**
      * @throws \Exception
      */
-    public function createCollectionResolver(string $resourceClass, string $rootClass, string $operationName): callable
+    public function createCollectionResolver(string $resourceClass, string $rootClass): callable
     {
-        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
             if (null !== $request = $this->requestStack->getCurrentRequest()) {
                 $request->attributes->set(
                     '_graphql_collections_args',
@@ -74,7 +74,7 @@ final class CollectionResolverFactory extends AbstractResolverFactory implements
 
             $context = $this->resourceMetadataFactory
                 ->create($resourceClass)
-                ->getCollectionOperationAttribute($operationName, 'normalization_context', [], true);
+                ->getGraphqlAttribute('query', 'normalization_context', [], true);
 
             if (!$this->paginationEnabled) {
                 $data = [];

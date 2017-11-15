@@ -13,6 +13,10 @@
     subresourceOperations:
         my_collection_subresource:
             path: 'the/subresource/path'
+    graphql:
+        query:
+            normalization_context:
+                groups: ['graphql']
     attributes:
         normalization_context:
             groups: ['default']

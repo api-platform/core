@@ -82,6 +82,13 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
             $resourceMetadata = $this->normalize(false, $resourceMetadata, $itemOperations);
         }
 
+        $graphql = $resourceMetadata->getGraphql();
+        if (null === $graphql) {
+            $resourceMetadata = $resourceMetadata->withGraphql(['query' => []]);
+        } else {
+            $resourceMetadata = $this->normalizeGraphQl($resourceMetadata, $graphql);
+        }
+
         return $resourceMetadata;
     }
 
@@ -120,5 +127,17 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         }
 
         return $collection ? $resourceMetadata->withCollectionOperations($newOperations) : $resourceMetadata->withItemOperations($newOperations);
+    }
+
+    private function normalizeGraphQl(ResourceMetadata $resourceMetadata, array $operations)
+    {
+        foreach ($operations as $operationName => $operation) {
+            if (is_int($operationName) && is_string($operation)) {
+                unset($operations[$operationName]);
+                $operations[$operation] = [];
+            }
+        }
+
+        return $resourceMetadata->withGraphql($operations);
     }
 }

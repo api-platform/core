@@ -41,6 +41,13 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'subresourceOperations' => [
                 'my_collection_subresource' => ['path' => 'the/subresource/path'],
             ],
+            'graphql' => [
+                'query' => [
+                    'normalization_context' => [
+                        AbstractNormalizer::GROUPS => ['graphql'],
+                    ],
+                ],
+            ],
             'iri' => 'someirischema',
             'attributes' => [
                 'normalization_context' => [
@@ -56,7 +63,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             ],
         ];
 
-        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'iri', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'iri', 'attributes'] as $property) {
             $wither = 'with'.ucfirst($property);
             $resourceMetadata = $resourceMetadata->$wither($metadata[$property]);
         }

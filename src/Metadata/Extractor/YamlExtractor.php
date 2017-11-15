@@ -68,6 +68,7 @@ final class YamlExtractor extends AbstractExtractor
                 'itemOperations' => $resourceYaml['itemOperations'] ?? null,
                 'collectionOperations' => $resourceYaml['collectionOperations'] ?? null,
                 'subresourceOperations' => $resourceYaml['subresourceOperations'] ?? null,
+                'graphql' => $resourceYaml['graphql'] ?? null,
                 'attributes' => $resourceYaml['attributes'] ?? null,
             ];
 

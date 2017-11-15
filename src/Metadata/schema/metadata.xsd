@@ -23,6 +23,7 @@
                 <xsd:element name="itemOperations" minOccurs="0" maxOccurs="unbounded" type="itemOperations"/>
                 <xsd:element name="collectionOperations" minOccurs="0" maxOccurs="unbounded" type="collectionOperations"/>
                 <xsd:element name="subresourceOperations" minOccurs="0" maxOccurs="unbounded" type="subresourceOperations"/>
+                <xsd:element name="graphql" minOccurs="0" type="graphql"/>
             </xsd:sequence>
 
             <xsd:attribute type="xsd:string" name="class" use="required"/>
@@ -38,8 +39,8 @@
     </xsd:complexType>
 
     <xsd:complexType name="itemOperation">
-        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="attribute" minOccurs="1" maxOccurs="unbounded" type="attribute"/>
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>
@@ -51,8 +52,21 @@
     </xsd:complexType>
 
     <xsd:complexType name="collectionOperation">
-        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="attribute" minOccurs="1" maxOccurs="unbounded" type="attribute"/>
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="graphql">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="operation" minOccurs="0" maxOccurs="unbounded" type="operation"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="operation">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="attribute" maxOccurs="unbounded" type="attribute"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="name"/>
     </xsd:complexType>

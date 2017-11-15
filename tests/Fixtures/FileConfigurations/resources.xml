@@ -30,6 +30,15 @@
                 <attribute name="path">the/subresource/path</attribute>
             </subresourceOperation>
         </subresourceOperations>
+        <graphql>
+            <operation name="query">
+                <attribute name="normalization_context">
+                    <attribute name="groups">
+                        <attribute>graphql</attribute>
+                    </attribute>
+                </attribute>
+            </operation>
+        </graphql>
         <attribute name="normalization_context">
             <attribute name="groups">
                 <attribute>default</attribute>
