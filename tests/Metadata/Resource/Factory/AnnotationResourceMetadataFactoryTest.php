@@ -42,6 +42,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals('http://example.com', $metadata->getIri());
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
+        $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
         $this->assertEquals(['a' => 1], $metadata->getAttributes());
     }
 
@@ -53,6 +54,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $annotation->iri = 'http://example.com';
         $annotation->itemOperations = ['foo' => ['bar' => true]];
         $annotation->collectionOperations = ['baz' => ['tab' => false]];
+        $annotation->subresourceOperations = ['sub' => ['bus' => false]];
         $annotation->attributes = ['a' => 1];
 
         $reader = $this->prophesize(Reader::class);

@@ -22,6 +22,7 @@
                 <xsd:element name="property" minOccurs="0" maxOccurs="unbounded" type="property"/>
                 <xsd:element name="itemOperations" minOccurs="0" maxOccurs="unbounded" type="itemOperations"/>
                 <xsd:element name="collectionOperations" minOccurs="0" maxOccurs="unbounded" type="collectionOperations"/>
+                <xsd:element name="subresourceOperations" minOccurs="0" maxOccurs="unbounded" type="subresourceOperations"/>
             </xsd:sequence>
 
             <xsd:attribute type="xsd:string" name="class" use="required"/>
@@ -50,6 +51,19 @@
     </xsd:complexType>
 
     <xsd:complexType name="collectionOperation">
+        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="attribute" minOccurs="1" maxOccurs="unbounded" type="attribute"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="subresourceOperations">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="subresourceOperation" minOccurs="0" maxOccurs="unbounded" type="subresourceOperation"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="subresourceOperation">
         <xsd:sequence minOccurs="1" maxOccurs="unbounded">
             <xsd:element name="attribute" minOccurs="1" maxOccurs="unbounded" type="attribute"/>
         </xsd:sequence>
