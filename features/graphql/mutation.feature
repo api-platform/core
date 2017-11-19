@@ -34,7 +34,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.__type.fields[0].args[0].name" should be equal to "input"
     And the JSON node "data.__type.fields[0].args[0].type.name" should contain "InputDeleteMutation"
     And the JSON node "data.__type.fields[0].args[0].type.kind" should be equal to "INPUT_OBJECT"
-    And print last JSON response
 
   Scenario: Delete an item through a mutation
     Given there is 1 dummy objects
@@ -52,7 +51,6 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.deleteDummy.id" should be equal to 1
 
-  @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -73,3 +71,47 @@ Feature: GraphQL mutation support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.deleteCompositeRelation.compositeItem.id" should be equal to 1
     And the JSON node "data.deleteCompositeRelation.compositeLabel.id" should be equal to 1
+
+  Scenario: Modify an item through a mutation
+    Given there is 1 dummy objects
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateDummy(input: {id: 1, description: "Modified description."}) {
+        id,
+        name,
+        description
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.updateDummy.id" should be equal to 1
+    And the JSON node "data.updateDummy.name" should be equal to "Dummy #1"
+    And the JSON node "data.updateDummy.description" should be equal to "Modified description."
+
+  @dropSchema
+  # @TODO Find a way to manage composite identifiers.
+  Scenario: Modify an item with composite identifiers through a mutation
+    Given there are Composite identifier objects
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateCompositeRelation(input: {compositeItem: {id: 1}, compositeLabel: {id: 1}, value: "Modified value."}) {
+        compositeItem {
+          id
+        },
+        compositeLabel {
+          id
+        },
+        value
+      }
+    }
+    """
+    #Then the response status code should be 200
+    #And the response should be in JSON
+    #And the header "Content-Type" should be equal to "application/json"
+    #And the JSON node "data.putCompositeRelation.compositeItem.id" should be equal to 1
+    #And the JSON node "data.putCompositeRelation.compositeLabel.id" should be equal to 1
+    #And the JSON node "data.putCompositeRelation.value" should be equal to "Modified value."

@@ -17,10 +17,12 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Bridge\Graphql\Resolver\ItemMutationResolverFactory;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -107,9 +109,15 @@ class ItemMutationResolverFactoryTest extends TestCase
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProviderProphecy->getItem('resourceClass', $flatId)->willReturn($item);
 
+        $serializerProphecy = $this->prophesize(Serializer::class);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
         return new ItemMutationResolverFactory(
             $identifiersExtractorProphecy->reveal(),
             $itemDataProviderProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
             $dataPersisterProphecy->reveal()
         );
     }

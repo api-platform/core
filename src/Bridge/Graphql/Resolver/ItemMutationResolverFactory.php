@@ -16,8 +16,10 @@ namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * Creates a function resolving a GraphQL mutation of an item.
@@ -30,12 +32,16 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
 {
     private $identifiersExtractor;
     private $itemDataProvider;
+    private $serializer;
+    private $resourceMetadataFactory;
     private $dataPersister;
 
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, ItemDataProviderInterface $itemDataProvider, DataPersisterInterface $dataPersister)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, ItemDataProviderInterface $itemDataProvider, Serializer $serializer, ResourceMetadataFactoryInterface $resourceMetadataFactory, DataPersisterInterface $dataPersister)
     {
         $this->identifiersExtractor = $identifiersExtractor;
         $this->itemDataProvider = $itemDataProvider;
+        $this->serializer = $serializer;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->dataPersister = $dataPersister;
     }
 
@@ -59,17 +65,30 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
             } else {
                 $id = $args['input'][$identifiers[0]];
             }
-            $item = $this->itemDataProvider->getItem($resourceClass, $id);
-
-            if (null === $item) {
-                throw Error::createLocatedError("Item $resourceClass $id not found", $info->fieldNodes, $info->path);
-            }
 
             if ('delete' === $mutationName) {
-                $this->dataPersister->remove($item);
-            }
+                $item = $this->itemDataProvider->getItem($resourceClass, $id);
 
-            return $args['input'];
+                if (null === $item) {
+                    throw Error::createLocatedError("Item $resourceClass $id not found", $info->fieldNodes, $info->path);
+                }
+
+                $this->dataPersister->remove($item);
+
+                return $args['input'];
+            } elseif ('update' === $mutationName) {
+                $item = $this->serializer->denormalize($args['input'], $resourceClass, null, ['resource_class' => $resourceClass]);
+
+                $this->dataPersister->persist($item);
+
+                return $this->serializer->normalize(
+                    $item,
+                    null,
+                    ['graphql' => true] + $this->resourceMetadataFactory
+                        ->create($resourceClass)
+                        ->getGraphqlAttribute($mutationName, 'normalization_context', [], true)
+                );
+            }
         };
     }
 }

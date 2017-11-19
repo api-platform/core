@@ -252,7 +252,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             return $this->paginationEnabled ? $this->getResourcePaginatedCollectionType($graphqlType, $isInput) : GraphQLType::listOf($graphqlType);
         }
 
-        return $type->isNullable() ? $graphqlType : GraphQLType::nonNull($graphqlType);
+        return $type->isNullable() || ($isMutation && 'update' === $mutationName) ? $graphqlType : GraphQLType::nonNull($graphqlType);
     }
 
     /**
