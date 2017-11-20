@@ -5,7 +5,7 @@ Feature: Numeric filter on collections
 
   @createSchema
   Scenario: Get collection by id equals 9.99 which is not possible
-    Given there is "30" dummy objects
+    Given there is "30" dummy objects with dummyPrice
     When I send a "GET" request to "/dummies?id=9.99"
     Then the response status code should be 200
     And the response should be in JSON
@@ -22,10 +22,40 @@ Feature: Numeric filter on collections
           "type": "array",
           "maxItems": 0
         },
+        "hydra:totalItems": {"exact": 0},
         "hydra:view": {
           "type": "object",
           "properties": {
             "@id": {"pattern": "^/dummies\\?id=9.99$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get collection by dummyPrice equals 9.89 which is not possible
+    When I send a "GET" request to "/dummies?dummyPrice=9.89"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "hydra:totalItems": {"exact": 0},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice=9.89$"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -59,6 +89,7 @@ Feature: Numeric filter on collections
             }
           }
         },
+        "hydra:totalItems": {"exact": 1},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -70,6 +101,45 @@ Feature: Numeric filter on collections
     }
     """
 
+  Scenario: Get collection by dummyPrice equals 9.99
+    When I send a "GET" request to "/dummies?dummyPrice=9.99"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/5$"},
+                  {"pattern": "^/dummies/9$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:totalItems": {"exact": 8},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?dummyPrice=9.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
 
   @dropSchema
   Scenario: Get collection ordered by a non valid properties
@@ -100,6 +170,7 @@ Feature: Numeric filter on collections
             }
           }
         },
+        "hydra:totalItems": {"exact": 30},
         "hydra:view": {
           "type": "object",
           "properties": {
@@ -138,6 +209,7 @@ Feature: Numeric filter on collections
             }
           }
         },
+        "hydra:totalItems": {"exact": 30},
         "hydra:view": {
           "type": "object",
           "properties": {
