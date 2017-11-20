@@ -23,6 +23,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -81,8 +82,9 @@ class ItemDataProvider implements ItemDataProviderInterface
 
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
+        $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
 
-        $this->addWhereForIdentifiers($identifiers, $queryBuilder);
+        $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
@@ -98,10 +100,11 @@ class ItemDataProvider implements ItemDataProviderInterface
     /**
      * Add WHERE conditions to the query for one or more identifiers (simple or composite).
      *
-     * @param array        $identifiers
-     * @param QueryBuilder $queryBuilder
+     * @param array         $identifiers
+     * @param QueryBuilder  $queryBuilder
+     * @param ClassMetadata $classMetadata
      */
-    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder)
+    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
     {
         foreach ($identifiers as $identifier => $value) {
             $placeholder = ':id_'.$identifier;
@@ -112,7 +115,7 @@ class ItemDataProvider implements ItemDataProviderInterface
 
             $queryBuilder->andWhere($expression);
 
-            $queryBuilder->setParameter($placeholder, $value);
+            $queryBuilder->setParameter($placeholder, $value, $classMetadata->getTypeOfField($identifier));
         }
     }
 }
