@@ -53,7 +53,7 @@ class OrderFilter extends AbstractFilter
      */
     protected $orderParameterName;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, string $orderParameterName, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null)
     {
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {

@@ -51,19 +51,23 @@ trait AnnotationFilterExtractorTrait
 
         if ($filterAnnotation->properties) {
             foreach ($filterAnnotation->properties as $property => $strategy) {
-                $properties[$property] = $strategy;
+                if (is_int($property)) {
+                    $properties[$strategy] = null;
+                } else {
+                    $properties[$property] = $strategy;
+                }
             }
 
             return $properties;
         }
 
+        if (null !== $reflectionProperty) {
+            $properties[$reflectionProperty->getName()] = $filterAnnotation->strategy ?: null;
+
+            return $properties;
+        }
+
         if ($filterAnnotation->strategy) {
-            if (null !== $reflectionProperty) {
-                $properties[$reflectionProperty->getName()] = $filterAnnotation->strategy;
-
-                return $properties;
-            }
-
             foreach ($reflectionClass->getProperties() as $reflectionProperty) {
                 $properties[$reflectionProperty->getName()] = $filterAnnotation->strategy;
             }
