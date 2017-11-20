@@ -18,4 +18,4 @@ high performance API-first projects. Extend or override everything you want.
 
 ## Documentation
 
-The documentation of API Platform can be browsed [on the official website](https://api-platform.com/docs/).
+The documentation of API Platform Core Library can be browsed [on the official website](https://api-platform.com/docs/core).
