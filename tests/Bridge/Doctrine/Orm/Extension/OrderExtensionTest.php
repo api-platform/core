@@ -111,7 +111,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverridenWithAssociation()
+    public function testApplyToCollectionWithOrderOverriddenWithAssociation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
