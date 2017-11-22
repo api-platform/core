@@ -79,6 +79,12 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
 
             $visiting = "$resourceClass $property $subresourceClass";
+            //var_dump($visited);
+            $maxDepth = $propertyMetadata->getSubresource()->getMaxDepth();
+            if(!is_null($maxDepth) && count($visited) > $maxDepth){
+                //var_dump('plop');
+                continue;
+            }
             if (isset($visited[$visiting])) {
                 continue;
             }
