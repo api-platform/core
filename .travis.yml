@@ -20,6 +20,8 @@ matrix:
     - php: '7.2'
       env: deps='low'
     - php: '7.2'
+      env: deps='beta'
+    - php: '7.2'
       env: SYMFONY_DEPRECATIONS_HELPER=0
   allow_failures:
       env: SYMFONY_DEPRECATIONS_HELPER=0
@@ -37,7 +39,8 @@ before_install:
 
 install:
   - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^5.2.2'; fi
-  - if [[ ! $deps ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
+  - if [[ $deps = 'beta' ]]; then composer config minimum-stability beta; fi
+  - if [[ $deps != 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
   - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
 
 script:

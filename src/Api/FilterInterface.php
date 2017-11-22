@@ -36,7 +36,7 @@ interface FilterInterface
      *     ]
      * The description can contain additional data specific to a filter.
      *
-     * @see ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
+     * @see \ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
      *
      * @param string $resourceClass
      *
