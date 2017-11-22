@@ -3,31 +3,10 @@ const { events, Job } = require('brigadier');
 const coverage = (event, project) => {
     console.log(`===> Building ${ project.repo.cloneURL } ${ event.commit }`);
 
-    const job = new Job('coverage', 'php:rc-alpine');
+    const job = new Job('coverage', 'cooptilleuls/api-platform-core-brigade-coverage:latest');
 
     job.tasks = [
         'set -xe',
-        'apk add --no-cache curl git openssl icu-libs zlib icu-dev zlib-dev $PHPIZE_DEPS',
-        'docker-php-ext-install intl zip',
-        'echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini',
-        'curl -s -f -L -o /tmp/installer.php https://getcomposer.org/installer',
-        'curl -s -f -L -o /tmp/install.sig https://composer.github.io/installer.sig',
-        `php -r "
-            \\$signature = trim(file_get_contents('/tmp/install.sig'));
-            \\$hash = hash('SHA384', file_get_contents('/tmp/installer.php'));
-
-            if (hash_equals(\\$signature, \\$hash)) {
-                echo 'Installer verified'.PHP_EOL;
-            } else {
-                unlink('/tmp/installer.php');
-                echo 'Installer corrupt'.PHP_EOL;
-                exit(1);
-            }
-        "`,
-        'php /tmp/installer.php --no-ansi --install-dir=/usr/bin --filename=composer',
-        'curl -s -f -L -o /usr/bin/phpcov https://phar.phpunit.de/phpcov.phar',
-        'curl -s -f -L -o /usr/bin/coveralls https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar',
-        'chmod 755 /usr/bin/phpcov /usr/bin/coveralls',
         'cd /src/',
         'mkdir -p build/logs build/cov',
         'composer require --dev --no-update \'phpunit/php-code-coverage:^5.2.2\'',
@@ -39,7 +18,6 @@ const coverage = (event, project) => {
     ];
 
     job.env = {
-        'COMPOSER_ALLOW_SUPERUSER': '1',
         'COVERALLS_RUN_LOCALLY': '1',
         'COVERALLS_REPO_TOKEN': project.secrets.coverallsToken,
     };
