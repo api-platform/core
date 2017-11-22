@@ -41,7 +41,8 @@ install:
 
 script:
   - vendor/bin/phpunit
-  - vendor/bin/behat --format=progress
+  - if [[ $deps = 'beta' ]]; then vendor/bin/behat --format=progress --tags='~@nobeta'; fi
+  - if [[ $deps != 'beta' ]]; then vendor/bin/behat --format=progress; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger-cli validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
   - if [[ $lint = 1 ]]; then phpstan analyse -c phpstan.neon -l5 --ansi src tests; fi
