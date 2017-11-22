@@ -48,7 +48,9 @@ api_platform:
     enable_nelmio_api_doc: true
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
-        ApiPlatform\Core\Exception\InvalidArgumentException: !php/const:Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Core\Exception\InvalidArgumentException: 400
+        # Use this syntax with Symfony YAML 3.4+:
+        #ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
     http_cache:
         invalidation:
             enabled: true
@@ -76,6 +78,10 @@ nelmio_api_doc:
         request_format:
             formats:
                 json:       'application/json'
+
+parameters:
+    container.autowiring.strict_mode: true
+    container.dumper.inline_class_loader: true
 
 services:
     contain_non_resource.item_data_provider:
@@ -191,3 +197,7 @@ services:
 
     api_platform.http_cache.purger:
         class: ApiPlatform\Core\Tests\Fixtures\NullPurger
+
+    test.property_accessor:
+        alias: property_accessor
+        public: true

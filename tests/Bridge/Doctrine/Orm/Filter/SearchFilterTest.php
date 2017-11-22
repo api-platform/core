@@ -84,7 +84,7 @@ class SearchFilterTest extends KernelTestCase
 
         $this->iriConverter = $iriConverterProphecy->reveal();
 
-        $this->propertyAccessor = self::$kernel->getContainer()->get('property_accessor');
+        $this->propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
         $this->repository = $manager->getRepository(Dummy::class);
         $this->resourceClass = Dummy::class;
     }
