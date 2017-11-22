@@ -39,7 +39,7 @@ class CollectionResolverFactoryTest extends TestCase
     {
         $mockedCollectionResolverFactory = $this->mockCollectionResolverFactory([], [], [], $paginationEnabled);
 
-        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass', 'foo');
+        $resolver = $mockedCollectionResolverFactory->createCollectionResolver('resourceClass', 'rootClass');
 
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
