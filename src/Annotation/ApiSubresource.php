@@ -23,4 +23,8 @@ namespace ApiPlatform\Core\Annotation;
  */
 final class ApiSubresource
 {
+    /**
+     * @var int
+     */
+    public $maxDepth;
 }
