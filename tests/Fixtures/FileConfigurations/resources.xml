@@ -63,7 +63,7 @@
                 writableLink="false"
                 required="true"
         >
-            <subresource collection="true" resourceClass="Foo" />
+            <subresource collection="true" resourceClass="Foo" maxDepth="1" />
             <attribute name="foo">
                 <attribute>Foo</attribute>
             </attribute>

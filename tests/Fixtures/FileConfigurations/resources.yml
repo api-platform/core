@@ -32,7 +32,7 @@ resources:
         iri: 'someirischema'
         properties:
             'foo':
-                subresource: {collection: true, resourceClass: 'Foo'}
+                subresource: {collection: true, resourceClass: 'Foo', maxDepth: 1}
                 description: 'The dummy foo'
                 readable: true
                 writable: true

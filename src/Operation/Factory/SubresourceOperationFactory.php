@@ -60,8 +60,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
      * @param array  $visited
+     * @param int    $depth             the number of visited
+     * @param int    $maxDepth
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [])
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $depth = 0, int $maxDepth = null)
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;
@@ -79,6 +81,15 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
 
             $visiting = "$resourceClass $property $subresourceClass";
+
+            // Handle maxDepth
+            if ($rootResourceClass === $resourceClass) {
+                $maxDepth = $subresource->getMaxDepth();
+            }
+
+            if (null !== $maxDepth && $depth >= $maxDepth) {
+                break;
+            }
             if (isset($visited[$visiting])) {
                 continue;
             }
@@ -154,7 +165,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
             $tree[$operation['route_name']] = $operation;
 
-            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true]);
+            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true], ++$depth, $maxDepth);
         }
     }
 }

@@ -94,6 +94,7 @@
     <xsd:complexType name="subresource" mixed="true">
         <xsd:attribute type="xsd:boolean" name="collection"/>
         <xsd:attribute type="xsd:string" name="resourceClass"/>
+        <xsd:attribute type="xsd:integer" name="maxDepth"/>
     </xsd:complexType>
 
     <xsd:complexType name="property">
