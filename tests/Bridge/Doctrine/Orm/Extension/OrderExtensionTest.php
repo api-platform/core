@@ -66,7 +66,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverriden()
+    public function testApplyToCollectionWithOrderOverridden()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -88,7 +88,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverridenWithNoDirection()
+    public function testApplyToCollectionWithOrderOverriddenWithNoDirection()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
@@ -111,7 +111,7 @@ class OrderExtensionTest extends TestCase
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverridenWithAssociation()
+    public function testApplyToCollectionWithOrderOverriddenWithAssociation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
