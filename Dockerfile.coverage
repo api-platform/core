@@ -1,0 +1,30 @@
+FROM composer:1.5
+FROM php:rc-alpine
+
+RUN apk add --no-cache --virtual .persistent-deps \
+    git \
+    icu-libs \
+    zlib
+
+RUN apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS \
+    icu-dev \
+    zlib-dev \
+    curl
+
+RUN set -xe \
+	&& docker-php-ext-install \
+		intl \
+		zip
+
+COPY --from=0 /usr/bin/composer /usr/bin/composer
+
+RUN curl -L -o /usr/bin/phpcov https://phar.phpunit.de/phpcov.phar \
+    && curl -L -o /usr/bin/coveralls https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar \
+    && chmod 755 /usr/bin/phpcov /usr/bin/coveralls
+
+RUN apk del .build-deps
+
+RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
