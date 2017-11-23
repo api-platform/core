@@ -82,7 +82,8 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         $type = $propertyMetadata->getType();
         $isCollection = $type->isCollection();
         $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+        $maxDepth = $annotation->maxDepth ? $annotation->maxDepth : null;
 
-        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection));
+        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection, $maxDepth));
     }
 }
