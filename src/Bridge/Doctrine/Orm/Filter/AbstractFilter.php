@@ -18,7 +18,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\RequestParser;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -340,5 +341,18 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return [$alias, $propertyParts['field'], $propertyParts['associations']];
+    }
+
+    /**
+     * Gets the Doctrine Type of a given property/resourceClass.
+     *
+     * @return Type|string|null
+     */
+    protected function getDoctrineFieldType(string $property, string $resourceClass)
+    {
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
+
+        return $metadata->getTypeOfField($propertyParts['field']);
     }
 }

@@ -8,6 +8,9 @@ cache:
 init:
   - SET PATH=c:\tools\php71;%PATH%
 
+environment:
+    APP_ENV: 'test'
+
 install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php
@@ -26,5 +29,5 @@ install:
 
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
-  - php vendor\behat\behat\bin\behat --format=progress
+  - php vendor\behat\behat\bin\behat --format=progress --tags='~@postgres'
   - php vendor\phpunit\phpunit\phpunit

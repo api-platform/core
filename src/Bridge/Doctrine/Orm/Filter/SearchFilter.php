@@ -211,6 +211,14 @@ class SearchFilter extends AbstractFilter
                 $values = array_map([$this, 'getIdFromValue'], $values);
             }
 
+            if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+                $this->logger->notice('Invalid filter ignored', [
+                     'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                ]);
+
+                return;
+            }
+
             $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
             // prefixing the strategy with i makes it case insensitive
@@ -247,6 +255,14 @@ class SearchFilter extends AbstractFilter
         }
 
         $values = array_map([$this, 'getIdFromValue'], $values);
+
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            $this->logger->notice('Invalid filter ignored', [
+                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+            ]);
+
+            return;
+        }
 
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
@@ -378,5 +394,21 @@ class SearchFilter extends AbstractFilter
         }
 
         return array_values($values);
+    }
+
+    /**
+     * When the field should be an integer, check that the given value is a valid one.
+     *
+     * @param Type|string $type
+     */
+    protected function hasValidValues(array $values, $type = null): bool
+    {
+        foreach ($values as $key => $value) {
+            if (Type::INTEGER === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

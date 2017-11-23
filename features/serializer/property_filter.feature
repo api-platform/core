@@ -235,7 +235,6 @@ Feature: Filter with serialization attributes on items and collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And print last JSON response
     And the JSON should be valid according to this schema:
     """
     {

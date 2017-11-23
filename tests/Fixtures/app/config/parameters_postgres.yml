@@ -1,0 +1,5 @@
+parameters:
+    dbname:   'api_platform_test'
+    user:     'postgres'
+    password: ''
+    host:     'localhost'

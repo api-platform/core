@@ -19,9 +19,9 @@ framework:
 
 doctrine:
     dbal:
-        driver:                        'pdo_sqlite'
-        path:                          '%kernel.cache_dir%/db.sqlite'
-        charset:                       'UTF8'
+        driver:   'pdo_sqlite'
+        path:     '%kernel.cache_dir%/db.sqlite'
+        charset:  'UTF8'
 
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'
@@ -119,6 +119,11 @@ services:
         parent:    'api_platform.doctrine.orm.date_filter'
         arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.date' } ]
+
+    app.my_dummy_date_resource.date_filter:
+        parent:    'api_platform.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy_date.date' } ]
 
     app.my_dummy_resource.range_filter:
         parent:    'api_platform.doctrine.orm.range_filter'
