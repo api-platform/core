@@ -61,6 +61,7 @@
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
+        <service id="ApiPlatform\Core\Serializer\SerializerContextBuilder" alias="api_platform.serializer.context_builder.filter.inner"/>
 
         <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Core\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -148,6 +149,7 @@
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
+        <service id="ApiPlatform\Core\EventListener\DeserializeListener" alias="api_platform.listener.request.deserialize"/>
 
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
             <argument type="service" id="api_platform.serializer" />
