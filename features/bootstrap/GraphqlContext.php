@@ -16,7 +16,8 @@ use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\RestContext;
-use Symfony\Component\HttpFoundation\Request;
+use Behatch\HttpCall\Request;
+use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 
 /**
  * Context for GraphQL.
@@ -39,6 +40,13 @@ final class GraphqlContext implements Context
      * @var int
      */
     private $graphqlLine;
+
+    private $request;
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * Gives access to the Behatch context.
@@ -90,6 +98,7 @@ final class GraphqlContext implements Context
 
     private function sendGraphqlRequest()
     {
-        $this->restContext->iSendARequestTo(Request::METHOD_GET, '/graphql?'.http_build_query($this->graphqlRequest));
+        $this->request->setHttpHeader('Accept', null);
+        $this->restContext->iSendARequestTo(HttpFoundationRequest::METHOD_GET, '/graphql?'.http_build_query($this->graphqlRequest));
     }
 }

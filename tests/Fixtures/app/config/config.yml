@@ -88,7 +88,7 @@ nelmio_api_doc:
                 json:       'application/json'
 
 parameters:
-    container.autowiring.strict_mode: true
+    #container.autowiring.strict_mode: true
     container.dumper.inline_class_loader: true
 
 services:
@@ -220,4 +220,8 @@ services:
 
     test.property_accessor:
         alias: property_accessor
+        public: true
+
+    test.annotation_reader:
+        alias: annotation_reader
         public: true

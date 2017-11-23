@@ -34,6 +34,7 @@ final class JsonApiContext implements Context
      */
     private $restContext;
     private $inspector;
+    private $validator;
     private $jsonApiSchemaFile;
     private $manager;
 
@@ -43,7 +44,11 @@ final class JsonApiContext implements Context
             throw new \InvalidArgumentException('The JSON API schema doesn\'t exist.');
         }
 
-        $this->inspector = new JsonInspector('javascript');
+        if (class_exists(RefResolver::class)) {
+            $this->inspector = new JsonInspector('javascript');
+        } else {
+            $this->validator = new Validator();
+        }
         $this->jsonApiSchemaFile = $jsonApiSchemaFile;
         $this->manager = $doctrine->getManager();
     }
@@ -65,13 +70,20 @@ final class JsonApiContext implements Context
      */
     public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
     {
-        $refResolver = new RefResolver(new UriRetriever());
-        $refResolver::$maxDepth = 15;
+        if ($this->inspector) {
+            $refResolver = new RefResolver(new UriRetriever());
+            $refResolver::$maxDepth = 15;
 
-        (new JsonSchema(file_get_contents($this->jsonApiSchemaFile), 'file://'.__DIR__))
-            ->resolve($refResolver)
-            ->validate($this->getJson(), new Validator())
-        ;
+            (new JsonSchema(file_get_contents($this->jsonApiSchemaFile), 'file://'.__DIR__))
+                ->resolve($refResolver)
+                ->validate($this->getJson(), new Validator())
+            ;
+
+            return;
+        }
+
+        $json = $this->getJson();
+        $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
     }
 
     /**
@@ -79,7 +91,8 @@ final class JsonApiContext implements Context
      */
     public function theJsonNodeShouldBeAnEmptyArray($node)
     {
-        if (!is_array($actual = $this->getValueOfNode($node)) || !empty($actual)) {
+        $actual = $this->getValueOfNode($node);
+        if (null !== $actual && [] !== $actual) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
@@ -149,7 +162,12 @@ final class JsonApiContext implements Context
 
     private function getValueOfNode($node)
     {
-        return $this->inspector->evaluate($this->getJson(), $node);
+        if ($this->inspector) {
+            return $this->inspector->evaluate($this->getJson(), $node);
+        }
+
+        $json = $this->getJson();
+        $this->validator->validate($json, $node);
     }
 
     private function getJson()
