@@ -6,10 +6,13 @@
 
     <services>
         <service id="api_platform.item_data_provider" class="ApiPlatform\Core\DataProvider\ChainItemDataProvider" />
+        <service id="ApiPlatform\Core\DataProvider\ItemDataProviderInterface" alias="api_platform.item_data_provider" />
 
         <service id="api_platform.collection_data_provider" class="ApiPlatform\Core\DataProvider\ChainCollectionDataProvider" />
+        <service id="ApiPlatform\Core\DataProvider\CollectionDataProviderInterface" alias="api_platform.collection_data_provider" />
 
         <service id="api_platform.subresource_data_provider" class="ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider" />
+        <service id="ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface" alias="api_platform.subresource_data_provider" />
     </services>
 
 </container>
