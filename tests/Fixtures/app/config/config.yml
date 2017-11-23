@@ -163,6 +163,7 @@ services:
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
+        public: true
 
     app.entity.filter.dummy_property.property:
         parent:    'api_platform.serializer.property_filter'
@@ -212,6 +213,10 @@ services:
 
     api_platform.http_cache.purger:
         class: ApiPlatform\Core\Tests\Fixtures\NullPurger
+
+    test.api_platform.http_cache.purger:
+        alias: api_platform.http_cache.purger
+        public: true
 
     test.property_accessor:
         alias: property_accessor
