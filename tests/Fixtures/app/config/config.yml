@@ -221,3 +221,7 @@ services:
     test.property_accessor:
         alias: property_accessor
         public: true
+
+    test.annotation_reader:
+        alias: annotation_reader
+        public: true
