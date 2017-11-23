@@ -32,6 +32,7 @@ before_install:
   - npm install -g swagger-cli
   - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.7.1/php-cs-fixer.phar; fi
   - if [[ $lint = 1 ]]; then composer global require --dev 'phpstan/phpstan:^0.8'; fi
+  - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
   - if [[ $deps = 'beta' ]]; then composer config minimum-stability beta; fi
