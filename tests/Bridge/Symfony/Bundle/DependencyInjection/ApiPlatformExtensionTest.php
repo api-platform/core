@@ -487,6 +487,7 @@ class ApiPlatformExtensionTest extends TestCase
             CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
             ItemDataProviderInterface::class => 'api_platform.item_data_provider',
             SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
+            DataPersisterInterface::class => 'api_platform.data_persister',
         ];
 
         foreach ($aliases as $alias => $service) {
