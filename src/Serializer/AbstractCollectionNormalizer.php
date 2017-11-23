@@ -30,8 +30,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     use ContextTrait { initContext as protected; }
     use NormalizerAwareTrait;
 
-    const FORMAT = self::FORMAT;
-
     protected $resourceClassResolver;
     protected $pageParameterName;
 
