@@ -60,8 +60,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      * @param string $rootResourceClass null on the first iteration, it then keeps track of the origin resource class
      * @param array  $parentOperation   the previous call operation
      * @param array  $visited
+     * @param int    $maxDepth
      */
-    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [])
+    private function computeSubresourceOperations(string $resourceClass, array &$tree, string $rootResourceClass = null, array $parentOperation = null, array $visited = [], int $maxDepth = null)
     {
         if (null === $rootResourceClass) {
             $rootResourceClass = $resourceClass;
@@ -79,10 +80,13 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
 
             $visiting = "$resourceClass $property $subresourceClass";
-            //var_dump($visited);
-            $maxDepth = $propertyMetadata->getSubresource()->getMaxDepth();
-            if(!is_null($maxDepth) && count($visited) > $maxDepth){
-                //var_dump('plop');
+
+            // Handle maxDepth
+            if ($rootResourceClass == $resourceClass) {
+                $maxDepth = $subresource->getMaxDepth();
+            }
+
+            if(!is_null($maxDepth) && count($visited) >= $maxDepth) {
                 continue;
             }
             if (isset($visited[$visiting])) {
@@ -160,7 +164,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
             $tree[$operation['route_name']] = $operation;
 
-            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true]);
+            $this->computeSubresourceOperations($subresourceClass, $tree, $rootResourceClass, $operation, $visited + [$visiting => true], $maxDepth);
         }
     }
 }
