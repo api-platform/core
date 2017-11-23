@@ -58,7 +58,7 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter(':id_id', 1)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_id', 1, DBALType::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -96,8 +96,8 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
 
-        $queryBuilderProphecy->setParameter(':id_ida', 1)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter(':id_idb', 2)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_ida', 1, DBALType::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_idb', 2, DBALType::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -155,7 +155,7 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter(':id_id', 1)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_id', 1, DBALType::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
