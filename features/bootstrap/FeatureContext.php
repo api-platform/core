@@ -44,6 +44,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behatch\HttpCall\Request;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -82,9 +83,21 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * Sets the default Accept HTTP header to null (workaround to artificially remove it).
      *
+     * @AfterStep
+     */
+    public function removeAcceptHeaderAfterRequest(AfterStepScope $event)
+    {
+        if (preg_match('/^I send a "[A-Z]+" request to ".+"/', $event->getStep()->getText())) {
+            $this->request->setHttpHeader('Accept', null);
+        }
+    }
+
+    /**
+     * Sets the default Accept HTTP header to null (workaround to artificially remove it).
+     *
      * @BeforeScenario
      */
-    public function removeAcceptHeader()
+    public function removeAcceptHeaderBeforeScenario()
     {
         $this->request->setHttpHeader('Accept', null);
     }

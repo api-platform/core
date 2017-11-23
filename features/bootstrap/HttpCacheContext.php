@@ -35,7 +35,7 @@ final class HttpCacheContext implements KernelAwareContext
      */
     public function irisShouldBePurged(string $iris)
     {
-        $purger = $this->kernel->getContainer()->get('api_platform.http_cache.purger');
+        $purger = $this->kernel->getContainer()->get('test.api_platform.http_cache.purger');
 
         $purgedIris = implode(',', $purger->getIris());
         $purger->clear();
