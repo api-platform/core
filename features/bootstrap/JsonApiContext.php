@@ -65,7 +65,7 @@ final class JsonApiContext implements Context
      */
     public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
     {
-        $refResolver = new RefResolver(new UriRetriever());
+        $refResolver = class_exists(RefResolver::class) ? new RefResolver(new UriRetriever()) : new \JsonSchema\SchemaStorage(UriRetriever());
         $refResolver::$maxDepth = 15;
 
         (new JsonSchema(file_get_contents($this->jsonApiSchemaFile), 'file://'.__DIR__))
