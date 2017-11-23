@@ -15,8 +15,8 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
-use Behatch\HttpCall\Request;
 use Behatch\Context\RestContext;
+use Behatch\HttpCall\Request;
 use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
 
 /**

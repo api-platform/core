@@ -47,7 +47,7 @@ final class JsonApiContext implements Context
         if (class_exists(RefResolver::class)) {
             $this->inspector = new JsonInspector('javascript');
         } else {
-            $this->validator = new Validator;
+            $this->validator = new Validator();
         }
         $this->jsonApiSchemaFile = $jsonApiSchemaFile;
         $this->manager = $doctrine->getManager();
@@ -83,7 +83,7 @@ final class JsonApiContext implements Context
         }
 
         $json = $this->getJson();
-        $this->validator->validate($json, (object)['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
+        $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
     }
 
     /**
