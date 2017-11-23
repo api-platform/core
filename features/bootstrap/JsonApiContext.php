@@ -91,7 +91,8 @@ final class JsonApiContext implements Context
      */
     public function theJsonNodeShouldBeAnEmptyArray($node)
     {
-        if (!is_array($actual = $this->getValueOfNode($node)) || !empty($actual)) {
+        $actual = $this->getValueOfNode($node);
+        if (null !== $actual && [] !== $actual) {
             throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
