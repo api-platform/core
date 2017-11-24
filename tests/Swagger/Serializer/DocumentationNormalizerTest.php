@@ -1046,9 +1046,9 @@ class DocumentationNormalizerTest extends TestCase
 
         $documentation = new Documentation(new ResourceNameCollection([Dummy::class]), 'Test API', 'This is a test API.', '1.2.3', ['jsonld' => ['application/ld+json']]);
 
-        $this->assertEquals(true, $normalizer->supportsNormalization($documentation, 'json'));
-        $this->assertEquals(false, $normalizer->supportsNormalization($documentation));
-        $this->assertEquals(false, $normalizer->supportsNormalization(new Dummy(), 'json'));
+        $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
+        $this->assertFalse($normalizer->supportsNormalization($documentation));
+        $this->assertFalse($normalizer->supportsNormalization(new Dummy(), 'json'));
     }
 
     public function testNoOperations()
