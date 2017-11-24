@@ -6,6 +6,7 @@
 
     <services>
         <service id="api_platform.data_persister" class="ApiPlatform\Core\DataPersister\ChainDataPersister" public="false" />
+        <service id="ApiPlatform\Core\DataPersister\DataPersisterInterface" alias="api_platform.data_persister" />
     </services>
 
 </container>
