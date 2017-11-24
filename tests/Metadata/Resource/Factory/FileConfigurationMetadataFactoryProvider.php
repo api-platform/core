@@ -38,6 +38,9 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'collectionOperations' => [
                 'my_collection_op' => ['method' => 'POST', 'path' => 'the/collection/path'],
             ],
+            'subresourceOperations' => [
+                'my_collection_subresource' => ['path' => 'the/subresource/path'],
+            ],
             'iri' => 'someirischema',
             'attributes' => [
                 'normalization_context' => [
@@ -53,7 +56,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             ],
         ];
 
-        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'iri', 'attributes'] as $property) {
             $wither = 'with'.ucfirst($property);
             $resourceMetadata = $resourceMetadata->$wither($metadata[$property]);
         }

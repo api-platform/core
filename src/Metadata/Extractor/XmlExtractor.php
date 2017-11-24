@@ -47,6 +47,7 @@ final class XmlExtractor extends AbstractExtractor
                 'iri' => $this->phpize($resource, 'iri', 'string'),
                 'itemOperations' => $this->getOperations($resource, 'itemOperation'),
                 'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
+                'subresourceOperations' => $this->getOperations($resource, 'subresourceOperation'),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
                 'properties' => $this->getProperties($resource) ?: null,
             ];

@@ -113,12 +113,13 @@ final class ApiLoader extends Loader
                             'collection' => $operation['collection'],
                             'operationId' => $operationId,
                         ],
-                    ],
+                    ] + $operation['defaults'] ?? [],
                     $operation['requirements'] ?? [],
-                    [],
-                    '',
-                    [],
-                    ['GET']
+                    $operation['options'] ?? [],
+                    $operation['host'] ?? '',
+                    $operation['schemes'] ?? [],
+                    ['GET'],
+                    $operation['condition'] ?? ''
                 ));
             }
         }

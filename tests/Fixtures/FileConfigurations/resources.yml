@@ -12,6 +12,9 @@ resources:
             my_collection_op:
                 method: 'POST'
                 path: 'the/collection/path'
+        subresourceOperations:
+            my_collection_subresource:
+                path: 'the/subresource/path'
         attributes:
             normalization_context:
                 groups: ['default']
