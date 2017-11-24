@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
@@ -479,6 +482,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.property_accessor' => 'property_accessor',
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
+            IriConverterInterface::class => 'api_platform.iri_converter',
+            SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
+            CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
+            ItemDataProviderInterface::class => 'api_platform.item_data_provider',
+            SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
         ];
 
         foreach ($aliases as $alias => $service) {
