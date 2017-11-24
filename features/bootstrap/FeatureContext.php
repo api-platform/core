@@ -73,6 +73,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $this->request->setHttpHeader('Accept', null);
         }
     }
+
     /**
      * Sets the default Accept HTTP header to null (workaround to artificially remove it).
      *
