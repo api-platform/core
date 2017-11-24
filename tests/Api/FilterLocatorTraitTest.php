@@ -53,7 +53,7 @@ class FilterLocatorTraitTest extends TestCase
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(null, true);
 
-        $this->assertEquals(null, $filterLocatorTraitImpl->getFilterLocator());
+        $this->assertNull($filterLocatorTraitImpl->getFilterLocator());
     }
 
     /**

@@ -114,7 +114,7 @@ class DummyProduct
         $this->relatedProducts = $relatedProducts;
     }
 
-    public function addRelatedProduct(DummyProduct $relatedProduct)
+    public function addRelatedProduct(self $relatedProduct)
     {
         $this->relatedProducts->add($relatedProduct);
         $relatedProduct->setParent($this);
@@ -125,7 +125,7 @@ class DummyProduct
         return $this->parent;
     }
 
-    public function setParent(DummyProduct $product)
+    public function setParent(self $product)
     {
         $this->parent = $product;
     }
