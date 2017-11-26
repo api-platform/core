@@ -209,7 +209,13 @@ class SchemaBuilderTest extends TestCase
             $resourceClassNames[] = $resourceClassName;
             $resourceMetadata = new ResourceMetadata(
                 "ShortName$i",
-                "Description$i"
+                "Description$i",
+                null,
+                null,
+                null,
+                null,
+                null,
+                ['query' => []]
             );
             $resourceMetadataFactoryProphecy->create($resourceClassName)->willReturn($resourceMetadata);
             $resourceMetadataFactoryProphecy->create('unknownResource')->willThrow(new ResourceClassNotFoundException());

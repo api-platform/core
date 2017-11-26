@@ -67,7 +67,12 @@ final class SchemaBuilder implements SchemaBuilderInterface
     {
         $queryFields = [];
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            $queryFields += $this->getQueryFields($resourceClass);
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (!isset($resourceMetadata->getGraphql()['query'])) {
+                continue;
+            }
+
+            $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata);
         }
 
         return new Schema([
@@ -81,10 +86,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the query fields of the schema.
      */
-    private function getQueryFields(string $resourceClass): array
+    private function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata): array
     {
         $queryFields = [];
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $shortName = $resourceMetadata->getShortName();
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass)) {
