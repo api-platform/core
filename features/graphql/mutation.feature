@@ -91,7 +91,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.name" should be equal to "Dummy #1"
     And the JSON node "data.updateDummy.description" should be equal to "Modified description."
 
-  @dropSchema
   # @TODO Find a way to manage composite identifiers.
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
@@ -115,3 +114,24 @@ Feature: GraphQL mutation support
     #And the JSON node "data.putCompositeRelation.compositeItem.id" should be equal to 1
     #And the JSON node "data.putCompositeRelation.compositeLabel.id" should be equal to 1
     #And the JSON node "data.putCompositeRelation.value" should be equal to "Modified value."
+
+  @dropSchema
+  Scenario: Create an item
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummy(input: {name: "A new one", alias: "new", description: "brand new!"}) {
+        id,
+        name,
+        alias,
+        description
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createDummy.id" should be equal to 2
+    And the JSON node "data.createDummy.name" should be equal to "A new one"
+    And the JSON node "data.createDummy.alias" should be equal to "new"
+    And the JSON node "data.createDummy.description" should be equal to "brand new!"

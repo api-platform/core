@@ -287,9 +287,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $fields = [];
         foreach ($this->propertyNameCollectionFactory->create($resource) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resource, $property);
-            if (null === ($propertyType = $propertyMetadata->getType())
-                || !$propertyMetadata->isReadable()
-                || ($isMutation && 'delete' === $mutationName && !$propertyMetadata->isIdentifier())) {
+            if (
+                null === ($propertyType = $propertyMetadata->getType())
+                || (!$isInput && !$isMutation && !$propertyMetadata->isReadable())
+                //|| ($isMutation && !$propertyMetadata->isWritable())
+                || ($isInput && $isMutation && 'create' === $mutationName && $propertyMetadata->isIdentifier())
+                || ($isMutation && 'delete' === $mutationName && !$propertyMetadata->isIdentifier())
+            ) {
                 continue;
             }
 

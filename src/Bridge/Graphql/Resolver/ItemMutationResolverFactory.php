@@ -48,10 +48,9 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
     public function createItemMutationResolver(string $resourceClass, string $mutationName): callable
     {
         return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $mutationName) {
-            $id = $this->getIdentifier($this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass), $args, $info);
             $item = null;
-
             if ('update' === $mutationName || 'delete' === $mutationName) {
+                $id = $this->getIdentifier($this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass), $args, $info);
                 $item = $this->getItem($resourceClass, $id, $info);
             }
 
