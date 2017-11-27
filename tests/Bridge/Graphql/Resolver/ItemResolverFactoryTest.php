@@ -33,7 +33,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $mockedItemResolverFactory = $this->mockItemResolverFactory(null, null, [], null);
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass', 'foo');
+        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
 
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
@@ -45,7 +45,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', null, ['id' => 3], 3);
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass', 'foo');
+        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
 
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
@@ -57,7 +57,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', null, ['relation1' => 1, 'relation2' => 2], 'relation1=1;relation2=2');
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass', 'foo');
+        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
 
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
@@ -73,7 +73,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', null, ['relation1' => ['link1' => 1, 'link2' => 3], 'relation2' => 2], null);
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass', 'foo');
+        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
 
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';
@@ -88,7 +88,7 @@ class ItemResolverFactoryTest extends TestCase
     {
         $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', $subresource, ['rootIdentifier' => 'valueRootIdentifier'], null);
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('subresourceClass', 'rootClass', 'foo');
+        $resolver = $mockedItemResolverFactory->createItemResolver('subresourceClass', 'rootClass');
 
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
         $resolveInfoProphecy->fieldName = 'rootProperty';

@@ -50,13 +50,34 @@ class SchemaBuilderTest extends TestCase
         $mockedSchemaBuilder->getSchema();
     }
 
-    public function testGetSchemaNullOperation()
+    public function testGetSchemaAllFields()
     {
-        $propertyMetadataMockBuilder = function () {
-            return new PropertyMetadata();
+        $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
+            return new PropertyMetadata(
+                new Type(
+                    $builtinType,
+                    false,
+                    'GraphqlResource3' === $resourceClassName ? 'unknownResource' : $resourceClassName
+                ),
+                "{$builtinType}Description",
+                null,
+                null,
+                null,
+                null,
+                null,
+                Type::BUILTIN_TYPE_INT === $builtinType
+            );
         };
-        $mockedSchemaBuilder = $this->mockSchemaBuilder($propertyMetadataMockBuilder, false, true);
-        $this->assertEquals([], $mockedSchemaBuilder->getSchema()->getConfig()->getQuery()->getFields());
+
+        $mockedSchemaBuilder = $this->mockSchemaBuilder($propertyMetadataMockBuilder, false);
+        $this->assertEquals([
+            'shortName1',
+            'shortName1s',
+            'shortName2',
+            'shortName2s',
+            'shortName3',
+            'shortName3s',
+        ], array_keys($mockedSchemaBuilder->getSchema()->getConfig()->getQuery()->getFields()));
     }
 
     public function testGetSchemaResourceClassNotFound()
@@ -66,9 +87,9 @@ class SchemaBuilderTest extends TestCase
                 new Type(
                     $builtinType,
                     false,
-                    'item3' === $resourceClassName ? 'unknownResource' : $resourceClassName
+                    'GraphqlResource3' === $resourceClassName ? 'unknownResource' : $resourceClassName
                 ),
-                $builtinType.'Description',
+                "{$builtinType}Description",
                 null,
                 null,
                 null,
@@ -83,26 +104,26 @@ class SchemaBuilderTest extends TestCase
 
         // objectProperty has been skipped.
         /** @var ObjectType $type */
-        $type = $queryFields['itemShortName3']->getType();
-        $this->assertArrayNotHasKey('objectProperty', array_keys($type->getFields()));
+        $type = $queryFields['shortName3']->getType();
+        $this->assertArrayNotHasKey('objectProperty', $type->getFields());
     }
 
     /**
      * @dataProvider paginationProvider
      */
-    public function testGetSchema($paginationEnabled, $expected)
+    public function testGetSchema($paginationEnabled)
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
                 new Type(
                     $builtinType,
                     false,
-                    'item3' === $resourceClassName ? \DateTime::class : $resourceClassName,
-                    Type::BUILTIN_TYPE_OBJECT === $builtinType && 'item3' !== $resourceClassName,
+                    'GraphqlResource3' === $resourceClassName ? \DateTime::class : $resourceClassName,
+                    Type::BUILTIN_TYPE_OBJECT === $builtinType && 'GraphqlResource3' !== $resourceClassName,
                     null,
                     Type::BUILTIN_TYPE_OBJECT === $builtinType ? new Type(Type::BUILTIN_TYPE_STRING, false, $resourceClassName) : null
                 ),
-                $builtinType.'Description',
+                "{$builtinType}Description",
                 true,
                 null,
                 null,
@@ -115,22 +136,16 @@ class SchemaBuilderTest extends TestCase
         $queryFields = $schema->getConfig()->getQuery()->getFields();
 
         $this->assertEquals([
-            'itemShortName1',
-            'itemShortName1s',
-            'itemShortName2',
-            'itemShortName2s',
-            'itemShortName3',
-            'itemShortName3s',
-            'collectionShortName1',
-            'collectionShortName1s',
-            'collectionShortName2',
-            'collectionShortName2s',
-            'collectionShortName3',
-            'collectionShortName3s',
+            'shortName1',
+            'shortName1s',
+            'shortName2',
+            'shortName2s',
+            'shortName3',
+            'shortName3s',
         ], array_keys($queryFields));
 
         /** @var ObjectType $type */
-        $type = $queryFields['itemShortName2']->getType();
+        $type = $queryFields['shortName2']->getType();
         $resourceTypeFields = $type->getFields();
         $this->assertEquals(
             ['intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty'],
@@ -139,15 +154,15 @@ class SchemaBuilderTest extends TestCase
 
         // Types are equal because of the cache.
         /** @var ObjectType $type */
-        $type = $queryFields['collectionShortName1']->getType();
+        $type = $queryFields['shortName1']->getType();
         if ($paginationEnabled) {
             /** @var ObjectType $objectPropertyFieldType */
             $objectPropertyFieldType = $type->getFields()['objectProperty']->getType();
-            $this->assertEquals($objectPropertyFieldType->name, 'collectionShortName1Connection');
+            $this->assertEquals($objectPropertyFieldType->name, 'ShortName1Connection');
             /** @var ListOfType $edgesType */
             $edgesType = $objectPropertyFieldType->getFields()['edges']->getType();
             $edgeType = $edgesType->getWrappedType();
-            $this->assertEquals($edgeType->name, 'collectionShortName1Edge');
+            $this->assertEquals($edgeType->name, 'ShortName1Edge');
             $this->assertEquals($edgeType->getFields()['cursor']->getType(), GraphQLType::nonNull(GraphQLType::string()));
             $this->assertEquals(
                 $type,
@@ -164,7 +179,7 @@ class SchemaBuilderTest extends TestCase
 
         // DateTime is considered as a string instead of an object.
         /** @var ObjectType $type */
-        $type = $queryFields['itemShortName3']->getType();
+        $type = $queryFields['shortName3']->getType();
         /** @var ListOfType $objectPropertyFieldType */
         $objectPropertyFieldType = $type->getFields()['objectProperty']->getType();
         $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $objectPropertyFieldType);
@@ -172,10 +187,13 @@ class SchemaBuilderTest extends TestCase
 
     public function paginationProvider()
     {
-        return [[true, null], [false, null]];
+        return [
+            [true],
+            [false],
+        ];
     }
 
-    private function mockSchemaBuilder($propertyMetadataMockBuilder, bool $paginationEnabled, bool $nullOperation = false): SchemaBuilder
+    private function mockSchemaBuilder($propertyMetadataMockBuilder, bool $paginationEnabled): SchemaBuilder
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -186,41 +204,32 @@ class SchemaBuilderTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
 
         $resourceClassNames = [];
-        $resourceTypes = ['item', 'collection'];
-        foreach ($resourceTypes as $resourceType) {
-            for ($i = 1; $i <= 3; ++$i) {
-                $resourceClassName = $resourceType.$i;
-                $resourceClassNames[] = $resourceClassName;
-                $resourceMetadata = new ResourceMetadata(
-                    $resourceType.'ShortName'.$i,
-                    $resourceType.'Description'.$i,
-                    null,
-                    $nullOperation ? null : [
-                        'get' => ['method' => 'GET'],
-                        'post' => ['method' => 'POST'],
-                        'op' => ['method' => 'GET', 'controller' => 'controller.name'],
-                    ],
-                    $nullOperation ? null : [
-                        'get' => ['method' => 'GET'],
-                        'post' => ['method' => 'POST'],
-                        'op' => ['method' => 'GET', 'controller' => 'controller.name'],
-                    ]
-                );
-                $resourceMetadataFactoryProphecy->create($resourceClassName)->willReturn($resourceMetadata);
-                $resourceMetadataFactoryProphecy->create('unknownResource')->willThrow(new ResourceClassNotFoundException());
+        for ($i = 1; $i <= 3; ++$i) {
+            $resourceClassName = "GraphqlResource$i";
+            $resourceClassNames[] = $resourceClassName;
+            $resourceMetadata = new ResourceMetadata(
+                "ShortName$i",
+                "Description$i",
+                null,
+                null,
+                null,
+                null,
+                null,
+                ['query' => []]
+            );
+            $resourceMetadataFactoryProphecy->create($resourceClassName)->willReturn($resourceMetadata);
+            $resourceMetadataFactoryProphecy->create('unknownResource')->willThrow(new ResourceClassNotFoundException());
 
-                $propertyNames = [];
-                foreach (Type::$builtinTypes as $builtinType) {
-                    $propertyName = $builtinType.'Property';
-                    $propertyNames[] = $propertyName;
-                    $propertyMetadata = $propertyMetadataMockBuilder($builtinType, $resourceClassName);
-                    $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName)->willReturn($propertyMetadata);
-                }
-                $propertyNameCollection = new PropertyNameCollection($propertyNames);
-                $propertyNameCollectionFactoryProphecy->create($resourceClassName)->willReturn($propertyNameCollection);
-
-                $identifiersExtractorProphecy->getIdentifiersFromResourceClass($resourceClassName)->willReturn(['intProperty']);
+            $propertyNames = [];
+            foreach (Type::$builtinTypes as $builtinType) {
+                $propertyName = "{$builtinType}Property";
+                $propertyNames[] = $propertyName;
+                $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName)->willReturn($propertyMetadataMockBuilder($builtinType, $resourceClassName));
             }
+            $propertyNameCollection = new PropertyNameCollection($propertyNames);
+            $propertyNameCollectionFactoryProphecy->create($resourceClassName)->willReturn($propertyNameCollection);
+
+            $identifiersExtractorProphecy->getIdentifiersFromResourceClass($resourceClassName)->willReturn(['intProperty']);
         }
         $resourceNameCollection = new ResourceNameCollection($resourceClassNames);
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);

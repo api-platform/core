@@ -65,12 +65,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ResourceMetadata|null $parentPropertyMetadata
-     * @param string                $resourceClass
-     *
      * @throws ResourceClassNotFoundException
-     *
-     * @return ResourceMetadata
      */
     private function handleNotFound(ResourceMetadata $parentPropertyMetadata = null, string $resourceClass): ResourceMetadata
     {
@@ -91,12 +86,13 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
                 $annotation->itemOperations,
                 $annotation->collectionOperations,
                 $annotation->attributes,
-                $annotation->subresourceOperations
+                $annotation->subresourceOperations,
+                $annotation->graphql
             );
         }
 
         $resourceMetadata = $parentResourceMetadata;
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
             $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
         }
 
@@ -106,21 +102,18 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
     /**
      * Creates a new instance of metadata if the property is not already set.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $property
-     * @param mixed            $value
-     *
-     * @return ResourceMetadata
+     * @param mixed $value
      */
     private function createWith(ResourceMetadata $resourceMetadata, string $property, $value): ResourceMetadata
     {
-        $getter = 'get'.ucfirst($property);
+        $upperProperty = ucfirst($property);
+        $getter = "get$upperProperty";
 
         if (null !== $resourceMetadata->$getter()) {
             return $resourceMetadata;
         }
 
-        $wither = 'with'.ucfirst($property);
+        $wither = "with$upperProperty";
 
         return $resourceMetadata->$wither($value);
     }

@@ -29,7 +29,6 @@ use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Type\Schema;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -67,9 +66,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
     public function getSchema(): Schema
     {
         $queryFields = [];
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (!isset($resourceMetadata->getGraphql()['query'])) {
+                continue;
+            }
 
-        foreach ($this->resourceNameCollectionFactory->create() as $resource) {
-            $queryFields += $this->getQueryFields($resource);
+            $queryFields += $this->getQueryFields($resourceClass, $resourceMetadata);
         }
 
         return new Schema([
@@ -83,44 +86,41 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the query fields of the schema.
      */
-    private function getQueryFields(string $resource): array
+    private function getQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata): array
     {
         $queryFields = [];
-        $resourceMetadata = $this->resourceMetadataFactory->create($resource);
         $shortName = $resourceMetadata->getShortName();
 
-        foreach ($this->getOperations($resourceMetadata, true, true) as $operationName => $queryItemOperation) {
-            $fieldNamePrefix = 'get' === $operationName ? '' : $operationName;
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resource), $resource, $operationName)) {
-                $fieldConfiguration['args'] += $this->getResourceIdentifiersArgumentsConfiguration($resource, $operationName);
-                $queryFields[lcfirst($fieldNamePrefix.$shortName)] = $fieldConfiguration;
-            }
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass)) {
+            $fieldConfiguration['args'] += $this->getResourceIdentifiersArgumentsConfiguration($resourceClass);
+            $queryFields[lcfirst($shortName)] = $fieldConfiguration;
         }
 
-        foreach ($this->getOperations($resourceMetadata, true, false) as $operationName => $queryCollectionOperation) {
-            $fieldNamePrefix = 'get' === $operationName ? '' : $operationName;
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resource)), $resource, $operationName)) {
-                $queryFields[lcfirst($fieldNamePrefix.Inflector::pluralize($shortName))] = $fieldConfiguration;
-            }
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass)) {
+            $queryFields[lcfirst(Inflector::pluralize($shortName))] = $fieldConfiguration;
         }
 
         return $queryFields;
     }
 
     /**
-     * Get the field configuration of a resource.
+     * Gets the field configuration of a resource.
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
      *
      * @return array|null
      */
-    private function getResourceFieldConfiguration(string $fieldDescription = null, Type $type, string $rootResource, string $operationName, bool $isInput = false)
+    private function getResourceFieldConfiguration(string $fieldDescription = null, Type $type, string $rootResource, bool $isInput = false)
     {
         try {
-            $graphqlType = $this->convertType($type, $operationName, $isInput);
+            $graphqlType = $this->convertType($type, $isInput);
             $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType() : $graphqlType;
             $isInternalGraphqlType = in_array($graphqlWrappedType, GraphQLType::getInternalTypes(), true);
-            $className = $isInternalGraphqlType ? '' : ($type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName());
+            if ($isInternalGraphqlType) {
+                $className = '';
+            } else {
+                $className = $type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+            }
 
             $args = [];
             if ($this->paginationEnabled && !$isInternalGraphqlType && $type->isCollection() && !$isInput) {
@@ -139,7 +139,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($isInternalGraphqlType || $isInput) {
                 $resolve = null;
             } else {
-                $resolve = $type->isCollection() ? $this->collectionResolverFactory->createCollectionResolver($className, $rootResource, $operationName) : $this->itemResolverFactory->createItemResolver($className, $rootResource, $operationName);
+                $resolve = $type->isCollection() ? $this->collectionResolverFactory->createCollectionResolver($className, $rootResource) : $this->itemResolverFactory->createItemResolver($className, $rootResource);
             }
 
             return [
@@ -158,21 +158,21 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @throws \LogicException
      */
-    private function getResourceIdentifiersArgumentsConfiguration(string $resource, string $operationName): array
+    private function getResourceIdentifiersArgumentsConfiguration(string $resourceClass): array
     {
         $arguments = [];
-        $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resource);
+        $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);
         foreach ($identifiers as $identifier) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resource, $identifier);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $identifier);
             $propertyType = $propertyMetadata->getType();
             if (null === $propertyType) {
                 continue;
             }
 
-            $arguments[$identifier] = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $operationName, true);
+            $arguments[$identifier] = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resourceClass, true);
         }
         if (!$arguments) {
-            throw new \LogicException("Missing identifier field for resource \"$resource\".");
+            throw new \LogicException("Missing identifier field for resource \"$resourceClass\".");
         }
 
         return $arguments;
@@ -183,7 +183,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @throws InvalidTypeException
      */
-    private function convertType(Type $type, string $operationName, bool $isInput = false): GraphQLType
+    private function convertType(Type $type, bool $isInput = false): GraphQLType
     {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
@@ -211,7 +211,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     throw new InvalidTypeException();
                 }
 
-                $graphqlType = $this->getResourceObjectType($className, $resourceMetadata, $operationName, $isInput);
+                $graphqlType = $this->getResourceObjectType($className, $resourceMetadata, $isInput);
                 break;
             default:
                 throw new InvalidTypeException();
@@ -229,10 +229,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType|InputObjectType
      */
-    private function getResourceObjectType(string $resource, ResourceMetadata $resourceMetadata, string $operationName, bool $isInput = false)
+    private function getResourceObjectType(string $resource, ResourceMetadata $resourceMetadata, bool $isInput = false)
     {
         $shortName = $resourceMetadata->getShortName().($isInput ? 'Input' : '');
-
         if (isset($this->resourceTypesCache[$shortName])) {
             return $this->resourceTypesCache[$shortName];
         }
@@ -240,8 +239,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $configuration = [
             'name' => $shortName,
             'description' => $resourceMetadata->getDescription(),
-            'fields' => function () use ($resource, $operationName, $isInput) {
-                return $this->getResourceObjectTypeFields($resource, $operationName, $isInput);
+            'fields' => function () use ($resource, $isInput) {
+                return $this->getResourceObjectTypeFields($resource, $isInput);
             },
         ];
 
@@ -251,18 +250,16 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    private function getResourceObjectTypeFields(string $resource, string $operationName, bool $isInput = false): array
+    private function getResourceObjectTypeFields(string $resource, bool $isInput = false): array
     {
         $fields = [];
-
         foreach ($this->propertyNameCollectionFactory->create($resource) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resource, $property);
-            if (null === ($propertyType = $propertyMetadata->getType())
-                || !$propertyMetadata->isReadable()) {
+            if (null === ($propertyType = $propertyMetadata->getType()) || !$propertyMetadata->isReadable()) {
                 continue;
             }
 
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $operationName, $isInput)) {
+            if ($fieldConfiguration = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $isInput)) {
                 $fields[$property] = $fieldConfiguration;
             }
         }
@@ -286,7 +283,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         $edgeObjectTypeConfiguration = [
-            'name' => $shortName.'Edge',
+            'name' => "{$shortName}Edge",
             'description' => "Edge of $shortName.",
             'fields' => [
                 'node' => $resourceType,
@@ -295,7 +292,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         ];
         $edgeObjectType = $isInput ? new InputObjectType($edgeObjectTypeConfiguration) : new ObjectType($edgeObjectTypeConfiguration);
         $pageInfoObjectTypeConfiguration = [
-            'name' => $shortName.'PageInfo',
+            'name' => "{$shortName}PageInfo",
             'description' => 'Information about the current page.',
             'fields' => [
                 'endCursor' => GraphQLType::string(),
@@ -305,7 +302,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         $pageInfoObjectType = $isInput ? new InputObjectType($pageInfoObjectTypeConfiguration) : new ObjectType($pageInfoObjectTypeConfiguration);
 
         $configuration = [
-            'name' => $shortName.'Connection',
+            'name' => "{$shortName}Connection",
             'description' => "Connection for $shortName.",
             'fields' => [
                 'edges' => GraphQLType::listOf($edgeObjectType),
@@ -313,29 +310,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
 
-        return $this->resourceTypesCache[$shortName.'Connection'] = $isInput ? new InputObjectType($configuration) : new ObjectType($configuration);
-    }
-
-    /**
-     * Get the available operations for a resource.
-     */
-    private function getOperations(ResourceMetadata $resourceMetadata, bool $isQuery, bool $isItem): \Traversable
-    {
-        $operations = $isItem ? $resourceMetadata->getItemOperations() : $resourceMetadata->getCollectionOperations();
-        if (null === $operations) {
-            return yield from [];
-        }
-
-        foreach ($operations as $operationName => $operation) {
-            if (isset($operation['controller']) || !isset($operation['method'])) {
-                continue;
-            }
-
-            if ($isQuery && Request::METHOD_GET !== $operation['method'] || !$isQuery && Request::METHOD_GET === $operation['method']) {
-                continue;
-            }
-
-            yield $operationName => $operation;
-        }
+        return $this->resourceTypesCache["{$shortName}Connection"] = $isInput ? new InputObjectType($configuration) : new ObjectType($configuration);
     }
 }

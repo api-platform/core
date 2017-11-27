@@ -22,5 +22,5 @@ namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
  */
 interface CollectionResolverFactoryInterface
 {
-    public function createCollectionResolver(string $resourceClass, string $rootClass, string $operationName): callable;
+    public function createCollectionResolver(string $resourceClass, string $rootClass): callable;
 }

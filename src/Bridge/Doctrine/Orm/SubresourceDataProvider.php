@@ -109,7 +109,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass) : [];
 
             switch ($relationType) {
-                //MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
+                // MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
                 case ClassMetadataInfo::MANY_TO_MANY:
                     $joinAlias = $queryNameGenerator->generateJoinAlias($previousAssociationProperty);
 

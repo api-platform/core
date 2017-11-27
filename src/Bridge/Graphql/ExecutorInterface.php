@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Graphql;
 
 use GraphQL\Executor\ExecutionResult;
+use GraphQL\Type\Schema;
 
 /**
  * Wrapper for the GraphQL facade.
@@ -26,10 +27,6 @@ interface ExecutorInterface
 {
     /**
      * @see http://webonyx.github.io/graphql-php/executing-queries/#using-facade-method
-     *
-     * @param array ...$args
-     *
-     * @return ExecutionResult
      */
-    public function executeQuery(...$args): ExecutionResult;
+    public function executeQuery(Schema $schema, $source, $rootValue = null, $context = null, array $variableValues = null, string $operationName = null, callable $fieldResolver = null, array $validationRules = null): ExecutionResult;
 }

@@ -67,7 +67,7 @@ final class GraphqlEntrypointAction
             $executionResult = new ExecutionResult(null, [$e]);
         }
 
-        return new JsonResponse($executionResult->toArray($this->debug), !$executionResult->errors ? Response::HTTP_OK : Response::HTTP_BAD_REQUEST);
+        return new JsonResponse($executionResult->toArray($this->debug), $executionResult->errors ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
     }
 
     private function parseRequest(Request $request): array

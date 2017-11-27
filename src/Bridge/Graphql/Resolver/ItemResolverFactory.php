@@ -48,9 +48,9 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
     /**
      * @throws \Exception
      */
-    public function createItemResolver(string $resourceClass, string $rootClass, string $operationName): callable
+    public function createItemResolver(string $resourceClass, string $rootClass): callable
     {
-        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+        return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
             $rootProperty = $info->fieldName;
             $rootIdentifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($rootClass);
             if (isset($root[$rootProperty])) {
@@ -89,7 +89,7 @@ final class ItemResolverFactory extends AbstractResolverFactory implements ItemR
                 null,
                 ['graphql' => true] + $this->resourceMetadataFactory
                     ->create($resourceClass)
-                    ->getItemOperationAttribute($operationName, 'normalization_context', [], true)
+                    ->getGraphqlAttribute('query', 'normalization_context', [], true)
             ) : null;
         };
     }

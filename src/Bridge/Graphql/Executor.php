@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Graphql;
 
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL;
+use GraphQL\Type\Schema;
 
 /**
  * Wrapper for the GraphQL facade.
@@ -28,8 +29,8 @@ final class Executor implements ExecutorInterface
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(...$args): ExecutionResult
+    public function executeQuery(Schema $schema, $source, $rootValue = null, $context = null, array $variableValues = null, string $operationName = null, callable $fieldResolver = null, array $validationRules = null): ExecutionResult
     {
-        return GraphQL::executeQuery(...$args);
+        return GraphQL::executeQuery($schema, $source, $rootValue, $context, $variableValues, $operationName, $fieldResolver, $validationRules);
     }
 }
