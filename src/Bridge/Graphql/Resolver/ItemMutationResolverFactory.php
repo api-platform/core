@@ -66,28 +66,30 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
                 $id = $args['input'][$identifiers[0]];
             }
 
-            if ('delete' === $mutationName) {
+            if ('update' === $mutationName || 'delete' === $mutationName) {
                 $item = $this->itemDataProvider->getItem($resourceClass, $id);
-
                 if (null === $item) {
                     throw Error::createLocatedError("Item $resourceClass $id not found", $info->fieldNodes, $info->path);
                 }
+            }
 
-                $this->dataPersister->remove($item);
+            switch ($mutationName) {
+                case 'delete':
+                    $this->dataPersister->remove($item);
 
-                return $args['input'];
-            } elseif ('update' === $mutationName) {
-                $item = $this->serializer->denormalize($args['input'], $resourceClass, null, ['resource_class' => $resourceClass]);
+                    return $args['input'];
 
-                $this->dataPersister->persist($item);
+                case 'update':
+                    $item = $this->serializer->denormalize($args['input'], $resourceClass, null, ['resource_class' => $resourceClass, 'object_to_populate' => $item]);
+                    $this->dataPersister->persist($item);
 
-                return $this->serializer->normalize(
-                    $item,
-                    null,
-                    ['graphql' => true] + $this->resourceMetadataFactory
-                        ->create($resourceClass)
-                        ->getGraphqlAttribute($mutationName, 'normalization_context', [], true)
-                );
+                    return $this->serializer->normalize(
+                        $item,
+                        null,
+                        ['graphql' => true] + $this->resourceMetadataFactory
+                            ->create($resourceClass)
+                            ->getGraphqlAttribute($mutationName, 'normalization_context', [], true)
+                    );
             }
         };
     }
