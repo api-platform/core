@@ -101,9 +101,9 @@ class ExceptionListenerTest extends TestCase
     public function dataLogLevel()
     {
         return [
-            [ \Exception::class, true ],
-            [ NotFoundHttpException::class, false ],
-            [ InvalidArgumentException::class, false ],
+            [\Exception::class, true],
+            [NotFoundHttpException::class, false],
+            [InvalidArgumentException::class, false],
         ];
     }
 }

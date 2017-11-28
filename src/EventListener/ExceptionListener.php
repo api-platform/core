@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
-use Psr\Log\LoggerInterface;
 
 /**
  * Handles requests errors.
@@ -31,9 +31,9 @@ final class ExceptionListener extends BaseExceptionListener
     private $exceptionToStatus;
 
     /**
-     * @param mixed $controller
+     * @param mixed           $controller
      * @param LoggerInterface $logger
-     * @param array $exceptionToStatus
+     * @param array           $exceptionToStatus
      */
     public function __construct($controller, LoggerInterface $logger = null, array $exceptionToStatus = null)
     {
@@ -57,7 +57,7 @@ final class ExceptionListener extends BaseExceptionListener
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function logException(\Exception $exception, $message)
     {
