@@ -47,6 +47,13 @@ class AppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
-        $loader->load($this->getRootDir().'/config/config.yml');
+        $environment = $this->getEnvironment();
+
+        // patch for behat not supporting %env(APP_ENV)% in older versions
+        if ($appEnv = $_SERVER['APP_ENV'] ?? null && $appEnv !== $environment) {
+            $environment = $appEnv;
+        }
+
+        $loader->load("{$this->getRootDir()}/config/config_{$environment}.yml");
     }
 }

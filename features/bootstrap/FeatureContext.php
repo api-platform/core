@@ -21,6 +21,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
@@ -790,6 +791,25 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
         $person->pets->add($personToPet);
         $this->manager->persist($person);
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is :nb dummydate objects with dummyDate
+     */
+    public function thereIsDummyDateObjectsWithDummyDate(int $nb)
+    {
+        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+
+            $dummy = new DummyDate();
+            $dummy->dummyDate = $date;
+
+            $this->manager->persist($dummy);
+        }
 
         $this->manager->flush();
     }

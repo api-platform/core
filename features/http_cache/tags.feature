@@ -1,3 +1,4 @@
+@sqlite
 Feature: Cache invalidation through HTTP Cache tags
   In order to have a fast API
   As an API software developer

@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -91,6 +93,7 @@ class DateFilter extends AbstractFilter
         }
 
         $nullManagement = $this->properties[$property] ?? null;
+        $type = $this->getDoctrineFieldType($property, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
@@ -104,7 +107,8 @@ class DateFilter extends AbstractFilter
                 $field,
                 self::PARAMETER_BEFORE,
                 $values[self::PARAMETER_BEFORE],
-                $nullManagement
+                $nullManagement,
+                $type
             );
         }
 
@@ -116,7 +120,8 @@ class DateFilter extends AbstractFilter
                 $field,
                 self::PARAMETER_STRICTLY_BEFORE,
                 $values[self::PARAMETER_STRICTLY_BEFORE],
-                $nullManagement
+                $nullManagement,
+                $type
             );
         }
 
@@ -128,7 +133,8 @@ class DateFilter extends AbstractFilter
                 $field,
                 self::PARAMETER_AFTER,
                 $values[self::PARAMETER_AFTER],
-                $nullManagement
+                $nullManagement,
+                $type
             );
         }
 
@@ -140,7 +146,8 @@ class DateFilter extends AbstractFilter
                 $field,
                 self::PARAMETER_STRICTLY_AFTER,
                 $values[self::PARAMETER_STRICTLY_AFTER],
-                $nullManagement
+                $nullManagement,
+                $type
             );
         }
     }
@@ -155,11 +162,22 @@ class DateFilter extends AbstractFilter
      * @param string                      $operator
      * @param string                      $value
      * @param string|null                 $nullManagement
+     * @param string|Type                 $type
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
     {
-        $valueParameter = $queryNameGenerator->generateParameterName($field);
+        try {
+            $value = new \DateTime($value);
+        } catch (\Exception $e) {
+            // Silently ignore this filter if it can not be transformed to a \DateTime
+            $this->logger->notice('Invalid filter ignored', [
+              'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
+          ]);
 
+            return;
+        }
+
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
         $operatorValue = [
             self::PARAMETER_BEFORE => '<=',
             self::PARAMETER_STRICTLY_BEFORE => '<',
@@ -185,7 +203,7 @@ class DateFilter extends AbstractFilter
             ));
         }
 
-        $queryBuilder->setParameter($valueParameter, new \DateTime($value));
+        $queryBuilder->setParameter($valueParameter, $value, $type);
     }
 
     /**
@@ -198,10 +216,7 @@ class DateFilter extends AbstractFilter
      */
     protected function isDateField(string $property, string $resourceClass): bool
     {
-        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-        $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
-
-        return isset(self::DOCTRINE_DATE_TYPES[$metadata->getTypeOfField($propertyParts['field'])]);
+        return isset(self::DOCTRINE_DATE_TYPES[$this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
     /**

@@ -662,6 +662,15 @@ Feature: Date filter on collections
 
   @dropSchema
   @createSchema
+  Scenario: Get collection filtered by date that is not a datetime
+    Given there is "30" dummydate objects with dummyDate
+    When I send a "GET" request to "/dummy_dates?dummyDate[after]=2015-04-28"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @dropSchema
+  @createSchema
   Scenario: Get collection filtered by embedded date
     Given there is "2" embedded dummy objects with dummyDate and embeddedDummy
     When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyDate[after]=2015-04-28"
