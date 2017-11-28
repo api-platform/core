@@ -34,6 +34,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class SearchFilterTest extends KernelTestCase
 {
+    const ALIAS = 'oo';
+
     /**
      * @var ManagerRegistry
      */
@@ -99,7 +101,7 @@ class SearchFilterTest extends KernelTestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $queryBuilder = $this->repository->createQueryBuilder(self::ALIAS);
 
         $filter = new SearchFilter(
             $this->managerRegistry,
@@ -434,7 +436,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_p1', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'exact',
                     ],
@@ -449,7 +451,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) = LOWER(:name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'exact',
                     ],
@@ -467,7 +469,7 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name IN (:name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN (:name_p1)', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => [
                             'CaSE',
@@ -488,7 +490,7 @@ class SearchFilterTest extends KernelTestCase
                     ],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) IN (:name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN (:name_p1)', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => [
                             'case',
@@ -506,7 +508,7 @@ class SearchFilterTest extends KernelTestCase
                     'foo' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s', self::ALIAS, Dummy::class),
                     'parameters' => [],
                 ],
             ],
@@ -523,7 +525,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => [['foo']],
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name = :name_p1 AND o.relatedDummy = :relatedDummy_p2', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1 AND %1$s.relatedDummy = :relatedDummy_p2', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'relatedDummy_p2' => 'foo',
                     ],
@@ -538,7 +540,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -553,7 +555,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -568,7 +570,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(:name_p1, \'%%\')', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\')', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -583,7 +585,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(:name_p1, \'%%\'))', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\'))', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -598,7 +600,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(\'%%\', :name_p1)', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1)', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -613,7 +615,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(\'%%\', :name_p1))', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1))', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -628,7 +630,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.name LIKE CONCAT(:name_p1, \'%%\') OR o.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -643,7 +645,7 @@ class SearchFilterTest extends KernelTestCase
                     'name' => 'partial',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE LOWER(o.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(o.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'partial',
                     ],
@@ -659,7 +661,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o WHERE o.relatedDummy = :relatedDummy_p1', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedDummy = :relatedDummy_p1', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => 'exact',
                     ],
@@ -675,7 +677,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.id' => '/related_dummies/1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'id_p1' => 1,
                     ],
@@ -693,7 +695,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummies' => '1',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummies relatedDummies_a1 WHERE o.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'relatedDummy_p1' => [1, 2],
                         'relatedDummies_p2' => 1,
@@ -711,7 +713,7 @@ class SearchFilterTest extends KernelTestCase
                     'relatedDummy.symfony' => 'exact',
                 ],
                 [
-                    'dql' => sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', Dummy::class),
+                    'dql' => sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', self::ALIAS, Dummy::class),
                     'parameters' => [
                         'name_p1' => 'exact',
                         'symfony_p2' => 'exact',
@@ -726,7 +728,7 @@ class SearchFilterTest extends KernelTestCase
         $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $queryBuilder = $this->repository->createQueryBuilder(self::ALIAS);
         $filter = new SearchFilter(
             $this->managerRegistry,
             $requestStack,
@@ -736,11 +738,11 @@ class SearchFilterTest extends KernelTestCase
             ['relatedDummy.symfony' => null]
         );
 
-        $queryBuilder->innerJoin('o.relatedDummy', 'relateddummy_a1');
+        $queryBuilder->innerJoin(sprintf('%s.relatedDummy', self::ALIAS), 'relateddummy_a1');
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower(sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', Dummy::class));
+        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', self::ALIAS, Dummy::class));
         $this->assertEquals($actual, $expected);
     }
 
@@ -749,7 +751,7 @@ class SearchFilterTest extends KernelTestCase
         $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '2']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $queryBuilder = $this->repository->createQueryBuilder('o');
+        $queryBuilder = $this->repository->createQueryBuilder(self::ALIAS);
         $filter = new SearchFilter(
             $this->managerRegistry,
             $requestStack,
@@ -759,12 +761,12 @@ class SearchFilterTest extends KernelTestCase
             ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]
         );
 
-        $queryBuilder->innerJoin('o.relatedDummy', 'relateddummy_a1');
+        $queryBuilder->innerJoin(sprintf('%s.relatedDummy', self::ALIAS), 'relateddummy_a1');
         $queryBuilder->innerJoin('relateddummy_a1.thirdLevel', 'thirdLevel_a1');
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower(sprintf('SELECT o FROM %s o inner join o.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', Dummy::class));
+        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', self::ALIAS, Dummy::class));
         $this->assertEquals($actual, $expected);
     }
 
@@ -773,8 +775,8 @@ class SearchFilterTest extends KernelTestCase
         $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '3']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $queryBuilder = $this->repository->createQueryBuilder('o');
-        $queryBuilder->leftJoin('o.relatedDummy', 'relateddummy_a1');
+        $queryBuilder = $this->repository->createQueryBuilder(self::ALIAS);
+        $queryBuilder->leftJoin(sprintf('%s.relatedDummy', self::ALIAS), 'relateddummy_a1');
 
         $filter = new SearchFilter(
             $this->managerRegistry,
@@ -787,7 +789,36 @@ class SearchFilterTest extends KernelTestCase
 
         $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
-        $expected = strtolower(sprintf('SELECT o FROM %s o left join o.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', Dummy::class));
+        $expected = strtolower(sprintf('SELECT %s FROM %s %1$s left join %1$s.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', self::ALIAS, Dummy::class));
         $this->assertEquals($actual, $expected);
+    }
+
+    public function testApplyWithAnotherAlias()
+    {
+        $request = Request::create('/api/dummies', 'GET', ['name' => 'exact']);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $queryBuilder = $this->repository->createQueryBuilder('somealias');
+
+        $filter = new SearchFilter(
+            $this->managerRegistry,
+            $requestStack,
+            $this->iriConverter,
+            $this->propertyAccessor,
+            null,
+            [
+                'id' => null,
+                'name' => null,
+            ]
+        );
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op');
+        $actualDql = $queryBuilder->getQuery()->getDQL();
+
+        $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
+
+        $this->assertEquals($expectedDql, $actualDql);
     }
 }

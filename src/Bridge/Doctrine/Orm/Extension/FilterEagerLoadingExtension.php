@@ -54,7 +54,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         }
 
         $joinParts = $queryBuilder->getDQLPart('join');
-        $originAlias = 'o';
+        $originAlias = $queryBuilder->getRootAliases()[0];
 
         if (!$joinParts || !isset($joinParts[$originAlias])) {
             return;

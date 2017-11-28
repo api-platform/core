@@ -41,6 +41,7 @@ class OrderExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
@@ -60,6 +61,7 @@ class OrderExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension();
@@ -82,6 +84,7 @@ class OrderExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal());
@@ -105,6 +108,7 @@ class OrderExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal());
@@ -129,6 +133,7 @@ class OrderExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getEntityManager()->shouldBeCalled()->willReturn($emProphecy->reveal());
+        $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal());
