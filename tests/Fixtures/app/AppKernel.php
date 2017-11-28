@@ -50,7 +50,7 @@ class AppKernel extends Kernel
         $environment = $this->getEnvironment();
 
         // patch for behat not supporting %env(APP_ENV)% in older versions
-        if ($appEnv = $_SERVER['APP_ENV'] ?? null && $appEnv !== $environment) {
+        if (($appEnv = $_SERVER['APP_ENV'] ?? 'test') && $appEnv !== $environment) {
             $environment = $appEnv;
         }
 
