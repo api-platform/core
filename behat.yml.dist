@@ -12,9 +12,9 @@ default:
   extensions:
     'Behat\Symfony2Extension':
       kernel:
-        env:       '%env(APP_ENV)%'
-        debug:     'true'
-        path:      'tests/Fixtures/app/AppKernel.php'
+        env: '%env(APP_ENV)%'
+        debug: 'true'
+        path: 'tests/Fixtures/app/AppKernel.php'
         bootstrap: 'tests/Fixtures/app/bootstrap.php'
     'Behat\MinkExtension':
       base_url: "http://example.com/"
