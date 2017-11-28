@@ -2,7 +2,7 @@
 
 ## 2.2.0
 
-* Add GraphQL support
+* Add GraphQL support``
 * Add JSONAPI support
 * Add a new `@ApiFilter` annotation to directly configure filters from resource classes
 * Add a partial paginator that prevents `COUNT()` SQL queries

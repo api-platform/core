@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Serializer;
@@ -48,10 +49,12 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
     public function createItemMutationResolver(string $resourceClass, string $mutationName): callable
     {
         return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $mutationName) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
             $item = null;
             if ('update' === $mutationName || 'delete' === $mutationName) {
                 $id = $this->getIdentifier($this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass), $args, $info);
-                $item = $this->getItem($resourceClass, $id, $info);
+                $item = $this->getItem($resourceClass, $id, $resourceMetadata, $info);
             }
 
             switch ($mutationName) {
@@ -64,9 +67,7 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
                     return $this->serializer->normalize(
                         $item,
                         null,
-                        ['graphql' => true] + $this->resourceMetadataFactory
-                            ->create($resourceClass)
-                            ->getGraphqlAttribute($mutationName, 'normalization_context', [], true)
+                        ['graphql' => true] + $resourceMetadata->getGraphqlAttribute($mutationName, 'normalization_context', [], true)
                     );
 
                 case 'delete':
@@ -101,11 +102,11 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
         return implode(';', $identifierPairs);
     }
 
-    private function getItem(string $resourceClass, $id, $info)
+    private function getItem(string $resourceClass, $id, ResourceMetadata $resourceMetadata, $info)
     {
         $item = $this->itemDataProvider->getItem($resourceClass, $id);
         if (null === $item) {
-            throw Error::createLocatedError("Item $resourceClass $id not found", $info->fieldNodes, $info->path);
+            throw Error::createLocatedError(sprintf("Item \"%s\" identified by \"%s\" not found", $resourceMetadata->getShortName(), $id), $info->fieldNodes, $info->path);
         }
 
         return $item;
