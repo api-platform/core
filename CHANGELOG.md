@@ -17,6 +17,18 @@
 * Delete the `api_platform.doctrine.listener.view.write` event listener service.
 * Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
 
+## 2.1.4
+
+* Symfony 3.4 and 4.0 compatibility
+* Autowiring strict mode compatibility 
+* Fix a bug preventing to create resource classes in the global namespace
+* Fix Doctrine type conversion in filter's WHERE clauses
+* Fix filters when using eager loading and non-association composite identifier
+* Fix Doctrine type resolution for identifiers (for custom DBALType) 
+* Add missing Symfony Routing options to operations configuration
+* Add SubresourceOperations to metadata
+* Fix disabling of cache pools with the dev environment 
+
 ## 2.1.3
 
 * Don't use dynamic values in Varnish-related service keys (improves Symfony 3.3 compatibility)
