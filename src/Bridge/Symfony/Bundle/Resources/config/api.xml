@@ -172,6 +172,7 @@
         <service id="api_platform.listener.exception" class="ApiPlatform\Core\EventListener\ExceptionListener">
             <argument>api_platform.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>%api_platform.exception_to_status%</argument>
 
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" priority="-96" />
             <tag name="monolog.logger" channel="request" />
