@@ -30,16 +30,11 @@ final class ExceptionListener extends BaseExceptionListener
      */
     private $exceptionToStatus;
 
-    /**
-     * @param mixed           $controller
-     * @param LoggerInterface $logger
-     * @param array           $exceptionToStatus
-     */
-    public function __construct($controller, LoggerInterface $logger = null, array $exceptionToStatus = null)
+    public function __construct($controller, LoggerInterface $logger = null, array $exceptionToStatus = [])
     {
         parent::__construct($controller, $logger);
 
-        $this->exceptionToStatus = $exceptionToStatus ?? [];
+        $this->exceptionToStatus = $exceptionToStatus;
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
@@ -67,11 +62,9 @@ final class ExceptionListener extends BaseExceptionListener
             return;
         }
 
-        $exceptionClass = get_class($exception);
         $statusCode = null;
-
         foreach ($this->exceptionToStatus as $class => $status) {
-            if (is_a($exceptionClass, $class, true)) {
+            if ($exception instanceof $class) {
                 $statusCode = $status;
 
                 break;
