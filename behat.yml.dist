@@ -4,17 +4,17 @@ default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'GraphqlContext'
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
         - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'
   extensions:
     'Behat\Symfony2Extension':
       kernel:
-        env:       'test'
+        env:       '%env(APP_ENV)%'
         debug:     'true'
         path:      'tests/Fixtures/app/AppKernel.php'
         bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -31,6 +31,7 @@ coverage:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
         - 'GraphqlContext'
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
@@ -38,4 +39,3 @@ coverage:
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'

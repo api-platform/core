@@ -746,7 +746,7 @@ class SearchFilterTest extends KernelTestCase
 
     public function testTripleJoin()
     {
-        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '2']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
         $queryBuilder = $this->repository->createQueryBuilder('o');
@@ -770,7 +770,7 @@ class SearchFilterTest extends KernelTestCase
 
     public function testJoinLeft()
     {
-        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => 'bar']);
+        $request = Request::create('/api/dummies', 'GET', ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '3']);
         $requestStack = new RequestStack();
         $requestStack->push($request);
         $queryBuilder = $this->repository->createQueryBuilder('o');
