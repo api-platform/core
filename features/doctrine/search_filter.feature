@@ -19,7 +19,7 @@ Feature: Search filter on collections
     Given there is a DummyCar entity with related colors
     When I send a "GET" request to "/dummy_cars?colors.prop=red"
     Then the response status code should be 200
-    And the JSON should be equal to:
+    And the JSON should be deep equal to:
 		"""
     {
         "@context": "/contexts/DummyCar",
@@ -211,6 +211,7 @@ Feature: Search filter on collections
     }
     """
 
+  @sqlite
   Scenario: Search collection by description (word_start)
     When I send a "GET" request to "/dummies?description=smart"
     Then the response status code should be 200
@@ -234,6 +235,47 @@ Feature: Search filter on collections
                   {"pattern": "^/dummies/1$"},
                   {"pattern": "^/dummies/2$"},
                   {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?description=smart"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  # note on Postgres compared to sqlite the LIKE clause is case sensitive
+  @postgres
+  Scenario: Search collection by description (word_start)
+    When I send a "GET" request to "/dummies?description=smart"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/4$"},
+                  {"pattern": "^/dummies/6$"}
                 ]
               }
             }
@@ -292,3 +334,159 @@ Feature: Search filter on collections
     And the JSON node "_embedded.item[1]._links.relatedDummies" should have 3 elements
     And the JSON node "_embedded.item[2]._links.relatedDummies" should have 3 elements
 
+  @createSchema
+  Scenario: Get collection by id equals 9.99 which is not possible
+    Given there is "30" dummy objects
+    When I send a "GET" request to "/dummies?id=9.99"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?id=9.99"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  Scenario: Get collection by id 10
+    When I send a "GET" request to "/dummies?id=10"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/10$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?id=10"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+
+  @dropSchema
+  Scenario: Get collection ordered by a non valid properties
+    When I send a "GET" request to "/dummies?unknown=0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?unknown=0"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+    When I send a "GET" request to "/dummies?unknown=1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?unknown=1"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """

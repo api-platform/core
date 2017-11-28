@@ -3,16 +3,16 @@ default:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'
   extensions:
     'Behat\Symfony2Extension':
       kernel:
-        env:       'test'
+        env:       '%env(APP_ENV)%'
         debug:     'true'
         path:      'tests/Fixtures/app/AppKernel.php'
         bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -28,10 +28,10 @@ coverage:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'
