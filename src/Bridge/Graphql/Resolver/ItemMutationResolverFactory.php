@@ -106,7 +106,7 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
     {
         $item = $this->itemDataProvider->getItem($resourceClass, $id);
         if (null === $item) {
-            throw Error::createLocatedError(sprintf("Item \"%s\" identified by \"%s\" not found", $resourceMetadata->getShortName(), $id), $info->fieldNodes, $info->path);
+            throw Error::createLocatedError(sprintf('Item "%s" identified by "%s" not found', $resourceMetadata->getShortName(), $id), $info->fieldNodes, $info->path);
         }
 
         return $item;
