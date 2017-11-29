@@ -86,7 +86,7 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
 
     private function getIdentifier(array $identifiers, $args, $info)
     {
-        if (\count($identifiers) === 1) {
+        if (1 === \count($identifiers)) {
             return $args['input'][$identifiers[0]];
         }
 
