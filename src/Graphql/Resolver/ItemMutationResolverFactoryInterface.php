@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
+namespace ApiPlatform\Core\Graphql\Resolver;
 
 /**
  * Creates a function resolving a GraphQL mutation of an item.
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
+ * @experimental
  *
- * @internal
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface ItemMutationResolverFactoryInterface
 {

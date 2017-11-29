@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Graphql\Resolver;
+namespace ApiPlatform\Core\Tests\Graphql\Resolver;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Bridge\Graphql\Resolver\CollectionResolverFactory;
+use ApiPlatform\Core\Graphql\Resolver\CollectionResolverFactory;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;

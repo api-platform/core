@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Action;
+namespace ApiPlatform\Core\Tests\Graphql\Action;
 
-use ApiPlatform\Core\Action\GraphqlEntrypointAction;
-use ApiPlatform\Core\Bridge\Graphql\ExecutorInterface;
-use ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilderInterface;
+use ApiPlatform\Core\Graphql\Action\EntrypointAction;
+use ApiPlatform\Core\Graphql\ExecutorInterface;
+use ApiPlatform\Core\Graphql\Type\SchemaBuilderInterface;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;
@@ -26,13 +26,13 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class GraphqlEntrypointActionTest extends TestCase
+class EntrypointActionTest extends TestCase
 {
     public function testGetAction()
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
-        $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction($request);
 
         $this->assertEquals(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
@@ -42,7 +42,7 @@ class GraphqlEntrypointActionTest extends TestCase
         $request = new Request(['variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName'], [], [], [], [], [], 'graphqlQuery');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/graphql');
-        $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction($request);
 
         $this->assertEquals(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
@@ -52,7 +52,7 @@ class GraphqlEntrypointActionTest extends TestCase
         $request = new Request([], [], [], [], [], [], '{"query": "graphqlQuery", "variables": "[\"graphqlVariable\"]", "operation": "graphqlOperationName"}');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/json');
-        $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction($request);
 
         $this->assertEquals(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
@@ -62,7 +62,7 @@ class GraphqlEntrypointActionTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/xml');
-        $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction($request);
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
@@ -72,7 +72,7 @@ class GraphqlEntrypointActionTest extends TestCase
     {
         $request = new Request();
         $request->setMethod('PUT');
-        $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction($request);
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL query is not valid","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
@@ -82,13 +82,13 @@ class GraphqlEntrypointActionTest extends TestCase
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => 'graphqlVariable', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
-        $mockedEntrypoint = $this->mockGraphqlEntrypointAction($request);
+        $mockedEntrypoint = $this->getEntrypointAction($request);
 
         $this->assertEquals(400, $mockedEntrypoint($request)->getStatusCode());
         $this->assertEquals('{"errors":[{"message":"GraphQL variables are not valid JSON","category":"graphql"}]}', $mockedEntrypoint($request)->getContent());
     }
 
-    private function mockGraphqlEntrypointAction(Request $request): GraphqlEntrypointAction
+    private function getEntrypointAction(Request $request): EntrypointAction
     {
         $schema = $this->prophesize(Schema::class);
         $schemaBuilderProphecy = $this->prophesize(SchemaBuilderInterface::class);
@@ -101,6 +101,6 @@ class GraphqlEntrypointActionTest extends TestCase
 
         $twigProphecy = $this->prophesize(\Twig_Environment::class);
 
-        return new GraphqlEntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $twigProphecy->reveal(), true, true, '');
+        return new EntrypointAction($schemaBuilderProphecy->reveal(), $executorProphecy->reveal(), $twigProphecy->reveal(), true, true, '');
     }
 }

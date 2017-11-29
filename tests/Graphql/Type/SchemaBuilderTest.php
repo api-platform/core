@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Graphql\Type;
+namespace ApiPlatform\Core\Tests\Graphql\Type;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Bridge\Graphql\Resolver\CollectionResolverFactoryInterface;
-use ApiPlatform\Core\Bridge\Graphql\Resolver\ItemMutationResolverFactoryInterface;
-use ApiPlatform\Core\Bridge\Graphql\Resolver\ItemResolverFactoryInterface;
-use ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilder;
+use ApiPlatform\Core\Graphql\Resolver\CollectionResolverFactoryInterface;
+use ApiPlatform\Core\Graphql\Resolver\ItemMutationResolverFactoryInterface;
+use ApiPlatform\Core\Graphql\Resolver\ItemResolverFactoryInterface;
+use ApiPlatform\Core\Graphql\Type\SchemaBuilder;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

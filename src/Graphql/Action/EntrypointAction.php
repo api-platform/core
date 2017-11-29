@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Action;
+namespace ApiPlatform\Core\Graphql\Action;
 
-use ApiPlatform\Core\Bridge\Graphql\ExecutorInterface;
-use ApiPlatform\Core\Bridge\Graphql\Type\SchemaBuilderInterface;
+use ApiPlatform\Core\Graphql\ExecutorInterface;
+use ApiPlatform\Core\Graphql\Type\SchemaBuilderInterface;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class GraphqlEntrypointAction
+final class EntrypointAction
 {
     private $schemaBuilder;
     private $executor;

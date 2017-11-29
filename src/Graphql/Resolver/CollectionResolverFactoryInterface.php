@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
+namespace ApiPlatform\Core\Graphql\Resolver;
 
 /**
  * Creates a function retrieving a collection to resolve a GraphQL query.
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
+ * @experimental
  *
- * @internal
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface CollectionResolverFactoryInterface
 {
