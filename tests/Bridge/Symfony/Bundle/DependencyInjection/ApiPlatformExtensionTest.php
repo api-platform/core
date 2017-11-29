@@ -235,6 +235,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.collection_resolver_factory')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.item_resolver_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.item_mutation_resolver_factory')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder')->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
@@ -561,6 +562,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.collection_resolver_factory',
             'api_platform.graphql.executor',
             'api_platform.graphql.item_resolver_factory',
+            'api_platform.graphql.item_mutation_resolver_factory',
             'api_platform.graphql.schema_builder',
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
