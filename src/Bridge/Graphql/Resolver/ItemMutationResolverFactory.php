@@ -16,11 +16,13 @@ namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Creates a function resolving a GraphQL mutation of an item.
@@ -33,15 +35,19 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
 {
     private $identifiersExtractor;
     private $itemDataProvider;
-    private $serializer;
+    private $normalizer;
     private $resourceMetadataFactory;
     private $dataPersister;
 
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, ItemDataProviderInterface $itemDataProvider, Serializer $serializer, ResourceMetadataFactoryInterface $resourceMetadataFactory, DataPersisterInterface $dataPersister)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, ItemDataProviderInterface $itemDataProvider, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, DataPersisterInterface $dataPersister)
     {
+        if (!$normalizer instanceof DenormalizerInterface) {
+            throw new InvalidArgumentException(sprintf('The normalizer must implements the "%s" interface', DenormalizerInterface::class));
+        }
+
         $this->identifiersExtractor = $identifiersExtractor;
         $this->itemDataProvider = $itemDataProvider;
-        $this->serializer = $serializer;
+        $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->dataPersister = $dataPersister;
     }
@@ -61,10 +67,10 @@ final class ItemMutationResolverFactory implements ItemMutationResolverFactoryIn
                 case 'create':
                 case 'update':
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
-                    $item = $this->serializer->denormalize($args['input'], $resourceClass, null, $context);
+                    $item = $this->normalizer->denormalize($args['input'], $resourceClass, null, $context);
                     $this->dataPersister->persist($item);
 
-                    return $this->serializer->normalize(
+                    return $this->normalizer->normalize(
                         $item,
                         null,
                         ['graphql' => true] + $resourceMetadata->getGraphqlAttribute($mutationName, 'normalization_context', [], true)
