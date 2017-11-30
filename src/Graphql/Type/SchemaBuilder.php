@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Graphql\Type;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Graphql\Resolver\CollectionResolverFactoryInterface;
 use ApiPlatform\Core\Graphql\Resolver\ItemMutationResolverFactoryInterface;
 use ApiPlatform\Core\Graphql\Resolver\ItemResolverFactoryInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;

@@ -33,9 +33,9 @@ abstract class AbstractResolverFactory
     }
 
     /**
-     * @return object|null
-     *
      * @throws ResourceClassNotSupportedException
+     *
+     * @return object|null
      */
     protected function getSubresource(string $rootClass, array $rootResolvedFields, array $rootIdentifiers, string $rootProperty, string $subresourceClass, bool $isCollection)
     {
