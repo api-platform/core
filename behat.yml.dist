@@ -9,6 +9,8 @@ default:
         - 'HttpCacheContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
+      filters:
+        tags: ~@postgres
   extensions:
     'Behat\Symfony2Extension':
       kernel:
