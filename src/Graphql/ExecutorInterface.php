@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Graphql;
+namespace ApiPlatform\Core\Graphql;
 
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
@@ -19,9 +19,9 @@ use GraphQL\Type\Schema;
 /**
  * Wrapper for the GraphQL facade.
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
+ * @experimental
  *
- * @internal
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface ExecutorInterface
 {

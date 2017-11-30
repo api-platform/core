@@ -11,16 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Graphql\Resolver;
+namespace ApiPlatform\Core\Graphql\Resolver;
 
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * Base resolver factory.
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
- *
  * @internal
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 abstract class AbstractResolverFactory
 {
@@ -32,6 +33,8 @@ abstract class AbstractResolverFactory
     }
 
     /**
+     * @throws ResourceClassNotSupportedException
+     *
      * @return object|null
      */
     protected function getSubresource(string $rootClass, array $rootResolvedFields, array $rootIdentifiers, string $rootProperty, string $subresourceClass, bool $isCollection)
