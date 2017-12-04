@@ -6,7 +6,7 @@ cache:
   - '%LOCALAPPDATA%\Composer\files'
 
 init:
-  - SET PATH=c:\tools\php71;%PATH%
+  - SET PATH=c:\tools\php72;%PATH%
 
 environment:
     APP_ENV: 'test'
@@ -14,7 +14,7 @@ environment:
 install:
   - ps: Set-Service wuauserv -StartupType Manual
   - cinst -y php
-  - cd c:\tools\php71
+  - cd c:\tools\php72
   - copy php.ini-production php.ini /Y
   - echo date.timezone="UTC" >> php.ini
   - echo extension_dir=ext >> php.ini
