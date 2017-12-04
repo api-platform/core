@@ -6,10 +6,12 @@ Feature: GraphQL query support
     Given there is 2 dummy objects with relatedDummy
     When I have the following GraphQL request:
     """
-    query DummyWithId($itemId: Int = 1) {
+    query DummyWithId($itemId: ID = "/dummies/1") {
       dummyItem: dummy(id: $itemId) {
+        id
         name
         relatedDummy {
+          id
           name
         }
       }
@@ -18,13 +20,15 @@ Feature: GraphQL query support
     When I send the GraphQL request with variables:
     """
     {
-      "itemId": 2
+      "itemId": "/dummies/2"
     }
     """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummyItem.id" should be equal to "/dummies/2"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #2"
+    And the JSON node "data.dummyItem.relatedDummy.id" should be equal to "/related_dummies/2"
     And the JSON node "data.dummyItem.relatedDummy.name" should be equal to "RelatedDummy #2"
 
   @createSchema
@@ -34,23 +38,25 @@ Feature: GraphQL query support
     When I have the following GraphQL request:
     """
     query DummyWithId1 {
-      dummyItem: dummy(id: 1) {
+      dummyItem: dummy(id: "/dummies/1") {
         name
       }
     }
     query DummyWithId2 {
-      dummyItem: dummy(id: 2) {
+      dummyItem: dummy(id: "/dummies/2") {
+        id
         name
       }
     }
     """
-    When I send the GraphQL request with operation "DummyWithId2"
+    And I send the GraphQL request with operation "DummyWithId2"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummyItem.id" should be equal to "/dummies/2"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #2"
-    When I send the GraphQL request with operation "DummyWithId1"
-    Then the JSON node "data.dummyItem.name" should be equal to "Dummy #1"
+    And I send the GraphQL request with operation "DummyWithId1"
+    And the JSON node "data.dummyItem.name" should be equal to "Dummy #1"
 
   @createSchema
   @dropSchema
@@ -59,7 +65,7 @@ Feature: GraphQL query support
     When I send the following GraphQL request:
     """
     {
-      dummy(id: 2) {
+      dummy(id: "/dummies/2") {
         name
       }
     }
@@ -83,10 +89,12 @@ Feature: GraphQL query support
     fragment dummyFields on DummyConnection {
       edges {
         node {
+          id
           name
           relatedDummy {
             name
             thirdLevel {
+              id
               level
             }
           }

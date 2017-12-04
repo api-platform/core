@@ -6,7 +6,7 @@
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="api_graphql_entrypoint" path="/graphql">
-        <default key="_controller">api_platform.action.graphql_entrypoint</default>
+        <default key="_controller">api_platform.graphql.action.entrypoint</default>
     </route>
 
 </routes>

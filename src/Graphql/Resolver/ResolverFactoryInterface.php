@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Graphql\Resolver;
 
 /**
- * Creates a function retrieving an item to resolve a GraphQL query.
+ * Builds a GraphQL resolver.
  *
  * @experimental
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface ItemResolverFactoryInterface
+interface ResolverFactoryInterface
 {
-    public function createItemResolver(string $resourceClass, string $rootClass): callable;
+    public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable;
 }

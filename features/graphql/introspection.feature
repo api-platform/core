@@ -1,4 +1,4 @@
-Feature: GraphQL query support
+Feature: GraphQL introspection support
 
   @createSchema
   Scenario: Execute an empty GraphQL query
@@ -89,9 +89,10 @@ Feature: GraphQL query support
     When I send the following GraphQL request:
     """
     {
-      dummyItem: dummy(id: 3) {
+      dummyItem: dummy(id: "/dummies/3") {
         name
         relatedDummy {
+          id
           name
           __typename
         }
