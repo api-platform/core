@@ -46,15 +46,13 @@ before_install:
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
-  - if [[ $deps = 'beta' ]]; then composer config minimum-stability beta; fi
   - if [[ $deps != 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
   - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
 
 script:
   - vendor/bin/phpunit
-  - if [[ $APP_ENV = 'test' && $deps = 'low' ]]; then vendor/bin/behat --format=progress --tags='@low'; fi
-  - if [[ ($APP_ENV = 'test' || $APP_ENV = 'mysql') && $deps != 'low' ]]; then vendor/bin/behat --format=progress; fi
-  - if [[ $APP_ENV = 'postgres' ]]; then vendor/bin/behat --tags='~@sqlite&&~@low&&@postgres' --format=progress; fi
+  - if [[ $APP_ENV != 'postgres' ]]; then vendor/bin/behat --format=progress; fi
+  - if [[ $APP_ENV = 'postgres' ]]; then vendor/bin/behat --tags='~@sqlite&&@postgres' --format=progress; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger-cli validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
   - if [[ $lint = 1 ]]; then phpstan analyse -c phpstan.neon -l5 --ansi src tests; fi
