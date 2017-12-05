@@ -21,8 +21,6 @@ matrix:
     - php: '7.2'
       env: deps=low
     - php: '7.2'
-      env: deps=beta
-    - php: '7.2'
       env: SYMFONY_DEPRECATIONS_HELPER=0
     - php: '7.2'
       services:
@@ -48,16 +46,13 @@ before_install:
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
-  - if [[ $deps = 'beta' ]]; then composer config minimum-stability beta; fi
   - if [[ $deps != 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
   - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
 
 script:
   - vendor/bin/phpunit
-  - if [[ $APP_ENV = 'test' && $deps = 'beta' ]]; then vendor/bin/behat --format=progress --tags='~@nobeta&&~@postgres'; fi
-  - if [[ $APP_ENV = 'test' && $deps != 'beta' ]]; then vendor/bin/behat --format=progress --tags='~@postgres'; fi
-  - if [[ $APP_ENV = 'postgres' ]]; then vendor/bin/behat --tags='~@sqlite' --format=progress; fi
-  - if [[ $APP_ENV = 'mysql' ]]; then vendor/bin/behat --tags='~@postgres' --format=progress; fi
+  - if [[ $APP_ENV != 'postgres' ]]; then vendor/bin/behat --format=progress; fi
+  - if [[ $APP_ENV = 'postgres' ]]; then vendor/bin/behat --tags='~@sqlite&&@postgres' --format=progress; fi
   - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger-cli validate swagger.json && rm swagger.json
   - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
   - if [[ $lint = 1 ]]; then phpstan analyse -c phpstan.neon -l5 --ansi src tests; fi

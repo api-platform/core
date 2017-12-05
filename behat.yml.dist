@@ -11,6 +11,8 @@ default:
         - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
+      filters:
+        tags: ~@postgres
   extensions:
     'Behat\Symfony2Extension':
       kernel:
