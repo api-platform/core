@@ -10,7 +10,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
-        tags: ~@postgres&&~@low
+        tags: ~@postgres
   extensions:
     'Behat\Symfony2Extension':
       kernel:

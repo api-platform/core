@@ -1,4 +1,3 @@
-@low
 # Skip while NelmioApiDoc 2 isn't compatible with Symfony 3.4
 Feature: NelmioApiDoc integration
   In order to use NelmioApiDocBundle
