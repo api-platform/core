@@ -19,11 +19,7 @@ use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use Behatch\Json\Json;
-use Behatch\Json\JsonInspector;
-use Behatch\Json\JsonSchema;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use JsonSchema\RefResolver;
-use JsonSchema\Uri\UriRetriever;
 use JsonSchema\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -33,7 +29,6 @@ final class JsonApiContext implements Context
      * @var RestContext
      */
     private $restContext;
-    private $inspector;
     private $validator;
     private $jsonApiSchemaFile;
     private $manager;
@@ -44,11 +39,7 @@ final class JsonApiContext implements Context
             throw new \InvalidArgumentException('The JSON API schema doesn\'t exist.');
         }
 
-        if (class_exists(RefResolver::class)) {
-            $this->inspector = new JsonInspector('javascript');
-        } else {
-            $this->validator = new Validator();
-        }
+        $this->validator = new Validator();
         $this->jsonApiSchemaFile = $jsonApiSchemaFile;
         $this->manager = $doctrine->getManager();
     }
@@ -70,18 +61,6 @@ final class JsonApiContext implements Context
      */
     public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
     {
-        if ($this->inspector) {
-            $refResolver = new RefResolver(new UriRetriever());
-            $refResolver::$maxDepth = 15;
-
-            (new JsonSchema(file_get_contents($this->jsonApiSchemaFile), 'file://'.__DIR__))
-                ->resolve($refResolver)
-                ->validate($this->getJson(), new Validator())
-            ;
-
-            return;
-        }
-
         $json = $this->getJson();
         $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
     }
@@ -162,10 +141,6 @@ final class JsonApiContext implements Context
 
     private function getValueOfNode($node)
     {
-        if ($this->inspector) {
-            return $this->inspector->evaluate($this->getJson(), $node);
-        }
-
         $json = $this->getJson();
         $this->validator->validate($json, $node);
     }
