@@ -85,7 +85,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     }
 
     /**
-     * {@inheritdoc}
      * The context may contain serialization groups which helps defining joined entities that are readable.
      */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
@@ -113,16 +112,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     /**
      * Joins relations to eager load.
      *
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $resourceClass
-     * @param bool                        $forceEager
-     * @param string                      $parentAlias
-     * @param array                       $propertyMetadataOptions
-     * @param array                       $context
-     * @param bool                        $wasLeftJoin             if the relation containing the new one had a left join, we have to force the new one to left join too
-     * @param int                         $joinCount               the number of joins
-     * @param int                         $currentDepth            the current max depth
+     * @param bool $wasLeftJoin  if the relation containing the new one had a left join, we have to force the new one to left join too
+     * @param int  $joinCount    the number of joins
+     * @param int  $currentDepth the current max depth
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
@@ -241,11 +233,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
     /**
      * Gets serializer context.
      *
-     * @param string $resourceClass
-     * @param string $contextType   normalization_context or denormalization_context
-     * @param array  $options       represents the operation name so that groups are the one of the specific operation
-     *
-     * @return array
+     * @param string $contextType normalization_context or denormalization_context
+     * @param array  $options     represents the operation name so that groups are the one of the specific operation
      */
     private function getSerializerContext(string $resourceClass, string $contextType, array $options): array
     {
@@ -269,16 +258,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $context = $resourceMetadata->getAttribute($contextType);
         }
 
-        return $context ? $context : [];
+        return $context ?: [];
     }
 
     /**
      * Gets serializer groups if available, if not it returns the $options array.
      *
      * @param array $options represents the operation name so that groups are the one of the specific operation
-     * @param array $context
-     *
-     * @return array
      */
     private function getSerializerGroups(array $options, array $context): array
     {
