@@ -99,12 +99,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
         $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
         $serializerContext = $this->getSerializerContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
-
-        if (isset($context[AbstractNormalizer::GROUPS])) {
-            $groups = ['serializer_groups' => $context[AbstractNormalizer::GROUPS]];
-        } else {
-            $groups = $this->getSerializerGroups($options, $serializerContext);
-        }
+        $groups = $this->getSerializerGroups($options, $serializerContext);
 
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $groups, $serializerContext);
     }
