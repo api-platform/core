@@ -461,7 +461,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
         }
 
-        if (null === $relatedObject || $propertyMetadata->isReadableLink()) {
+        if (null === $relatedObject || $propertyMetadata->isReadableLink() || !empty($context['attributes'])) {
             if (null === $relatedObject) {
                 unset($context['resource_class']);
             } else {
