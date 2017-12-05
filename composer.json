@@ -37,7 +37,7 @@
         "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0",
         "guzzlehttp/guzzle": "^6.0",
-        "justinrainbow/json-schema": "^1.5 || ^5.0",
+        "justinrainbow/json-schema": "^5.0",
         "nelmio/api-doc-bundle": "^2.13.3",
         "php-mock/php-mock-phpunit": "^2.0",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0",
