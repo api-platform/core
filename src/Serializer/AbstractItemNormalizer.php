@@ -297,7 +297,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
         }
 
-        if (!$this->resourceClassResolver->isResourceClass($className) || $propertyMetadata->isWritableLink()) {
+        if (
+            !$this->resourceClassResolver->isResourceClass($className) ||
+            ($propertyMetadata->isWritableLink() && is_array($value))
+        ) {
             $context['resource_class'] = $className;
 
             return $this->serializer->denormalize($value, $className, $format, $context);
