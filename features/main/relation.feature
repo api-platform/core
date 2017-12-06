@@ -442,3 +442,28 @@ Feature: Relations support
       "related": null
     }
     """
+
+  Scenario: Issue #1547 Passing wrong argument to a relation
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
+    """
+    {
+      "related": "certainly not an iri"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:description" should contain "Expected IRI or nested document"
+
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/relation_embedders" with body:
+    """
+    {
+      "related": 8
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:description" should contain "Expected IRI or nested document"
