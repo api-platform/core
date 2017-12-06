@@ -132,8 +132,12 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            // We don't want to interfere with doctrine on this association
-            if (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch']) {
+            if (
+                // Always skip extra lazy associations
+                ClassMetadataInfo::FETCH_EXTRA_LAZY === $mapping['fetch'] ||
+                // We don't want to interfere with doctrine on this association
+                (false === $forceEager && ClassMetadataInfo::FETCH_EAGER !== $mapping['fetch'])
+            ) {
                 continue;
             }
 
