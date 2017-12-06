@@ -144,6 +144,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 unset($context[AbstractNormalizer::ATTRIBUTES]);
             }
 
+            if (
+                ((!$inAttributes && false === $propertyMetadata->isReadableLink()) || false === $propertyMetadata->isReadable()) &&
+                false === $propertyMetadata->getAttribute('fetchEager', false)
+            ) {
+                continue;
+            }
+
             $isNullable = $mapping['joinColumns'][0]['nullable'] ?? true;
             if (false !== $wasLeftJoin || true === $isNullable) {
                 $method = 'leftJoin';

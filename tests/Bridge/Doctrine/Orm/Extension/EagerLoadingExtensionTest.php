@@ -637,7 +637,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $relationPropertyMetadata = new PropertyMetadata();
-        //$relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
@@ -682,7 +682,7 @@ class EagerLoadingExtensionTest extends TestCase
         $requestStack->push($request);
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
-        $serializerContextBuilderProphecy->createFromRequest($request, true)->shouldBeCalled()->willReturn([AbstractNormalizer::GROUPS => ['foo']]);
+        $serializerContextBuilderProphecy->createFromRequest($request, true)->shouldBeCalled()->willReturn([AbstractNormalizer::GROUPS => ['foo'], AbstractNormalizer::ATTRIBUTES => ['relatedDummy' => ['id', 'name']]]);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, $requestStack, $serializerContextBuilderProphecy->reveal(), true);
