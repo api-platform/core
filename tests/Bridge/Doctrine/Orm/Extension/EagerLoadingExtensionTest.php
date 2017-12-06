@@ -625,6 +625,70 @@ class EagerLoadingExtensionTest extends TestCase
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 
+    public function testAttributes()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $relatedNameCollection = new PropertyNameCollection(['id', 'name']);
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
+
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+
+        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
+        $namePropertyMetadata = new PropertyMetadata();
+        $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
+
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', ['serializer_groups' => ['foo']])->willReturn($idPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', ['serializer_groups' => ['foo']])->willReturn($namePropertyMetadata)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->associationMappings = [
+            'relatedDummy' => ['fetch' => 3, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+        ];
+
+        $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
+
+        foreach ($relatedNameCollection as $property) {
+            if ('id' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(true)->shouldBeCalled();
+            }
+        }
+
+        $relatedClassMetadataProphecy->associationMappings = [];
+
+        $emProphecy = $this->prophesize(EntityManager::class);
+        $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+        $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
+
+        $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
+
+        $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalled(1);
+        $queryBuilderProphecy->addSelect('partial relatedDummy_a1.{id,name}')->shouldBeCalled(1);
+
+        $request = Request::create('/api/dummies', 'GET', []);
+
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest($request, true)->shouldBeCalled()->willReturn([AbstractNormalizer::GROUPS => ['foo'], AbstractNormalizer::ATTRIBUTES => ['relatedDummy' => ['id', 'name']]]);
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+        $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, $requestStack, $serializerContextBuilderProphecy->reveal(), true);
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
+    }
+
     public function testApplyToCollectionNoPartial()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
