@@ -123,6 +123,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $qb = $this->prophesize(QueryBuilder::class);
         $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Expr\Andx());
         $qb->getDQLPart('join')->shouldBeCalled()->willReturn(null);
+        $qb->getRootAliases()->shouldBeCalled()->willReturn(['o']);
         $qb->getEntityManager()->willReturn($em);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);

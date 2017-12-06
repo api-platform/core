@@ -58,12 +58,13 @@ final class QueryBuilderHelper
     private static function getExistingJoin(QueryBuilder $queryBuilder, string $alias, string $association)
     {
         $parts = $queryBuilder->getDQLPart('join');
+        $rootAlias = $queryBuilder->getRootAliases()[0];
 
-        if (!isset($parts['o'])) {
+        if (!isset($parts[$rootAlias])) {
             return null;
         }
 
-        foreach ($parts['o'] as $join) {
+        foreach ($parts[$rootAlias] as $join) {
             /** @var Join $join */
             if (sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
                 return $join;

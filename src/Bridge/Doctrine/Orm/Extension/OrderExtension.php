@@ -41,6 +41,8 @@ final class OrderExtension implements QueryCollectionExtensionInterface
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
         if (null !== $this->resourceMetadataFactory) {
@@ -54,9 +56,9 @@ final class OrderExtension implements QueryCollectionExtensionInterface
                     }
                     if (false === ($pos = strpos($field, '.'))) {
                         // Configure default filter with property
-                        $field = 'o.'.$field;
+                        $field = "{$rootAlias}.{$field}";
                     } else {
-                        $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, 'o', substr($field, 0, $pos));
+                        $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $rootAlias, substr($field, 0, $pos));
                         $field = sprintf('%s.%s', $alias, substr($field, $pos + 1));
                     }
                     $queryBuilder->addOrderBy($field, $order);
@@ -68,7 +70,7 @@ final class OrderExtension implements QueryCollectionExtensionInterface
 
         if (null !== $this->order) {
             foreach ($identifiers as $identifier) {
-                $queryBuilder->addOrderBy('o.'.$identifier, $this->order);
+                $queryBuilder->addOrderBy("{$rootAlias}.{$identifier}", $this->order);
             }
         }
     }

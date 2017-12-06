@@ -108,10 +108,11 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
      */
     private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
     {
+        $alias = $queryBuilder->getRootAliases()[0];
         foreach ($identifiers as $identifier => $value) {
             $placeholder = ':id_'.$identifier;
             $expression = $queryBuilder->expr()->eq(
-                'o.'.$identifier,
+                "{$alias}.{$identifier}",
                 $placeholder
             );
 

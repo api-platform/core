@@ -70,7 +70,7 @@ class RangeFilter extends AbstractFilter
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
