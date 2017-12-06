@@ -7,6 +7,10 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+env:
+  global:
+    - SYMFONY_DEPRECATIONS_HELPER=weak
+
 matrix:
   include:
     - php: '7.0'
