@@ -69,15 +69,11 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        $options = [];
-
-        if (null !== $operationName) {
-            $options = ['collection_operation_name' => $operationName];
-        }
+        $options = null === $operationName ? [] : ['collection_operation_name' => $operationName];
 
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
         $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
-        $serializerContext = $this->getSerializerContext($resourceClass, 'normalization_context', $options);
+        $serializerContext = $this->getPropertyMetadataOptions($resourceClass, 'normalization_context', $options);
 
         $groups = $this->getSerializerGroups($options, $serializerContext);
 
@@ -89,19 +85,15 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
-        $options = [];
-
-        if (null !== $operationName) {
-            $options = ['item_operation_name' => $operationName];
-        }
+        $options = null === $operationName ? [] : ['item_operation_name' => $operationName];
 
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
         $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
         $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-        $serializerContext = $this->getSerializerContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
-        $groups = $this->getSerializerGroups($options, $serializerContext);
+        $propertyMetadataOptions = $this->getPropertyMetadataOptions($context['resource_class'] ?? $resourceClass, $contextType, $options);
+        $serializerGroups = $this->getSerializerGroups($options, $propertyMetadataOptions);
 
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $groups, $serializerContext);
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $serializerGroups, $propertyMetadataOptions);
     }
 
     /**
@@ -231,10 +223,9 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      * @param string $contextType normalization_context or denormalization_context
      * @param array  $options     represents the operation name so that groups are the one of the specific operation
      */
-    private function getSerializerContext(string $resourceClass, string $contextType, array $options): array
+    private function getPropertyMetadataOptions(string $resourceClass, string $contextType, array $options): array
     {
         $request = null;
-
         if (null !== $this->requestStack && null !== $this->serializerContextBuilder) {
             $request = $this->requestStack->getCurrentRequest();
         }
@@ -244,7 +235,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
         if (isset($options['collection_operation_name'])) {
             $context = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $contextType, null, true);
         } elseif (isset($options['item_operation_name'])) {
@@ -263,10 +253,10 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      */
     private function getSerializerGroups(array $options, array $context): array
     {
-        if (empty($context[AbstractNormalizer::GROUPS])) {
-            return $options;
+        if (!empty($context[AbstractNormalizer::GROUPS])) {
+            $options['serializer_groups'] = $context[AbstractNormalizer::GROUPS];
         }
 
-        return ['serializer_groups' => $context[AbstractNormalizer::GROUPS]];
+        return $options;
     }
 }
