@@ -137,13 +137,15 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            if ($useAttributes = isset($context[AbstractNormalizer::ATTRIBUTES])) {
+            if (isset($context[AbstractNormalizer::ATTRIBUTES])) {
                 if ($inAttributes = isset($context[AbstractNormalizer::ATTRIBUTES][$association])) {
                     // prepare the child context
                     $context[AbstractNormalizer::ATTRIBUTES] = $context[AbstractNormalizer::ATTRIBUTES][$association];
                 } else {
                     unset($context[AbstractNormalizer::ATTRIBUTES]);
                 }
+            } else {
+                $inAttributes = null;
             }
 
             $isNotReadableLink = false === $propertyMetadata->isReadableLink();
@@ -151,7 +153,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 false === $propertyMetadata->getAttribute('fetchEager', false) &&
                 (
                     false === $propertyMetadata->isReadable() ||
-                    ((!$useAttributes && $isNotReadableLink) || ($useAttributes && !$inAttributes))
+                    ((null === $inAttributes && $isNotReadableLink) || (false === $inAttributes))
                 )
             ) {
                 continue;
