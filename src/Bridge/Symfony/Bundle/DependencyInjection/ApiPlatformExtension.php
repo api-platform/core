@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -96,6 +97,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.item');
         $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
+        $container->registerForAutoconfiguration(FilterInterface::class)
+            ->addTag('api_platform.filter');
 
         if (interface_exists(ValidatorInterface::class)) {
             $loader->load('validator.xml');
