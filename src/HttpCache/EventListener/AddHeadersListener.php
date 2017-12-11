@@ -27,7 +27,7 @@ final class AddHeadersListener
 {
     private $etag;
     private $maxAge;
-    private $sharedMaxage;
+    private $sharedMaxAge;
     private $vary;
     private $public;
 
@@ -35,7 +35,7 @@ final class AddHeadersListener
     {
         $this->etag = $etag;
         $this->maxAge = $maxAge;
-        $this->sharedMaxage = $sharedMaxAge;
+        $this->sharedMaxAge = $sharedMaxAge;
         $this->vary = $vary;
         $this->public = $public;
     }
@@ -65,8 +65,8 @@ final class AddHeadersListener
             $response->setVary(array_diff($this->vary, $response->getVary()), false);
         }
 
-        if (null !== $this->sharedMaxage) {
-            $response->setSharedMaxAge($this->sharedMaxage);
+        if (null !== $this->sharedMaxAge) {
+            $response->setSharedMaxAge($this->sharedMaxAge);
         }
 
         if (null !== $this->public) {
