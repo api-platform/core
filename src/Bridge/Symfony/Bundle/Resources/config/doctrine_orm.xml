@@ -119,6 +119,7 @@
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="64" />
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="64" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.eager_loading" />
 
         <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -126,6 +127,7 @@
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="32" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension" alias="api_platform.doctrine.orm.query_extension.filter" />
 
         <!-- This needs to be executed right after the filter extension -->
 
@@ -135,6 +137,7 @@
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="31" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.filter_eager_loading" />
 
         <service id="api_platform.doctrine.orm.query_extension.pagination" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine" />
@@ -151,6 +154,7 @@
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="8" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" alias="api_platform.doctrine.orm.query_extension.pagination" />
 
         <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
@@ -158,6 +162,7 @@
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="16" />
         </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
     </services>
 
 </container>

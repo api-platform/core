@@ -15,6 +15,11 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
@@ -22,6 +27,10 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -246,7 +255,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $this->extension->load(
             array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => [__FILE__]]]]),
-            $this->getPartialContainerBuilderProphecy()->reveal()
+            $this->getPartialContainerBuilderProphecy(false)->reveal()
         );
     }
 
@@ -283,7 +292,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
-    private function getPartialContainerBuilderProphecy()
+    private function getPartialContainerBuilderProphecy($test = false)
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $childDefinitionProphecy = $this->prophesize(ChildDefinition::class);
@@ -460,6 +469,10 @@ class ApiPlatformExtensionTest extends TestCase
             CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
             ItemDataProviderInterface::class => 'api_platform.item_data_provider',
             SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
+            ResourceNameCollectionFactoryInterface::class => 'api_platform.metadata.resource.name_collection_factory',
+            ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
+            PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
+            PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -581,7 +594,18 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
 
-        $containerBuilderProphecy->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish')->shouldBeCalled();
+        $aliases = [
+            'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
+            EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
+            FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
+            FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
+            PaginationExtension::class => 'api_platform.doctrine.orm.query_extension.pagination',
+            OrderExtension::class => 'api_platform.doctrine.orm.query_extension.order',
+        ];
+
+        foreach ($aliases as $alias => $service) {
+            $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
+        }
 
         return $containerBuilderProphecy;
     }
