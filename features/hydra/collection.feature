@@ -395,3 +395,45 @@ Feature: Collections support
       "additionalProperties": false
     }
     """
+
+  @dropSchema
+  @createSchema
+  Scenario: Allow passing "0" to `itemsPerPage`
+    When I send a "GET" request to "/dummies?itemsPerPage=0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 30},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 0
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?itemsPerPage=0$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:first": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"},
+            "hydra:last": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"},
+            "hydra:previous": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"},
+            "hydra:next": {"pattern": "^/dummies\\?itemsPerPage=0&page=1$"}
+          }
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
+    }
+    """
+
+    When I send a "GET" request to "/dummies?itemsPerPage=0&page=2"
+    Then the response status code should be 400
+    And the JSON node "hydra:description" should be equal to "Page should not be greater than 1 if itemsPegPage is equal to 0"
