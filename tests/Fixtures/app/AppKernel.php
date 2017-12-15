@@ -12,6 +12,7 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
@@ -22,12 +23,12 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
+
 /**
  * AppKernel for tests.
  *
@@ -77,7 +78,7 @@ class AppKernel extends Kernel
             'providers' => [
                 'chain_provider' => [
                     'chain' => [
-                        'providers' => ['in_memory', 'fos_userbundle']
+                        'providers' => ['in_memory', 'fos_userbundle'],
                     ],
                 ],
                 'in_memory' => [
