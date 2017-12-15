@@ -31,6 +31,7 @@ security:
             provider: chain_provider
             http_basic: ~
             anonymous: ~
+            logout_on_user_change: true
 
     access_control:
         - { path: ^/, role: IS_AUTHENTICATED_ANONYMOUSLY }
