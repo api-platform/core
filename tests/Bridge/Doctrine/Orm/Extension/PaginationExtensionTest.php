@@ -62,14 +62,10 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Item per page parameter should not be less than or equal to 0
-     */
     public function testApplyToCollectionWithItemPerPageZero()
     {
         $requestStack = new RequestStack();
-        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]));
+        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]));
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $attributes = [
@@ -81,8 +77,8 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->setFirstResult(40)->willReturn($queryBuilderProphecy)->shouldNotBeCalled();
-        $queryBuilderProphecy->setMaxResults(40)->shouldNotBeCalled();
+        $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(0)->shouldBeCalled();
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $extension = new PaginationExtension(
@@ -100,7 +96,43 @@ class PaginationExtensionTest extends TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Item per page parameter should not be less than or equal to 0
+     * @expectedExceptionMessage Page should not be greater than 1 if itemsPegPage is equal to 0
+     */
+    public function testApplyToCollectionWithItemPerPageZeroAndPage2()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_items_per_page' => 0,
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldNotBeCalled();
+        $queryBuilderProphecy->setMaxResults(0)->shouldNotBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactory,
+            true,
+            false,
+            false,
+            0,
+            '_page'
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Item per page parameter should not be less than 0
      */
     public function testApplyToCollectionWithItemPerPageLessThen0()
     {
@@ -111,7 +143,7 @@ class PaginationExtensionTest extends TestCase
         $attributes = [
             'pagination_enabled' => true,
             'pagination_client_enabled' => true,
-            'pagination_items_per_page' => 0,
+            'pagination_items_per_page' => -20,
         ];
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();

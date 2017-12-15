@@ -81,12 +81,18 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
         }
 
-        if (0 >= $itemsPerPage) {
-            throw new InvalidArgumentException('Item per page parameter should not be less than or equal to 0');
+        if (0 > $itemsPerPage) {
+            throw new InvalidArgumentException('Item per page parameter should not be less than 0');
+        }
+
+        $page = $request->query->get($this->pageParameterName, 1);
+
+        if (0 === $itemsPerPage && 1 < $page) {
+            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPegPage is equal to 0');
         }
 
         $queryBuilder
-            ->setFirstResult(($request->query->get($this->pageParameterName, 1) - 1) * $itemsPerPage)
+            ->setFirstResult(($page - 1) * $itemsPerPage)
             ->setMaxResults($itemsPerPage);
     }
 
