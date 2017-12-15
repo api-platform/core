@@ -100,7 +100,6 @@ class AppKernel extends Kernel
                     'provider' => 'chain_provider',
                     'http_basic' => null,
                     'anonymous' => null,
-                    'logout_on_user_change' => true,
                 ],
             ],
             'access_control' => [
