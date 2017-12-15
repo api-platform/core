@@ -13,5 +13,5 @@ relation_embedded.custom_get:
         _controller:     'TestBundle:Custom:custom'
 
 controller:
-    resource: "@TestBundle/Controller"
+    resource: '@TestBundle/Controller'
     type:     annotation
