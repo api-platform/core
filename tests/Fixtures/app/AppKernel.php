@@ -38,7 +38,7 @@ class AppKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    public function registerBundles(): iterable
+    public function registerBundles(): array
     {
         return [
             new FrameworkBundle(),
