@@ -108,7 +108,7 @@ class AppKernel extends Kernel
             ],
         ];
 
-        if (method_exists(ContextListener, 'setLogoutOnUserChange')) {
+        if (method_exists(ContextListener::class, 'setLogoutOnUserChange')) {
             $securityConfig['firewalls']['default']['logout_on_user_change'] = true;
         }
 
