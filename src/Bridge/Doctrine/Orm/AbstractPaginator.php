@@ -46,6 +46,10 @@ abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginator
      */
     public function getCurrentPage(): float
     {
+        if (0 >= $this->maxResults) {
+            return 1.;
+        }
+
         return floor($this->firstResult / $this->maxResults) + 1.;
     }
 

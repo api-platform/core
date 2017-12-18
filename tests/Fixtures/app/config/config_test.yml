@@ -47,7 +47,6 @@ api_platform:
             client_items_per_page:     true
             client_partial:            true
             items_per_page:            3
-    enable_nelmio_api_doc: true
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
         ApiPlatform\Core\Exception\InvalidArgumentException: 400
@@ -70,16 +69,6 @@ fos_user:
     from_email:
         address:      'no-reply@les-tilleuls.coop'
         sender_name:  'Kévin Dunglas'
-
-nelmio_api_doc:
-    sandbox:
-        accept_type:        'application/json'
-        body_format:
-            formats:        [ 'json' ]
-            default_format: 'json'
-        request_format:
-            formats:
-                json:       'application/json'
 
 parameters:
     container.autowiring.strict_mode: true

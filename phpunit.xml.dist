@@ -12,6 +12,7 @@
         <ini name="memory_limit" value="-1" />
         <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
         <server name="KERNEL_CLASS" value="AppKernel" />
+        <server name="LEGACY" value="0" />
     </php>
 
     <testsuites>
