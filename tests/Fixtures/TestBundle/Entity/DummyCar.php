@@ -47,6 +47,11 @@ class DummyCar
      */
     private $colors;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Brand", mappedBy="car")
+     */
+    public $brand;
+
     public function __construct()
     {
         $this->colors = new ArrayCollection();

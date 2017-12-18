@@ -12,6 +12,7 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Brand;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
@@ -594,7 +595,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there is a DummyCar entity with related colors
      */
-    public function thereIsAFooEntityWithRelatedBars()
+    public function thereIsADummyCarEntityWithRelatedColors()
     {
         $foo = new DummyCar();
         $this->manager->persist($foo);
@@ -762,6 +763,22 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->dummyDate = $date;
 
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a brand and :nb DummyCar
+     */
+    public function thereAreSomeBrands(int $nb)
+    {
+        $brand = new Brand();
+        $this->manager->persist($brand);
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $foo = new DummyCar();
+            $this->manager->persist($foo);
         }
 
         $this->manager->flush();
