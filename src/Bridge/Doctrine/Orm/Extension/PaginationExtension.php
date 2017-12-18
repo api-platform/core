@@ -93,11 +93,17 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
             $itemsPerPage = (null !== $this->maximumItemPerPage && $itemsPerPage >= $this->maximumItemPerPage ? $this->maximumItemPerPage : $itemsPerPage);
         }
 
-        if (0 >= $itemsPerPage) {
-            throw new InvalidArgumentException('Item per page parameter should not be less than or equal to 0');
+        if (0 > $itemsPerPage) {
+            throw new InvalidArgumentException('Item per page parameter should not be less than 0');
         }
 
-        $firstResult = ($this->getPaginationParameter($request, $this->pageParameterName, 1) - 1) * $itemsPerPage;
+        $page = $this->getPaginationParameter($request, $this->pageParameterName, 1);
+
+        if (0 === $itemsPerPage && 1 < $page) {
+            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPegPage is equal to 0');
+        }
+
+        $firstResult = ($page - 1) * $itemsPerPage;
         if ($request->attributes->get('_graphql')) {
             $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
             if (isset($collectionArgs[$resourceClass]['after'])) {

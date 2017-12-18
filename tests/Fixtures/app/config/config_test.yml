@@ -1,11 +1,5 @@
-imports:
-    - { resource: security.yml }
-
 framework:
     secret:                           'dunglas.fr'
-    router:
-        resource:                     '%kernel.root_dir%/config/routing.yml'
-        strict_requirements:          '%kernel.debug%'
     validation:
         enable_annotations:            true
     serializer:
