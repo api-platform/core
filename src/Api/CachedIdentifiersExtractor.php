@@ -59,7 +59,7 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
         foreach ($keys as $propertyName) {
             $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
 
-            if (!is_object($identifiers[$propertyName])) {
+            if (!\is_object($identifiers[$propertyName])) {
                 continue;
             }
 

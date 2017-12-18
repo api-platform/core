@@ -39,7 +39,7 @@ final class GroupFilter implements FilterInterface
      */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context)
     {
-        if (!is_array($groups = $request->query->get($this->parameterName))) {
+        if (!\is_array($groups = $request->query->get($this->parameterName))) {
             return;
         }
         if (null !== $this->whitelist) {

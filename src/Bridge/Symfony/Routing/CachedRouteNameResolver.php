@@ -51,7 +51,7 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
             // do nothing
         }
 
-        if (func_num_args() > 2) {
+        if (\func_num_args() > 2) {
             $context = func_get_arg(2);
         } else {
             $context = [];

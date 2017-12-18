@@ -34,7 +34,7 @@ final class DashOperationPathResolver implements OperationPathResolverInterface
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        if (func_num_args() >= 4) {
+        if (\func_num_args() >= 4) {
             $operationName = func_get_arg(3);
         } else {
             $operationName = null;

@@ -43,6 +43,6 @@ final class ResourceNameCollection implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        return count($this->classes);
+        return \count($this->classes);
     }
 }

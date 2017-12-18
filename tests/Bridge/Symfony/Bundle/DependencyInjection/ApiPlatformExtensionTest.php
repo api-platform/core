@@ -195,7 +195,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $builder = new ContainerBuilder();
 
-        $loader = new XmlFileLoader($builder, new FileLocator(dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
+        $loader = new XmlFileLoader($builder, new FileLocator(\dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
         $loader->load('api.xml');
         $loader->load('fos_user.xml');
 

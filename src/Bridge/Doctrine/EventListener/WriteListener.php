@@ -78,7 +78,7 @@ final class WriteListener
     private function getManager(string $resourceClass, $data)
     {
         $objectManager = $this->managerRegistry->getManagerForClass($resourceClass);
-        if (null === $objectManager || !is_object($data)) {
+        if (null === $objectManager || !\is_object($data)) {
             return null;
         }
 

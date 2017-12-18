@@ -75,9 +75,9 @@ class ExistsFilter extends AbstractFilter
             return;
         }
 
-        if (in_array($value[self::QUERY_PARAMETER_KEY], ['true', '1', '', null], true)) {
+        if (\in_array($value[self::QUERY_PARAMETER_KEY], ['true', '1', '', null], true)) {
             $value = true;
-        } elseif (in_array($value[self::QUERY_PARAMETER_KEY], ['false', '0'], true)) {
+        } elseif (\in_array($value[self::QUERY_PARAMETER_KEY], ['false', '0'], true)) {
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [

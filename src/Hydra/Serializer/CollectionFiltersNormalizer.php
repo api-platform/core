@@ -82,7 +82,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         $requestParts = parse_url($context['request_uri'] ?? '');
-        if (!is_array($requestParts)) {
+        if (!\is_array($requestParts)) {
             return $data;
         }
 

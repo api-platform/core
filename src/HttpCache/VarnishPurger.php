@@ -48,7 +48,7 @@ final class VarnishPurger implements PurgerInterface
             return sprintf('(^|\,)%s($|\,)', preg_quote($iri));
         }, $iris);
 
-        $regex = count($parts) > 1 ? sprintf('(%s)', implode(')|(', $parts)) : array_shift($parts);
+        $regex = \count($parts) > 1 ? sprintf('(%s)', implode(')|(', $parts)) : array_shift($parts);
 
         foreach ($this->clients as $client) {
             $client->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => $regex]]);

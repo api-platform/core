@@ -155,7 +155,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
-                        if (!in_array($parameter['name'], $parametersMemory, true)) {
+                        if (!\in_array($parameter['name'], $parametersMemory, true)) {
                             $pathOperation['parameters'][] = $parameter;
                         }
                     }
@@ -658,7 +658,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $doc['info']['description'] = $description;
         }
 
-        if (count($definitions) > 0) {
+        if (\count($definitions) > 0) {
             $doc['definitions'] = $definitions;
         }
 

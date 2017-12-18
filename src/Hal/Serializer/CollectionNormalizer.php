@@ -48,7 +48,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
+        return self::FORMAT === $format && (\is_array($data) || ($data instanceof \Traversable));
     }
 
     /**
@@ -105,8 +105,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['_links']['item'][] = $item['_links']['self'];
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
+        if (\is_array($object) || $object instanceof \Countable) {
+            $data['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : \count($object);
         }
 
         if ($isPaginator) {

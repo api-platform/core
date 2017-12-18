@@ -51,7 +51,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         $query = $paginator->getQuery();
         $this->firstResult = $query->getFirstResult();
         $this->maxResults = $query->getMaxResults();
-        $this->totalItems = count($paginator);
+        $this->totalItems = \count($paginator);
     }
 
     /**
@@ -111,6 +111,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     public function count()
     {
-        return count($this->getIterator());
+        return \count($this->getIterator());
     }
 }

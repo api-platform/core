@@ -37,7 +37,7 @@ final class RouteNameResolver implements RouteNameResolverInterface
      */
     public function getRouteName(string $resourceClass, $operationType /**, array $context = [] **/): string
     {
-        if (func_num_args() > 2) {
+        if (\func_num_args() > 2) {
             $context = func_get_arg(2);
         } else {
             $context = [];
@@ -50,7 +50,7 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
             $methods = $route->getMethods();
 
-            if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || in_array('GET', $methods, true))) {
+            if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || \in_array('GET', $methods, true))) {
                 if (OperationType::SUBRESOURCE === $operationType && false === $this->isSameSubresource($context, $route->getDefault('_api_subresource_context'))) {
                     continue;
                 }
