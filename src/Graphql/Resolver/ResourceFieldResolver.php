@@ -40,8 +40,8 @@ final class ResourceFieldResolver
         }
 
         if ('_id' === $info->fieldName && isset($source['id'])) {
-            $property = 'id';
-        } elseif (isset($source[$info->fieldName])) {
+            $property = $source['id'];
+        } elseif (\is_array($source) && isset($source[$info->fieldName])) {
             $property = $source[$info->fieldName];
         } elseif (isset($source->{$info->fieldName})) {
             $property = $source->{$info->fieldName};
