@@ -435,10 +435,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Normalizes a collection of relations (to-many).
      *
-     * @param object      $relatedObject
-     * @param string|null $format
+     * @param iterable $attributeValue
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, iterable $attributeValue, string $resourceClass, string $format = null, array $context): array
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
     {
         $value = [];
         foreach ($attributeValue as $index => $obj) {

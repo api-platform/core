@@ -47,7 +47,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, iterable $attributeValue, string $resourceClass, string $format = null, array $context): array
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
     {
         // to-many are handled directly by the GraphQL resolver
         return [];
