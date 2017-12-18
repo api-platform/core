@@ -175,7 +175,7 @@ class CollectionResolverFactoryTest extends TestCase
     }
 
     /**
-     * @param array|PaginatorInterface $collection
+     * @param array|\Iterator $collection
      */
     private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled): CollectionResolverFactory
     {
