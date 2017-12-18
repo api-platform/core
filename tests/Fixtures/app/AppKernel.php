@@ -51,7 +51,7 @@ class AppKernel extends Kernel
             new TestBundle(),
         ];
 
-        if ($_ENV['LEGACY'] ?? true) {
+        if ($_SERVER['LEGACY'] ?? true) {
             $bundles[] = new NelmioApiDocBundle();
         }
 
@@ -62,7 +62,7 @@ class AppKernel extends Kernel
     {
         $routes->import('config/routing.yml');
 
-        if ($_ENV['LEGACY'] ?? true) {
+        if ($_SERVER['LEGACY'] ?? true) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
         }
     }
@@ -121,7 +121,7 @@ class AppKernel extends Kernel
         }
         $c->loadFromExtension('security', $securityConfig);
 
-        if ($_ENV['LEGACY'] ?? true) {
+        if ($_SERVER['LEGACY'] ?? true) {
             $c->loadFromExtension('nelmio_api_doc', [
                 'sandbox' => [
                     'accept_type' => 'application/json',

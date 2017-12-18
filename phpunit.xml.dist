@@ -10,9 +10,9 @@
     <php>
         <ini name="error_reporting" value="-1" />
         <ini name="memory_limit" value="-1" />
-        <env name="KERNEL_DIR" value="tests/Fixtures/app/" />
-        <env name="KERNEL_CLASS" value="AppKernel" />
-        <env name="LEGACY" value="0" />
+        <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
+        <server name="KERNEL_CLASS" value="AppKernel" />
+        <server name="LEGACY" value="0" />
     </php>
 
     <testsuites>
