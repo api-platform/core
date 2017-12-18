@@ -209,8 +209,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     break;
                 }
 
+                $className = $type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
                 try {
-                    $className = $type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
                     $resourceMetadata = $this->resourceMetadataFactory->create($className);
                 } catch (ResourceClassNotFoundException $e) {
                     throw new InvalidTypeException(sprintf('The class "%s" does not exist.', $className));
@@ -260,13 +260,17 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private function getResourceObjectTypeFields(string $resource, bool $isInput = false, bool $isMutation = false, string $mutationName = null): array
     {
         $fields = [];
+        $idField = ['type' => GraphQLType::id()];
+
+        if ('delete' === $mutationName) {
+            return ['id' => $idField];
+        }
+
+        if (!$isInput || 'create' !== $mutationName) {
+            $fields['id'] = $idField;
+        }
+
         foreach ($this->propertyNameCollectionFactory->create($resource) as $property) {
-            $idField = ['type' => GraphQLType::id()];
-
-            if ('delete' === $mutationName) {
-                return ['id' => $idField];
-            }
-
             $propertyMetadata = $this->propertyMetadataFactory->create($resource, $property);
             if (
                 null === ($propertyType = $propertyMetadata->getType())
@@ -279,10 +283,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($fieldConfiguration = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $isInput, $isMutation, $mutationName)) {
                 $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
             }
-        }
-
-        if (!$isInput || 'create' !== $mutationName) {
-            $fields['id'] = $idField;
         }
 
         return $fields;

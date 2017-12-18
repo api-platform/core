@@ -76,7 +76,7 @@ Feature: GraphQL introspection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.type1.description" should be equal to "Dummy Product."
-    And the JSON node "data.type1.fields[0].type.name" should be equal to "DummyAggregateOfferConnection"
+    And the JSON node "data.type1.fields[1].type.name" should be equal to "DummyAggregateOfferConnection"
     And the JSON node "data.type2.fields[0].name" should be equal to "edges"
     And the JSON node "data.type2.fields[0].type.ofType.name" should be equal to "DummyAggregateOfferEdge"
     And the JSON node "data.type3.fields[0].name" should be equal to "node"

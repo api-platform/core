@@ -174,7 +174,10 @@ class CollectionResolverFactoryTest extends TestCase
         );
     }
 
-    private function createCollectionResolverFactory(iterable $collection, array $subcollection, array $identifiers, bool $paginationEnabled): CollectionResolverFactory
+    /**
+     * @param array|PaginatorInterface $collection
+     */
+    private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled): CollectionResolverFactory
     {
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProviderProphecy->getCollection(Dummy::class)->willReturn($collection);
@@ -189,12 +192,12 @@ class CollectionResolverFactoryTest extends TestCase
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
-        if (!\is_array($collection)) {
-            $normalizerProphecy->normalize($collection->current(), Argument::cetera())->willReturn('normalized'.$collection->current());
-        } else {
+        if (\is_array($collection)) {
             foreach ($collection as $object) {
                 $normalizerProphecy->normalize($object, Argument::cetera())->willReturn('normalized'.$object);
             }
+        } else {
+            $normalizerProphecy->normalize($collection->current(), Argument::cetera())->willReturn('normalized'.$collection->current());
         }
 
         foreach ($subcollection as $object) {
