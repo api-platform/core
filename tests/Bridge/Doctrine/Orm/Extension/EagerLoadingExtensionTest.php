@@ -97,7 +97,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         foreach ($relatedNameCollection as $property) {
             if ('id' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn(!in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
             }
         }
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
@@ -183,7 +183,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         foreach ($relatedNameCollection as $property) {
             if ('id' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn(!in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
             }
         }
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();

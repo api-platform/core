@@ -35,7 +35,7 @@ trait FilterLocatorTrait
      */
     private function setFilterLocator($filterLocator = null, bool $allowNull = false)
     {
-        if ($filterLocator instanceof ContainerInterface || $filterLocator instanceof FilterCollection || null === $filterLocator && $allowNull) {
+        if ($filterLocator instanceof ContainerInterface || $filterLocator instanceof FilterCollection || (null === $filterLocator && $allowNull)) {
             if ($filterLocator instanceof FilterCollection) {
                 @trigger_error(sprintf('The %s class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of %s instead.', FilterCollection::class, ContainerInterface::class), E_USER_DEPRECATED);
             }

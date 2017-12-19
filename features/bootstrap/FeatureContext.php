@@ -753,8 +753,6 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereIsDummyDateObjectsWithDummyDate(int $nb)
     {
-        $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
-
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
 

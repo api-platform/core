@@ -37,7 +37,7 @@ final class SwaggerUiAction
     private $title;
     private $description;
     private $version;
-    private $formats = [];
+    private $formats;
     private $oauthEnabled;
     private $oauthClientId;
     private $oauthClientSecret;

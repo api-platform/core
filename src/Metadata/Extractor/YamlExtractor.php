@@ -43,8 +43,8 @@ final class YamlExtractor extends AbstractExtractor
             return;
         }
 
-        if (!is_array($resourcesYaml)) {
-            throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', gettype($resourcesYaml), $path));
+        if (!\is_array($resourcesYaml)) {
+            throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', \gettype($resourcesYaml), $path));
         }
 
         $this->extractResources($resourcesYaml, $path);
@@ -57,8 +57,8 @@ final class YamlExtractor extends AbstractExtractor
                 $resourceYaml = [];
             }
 
-            if (!is_array($resourceYaml)) {
-                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $resourceName, gettype($resourceYaml), $path));
+            if (!\is_array($resourceYaml)) {
+                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $resourceName, \gettype($resourceYaml), $path));
             }
 
             $this->resources[$resourceName] = [
@@ -77,8 +77,8 @@ final class YamlExtractor extends AbstractExtractor
                 continue;
             }
 
-            if (!is_array($resourceYaml['properties'])) {
-                throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', gettype($resourceYaml['properties']), $path));
+            if (!\is_array($resourceYaml['properties'])) {
+                throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', \gettype($resourceYaml['properties']), $path));
             }
 
             $this->extractProperties($resourceYaml, $resourceName, $path);
@@ -94,8 +94,8 @@ final class YamlExtractor extends AbstractExtractor
                 continue;
             }
 
-            if (!is_array($propertyValues)) {
-                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $propertyName, gettype($propertyValues), $path));
+            if (!\is_array($propertyValues)) {
+                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given in "%s".', $propertyName, \gettype($propertyValues), $path));
             }
 
             $this->resources[$resourceName]['properties'][$propertyName] = [
@@ -132,17 +132,17 @@ final class YamlExtractor extends AbstractExtractor
 
         switch ($type) {
             case 'bool':
-                if (is_bool($array[$key])) {
+                if (\is_bool($array[$key])) {
                     return $array[$key];
                 }
                 break;
             case 'string':
-                if (is_string($array[$key])) {
+                if (\is_string($array[$key])) {
                     return $array[$key];
                 }
                 break;
         }
 
-        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, gettype($array[$key])));
+        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($array[$key])));
     }
 }

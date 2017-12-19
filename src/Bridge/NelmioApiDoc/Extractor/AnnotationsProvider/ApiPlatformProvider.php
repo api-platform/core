@@ -165,7 +165,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getResourceHydraDoc(array $hydraApiDoc, string $prefixedShortName)
     {
-        if (!isset($hydraApiDoc['hydra:supportedClass']) || !is_array($hydraApiDoc['hydra:supportedClass'])) {
+        if (!isset($hydraApiDoc['hydra:supportedClass']) || !\is_array($hydraApiDoc['hydra:supportedClass'])) {
             return null;
         }
 
@@ -188,7 +188,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getOperationHydraDoc(string $method, array $hydraDoc): array
     {
-        if (!isset($hydraDoc['hydra:supportedOperation']) || !is_array($hydraDoc['hydra:supportedOperation'])) {
+        if (!isset($hydraDoc['hydra:supportedOperation']) || !\is_array($hydraDoc['hydra:supportedOperation'])) {
             return [];
         }
 
@@ -212,7 +212,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
      */
     private function getCollectionOperationHydraDoc(string $shortName, string $method, array $hydraEntrypointDoc): array
     {
-        if (!isset($hydraEntrypointDoc['hydra:supportedProperty']) || !is_array($hydraEntrypointDoc['hydra:supportedProperty'])) {
+        if (!isset($hydraEntrypointDoc['hydra:supportedProperty']) || !\is_array($hydraEntrypointDoc['hydra:supportedProperty'])) {
             return [];
         }
 

@@ -188,7 +188,6 @@ class QueryCheckerTest extends TestCase
         $queryBuilder->getDQLPart('join')->willReturn(['d' => [new Join('LEFT_JOIN', 'd.relatedDummy', 'a_1')]]);
         $queryBuilder->getDQLPart('orderBy')->willReturn(['a_1.name' => new OrderBy('a_1.name', 'asc')]);
         $classMetadata = $this->prophesize(ClassMetadata::class);
-        $classMetadata = $this->prophesize(ClassMetadata::class);
         $classMetadata->isCollectionValuedAssociation('relatedDummy')->willReturn(true);
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());

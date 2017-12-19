@@ -58,7 +58,7 @@ class OrderFilter extends AbstractFilter
         if (null !== $properties) {
             $properties = array_map(function ($propertyOptions) {
                 // shorthand for default direction
-                if (is_string($propertyOptions)) {
+                if (\is_string($propertyOptions)) {
                     $propertyOptions = [
                         'default_direction' => $propertyOptions,
                     ];
@@ -115,7 +115,7 @@ class OrderFilter extends AbstractFilter
         }
 
         $direction = strtoupper($direction);
-        if (!in_array($direction, ['ASC', 'DESC'], true)) {
+        if (!\in_array($direction, ['ASC', 'DESC'], true)) {
             return;
         }
 
@@ -144,7 +144,7 @@ class OrderFilter extends AbstractFilter
     protected function extractProperties(Request $request/*, string $resourceClass*/): array
     {
         $properties = $request->query->get($this->orderParameterName, []);
-        if (!is_array($properties)) {
+        if (!\is_array($properties)) {
             return [];
         }
 

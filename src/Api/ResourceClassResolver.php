@@ -39,7 +39,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
      */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string
     {
-        if (is_object($value) && !$value instanceof \Traversable) {
+        if (\is_object($value) && !$value instanceof \Traversable) {
             $typeToFind = $type = $this->getObjectClass($value);
             if (null === $resourceClass) {
                 $resourceClass = $typeToFind;

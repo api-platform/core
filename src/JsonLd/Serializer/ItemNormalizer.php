@@ -71,7 +71,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['iri'] = $this->iriConverter->getIriFromItem($object);
 
         $rawData = parent::normalize($object, $format, $context);
-        if (!is_array($rawData)) {
+        if (!\is_array($rawData)) {
             return $rawData;
         }
 

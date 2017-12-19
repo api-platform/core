@@ -214,14 +214,14 @@ final class Configuration implements ConfigurationInterface
                         ->ifArray()
                         ->then(function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as &$httpStatusCode) {
-                                if (is_int($httpStatusCode)) {
+                                if (\is_int($httpStatusCode)) {
                                     continue;
                                 }
 
-                                if (defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
+                                if (\defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
                                     @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const %s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
 
-                                    $httpStatusCode = constant($httpStatusCodeConstant);
+                                    $httpStatusCode = \constant($httpStatusCodeConstant);
                                 }
                             }
 

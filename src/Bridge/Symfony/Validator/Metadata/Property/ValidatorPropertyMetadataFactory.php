@@ -81,7 +81,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     private function isRequiredByGroups(ValidatorPropertyMetadataInterface $validatorPropertyMetadata, array $options): bool
     {
         foreach ($options['validation_groups'] as $validationGroup) {
-            if (!is_string($validationGroup)) {
+            if (!\is_string($validationGroup)) {
                 continue;
             }
 

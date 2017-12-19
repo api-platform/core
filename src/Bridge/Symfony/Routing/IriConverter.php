@@ -39,26 +39,20 @@ final class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
 
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
     private $itemDataProvider;
     private $routeNameResolver;
     private $router;
-    private $propertyAccessor;
     private $identifiersExtractor;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
         $this->router = $router;
-        $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
 
         if (null === $identifiersExtractor) {
             @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
-            $this->identifiersExtractor = new IdentifiersExtractor($this->propertyNameCollectionFactory, $this->propertyMetadataFactory, $this->propertyAccessor);
+            $this->identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
         } else {
             $this->identifiersExtractor = $identifiersExtractor;
         }
@@ -156,7 +150,7 @@ final class IriConverter implements IriConverterInterface
      */
     private function generateIdentifiersUrl(array $identifiers): array
     {
-        if (1 === count($identifiers)) {
+        if (1 === \count($identifiers)) {
             return [rawurlencode((string) array_values($identifiers)[0])];
         }
 

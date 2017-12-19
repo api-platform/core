@@ -42,8 +42,8 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        if (func_num_args() >= 4) {
-            $operationName = func_get_arg(3);
+        if (\func_num_args() >= 4) {
+            $operationName = (string) func_get_arg(3);
         } else {
             @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
 

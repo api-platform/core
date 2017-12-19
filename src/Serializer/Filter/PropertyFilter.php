@@ -39,7 +39,7 @@ final class PropertyFilter implements FilterInterface
      */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context)
     {
-        if (!is_array($properties = $request->query->get($this->parameterName))) {
+        if (!\is_array($properties = $request->query->get($this->parameterName))) {
             return;
         }
 
@@ -98,14 +98,14 @@ final class PropertyFilter implements FilterInterface
 
         foreach ($properties as $key => $value) {
             if (is_numeric($key)) {
-                if (in_array($value, $whitelist, true)) {
+                if (\in_array($value, $whitelist, true)) {
                     $result[] = $value;
                 }
 
                 continue;
             }
 
-            if (isset($whitelist[$key]) && is_array($value) && $recursiveResult = $this->getProperties($value, $whitelist[$key])) {
+            if (isset($whitelist[$key]) && \is_array($value) && $recursiveResult = $this->getProperties($value, $whitelist[$key])) {
                 $result[$key] = $recursiveResult;
             }
         }

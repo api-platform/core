@@ -54,7 +54,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      */
     public function supportsNormalization($data, $format = null)
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
+        return self::FORMAT === $format && (\is_array($data) || ($data instanceof \Traversable));
     }
 
     /**
@@ -88,8 +88,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
         }
 
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : count($object);
+        if (\is_array($object) || $object instanceof \Countable) {
+            $data['hydra:totalItems'] = $object instanceof PaginatorInterface ? $object->getTotalItems() : \count($object);
         }
 
         return $data;

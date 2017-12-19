@@ -54,7 +54,7 @@ class ChainCollectionDataProviderTest extends TestCase
 
         $collection = (new ChainCollectionDataProvider([$firstDataProvider->reveal()]))->getCollection('notfound', 'op');
 
-        $this->assertTrue(is_array($collection) || $collection instanceof \Traversable);
+        $this->assertTrue(\is_array($collection) || $collection instanceof \Traversable);
         $this->assertEmpty($collection);
     }
 
@@ -62,7 +62,7 @@ class ChainCollectionDataProviderTest extends TestCase
     {
         $collection = (new ChainCollectionDataProvider([]))->getCollection(Dummy::class);
 
-        $this->assertTrue(is_array($collection) || $collection instanceof \Traversable);
+        $this->assertTrue(\is_array($collection) || $collection instanceof \Traversable);
         $this->assertEmpty($collection);
     }
 }
