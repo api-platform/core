@@ -40,9 +40,21 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
-                ->scalarNode('description')->defaultValue('')->info('The description of the API.')->end()
-                ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
+                ->scalarNode('title')
+                    ->info('The title of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('description')
+                    ->info('The description of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('version')
+                    ->info('The version of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('0.0.0')
+                ->end()
                 ->scalarNode('default_operation_path_resolver')
                     ->beforeNormalization()->always(function ($v) {
                         @trigger_error('The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.', E_USER_DEPRECATED);
