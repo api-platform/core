@@ -234,4 +234,17 @@ class ConfigurationTest extends TestCase
         $this->assertTrue(isset($config['swagger']['api_keys']));
         $this->assertSame($exampleConfig, $config['swagger']['api_keys'][0]);
     }
+
+    /**
+     * Test config for empty title and description.
+     */
+    public function testEmptyTitleDescriptionConfig()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [],
+        ]);
+
+        $this->assertSame($config['title'], '');
+        $this->assertSame($config['description'], '');
+    }
 }
