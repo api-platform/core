@@ -75,7 +75,7 @@ trait EagerLoadingTrait
             $attribute = $resourceMetadata->getAttribute($attributeName);
         }
 
-        return is_bool($attribute) ? $attribute : $default;
+        return \is_bool($attribute) ? $attribute : $default;
     }
 
     /**
@@ -98,7 +98,7 @@ trait EagerLoadingTrait
 
             $related = $em->getClassMetadata($mapping['targetEntity']);
 
-            if (in_array($related->name, $checked, true)) {
+            if (\in_array($related->name, $checked, true)) {
                 continue;
             }
 

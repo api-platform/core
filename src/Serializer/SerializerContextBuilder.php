@@ -65,7 +65,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['item_operation_name'] = $attributes['item_operation_name'];
         }
 
-        $context['operation_type'] = $operationType ? $operationType : OperationType::ITEM;
+        $context['operation_type'] = $operationType ?: OperationType::ITEM;
 
         if (!$normalization && !isset($context['api_allow_update'])) {
             $context['api_allow_update'] = in_array($request->getMethod(), [Request::METHOD_PUT, Request::METHOD_PATCH], true);

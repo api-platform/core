@@ -42,7 +42,7 @@ class IdentifiersExtractorTest extends TestCase
 
         foreach ($properties as $prop) {
             $metadata = new PropertyMetadata();
-            $propertyMetadataFactoryProphecy->create($class, $prop)->shouldBeCalled()->willReturn($metadata->withIdentifier(in_array($prop, $identifiers, true)));
+            $propertyMetadataFactoryProphecy->create($class, $prop)->shouldBeCalled()->willReturn($metadata->withIdentifier(\in_array($prop, $identifiers, true)));
         }
 
         return [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy];

@@ -77,7 +77,7 @@ class DateFilter extends AbstractFilter
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
-            !is_array($values) ||
+            !\is_array($values) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass) ||
             !$this->isDateField($property, $resourceClass)
@@ -189,8 +189,8 @@ class DateFilter extends AbstractFilter
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($baseWhere);
         } elseif (
-            (in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true) && self::INCLUDE_NULL_BEFORE === $nullManagement) ||
-            (in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true) && self::INCLUDE_NULL_AFTER === $nullManagement)
+            (\in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true) && self::INCLUDE_NULL_BEFORE === $nullManagement) ||
+            (\in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true) && self::INCLUDE_NULL_AFTER === $nullManagement)
         ) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $baseWhere,

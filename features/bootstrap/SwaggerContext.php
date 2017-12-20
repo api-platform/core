@@ -17,7 +17,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class SwaggerContext implements Context
 {
@@ -25,12 +24,6 @@ final class SwaggerContext implements Context
      * @var RestContext
      */
     private $restContext;
-    private $propertyAccessor;
-
-    public function __construct()
-    {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-    }
 
     /**
      * Gives access to the Behatch context.

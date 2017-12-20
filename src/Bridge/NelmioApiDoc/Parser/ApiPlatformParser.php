@@ -66,7 +66,7 @@ final class ApiPlatformParser implements ParserInterface
     public function supports(array $item)
     {
         $data = explode(':', $item['class'], 3);
-        if (!in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX], true)) {
+        if (!\in_array($data[0], [self::IN_PREFIX, self::OUT_PREFIX], true)) {
             return false;
         }
         if (!isset($data[1])) {
@@ -284,7 +284,7 @@ final class ApiPlatformParser implements ParserInterface
 
             $data['actualType'] = DataTypes::MODEL;
             $data['subType'] = $className;
-            $data['children'] = in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io, $visited);
+            $data['children'] = \in_array($className, $visited, true) ? [] : $this->parseResource($resourceMetadata, $className, $io, $visited);
 
             return $data;
         }

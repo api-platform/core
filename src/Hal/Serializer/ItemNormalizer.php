@@ -50,7 +50,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['api_normalize'] = true;
 
         $rawData = parent::normalize($object, $format, $context);
-        if (!is_array($rawData)) {
+        if (!\is_array($rawData)) {
             return $rawData;
         }
 

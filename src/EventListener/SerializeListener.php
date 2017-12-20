@@ -87,7 +87,7 @@ final class SerializeListener
             return;
         }
 
-        if (is_object($controllerResult)) {
+        if (\is_object($controllerResult)) {
             $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat()));
 
             return;

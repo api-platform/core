@@ -47,7 +47,7 @@ final class PropertyFilter implements FilterInterface
             $properties = $request->query->get($this->parameterName);
         }
 
-        if (!is_array($properties)) {
+        if (!\is_array($properties)) {
             return;
         }
 
@@ -106,14 +106,14 @@ final class PropertyFilter implements FilterInterface
 
         foreach ($properties as $key => $value) {
             if (is_numeric($key)) {
-                if (in_array($value, $whitelist, true)) {
+                if (\in_array($value, $whitelist, true)) {
                     $result[] = $value;
                 }
 
                 continue;
             }
 
-            if (isset($whitelist[$key]) && is_array($value) && $recursiveResult = $this->getProperties($value, $whitelist[$key])) {
+            if (isset($whitelist[$key]) && \is_array($value) && $recursiveResult = $this->getProperties($value, $whitelist[$key])) {
                 $result[$key] = $recursiveResult;
             }
         }

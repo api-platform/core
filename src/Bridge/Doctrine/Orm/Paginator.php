@@ -44,6 +44,6 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface
      */
     public function getTotalItems(): float
     {
-        return (float) ($this->totalItems ?? $this->totalItems = count($this->paginator));
+        return (float) ($this->totalItems ?? $this->totalItems = \count($this->paginator));
     }
 }

@@ -33,7 +33,7 @@
         "behat/symfony2-extension": "^2.1.1",
         "behatch/contexts": "dev-master",
         "doctrine/doctrine-bundle": "^1.6.3",
-        "doctrine/orm": "^2.5.2",
+        "doctrine/orm": ">=2.5.2 <2.6",
         "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0",
         "guzzlehttp/guzzle": "^6.0",

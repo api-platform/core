@@ -85,7 +85,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $previousQueryBuilder = null;
         $previousAlias = null;
 
-        $num = count($context['identifiers']);
+        $num = \count($context['identifiers']);
 
         while ($num--) {
             list($identifier, $identifierResourceClass) = $context['identifiers'][$num];

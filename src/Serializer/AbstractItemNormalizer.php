@@ -70,7 +70,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsNormalization($data, $format = null)
     {
-        if (!is_object($data)) {
+        if (!\is_object($data)) {
             return false;
         }
 
@@ -218,14 +218,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         $builtinType = $type->getBuiltinType();
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
-            $isValid = is_float($value) || is_int($value);
+            $isValid = \is_float($value) || \is_int($value);
         } else {
-            $isValid = call_user_func('is_'.$builtinType, $value);
+            $isValid = \call_user_func('is_'.$builtinType, $value);
         }
 
         if (!$isValid) {
             throw new InvalidArgumentException(sprintf(
-                'The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, gettype($value)
+                'The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)
             ));
         }
     }
@@ -247,9 +247,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeCollection(string $attribute, PropertyMetadata $propertyMetadata, Type $type, string $className, $value, string $format = null, array $context): array
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new InvalidArgumentException(sprintf(
-                'The type of the "%s" attribute must be "array", "%s" given.', $attribute, gettype($value)
+                'The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)
             ));
         }
 
@@ -258,10 +258,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $values = [];
         foreach ($value as $index => $obj) {
-            if (null !== $collectionKeyBuiltinType && !call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
+            if (null !== $collectionKeyBuiltinType && !\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
                 throw new InvalidArgumentException(sprintf(
                         'The type of the key "%s" must be "%s", "%s" given.',
-                        $index, $collectionKeyBuiltinType, gettype($index))
+                        $index, $collectionKeyBuiltinType, \gettype($index))
                 );
             }
 
@@ -287,7 +287,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, string $format = null, array $context)
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             try {
                 return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
@@ -299,14 +299,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (
             !$this->resourceClassResolver->isResourceClass($className) ||
-            ($propertyMetadata->isWritableLink() && is_array($value))
+            ($propertyMetadata->isWritableLink() && \is_array($value))
         ) {
             $context['resource_class'] = $className;
 
             return $this->serializer->denormalize($value, $className, $format, $context);
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             // repeat the code so that IRIs keep working with the json format
             if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
                 try {
@@ -319,7 +319,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             throw new InvalidArgumentException(sprintf(
-                'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, gettype($value)
+                'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
             ));
         }
 
@@ -409,7 +409,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata->getType();
 
         if (
-            (is_array($attributeValue) || $attributeValue instanceof \Traversable) &&
+            (\is_array($attributeValue) || $attributeValue instanceof \Traversable) &&
             $type &&
             $type->isCollection() &&
             ($collectionValueType = $type->getCollectionValueType()) &&
