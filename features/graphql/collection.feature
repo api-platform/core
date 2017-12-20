@@ -1,4 +1,4 @@
-Feature: GraphQL query support
+Feature: GraphQL collection support
 
   @createSchema
   @dropSchema
@@ -16,7 +16,7 @@ Feature: GraphQL query support
           }
         }
       }
-      dummyGroup(id: 2) {
+      dummyGroup(id: "/dummy_groups/2") {
         foo
       }
     }
@@ -239,7 +239,7 @@ Feature: GraphQL query support
     When I send the following GraphQL request:
     """
     {
-      compositePrimitiveItem(name: "Bar", year: 2017) {
+      compositePrimitiveItem(id: "/composite_primitive_items/name=Bar;year=2017") {
         description
       }
     }
@@ -256,7 +256,7 @@ Feature: GraphQL query support
     When I send the following GraphQL request:
     """
     {
-      compositeRelation(compositeItem: {id: 1}, compositeLabel: {id: 1}) {
+      compositeRelation(id: "/composite_relations/compositeItem=1;compositeLabel=1") {
         value
       }
     }

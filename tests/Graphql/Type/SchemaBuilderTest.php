@@ -13,11 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Graphql\Type;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Graphql\Resolver\CollectionResolverFactoryInterface;
-use ApiPlatform\Core\Graphql\Resolver\ItemMutationResolverFactoryInterface;
-use ApiPlatform\Core\Graphql\Resolver\ItemResolverFactoryInterface;
+use ApiPlatform\Core\Graphql\Resolver\ResolverFactoryInterface;
 use ApiPlatform\Core\Graphql\Type\SchemaBuilder;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -39,18 +36,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class SchemaBuilderTest extends TestCase
 {
-    /**
-     * @expectedException \LogicException
-     */
-    public function testGetSchemaNoResourceIdentifier()
-    {
-        $propertyMetadataMockBuilder = function () {
-            return new PropertyMetadata();
-        };
-        $mockedSchemaBuilder = $this->mockSchemaBuilder($propertyMetadataMockBuilder, false);
-        $mockedSchemaBuilder->getSchema();
-    }
-
     public function testGetSchemaAllFields()
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
@@ -70,7 +55,7 @@ class SchemaBuilderTest extends TestCase
             );
         };
 
-        $mockedSchemaBuilder = $this->mockSchemaBuilder($propertyMetadataMockBuilder, false);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
         $this->assertEquals([
             'shortName1',
             'shortName1s',
@@ -99,7 +84,7 @@ class SchemaBuilderTest extends TestCase
                 Type::BUILTIN_TYPE_INT === $builtinType
             );
         };
-        $mockedSchemaBuilder = $this->mockSchemaBuilder($propertyMetadataMockBuilder, false);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
         $schema = $mockedSchemaBuilder->getSchema();
         $queryFields = $schema->getConfig()->getQuery()->getFields();
 
@@ -112,7 +97,7 @@ class SchemaBuilderTest extends TestCase
     /**
      * @dataProvider paginationProvider
      */
-    public function testGetSchema($paginationEnabled)
+    public function testGetSchema(bool $paginationEnabled)
     {
         $propertyMetadataMockBuilder = function ($builtinType, $resourceClassName) {
             return new PropertyMetadata(
@@ -132,7 +117,7 @@ class SchemaBuilderTest extends TestCase
                 null
             );
         };
-        $mockedSchemaBuilder = $this->mockSchemaBuilder($propertyMetadataMockBuilder, $paginationEnabled);
+        $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, $paginationEnabled);
         $schema = $mockedSchemaBuilder->getSchema();
         $queryFields = $schema->getConfig()->getQuery()->getFields();
 
@@ -149,7 +134,7 @@ class SchemaBuilderTest extends TestCase
         $type = $queryFields['shortName2']->getType();
         $resourceTypeFields = $type->getFields();
         $this->assertEquals(
-            ['intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty'],
+            ['id', 'intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty'],
             array_keys($resourceTypeFields)
         );
 
@@ -186,7 +171,7 @@ class SchemaBuilderTest extends TestCase
         $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $objectPropertyFieldType);
     }
 
-    public function paginationProvider()
+    public function paginationProvider(): array
     {
         return [
             [true],
@@ -194,16 +179,15 @@ class SchemaBuilderTest extends TestCase
         ];
     }
 
-    private function mockSchemaBuilder($propertyMetadataMockBuilder, bool $paginationEnabled): SchemaBuilder
+    private function createSchemaBuilder($propertyMetadataMockBuilder, bool $paginationEnabled): SchemaBuilder
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $collectionResolverFactoryProphecy = $this->prophesize(CollectionResolverFactoryInterface::class);
-        $itemResolverFactoryProphecy = $this->prophesize(ItemResolverFactoryInterface::class);
-        $itemMutationResolverFactoryProphecy = $this->prophesize(ItemMutationResolverFactoryInterface::class);
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
+        $itemResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
+        $itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
 
         $resourceClassNames = [];
         for ($i = 1; $i <= 3; ++$i) {
@@ -230,15 +214,13 @@ class SchemaBuilderTest extends TestCase
             }
             $propertyNameCollection = new PropertyNameCollection($propertyNames);
             $propertyNameCollectionFactoryProphecy->create($resourceClassName)->willReturn($propertyNameCollection);
-
-            $identifiersExtractorProphecy->getIdentifiersFromResourceClass($resourceClassName)->willReturn(['intProperty']);
         }
         $resourceNameCollection = new ResourceNameCollection($resourceClassNames);
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);
 
-        $collectionResolverFactoryProphecy->createCollectionResolver(Argument::cetera())->willReturn(function () {});
-        $itemResolverFactoryProphecy->createItemResolver(Argument::cetera())->willReturn(function () {});
-        $itemMutationResolverFactoryProphecy->createItemMutationResolver(Argument::cetera())->willReturn(function () {});
+        $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
+        $itemResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
+        $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
 
         return new SchemaBuilder(
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -248,7 +230,7 @@ class SchemaBuilderTest extends TestCase
             $collectionResolverFactoryProphecy->reveal(),
             $itemResolverFactoryProphecy->reveal(),
             $itemMutationResolverFactoryProphecy->reveal(),
-            $identifiersExtractorProphecy->reveal(),
+            function () {},
             $paginationEnabled
         );
     }

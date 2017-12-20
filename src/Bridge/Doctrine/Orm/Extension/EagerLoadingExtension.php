@@ -118,7 +118,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             //Don't join if max depth is enabled and the current depth limit is reached
-            if (isset($context[AbstractObjectNormalizer::ENABLE_MAX_DEPTH]) && 0 === $currentDepth) {
+            if (0 === $currentDepth && isset($context[AbstractObjectNormalizer::ENABLE_MAX_DEPTH])) {
                 continue;
             }
 

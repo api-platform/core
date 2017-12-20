@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Graphql\Resolver;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Graphql\Resolver\ItemMutationResolverFactory;
-use ApiPlatform\Core\Graphql\Resolver\ItemMutationResolverFactoryInterface;
+use ApiPlatform\Core\Graphql\Resolver\ResolverFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -39,63 +40,30 @@ class ItemMutationResolverFactoryTest extends TestCase
     {
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->remove(Argument::any())->shouldNotBeCalled();
-        $mockedItemMutationResolverFactory = $this->mockItemMutationResolverFactory(null, ['id' => 3], 3, $dataPersisterProphecy);
-        $resolver = $mockedItemMutationResolverFactory->createItemMutationResolver('resourceClass', 'delete');
 
-        $resolver(null, ['input' => ['id' => 3]], null, new ResolveInfo([]));
+        $resolverFactory = $this->createItemMutationResolverFactory(null, $dataPersisterProphecy);
+        $resolver = $resolverFactory(Dummy::class, Dummy::class, 'delete');
+
+        $resolver(null, ['input' => ['id' => '/dummies/3']], null, new ResolveInfo([]));
     }
 
     public function testCreateItemDeleteMutationResolver()
     {
-        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->remove('Item1')->shouldBeCalled();
-        $mockedItemMutationResolverFactory = $this->mockItemMutationResolverFactory('Item1', ['id' => 3], 3, $dataPersisterProphecy);
-        $resolver = $mockedItemMutationResolverFactory->createItemMutationResolver('resourceClass', 'delete');
+        $dummy = new Dummy();
 
-        $this->assertEquals(['id' => 3], $resolver(null, ['input' => ['id' => 3]], null, new ResolveInfo([])));
+        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $dataPersisterProphecy->remove($dummy)->shouldBeCalled();
+        $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
+        $resolver = $resolverFactory(Dummy::class, null, 'delete');
+
+        $this->assertEquals(['id' => '/dummies/3'], $resolver(null, ['input' => ['id' => '/dummies/3']], null, new ResolveInfo([])));
     }
 
-    public function testCreateCompositeSimpleIdentifiersMutationItemResolver()
+    private function createItemMutationResolverFactory($item, ObjectProphecy $dataPersisterProphecy): ResolverFactoryInterface
     {
-        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->remove('Item1')->shouldBeCalled();
-        $mockedItemMutationResolverFactory = $this->mockItemMutationResolverFactory('Item1', ['id1' => 1, 'id2' => 2], 'id1=1;id2=2', $dataPersisterProphecy);
-        $resolver = $mockedItemMutationResolverFactory->createItemMutationResolver('resourceClass', 'delete');
-
-        $this->assertEquals(['id1' => 1, 'id2' => 2], $resolver(null, ['input' => ['id1' => 1, 'id2' => 2]], null, new ResolveInfo([])));
-    }
-
-    public function testCreateCompositeIdentifiersMutationItemResolver()
-    {
-        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->remove('Item1')->shouldBeCalled();
-        $mockedItemMutationResolverFactory = $this->mockItemMutationResolverFactory('Item1', ['relation1' => 1, 'relation2' => 2], 'relation1=1;relation2=2', $dataPersisterProphecy);
-        $resolver = $mockedItemMutationResolverFactory->createItemMutationResolver('resourceClass', 'delete');
-
-        $this->assertEquals(['relation1' => ['id' => 1], 'relation2' => ['id' => 2]], $resolver(null, ['input' => ['relation1' => ['id' => 1], 'relation2' => ['id' => 2]]], null, new ResolveInfo([])));
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Composite identifiers are not allowed for a resource already used as a composite identifier
-     */
-    public function testCreateRecursiveCompositeIdentifiersItemMutationResolver()
-    {
-        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
-        $dataPersisterProphecy->remove(Argument::any())->shouldNotBeCalled();
-        $mockedItemMutationResolverFactory = $this->mockItemMutationResolverFactory('Item1', ['relation1' => ['link1' => 1, 'link2' => 3], 'relation2' => 2], null, $dataPersisterProphecy);
-        $resolver = $mockedItemMutationResolverFactory->createItemMutationResolver('resourceClass', 'delete');
-
-        $resolver(null, ['input' => ['relation1' => ['link1' => ['id' => 1], 'link2' => ['id' => 3]], 'relation2' => ['id' => 2]]], null, new ResolveInfo([]));
-    }
-
-    private function mockItemMutationResolverFactory($item, array $identifiers, $flatId, ObjectProphecy $dataPersisterProphecy): ItemMutationResolverFactoryInterface
-    {
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromResourceClass('resourceClass')->willReturn(array_keys($identifiers));
-
-        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProviderProphecy->getItem('resourceClass', $flatId)->willReturn($item);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3');
+        null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class)->willImplement(DenormalizerInterface::class);
 
@@ -103,11 +71,10 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadata());
 
         return new ItemMutationResolverFactory(
-            $identifiersExtractorProphecy->reveal(),
-            $itemDataProviderProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $dataPersisterProphecy->reveal(),
             $normalizerProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal(),
-            $dataPersisterProphecy->reveal()
+            $resourceMetadataFactoryProphecy->reveal()
         );
     }
 }

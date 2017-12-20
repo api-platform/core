@@ -38,37 +38,34 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {name: "A new one", alias: "new", description: "brand new!"}) {
+      createFoo(input: {name: "A new one", bar: "new"}) {
         id,
         name,
-        alias,
-        description
+        bar
       }
     }
     """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.createDummy.id" should be equal to 1
-    And the JSON node "data.createDummy.name" should be equal to "A new one"
-    And the JSON node "data.createDummy.alias" should be equal to "new"
-    And the JSON node "data.createDummy.description" should be equal to "brand new!"
+    And the JSON node "data.createFoo.id" should be equal to "/foos/1"
+    And the JSON node "data.createFoo.name" should be equal to "A new one"
+    And the JSON node "data.createFoo.bar" should be equal to "new"
 
   @dropSchema
   Scenario: Delete an item through a mutation
     When I send the following GraphQL request:
     """
     mutation {
-      deleteDummy(input: {id: 1}) {
+      deleteFoo(input: {id: "/foos/1"}) {
         id
       }
     }
     """
-    Then print last response
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.deleteDummy.id" should be equal to 1
+    And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
 
   @createSchema
   @dropSchema
@@ -77,44 +74,37 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      deleteCompositeRelation(input: {compositeItem: {id: 1}, compositeLabel: {id: 1}}) {
-        compositeItem {
-          id
-        },
-        compositeLabel {
-          id
-        }
+      deleteCompositeRelation(input: {id: "/composite_relations/compositeItem=1;compositeLabel=1"}) {
+        id
       }
     }
     """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.deleteCompositeRelation.compositeItem.id" should be equal to 1
-    And the JSON node "data.deleteCompositeRelation.compositeLabel.id" should be equal to 1
+    And the JSON node "data.deleteCompositeRelation.id" should be equal to "/composite_relations/compositeItem=1;compositeLabel=1"
 
   @createSchema
   @dropSchema
   Scenario: Modify an item through a mutation
-    Given there is 1 dummy objects
+    Given there are 1 foo objects with fake names
     When I send the following GraphQL request:
     """
     mutation {
-      updateDummy(input: {id: 1, description: "Modified description."}) {
+      updateFoo(input: {id: "/foos/1", bar: "Modified description."}) {
         id,
         name,
-        description
+        bar
       }
     }
     """
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.updateDummy.id" should be equal to 1
-    And the JSON node "data.updateDummy.name" should be equal to "Dummy #1"
-    And the JSON node "data.updateDummy.description" should be equal to "Modified description."
+    And the JSON node "data.updateFoo.id" should be equal to "/foos/1"
+    And the JSON node "data.updateFoo.name" should be equal to "Hawsepipe"
+    And the JSON node "data.updateFoo.bar" should be equal to "Modified description."
 
-  # Composite identifiers are not supported yet
   @createSchema
   @dropSchema
   Scenario: Modify an item with composite identifiers through a mutation
@@ -122,20 +112,14 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      updateCompositeRelation(input: {compositeItem: {id: 2}, compositeLabel: {id: 8}, value: "Modified value."}) {
-        compositeItem {
-          id
-        },
-        compositeLabel {
-          id
-        },
+      updateCompositeRelation(input: {id: "/composite_relations/compositeItem=1;compositeLabel=2", value: "Modified value."}) {
+        id
         value
       }
     }
     """
-    #Then the response status code should be 200
-    #And the response should be in JSON
-    #And the header "Content-Type" should be equal to "application/json"
-    #And the JSON node "data.putCompositeRelation.compositeItem.id" should be equal to 1
-    #And the JSON node "data.putCompositeRelation.compositeLabel.id" should be equal to 1
-    #And the JSON node "data.putCompositeRelation.value" should be equal to "Modified value."
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.updateCompositeRelation.id" should be equal to "/composite_relations/compositeItem=1;compositeLabel=2"
+    And the JSON node "data.updateCompositeRelation.value" should be equal to "Modified value."

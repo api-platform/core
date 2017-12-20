@@ -416,16 +416,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            if (isset($context['graphql'])) {
-                return [];
-            }
-
-            $value = [];
-            foreach ($attributeValue as $index => $obj) {
-                $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $className, $format, $this->createChildContext($context, $attribute));
-            }
-
-            return $value;
+            return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
         }
 
         if (
@@ -433,10 +424,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($className = $type->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
-            if (isset($context['graphql'])) {
-                return false;
-            }
-
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
         }
 
@@ -446,13 +433,25 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
+     * Normalizes a collection of relations (to-many).
+     *
+     * @param iterable $attributeValue
+     */
+    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, string $format = null, array $context): array
+    {
+        $value = [];
+        foreach ($attributeValue as $index => $obj) {
+            $value[$index] = $this->normalizeRelation($propertyMetadata, $obj, $resourceClass, $format, $context);
+        }
+
+        return $value;
+    }
+
+    /**
      * Normalizes a relation as an object if is a Link or as an URI.
      *
-     * @param PropertyMetadata $propertyMetadata
-     * @param mixed            $relatedObject
-     * @param string           $resourceClass
-     * @param string|null      $format
-     * @param array            $context
+     * @param mixed       $relatedObject
+     * @param string|null $format
      *
      * @return string|array
      */

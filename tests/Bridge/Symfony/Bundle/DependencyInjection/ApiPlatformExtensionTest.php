@@ -242,11 +242,13 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setDefinition('api_platform.action.graphql_entrypoint')->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.collection_resolver_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.collection_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.item_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.item_mutation_factory')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.resource_field')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor')->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.item_resolver_factory')->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.graphql.item_mutation_resolver_factory')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder')->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item')->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.graphql.enabled', false)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -554,7 +556,6 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $definitions = [
-            'api_platform.action.graphql_entrypoint',
             'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
@@ -577,11 +578,14 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.range_filter',
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.subresource_data_provider',
-            'api_platform.graphql.collection_resolver_factory',
+            'api_platform.graphql.action.entrypoint',
             'api_platform.graphql.executor',
-            'api_platform.graphql.item_resolver_factory',
-            'api_platform.graphql.item_mutation_resolver_factory',
             'api_platform.graphql.schema_builder',
+            'api_platform.graphql.resolver.collection_factory',
+            'api_platform.graphql.resolver.item_factory',
+            'api_platform.graphql.resolver.item_mutation_factory',
+            'api_platform.graphql.resolver.resource_field',
+            'api_platform.graphql.normalizer.item',
             'api_platform.jsonld.normalizer.item',
             'api_platform.jsonld.encoder',
             'api_platform.jsonld.action.context',

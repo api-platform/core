@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Graphql\Resolver;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Graphql\Resolver\ItemResolverFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -26,109 +27,73 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ItemResolverFactoryTest extends TestCase
 {
     public function testCreateItemResolverNoItem()
     {
-        $mockedItemResolverFactory = $this->mockItemResolverFactory(null, null, [], null);
+        $resolverFactory = $this->createItemResolverFactory(null);
+        $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
+        $resolveInfo = new ResolveInfo([]);
+        $resolveInfo->fieldName = 'name';
+        $resolveInfo->fieldNodes = [];
 
-        $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->fieldName = 'rootProperty';
-
-        $this->assertNull($resolver(null, ['id' => 3], null, $resolveInfoProphecy->reveal()));
+        $this->assertNull($resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
 
     public function testCreateItemResolver()
     {
-        $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', null, ['id' => 3], 3);
+        $resolverFactory = $this->createItemResolverFactory(new RelatedDummy());
+        $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
+        $resolveInfo = new ResolveInfo([]);
+        $resolveInfo->fieldName = 'name';
+        $resolveInfo->fieldNodes = [];
 
-        $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->fieldName = 'rootProperty';
-
-        $this->assertEquals('normalizedItem1', $resolver(null, ['id' => 3], null, $resolveInfoProphecy->reveal()));
-    }
-
-    public function testCreateCompositeIdentifiersItemResolver()
-    {
-        $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', null, ['relation1' => 1, 'relation2' => 2], 'relation1=1;relation2=2');
-
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
-
-        $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->fieldName = 'rootProperty';
-
-        $this->assertEquals('normalizedItem1', $resolver(null, ['relation1' => ['id' => 1], 'relation2' => ['id' => 2]], null, $resolveInfoProphecy->reveal()));
-    }
-
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Composite identifiers are not allowed for a resource already used as a composite identifier
-     */
-    public function testCreateRecursiveCompositeIdentifiersItemResolver()
-    {
-        $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', null, ['relation1' => ['link1' => 1, 'link2' => 3], 'relation2' => 2], null);
-
-        $resolver = $mockedItemResolverFactory->createItemResolver('resourceClass', 'rootClass');
-
-        $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->fieldName = 'rootProperty';
-
-        $resolver(null, ['relation1' => ['link1' => ['id' => 1], 'link2' => ['id' => 3]], 'relation2' => ['id' => 2]], null, $resolveInfoProphecy->reveal());
+        $this->assertEquals('normalizedItem', $resolver(null, ['id' => '/related_dummies/3'], null, $resolveInfo));
     }
 
     /**
      * @dataProvider subresourceProvider
      */
-    public function testCreateSubresourceItemResolver($subresource, $expected)
+    public function testCreateSubresourceItemResolver($normalizedSubresource)
     {
-        $mockedItemResolverFactory = $this->mockItemResolverFactory('Item1', $subresource, ['rootIdentifier' => 'valueRootIdentifier'], null);
+        $resolverFactory = $this->createItemResolverFactory(new Dummy());
+        $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
 
-        $resolver = $mockedItemResolverFactory->createItemResolver('subresourceClass', 'rootClass');
+        $resolveInfo = new ResolveInfo([]);
+        $resolveInfo->fieldName = 'relatedDummy';
+        $resolveInfo->fieldNodes = [];
 
-        $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->fieldName = 'rootProperty';
-
-        $this->assertEquals($expected, $resolver(['rootProperty' => true, 'rootIdentifier' => 'valueRootIdentifier'], [], null, $resolveInfoProphecy->reveal()));
+        $this->assertEquals($normalizedSubresource, $resolver(['relatedDummy' => $normalizedSubresource], [], null, $resolveInfo));
     }
 
-    public function subresourceProvider()
+    public function subresourceProvider(): array
     {
-        return [['Subitem1', 'normalizedSubitem1'], [null, null]];
+        return [
+            ['/related_dummies/3'],
+            [null],
+        ];
     }
 
-    private function mockItemResolverFactory($item, $subitem, array $identifiers, $flatId): ItemResolverFactory
+    private function createItemResolverFactory($item): ItemResolverFactory
     {
-        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProviderProphecy->getItem('resourceClass', $flatId)->willReturn($item);
-
-        $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
-        $subresourceDataProviderProphecy->getSubresource('subresourceClass', $identifiers, [
-            'property' => 'rootProperty',
-            'identifiers' => [['rootIdentifier', 'rootClass']],
-            'collection' => false,
-        ])->willReturn($subitem);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/related_dummies/3');
+        null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize($item, Argument::cetera())->willReturn('normalized'.$item);
-        $normalizerProphecy->normalize($subitem, Argument::cetera())->willReturn('normalized'.$subitem);
-
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromResourceClass('rootClass')->willReturn(array_keys($identifiers));
+        $normalizerProphecy->normalize($item, Argument::cetera())->willReturn('normalizedItem');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('resourceClass')->willReturn(new ResourceMetadata('resourceClass', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
-        $resourceMetadataFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadata('subresourceClass', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
 
         return new ItemResolverFactory(
-            $itemDataProviderProphecy->reveal(),
-            $subresourceDataProviderProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
             $normalizerProphecy->reveal(),
-            $identifiersExtractorProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal()
         );
     }
