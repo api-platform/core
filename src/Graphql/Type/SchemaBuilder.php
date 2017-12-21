@@ -106,7 +106,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
             return $this->graphqlTypes['#node'];
         }
 
-
         return $this->graphqlTypes['#node'] = new InterfaceType([
             'name' => 'Node',
             'description' => 'A node, according to the Relay specification.',
