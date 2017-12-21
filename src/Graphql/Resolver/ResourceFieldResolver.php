@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Graphql\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -35,8 +36,8 @@ final class ResourceFieldResolver
     public function __invoke($source, $args, $context, ResolveInfo $info)
     {
         $property = null;
-        if ('id' === $info->fieldName && isset($source['#item'])) {
-            return $this->iriConverter->getIriFromItem(unserialize($source['#item']));
+        if ('id' === $info->fieldName && isset($source[ItemNormalizer::ITEM_KEY])) {
+            return $this->iriConverter->getIriFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
         }
 
         if ('_id' === $info->fieldName && isset($source['id'])) {

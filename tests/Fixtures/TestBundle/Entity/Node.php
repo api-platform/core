@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @see https://github.com/api-platform/core/pull/904#issuecomment-294132077
- * @ApiResource
+ * @ApiResource(graphql={})
  * @ORM\Entity
  */
 class Node
