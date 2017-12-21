@@ -298,6 +298,8 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.eager_loading.enabled', false)->shouldBeCalled();
+        $containerBuilderProphecy->removeAlias(EagerLoadingExtension::class)->shouldBeCalled();
+        $containerBuilderProphecy->removeAlias(FilterEagerLoadingExtension::class)->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.eager_loading')->shouldBeCalled();
         $containerBuilderProphecy->removeDefinition('api_platform.doctrine.orm.query_extension.filter_eager_loading')->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
