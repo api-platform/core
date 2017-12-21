@@ -69,7 +69,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
             $identifier = $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
-            if (!is_object($identifier)) {
+            if (!\is_object($identifier)) {
                 continue;
             } elseif (method_exists($identifier, '__toString')) {
                 $identifiers[$propertyName] = (string) $identifier;

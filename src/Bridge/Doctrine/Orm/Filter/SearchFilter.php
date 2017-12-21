@@ -158,7 +158,7 @@ class SearchFilter extends AbstractFilter
                 return 'float';
         }
 
-        if (defined(Type::class.'::DATE_IMMUTABLE')) {
+        if (\defined(Type::class.'::DATE_IMMUTABLE')) {
             switch ($doctrineType) {
                 case Type::DATE_IMMUTABLE:
                 case Type::TIME_IMMUTABLE:
@@ -227,7 +227,7 @@ class SearchFilter extends AbstractFilter
                 $caseSensitive = false;
             }
 
-            if (1 === count($values)) {
+            if (1 === \count($values)) {
                 $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values[0], $caseSensitive);
 
                 return;
@@ -275,7 +275,7 @@ class SearchFilter extends AbstractFilter
             $associationField = $field;
         }
 
-        if (1 === count($values)) {
+        if (1 === \count($values)) {
             $queryBuilder
                 ->andWhere(sprintf('%s.%s = :%s', $associationAlias, $associationField, $valueParameter))
                 ->setParameter($valueParameter, $values[0]);
@@ -388,7 +388,7 @@ class SearchFilter extends AbstractFilter
     protected function normalizeValues(array $values): array
     {
         foreach ($values as $key => $value) {
-            if (!is_int($key) || !is_string($value)) {
+            if (!\is_int($key) || !\is_string($value)) {
                 unset($values[$key]);
             }
         }

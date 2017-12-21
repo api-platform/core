@@ -57,7 +57,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
                 $paginated = 1. !== $lastPage = $object->getLastPage();
             } else {
                 $itemsPerPage = $object->getItemsPerPage();
-                $pageTotalItems = (float) count($object);
+                $pageTotalItems = (float) \count($object);
             }
 
             $currentPage = $object->getCurrentPage();

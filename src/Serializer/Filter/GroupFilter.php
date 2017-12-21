@@ -45,7 +45,7 @@ final class GroupFilter implements FilterInterface
             $groups = $request->query->get($this->parameterName);
         }
 
-        if (!is_array($groups)) {
+        if (!\is_array($groups)) {
             return;
         }
 

@@ -33,6 +33,6 @@ trait ClassInfoTrait
      */
     private function getObjectClass($object)
     {
-        return class_exists(ClassUtils::class) ? ClassUtils::getClass($object) : get_class($object);
+        return class_exists(ClassUtils::class) ? ClassUtils::getClass($object) : \get_class($object);
     }
 }

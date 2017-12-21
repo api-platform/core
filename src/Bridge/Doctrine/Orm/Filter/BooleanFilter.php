@@ -72,9 +72,9 @@ class BooleanFilter extends AbstractFilter
             return;
         }
 
-        if (in_array($value, ['true', '1'], true)) {
+        if (\in_array($value, ['true', '1'], true)) {
             $value = true;
-        } elseif (in_array($value, ['false', '0'], true)) {
+        } elseif (\in_array($value, ['false', '0'], true)) {
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [

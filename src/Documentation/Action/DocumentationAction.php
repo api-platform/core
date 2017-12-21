@@ -27,7 +27,7 @@ final class DocumentationAction
     private $title;
     private $description;
     private $version;
-    private $formats = [];
+    private $formats;
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', array $formats = [])
     {

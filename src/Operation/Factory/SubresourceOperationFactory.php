@@ -129,7 +129,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     self::FORMAT_SUFFIX
                 );
 
-                if (!in_array($rootShortname, $operation['shortNames'], true)) {
+                if (!\in_array($rootShortname, $operation['shortNames'], true)) {
                     $operation['shortNames'][] = $rootShortname;
                 }
             } else {
@@ -141,7 +141,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
                 $operation['route_name'] = str_replace($parentOperation['operation_name'], $operation['operation_name'], $parentOperation['route_name']);
 
-                if (!in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
+                if (!\in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
                     $operation['shortNames'][] = $resourceMetadata->getShortName();
                 }
 
