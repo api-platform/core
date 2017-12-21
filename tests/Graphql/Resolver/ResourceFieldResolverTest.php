@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Graphql\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Graphql\Resolver\ResourceFieldResolver;
+use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ class ResourceFieldResolverTest extends TestCase
         $resolveInfo->fieldNodes = [];
 
         $resolver = new ResourceFieldResolver($iriConverterProphecy->reveal());
-        $this->assertEquals('/dummies/1', $resolver(['#item' => serialize($dummy)], [], [], $resolveInfo));
+        $this->assertEquals('/dummies/1', $resolver([ItemNormalizer::ITEM_KEY => serialize($dummy)], [], [], $resolveInfo));
     }
 
     public function testOriginalId()

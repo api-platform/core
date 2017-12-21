@@ -32,6 +32,7 @@ use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 final class ItemNormalizer extends AbstractItemNormalizer
 {
     const FORMAT = 'graphql';
+    const ITEM_KEY = '#item';
 
     /**
      * {@inheritdoc}
@@ -39,7 +40,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $data = parent::normalize($object, $format, $context);
-        $data['#item'] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
+        $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
         return $data;
     }

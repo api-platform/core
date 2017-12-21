@@ -9,7 +9,7 @@
 
         <!-- Resolvers -->
 
-        <service id="api_platform.graphql.resolver.collection_factory" class="ApiPlatform\Core\Graphql\Resolver\CollectionResolverFactory" public="false">
+        <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\Core\Graphql\Resolver\Factory\CollectionResolverFactory" public="false">
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="serializer" />
@@ -19,15 +19,15 @@
             <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>
 
-        <service id="api_platform.graphql.resolver.item_factory" class="ApiPlatform\Core\Graphql\Resolver\ItemResolverFactory" public="false">
+        <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\Graphql\Resolver\Factory\ItemMutationResolverFactory" public="false">
             <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
-        <service id="api_platform.graphql.resolver.item_mutation_factory" class="ApiPlatform\Core\Graphql\Resolver\ItemMutationResolverFactory" public="false">
+        <service id="api_platform.graphql.resolver.item" class="ApiPlatform\Core\Graphql\Resolver\ItemResolver" public="false">
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
@@ -41,9 +41,9 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.graphql.resolver.collection_factory" />
-            <argument type="service" id="api_platform.graphql.resolver.item_factory" />
-            <argument type="service" id="api_platform.graphql.resolver.item_mutation_factory" />
+            <argument type="service" id="api_platform.graphql.resolver.factory.collection" />
+            <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
+            <argument type="service" id="api_platform.graphql.resolver.item" />
             <argument type="service" id="api_platform.graphql.resolver.resource_field" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>

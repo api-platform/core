@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\Graphql\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Graphql\Resolver\ItemResolverFactory;
+use ApiPlatform\Core\Graphql\Resolver\ItemResolver;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -29,12 +29,11 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemResolverFactoryTest extends TestCase
+class ItemResolverTest extends TestCase
 {
     public function testCreateItemResolverNoItem()
     {
-        $resolverFactory = $this->createItemResolverFactory(null);
-        $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
+        $resolver = $this->createItemResolver(null);
 
         $resolveInfo = new ResolveInfo([]);
         $resolveInfo->fieldName = 'name';
@@ -45,8 +44,7 @@ class ItemResolverFactoryTest extends TestCase
 
     public function testCreateItemResolver()
     {
-        $resolverFactory = $this->createItemResolverFactory(new RelatedDummy());
-        $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
+        $resolver = $this->createItemResolver(new RelatedDummy());
 
         $resolveInfo = new ResolveInfo([]);
         $resolveInfo->fieldName = 'name';
@@ -60,8 +58,7 @@ class ItemResolverFactoryTest extends TestCase
      */
     public function testCreateSubresourceItemResolver($normalizedSubresource)
     {
-        $resolverFactory = $this->createItemResolverFactory(new Dummy());
-        $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
+        $resolver = $this->createItemResolver(new Dummy());
 
         $resolveInfo = new ResolveInfo([]);
         $resolveInfo->fieldName = 'relatedDummy';
@@ -78,7 +75,7 @@ class ItemResolverFactoryTest extends TestCase
         ];
     }
 
-    private function createItemResolverFactory($item): ItemResolverFactory
+    private function createItemResolver($item): ItemResolver
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $getItemFromIri = $iriConverterProphecy->getItemFromIri('/related_dummies/3');
@@ -91,7 +88,7 @@ class ItemResolverFactoryTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, null, null, ['normalization_context' => ['groups' => ['foo']]]));
 
-        return new ItemResolverFactory(
+        return new ItemResolver(
             $iriConverterProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal()

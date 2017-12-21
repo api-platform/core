@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Graphql\Type;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Graphql\Resolver\ResolverFactoryInterface;
+use ApiPlatform\Core\Graphql\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\Graphql\Type\SchemaBuilder;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -57,6 +57,7 @@ class SchemaBuilderTest extends TestCase
 
         $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, false);
         $this->assertEquals([
+            'node',
             'shortName1',
             'shortName1s',
             'shortName2',
@@ -122,6 +123,7 @@ class SchemaBuilderTest extends TestCase
         $queryFields = $schema->getConfig()->getQuery()->getFields();
 
         $this->assertEquals([
+            'node',
             'shortName1',
             'shortName1s',
             'shortName2',
@@ -186,7 +188,6 @@ class SchemaBuilderTest extends TestCase
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
-        $itemResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
 
         $resourceClassNames = [];
@@ -219,7 +220,6 @@ class SchemaBuilderTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn($resourceNameCollection);
 
         $collectionResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
-        $itemResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
         $itemMutationResolverFactoryProphecy->__invoke(Argument::cetera())->willReturn(function () {});
 
         return new SchemaBuilder(
@@ -228,8 +228,8 @@ class SchemaBuilderTest extends TestCase
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $collectionResolverFactoryProphecy->reveal(),
-            $itemResolverFactoryProphecy->reveal(),
             $itemMutationResolverFactoryProphecy->reveal(),
+            function () {},
             function () {},
             $paginationEnabled
         );

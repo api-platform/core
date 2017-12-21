@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql\Resolver;
+namespace ApiPlatform\Core\Graphql\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -64,8 +64,8 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 );
             }
 
-            if (isset($source[$rootProperty = $info->fieldName], $source['#item'])) {
-                $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source['#item']));
+            if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
+                $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
                 $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true);
                 $collection = $subresource ?? [];
             } else {

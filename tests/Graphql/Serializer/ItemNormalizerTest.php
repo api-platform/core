@@ -96,7 +96,7 @@ class ItemNormalizerTest extends TestCase
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $this->assertEquals(['name' => 'hello', '#item' => serialize($dummy)], $normalizer->normalize($dummy, ItemNormalizer::FORMAT, ['resources' => []]));
+        $this->assertEquals(['name' => 'hello', ItemNormalizer::ITEM_KEY => serialize($dummy)], $normalizer->normalize($dummy, ItemNormalizer::FORMAT, ['resources' => []]));
     }
 
     public function testDenormalize()
