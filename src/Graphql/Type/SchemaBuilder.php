@@ -294,16 +294,18 @@ final class SchemaBuilder implements SchemaBuilderInterface
      */
     private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null): GraphQLType
     {
-        $shortName = $resourceMetadata->getShortName();
-        if ($input) {
-            $shortName .= 'Input';
-        }
-        if (null !== $mutationName) {
-            $shortName .= ucfirst($mutationName).'Mutation';
-        }
-
         if (isset($this->graphqlTypes[$resourceClass][$mutationName][$input])) {
             return $this->graphqlTypes[$resourceClass][$mutationName][$input];
+        }
+
+        $shortName = $resourceMetadata->getShortName();
+        if (null !== $mutationName) {
+            $shortName = $mutationName.ucfirst($shortName);
+        }
+        if ($input) {
+            $shortName .= 'Input';
+        } elseif (null !== $mutationName) {
+            $shortName .= 'Payload';
         }
 
         $configuration = [
@@ -325,10 +327,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private function getResourceObjectTypeFields(string $resource, bool $input = false, string $mutationName = null): array
     {
         $fields = [];
-        $idField = ['type' => GraphQLType::id()];
+        $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
+        $clientMutationId = GraphQLType::nonNull(GraphQLType::string());
 
         if ('delete' === $mutationName) {
-            return ['id' => $idField];
+            return [
+                'id' => $idField,
+                'clientMutationId' => $clientMutationId,
+            ];
         }
 
         if (!$input || 'create' !== $mutationName) {
@@ -348,6 +354,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($fieldConfiguration = $this->getResourceFieldConfiguration($propertyMetadata->getDescription(), $propertyType, $resource, $input, $mutationName)) {
                 $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
             }
+        }
+
+        if (null !== $mutationName) {
+            $fields['clientMutationId'] = $clientMutationId;
         }
 
         return $fields;
