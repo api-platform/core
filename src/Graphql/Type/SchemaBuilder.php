@@ -327,7 +327,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private function getResourceObjectTypeFields(string $resource, bool $input = false, string $mutationName = null): array
     {
         $fields = [];
-        $idField = ['type' => GraphQLType::id()];
+        $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
         $clientMutationId = GraphQLType::nonNull(GraphQLType::string());
 
         if ('delete' === $mutationName) {
