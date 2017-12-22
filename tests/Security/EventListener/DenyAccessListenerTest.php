@@ -28,6 +28,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
+ * @group legacy
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class DenyAccessListenerTest extends TestCase

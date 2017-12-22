@@ -223,6 +223,7 @@ class CollectionResolverFactoryTest extends TestCase
             $normalizerProphecy->reveal(),
             $identifiersExtractorProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
+            null,
             $requestStack,
             $paginationEnabled
         );

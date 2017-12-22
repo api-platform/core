@@ -20,6 +20,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,16 +40,18 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private $subresourceDataProvider;
     private $normalizer;
     private $identifiersExtractor;
+    private $resourceAccessChecker;
     private $requestStack;
     private $paginationEnabled;
     private $resourceMetadataFactory;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestStack $requestStack = null, bool $paginationEnabled = false)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, NormalizerInterface $normalizer, IdentifiersExtractorInterface $identifiersExtractor, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, RequestStack $requestStack = null, bool $paginationEnabled = false)
     {
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->normalizer = $normalizer;
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->resourceAccessChecker = $resourceAccessChecker;
         $this->requestStack = $requestStack;
         $this->paginationEnabled = $paginationEnabled;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -72,9 +75,16 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $this->collectionDataProvider->getCollection($resourceClass);
             }
 
-            $normalizationContext = $this->resourceMetadataFactory
-                ->create($resourceClass)
-                ->getGraphqlAttribute('query', 'normalization_context', [], true);
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            if (null !== $this->resourceAccessChecker) {
+                $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
+                if (null !== $isGranted && !$this->resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $collection])) {
+                    throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
+                }
+            }
+
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
             $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
 
             if (!$this->paginationEnabled) {

@@ -17,7 +17,9 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -34,14 +36,16 @@ final class ItemResolver
     use ClassInfoTrait;
 
     private $iriConverter;
+    private $resourceAccessChecker;
     private $normalizer;
     private $resourceMetadataFactory;
 
-    public function __construct(IriConverterInterface $iriConverter, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(IriConverterInterface $iriConverter, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         $this->iriConverter = $iriConverter;
         $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     public function __invoke($source, $args, $context, ResolveInfo $info)
@@ -62,7 +66,17 @@ final class ItemResolver
             return null;
         }
 
-        $normalizationContext = $this->resourceMetadataFactory->create($this->getObjectClass($item))->getGraphqlAttribute('query', 'normalization_context', [], true);
+        $resourceClass = $this->getObjectClass($item);
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (null !== $this->resourceAccessChecker) {
+            $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
+            if (null !== $isGranted && !$this->resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $item])) {
+                throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
+            }
+        }
+
+        $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
 
         return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + ['attributes' => $info->getFieldSelection(PHP_INT_MAX)]);
     }

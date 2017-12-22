@@ -32,6 +32,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -263,6 +264,8 @@ class ApiPlatformExtensionTest extends TestCase
             'DoctrineBundle' => DoctrineBundle::class,
             'SecurityBundle' => SecurityBundle::class,
         ])->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.security.resource_access_checker', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setAlias(ResourceAccessCheckerInterface::class, 'api_platform.security.resource_access_checker')->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.security.listener.request.deny_access', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.security.expression_language', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();

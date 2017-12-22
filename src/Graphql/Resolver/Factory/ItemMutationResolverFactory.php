@@ -19,6 +19,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -37,8 +38,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $dataPersister;
     private $normalizer;
     private $resourceMetadataFactory;
+    private $resourceAccessChecker;
 
-    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!$normalizer instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(sprintf('The normalizer must implements the "%s" interface', DenormalizerInterface::class));
@@ -48,6 +50,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         $this->dataPersister = $dataPersister;
         $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
@@ -65,6 +68,12 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (null !== $this->resourceAccessChecker) {
+                $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
+                if (null !== $isGranted && !$this->resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $item])) {
+                    throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
+                }
+            }
 
             switch ($operationName) {
                 case 'create':
