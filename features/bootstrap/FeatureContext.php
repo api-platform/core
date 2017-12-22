@@ -338,6 +338,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $item = new CompositeItem();
         $item->setField1('foobar');
         $this->manager->persist($item);
+        $this->manager->flush();
 
         for ($i = 0; $i < 4; ++$i) {
             $label = new CompositeLabel();
@@ -349,6 +350,8 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $rel->setValue('somefoobardummy');
 
             $this->manager->persist($label);
+            // since doctrine 2.6 we need existing identifiers on relations
+            $this->manager->flush();
             $this->manager->persist($rel);
         }
 
@@ -401,12 +404,16 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $relatedDummy = new RelatedDummy();
         $relatedDummy->setName('RelatedDummy with friends');
         $this->manager->persist($relatedDummy);
+        $this->manager->flush();
 
         for ($i = 1; $i <= $nb; ++$i) {
             $friend = new DummyFriend();
             $friend->setName('Friend-'.$i);
 
             $this->manager->persist($friend);
+            // since doctrine 2.6 we need existing identifiers on relations
+            // See https://github.com/doctrine/doctrine2/pull/6701
+            $this->manager->flush();
 
             $relation = new RelatedToDummyFriend();
             $relation->setName('Relation-'.$i);
