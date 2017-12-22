@@ -53,7 +53,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
         return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
+            $data = ['clientMutationId' => $args['input']['clientMutationId'] ?? null];
             $item = null;
+
             if (isset($args['input']['id'])) {
                 try {
                     $item = $this->iriConverter->getItemFromIri($args['input']['id']);
@@ -75,13 +77,18 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                         $item,
                         ItemNormalizer::FORMAT,
                         $resourceMetadata->getGraphqlAttribute($operationName, 'normalization_context', [], true)
-                    );
+                    ) + $data;
 
                 case 'delete':
-                    $this->dataPersister->remove($item);
-
-                    return $args['input'];
+                    if ($item) {
+                        $this->dataPersister->remove($item);
+                        $data['id'] = $args['input']['id'];
+                    } else {
+                        $data['id'] = null;
+                    }
             }
+
+            return $data;
         };
     }
 }

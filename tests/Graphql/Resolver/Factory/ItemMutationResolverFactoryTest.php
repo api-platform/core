@@ -44,7 +44,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory(null, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, Dummy::class, 'delete');
 
-        $resolver(null, ['input' => ['id' => '/dummies/3']], null, new ResolveInfo([]));
+        $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, new ResolveInfo([]));
     }
 
     public function testCreateItemDeleteMutationResolver()
@@ -56,7 +56,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, null, 'delete');
 
-        $this->assertEquals(['id' => '/dummies/3'], $resolver(null, ['input' => ['id' => '/dummies/3']], null, new ResolveInfo([])));
+        $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, new ResolveInfo([])));
     }
 
     private function createItemMutationResolverFactory($item, ObjectProphecy $dataPersisterProphecy): ResolverFactoryInterface
