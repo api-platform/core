@@ -11,14 +11,15 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql\Resolver\Factory;
+namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
+use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use GraphQL\Error\Error;
@@ -36,6 +37,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class CollectionResolverFactory implements ResolverFactoryInterface
 {
+    use ResourceAccessCheckerTrait;
+
     private $collectionDataProvider;
     private $subresourceDataProvider;
     private $normalizer;
@@ -76,6 +79,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection);
 
             if (null !== $this->resourceAccessChecker) {
                 $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);

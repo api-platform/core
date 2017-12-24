@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Graphql\Action;
+namespace ApiPlatform\Core\Tests\GraphQl\Action;
 
-use ApiPlatform\Core\Graphql\Action\EntrypointAction;
-use ApiPlatform\Core\Graphql\ExecutorInterface;
-use ApiPlatform\Core\Graphql\Type\SchemaBuilderInterface;
+use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
+use ApiPlatform\Core\GraphQl\ExecutorInterface;
+use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 use PHPUnit\Framework\TestCase;

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql\Resolver;
+namespace ApiPlatform\Core\GraphQl\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
@@ -34,6 +34,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class ItemResolver
 {
     use ClassInfoTrait;
+    use ResourceAccessCheckerTrait;
 
     private $iriConverter;
     private $resourceAccessChecker;
@@ -68,6 +69,7 @@ final class ItemResolver
 
         $resourceClass = $this->getObjectClass($item);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item);
 
         if (null !== $this->resourceAccessChecker) {
             $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);

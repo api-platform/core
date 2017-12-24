@@ -11,13 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql\Resolver\Factory;
+namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
+use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use GraphQL\Error\Error;
@@ -34,6 +35,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ItemMutationResolverFactory implements ResolverFactoryInterface
 {
+    use ResourceAccessCheckerTrait;
+
     private $iriConverter;
     private $dataPersister;
     private $normalizer;
@@ -68,12 +71,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            if (null !== $this->resourceAccessChecker) {
-                $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
-                if (null !== $isGranted && !$this->resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $item])) {
-                    throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
-                }
-            }
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item);
 
             switch ($operationName) {
                 case 'create':

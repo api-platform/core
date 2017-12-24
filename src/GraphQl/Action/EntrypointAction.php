@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql\Action;
+namespace ApiPlatform\Core\GraphQl\Action;
 
-use ApiPlatform\Core\Graphql\ExecutorInterface;
-use ApiPlatform\Core\Graphql\Type\SchemaBuilderInterface;
+use ApiPlatform\Core\GraphQl\ExecutorInterface;
+use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use Symfony\Component\HttpFoundation\JsonResponse;

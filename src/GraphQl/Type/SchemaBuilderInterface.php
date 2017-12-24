@@ -11,16 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql\Resolver\Factory;
+namespace ApiPlatform\Core\GraphQl\Type;
+
+use GraphQL\Type\Schema;
 
 /**
- * Builds a GraphQL resolver.
+ * Builds a GraphQL schema.
  *
  * @experimental
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
-interface ResolverFactoryInterface
+interface SchemaBuilderInterface
 {
-    public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable;
+    public function getSchema(): Schema;
 }

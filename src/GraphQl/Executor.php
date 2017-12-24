@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Graphql;
+namespace ApiPlatform\Core\GraphQl;
 
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL;

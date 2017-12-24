@@ -19,7 +19,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace ApiPlatform\Core\Graphql\Serializer;
+namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;

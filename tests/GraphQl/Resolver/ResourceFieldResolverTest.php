@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Graphql\Resolver;
+namespace ApiPlatform\Core\Tests\GraphQl\Resolver;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Graphql\Resolver\ResourceFieldResolver;
-use ApiPlatform\Core\Graphql\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver;
+use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Graphql\Type;
+namespace ApiPlatform\Core\Tests\GraphqQl\Type;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Graphql\Resolver\Factory\ResolverFactoryInterface;
-use ApiPlatform\Core\Graphql\Type\SchemaBuilder;
+use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
+use ApiPlatform\Core\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;

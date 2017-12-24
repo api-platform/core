@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Graphql\Resolver\Factory;
+namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Graphql\Resolver\Factory\ItemMutationResolverFactory;
-use ApiPlatform\Core\Graphql\Resolver\Factory\ResolverFactoryInterface;
+use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
+use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;

@@ -58,7 +58,7 @@ Feature: Authorization checking
     """
     Then the response status code should be 201
 
-  Scenario: An user retrieves cannot retrieve an item he doesn't own
+  Scenario: An user cannot retrieve an item he doesn't own
     When I add "Accept" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send a "GET" request to "/secured_dummies/1"
