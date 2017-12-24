@@ -15,39 +15,38 @@ namespace ApiPlatform\Core\Security\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ExpressionLanguage;
+use ApiPlatform\Core\Security\ResourceAccessChecker;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * Denies access to the current resource if the logged user doesn't have sufficient permissions.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
  */
 final class DenyAccessListener
 {
     private $resourceMetadataFactory;
-    private $expressionLanguage;
-    private $authenticationTrustResolver;
-    private $roleHierarchy;
-    private $tokenStorage;
-    private $authorizationChecker;
+    private $resourceAccessChecker;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ExpressionLanguage $expressionLanguage = null, AuthenticationTrustResolverInterface $authenticationTrustResolver = null, RoleHierarchyInterface $roleHierarchy = null, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, /*ResourceAccessCheckerInterface*/ $resourceAccessCheckerOrExpressionLanguage = null, AuthenticationTrustResolverInterface $authenticationTrustResolver = null, RoleHierarchyInterface $roleHierarchy = null, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->expressionLanguage = $expressionLanguage;
-        $this->authenticationTrustResolver = $authenticationTrustResolver;
-        $this->roleHierarchy = $roleHierarchy;
-        $this->tokenStorage = $tokenStorage;
-        $this->authorizationChecker = $authorizationChecker;
+
+        if ($resourceAccessCheckerOrExpressionLanguage instanceof ResourceAccessCheckerInterface) {
+            $this->resourceAccessChecker = $resourceAccessCheckerOrExpressionLanguage;
+
+            return;
+        }
+
+        $this->resourceAccessChecker = new ResourceAccessChecker($resourceAccessCheckerOrExpressionLanguage, $authenticationTrustResolver, $roleHierarchy, $tokenStorage, $authorizationChecker);
+        @trigger_error(sprintf('Passing an instance of "%s" or null as second argument of "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Pass an instance of "%s" and no extra argument instead.', ExpressionLanguage::class, self::class, ResourceAccessCheckerInterface::class), E_USER_DEPRECATED);
     }
 
     /**
@@ -77,45 +76,12 @@ final class DenyAccessListener
             return;
         }
 
-        if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
-            throw new \LogicException(sprintf('The "symfony/security" library must be installed to use the "access_control" attribute on class "%s".', $attributes['resource_class']));
-        }
-        if (null === $this->tokenStorage->getToken()) {
-            throw new \LogicException(sprintf('The resource must be behind a firewall to use the "access_control" attribute on class "%s".', $attributes['resource_class']));
-        }
-        if (null === $this->expressionLanguage) {
-            throw new \LogicException(sprintf('The "symfony/expression-language" library must be installed to use the "access_control" attribute on class "%s".', $attributes['resource_class']));
-        }
+        $extraVariables = $request->attributes->all();
+        $extraVariables['object'] = $request->attributes->get('data');
+        $extraVariables['request'] = $request;
 
-        if (!$this->expressionLanguage->evaluate($isGranted, $this->getVariables($request))) {
+        if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
             throw new AccessDeniedException();
         }
-    }
-
-    /**
-     * @copyright Fabien Potencier <fabien@symfony.com>
-     *
-     * @see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php
-     */
-    private function getVariables(Request $request): array
-    {
-        $token = $this->tokenStorage->getToken();
-        $roles = $this->roleHierarchy ? $this->roleHierarchy->getReachableRoles($token->getRoles()) : $token->getRoles();
-
-        $variables = [
-            'token' => $token,
-            'user' => $token->getUser(),
-            'object' => $request->attributes->get('data'),
-            'request' => $request,
-            'roles' => array_map(function (Role $role) {
-                return $role->getRole();
-            }, $roles),
-            'trust_resolver' => $this->authenticationTrustResolver,
-            // needed for the is_granted expression function
-            'auth_checker' => $this->authorizationChecker,
-        ];
-
-        // controller variables should also be accessible
-        return array_merge($request->attributes->all(), $variables);
     }
 }

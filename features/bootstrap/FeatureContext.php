@@ -40,6 +40,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
@@ -550,6 +551,23 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
             $this->manager->persist($relationDummy);
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb SecuredDummy objects
+     */
+    public function thereAreSecuredDummyObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $securedDummy = new SecuredDummy();
+            $securedDummy->setTitle("#$i");
+            $securedDummy->setDescription("Hello #$i");
+            $securedDummy->setOwner('notexist');
+
+            $this->manager->persist($securedDummy);
         }
 
         $this->manager->flush();

@@ -5,38 +5,41 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.graphql.executor" class="ApiPlatform\Core\Graphql\Executor" public="false" />
+        <service id="api_platform.graphql.executor" class="ApiPlatform\Core\GraphQl\Executor" public="false" />
 
         <!-- Resolvers -->
 
-        <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\Core\Graphql\Resolver\Factory\CollectionResolverFactory" public="false">
+        <service id="api_platform.graphql.resolver.factory.collection" class="ApiPlatform\Core\GraphQl\Resolver\Factory\CollectionResolverFactory" public="false">
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="null" />
             <argument type="service" id="request_stack" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>
 
-        <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\Graphql\Resolver\Factory\ItemMutationResolverFactory" public="false">
+        <service id="api_platform.graphql.resolver.factory.item_mutation" class="ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory" public="false">
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.graphql.resolver.item" class="ApiPlatform\Core\Graphql\Resolver\ItemResolver" public="false">
+        <service id="api_platform.graphql.resolver.item" class="ApiPlatform\Core\GraphQl\Resolver\ItemResolver" public="false">
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\Core\Graphql\Resolver\ResourceFieldResolver" public="false">
+        <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver" public="false">
             <argument type="service" id="api_platform.iri_converter" />
         </service>
 
-        <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\Graphql\Type\SchemaBuilder" public="false">
+        <service id="api_platform.graphql.schema_builder" class="ApiPlatform\Core\GraphQl\Type\SchemaBuilder" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -50,7 +53,7 @@
 
         <!-- Action -->
 
-        <service id="api_platform.graphql.action.entrypoint" class="ApiPlatform\Core\Graphql\Action\EntrypointAction" public="true">
+        <service id="api_platform.graphql.action.entrypoint" class="ApiPlatform\Core\GraphQl\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.graphql.schema_builder" />
             <argument type="service" id="api_platform.graphql.executor" />
             <argument type="service" id="twig" />
@@ -61,7 +64,7 @@
 
         <!-- Serializer -->
 
-        <service id="api_platform.graphql.normalizer.item" class="ApiPlatform\Core\Graphql\Serializer\ItemNormalizer" public="false">
+        <service id="api_platform.graphql.normalizer.item" class="ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.iri_converter" />

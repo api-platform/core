@@ -1,10 +1,10 @@
 Feature: Authorization checking
   In order to use the API
-  As a client software developer
+  As a client software user
   I need to be authorized to access a given resource.
 
   @createSchema
-  Scenario: An anonymous user retrieve a secured resource
+  Scenario: An anonymous user retrieves a secured resource
     When I add "Accept" header equal to "application/ld+json"
     And I send a "GET" request to "/secured_dummies"
     Then the response status code should be 401
@@ -15,7 +15,6 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies"
     Then the response status code should be 200
     And the response should be in JSON
-
 
   Scenario: A standard user cannot create a secured resource
     When I add "Accept" header equal to "application/ld+json"
@@ -59,7 +58,7 @@ Feature: Authorization checking
     """
     Then the response status code should be 201
 
-  Scenario: An user retrieve cannot retrieve an item he doesn't own
+  Scenario: An user cannot retrieve an item he doesn't own
     When I add "Accept" header equal to "application/ld+json"
     And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send a "GET" request to "/secured_dummies/1"
