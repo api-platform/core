@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Validates data.
  *
+ * @deprecated
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class ValidateListener
