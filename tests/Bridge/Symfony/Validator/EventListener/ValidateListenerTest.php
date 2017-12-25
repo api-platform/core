@@ -28,6 +28,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ *
+ * @group legacy
  */
 class ValidateListenerTest extends TestCase
 {
@@ -157,6 +159,8 @@ class ValidateListenerTest extends TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $violationsProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $violationsProphecy->rewind()->shouldBeCalled();
+        $violationsProphecy->valid()->shouldBeCalled();
         $violationsProphecy->count()->willReturn(1)->shouldBeCalled();
         $violations = $violationsProphecy->reveal();
 
