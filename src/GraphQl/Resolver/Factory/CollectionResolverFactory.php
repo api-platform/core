@@ -79,7 +79,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection);
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
 
             if (null !== $this->resourceAccessChecker) {
                 $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);

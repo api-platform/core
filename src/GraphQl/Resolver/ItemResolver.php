@@ -69,7 +69,7 @@ final class ItemResolver
 
         $resourceClass = $this->getObjectClass($item);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item);
+        $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, 'query');
 
         if (null !== $this->resourceAccessChecker) {
             $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
