@@ -26,7 +26,6 @@ interface ValidatorInterface
      * Validates an item.
      *
      * @param object $data
-     * @param array  $contexy
      *
      * @throws ValidationException
      */

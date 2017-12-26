@@ -35,10 +35,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Validates an item.
-     *
-     * @param object $data
-     * @param array  $context
+     * {@inheritdoc}
      */
     public function validate($data, array $context = [])
     {
