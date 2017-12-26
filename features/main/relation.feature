@@ -19,6 +19,7 @@ Feature: Relations support
       "@context": "/contexts/ThirdLevel",
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
+      "fourthLevel": null,
       "id": 1,
       "level": 3,
       "test": true
@@ -64,7 +65,11 @@ Feature: Relations support
       "name": null,
       "symfony": "symfony",
       "dummyDate": null,
-      "thirdLevel": "/third_levels/1",
+      "thirdLevel": {
+        "@id": "/third_levels/1",
+        "@type": "ThirdLevel",
+        "fourthLevel": null
+      },
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
       "embeddedDummy": null,
@@ -258,7 +263,8 @@ Feature: Relations support
           "thirdLevel": {
             "@id": "/third_levels/1",
             "@type": "ThirdLevel",
-            "level": 3
+            "level": 3,
+            "fourthLevel": null
           }
         }
       }
