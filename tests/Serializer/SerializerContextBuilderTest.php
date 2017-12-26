@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Serializer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilder;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -37,7 +38,10 @@ class SerializerContextBuilderTest extends TestCase
             null,
             [],
             [],
-            ['normalization_context' => ['foo' => 'bar'], 'denormalization_context' => ['bar' => 'baz']]
+            [
+                'normalization_context' => ['foo' => 'bar', DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'MyDefinition'],
+                'denormalization_context' => ['bar' => 'baz'],
+            ]
         );
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

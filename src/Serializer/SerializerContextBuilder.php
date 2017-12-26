@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -91,6 +92,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['subresource_property'] = $attributes['subresource_property'];
             $context['subresource_resource_class'] = $attributes['subresource_resource_class'] ?? null;
         }
+
+        unset($context[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
 
         return $context;
     }
