@@ -46,6 +46,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     const SWAGGER_VERSION = '2.0';
     const FORMAT = 'json';
+    const SWAGGER_DEFINITION_NAME = 'swagger_definition_name';
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -445,7 +446,11 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
-        $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
+        if (isset($serializerContext[self::SWAGGER_DEFINITION_NAME])) {
+            $definitionKey = sprintf('%s-%s', $resourceMetadata->getShortName(), $serializerContext[self::SWAGGER_DEFINITION_NAME]);
+        } else {
+            $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
+        }
 
         if (!isset($definitions[$definitionKey])) {
             $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
