@@ -284,6 +284,22 @@ Feature: Subresource support
     }
     """
 
+  Scenario: Get the embedded relation collection at the fourth level
+    When I send a "GET" request to "/dummies/1/related_dummies/1/third_level/fourth_level"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/FourthLevel",
+      "@id": "/fourth_levels/1",
+      "@type": "FourthLevel",
+      "id": 1,
+      "level": 4
+    }
+    """
+
   Scenario: Get offers subresource from aggregate offers subresource
     Given I have a product with offers
     When I send a "GET" request to "/dummy_products/2/offers/1/offers"
