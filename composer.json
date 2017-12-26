@@ -31,9 +31,9 @@
         "behat/mink-extension": "^2.2",
         "behat/symfony2-extension": "^2.1",
         "behatch/contexts": "^2.6",
+        "doctrine/annotations": "^1.2",
         "doctrine/doctrine-bundle": "^1.6.3",
         "doctrine/orm": "^2.5",
-        "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0",
         "nelmio/api-doc-bundle": "^2.11.2",
         "php-mock/php-mock-phpunit": "^2.0",
@@ -71,5 +71,8 @@
         "branch-alias": {
             "dev-master": "2.0.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
