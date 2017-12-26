@@ -19,7 +19,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
- * Use Doctrine metadata to populate the identifier property.
+ * Use Doctrine metadata to populate the identifier and/or required properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -41,7 +41,7 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        if (null !== $propertyMetadata->isIdentifier()) {
+        if (null !== $propertyMetadata->isIdentifier() && null !== $propertyMetadata->isRequired()) {
             return $propertyMetadata;
         }
 
@@ -53,6 +53,18 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         if (!$doctrineClassMetadata) {
             return $propertyMetadata;
+        }
+
+        if (null === $propertyMetadata->isRequired()
+            && $doctrineClassMetadata instanceof ClassMetadataInfo
+            && $doctrineClassMetadata->hasAssociation($property)
+        ) {
+            $mapping = $doctrineClassMetadata->getAssociationMapping($property);
+            $propertyMetadata = $propertyMetadata->withRequired(!($mapping['joinColumns'][0]['nullable'] ?? true));
+
+            if (null !== $propertyMetadata->isIdentifier()) {
+                return $propertyMetadata;
+            }
         }
 
         $identifiers = $doctrineClassMetadata->getIdentifier();

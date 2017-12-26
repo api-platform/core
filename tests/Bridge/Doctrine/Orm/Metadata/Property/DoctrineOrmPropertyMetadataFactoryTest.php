@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMe
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NotNullableRelationDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -59,10 +60,11 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id', []), $propertyMetadata);
     }
 
-    public function testCreateIsIdentifier()
+    public function testCreateIsIdentifierNotRequired()
     {
         $propertyMetadata = new PropertyMetadata();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
+        $propertyMetadata = $propertyMetadata->withRequired(false);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
@@ -90,6 +92,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $classMetadata = $this->prophesize(ClassMetadataInfo::class);
         $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
+        $classMetadata->hasAssociation('id')->shouldBeCalled()->willReturn(false);
 
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
@@ -115,6 +118,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $classMetadata = $this->prophesize(ClassMetadataInfo::class);
         $classMetadata->getIdentifier()->shouldBeCalled()->willReturn(['id']);
         $classMetadata->isIdentifierNatural()->shouldBeCalled()->willReturn(true);
+        $classMetadata->hasAssociation('id')->shouldBeCalled()->willReturn(false);
 
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
@@ -152,5 +156,31 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
         $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), true);
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
+    }
+
+    public function testCreateIsRequired()
+    {
+        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = $propertyMetadata->withIdentifier(false);
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create(NotNullableRelationDummy::class, 'dummyFriend', [])->shouldBeCalled()->willReturn($propertyMetadata);
+
+        $classMetadata = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadata->hasAssociation('dummyFriend')->shouldBeCalled()->willReturn(true);
+        $classMetadata->getAssociationMapping('dummyFriend')->shouldBeCalled()->willReturn(['joinColumns' => [['nullable' => false]]]);
+
+        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager->getClassMetadata(NotNullableRelationDummy::class)->shouldBeCalled()->willReturn($classMetadata->reveal());
+
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass(NotNullableRelationDummy::class)->shouldBeCalled()->willReturn($objectManager->reveal());
+
+        $doctrineOrmPropertyMetadataFactory = new DoctrineOrmPropertyMetadataFactory($managerRegistry->reveal(), $propertyMetadataFactory->reveal());
+
+        $doctrinePropertyMetadata = $doctrineOrmPropertyMetadataFactory->create(NotNullableRelationDummy::class, 'dummyFriend', []);
+
+        $this->assertEquals($doctrinePropertyMetadata->isIdentifier(), false);
+        $this->assertEquals($doctrinePropertyMetadata->isRequired(), true);
     }
 }
