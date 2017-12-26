@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Exception;
 
+use ApiPlatform\Core\Validator\Exception\ValidationException as BaseValidationException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -20,15 +21,15 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ValidationException extends \RuntimeException
+final class ValidationException extends BaseValidationException
 {
     private $constraintViolationList;
 
-    public function __construct(ConstraintViolationListInterface $constraintViolationList, $message = '', $code = 0, \Exception $previous = null)
+    public function __construct(ConstraintViolationListInterface $constraintViolationList, string $message = '', int $code = 0, \Exception $previous = null)
     {
-        parent::__construct($message, $code, $previous);
-
         $this->constraintViolationList = $constraintViolationList;
+
+        parent::__construct($message ?: $this->__toString(), $code, $previous);
     }
 
     /**
@@ -39,5 +40,22 @@ final class ValidationException extends \RuntimeException
     public function getConstraintViolationList()
     {
         return $this->constraintViolationList;
+    }
+
+    public function __toString(): string
+    {
+        $message = '';
+        foreach ($this->constraintViolationList as $violation) {
+            if ('' !== $message) {
+                $message .= "\n";
+            }
+            if ($propertyPath = $violation->getPropertyPath()) {
+                $message .= "$propertyPath: ";
+            }
+
+            $message .= $violation->getMessage();
+        }
+
+        return $message;
     }
 }

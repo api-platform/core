@@ -114,7 +114,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateFoo.clientMutationId" should be equal to "myId"
 
   @createSchema
-  @dropSchema
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -133,3 +132,18 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateCompositeRelation.id" should be equal to "/composite_relations/compositeItem=1;compositeLabel=2"
     And the JSON node "data.updateCompositeRelation.value" should be equal to "Modified value."
     And the JSON node "data.updateCompositeRelation.clientMutationId" should be equal to "myId"
+
+  @dropSchema
+  Scenario: Trigger a validation error
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummy(input: {_id: 12, name: "", clientMutationId: "myId"}) {
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].message" should be equal to "name: This value should not be blank."

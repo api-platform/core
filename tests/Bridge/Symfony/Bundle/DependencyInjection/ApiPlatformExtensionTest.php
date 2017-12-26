@@ -35,6 +35,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Core\Validator\ValidatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use FOS\UserBundle\FOSUserBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
@@ -480,6 +481,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
             'api_platform.serializer_locator',
+            'api_platform.validator',
         ];
 
         foreach ($definitions as $definition) {
@@ -514,6 +516,7 @@ class ApiPlatformExtensionTest extends TestCase
             ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
             PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
+            ValidatorInterface::class => 'api_platform.validator',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -640,6 +643,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.purger.varnish',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.listener.response.add_tags',
+            'api_platform.validator',
         ];
 
         foreach ($definitions as $definition) {
@@ -653,6 +657,7 @@ class ApiPlatformExtensionTest extends TestCase
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
             PaginationExtension::class => 'api_platform.doctrine.orm.query_extension.pagination',
             OrderExtension::class => 'api_platform.doctrine.orm.query_extension.order',
+            ValidatorInterface::class => 'api_platform.validator',
         ];
 
         foreach ($aliases as $alias => $service) {

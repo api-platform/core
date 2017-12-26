@@ -20,7 +20,10 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceAccessCheckerTrait;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Core\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Validator\ValidatorInterface;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -42,8 +45,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $normalizer;
     private $resourceMetadataFactory;
     private $resourceAccessChecker;
+    private $validator;
 
-    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(IriConverterInterface $iriConverter, DataPersisterInterface $dataPersister, NormalizerInterface $normalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceAccessCheckerInterface $resourceAccessChecker = null, ValidatorInterface $validator = null)
     {
         if (!$normalizer instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(sprintf('The normalizer must implements the "%s" interface', DenormalizerInterface::class));
@@ -54,6 +58,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         $this->normalizer = $normalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
+        $this->validator = $validator;
     }
 
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
@@ -78,6 +83,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 case 'update':
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
+                    $this->validate($item, $info, $resourceMetadata, $operationName);
                     $this->dataPersister->persist($item);
 
                     return $this->normalizer->normalize(
@@ -97,5 +103,25 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             return $data;
         };
+    }
+
+    /**
+     * @param object $item
+     *
+     * @throws Error
+     */
+    private function validate($item, ResolveInfo $info, ResourceMetadata $resourceMetadata, string $operationName = null)
+    {
+        if (null === $this->validator) {
+            return;
+        }
+
+        $validationGroups = $resourceMetadata->getGraphqlAttribute($operationName, 'validation_groups', null, true);
+
+        try {
+            $this->validator->validate($item, ['groups' => $validationGroups]);
+        } catch (ValidationException $e) {
+            throw Error::createLocatedError($e->getMessage(), $info->fieldNodes, $info->path);
+        }
     }
 }

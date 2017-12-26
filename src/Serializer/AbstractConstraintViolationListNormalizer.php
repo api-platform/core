@@ -57,10 +57,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
             }
 
             $violations[] = $violationData;
-
-            $propertyPath = $violation->getPropertyPath();
-            $prefix = $propertyPath ? sprintf('%s: ', $propertyPath) : '';
-            $messages[] = "$prefix{$violation->getMessage()}";
+            $messages[] = ($violationData['propertyPath'] ? "{$violationData['propertyPath']}: " : '').$violationData['message'];
         }
 
         return [$messages, $violations];
