@@ -36,8 +36,8 @@ class ValidationExceptionTest extends TestCase
     public function testToString()
     {
         $e = new ValidationException(new ConstraintViolationList([
-            new ConstraintViolation('message 1', null, [], '', '', 'invalid'),
-            new ConstraintViolation('message 2', null, [], '', 'foo', 'invalid'),
+            new ConstraintViolation('message 1', '', [], '', '', 'invalid'),
+            new ConstraintViolation('message 2', '', [], '', 'foo', 'invalid'),
         ]));
         $this->assertInstanceOf(MainValidationException::class, $e);
         $this->assertInstanceOf(RuntimeException::class, $e);
