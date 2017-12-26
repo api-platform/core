@@ -41,13 +41,13 @@ trait ResourceAccessCheckerTrait
      *
      * @throws Error
      */
-    public function canAccess(ResourceAccessCheckerInterface $resourceAccessChecker = null, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null)
+    public function canAccess(ResourceAccessCheckerInterface $resourceAccessChecker = null, ResourceMetadata $resourceMetadata, string $resourceClass, ResolveInfo $info, $object = null, string $operationName = null)
     {
         if (null === $resourceAccessChecker) {
             return;
         }
 
-        $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
+        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
         if (null === $isGranted || $resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $object])) {
             return;
         }

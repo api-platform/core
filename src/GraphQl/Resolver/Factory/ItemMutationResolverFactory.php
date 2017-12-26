@@ -71,7 +71,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item);
+            $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, $operationName);
 
             switch ($operationName) {
                 case 'create':
