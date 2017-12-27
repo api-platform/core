@@ -127,7 +127,11 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $responseDefinitionKey = $this->getDefinition($definitions, $subResourceMetadata, $subresourceOperation['resource_class'], $serializerContext);
 
                 $pathOperation = new \ArrayObject([]);
-                $pathOperation['tags'] = $subresourceOperation['shortNames'];
+                if (isset($subresourceOperation['shortNames'][1])) {
+                    $pathOperation['tags'] = [$subresourceOperation['shortNames'][1]];
+                } else {
+                    $pathOperation['tags'] = [$subresourceOperation['shortNames'][0]];
+                }
                 $pathOperation['operationId'] = $operationId;
                 $pathOperation['produces'] = $mimeTypes;
                 $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');

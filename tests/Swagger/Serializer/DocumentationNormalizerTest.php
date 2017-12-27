@@ -1735,7 +1735,7 @@ class DocumentationNormalizerTest extends TestCase
                 ],
                 '/api/questions/{id}/answer' => new \ArrayObject([
                     'get' => new \ArrayObject([
-                        'tags' => ['Answer', 'Question'],
+                        'tags' => ['Question'],
                         'operationId' => 'api_questions_answer_get_subresource',
                         'produces' => ['application/ld+json'],
                         'summary' => 'Retrieves a Answer resource.',
