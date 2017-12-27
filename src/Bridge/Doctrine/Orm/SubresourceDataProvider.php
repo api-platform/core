@@ -128,7 +128,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
      */
     private function buildQuery(array $identifiers, array $context, QueryNameGenerator $queryNameGenerator, QueryBuilder $previousQueryBuilder, string $previousAlias, int $remainingIdentifiers, QueryBuilder $topQueryBuilder = null): QueryBuilder
     {
-        if (!$remainingIdentifiers) {
+        if ($remainingIdentifiers <= 0) {
             return $previousQueryBuilder;
         }
 
