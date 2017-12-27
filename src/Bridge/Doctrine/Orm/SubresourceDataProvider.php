@@ -168,11 +168,9 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                 $qb->select($joinAlias)
                     ->from($identifierResourceClass, $alias)
                     ->innerJoin("$alias.$previousAssociationProperty", $joinAlias);
-
                 break;
             case ClassMetadataInfo::ONE_TO_MANY:
                 $mappedBy = $classMetadata->getAssociationMapping($previousAssociationProperty)['mappedBy'];
-
                 $previousAlias = "$previousAlias.$mappedBy";
 
                 $qb->select($alias)
