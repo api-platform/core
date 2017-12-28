@@ -111,6 +111,8 @@ final class ApiLoader extends Loader
                             'property' => $operation['property'],
                             'identifiers' => $operation['identifiers'],
                             'collection' => $operation['collection'],
+                            'parent_resource_class' => $resourceClass,
+                            'parent_operation_name' => $operation['operation_name'],
                             'operationId' => $operationId,
                         ],
                     ] + $operation['defaults'] ?? [],

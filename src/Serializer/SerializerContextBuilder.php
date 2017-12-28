@@ -42,36 +42,43 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             throw new RuntimeException('Request attributes are not valid.');
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
 
-        $operationKey = null;
-        $operationType = null;
-
         if (isset($attributes['collection_operation_name'])) {
-            $operationKey = 'collection_operation_name';
-            $operationType = OperationType::COLLECTION;
-        } elseif (isset($attributes['subresource_operation_name'])) {
-            $operationKey = 'subresource_operation_name';
-            $operationType = OperationType::SUBRESOURCE;
-        }
+            $attribute = $attributes['collection_operation_name'];
+            $resourceClass = $attributes['resource_class'];
 
-        if (null !== $operationKey) {
-            $attribute = $attributes[$operationKey];
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $context = $resourceMetadata->getCollectionOperationAttribute($attribute, $key, [], true);
-            $context[$operationKey] = $attribute;
+
+            $context['collection_operation_name'] = $attribute;
+            $context['resource_class'] = $resourceClass;
+            $context['operation_type'] = OperationType::COLLECTION;
+        } elseif (isset($attributes['subresource_operation_name'])) {
+            $attribute = $attributes['subresource_operation_name'];
+            $resourceClass = $attributes['resource_class'];
+            $parentClass = $attributes['subresource_context']['parent_resource_class'];
+            $parentOperationName = $attributes['subresource_context']['parent_operation_name'];
+
+            $parentMetadata = $this->resourceMetadataFactory->create($parentClass);
+            $context = $parentMetadata->getSubresourceOperationAttribute($parentOperationName, $key, [], true);
+
+            $context['subresource_operation_name'] = $attribute;
+            $context['resource_class'] = $resourceClass;
+            $context['operation_type'] = OperationType::SUBRESOURCE;
         } else {
+            $resourceClass = $attributes['resource_class'];
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $context = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], $key, [], true);
             $context['item_operation_name'] = $attributes['item_operation_name'];
+            $context['resource_class'] = $attributes['resource_class'];
+            $context['operation_type'] = OperationType::ITEM;
         }
-
-        $context['operation_type'] = $operationType ?: OperationType::ITEM;
 
         if (!$normalization && !isset($context['api_allow_update'])) {
             $context['api_allow_update'] = Request::METHOD_PUT === $request->getMethod();
         }
 
-        $context['resource_class'] = $attributes['resource_class'];
         $context['request_uri'] = $request->getRequestUri();
 
         if (isset($attributes['subresource_context'])) {
