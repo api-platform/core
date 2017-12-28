@@ -91,7 +91,6 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $this->dataPersister->persist($item);
 
                     return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
-
                 case 'delete':
                     if ($item) {
                         $this->dataPersister->remove($item);

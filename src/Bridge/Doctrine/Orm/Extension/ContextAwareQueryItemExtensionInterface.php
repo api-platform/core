@@ -28,5 +28,4 @@ interface ContextAwareQueryItemExtensionInterface extends QueryItemExtensionInte
      * @return mixed
      */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []);
-
 }

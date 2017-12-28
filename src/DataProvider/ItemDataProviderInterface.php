@@ -25,7 +25,7 @@ interface ItemDataProviderInterface
     /**
      * Retrieves an item.
      *
-     * @param int|string  $id
+     * @param int|string $id
      *
      * @throws ResourceClassNotSupportedException
      *

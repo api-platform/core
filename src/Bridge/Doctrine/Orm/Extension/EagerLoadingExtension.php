@@ -54,9 +54,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
-        if (null !== $this->serializerContextBuilder) {
-            @trigger_error('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "normalization_context" of the data provider\'s context instead.', E_USER_DEPRECATED);
-        }
+        //if (null !== $this->serializerContextBuilder) {
+        //    @trigger_error('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "normalization_context" of the data provider\'s context instead.', E_USER_DEPRECATED);
+        //}
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -84,7 +84,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
         if (!$normalizationContext = $context['normalization_context'] ?? false) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            $normalizationContext =  $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
+            $normalizationContext = $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
         }
 
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $normalizationContext);
@@ -101,7 +101,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
         if (!$normalizationContext = $context['normalization_context'] ?? false) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            $normalizationContext =  $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
+            $normalizationContext = $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
         }
 
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $normalizationContext);
