@@ -18,5 +18,5 @@ namespace ApiPlatform\Core\DataProvider;
  */
 interface RestrictedDataProviderInterface
 {
-    public function supports(string $resourceClass, string $operationName = null): bool;
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool;
 }

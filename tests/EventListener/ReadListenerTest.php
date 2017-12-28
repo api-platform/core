@@ -92,7 +92,7 @@ class ReadListenerTest extends TestCase
     public function testRetrieveCollectionGet()
     {
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
-        $collectionDataProvider->getCollection('Foo', 'get')->willReturn([])->shouldBeCalled();
+        $collectionDataProvider->getCollection('Foo', 'get', [])->willReturn([])->shouldBeCalled();
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
@@ -119,7 +119,7 @@ class ReadListenerTest extends TestCase
 
         $data = new \stdClass();
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', 1, 'get')->willReturn($data)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', 1, 'get', [])->willReturn($data)->shouldBeCalled();
 
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
@@ -168,7 +168,7 @@ class ReadListenerTest extends TestCase
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', 22, 'get')->willReturn(null)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', 22, 'get', [])->willReturn(null)->shouldBeCalled();
 
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 

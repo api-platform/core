@@ -17,12 +17,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Interface of Doctrine ORM query extensions for collection queries.
+ * Context aware extension.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface QueryCollectionExtensionInterface
+interface ContextAwareQueryCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = []);
 }

@@ -51,7 +51,7 @@ class CollectionDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
         $extensionProphecy = $this->prophesize(QueryCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, 'foo')->shouldBeCalled();
+        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, 'foo', [])->shouldBeCalled();
 
         $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
@@ -72,9 +72,9 @@ class CollectionDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
         $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
-        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, 'foo')->shouldBeCalled();
-        $extensionProphecy->supportsResult(Dummy::class, 'foo')->willReturn(true)->shouldBeCalled();
-        $extensionProphecy->getResult($queryBuilder, Dummy::class, 'foo')->willReturn([])->shouldBeCalled();
+        $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, 'foo', [])->shouldBeCalled();
+        $extensionProphecy->supportsResult(Dummy::class, 'foo', [])->willReturn(true)->shouldBeCalled();
+        $extensionProphecy->getResult($queryBuilder, Dummy::class, 'foo', [])->willReturn([])->shouldBeCalled();
 
         $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));

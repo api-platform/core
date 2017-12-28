@@ -397,12 +397,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertNotInstanceOf(PaginatorInterface::class, $result);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Method ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension::getResult() will have a 2nd `string $resourceClass` argument in version 3.0. Not defining it is deprecated since 2.2.
-     * @expectedDeprecation Method ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension::getResult() will have a 3rd `string $operationName = null` argument in version 3.0. Not defining it is deprecated since 2.2.
-     */
-    public function testLegacyGetResult()
+    public function testSimpleGetResult()
     {
         $result = $this->getPaginationExtensionResult(false, true);
 

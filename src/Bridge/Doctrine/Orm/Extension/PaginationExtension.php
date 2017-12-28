@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class PaginationExtension implements QueryResultCollectionExtensionInterface
+final class PaginationExtension implements ContextAwareQueryResultCollectionExtensionInterface
 {
     private $managerRegistry;
     private $requestStack;
@@ -70,8 +70,12 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
+        if (null === $resourceClass) {
+            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
+        }
+
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
             return;
@@ -121,7 +125,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName = null): bool
+    public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
@@ -136,22 +140,8 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     /**
      * {@inheritdoc}
      */
-    public function getResult(QueryBuilder $queryBuilder/*, string $resourceClass, string $operationName = null*/)
+    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
     {
-        $resourceClass = $operationName = null;
-
-        if (func_num_args() >= 2) {
-            $resourceClass = func_get_arg(1);
-        } else {
-            @trigger_error(sprintf('Method %s() will have a 2nd `string $resourceClass` argument in version 3.0. Not defining it is deprecated since 2.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-
-        if (func_num_args() >= 3) {
-            $operationName = func_get_arg(2);
-        } else {
-            @trigger_error(sprintf('Method %s() will have a 3rd `string $operationName = null` argument in version 3.0. Not defining it is deprecated since 2.2.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 

@@ -58,7 +58,10 @@ final class SerializeListener
             return;
         }
 
-        $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        if (null === $context = $request->attributes->get('_api_normalization_context')) {
+            $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        }
+
         $resources = new class() extends \ArrayObject {
             public function serialize()
             {

@@ -40,7 +40,7 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
         foreach ($this->dataProviders as $dataProvider) {
             try {
                 if ($dataProvider instanceof RestrictedDataProviderInterface
-                    && !$dataProvider->supports($resourceClass, $operationName)) {
+                    && !$dataProvider->supports($resourceClass, $operationName, $context)) {
                     continue;
                 }
 

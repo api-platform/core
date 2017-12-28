@@ -16,11 +16,11 @@ namespace ApiPlatform\Core\DataProvider;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
- * Retrieves items from a persistence layer.
+ * Retrieves items from a persistence layer and allow to pass a context to it.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface CollectionDataProviderInterface
+interface ContextAwareCollectionDataProviderInterface extends CollectionDataProviderInterface
 {
     /**
      * Retrieves a collection.
@@ -29,5 +29,5 @@ interface CollectionDataProviderInterface
      *
      * @return array|\Traversable
      */
-    public function getCollection(string $resourceClass, string $operationName = null);
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = []);
 }
