@@ -32,9 +32,9 @@
         "behat/mink-extension": "^2.2",
         "behat/symfony2-extension": "^2.1.1",
         "behatch/contexts": "dev-master",
+        "doctrine/annotations": "^1.2",
         "doctrine/doctrine-bundle": "^1.6.3",
         "doctrine/orm": "^2.5.2",
-        "doctrine/annotations": "^1.2",
         "friendsofsymfony/user-bundle": "^2.0",
         "guzzlehttp/guzzle": "^6.0",
         "nelmio/api-doc-bundle": "^2.13.3",
@@ -73,8 +73,8 @@
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
-        "symfony/expression-language": "To use authorization features.",
         "symfony/config": "To load XML configuration files.",
+        "symfony/expression-language": "To use authorization features.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration."
     },
@@ -88,5 +88,8 @@
         "branch-alias": {
             "dev-master": "2.1.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
