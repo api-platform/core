@@ -12,15 +12,15 @@ Feature: Subresource support
     And the JSON should be equal to:
     """
     {
-			"@context": "/contexts/Answer",
-			"@id": "/answers/1",
-			"@type": "Answer",
-			"id": 1,
-			"content": "42",
-			"question": "/questions/1",
-			"relatedQuestions": [
-				"/questions/1"
-			]
+      "@context": "/contexts/Answer",
+      "@id": "/answers/1",
+      "@type": "Answer",
+      "id": 1,
+      "content": "42",
+      "question": "/questions/1",
+      "relatedQuestions": [
+        "/questions/1"
+      ]
     }
     """
 
@@ -35,15 +35,35 @@ Feature: Subresource support
       "@id": "/questions/1/answer/related_questions",
       "@type": "hydra:Collection",
       "hydra:member": [
-				{
-					"@id": "/questions/1",
-					"@type": "Question",
-					"content": "What's the answer to the Ultimate Question of Life, the Universe and Everything?",
-					"id": 1,
-					"answer": "/answers/1"
-				}
+        {
+          "@id": "/questions/1",
+          "@type": "Question",
+          "content": "What's the answer to the Ultimate Question of Life, the Universe and Everything?",
+          "id": 1,
+          "answer": "/answers/1"
+        }
       ],
       "hydra:totalItems": 1
+    }
+    """
+
+  Scenario: Create a fourth level
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/fourth_levels" with body:
+    """
+    {"level": 4}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/FourthLevel",
+      "@id": "/fourth_levels/1",
+      "@type": "FourthLevel",
+      "id": 1,
+      "level": 4
     }
     """
 
@@ -51,7 +71,7 @@ Feature: Subresource support
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/third_levels" with body:
     """
-    {"level": 3}
+    {"level": 3, "fourthLevel": "/fourth_levels/1"}
     """
     Then the response status code should be 201
     And the response should be in JSON
@@ -62,6 +82,7 @@ Feature: Subresource support
       "@context": "/contexts/ThirdLevel",
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
+      "fourthLevel": "/fourth_levels/1",
       "id": 1,
       "level": 3,
       "test": true
@@ -125,7 +146,11 @@ Feature: Subresource support
           "name": "Hello",
           "symfony": "symfony",
           "dummyDate": null,
-          "thirdLevel": "/third_levels/1",
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
           "embeddedDummy": [],
@@ -138,7 +163,11 @@ Feature: Subresource support
           "name": null,
           "symfony": "symfony",
           "dummyDate": null,
-          "thirdLevel": "/third_levels/1",
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
           "embeddedDummy": [],
@@ -193,7 +222,11 @@ Feature: Subresource support
           "name": "Hello",
           "symfony": "symfony",
           "dummyDate": null,
-          "thirdLevel": "/third_levels/1",
+          "thirdLevel": {
+            "@id": "/third_levels/1",
+            "@type": "ThirdLevel",
+            "fourthLevel": "/fourth_levels/1"
+          },
           "relatedToDummyFriend": [],
           "dummyBoolean": null,
           "embeddedDummy": [],
@@ -233,7 +266,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get the embedded relation collection
+  Scenario: Get the embedded relation collection at the third level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
     And the response status code should be 200
     And the response should be in JSON
@@ -244,9 +277,26 @@ Feature: Subresource support
       "@context": "/contexts/ThirdLevel",
       "@id": "/third_levels/1",
       "@type": "ThirdLevel",
+      "fourthLevel": "/fourth_levels/1",
       "id": 1,
       "level": 3,
       "test": true
+    }
+    """
+
+  Scenario: Get the embedded relation collection at the fourth level
+    When I send a "GET" request to "/dummies/1/related_dummies/1/third_level/fourth_level"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/FourthLevel",
+      "@id": "/fourth_levels/1",
+      "@type": "FourthLevel",
+      "id": 1,
+      "level": 4
     }
     """
 
