@@ -70,15 +70,18 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 );
             }
 
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
+            $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
+
             if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
-                $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true);
+                $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $normalizationContext);
                 $collection = $subresource ?? [];
             } else {
-                $collection = $this->collectionDataProvider->getCollection($resourceClass);
+                $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $normalizationContext);
             }
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
 
             if (null !== $this->resourceAccessChecker) {
@@ -87,9 +90,6 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                     throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
                 }
             }
-
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
-            $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
 
             if (!$this->paginationEnabled) {
                 $data = [];
@@ -141,7 +141,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
      *
      * @return object|null
      */
-    private function getSubresource(string $rootClass, array $rootResolvedFields, array $rootIdentifiers, string $rootProperty, string $subresourceClass, bool $isCollection)
+    private function getSubresource(string $rootClass, array $rootResolvedFields, array $rootIdentifiers, string $rootProperty, string $subresourceClass, bool $isCollection, array $normalizationContext)
     {
         $identifiers = [];
         $resolvedIdentifiers = [];
@@ -153,7 +153,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $resolvedIdentifiers[] = [$rootIdentifier, $rootClass];
         }
 
-        return $this->subresourceDataProvider->getSubresource($subresourceClass, $identifiers, [
+        return $this->subresourceDataProvider->getSubresource($subresourceClass, $identifiers, $normalizationContext + [
             'property' => $rootProperty,
             'identifiers' => $resolvedIdentifiers,
             'collection' => $isCollection,

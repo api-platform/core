@@ -60,9 +60,9 @@ final class ItemResolver
             return null;
         }
 
-        // TODO: initialize the EagerLoading extension
+        $baseNormalizationContext = ['attributes' => $info->getFieldSelection(PHP_INT_MAX)];
         try {
-            $item = $this->iriConverter->getItemFromIri($args['id']);
+            $item = $this->iriConverter->getItemFromIri($args['id'], $baseNormalizationContext);
         } catch (ItemNotFoundException $e) {
             return null;
         }
@@ -80,6 +80,6 @@ final class ItemResolver
 
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
 
-        return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + ['attributes' => $info->getFieldSelection(PHP_INT_MAX)]);
+        return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext + $baseNormalizationContext);
     }
 }

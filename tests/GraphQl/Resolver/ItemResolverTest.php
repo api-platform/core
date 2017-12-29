@@ -78,7 +78,7 @@ class ItemResolverTest extends TestCase
     private function createItemResolver($item): ItemResolver
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/related_dummies/3');
+        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/related_dummies/3', ['attributes' => []]);
         null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);

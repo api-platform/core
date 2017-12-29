@@ -109,8 +109,10 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.eager_loading.max_joins%</argument>
             <argument>%api_platform.eager_loading.force_eager%</argument>
-            <argument type="service" id="request_stack" />
-            <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument>null</argument>
+            <argument>null</argument>
+            <!--<argument type="service" id="request_stack" />-->
+            <!--<argument type="service" id="api_platform.serializer.context_builder" />-->
             <argument>%api_platform.eager_loading.fetch_partial%</argument>
             <argument type="service" id="serializer.mapping.class_metadata_factory"></argument>
 

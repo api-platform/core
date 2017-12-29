@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -25,7 +26,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class OrderExtension implements QueryCollectionExtensionInterface
+final class OrderExtension implements ContextAwareQueryCollectionExtensionInterface
 {
     private $order;
     private $resourceMetadataFactory;
@@ -39,8 +40,12 @@ final class OrderExtension implements QueryCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
+        if (null === $resourceClass) {
+            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
+        }
+
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);

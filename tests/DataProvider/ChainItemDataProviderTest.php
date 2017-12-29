@@ -34,16 +34,16 @@ class ChainItemDataProviderTest extends TestCase
 
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
-        $firstDataProvider->supports(Dummy::class, null)->willReturn(false);
+        $firstDataProvider->supports(Dummy::class, null, [])->willReturn(false);
 
         $secondDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $secondDataProvider->willImplement(RestrictedDataProviderInterface::class);
-        $secondDataProvider->supports(Dummy::class, null)->willReturn(true);
+        $secondDataProvider->supports(Dummy::class, null, [])->willReturn(true);
         $secondDataProvider->getItem(Dummy::class, 1, null, [])->willReturn($dummy);
 
         $thirdDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $thirdDataProvider->willImplement(RestrictedDataProviderInterface::class);
-        $thirdDataProvider->supports(Dummy::class, null)->willReturn(true);
+        $thirdDataProvider->supports(Dummy::class, null, [])->willReturn(true);
         $thirdDataProvider->getItem(Dummy::class, 1, null, [])->willReturn(new \stdClass());
 
         $chainItemDataProvider = new ChainItemDataProvider([
@@ -59,7 +59,7 @@ class ChainItemDataProviderTest extends TestCase
     {
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
-        $firstDataProvider->supports('notfound', null)->willReturn(false);
+        $firstDataProvider->supports('notfound', null, [])->willReturn(false);
 
         $chainItemDataProvider = new ChainItemDataProvider([$firstDataProvider->reveal()]);
 

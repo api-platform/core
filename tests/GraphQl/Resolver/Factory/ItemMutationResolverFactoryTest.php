@@ -44,7 +44,10 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory(null, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, Dummy::class, 'delete');
 
-        $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, new ResolveInfo([]));
+        $resolveInfo = new ResolveInfo([]);
+        $resolveInfo->fieldNodes = [];
+
+        $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo);
     }
 
     public function testCreateItemDeleteMutationResolver()
@@ -56,13 +59,16 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resolverFactory = $this->createItemMutationResolverFactory($dummy, $dataPersisterProphecy);
         $resolver = $resolverFactory(Dummy::class, null, 'delete');
 
-        $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, new ResolveInfo([])));
+        $resolveInfo = new ResolveInfo([]);
+        $resolveInfo->fieldNodes = [];
+
+        $this->assertEquals(['id' => '/dummies/3', 'clientMutationId' => '1936'], $resolver(null, ['input' => ['id' => '/dummies/3', 'clientMutationId' => '1936']], null, $resolveInfo));
     }
 
     private function createItemMutationResolverFactory($item, ObjectProphecy $dataPersisterProphecy): ResolverFactoryInterface
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3');
+        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []]);
         null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class)->willImplement(DenormalizerInterface::class);

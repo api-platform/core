@@ -67,9 +67,13 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             $data = ['clientMutationId' => $args['input']['clientMutationId'] ?? null];
             $item = null;
 
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName, 'normalization_context', [], true);
+            $normalizationContext['attributes'] = $info->getFieldSelection(PHP_INT_MAX);
+
             if (isset($args['input']['id'])) {
                 try {
-                    $item = $this->iriConverter->getItemFromIri($args['input']['id']);
+                    $item = $this->iriConverter->getItemFromIri($args['input']['id'], $normalizationContext);
                 } catch (ItemNotFoundException $e) {
                     throw Error::createLocatedError(sprintf('Item "%s" not found.', $args['input']['id']), $info->fieldNodes, $info->path);
                 }
@@ -86,12 +90,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $this->validate($item, $info, $resourceMetadata, $operationName);
                     $this->dataPersister->persist($item);
 
-                    return $this->normalizer->normalize(
-                        $item,
-                        ItemNormalizer::FORMAT,
-                        $resourceMetadata->getGraphqlAttribute($operationName, 'normalization_context', [], true)
-                    ) + $data;
-
+                    return $this->normalizer->normalize($item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
                 case 'delete':
                     if ($item) {
                         $this->dataPersister->remove($item);
@@ -117,7 +116,6 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         }
 
         $validationGroups = $resourceMetadata->getGraphqlAttribute($operationName, 'validation_groups', null, true);
-
         try {
             $this->validator->validate($item, ['groups' => $validationGroups]);
         } catch (ValidationException $e) {

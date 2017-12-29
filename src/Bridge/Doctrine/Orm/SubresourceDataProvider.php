@@ -102,18 +102,16 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                     continue;
                 }
 
-                $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
-
-                if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
-                    return $extension->getResult($queryBuilder, $resourceClass, $operationName);
+                $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+                if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+                    return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
                 }
             }
         } else {
             foreach ($this->itemExtensions as $extension) {
                 $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
-
-                if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
-                    return $extension->getResult($queryBuilder, $resourceClass, $operationName);
+                if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+                    return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
                 }
             }
         }

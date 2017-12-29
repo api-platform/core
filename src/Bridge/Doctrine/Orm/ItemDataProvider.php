@@ -54,7 +54,7 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
         $this->itemExtensions = $itemExtensions;
     }
 
-    public function supports(string $resourceClass, string $operationName = null): bool
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return null !== $this->managerRegistry->getManagerForClass($resourceClass);
     }
@@ -91,8 +91,8 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
 
-            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName)) {
-                return $extension->getResult($queryBuilder);
+            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+                return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
             }
         }
 

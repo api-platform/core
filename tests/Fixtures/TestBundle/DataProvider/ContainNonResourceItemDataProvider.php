@@ -23,7 +23,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
  */
 class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
-    public function supports(string $resourceClass, string $operationName = null): bool
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return ContainNonResource::class === $resourceClass;
     }

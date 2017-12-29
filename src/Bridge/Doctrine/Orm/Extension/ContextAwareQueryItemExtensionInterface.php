@@ -16,18 +16,16 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Interface of Doctrine ORM query extensions that supports result production
- * for specific cases such as pagination.
+ * Context aware extension.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensionInterface
+interface ContextAwareQueryItemExtensionInterface extends QueryItemExtensionInterface
 {
-    public function supportsResult(string $resourceClass, string $operationName = null): bool;
+    public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool;
 
     /**
      * @return mixed
      */
-    public function getResult(QueryBuilder $queryBuilder);
+    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []);
 }
