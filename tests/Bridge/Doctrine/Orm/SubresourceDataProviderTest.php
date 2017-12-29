@@ -129,11 +129,7 @@ class SubresourceDataProviderTest extends TestCase
         $funcProphecy = $this->prophesize(Func::class);
         $func = $funcProphecy->reveal();
 
-        $exprProphecy = $this->prophesize(Expr::class);
-        $exprProphecy->in('o', $dql)->willReturn($func)->shouldBeCalled();
-
-        $queryBuilder->expr()->shouldBeCalled()->willReturn($exprProphecy->reveal());
-        $queryBuilder->where($func)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
 
         $queryBuilder->getQuery()->shouldBeCalled()->willReturn($queryProphecy->reveal());
 
@@ -158,6 +154,11 @@ class SubresourceDataProviderTest extends TestCase
         $qb->andWhere('id_a1.id = :id_p1')->shouldBeCalled()->willReturn($qb);
         $qb->getDQL()->shouldBeCalled()->willReturn($dql);
 
+        $exprProphecy = $this->prophesize(Expr::class);
+        $exprProphecy->in('o', $dql)->willReturn($func)->shouldBeCalled();
+
+        $qb->expr()->shouldBeCalled()->willReturn($exprProphecy->reveal());
+
         $managerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($qb->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -177,6 +178,8 @@ class SubresourceDataProviderTest extends TestCase
     {
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $identifiers = ['id'];
+        $funcProphecy = $this->prophesize(Func::class);
+        $func = $funcProphecy->reveal();
 
         // First manager (Dummy)
         $dummyDQL = 'SELECT relatedDummies_a3 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy id_a2 INNER JOIN id_a2.relatedDummies relatedDummies_a3 WHERE id_a2.id = :id_p2';
@@ -218,6 +221,11 @@ class SubresourceDataProviderTest extends TestCase
         $rqb->andWhere($dummyFunc)->shouldBeCalled()->willReturn($rqb);
         $rqb->getDQL()->shouldBeCalled()->willReturn($relatedDQL);
 
+        $relatedExpProphecy = $this->prophesize(Expr::class);
+        $relatedExpProphecy->in('o', $relatedDQL)->willReturn($func)->shouldBeCalled();
+
+        $rqb->expr()->shouldBeCalled()->willReturn($relatedExpProphecy->reveal());
+
         $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $rClassMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn($identifiers);
         $rClassMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn('integer');
@@ -237,14 +245,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $queryBuilder = $this->prophesize(QueryBuilder::class);
 
-        $funcProphecy = $this->prophesize(Func::class);
-        $func = $funcProphecy->reveal();
-
-        $exprProphecy = $this->prophesize(Expr::class);
-        $exprProphecy->in('o', $relatedDQL)->willReturn($func)->shouldBeCalled();
-
-        $queryBuilder->expr()->shouldBeCalled()->willReturn($exprProphecy->reveal());
-        $queryBuilder->where($func)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
 
         $queryBuilder->getQuery()->shouldBeCalled()->willReturn($queryProphecy->reveal());
         $queryBuilder->setParameter('id_p1', 1)->shouldBeCalled()->willReturn($queryBuilder);
@@ -277,11 +278,7 @@ class SubresourceDataProviderTest extends TestCase
         $funcProphecy = $this->prophesize(Func::class);
         $func = $funcProphecy->reveal();
 
-        $exprProphecy = $this->prophesize(Expr::class);
-        $exprProphecy->in('o', $dql)->willReturn($func)->shouldBeCalled();
-
-        $queryBuilder->expr()->shouldBeCalled()->willReturn($exprProphecy->reveal());
-        $queryBuilder->where($func)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
         $repositoryProphecy->createQueryBuilder('o')->shouldBeCalled()->willReturn($queryBuilder->reveal());
@@ -304,6 +301,11 @@ class SubresourceDataProviderTest extends TestCase
         $qb->innerJoin('id_a1.relatedDummies', 'relatedDummies_a2')->shouldBeCalled()->willReturn($qb);
         $qb->andWhere('id_a1.id = :id_p1')->shouldBeCalled()->willReturn($qb);
         $qb->getDQL()->shouldBeCalled()->willReturn($dql);
+
+        $exprProphecy = $this->prophesize(Expr::class);
+        $exprProphecy->in('o', $dql)->willReturn($func)->shouldBeCalled();
+
+        $qb->expr()->shouldBeCalled()->willReturn($exprProphecy->reveal());
 
         $managerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($qb->reveal());
         $this->assertIdentifierManagerMethodCalls($managerProphecy);

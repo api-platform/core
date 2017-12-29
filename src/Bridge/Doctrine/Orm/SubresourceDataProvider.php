@@ -28,6 +28,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Subresource data provider for the Doctrine ORM.
@@ -79,82 +80,10 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
 
-        $originAlias = 'o';
-        $queryBuilder = $repository->createQueryBuilder($originAlias);
         $queryNameGenerator = new QueryNameGenerator();
-        $previousQueryBuilder = null;
-        $previousAlias = null;
-
-        $num = \count($context['identifiers']);
-
-        while ($num--) {
-            list($identifier, $identifierResourceClass) = $context['identifiers'][$num];
-            $previousAssociationProperty = $context['identifiers'][$num + 1][0] ?? $context['property'];
-
-            $manager = $this->managerRegistry->getManagerForClass($identifierResourceClass);
-
-            if (!$manager instanceof EntityManagerInterface) {
-                throw new RuntimeException("The manager for $identifierResourceClass must be an EntityManager.");
-            }
-
-            $classMetadata = $manager->getClassMetadata($identifierResourceClass);
-
-            if (!$classMetadata instanceof ClassMetadataInfo) {
-                throw new RuntimeException("The class metadata for $identifierResourceClass must be an instance of ClassMetadataInfo.");
-            }
-
-            $qb = $manager->createQueryBuilder();
-            $alias = $queryNameGenerator->generateJoinAlias($identifier);
-            $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
-            $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass) : [];
-
-            switch ($relationType) {
-                //MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
-                case ClassMetadataInfo::MANY_TO_MANY:
-                    $joinAlias = $queryNameGenerator->generateJoinAlias($previousAssociationProperty);
-
-                    $qb->select($joinAlias)
-                        ->from($identifierResourceClass, $alias)
-                        ->innerJoin("$alias.$previousAssociationProperty", $joinAlias);
-
-                    break;
-                case ClassMetadataInfo::ONE_TO_MANY:
-                    $mappedBy = $classMetadata->getAssociationMapping($previousAssociationProperty)['mappedBy'];
-
-                    // first pass, o.property instead of alias.property
-                    if (null === $previousQueryBuilder) {
-                        $originAlias = "$originAlias.$mappedBy";
-                    } else {
-                        $previousAlias = "$previousAlias.$mappedBy";
-                    }
-
-                    $qb->select($alias)
-                        ->from($identifierResourceClass, $alias);
-                    break;
-                default:
-                    $qb->select("IDENTITY($alias.$previousAssociationProperty)")
-                        ->from($identifierResourceClass, $alias);
-            }
-
-            // Add where clause for identifiers
-            foreach ($normalizedIdentifiers as $key => $value) {
-                $placeholder = $queryNameGenerator->generateParameterName($key);
-                $qb->andWhere("$alias.$key = :$placeholder");
-                $queryBuilder->setParameter($placeholder, $value);
-            }
-
-            // recurse queries
-            if (null === $previousQueryBuilder) {
-                $previousQueryBuilder = $qb;
-            } else {
-                $previousQueryBuilder->andWhere($qb->expr()->in($previousAlias, $qb->getDQL()));
-            }
-
-            $previousAlias = $alias;
-        }
 
         /*
-         * The following translate to this pseudo-dql:
+         * The following recursively translates to this pseudo-dql:
          *
          * SELECT thirdLevel WHERE thirdLevel IN (
          *   SELECT thirdLevel FROM relatedDummies WHERE relatedDummies = ? AND relatedDummies IN (
@@ -164,9 +93,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
          *
          * By using subqueries, we're forcing the SQL execution plan to go through indexes on doctrine identifiers.
          */
-        $queryBuilder->where(
-            $queryBuilder->expr()->in($originAlias, $previousQueryBuilder->getDQL())
-        );
+        $queryBuilder = $this->buildQuery($identifiers, $context, $queryNameGenerator, $repository->createQueryBuilder($alias = 'o'), $alias, \count($context['identifiers']));
 
         if (true === $context['collection']) {
             foreach ($this->collectionExtensions as $extension) {
@@ -194,5 +121,76 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $query = $queryBuilder->getQuery();
 
         return $context['collection'] ? $query->getResult() : $query->getOneOrNullResult();
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    private function buildQuery(array $identifiers, array $context, QueryNameGenerator $queryNameGenerator, QueryBuilder $previousQueryBuilder, string $previousAlias, int $remainingIdentifiers, QueryBuilder $topQueryBuilder = null): QueryBuilder
+    {
+        if ($remainingIdentifiers <= 0) {
+            return $previousQueryBuilder;
+        }
+
+        $topQueryBuilder = $topQueryBuilder ?? $previousQueryBuilder;
+
+        list($identifier, $identifierResourceClass) = $context['identifiers'][$remainingIdentifiers - 1];
+        $previousAssociationProperty = $context['identifiers'][$remainingIdentifiers][0] ?? $context['property'];
+
+        $manager = $this->managerRegistry->getManagerForClass($identifierResourceClass);
+
+        if (!$manager instanceof EntityManagerInterface) {
+            throw new RuntimeException("The manager for $identifierResourceClass must be an EntityManager.");
+        }
+
+        $classMetadata = $manager->getClassMetadata($identifierResourceClass);
+
+        if (!$classMetadata instanceof ClassMetadataInfo) {
+            throw new RuntimeException(
+                "The class metadata for $identifierResourceClass must be an instance of ClassMetadataInfo."
+            );
+        }
+
+        $qb = $manager->createQueryBuilder();
+        $alias = $queryNameGenerator->generateJoinAlias($identifier);
+        $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
+        $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers(
+            $identifiers[$identifier],
+            $manager,
+            $identifierResourceClass
+        ) : [];
+
+        switch ($relationType) {
+            // MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
+            case ClassMetadataInfo::MANY_TO_MANY:
+                $joinAlias = $queryNameGenerator->generateJoinAlias($previousAssociationProperty);
+
+                $qb->select($joinAlias)
+                    ->from($identifierResourceClass, $alias)
+                    ->innerJoin("$alias.$previousAssociationProperty", $joinAlias);
+                break;
+            case ClassMetadataInfo::ONE_TO_MANY:
+                $mappedBy = $classMetadata->getAssociationMapping($previousAssociationProperty)['mappedBy'];
+                $previousAlias = "$previousAlias.$mappedBy";
+
+                $qb->select($alias)
+                    ->from($identifierResourceClass, $alias);
+                break;
+            default:
+                $qb->select("IDENTITY($alias.$previousAssociationProperty)")
+                    ->from($identifierResourceClass, $alias);
+        }
+
+        // Add where clause for identifiers
+        foreach ($normalizedIdentifiers as $key => $value) {
+            $placeholder = $queryNameGenerator->generateParameterName($key);
+            $qb->andWhere("$alias.$key = :$placeholder");
+            $topQueryBuilder->setParameter($placeholder, $value);
+        }
+
+        // Recurse queries
+        $qb = $this->buildQuery($identifiers, $context, $queryNameGenerator, $qb, $alias, --$remainingIdentifiers, $topQueryBuilder);
+
+        return $previousQueryBuilder->andWhere($qb->expr()->in($previousAlias, $qb->getDQL()));
     }
 }
