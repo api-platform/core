@@ -68,7 +68,7 @@ class ItemMutationResolverFactoryTest extends TestCase
     private function createItemMutationResolverFactory($item, ObjectProphecy $dataPersisterProphecy): ResolverFactoryInterface
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3', ['normalization_context' => ['attributes' => []]]);
+        $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []]);
         null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class)->willImplement(DenormalizerInterface::class);

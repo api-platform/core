@@ -79,7 +79,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $normalizationContext);
                 $collection = $subresource ?? [];
             } else {
-                $collection = $this->collectionDataProvider->getCollection($resourceClass, null, ['normalization_context' => $normalizationContext]);
+                $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $normalizationContext);
             }
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
@@ -153,11 +153,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $resolvedIdentifiers[] = [$rootIdentifier, $rootClass];
         }
 
-        return $this->subresourceDataProvider->getSubresource($subresourceClass, $identifiers, [
+        return $this->subresourceDataProvider->getSubresource($subresourceClass, $identifiers, $normalizationContext + [
             'property' => $rootProperty,
             'identifiers' => $resolvedIdentifiers,
             'collection' => $isCollection,
-            'normalization_context' => $normalizationContext,
         ]);
     }
 }

@@ -62,7 +62,7 @@ final class ItemResolver
 
         $baseNormalizationContext = ['attributes' => $info->getFieldSelection(PHP_INT_MAX)];
         try {
-            $item = $this->iriConverter->getItemFromIri($args['id'], ['normalization_context' => $baseNormalizationContext]);
+            $item = $this->iriConverter->getItemFromIri($args['id'], $baseNormalizationContext);
         } catch (ItemNotFoundException $e) {
             return null;
         }

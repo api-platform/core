@@ -69,7 +69,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName, 'normalization_context', [], true);
-            $normalizationContext['normalization_context']['attributes'] = $info->getFieldSelection(PHP_INT_MAX);
+            $normalizationContext['attributes'] = $info->getFieldSelection(PHP_INT_MAX);
 
             if (isset($args['input']['id'])) {
                 try {

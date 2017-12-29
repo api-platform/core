@@ -54,9 +54,12 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
-        //if (null !== $this->serializerContextBuilder) {
-        //    @trigger_error('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the "normalization_context" of the data provider\'s context instead.', E_USER_DEPRECATED);
-        //}
+        if (null !== $this->requestStack) {
+            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', RequestStack::class), E_USER_DEPRECATED);
+        }
+        if (null !== $this->serializerContextBuilder) {
+            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', SerializerContextBuilderInterface::class), E_USER_DEPRECATED);
+        }
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -99,12 +102,12 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
         $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
 
-        if (!$normalizationContext = $context['normalization_context'] ?? false) {
+        if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            $normalizationContext = $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
+            $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
         }
 
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $normalizationContext);
+        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
     }
 
     /**

@@ -131,10 +131,7 @@ final class ReadListener
             throw new RuntimeException('No subresource data provider.');
         }
 
-        if (isset($context['normalization_context'])) {
-            $attributes['subresource_context']['normalization_context'] = $context['normalization_context'];
-        }
-
+        $attributes['subresource_context'] += $context;
         $identifiers = [];
         foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, , $hasIdentifier)) {
             if (true === $hasIdentifier) {
