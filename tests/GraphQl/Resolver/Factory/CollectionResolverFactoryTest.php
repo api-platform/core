@@ -181,14 +181,15 @@ class CollectionResolverFactoryTest extends TestCase
     private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled): CollectionResolverFactory
     {
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
-        $collectionDataProviderProphecy->getCollection(Dummy::class)->willReturn($collection);
-        $collectionDataProviderProphecy->getCollection(RelatedDummy::class)->willReturn($collection);
+        $collectionDataProviderProphecy->getCollection(Dummy::class, null, ['normalization_context' => ['groups' => ['foo'], 'attributes' => []]])->willReturn($collection);
+        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['normalization_context' => ['groups' => ['foo'], 'attributes' => []]])->willReturn($collection);
 
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(RelatedDummy::class, $identifiers, [
             'property' => 'relatedDummies',
             'identifiers' => [['id', Dummy::class]],
             'collection' => true,
+            'normalization_context' => ['groups' => ['foo'], 'attributes' => []],
         ])->willReturn($subcollection);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);

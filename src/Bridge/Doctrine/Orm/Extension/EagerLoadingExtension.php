@@ -74,20 +74,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
     {
-        if (null === $resourceClass) {
-            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
-        }
-
-        $options = null === $operationName ? [] : ['collection_operation_name' => $operationName];
-        $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
-        $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
-
-        if (!$normalizationContext = $context['normalization_context'] ?? false) {
-            $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            $normalizationContext = $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
-        }
-
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $normalizationContext);
+        $this->apply(true, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
     }
 
     /**
@@ -95,7 +82,20 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      */
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
     {
-        $options = null === $operationName ? [] : ['item_operation_name' => $operationName];
+        $this->apply(false, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+    }
+
+    private function apply(bool $collection, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context)
+    {
+        if (null === $resourceClass) {
+            throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
+        }
+
+        $options = [];
+        if (null !== $operationName) {
+            $options[($collection ? 'collection' : 'item').'_operation_name'] = $operationName;
+        }
+
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
         $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
 

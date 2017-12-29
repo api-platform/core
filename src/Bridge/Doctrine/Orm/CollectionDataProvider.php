@@ -42,7 +42,7 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function supports(string $resourceClass, string $operationName = null, array $conext = []): bool
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return null !== $this->managerRegistry->getManagerForClass($resourceClass);
     }
