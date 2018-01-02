@@ -265,6 +265,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
     /**
      * @Given there are :nb dummy objects with relatedDummy and its thirdLevel
+     * @Given there is :nb dummy object with relatedDummy and its thirdLevel
      */
     public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb)
     {
@@ -334,6 +335,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
     /**
      * @Given there are :nb dummy objects with dummyDate
+     * @Given there is :nb dummy object with dummyDate
      */
     public function thereAreDummyObjectsWithDummyDate(int $nb)
     {
@@ -471,6 +473,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
     /**
      * @Given there are :nb dummy objects with dummyBoolean :bool
+     * @Given there is :nb dummy object with dummyBoolean :bool
      */
     public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
@@ -825,6 +828,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
     /**
      * @Given there are :nb dummydate objects with dummyDate
+     * @Given there is :nb dummydate object with dummyDate
      */
     public function thereAreDummyDateObjectsWithDummyDate(int $nb)
     {

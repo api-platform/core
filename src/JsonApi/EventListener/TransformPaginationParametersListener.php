@@ -31,7 +31,7 @@ final class TransformPaginationParametersListener
         if (
             'jsonapi' !== $request->getRequestFormat() ||
             null === ($pageParameter = $request->query->get('page')) ||
-            !is_array($pageParameter)
+            !\is_array($pageParameter)
         ) {
             return;
         }

@@ -24,6 +24,13 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 final class TransformSortingParametersListener
 {
+    private $orderParameterName;
+
+    public function __construct(string $orderParameterName = 'order')
+    {
+        $this->orderParameterName = $orderParameterName;
+    }
+
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -31,7 +38,7 @@ final class TransformSortingParametersListener
         if (
             'jsonapi' !== $request->getRequestFormat() ||
             null === ($orderParameter = $request->query->get('sort')) ||
-            is_array($orderParameter)
+            \is_array($orderParameter)
         ) {
             return;
         }
@@ -42,7 +49,7 @@ final class TransformSortingParametersListener
         foreach ($orderParametersArray as $orderParameter) {
             $sorting = 'asc';
 
-            if ('-' === substr($orderParameter, 0, 1)) {
+            if ('-' === ($orderParameter[0] ?? null)) {
                 $sorting = 'desc';
                 $orderParameter = substr($orderParameter, 1);
             }
@@ -50,6 +57,8 @@ final class TransformSortingParametersListener
             $transformedOrderParametersArray[$orderParameter] = $sorting;
         }
 
-        $request->attributes->set('_api_filter_order', $transformedOrderParametersArray);
+        $filters = $request->attributes->get('_api_filters', []);
+        $filters[$this->orderParameterName] = $transformedOrderParametersArray;
+        $request->attributes->set('_api_filters', $filters);
     }
 }

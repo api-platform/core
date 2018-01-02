@@ -24,7 +24,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  */
-class DateFilter extends AbstractFilter
+class DateFilter extends AbstractContextAwareFilter
 {
     const PARAMETER_BEFORE = 'before';
     const PARAMETER_STRICTLY_BEFORE = 'strictly_before';

@@ -65,7 +65,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
                 continue;
             }
 
-            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
 }
