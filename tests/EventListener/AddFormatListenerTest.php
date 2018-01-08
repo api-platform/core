@@ -32,10 +32,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['jsonld' => 'application/ld+json']);
+        $listener = new AddFormatListener(new Negotiator(), ['notexist' => 'application/vnd.notexist']);
         $listener->onKernelRequest($event);
 
-        $this->assertNull($request->getFormat('application/ld+json'));
+        $this->assertNull($request->getFormat('application/vnd.notexist'));
     }
 
     public function testSupportedRequestFormat()
