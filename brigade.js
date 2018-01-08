@@ -18,9 +18,20 @@ const coverage = (event, project) => {
     ];
 
     job.env = {
-        COVERALLS_RUN_LOCALLY: '1',
+        CI_NAME: 'brigade',
+        CI_BUILD_NUMBER: event.buildID,
         COVERALLS_REPO_TOKEN: project.secrets.coverallsToken,
     };
+
+    const gh = JSON.parse(event.payload);
+    if (gh.pull_request) {
+      job.env.CI_PULL_REQUEST = gh.pull_request.id.toString();
+    }
+
+    if (gh.ref) {
+      const parts = gh.ref.split('/');
+      job.env.CI_BRANCH = parts[parts.length - 1];
+    }
 
     job.run();
 };
