@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\EventListener;
 use ApiPlatform\Core\EventListener\AddFormatListener;
 use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
@@ -24,18 +26,18 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class AddFormatListenerTest extends TestCase
 {
-    public function testNoResourceClass()
+    public function testRequestFormatShouldNotBeSet()
     {
-        $request = new Request();
-
+        $requestProphecy = $this->prophesize(Request::class);
+        $parameterBagProphecy = $this->prophesize(ParameterBagInterface::class);
+        $requestProphecy->attributes = $parameterBagProphecy;
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $event = $eventProphecy->reveal();
+        $eventProphecy->getRequest()->willReturn($requestProphecy)->shouldBeCalled();
+        $parameterBagProphecy->has(Argument::type('string'))->willReturn(false)->shouldBeCalled();
+        $requestProphecy->setFormat('jsonld', 'application/ld+json')->shouldNotBeCalled();
 
         $listener = new AddFormatListener(new Negotiator(), ['jsonld' => 'application/ld+json']);
-        $listener->onKernelRequest($event);
-
-        $this->assertNull($request->getFormat('application/ld+json'));
+        $listener->onKernelRequest($eventProphecy->reveal());
     }
 
     public function testSupportedRequestFormat()
