@@ -27,7 +27,7 @@ const coverage = (event, project) => {
     const gh = JSON.parse(event.payload);
     if (gh.pull_request) {
       job.env.CI_PULL_REQUEST = gh.pull_request.number.toString();
-      job.env.CI_BRANCH = gh.pull_request.head.ref;
+      job.env.CI_BRANCH = gh.pull_request.base.ref;
     } else if (gh.ref) {
       const parts = gh.ref.split('/');
       job.env.CI_BRANCH = parts[parts.length - 1];
