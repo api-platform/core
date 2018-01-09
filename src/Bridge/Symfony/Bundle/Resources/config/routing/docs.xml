@@ -5,12 +5,10 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_entrypoint" path="/{index}.{_format}">
-        <default key="_controller">api_platform.action.entrypoint</default>
-        <default key="_format" />
+    <route id="api_doc" path="/docs.{_format}">
+        <default key="_controller">api_platform.action.documentation</default>
         <default key="_api_respond">1</default>
-        <default key="index">index</default>
-        <requirement key="index">index</requirement>
+        <default key="_format" />
     </route>
 
 </routes>

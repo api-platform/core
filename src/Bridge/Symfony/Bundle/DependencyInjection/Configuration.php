@@ -99,6 +99,8 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
+                ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
+                ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
 
                 ->arrayNode('oauth')
                     ->canBeEnabled()
