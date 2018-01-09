@@ -18,6 +18,7 @@ const coverage = (event, project) => {
     ];
 
     job.env = {
+        SYMFONY_DEPRECATIONS_HELPER: 'weak',
         CI_NAME: 'brigade',
         CI_BUILD_NUMBER: event.buildID,
         COVERALLS_REPO_TOKEN: project.secrets.coverallsToken,
@@ -25,10 +26,9 @@ const coverage = (event, project) => {
 
     const gh = JSON.parse(event.payload);
     if (gh.pull_request) {
-      job.env.CI_PULL_REQUEST = gh.pull_request.id.toString();
-    }
-
-    if (gh.ref) {
+      job.env.CI_PULL_REQUEST = gh.pull_request.number.toString();
+      job.env.CI_BRANCH = gh.pull_request.base.ref;
+    } else if (gh.ref) {
       const parts = gh.ref.split('/');
       job.env.CI_BRANCH = parts[parts.length - 1];
     }
