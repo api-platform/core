@@ -300,6 +300,41 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
+    public function testApplyToCollectionWithMaximumItemsPerPage()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'maximum_items_per_page' => 80,
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes))->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(80)->shouldBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactory,
+            true,
+            true,
+            true,
+            30,
+            'page',
+            'pagination',
+            'itemsPerPage',
+            50
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
+    }
+
     public function testSupportsResult()
     {
         $requestStack = new RequestStack();
