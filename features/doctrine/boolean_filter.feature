@@ -5,8 +5,8 @@ Feature: Boolean filter on collections
 
   @createSchema
   Scenario: Get collection by dummyBoolean true
-    Given there is "15" dummy objects with dummyBoolean true
-    And there is "10" dummy objects with dummyBoolean false
+    Given there are "15" dummy objects with dummyBoolean true
+    And there are "10" dummy objects with dummyBoolean false
     When I send a "GET" request to "/dummies?dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON

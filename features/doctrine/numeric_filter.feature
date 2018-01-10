@@ -5,7 +5,7 @@ Feature: Numeric filter on collections
 
   @createSchema
   Scenario: Get collection by id equals 9.99 which is not possible
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?id=9.99"
     Then the response status code should be 200
     And the response should be in JSON

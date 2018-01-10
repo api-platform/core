@@ -5,7 +5,7 @@ Feature: Range filter on collections
 
   @createSchema
   Scenario: Get collection filtered by range (between)
-    Given there is "30" dummy objects with dummyPrice
+    Given there are 30 dummy objects with dummyPrice
     When I send a "GET" request to "/dummies?dummyPrice[between]=12.99..15.99"
     Then the response status code should be 200
     And the response should be in JSON
