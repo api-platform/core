@@ -358,7 +358,7 @@ SQL;
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
-    public function testCompositeIdentifiersWithoutAssociation()
+    public function testCompositeIdentifiersWithAssociation()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new ResourceMetadata(CompositeRelation::class));
@@ -411,6 +411,48 @@ WHERE (o.item IN(
     INNER JOIN o_2.compositeLabel label_2
     WHERE item_2.field1 = :foo AND o_2.bar = :bar
 ))
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+    }
+
+    public function testCompositeIdentifiersWithoutAssociation()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new ResourceMetadata(CompositeRelation::class));
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadataInfo::class);
+        $classMetadataProphecy->getIdentifier()->willReturn(['foo', 'bar']);
+        $classMetadataProphecy->getAssociationMappings()->willReturn(['item' => ['fetch' => ClassMetadataInfo::FETCH_EAGER]]);
+        $classMetadataProphecy->hasAssociation('foo')->shouldBeCalled()->willReturn(false);
+        $classMetadataProphecy->hasAssociation('bar')->shouldBeCalled()->willReturn(false);
+
+        $classMetadata = $classMetadataProphecy->reveal();
+        $classMetadata->isIdentifierComposite = true;
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getClassMetadata(CompositeRelation::class)->shouldBeCalled()->willReturn($classMetadata);
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o')
+            ->from(CompositeRelation::class, 'o')
+            ->innerJoin('o.compositeItem', 'item')
+            ->innerJoin('o.compositeLabel', 'label')
+            ->where('item.field1 = :foo AND o.bar = :bar')
+            ->setParameter('foo', 1)
+            ->setParameter('bar', 2);
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, 'get');
+
+        $expected = <<<SQL
+SELECT o
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
+INNER JOIN o.compositeItem item
+INNER JOIN o.compositeLabel label
+WHERE item.field1 = :foo AND o.bar = :bar
 SQL;
 
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());

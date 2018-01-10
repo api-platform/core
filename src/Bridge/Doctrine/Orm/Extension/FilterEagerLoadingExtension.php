@@ -62,12 +62,14 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
 
         $queryBuilderClone = clone $queryBuilder;
         $queryBuilderClone->resetDQLPart('where');
+        $changedWhereClause = false;
 
         if (!$classMetadata->isIdentifierComposite) {
             $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
             $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
             $in->select($replacementAlias);
             $queryBuilderClone->andWhere($queryBuilderClone->expr()->in($originAlias, $in->getDQL()));
+            $changedWhereClause = true;
         } else {
             // Because Doctrine doesn't support WHERE ( foo, bar ) IN () (https://github.com/doctrine/doctrine2/issues/5238), we are building as many subqueries as they are identifiers
             foreach ($classMetadata->getIdentifier() as $identifier) {
@@ -79,7 +81,12 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
                 $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
                 $in->select("IDENTITY($replacementAlias.$identifier)");
                 $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("$originAlias.$identifier", $in->getDQL()));
+                $changedWhereClause = true;
             }
+        }
+
+        if (false === $changedWhereClause) {
+            return;
         }
 
         $queryBuilder->resetDQLPart('where');
