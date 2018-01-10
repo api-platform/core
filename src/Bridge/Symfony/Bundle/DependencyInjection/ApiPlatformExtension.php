@@ -143,6 +143,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats)
     {
+        $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
+        $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);

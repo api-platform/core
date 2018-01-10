@@ -38,6 +38,8 @@
             <argument>%api_platform.resource_class_directories%</argument>
             <argument type="service" id="api_platform.subresource_operation_factory" />
             <argument>%api_platform.graphql.enabled%</argument>
+            <argument>%api_platform.enable_entrypoint%</argument>
+            <argument>%api_platform.enable_docs%</argument>
 
             <tag name="routing.loader" />
         </service>

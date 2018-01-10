@@ -396,6 +396,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.shared_max_age' => null,
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
+            'api_platform.enable_entrypoint' => true,
+            'api_platform.enable_docs' => true,
         ];
 
         foreach ($parameters as $key => $value) {

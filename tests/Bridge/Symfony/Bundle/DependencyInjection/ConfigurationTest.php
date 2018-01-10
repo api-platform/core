@@ -78,6 +78,8 @@ class ConfigurationTest extends TestCase
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,
+            'enable_entrypoint' => true,
+            'enable_docs' => true,
             'graphql' => [
                 'enabled' => true,
                 'graphiql' => [

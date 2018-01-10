@@ -51,8 +51,10 @@ final class ApiLoader extends Loader
     private $resourceClassDirectories;
     private $subresourceOperationFactory;
     private $graphqlEnabled;
+    private $entrypointEnabled;
+    private $docsEnabled;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -63,6 +65,8 @@ final class ApiLoader extends Loader
         $this->resourceClassDirectories = $resourceClassDirectories;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->graphqlEnabled = $graphqlEnabled;
+        $this->entrypointEnabled = $entrypointEnabled;
+        $this->docsEnabled = $docsEnabled;
     }
 
     /**
@@ -145,6 +149,14 @@ final class ApiLoader extends Loader
     private function loadExternalFiles(RouteCollection $routeCollection)
     {
         $routeCollection->addCollection($this->fileLoader->load('api.xml'));
+
+        if ($this->entrypointEnabled) {
+            $routeCollection->addCollection($this->fileLoader->load('api.xml'));
+        }
+
+        if ($this->docsEnabled) {
+            $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
+        }
 
         if ($this->graphqlEnabled) {
             $graphqlCollection = $this->fileLoader->load('graphql.xml');
