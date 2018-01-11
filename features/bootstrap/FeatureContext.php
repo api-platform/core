@@ -102,7 +102,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects
+     * @Given there are :nb dummy objects
      */
     public function thereIsDummyObjects(int $nb)
     {
@@ -122,7 +122,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with relatedDummy
+     * @Given there are :nb dummy objects with relatedDummy
      */
     public function thereIsDummyObjectsWithRelatedDummy(int $nb)
     {
@@ -143,7 +143,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects having each :nbrelated relatedDummies
+     * @Given there are :nb dummy objects having each :nbrelated relatedDummies
      */
     public function thereIsDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
     {
@@ -168,7 +168,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyDate
+     * @Given there are :nb dummy objects with dummyDate
      */
     public function thereIsDummyObjectsWithDummyDate(int $nb)
     {
@@ -194,7 +194,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyDate and dummyBoolean :bool
+     * @Given there are :nb dummy objects with dummyDate and dummyBoolean :bool
      */
     public function thereIsDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool)
     {
@@ -230,7 +230,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyDate and relatedDummy
+     * @Given there are :nb dummy objects with dummyDate and relatedDummy
      */
     public function thereIsDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
     {
@@ -258,7 +258,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyPrice
+     * @Given there are :nb dummy objects with dummyPrice
      */
     public function thereIsDummyObjectsWithDummyPrice(int $nb)
     {
@@ -279,7 +279,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyBoolean :bool
+     * @Given there are :nb dummy objects with dummyBoolean :bool
      */
     public function thereIsDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
