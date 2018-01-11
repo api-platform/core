@@ -5,7 +5,7 @@ Feature: Exists filter on collections
 
   @createSchema
   Scenario: Get collection where exists does not exist
-    Given there is "15" dummy objects with dummyBoolean true
+    Given there are 15 dummy objects with dummyBoolean true
     When I send a "GET" request to "/dummies?dummyBoolean[exists]=0"
     Then the response status code should be 200
     And the response should be in JSON

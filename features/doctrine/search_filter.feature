@@ -65,7 +65,7 @@ Feature: Search filter on collections
     """
 
   Scenario: Search collection by name (partial)
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?name=my"
     Then the response status code should be 200
     And the response should be in JSON
@@ -105,7 +105,7 @@ Feature: Search filter on collections
     """
 
   Scenario: Search collection by name (partial)
-    Given there are "30" embedded dummy objects
+    Given there are 30 embedded dummy objects
     When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyName=my"
     Then the response status code should be 200
     And the response should be in JSON
@@ -324,7 +324,7 @@ Feature: Search filter on collections
   @createSchema
   @dropSchema
   Scenario: Search related collection by name
-    Given there is 3 dummy objects having each 3 relatedDummies
+    Given there are 3 dummy objects having each 3 relatedDummies
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/dummies?relatedDummies.name=RelatedDummy1"
     Then the response status code should be 200
@@ -336,7 +336,7 @@ Feature: Search filter on collections
 
   @createSchema
   Scenario: Get collection by id equals 9.99 which is not possible
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?id=9.99"
     Then the response status code should be 200
     And the response should be in JSON

@@ -5,7 +5,7 @@ Feature: Filter with serialization attributes on items and collections
 
   @createSchema
   Scenario: Get a collection of resources by attributes id, foo and bar
-    Given there is "10" dummy property objects
+    Given there are 10 dummy property objects
     When I send a "GET" request to "/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar"
     Then the response status code should be 200
     And the response should be in JSON

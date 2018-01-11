@@ -29,7 +29,7 @@ Feature: Collections support
     """
 
   Scenario: Retrieve the first page of a collection
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
