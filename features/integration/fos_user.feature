@@ -29,7 +29,7 @@ Feature: FOSUser integration
       "username": "dummy.user"
     }
     """
-    And the password "azerty" for user "1" should be hashed
+    And the password "azerty" for user 1 should be hashed
 
   @dropSchema
   Scenario: Delete a user
