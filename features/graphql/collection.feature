@@ -31,7 +31,7 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[2].node.name" should be equal to "Dummy #3"
     And the JSON node "data.dummies.edges[2].node.relatedDummy.name" should be equal to "RelatedDummy #3"
-    And the JSON node "data.dummies.edges[2].node.relatedDummy.thirdLevel.level" should be equal to "3"
+    And the JSON node "data.dummies.edges[2].node.relatedDummy.thirdLevel.level" should be equal to 3
 
   @createSchema
   @dropSchema

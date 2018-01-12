@@ -398,7 +398,7 @@ Feature: Collections support
 
   @dropSchema
   @createSchema
-  Scenario: Allow passing "0" to `itemsPerPage`
+  Scenario: Allow passing 0 to `itemsPerPage`
     When I send a "GET" request to "/dummies?itemsPerPage=0"
     Then the response status code should be 200
     And the response should be in JSON

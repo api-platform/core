@@ -69,7 +69,7 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].in" should be equal to "query"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].required" should be false
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].type" should be equal to "string"
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have "2" element
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 2 element
 
     # Subcollection - check schema
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.schema.items.$ref" should be equal to "#/definitions/RelatedToDummyFriend-fakemanytomany"
