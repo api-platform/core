@@ -40,6 +40,7 @@
             <argument>%api_platform.graphql.enabled%</argument>
             <argument>%api_platform.enable_entrypoint%</argument>
             <argument>%api_platform.enable_docs%</argument>
+            <argument>%api_platform.enable_batch_endpoint%</argument>
 
             <tag name="routing.loader" />
         </service>
@@ -193,6 +194,10 @@
 
         <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+        </service>
+
+        <service id="api_platform.action.batch_endpoint" class="ApiPlatform\Core\Action\BatchEndpointAction" public="true">
+            <argument type="service" id="http_kernel" />
         </service>
 
         <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction" public="true">

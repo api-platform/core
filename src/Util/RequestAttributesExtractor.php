@@ -45,6 +45,10 @@ final class RequestAttributesExtractor
             $result['subresource_context'] = $subresourceContext;
         }
 
+        if ($isBatchRequest = $request->attributes->get('_api_batch_request')) {
+            $result['batch_request'] = true;
+        }
+
         if (null === $result['resource_class']) {
             return [];
         }

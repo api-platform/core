@@ -18,6 +18,7 @@ use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -47,17 +48,34 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (
-            $request->isMethodSafe(false)
+
+        if ($request->isMethodSafe(false)
             || $request->isMethod(Request::METHOD_DELETE)
-            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
-            || !$attributes['receive']
-            || ('' === ($requestContent = $request->getContent()) && $request->isMethod(Request::METHOD_PUT))
         ) {
             return;
         }
 
         $format = $this->getFormat($request);
+
+        if ($request->attributes->get('_api_batch_request') && '' !== $request->getContent()) {
+            if (!$this->serializer instanceof DecoderInterface) {
+                return;
+            }
+
+            $request->attributes->set(
+                'data',
+                $this->serializer->decode($request->getContent(), $format)
+            );
+            return;
+        }
+
+        if (!($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || !$attributes['receive']
+            || ('' === $request->getContent() && $request->isMethod(Request::METHOD_PUT))
+        ) {
+            return;
+        }
+
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
         $data = $request->attributes->get('data');
@@ -68,7 +86,7 @@ final class DeserializeListener
         $request->attributes->set(
             'data',
             $this->serializer->deserialize(
-                $requestContent, $attributes['resource_class'], $format, $context
+                $request->getContent(), $attributes['resource_class'], $this->getFormat($request), $context
             )
         );
     }

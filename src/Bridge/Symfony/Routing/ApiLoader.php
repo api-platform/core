@@ -53,8 +53,9 @@ final class ApiLoader extends Loader
     private $graphqlEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
+    private $batchEndpointEnabled;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $batchEndpointEnabled = false)
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -67,6 +68,7 @@ final class ApiLoader extends Loader
         $this->graphqlEnabled = $graphqlEnabled;
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
+        $this->batchEndpointEnabled = $batchEndpointEnabled;
     }
 
     /**
@@ -128,6 +130,23 @@ final class ApiLoader extends Loader
                     $operation['condition'] ?? ''
                 ));
             }
+        }
+
+        if ($this->batchEndpointEnabled) {
+            $routeCollection->add(RouteNameGenerator::ROUTE_NAME_PREFIX . 'batch_endpoint', new Route(
+                '/batch', // TODO: make configurable
+                [
+                    '_controller' => self::DEFAULT_ACTION_PATTERN.'batch_endpoint',
+                    '_format' => null,
+                    '_api_batch_request' => true,
+                    '_api_respond' => true,
+                ],
+                [],
+                [],
+                '',
+                [],
+                ['POST']
+            ));
         }
 
         return $routeCollection;
