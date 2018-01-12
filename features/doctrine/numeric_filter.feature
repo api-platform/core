@@ -5,7 +5,7 @@ Feature: Numeric filter on collections
 
   @createSchema
   Scenario: Get collection by dummyPrice=9.99
-    Given there is "10" dummy objects with dummyPrice
+    Given there are 10 dummy objects with dummyPrice
     When I send a "GET" request to "/dummies?dummyPrice=9.99"
     Then the response status code should be 200
     And the response should be in JSON
@@ -49,7 +49,7 @@ Feature: Numeric filter on collections
 
   @dropSchema
   Scenario: Get collection by non-numeric dummyPrice=marty
-    Given there is "10" dummy objects with dummyPrice
+    Given there are 10 dummy objects with dummyPrice
     When I send a "GET" request to "/dummies?dummyPrice=marty"
     Then the response status code should be 200
     And the response should be in JSON

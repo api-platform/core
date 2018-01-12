@@ -9,7 +9,7 @@ Feature: JSON API filter handling
 
   @createSchema
   Scenario: Apply filters based on the 'filter' query parameter with 'my' as value
-    Given there is "30" dummy objects with dummyDate
+    Given there are 30 dummy objects with dummyDate
     When I send a "GET" request to "/dummies?filter[name]=my"
     Then the response status code should be 200
     And the response should be in JSON

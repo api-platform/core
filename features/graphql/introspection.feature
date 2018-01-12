@@ -170,7 +170,7 @@ Feature: GraphQL introspection support
 
   @dropSchema
   Scenario: Retrieve an item through a GraphQL query
-    Given there is 4 dummy objects with relatedDummy
+    Given there are 4 dummy objects with relatedDummy
     When I send the following GraphQL request:
     """
     {

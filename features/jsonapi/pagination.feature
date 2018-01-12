@@ -9,7 +9,7 @@ Feature: JSON API pagination handling
 
   @createSchema
   Scenario: Get the first page of a paginated collection according to basic config
-    Given there is "10" dummy objects
+    Given there are 10 dummy objects
     When I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the JSON should be valid according to the JSON API schema

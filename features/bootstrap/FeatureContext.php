@@ -122,9 +122,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects
+     * @Given there are :nb dummy objects
      */
-    public function thereIsDummyObjects(int $nb)
+    public function thereAreDummyObjects(int $nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -183,9 +183,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy group objects
+     * @Given there are :nb dummy group objects
      */
-    public function thereIsDummyGroupObjects(int $nb)
+    public function thereAreDummyGroupObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyGroup = new DummyGroup();
@@ -201,9 +201,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy property objects
+     * @Given there are :nb dummy property objects
      */
-    public function thereIsDummyPropertyObjects(int $nb)
+    public function thereAreDummyPropertyObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyProperty = new DummyProperty();
@@ -225,7 +225,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     /**
      * @Given there are :nb embedded dummy objects
      */
-    public function thereIsEmbeddedDummyObjects(int $nb)
+    public function thereAreEmbeddedDummyObjects(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new EmbeddedDummy();
@@ -242,9 +242,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with relatedDummy
+     * @Given there are :nb dummy objects with relatedDummy
      */
-    public function thereIsDummyObjectsWithRelatedDummy(int $nb)
+    public function thereAreDummyObjectsWithRelatedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $relatedDummy = new RelatedDummy();
@@ -263,9 +263,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with relatedDummy and its thirdLevel
+     * @Given there are :nb dummy objects with relatedDummy and its thirdLevel
      */
-    public function thereIsDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb)
+    public function thereAreDummyObjectsWithRelatedDummyAndItsThirdLevel(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $thirdLevel = new ThirdLevel();
@@ -288,9 +288,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with embeddedDummy
+     * @Given there are :nb dummy objects with embeddedDummy
      */
-    public function thereIsDummyObjectsWithEmbeddedDummy(int $nb)
+    public function thereAreDummyObjectsWithEmbeddedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $embeddableDummy = new EmbeddableDummy();
@@ -307,9 +307,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects having each :nbrelated relatedDummies
+     * @Given there are :nb dummy objects having each :nbrelated relatedDummies
      */
-    public function thereIsDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
+    public function thereAreDummyObjectsWithRelatedDummies(int $nb, int $nbrelated)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $dummy = new Dummy();
@@ -332,9 +332,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyDate
+     * @Given there are :nb dummy objects with dummyDate
      */
-    public function thereIsDummyObjectsWithDummyDate(int $nb)
+    public function thereAreDummyObjectsWithDummyDate(int $nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -358,9 +358,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyDate and dummyBoolean :bool
+     * @Given there are :nb dummy objects with dummyDate and dummyBoolean :bool
      */
-    public function thereIsDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithDummyDateAndDummyBoolean(int $nb, string $bool)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
@@ -394,9 +394,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyDate and relatedDummy
+     * @Given there are :nb dummy objects with dummyDate and relatedDummy
      */
-    public function thereIsDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
+    public function thereAreDummyObjectsWithDummyDateAndRelatedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -422,9 +422,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb embedded dummy objects with dummyDate and embeddedDummy
+     * @Given there are :nb embedded dummy objects with dummyDate and embeddedDummy
      */
-    public function thereIsDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb)
+    public function thereAreDummyObjectsWithDummyDateAndEmbeddedDummy(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
@@ -448,9 +448,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyPrice
+     * @Given there are :nb dummy objects with dummyPrice
      */
-    public function thereIsDummyObjectsWithDummyPrice(int $nb)
+    public function thereAreDummyObjectsWithDummyPrice(int $nb)
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
         $prices = ['9.99', '12.99', '15.99', '19.99'];
@@ -469,9 +469,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummy objects with dummyBoolean :bool
+     * @Given there are :nb dummy objects with dummyBoolean :bool
      */
-    public function thereIsDummyObjectsWithDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
         if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -497,9 +497,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb embedded dummy objects with embeddedDummy.dummyBoolean :bool
+     * @Given there are :nb embedded dummy objects with embeddedDummy.dummyBoolean :bool
      */
-    public function thereIsDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
     {
         if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -524,9 +524,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean :bool
+     * @Given there are :nb embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean :bool
      */
-    public function thereIsDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
+    public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
     {
         if (in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
@@ -823,9 +823,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there is :nb dummydate objects with dummyDate
+     * @Given there are :nb dummydate objects with dummyDate
      */
-    public function thereIsDummyDateObjectsWithDummyDate(int $nb)
+    public function thereAreDummyDateObjectsWithDummyDate(int $nb)
     {
         for ($i = 1; $i <= $nb; ++$i) {
             $date = new \DateTime(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));

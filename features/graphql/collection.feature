@@ -2,7 +2,7 @@ Feature: GraphQL collection support
   @createSchema
   @dropSchema
   Scenario: Retrieve a collection through a GraphQL query
-    Given there is 4 dummy objects with relatedDummy and its thirdLevel
+    Given there are 4 dummy objects with relatedDummy and its thirdLevel
     When I send the following GraphQL request:
     """
     {
@@ -62,7 +62,7 @@ Feature: GraphQL collection support
   @createSchema
   @dropSchema
   Scenario: Retrieve a collection with a nested collection through a GraphQL query
-    Given there is 4 dummy objects having each 3 relatedDummies
+    Given there are 4 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:
     """
     {
@@ -91,8 +91,8 @@ Feature: GraphQL collection support
   @createSchema
   @dropSchema
   Scenario: Retrieve a collection and an item through a GraphQL query
-    Given there is 3 dummy objects with dummyDate
-    And there is 2 dummy group objects
+    Given there are 3 dummy objects with dummyDate
+    And there are 2 dummy group objects
     When I send the following GraphQL request:
     """
     {
@@ -119,7 +119,7 @@ Feature: GraphQL collection support
   @createSchema
   @dropSchema
   Scenario: Retrieve a specific number of items in a collection through a GraphQL query
-    Given there is 4 dummy objects
+    Given there are 4 dummy objects
     When I send the following GraphQL request:
     """
     {
@@ -140,7 +140,7 @@ Feature: GraphQL collection support
   @createSchema
   @dropSchema
   Scenario: Retrieve a specific number of items in a nested collection through a GraphQL query
-    Given there is 2 dummy objects having each 5 relatedDummies
+    Given there are 2 dummy objects having each 5 relatedDummies
     When I send the following GraphQL request:
     """
     {
@@ -169,7 +169,7 @@ Feature: GraphQL collection support
   @createSchema
   @dropSchema
   Scenario: Paginate through collections through a GraphQL query
-    Given there is 4 dummy objects having each 4 relatedDummies
+    Given there are 4 dummy objects having each 4 relatedDummies
     When I send the following GraphQL request:
     """
     {

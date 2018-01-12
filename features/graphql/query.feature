@@ -1,7 +1,7 @@
 Feature: GraphQL query support
   @createSchema
   Scenario: Execute a basic GraphQL query
-    Given there is 2 dummy objects with relatedDummy
+    Given there are 2 dummy objects with relatedDummy
     When I send the following GraphQL request:
     """
     {

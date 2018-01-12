@@ -5,7 +5,7 @@ Feature: Date filter on collections
 
   @createSchema
   Scenario: Get collection filtered by date
-    Given there is "30" dummy objects with dummyDate
+    Given there are 30 dummy objects with dummyDate
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
@@ -266,7 +266,7 @@ Feature: Date filter on collections
 
   @dropSchema
   Scenario: Get collection filtered by association date
-    Given there is "30" dummy objects with dummyDate and relatedDummy
+    Given there are 30 dummy objects with dummyDate and relatedDummy
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
@@ -387,7 +387,7 @@ Feature: Date filter on collections
   @dropSchema
   @createSchema
   Scenario: Get collection filtered by association date
-    Given there is "2" dummy objects with dummyDate and relatedDummy
+    Given there are 2 dummy objects with dummyDate and relatedDummy
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
@@ -669,7 +669,7 @@ Feature: Date filter on collections
   @dropSchema
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime
-    Given there is "30" dummydate objects with dummyDate
+    Given there are 30 dummydate objects with dummyDate
     When I send a "GET" request to "/dummy_dates?dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON
@@ -678,7 +678,7 @@ Feature: Date filter on collections
   @dropSchema
   @createSchema
   Scenario: Get collection filtered by embedded date
-    Given there is "2" embedded dummy objects with dummyDate and embeddedDummy
+    Given there are 2 embedded dummy objects with dummyDate and embeddedDummy
     When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyDate[after]=2015-04-28"
     Then the response status code should be 200
     And the response should be in JSON

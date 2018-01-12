@@ -5,7 +5,7 @@ Feature: Order filter on collections
 
   @createSchema
   Scenario: Get collection ordered in ascending order on an integer property and on which order filter has been enabled in whitelist mode
-    Given there is "30" dummy objects
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?order[id]=asc"
     Then the response status code should be 200
     And the response should be in JSON
@@ -301,7 +301,7 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered in ascending order on an association and on which order filter has been enabled in whitelist mode
-    Given there is "30" dummy objects with relatedDummy
+    Given there are 30 dummy objects with relatedDummy
     When I send a "GET" request to "/dummies?order[relatedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON
@@ -361,7 +361,7 @@ Feature: Order filter on collections
     """
 
   Scenario: Get collection ordered in ascending order on an embedded and on which order filter has been enabled in whitelist mode
-    Given there is "30" dummy objects with embeddedDummy
+    Given there are 30 dummy objects with embeddedDummy
     When I send a "GET" request to "/embedded_dummies?order[embeddedDummy]=asc"
     Then the response status code should be 200
     And the response should be in JSON

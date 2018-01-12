@@ -5,7 +5,7 @@ Feature: Set properties to include
 
   @createSchema
   Scenario: Test properties filter
-    Given there is 1 dummy objects with relatedDummy and its thirdLevel
+    Given there are 1 dummy objects with relatedDummy and its thirdLevel
     When I send a "GET" request to "/dummies/1?properties[]=name&properties[]=alias&properties[]=relatedDummy"
     And the JSON node "name" should be equal to "Dummy #1"
     And the JSON node "alias" should be equal to "Alias #0"

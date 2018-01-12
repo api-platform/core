@@ -5,8 +5,8 @@ Feature: Boolean filter on collections
 
   @createSchema
   Scenario: Get collection by dummyBoolean true
-    Given there is "15" dummy objects with dummyBoolean true
-    And there is "10" dummy objects with dummyBoolean false
+    Given there are 15 dummy objects with dummyBoolean true
+    And there are 10 dummy objects with dummyBoolean false
     When I send a "GET" request to "/dummies?dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON
@@ -167,8 +167,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 10
 
   Scenario: Get collection by embeddedDummy.dummyBoolean true
-    Given there is "15" embedded dummy objects with embeddedDummy.dummyBoolean true
-    And there is "10" embedded dummy objects with embeddedDummy.dummyBoolean false
+    Given there are 15 embedded dummy objects with embeddedDummy.dummyBoolean true
+    And there are 10 embedded dummy objects with embeddedDummy.dummyBoolean false
     When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON
@@ -329,8 +329,8 @@ Feature: Boolean filter on collections
     And the JSON node "hydra:totalItems" should be equal to 10
 
   Scenario: Get collection by association with embed relatedDummy.embeddedDummy.dummyBoolean true
-    Given there is "15" embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean true
-    And there is "10" embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean false
+    Given there are 15 embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean true
+    And there are 10 embedded dummy objects with relatedDummy.embeddedDummy.dummyBoolean false
     When I send a "GET" request to "/embedded_dummies?relatedDummy.embeddedDummy.dummyBoolean=true"
     Then the response status code should be 200
     And the response should be in JSON
