@@ -302,6 +302,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ($propertyMetadata->isWritableLink() && \is_array($value))
         ) {
             $context['resource_class'] = $className;
+            $context['api_allow_update'] = true;
 
             return $this->serializer->denormalize($value, $className, $format, $context);
         }
