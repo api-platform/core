@@ -17,17 +17,14 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Dummy Date.
- *
- * @author Antoine Bluchet <soyuka@gmail.com>
- *
+ * Dummy Immutable Date.
  *
  * @ApiResource(attributes={
- *     "filters"={"my_dummy_date.date"}
+ *     "filters"={"my_dummy_immutable_date.date"}
  * })
  * @ORM\Entity
  */
-class DummyDate
+class DummyImmutableDate
 {
     /**
      * @var int The id
@@ -39,9 +36,9 @@ class DummyDate
     private $id;
 
     /**
-     * @var \DateTime The dummy date
+     * @var \DateTimeImmutable The dummy date
      *
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date_immutable")
      */
     public $dummyDate;
 
