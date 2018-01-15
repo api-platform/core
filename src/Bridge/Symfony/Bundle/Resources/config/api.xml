@@ -40,7 +40,7 @@
             <argument>%api_platform.graphql.enabled%</argument>
             <argument>%api_platform.enable_entrypoint%</argument>
             <argument>%api_platform.enable_docs%</argument>
-            <argument>%api_platform.enable_batch_endpoint%</argument>
+            <argument>%api_platform.batch_endpoint%</argument>
 
             <tag name="routing.loader" />
         </service>

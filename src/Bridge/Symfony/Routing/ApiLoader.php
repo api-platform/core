@@ -53,9 +53,9 @@ final class ApiLoader extends Loader
     private $graphqlEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
-    private $batchEndpointEnabled;
+    private $batchEndpoint;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $batchEndpointEnabled = false)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, string $batchEndpoint = '')
     {
         $this->fileLoader = new XmlFileLoader(new FileLocator($kernel->locateResource('@ApiPlatformBundle/Resources/config/routing')));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
@@ -132,9 +132,9 @@ final class ApiLoader extends Loader
             }
         }
 
-        if ($this->batchEndpointEnabled) {
+        if ('' !== $this->batchEndpoint) {
             $routeCollection->add(RouteNameGenerator::ROUTE_NAME_PREFIX . 'batch_endpoint', new Route(
-                '/batch', // TODO: make configurable
+                $this->batchEndpoint,
                 [
                     '_controller' => self::DEFAULT_ACTION_PATTERN.'batch_endpoint',
                     '_format' => null,
