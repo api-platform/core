@@ -72,6 +72,9 @@ class BatchEndpointAction
                 $item['headers'] = $request->headers->all();
             }
 
+            // Make sure Content-Length is always correct
+            $item['headers']['content-length'] = strlen($item['body']);
+
             $result[] = $this->convertResponse(
                 $this->executeSubRequest(
                     $k,
