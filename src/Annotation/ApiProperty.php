@@ -67,4 +67,9 @@ final class ApiProperty
      * @var array
      */
     public $attributes = [];
+
+    /**
+     * @var bool
+     */
+    public $alwaysIdentifier;
 }

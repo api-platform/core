@@ -34,8 +34,9 @@ final class PropertyMetadata
     private $childInherited;
     private $attributes;
     private $subresource;
+    private $alwaysIdentifier;
 
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $alwaysIdentifier = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -49,6 +50,7 @@ final class PropertyMetadata
         $this->childInherited = $childInherited;
         $this->attributes = $attributes;
         $this->subresource = $subresource;
+        $this->alwaysIdentifier = $alwaysIdentifier;
     }
 
     /**
@@ -380,5 +382,26 @@ final class PropertyMetadata
         $metadata->subresource = $subresource;
 
         return $metadata;
+    }
+
+    /**
+     * Returns a new instance with the given alwaysIdentifier flag.
+     */
+    public function withAlwaysIdentifier(bool $alwaysIdentifier): self
+    {
+        $metadata = clone $this;
+        $metadata->alwaysIdentifier = $alwaysIdentifier;
+
+        return $metadata;
+    }
+
+    /**
+     * Is the property should be serialized as identifier  ?
+     *
+     * @return bool|null
+     */
+    public function isAlwaysIdentifier()
+    {
+        return $this->alwaysIdentifier;
     }
 }

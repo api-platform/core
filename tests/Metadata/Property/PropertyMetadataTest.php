@@ -25,7 +25,7 @@ class PropertyMetadataTest extends TestCase
     public function testValueObject()
     {
         $type = new Type(Type::BUILTIN_TYPE_STRING);
-        $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', null, ['foo' => 'bar']);
+        $metadata = new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'desc', true, true, false, false, true, false, 'http://example.com/foo', null, ['foo' => 'bar'], null, true);
         $this->assertEquals($type, $metadata->getType());
         $this->assertEquals('desc', $metadata->getDescription());
         $this->assertTrue($metadata->isReadable());
@@ -36,6 +36,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertFalse($metadata->isIdentifier());
         $this->assertEquals('http://example.com/foo', $metadata->getIri());
         $this->assertEquals(['foo' => 'bar'], $metadata->getAttributes());
+        $this->assertTrue($metadata->isAlwaysIdentifier());
 
         $newType = new Type(Type::BUILTIN_TYPE_BOOL);
         $newMetadata = $metadata->withType($newType);
@@ -78,6 +79,10 @@ class PropertyMetadataTest extends TestCase
         $this->assertNotSame($metadata, $newMetadata);
         $this->assertEquals(['a' => 'b'], $newMetadata->getAttributes());
         $this->assertEquals('b', $newMetadata->getAttribute('a'));
+
+        $newMetadata = $metadata->withAlwaysIdentifier(false);
+        $this->assertNotSame($metadata, $newMetadata);
+        $this->assertFalse($newMetadata->isAlwaysIdentifier());
     }
 
     public function testShouldReturnRequiredFalseWhenRequiredTrueIsSetButMaskedByWritableFalse()
