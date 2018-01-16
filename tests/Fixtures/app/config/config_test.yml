@@ -119,6 +119,11 @@ services:
         arguments: [ { 'dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy_date.date' } ]
 
+    my_dummy_immutable_date.date:
+        parent:    'api_platform.doctrine.orm.date_filter'
+        arguments: [ { 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter' } ]
+
     app.my_dummy_resource.range_filter:
         parent:    'api_platform.doctrine.orm.range_filter'
         arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
