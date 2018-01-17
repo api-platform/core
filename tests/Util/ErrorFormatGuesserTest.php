@@ -48,4 +48,45 @@ class ErrorFormatGuesserTest extends TestCase
         $this->assertEquals('xml', $format['key']);
         $this->assertEquals('text/xml', $format['value'][0]);
     }
+
+    public function testGuessCustomErrorFormat()
+    {
+        $request = new Request();
+        $request->setRequestFormat('custom_json_format');
+
+        $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'custom_json_format' => ['application/json']]);
+        $this->assertEquals('custom_json_format', $format['key']);
+        $this->assertEquals('application/json', $format['value'][0]);
+    }
+
+    public function testGuessErrorFormatFromAcceptHeader()
+    {
+        $request = new Request();
+        $request->headers->set('accept', 'application/ld+json');
+
+        $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'jsonld' => ['application/ld+json', 'application/json']]);
+        $this->assertEquals('jsonld', $format['key']);
+        $this->assertEquals('application/ld+json', $format['value'][0]);
+    }
+
+    public function testGuessErrorFormatFromContentTypeHeader()
+    {
+        $request = new Request();
+        $request->headers->set('content-type', 'application/ld+json');
+
+        $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'jsonld' => ['application/ld+json', 'application/json']]);
+        $this->assertEquals('jsonld', $format['key']);
+        $this->assertEquals('application/ld+json', $format['value'][0]);
+    }
+
+    public function testGuessErrorFormatFromAcceptHeaderFirst()
+    {
+        $request = new Request();
+        $request->headers->set('accept', 'text/xml');
+        $request->headers->set('content-type', 'application/ld+json');
+
+        $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'jsonld' => ['application/ld+json', 'application/json']]);
+        $this->assertEquals('xml', $format['key']);
+        $this->assertEquals('text/xml', $format['value'][0]);
+    }
 }

@@ -37,14 +37,35 @@ final class ErrorFormatGuesser
     public static function guessErrorFormat(Request $request, array $errorFormats): array
     {
         $requestFormat = $request->getRequestFormat('');
-        if ('' !== $requestFormat && isset($errorFormats[$requestFormat])) {
+
+        if ('' !== $requestFormat && array_key_exists($requestFormat, $errorFormats)) {
             return ['key' => $requestFormat, 'value' => $errorFormats[$requestFormat]];
         }
 
-        foreach ($errorFormats as $key => $value) {
-            return ['key' => $key, 'value' => $value];
+        $mimeType = self::getMimeType($request);
+
+        foreach ($errorFormats as $format => $mimeTypes) {
+            if (in_array($mimeType, $mimeTypes, true)) {
+                return ['key' => $format, 'value' => $mimeTypes];
+            }
         }
 
-        return [];
+        return ['key' => key($errorFormats), 'value' => reset($errorFormats)];
+    }
+
+    /**
+     * Get MIME type from the request.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
+     * @return string|null
+     */
+    private static function getMimeType(Request $request): ?string
+    {
+        if ($request->headers->has('accept') && '*/*' !== $request->headers->get('accept')) {
+            return $request->headers->get('accept');
+        }
+
+        return $request->getMimeType($request->getContentType());
     }
 }
