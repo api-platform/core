@@ -38,34 +38,23 @@ final class ErrorFormatGuesser
     {
         $requestFormat = $request->getRequestFormat('');
 
-        if ('' !== $requestFormat && array_key_exists($requestFormat, $errorFormats)) {
+        if ('' !== $requestFormat && isset($errorFormats[$requestFormat])) {
             return ['key' => $requestFormat, 'value' => $errorFormats[$requestFormat]];
         }
 
-        $mimeType = self::getMimeType($request);
+        $requestMimeTypes = Request::getMimeTypes($request->getRequestFormat());
+        $defaultFormat = [];
 
-        foreach ($errorFormats as $format => $mimeTypes) {
-            if (in_array($mimeType, $mimeTypes, true)) {
-                return ['key' => $format, 'value' => $mimeTypes];
+        foreach ($errorFormats as $format => $errorMimeTypes) {
+            if ([] === $defaultFormat) {
+                $defaultFormat = ['key' => $format, 'value' => $errorMimeTypes];
+            }
+
+            if (array_intersect($requestMimeTypes, $errorMimeTypes)) {
+                return ['key' => $format, 'value' => $errorMimeTypes];
             }
         }
 
-        return ['key' => key($errorFormats), 'value' => reset($errorFormats)];
-    }
-
-    /**
-     * Get MIME type from the request.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return string|null
-     */
-    private static function getMimeType(Request $request): ?string
-    {
-        if ($request->headers->has('accept') && '*/*' !== $request->headers->get('accept')) {
-            return $request->headers->get('accept');
-        }
-
-        return $request->getMimeType($request->getContentType());
+        return $defaultFormat;
     }
 }
