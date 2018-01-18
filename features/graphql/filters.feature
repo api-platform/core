@@ -6,8 +6,8 @@ Feature: Collections filtering
   @createSchema
   @dropSchema
   Scenario: Retrieve a collection filtered using the boolean filter
-    Given there is "1" dummy object with dummyBoolean true
-    And there is "1" dummy object with dummyBoolean false
+    Given there is 1 dummy object with dummyBoolean true
+    And there is 1 dummy object with dummyBoolean false
     When I send the following GraphQL request:
     """
     {
@@ -27,7 +27,7 @@ Feature: Collections filtering
   @createSchema
   @dropSchema
   Scenario: Retrieve a collection filtered using the date filter
-    Given there are "3" dummy objects with dummyDate
+    Given there are 3 dummy objects with dummyDate
     When I send the following GraphQL request:
     """
     {
@@ -47,7 +47,7 @@ Feature: Collections filtering
   @createSchema
   @dropSchema
   Scenario: Retrieve a collection filtered using the search filter
-    Given there are "10" dummy objects
+    Given there are 10 dummy objects
     When I send the following GraphQL request:
     """
     {
@@ -66,7 +66,7 @@ Feature: Collections filtering
 
   @createSchema
   @dropSchema
-  Scenario: Retrieve a collection filtered using the date filter
+  Scenario: Retrieve a collection filtered using the search filter
     Given there are 3 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:
     """
