@@ -49,6 +49,7 @@
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
             <argument type="service" id="api_platform.graphql.resolver.item" />
             <argument type="service" id="api_platform.graphql.resolver.resource_field" />
+            <argument type="service" id="api_platform.filter_locator" />
             <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>
 

@@ -20,6 +20,7 @@ use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -61,7 +62,12 @@ final class ReadListener
             return;
         }
 
-        $context = [];
+        if (null === $filters = $request->attributes->get('_api_filters')) {
+            $queryString = $request->getQueryString();
+            $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
+        }
+
+        $context = null === $filters ? [] : ['filters' => $filters];
         if ($this->serializerContextBuilder) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
             $context['normalization_context'] = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);

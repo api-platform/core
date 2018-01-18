@@ -30,7 +30,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class ExistsFilter extends AbstractFilter
+class ExistsFilter extends AbstractContextAwareFilter
 {
     const QUERY_PARAMETER_KEY = 'exists';
 

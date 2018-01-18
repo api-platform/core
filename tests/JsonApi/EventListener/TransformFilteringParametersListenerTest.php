@@ -77,7 +77,7 @@ class TransformFilteringParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']], [], ['_api_filter_common' => ['foo' => 'bar', 'baz' => 'qux']]);
+        $expectedRequest = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']], [], ['_api_filters' => ['foo' => 'bar', 'baz' => 'qux']]);
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

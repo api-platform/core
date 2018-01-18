@@ -78,9 +78,9 @@ class GroupFilterTest extends TestCase
         $this->assertEquals([AbstractNormalizer::GROUPS => ['foo', 'baz']], $context);
     }
 
-    public function testApplyWithGroupsInCommonFilterAttribute()
+    public function testApplyWithGroupsInFilterAttribute()
     {
-        $request = new Request(['groups' => ['foo', 'bar', 'baz']], [], ['_api_filter_common' => ['groups' => ['fooz']]]);
+        $request = new Request(['groups' => ['foo', 'bar', 'baz']], [], ['_api_filters' => ['groups' => ['fooz']]]);
         $context = ['groups' => ['foo', 'qux']];
 
         $groupFilter = new GroupFilter();

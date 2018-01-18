@@ -118,7 +118,7 @@ class CollectionResolverFactoryTest extends TestCase
         $factory = $this->createCollectionResolverFactory([
             'Object1',
             'Object2',
-        ], [], [], true);
+        ], [], [], true, $cursor);
 
         $resolver = $factory(RelatedDummy::class, Dummy::class, 'operationName');
 
@@ -162,7 +162,8 @@ class CollectionResolverFactoryTest extends TestCase
         $collectionPaginatorProphecy->count()->willReturn(8);
         $collectionPaginatorProphecy->getItemsPerPage()->willReturn(8);
 
-        $resolverFactory = $this->createCollectionResolverFactory($collectionPaginatorProphecy->reveal(), [], [], true);
+        $cursor = 'MQ==';
+        $resolverFactory = $this->createCollectionResolverFactory($collectionPaginatorProphecy->reveal(), [], [], true, $cursor);
         $resolver = $resolverFactory(RelatedDummy::class, Dummy::class, 'operationName');
 
         $resolveInfo = new ResolveInfo([]);
@@ -171,18 +172,20 @@ class CollectionResolverFactoryTest extends TestCase
 
         $this->assertEquals(
             ['edges' => [['node' => 'normalizedObject1', 'cursor' => 'Mg==']], 'pageInfo' => ['endCursor' => 'MTY=', 'hasNextPage' => true]],
-            $resolver(null, ['after' => 'MQ=='], null, $resolveInfo)
+            $resolver(null, ['after' => $cursor], null, $resolveInfo)
         );
     }
 
     /**
      * @param array|\Iterator $collection
      */
-    private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled): CollectionResolverFactory
+    private function createCollectionResolverFactory($collection, array $subcollection, array $identifiers, bool $paginationEnabled, string $cursor = null): CollectionResolverFactory
     {
         $collectionDataProviderProphecy = $this->prophesize(CollectionDataProviderInterface::class);
-        $collectionDataProviderProphecy->getCollection(Dummy::class, null, ['groups' => ['foo'], 'attributes' => []])->willReturn($collection);
-        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['groups' => ['foo'], 'attributes' => []])->willReturn($collection);
+
+        $filters = $cursor ? ['after' => $cursor] : [];
+        $collectionDataProviderProphecy->getCollection(Dummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => []])->willReturn($collection);
+        $collectionDataProviderProphecy->getCollection(RelatedDummy::class, null, ['groups' => ['foo'], 'attributes' => [], 'filters' => $filters])->willReturn($collection);
 
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(RelatedDummy::class, $identifiers, [
@@ -191,6 +194,7 @@ class CollectionResolverFactoryTest extends TestCase
             'collection' => true,
             'groups' => ['foo'],
             'attributes' => [],
+            'filters' => [],
         ])->willReturn($subcollection);
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);

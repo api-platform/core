@@ -77,7 +77,7 @@ class TransformSortingParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['sort' => 'foo,-bar,-baz,qux'], [], ['_api_filter_order' => ['foo' => 'asc', 'bar' => 'desc', 'baz' => 'desc', 'qux' => 'asc']]);
+        $expectedRequest = new Request(['sort' => 'foo,-bar,-baz,qux'], [], ['_api_filters' => ['order' => ['foo' => 'asc', 'bar' => 'desc', 'baz' => 'desc', 'qux' => 'asc']]]);
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

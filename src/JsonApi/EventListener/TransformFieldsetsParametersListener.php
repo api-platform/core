@@ -39,7 +39,7 @@ final class TransformFieldsetsParametersListener
             'jsonapi' !== $request->getRequestFormat() ||
             !($resourceClass = $request->attributes->get('_api_resource_class')) ||
             !($fieldsParameter = $request->query->get('fields')) ||
-            !is_array($fieldsParameter)
+            !\is_array($fieldsParameter)
         ) {
             return;
         }

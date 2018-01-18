@@ -14,78 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Lee Siong Chan <ahlee2326@me.com>
  */
-class RangeFilterTest extends KernelTestCase
+class RangeFilterTest extends AbstractFilterTest
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    /**
-     * @var EntityRepository
-     */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    protected $resourceClass;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        self::bootKernel();
-        $manager = DoctrineTestHelper::createTestEntityManager();
-        $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->repository = $manager->getRepository(Dummy::class);
-        $this->resourceClass = Dummy::class;
-    }
-
-    /**
-     * @dataProvider provideApplyTestData
-     */
-    public function testApply($properties, array $filterParameters, string $expected)
-    {
-        $request = Request::create('/api/dummies', 'GET', $filterParameters);
-
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-
-        $queryBuilder = $this->repository->createQueryBuilder('o');
-
-        $filter = new RangeFilter(
-            $this->managerRegistry,
-            $requestStack,
-            null,
-            $properties
-        );
-
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        $actual = $queryBuilder->getQuery()->getDQL();
-
-        $this->assertEquals($expected, $actual);
-    }
+    protected $filterClass = RangeFilter::class;
 
     public function testGetDescription()
     {
-        $filter = new RangeFilter(
-            $this->managerRegistry,
-            new RequestStack()
-        );
+        $filter = new RangeFilter($this->managerRegistry);
 
         $this->assertEquals([
             'id[between]' => [
@@ -366,16 +306,6 @@ class RangeFilterTest extends KernelTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    /**
-     * Provides test data.
-     *
-     * Provides 3 parameters:
-     *  - configuration of filterable properties
-     *  - filter parameters
-     *  - expected DQL query
-     *
-     * @return array
-     */
     public function provideApplyTestData(): array
     {
         return [
