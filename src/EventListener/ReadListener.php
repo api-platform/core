@@ -64,10 +64,10 @@ final class ReadListener
 
         if (null === $filters = $request->attributes->get('_api_filters')) {
             $queryString = $request->getQueryString();
-            $filters = $queryString ? RequestParser::parseRequestParams($queryString) : [];
+            $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
         }
 
-        $context = ['filters' => $filters];
+        $context = null === $filters ? [] : ['filters' => $filters];
         if ($this->serializerContextBuilder) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
             $context['normalization_context'] = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);

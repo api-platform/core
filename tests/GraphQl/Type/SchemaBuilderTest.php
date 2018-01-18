@@ -231,6 +231,7 @@ class SchemaBuilderTest extends TestCase
             $itemMutationResolverFactoryProphecy->reveal(),
             function () {},
             function () {},
+            null,
             $paginationEnabled
         );
     }
