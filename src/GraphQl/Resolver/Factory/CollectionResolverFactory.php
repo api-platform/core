@@ -71,15 +71,16 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
-            $normalizationContext['attributes'] = $this->fieldsToAttributes($info);
+            $dataProviderContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
+            $dataProviderContext['attributes'] = $this->fieldsToAttributes($info);
+            $dataProviderContext['filters'] = $args;
 
             if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
-                $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $normalizationContext);
+                $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
                 $collection = $subresource ?? [];
             } else {
-                $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $normalizationContext);
+                $collection = $this->collectionDataProvider->getCollection($resourceClass, null, $dataProviderContext);
             }
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
@@ -94,7 +95,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             if (!$this->paginationEnabled) {
                 $data = [];
                 foreach ($collection as $index => $object) {
-                    $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
+                    $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext);
                 }
 
                 return $data;
@@ -117,7 +118,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             foreach ($collection as $index => $object) {
                 $data['edges'][$index] = [
-                    'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext),
+                    'node' => $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $dataProviderContext),
                     'cursor' => base64_encode((string) ($index + $offset)),
                 ];
             }

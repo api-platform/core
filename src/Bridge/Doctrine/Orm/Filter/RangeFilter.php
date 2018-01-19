@@ -22,7 +22,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  */
-class RangeFilter extends AbstractFilter
+class RangeFilter extends AbstractContextAwareFilter
 {
     const PARAMETER_BETWEEN = 'between';
     const PARAMETER_GREATER_THAN = 'gt';

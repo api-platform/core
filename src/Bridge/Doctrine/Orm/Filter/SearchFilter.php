@@ -30,7 +30,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SearchFilter extends AbstractFilter
+class SearchFilter extends AbstractContextAwareFilter
 {
     /**
      * @var string Exact matching
@@ -60,7 +60,7 @@ class SearchFilter extends AbstractFilter
     protected $iriConverter;
     protected $propertyAccessor;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 

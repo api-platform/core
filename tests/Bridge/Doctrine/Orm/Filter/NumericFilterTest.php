@@ -14,85 +14,23 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class NumericFilterTest extends KernelTestCase
+class NumericFilterTest extends AbstractFilterTest
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    /**
-     * @var EntityRepository
-     */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    protected $resourceClass;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        self::bootKernel();
-        $manager = DoctrineTestHelper::createTestEntityManager();
-        $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->repository = $manager->getRepository(Dummy::class);
-        $this->resourceClass = Dummy::class;
-    }
-
-    /**
-     * @dataProvider provideApplyTestData
-     */
-    public function testApply($properties, array $filterParameters, string $expected)
-    {
-        $request = Request::create('/api/dummies', 'GET', $filterParameters);
-
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
-
-        $queryBuilder = $this->repository->createQueryBuilder('o');
-
-        $filter = new NumericFilter(
-            $this->managerRegistry,
-            $requestStack,
-            null,
-            $properties
-        );
-
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass);
-        $actual = $queryBuilder->getQuery()->getDQL();
-
-        $this->assertEquals($expected, $actual);
-    }
+    protected $filterClass = NumericFilter::class;
 
     public function testGetDescription()
     {
-        $filter = new NumericFilter(
-            $this->managerRegistry,
-            new RequestStack(),
-            null,
-            [
-                'id' => null,
-                'name' => null,
-                'foo' => null,
-                'dummyBoolean' => null,
-            ]
-        );
+        $filter = new NumericFilter($this->managerRegistry, null, null, [
+            'id' => null,
+            'name' => null,
+            'foo' => null,
+            'dummyBoolean' => null,
+        ]);
 
         $this->assertEquals([
             'id' => [
@@ -105,10 +43,7 @@ class NumericFilterTest extends KernelTestCase
 
     public function testGetDescriptionDefaultFields()
     {
-        $filter = new NumericFilter(
-            $this->managerRegistry,
-            new RequestStack()
-        );
+        $filter = new NumericFilter($this->managerRegistry);
 
         $this->assertEquals([
             'id' => [
@@ -129,16 +64,6 @@ class NumericFilterTest extends KernelTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    /**
-     * Provides test data.
-     *
-     * Provides 3 parameters:
-     *  - configuration of filterable properties
-     *  - filter parameters
-     *  - expected DQL query
-     *
-     * @return array
-     */
     public function provideApplyTestData(): array
     {
         return [

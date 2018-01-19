@@ -41,8 +41,12 @@ abstract class AbstractFilter implements FilterInterface
     protected $logger;
     protected $properties;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack, LoggerInterface $logger = null, array $properties = null)
+    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null)
     {
+        if (null !== $requestStack) {
+            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since 2.2. Use "filters" context key instead.', RequestStack::class), E_USER_DEPRECATED);
+        }
+
         $this->managerRegistry = $managerRegistry;
         $this->requestStack = $requestStack;
         $this->logger = $logger ?? new NullLogger();
@@ -52,10 +56,11 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
+        @trigger_error(sprintf('Using "%s::apply()" is deprecated since 2.2. Use "%s::apply()" with the "filters" context key instead.', __CLASS__, AbstractContextAwareFilter::class), E_USER_DEPRECATED);
+
+        if (null === $this->requestStack || null === $request = $this->requestStack->getCurrentRequest()) {
             return;
         }
 
@@ -66,15 +71,8 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Passes a property through the filter.
-     *
-     * @param string                      $property
-     * @param mixed                       $value
-     * @param QueryBuilder                $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string                      $resourceClass
-     * @param string|null                 $operationName
      */
-    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null);
+    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/);
 
     /**
      * Gets class metadata for the given resource.
@@ -248,12 +246,12 @@ abstract class AbstractFilter implements FilterInterface
         foreach ($parts as $part) {
             if ($metadata->hasAssociation($part)) {
                 $metadata = $this->getClassMetadata($metadata->getAssociationTargetClass($part));
-                $slice += 1;
+                ++$slice;
             }
         }
 
         if ($slice === \count($parts)) {
-            $slice -= 1;
+            --$slice;
         }
 
         return [
@@ -264,31 +262,13 @@ abstract class AbstractFilter implements FilterInterface
 
     /**
      * Extracts properties to filter from the request.
-     *
-     * @param Request $request
-     *
-     * @return array
      */
     protected function extractProperties(Request $request/*, string $resourceClass*/): array
     {
-        if (\func_num_args() > 1) {
-            $resourceClass = (string) func_get_arg(1);
-        } else {
-            if (__CLASS__ !== \get_class($this)) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
+        @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), E_USER_DEPRECATED);
 
-        if (null !== $properties = $request->attributes->get('_api_filter_common')) {
-            return $properties;
-        }
-
+        $resourceClass = \func_num_args() > 1 ? (string) func_get_arg(1) : null;
         $needsFixing = false;
-
         if (null !== $this->properties) {
             foreach ($this->properties as $property => $value) {
                 if (($this->isPropertyNested($property, $resourceClass) || $this->isPropertyEmbedded($property, $resourceClass)) && $request->query->has(str_replace('.', '_', $property))) {

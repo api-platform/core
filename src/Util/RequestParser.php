@@ -49,7 +49,7 @@ final class RequestParser
      *
      * @author Rok Kralj
      *
-     * @see http://stackoverflow.com/a/18209799/1529493
+     * @see https://stackoverflow.com/a/18209799/1529493
      *
      * @param string $source
      *
@@ -57,9 +57,9 @@ final class RequestParser
      */
     public static function parseRequestParams(string $source): array
     {
-        // '[' is urlencoded in the input, but we must urldecode it in order
+        // '[' is urlencoded ('%5B') in the input, but we must urldecode it in order
         // to find it when replacing names with the regexp below.
-        $source = str_replace(urlencode('['), '[', $source);
+        $source = str_replace('%5B', '[', $source);
 
         $source = preg_replace_callback(
             '/(^|(?<=&))[^=[&]+/',

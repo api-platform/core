@@ -29,7 +29,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class NumericFilter extends AbstractFilter
+class NumericFilter extends AbstractContextAwareFilter
 {
     /**
      * Type of numeric in Doctrine.
