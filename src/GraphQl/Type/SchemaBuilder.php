@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Type;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -331,6 +332,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 break;
             case Type::BUILTIN_TYPE_STRING:
                 $graphqlType = GraphQLType::string();
+                break;
+            case Type::BUILTIN_TYPE_ARRAY:
+            case Type::BUILTIN_TYPE_ITERABLE:
+                if (!isset($this->graphqlTypes['#iterable'])) {
+                    $this->graphqlTypes['#iterable'] = new IterableType();
+                }
+                $graphqlType = $this->graphqlTypes['#iterable'];
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
