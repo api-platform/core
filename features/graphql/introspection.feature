@@ -168,6 +168,32 @@ Feature: GraphQL introspection support
     And the JSON node "data.__schema.queryType.fields[0].args[0].type.ofType.name" should be equal to "ID"
     And the JSON node "data.__schema.queryType.fields[0].args[0].type.ofType.kind" should be equal to "SCALAR"
 
+  Scenario: Introspect an Iterable type field
+    When I send the following GraphQL request:
+    """
+    {
+      __type(name: "Dummy") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.__type.fields[9].name" should be equal to "jsonData"
+    And the JSON node "data.__type.fields[9].type.name" should be equal to "Iterable"
+
   @dropSchema
   Scenario: Retrieve an item through a GraphQL query
     Given there are 4 dummy objects with relatedDummy

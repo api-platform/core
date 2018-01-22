@@ -35,6 +35,26 @@ Feature: GraphQL query support
     And the JSON node "data.node.id" should be equal to "/dummies/1"
     And the JSON node "data.node.name" should be equal to "Dummy #1"
 
+  Scenario: Retrieve an item with an iterable field
+    Given there are 2 dummy objects with JSON data
+    When I send the following GraphQL request:
+    """
+    {
+      dummy(id: "/dummies/3") {
+        id
+        name
+        jsonData
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummy.id" should be equal to "/dummies/3"
+    And the JSON node "data.dummy.name" should be equal to "Dummy #1"
+    And the JSON node "data.dummy.jsonData.foo" should have 2 elements
+    And the JSON node "data.dummy.jsonData.bar" should be equal to 5
+
   Scenario: Retrieve an item through a GraphQL query with variables
     When I have the following GraphQL request:
     """
