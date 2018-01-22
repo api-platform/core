@@ -138,7 +138,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 12, name: "", clientMutationId: "myId"}) {
+      createDummy(input: {_id: 12, name: "", foo: [], clientMutationId: "myId"}) {
         clientMutationId
       }
     }
