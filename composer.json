@@ -79,7 +79,8 @@
         "symfony/expression-language": "To use authorization features.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
-        "webonyx/graphql-php": "To support GraphQL."
+        "webonyx/graphql-php": "To support GraphQL.",
+        "nelmio/cors-bundle": "To use CORS."
     },
     "autoload": {
         "psr-4": { "ApiPlatform\\Core\\": "src/" }
