@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.5
+
+* Add support for filters autoconfiguration with Symfony 3.4+
+* Add service aliases required to use the autowiring with Symfony 3.4+
+* Allow updating nested resource when issuing a `POST` HTTP request
+* Add support for the immutable date and time types introduced in Doctrine
+* Fix the Doctrine query generated to retrieve nested subresources
+* Fix several bugs in the automatic eager loading support
+* Fix a bug occurring when passing nor an IRI nor an array in an embedded relation
+* Allow to pass request `0` items per page in collections
+* Also copy the `Host` from the Symfony Router
+* `Paginator::getLastPage()` now always returns a `float`
+* Minor performance improvements
+* Minor quality fixes
+
 ## 2.1.4
 
 * Symfony 3.4 and 4.0 compatibility
