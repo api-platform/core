@@ -25,6 +25,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCarColor;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
@@ -859,6 +860,21 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $mainDummy->setRelated([$relatedDummy]);
 
         $this->manager->persist($mainDummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummyimmutabledate objects with dummyDate
+     */
+    public function thereAreDummyImmutableDateObjectsWithDummyDate(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $date = new \DateTimeImmutable(sprintf('2015-04-%d', $i), new \DateTimeZone('UTC'));
+            $dummy = new DummyImmutableDate();
+            $dummy->dummyDate = $date;
+
+            $this->manager->persist($dummy);
+        }
 
         $this->manager->flush();
     }
