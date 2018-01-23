@@ -2,10 +2,12 @@
 
 ## 2.2.0
 
-* Add GraphQL support``
+* Add GraphQL support (including mutations, pagination, filters, access control rules and automatic SQL joins)
+* Fully implement the GraphQL Relay Server specification
 * Add JSONAPI support
 * Add a new `@ApiFilter` annotation to directly configure filters from resource classes
 * Add a partial paginator that prevents `COUNT()` SQL queries
+* Add a new simplified way to configure operations
 * Add an option to serialize Validator's payloads (e.g. error levels)
 * Add support for generators in data providers
 * Add a new `allow_plain_identifiers` option to allow using plain IDs as identifier instead of IRIs
@@ -14,8 +16,28 @@
 * Add an `AbstractCollectionNormalizer` to help supporting custom formats
 * Deprecate NelmioApiDocBundle 2 support (upgrade to v3, it has native API Platform support)
 * Deprecate the `ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener` class in favor of the new `ApiPlatform\Core\EventListener\WriteListener` class.
-* Delete the `api_platform.doctrine.listener.view.write` event listener service.
+* Remove the `api_platform.doctrine.listener.view.write` event listener service.
 * Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
+* Add the a new configuration to disable the API entrypoint and the documentation
+* Allow to set maximum items per page at operation/resource level  
+* Add a new `alwaysIdentifier` configuration option for properties that force serializer to generate an IRI for the relation
+
+
+## 2.1.5
+
+* Add support for filters autoconfiguration with Symfony 3.4+
+* Add service aliases required to use the autowiring with Symfony 3.4+
+* Allow updating nested resource when issuing a `POST` HTTP request
+* Add support for the immutable date and time types introduced in Doctrine
+* Fix the Doctrine query generated to retrieve nested subresources
+* Fix several bugs in the automatic eager loading support
+* Fix a bug occurring when passing nor an IRI nor an array in an embedded relation
+* Allow to pass request `0` items per page in collections
+* Also copy the `Host` from the Symfony Router
+* `Paginator::getLastPage()` now always returns a `float`
+* Minor performance improvements
+* Minor quality fixes
+>>>>>>> 2.1
 
 ## 2.1.4
 
