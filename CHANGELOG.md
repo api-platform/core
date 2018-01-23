@@ -36,7 +36,6 @@
 * `Paginator::getLastPage()` now always returns a `float`
 * Minor performance improvements
 * Minor quality fixes
->>>>>>> 2.1
 
 ## 2.1.4
 
