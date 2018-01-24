@@ -115,7 +115,7 @@ services:
     # Tests if the id default to the service name, do not add id attributes here
     my_dummy.order:
         parent:    'api_platform.doctrine.orm.order_filter'
-        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~ } ]
+        arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~, 'dummyDate': ~} ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
     app.my_dummy_resource.date_filter:
