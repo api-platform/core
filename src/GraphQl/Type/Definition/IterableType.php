@@ -21,7 +21,6 @@ use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\ListValueNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\StringValueNode;
-use GraphQL\Language\AST\ValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
 
@@ -76,7 +75,10 @@ final class IterableType extends ScalarType
         return null;
     }
 
-    private function parseIterableLiteral(ValueNode $valueNode)
+    /**
+     * @param StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode $valueNode
+     */
+    private function parseIterableLiteral($valueNode)
     {
         switch ($valueNode) {
             case $valueNode instanceof StringValueNode:
