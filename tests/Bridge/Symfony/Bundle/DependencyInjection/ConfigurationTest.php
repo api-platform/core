@@ -119,6 +119,7 @@ class ConfigurationTest extends TestCase
                 'vary' => ['Accept'],
                 'public' => null,
             ],
+            'resource_class_directories' => [],
         ], $config);
     }
 
