@@ -34,7 +34,8 @@ Feature: Handle properly invalid data submitted to the API
       "name_converted": null,
       "id": 1,
       "name": "Not existing",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
