@@ -41,7 +41,10 @@ abstract class AbstractFilter implements FilterInterface
     protected $logger;
     protected $properties;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
+     */
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, LoggerInterface $logger = null, array $properties = null)
     {
         if (null !== $requestStack) {
             @trigger_error(sprintf('Passing an instance of "%s" is deprecated since 2.2. Use "filters" context key instead.', RequestStack::class), E_USER_DEPRECATED);

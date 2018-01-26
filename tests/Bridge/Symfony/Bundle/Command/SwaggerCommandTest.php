@@ -22,11 +22,6 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class SwaggerCommandTest extends KernelTestCase
 {
-    /**
-     * The legacy group a workaround to prevent the deprecation triggered by the @Filter annotation (because it autowires filters).
-     *
-     * @group legacy
-     */
     public function testExecute()
     {
         self::bootKernel();
