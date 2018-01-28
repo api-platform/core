@@ -60,7 +60,10 @@ class SearchFilter extends AbstractContextAwareFilter
     protected $iriConverter;
     protected $propertyAccessor;
 
-    public function __construct(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
+    /**
+     * @param RequestStack|null $requestStack No prefix to prevent autowiring of this deprecated property
+     */
+    public function __construct(ManagerRegistry $managerRegistry, $requestStack = null, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null)
     {
         parent::__construct($managerRegistry, $requestStack, $logger, $properties);
 
