@@ -54,6 +54,31 @@ Feature: GraphQL mutation support
     And the JSON node "data.createFoo.bar" should be equal to "new"
     And the JSON node "data.createFoo.clientMutationId" should be equal to "myId"
 
+  Scenario: Create an item with an iterable field
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createDummy(input: {_id: 1, name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, clientMutationId: "myId"}) {
+        id
+        name
+        foo
+        jsonData
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createDummy.id" should be equal to "/dummies/1"
+    And the JSON node "data.createDummy.name" should be equal to "A dummy"
+    And the JSON node "data.createDummy.foo" should have 0 elements
+    And the JSON node "data.createDummy.jsonData.bar.baz" should be equal to the number 3
+    And the JSON node "data.createDummy.jsonData.bar.qux[0]" should be equal to the number 7.6
+    And the JSON node "data.createDummy.jsonData.bar.qux[1]" should be false
+    And the JSON node "data.createDummy.jsonData.bar.qux[2]" should be null
+    And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
+
   @dropSchema
   Scenario: Delete an item through a mutation
     When I send the following GraphQL request:
@@ -138,7 +163,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 12, name: "", clientMutationId: "myId"}) {
+      createDummy(input: {_id: 12, name: "", foo: [], clientMutationId: "myId"}) {
         clientMutationId
       }
     }

@@ -136,7 +136,7 @@ class SchemaBuilderTest extends TestCase
         $type = $queryFields['shortName2']->getType();
         $resourceTypeFields = $type->getFields();
         $this->assertEquals(
-            ['id', 'intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty'],
+            ['id', 'intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty'],
             array_keys($resourceTypeFields)
         );
 

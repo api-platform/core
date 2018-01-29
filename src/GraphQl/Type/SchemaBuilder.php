@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Type;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -172,7 +173,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, ucfirst("{$mutationName}s a $shortName."), $resourceType, $resourceClass, false, $mutationName)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, null, $resourceType, $resourceClass, true, $mutationName)];
 
-            if (!$resourceType->isCollection()) {
+            if (!$this->isCollection($resourceType)) {
                 $itemMutationResolverFactory = $this->itemMutationResolverFactory;
                 $fieldConfiguration['resolve'] = $itemMutationResolverFactory($resourceClass, null, $mutationName);
             }
@@ -200,11 +201,11 @@ final class SchemaBuilder implements SchemaBuilderInterface
             if ($isInternalGraphqlType) {
                 $className = '';
             } else {
-                $className = $type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+                $className = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
             }
 
             $args = [];
-            if (!$input && null === $mutationName && !$isInternalGraphqlType && $type->isCollection()) {
+            if (!$input && null === $mutationName && !$isInternalGraphqlType && $this->isCollection($type)) {
                 if ($this->paginationEnabled) {
                     $args = [
                         'first' => [
@@ -245,7 +246,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
             if ($isInternalGraphqlType || $input || null !== $mutationName) {
                 $resolve = null;
-            } elseif ($type->isCollection()) {
+            } elseif ($this->isCollection($type)) {
                 $resolverFactory = $this->collectionResolverFactory;
                 $resolve = $resolverFactory($className, $rootResource);
             } else {
@@ -332,13 +333,20 @@ final class SchemaBuilder implements SchemaBuilderInterface
             case Type::BUILTIN_TYPE_STRING:
                 $graphqlType = GraphQLType::string();
                 break;
+            case Type::BUILTIN_TYPE_ARRAY:
+            case Type::BUILTIN_TYPE_ITERABLE:
+                if (!isset($this->graphqlTypes['#iterable'])) {
+                    $this->graphqlTypes['#iterable'] = new IterableType();
+                }
+                $graphqlType = $this->graphqlTypes['#iterable'];
+                break;
             case Type::BUILTIN_TYPE_OBJECT:
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     $graphqlType = GraphQLType::string();
                     break;
                 }
 
-                $resourceClass = $type->isCollection() ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+                $resourceClass = $this->isCollection($type) ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
                 try {
                     $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                     if ([] === $resourceMetadata->getGraphql() ?? []) {
@@ -355,7 +363,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
         }
 
-        if ($type->isCollection()) {
+        if ($this->isCollection($type)) {
             return $this->paginationEnabled ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType, $input) : GraphQLType::listOf($graphqlType);
         }
 
@@ -485,5 +493,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
         ];
 
         return $this->graphqlTypes[$resourceClass]['connection'][$input] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
+    }
+
+    private function isCollection(Type $type): bool
+    {
+        return $type->isCollection() && null !== $type->getCollectionValueType();
     }
 }

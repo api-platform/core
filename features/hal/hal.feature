@@ -76,7 +76,8 @@ Feature: HAL support
       "name_converted": null,
       "id": 1,
       "name": "Dummy with relations",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -116,7 +117,8 @@ Feature: HAL support
       "name_converted": null,
       "id": 1,
       "name": "A nice dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -220,7 +222,8 @@ Feature: HAL support
             "name_converted": null,
             "id": 1,
             "name": "A nice dummy",
-            "alias": null
+            "alias": null,
+            "foo": null
           }
         ]
       }

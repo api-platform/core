@@ -163,7 +163,8 @@ Feature: Relations support
       "name_converted": null,
       "id": 1,
       "name": "Dummy with relations",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 

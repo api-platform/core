@@ -25,18 +25,18 @@ Feature: Default order
           "bar": "Amet"
         },
         {
-          "@id": "/foos/2",
-          "@type": "Foo",
-          "id": 2,
-          "name": "Sthenelus",
-          "bar": "Dolor"
-        },
-        {
           "@id": "/foos/3",
           "@type": "Foo",
           "id": 3,
           "name": "Ephesian",
           "bar": "Dolor"
+        },
+        {
+          "@id": "/foos/2",
+          "@type": "Foo",
+          "id": 2,
+          "name": "Sthenelus",
+          "bar": "Ipsum"
         },
         {
           "@id": "/foos/1",
@@ -83,18 +83,18 @@ Feature: Default order
           "dummy": "/dummies/5"
         },
         {
-          "@id": "/foo_dummies/2",
-          "@type": "FooDummy",
-          "id": 2,
-          "name": "Ephesian",
-          "dummy": "/dummies/2"
-        },
-        {
           "@id": "/foo_dummies/3",
           "@type": "FooDummy",
           "id": 3,
           "name": "Sthenelus",
           "dummy": "/dummies/3"
+        },
+        {
+          "@id": "/foo_dummies/2",
+          "@type": "FooDummy",
+          "id": 2,
+          "name": "Ephesian",
+          "dummy": "/dummies/2"
         },
         {
           "@id": "/foo_dummies/1",

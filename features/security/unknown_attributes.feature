@@ -35,6 +35,7 @@ Feature: Ignore unknown attributes
       "name_converted": null,
       "id": 1,
       "name": "Not existing",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """

@@ -45,7 +45,8 @@ Feature: Create-Retrieve-Update-Delete
       "name_converted": null,
       "id": 1,
       "name": "My Dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -77,7 +78,8 @@ Feature: Create-Retrieve-Update-Delete
       "name_converted": null,
       "id": 1,
       "name": "My Dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -117,7 +119,8 @@ Feature: Create-Retrieve-Update-Delete
           "name_converted": null,
           "id": 1,
           "name": "My Dummy",
-          "alias": null
+          "alias": null,
+          "foo": null
         }
       ],
       "hydra:totalItems": 1,
@@ -433,7 +436,8 @@ Feature: Create-Retrieve-Update-Delete
       "name_converted": null,
       "id": 1,
       "name": "A nice dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 
@@ -468,7 +472,8 @@ Feature: Create-Retrieve-Update-Delete
       "name_converted": null,
       "id": 1,
       "name": "A nice dummy",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """
 

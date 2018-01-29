@@ -21,7 +21,7 @@
         "symfony/http-foundation": "^3.1 || ^4.0",
         "symfony/http-kernel": "^2.7 || ^3.0 || ^4.0",
         "symfony/property-access": "^2.7 || ^3.0 || ^4.0",
-        "symfony/property-info": "^3.1 || ^4.0",
+        "symfony/property-info": "^3.3.11 || ^4.0",
         "symfony/serializer": "^3.1 || ^4.0",
         "willdurand/negotiation": "^2.0.3"
     },

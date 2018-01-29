@@ -149,7 +149,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreFooObjectsWithFakeNames(int $nb)
     {
         $names = ['Hawsepipe', 'Sthenelus', 'Ephesian', 'Separativeness', 'Balbo'];
-        $bars = ['Lorem', 'Dolor', 'Dolor', 'Sit', 'Amet'];
+        $bars = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
 
         for ($i = 0; $i < $nb; ++$i) {
             $foo = new Foo();
@@ -168,7 +168,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     public function thereAreFooDummyObjectsWithFakeNames($nb)
     {
         $names = ['Hawsepipe', 'Ephesian', 'Sthenelus', 'Separativeness', 'Balbo'];
-        $dummies = ['Lorem', 'Dolor', 'Dolor', 'Sit', 'Amet'];
+        $dummies = ['Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet'];
 
         for ($i = 0; $i < $nb; ++$i) {
             $dummy = new Dummy();
@@ -258,6 +258,23 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setRelatedDummy($relatedDummy);
 
             $this->manager->persist($relatedDummy);
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb dummy objects with JSON data
+     */
+    public function thereAreDummyObjectsWithJsonData(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new Dummy();
+            $dummy->setName('Dummy #'.$i);
+            $dummy->setAlias('Alias #'.($nb - $i));
+            $dummy->setJsonData(['foo' => ['bar', 'baz'], 'bar' => 5]);
+
             $this->manager->persist($dummy);
         }
 
