@@ -247,6 +247,28 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
+    public function testAddResourceClassDirectories()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('api_platform.resource_class_directories')->shouldBeCalled()->willReturn([]);
+        $i = 0;
+        // it's called once from getResourcesToWatch and then if the configuration exists
+        $containerBuilderProphecy->setParameter('api_platform.resource_class_directories', Argument::that(function ($arg) use ($i) {
+            if (0 === $i++) {
+                return $arg;
+            }
+
+            if (!in_array('foobar', $arg, true)) {
+                throw new \Exception('"foobar" should be in "resource_class_directories"');
+            }
+
+            return $arg;
+        }))->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['resource_class_directories' => ['foobar']]]), $containerBuilder);
+    }
+
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
      * @expectedExceptionMessageRegExp /Unsupported mapping type in ".+", supported types are XML & Yaml\./

@@ -148,6 +148,10 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                ->arrayNode('resource_class_directories')
+                    ->prototype('scalar')->end()
+                ->end()
+
                 ->arrayNode('http_cache')
                     ->addDefaultsIfNotSet()
                     ->children()
