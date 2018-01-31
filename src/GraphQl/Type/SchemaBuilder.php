@@ -179,7 +179,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             }
         }
 
-        return $fieldConfiguration;
+        return $fieldConfiguration ?? [];
     }
 
     /**
@@ -220,7 +220,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 }
 
                 foreach ($resourceMetadata->getGraphqlAttribute('query', 'filters', [], true) as $filterId) {
-                    if (!$this->filterLocator->has($filterId)) {
+                    if (null === $this->filterLocator || !$this->filterLocator->has($filterId)) {
                         continue;
                     }
 
@@ -278,7 +278,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $value = $this->mergeFilterArgs($args[$key] ?? [], $value);
                 if (!isset($value['#name'])) {
                     $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, $pos);
-                    $value['#name'] = $resourceMetadata->getShortName().'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
+                    $value['#name'] = ($resourceMetadata ? $resourceMetadata->getShortName() : '').'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
                 }
             }
 
@@ -428,8 +428,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
             if (
                 null === ($propertyType = $propertyMetadata->getType())
-                || (!$input && null === $mutationName && !$propertyMetadata->isReadable())
-                || (null !== $mutationName && !$propertyMetadata->isWritable())
+                || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
+                || (null !== $mutationName && false === $propertyMetadata->isWritable())
             ) {
                 continue;
             }

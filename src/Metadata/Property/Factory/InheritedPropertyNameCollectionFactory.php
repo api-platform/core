@@ -40,8 +40,10 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
         $propertyNames = [];
 
         // Inherited from parent
-        foreach ($this->decorated->create($resourceClass, $options) as $propertyName) {
-            $propertyNames[$propertyName] = (string) $propertyName;
+        if ($this->decorated) {
+            foreach ($this->decorated->create($resourceClass, $options) as $propertyName) {
+                $propertyNames[$propertyName] = (string) $propertyName;
+            }
         }
 
         foreach ($this->resourceNameCollection->create() as $knownResourceClass) {

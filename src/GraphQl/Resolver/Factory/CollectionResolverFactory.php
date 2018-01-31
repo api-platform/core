@@ -63,7 +63,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
         return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
-            if (null !== $request = $this->requestStack->getCurrentRequest()) {
+            if ($this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
                 $request->attributes->set(
                     '_graphql_collections_args',
                     [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', [])
