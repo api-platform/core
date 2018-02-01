@@ -41,6 +41,8 @@
             <tag name="routing.loader" />
         </service>
 
+        <service id="ApiPlatform\Core\Api\UrlGeneratorInterface" alias="api_platform.router" />
+
         <service id="api_platform.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
         </service>
