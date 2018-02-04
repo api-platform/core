@@ -348,6 +348,9 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return 'xmls:decimal';
             case Type::BUILTIN_TYPE_BOOL:
                 return 'xmls:boolean';
+            case Type::BUILTIN_TYPE_ARRAY:
+            case Type::BUILTIN_TYPE_ITERABLE:
+                return 'xmls:list';
             case Type::BUILTIN_TYPE_OBJECT:
                 if (null === $className = $type->getClassName()) {
                     return null;

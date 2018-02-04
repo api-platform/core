@@ -71,6 +71,7 @@ Feature: Documentation support
     And the value of the node "hydra:property.range" of the property "name" of the Hydra class "Dummy" is "xmls:string"
     And the value of the node "hydra:property.range" of the property "relatedDummy" of the Hydra class "Dummy" is "https://schema.org/Product"
     And the value of the node "hydra:property.range" of the property "relatedDummies" of the Hydra class "Dummy" is "https://schema.org/Product"
+    And the value of the node "hydra:property.range" of the property "jsonData" of the Hydra class "Dummy" is "xmls:list"
     And the value of the node "hydra:title" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:description" of the property "name" of the Hydra class "Dummy" is "The dummy name"
     # Operations
