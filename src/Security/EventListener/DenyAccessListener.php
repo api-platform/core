@@ -76,7 +76,7 @@ final class DenyAccessListener
         $extraVariables['request'] = $request;
 
         if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
-            throw new AccessDeniedException();
+            throw new AccessDeniedException($resourceMetadata->getOperationAttribute($attributes, 'access_control_message', 'Access Denied.', true));
         }
     }
 }
