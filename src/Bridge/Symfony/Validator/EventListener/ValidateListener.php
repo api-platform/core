@@ -66,11 +66,7 @@ final class ValidateListener
         $data = $event->getControllerResult();
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
-        if (isset($attributes['collection_operation_name'])) {
-            $validationGroups = $resourceMetadata->getCollectionOperationAttribute($attributes['collection_operation_name'], 'validation_groups');
-        } else {
-            $validationGroups = $resourceMetadata->getItemOperationAttribute($attributes['item_operation_name'], 'validation_groups');
-        }
+        $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups');
 
         if (!$validationGroups) {
             // Fallback to the resource

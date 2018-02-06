@@ -176,7 +176,7 @@ final class ResourceMetadata
      */
     public function getCollectionOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        return $this->getOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
+        return $this->findOperationAttribute($this->collectionOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -188,7 +188,7 @@ final class ResourceMetadata
      */
     public function getItemOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        return $this->getOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
+        return $this->findOperationAttribute($this->itemOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -200,7 +200,7 @@ final class ResourceMetadata
      */
     public function getSubresourceOperationAttribute(string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
-        return $this->getOperationAttribute($this->subresourceOperations, $operationName, $key, $defaultValue, $resourceFallback);
+        return $this->findOperationAttribute($this->subresourceOperations, $operationName, $key, $defaultValue, $resourceFallback);
     }
 
     /**
@@ -210,7 +210,7 @@ final class ResourceMetadata
      *
      * @return mixed
      */
-    private function getOperationAttribute(array $operations = null, string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
+    private function findOperationAttribute(array $operations = null, string $operationName = null, string $key, $defaultValue = null, bool $resourceFallback = false)
     {
         if (null !== $operationName && isset($operations[$operationName][$key])) {
             return $operations[$operationName][$key];
@@ -234,6 +234,30 @@ final class ResourceMetadata
 
         if ($resourceFallback && isset($this->attributes[$key])) {
             return $this->attributes[$key];
+        }
+
+        return $defaultValue;
+    }
+
+    /**
+     * Gets the first available operation attribute according to the following order: collection, item, subresource, optionally fallback to a default value.
+     *
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public function getOperationAttribute(array $attributes, string $key, $defaultValue = null, bool $resourceFallback = false)
+    {
+        if (isset($attributes['collection_operation_name'])) {
+            return $this->getCollectionOperationAttribute($attributes['collection_operation_name'], $key, $defaultValue, $resourceFallback);
+        }
+
+        if (isset($attributes['item_operation_name'])) {
+            return $this->getItemOperationAttribute($attributes['item_operation_name'], $key, $defaultValue, $resourceFallback);
+        }
+
+        if (isset($attributes['subresource_operation_name'])) {
+            return $this->getSubresourceOperationAttribute($attributes['subresource_operation_name'], $key, $defaultValue, $resourceFallback);
         }
 
         return $defaultValue;
