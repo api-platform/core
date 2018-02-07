@@ -23,13 +23,14 @@ final class ResourceMetadata
     private $shortName;
     private $description;
     private $iri;
+    private $routePrefix;
     private $itemOperations;
     private $collectionOperations;
     private $subresourceOperations;
     private $graphql;
     private $attributes;
 
-    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null, array $subresourceOperations = null, array $graphql = null)
+    public function __construct(string $shortName = null, string $description = null, string $iri = null, array $itemOperations = null, array $collectionOperations = null, array $attributes = null, array $subresourceOperations = null, array $graphql = null, string $routePrefix = null)
     {
         $this->shortName = $shortName;
         $this->description = $description;
@@ -39,6 +40,7 @@ final class ResourceMetadata
         $this->subresourceOperations = $subresourceOperations;
         $this->graphql = $graphql;
         $this->attributes = $attributes;
+        $this->routePrefix = $routePrefix;
     }
 
     /**
@@ -317,6 +319,27 @@ final class ResourceMetadata
     {
         $metadata = clone $this;
         $metadata->graphql = $graphql;
+
+        return $metadata;
+    }
+
+    /**
+     * Gets the route prefix.
+     *
+     * @return string|null
+     */
+    public function getRoutePrefix()
+    {
+        return $this->routePrefix;
+    }
+
+    /**
+     * Returns a new instance with the given route prefix.
+     */
+    public function withRoutePrefix(string $routePrefix): self
+    {
+        $metadata = clone $this;
+        $metadata->routePrefix = $routePrefix;
 
         return $metadata;
     }

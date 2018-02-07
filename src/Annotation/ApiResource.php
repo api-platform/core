@@ -39,6 +39,11 @@ final class ApiResource
     public $iri;
 
     /**
+     * @var string
+     */
+    public $routePrefix;
+
+    /**
      * @var array
      */
     public $itemOperations;

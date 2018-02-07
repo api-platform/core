@@ -87,12 +87,13 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
                 $annotation->collectionOperations,
                 $annotation->attributes,
                 $annotation->subresourceOperations,
-                $annotation->graphql
+                $annotation->graphql,
+                $annotation->routePrefix
             );
         }
 
         $resourceMetadata = $parentResourceMetadata;
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes', 'routePrefix'] as $property) {
             $resourceMetadata = $this->createWith($resourceMetadata, $property, $annotation->$property);
         }
 
