@@ -187,6 +187,10 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                ->arrayNode('resource_class_directories')
+                    ->prototype('scalar')->end()
+                ->end()
+
                 ->arrayNode('http_cache')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -258,7 +262,7 @@ final class Configuration implements ConfigurationInterface
                                 }
 
                                 if (\defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
-                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const %s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
+                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const:%s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
 
                                     $httpStatusCode = \constant($httpStatusCodeConstant);
                                 }

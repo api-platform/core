@@ -91,7 +91,7 @@ final class SerializeListener
         }
 
         if (\is_object($controllerResult)) {
-            $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat()));
+            $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $request->attributes->get('_api_normalization_context', [])));
 
             return;
         }
