@@ -525,7 +525,9 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
+        $containerBuilderProphecy->getParameter('kernel.project_dir')->willReturn(__DIR__);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
+
         $containerBuilderProphecy->getDefinition('api_platform.http_cache.purger.varnish')->willReturn(new Definition());
 
         return $containerBuilderProphecy;
