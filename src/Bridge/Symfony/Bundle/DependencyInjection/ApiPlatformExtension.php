@@ -221,9 +221,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $paths = [];
             $dirname = $bundle['path'];
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
-                $paths[] = $dirname.'/Resources/config/api_resources'.$extension;
+                $paths[] = "$dirname/Resources/config/api_resources$extension";
             }
-            $paths[] = $dirname.'/Entity';
+            $paths[] = "$dirname/Entity";
 
             foreach ($paths as $path) {
                 if ($container->fileExists($path, false)) {
@@ -237,6 +237,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function getResourcesToWatch(ContainerBuilder $container, array $resourcesPaths): array
     {
+        // Flex structure
+        $projectDir = $container->getParameter('kernel.project_dir');
+        if (is_dir($dir = "$projectDir/config/api_platform")) {
+            $resourcesPaths[] = $dir;
+        }
+
         $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
         $resources = ['yml' => [], 'xml' => [], 'dir' => []];
 
@@ -248,15 +254,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
                 $resources['dir'][] = $path;
                 $container->addResource(new DirectoryResource($path, '/\.(xml|ya?ml|php)$/'));
-            } elseif ($container->fileExists($path, false)) {
+
+                continue;
+            }
+
+            if ($container->fileExists($path, false)) {
                 if (!preg_match('/\.(xml|ya?ml)$/', $path, $matches)) {
                     throw new RuntimeException(sprintf('Unsupported mapping type in "%s", supported types are XML & Yaml.', $path));
                 }
 
                 $resources['yaml' === $matches[1] ? 'yml' : $matches[1]][] = $path;
-            } else {
-                throw new RuntimeException(sprintf('Could not open file or directory "%s".', $path));
+
+                continue;
             }
+
+            throw new RuntimeException(sprintf('Could not open file or directory "%s".', $path));
         }
 
         $container->setParameter('api_platform.resource_class_directories', $resources['dir']);

@@ -70,6 +70,7 @@ class AppKernel extends Kernel
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader)
     {
         $environment = $this->getEnvironment();
+        $c->setParameter('kernel.project_dir', __DIR__);
 
         // patch for behat not supporting %env(APP_ENV)% in older versions
         if (($appEnv = $_SERVER['APP_ENV'] ?? 'test') && $appEnv !== $environment) {

@@ -44,7 +44,6 @@ Feature: Configurable resource CRUD
     }
     """
 
-  @dropSchema
   Scenario: Retrieve the ConfigDummy resource
     When I send a "GET" request to "/fileconfigdummies/1"
     Then the response status code should be 200
@@ -59,5 +58,22 @@ Feature: Configurable resource CRUD
       "id": 1,
       "name": "ConfigDummy",
       "foo": "Foo"
+    }
+    """
+
+  @dropSchema
+  Scenario: Entities can be configured using a Flex-like directory structure
+    When I send a "GET" request to "/flex_configs"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+         "@context": "/contexts/FlexConfig",
+         "@id": "/flex_configs",
+         "@type": "hydra:Collection",
+         "hydra:member": [],
+         "hydra:totalItems": 0
     }
     """
