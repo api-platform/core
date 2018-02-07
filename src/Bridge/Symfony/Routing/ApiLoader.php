@@ -148,8 +148,6 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection)
     {
-        $routeCollection->addCollection($this->fileLoader->load('api.xml'));
-
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.xml'));
         }
