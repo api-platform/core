@@ -110,16 +110,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createDatabase()
     {
-        $this->schemaTool->createSchema($this->classes);
-    }
-
-    /**
-     * @AfterScenario @dropSchema
-     */
-    public function dropDatabase()
-    {
         $this->schemaTool->dropSchema($this->classes);
         $this->doctrine->getManager()->clear();
+        $this->schemaTool->createSchema($this->classes);
     }
 
     /**

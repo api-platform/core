@@ -23,7 +23,6 @@ Feature: JSON API filter handling
     And the JSON should be valid according to the JSON API schema
     And the JSON node "data" should have 0 elements
 
-  @dropSchema
   Scenario: Apply filters based on the 'filter' query parameter with second level arguments
     When I send a "GET" request to "/dummies?filter[dummyDate][after]=2015-04-28"
     Then the response status code should be 200

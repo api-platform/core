@@ -104,7 +104,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.jsonData.bar.qux[2]" should be null
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
-  @dropSchema
   Scenario: Delete an item through a mutation
     When I send the following GraphQL request:
     """
@@ -122,7 +121,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
   @createSchema
-  @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -141,7 +139,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteCompositeRelation.clientMutationId" should be equal to "myId"
 
   @createSchema
-  @dropSchema
   Scenario: Modify an item through a mutation
     Given there are 1 foo objects with fake names
     When I send the following GraphQL request:
@@ -183,7 +180,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateCompositeRelation.value" should be equal to "Modified value."
     And the JSON node "data.updateCompositeRelation.clientMutationId" should be equal to "myId"
 
-  @dropSchema
   Scenario: Trigger a validation error
     When I send the following GraphQL request:
     """

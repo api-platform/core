@@ -93,12 +93,6 @@ The command to launch Behat tests is:
 ./vendor/bin/behat --stop-on-failure -vvv
 ```
 
-You may need to clear the cache manually before running behat tests because of the temporary sql database. To do so, just remove the `test` cache directory:
-
-```
-rm -r tests/Fixtures/app/cache/test
-```
-
 ## Squash your commits
 
 If you have 3 commits. So start with:

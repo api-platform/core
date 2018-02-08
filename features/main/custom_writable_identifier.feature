@@ -101,7 +101,6 @@ Feature: Using custom writable identifier on resource
     And "slug" property is readable for Hydra class "CustomWritableIdentifierDummy"
     And "slug" property is writable for Hydra class "CustomWritableIdentifierDummy"
 
-  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/custom_writable_identifier_dummies/slug_modified"
     Then the response status code should be 204

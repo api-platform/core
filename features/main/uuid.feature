@@ -97,7 +97,6 @@ Feature: Using uuid identifier on resource
     }
     """
 
-  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78"
     Then the response status code should be 204

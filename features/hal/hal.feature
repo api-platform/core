@@ -176,7 +176,6 @@ Feature: HAL support
     }
     """
 
-  @dropSchema
   Scenario: Get a collection
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/dummies"

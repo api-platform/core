@@ -952,7 +952,6 @@ Feature: Filter with serialization groups on items and collections
     }
     """
 
-  @dropSchema
   Scenario: Create a resource by groups dummy, dummy_baz, with overriding and with whitelist
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_groups?override_whitelisted_groups[]=dummy&override_whitelisted_groups[]=dummy_baz" with body:
