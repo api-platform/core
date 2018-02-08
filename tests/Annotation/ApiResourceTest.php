@@ -32,7 +32,6 @@ class ApiResourceTest extends TestCase
         $resource->collectionOperations = ['bar' => ['foo']];
         $resource->graphql = ['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]];
         $resource->attributes = ['foo' => 'bar'];
-        $resource->routePrefix = '/prefix';
 
         $this->assertSame('shortName', $resource->shortName);
         $this->assertSame('description', $resource->description);
@@ -40,7 +39,6 @@ class ApiResourceTest extends TestCase
         $this->assertSame(['bar' => ['foo']], $resource->collectionOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
         $this->assertSame(['foo' => 'bar'], $resource->attributes);
-        $this->assertSame('/prefix', $resource->routePrefix);
     }
 
     public function testApiResourceAnnotation()
@@ -53,7 +51,6 @@ class ApiResourceTest extends TestCase
         $this->assertSame('http://example.com/res', $resource->iri);
         $this->assertSame(['bar' => ['foo']], $resource->collectionOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
-        $this->assertSame(['foo' => 'bar'], $resource->attributes);
-        $this->assertSame('/whatever', $resource->routePrefix);
+        $this->assertSame(['foo' => 'bar', 'routePrefix' => '/whatever'], $resource->attributes);
     }
 }

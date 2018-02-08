@@ -43,9 +43,8 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
         $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
-        $this->assertEquals(['a' => 1], $metadata->getAttributes());
+        $this->assertEquals(['a' => 1, 'routePrefix' => '/foobar'], $metadata->getAttributes());
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
-        $this->assertEquals('/foobar', $metadata->getRoutePrefix());
     }
 
     public function getCreateDependencies()
@@ -57,9 +56,8 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $annotation->itemOperations = ['foo' => ['bar' => true]];
         $annotation->collectionOperations = ['baz' => ['tab' => false]];
         $annotation->subresourceOperations = ['sub' => ['bus' => false]];
-        $annotation->attributes = ['a' => 1];
+        $annotation->attributes = ['a' => 1, 'routePrefix' => '/foobar'];
         $annotation->graphql = ['foo' => 'bar'];
-        $annotation->routePrefix = '/foobar';
 
         $reader = $this->prophesize(Reader::class);
         $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();

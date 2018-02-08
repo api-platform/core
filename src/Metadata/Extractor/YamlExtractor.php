@@ -70,7 +70,6 @@ final class YamlExtractor extends AbstractExtractor
                 'subresourceOperations' => $resourceYaml['subresourceOperations'] ?? null,
                 'graphql' => $resourceYaml['graphql'] ?? null,
                 'attributes' => $resourceYaml['attributes'] ?? null,
-                'routePrefix' => $this->phpize($resourceYaml, 'routePrefix', 'string'),
             ];
 
             if (!isset($resourceYaml['properties'])) {

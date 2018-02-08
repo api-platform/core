@@ -51,7 +51,6 @@ final class XmlExtractor extends AbstractExtractor
                 'graphql' => $this->getOperations($resource, 'operation'),
                 'attributes' => $this->getAttributes($resource, 'attribute') ?: null,
                 'properties' => $this->getProperties($resource) ?: null,
-                'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             ];
         }
     }

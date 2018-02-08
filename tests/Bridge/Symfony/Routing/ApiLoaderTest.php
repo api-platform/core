@@ -106,7 +106,7 @@ class ApiLoaderTest extends TestCase
             'put' => ['method' => 'PUT'],
             'delete' => ['method' => 'DELETE'],
         ]);
-        $resourceMetadata = $resourceMetadata->withRoutePrefix('/foobar-prefix');
+        $resourceMetadata = $resourceMetadata->withAttributes(['routePrefix' => '/foobar-prefix']);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
