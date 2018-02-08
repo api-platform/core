@@ -66,6 +66,13 @@ final class AddTagsListener
             return;
         }
 
+        // Encode tags for greater compatiblity with different proxies
+        // Some do not allow special characters like / or @ in cache tags and
+        // also it allows to use a , in a tag, if you wish to do so.
+        $resources = array_map(function($resource) {
+            return base64_encode($resource);
+        }, $resources);
+
         $event->getResponse()->headers->set('Cache-Tags', implode(',', $resources));
     }
 }

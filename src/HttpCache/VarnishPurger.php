@@ -45,7 +45,10 @@ final class VarnishPurger implements PurgerInterface
 
         // Create the regex to purge all tags in just one request
         $parts = array_map(function ($iri) {
-            return sprintf('(^|\,)%s($|\,)', preg_quote($iri));
+            // Encode tags for greater compatiblity with different proxies
+            // Some do not allow special characters like / or @ in cache tags and
+            // also it allows to use a , in a tag, if you wish to do so.
+            return sprintf('(^|\,)%s($|\,)', base64_encode($iri));
         }, $iris);
 
         $regex = \count($parts) > 1 ? sprintf('(%s)', implode(')|(', $parts)) : array_shift($parts);

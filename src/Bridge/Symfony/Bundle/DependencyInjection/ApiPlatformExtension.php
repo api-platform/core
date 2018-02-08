@@ -502,6 +502,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('http_cache_tags.xml');
 
+        // TODO: Decide on how you would like to configure whether to use Varnish or Symfony (or any other?)
+        if (0 == count($config['http_cache']['invalidation']['varnish_urls'])) {
+            $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.symfony');
+            return;
+        }
+
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
             $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
