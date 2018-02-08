@@ -164,6 +164,14 @@ services:
         parent:    'api_platform.serializer.property_filter'
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFooFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\NotRequiredBarFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']

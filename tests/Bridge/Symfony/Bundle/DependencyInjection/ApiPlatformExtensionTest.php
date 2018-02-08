@@ -516,6 +516,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
+            'ApiPlatform\Core\Filter\QueryParameterValidateListener',
             'api_platform.listener.view.write',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.cached',
