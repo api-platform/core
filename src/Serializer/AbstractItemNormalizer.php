@@ -39,8 +39,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
     use ContextTrait;
 
-    const ALWAYS_IDENTIFIER = 'always_identifier';
-
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
     protected $iriConverter;
@@ -97,10 +95,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['resources'])) {
             $resource = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
             $context['resources'][$resource] = $resource;
-        }
-
-        if ($context[self::ALWAYS_IDENTIFIER] ?? false) {
-            return $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
         }
 
         return parent::normalize($object, $format, $context);
@@ -402,8 +396,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
-
-        $context[self::ALWAYS_IDENTIFIER] = $propertyMetadata->isAlwaysIdentifier();
 
         try {
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
