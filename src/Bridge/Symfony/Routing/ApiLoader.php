@@ -171,12 +171,7 @@ final class ApiLoader extends Loader
     /**
      * Creates and adds a route for the given operation to the route collection.
      *
-     * @param RouteCollection  $routeCollection
-     * @param string           $resourceClass
-     * @param string           $operationName
-     * @param array            $operation
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationType
+     * @throws RuntimeException
      */
     private function addRoute(RouteCollection $routeCollection, string $resourceClass, string $operationName, array $operation, ResourceMetadata $resourceMetadata, string $operationType)
     {
