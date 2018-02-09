@@ -155,7 +155,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
-                        if (!\in_array($parameter['name'], $parametersMemory, true)) {
+                        if (!\in_array($parameter['name'], $parametersMemory, true) && preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name'])) {
                             $pathOperation['parameters'][] = $parameter;
                         }
                     }
@@ -449,12 +449,12 @@ final class DocumentationNormalizer implements NormalizerInterface
             $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $definitions, $serializerContext);
         }
 
-        return $definitionKey;
+        return str_replace(['_', '-'], '', $definitionKey);
     }
 
     private function getDefinitionKey(string $resourceShortName, array $groups): string
     {
-        return $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName;
+        return str_replace(['-', '_'], '', $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName);
     }
 
     /**
@@ -510,10 +510,6 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getPropertySchema(PropertyMetadata $propertyMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
     {
         $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
-
-        if (false === $propertyMetadata->isWritable()) {
-            $propertySchema['readOnly'] = true;
-        }
 
         if (null !== $description = $propertyMetadata->getDescription()) {
             $propertySchema['description'] = $description;
@@ -609,7 +605,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
-            'basePath' => $context['base_url'] ?? '/',
+            'basePath' => !empty($context['base_url']) ? $context['base_url'] : '/',
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),
@@ -690,6 +686,9 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
+                if (!preg_match('/^[a-zA-Z0-9._$-]+$/', $name)) {
+                    continue;
+                }
                 $parameter = [
                     'name' => $name,
                     'in' => 'query',
