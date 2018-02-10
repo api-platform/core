@@ -41,7 +41,7 @@ class FilterExtensionTest extends TestCase
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $ormFilterProphecy = $this->prophesize(FilterInterface::class);
-        $ormFilterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get', [])->shouldBeCalled();
+        $ormFilterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get', ['filters' => []])->shouldBeCalled();
 
         $ordinaryFilterProphecy = $this->prophesize(ApiFilterInterface::class);
 
@@ -70,7 +70,7 @@ class FilterExtensionTest extends TestCase
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $filterProphecy = $this->prophesize(FilterInterface::class);
-        $filterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get', [])->shouldBeCalled();
+        $filterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get', ['filters' => []])->shouldBeCalled();
 
         $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), new FilterCollection(['dummyFilter' => $filterProphecy->reveal()]));
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get');
