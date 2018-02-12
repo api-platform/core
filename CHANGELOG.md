@@ -20,6 +20,8 @@
 * Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
 * Add the a new configuration to disable the API entrypoint and the documentation
 * Allow to set maximum items per page at operation/resource level  
+* Add the ability to customize the message when configuring an access control rule trough the `access_control_message` attribute
+* Allow empty operations in XML configs 
 
 ## 2.1.6
 
