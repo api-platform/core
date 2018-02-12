@@ -66,6 +66,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $paginationPageParameterName;
     private $clientItemsPerPage;
     private $itemsPerPageParameterName;
+    private $apiGateway = false;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
@@ -105,6 +106,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        $this->apiGateway = $context['api_gateway'] ?? false;
         $mimeTypes = $object->getMimeTypes();
         $definitions = new \ArrayObject();
         $paths = new \ArrayObject();
@@ -155,7 +157,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
-                        if (!\in_array($parameter['name'], $parametersMemory, true) && preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name'])) {
+                        if (!\in_array($parameter['name'], $parametersMemory, true) && (!$this->apiGateway || preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name']))) {
                             $pathOperation['parameters'][] = $parameter;
                         }
                     }
@@ -443,18 +445,19 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
         $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
-
         if (!isset($definitions[$definitionKey])) {
             $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
             $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $definitions, $serializerContext);
         }
 
-        return str_replace(['_', '-'], '', $definitionKey);
+        return $this->apiGateway ? str_replace(['_', '-'], '', $definitionKey) : $definitionKey;
     }
 
     private function getDefinitionKey(string $resourceShortName, array $groups): string
     {
-        return str_replace(['-', '_'], '', $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName);
+        $definitionKey = $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName;
+
+        return $this->apiGateway ? str_replace(['_', '-'], '', $definitionKey) : $definitionKey;
     }
 
     /**
@@ -510,6 +513,10 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getPropertySchema(PropertyMetadata $propertyMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
     {
         $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
+
+        if (false === $propertyMetadata->isWritable() && !$this->apiGateway) {
+            $propertySchema['readOnly'] = true;
+        }
 
         if (null !== $description = $propertyMetadata->getDescription()) {
             $propertySchema['description'] = $description;
@@ -686,7 +693,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
-                if (!preg_match('/^[a-zA-Z0-9._$-]+$/', $name)) {
+                if ($this->apiGateway && !preg_match('/^[a-zA-Z0-9._$-]+$/', $name)) {
                     continue;
                 }
                 $parameter = [

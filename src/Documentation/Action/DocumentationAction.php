@@ -42,7 +42,11 @@ final class DocumentationAction
     public function __invoke(Request $request = null): Documentation
     {
         if (null !== $request) {
-            $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + ['base_url' => $request->getBaseUrl()]);
+            $context = ['base_url' => $request->getBaseUrl()];
+            if ($request->query->has('api_gateway') && true === $request->query->getBoolean('api_gateway')) {
+                $context['api_gateway'] = true;
+            }
+            $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
         }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
