@@ -364,7 +364,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         if ($this->isCollection($type)) {
-            return $this->paginationEnabled ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType, $input) : GraphQLType::listOf($graphqlType);
+            return $this->paginationEnabled && !$input ? $this->getResourcePaginatedCollectionType($resourceClass, $graphqlType) : GraphQLType::listOf($graphqlType);
         }
 
         return $type->isNullable() || (null !== $mutationName && 'update' === $mutationName) ? $graphqlType : GraphQLType::nonNull($graphqlType);
@@ -449,19 +449,16 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the type of a paginated collection of the given resource type.
      *
-     * @param ObjectType|InputObjectType $resourceType
+     * @param ObjectType $resourceType
      *
-     * @return ObjectType|InputObjectType
+     * @return ObjectType
      */
-    private function getResourcePaginatedCollectionType(string $resourceClass, GraphQLType $resourceType, bool $input = false): GraphQLType
+    private function getResourcePaginatedCollectionType(string $resourceClass, GraphQLType $resourceType): GraphQLType
     {
         $shortName = $resourceType->name;
-        if ($input) {
-            $shortName .= 'Input';
-        }
 
-        if (isset($this->graphqlTypes[$resourceClass]['connection'][$input])) {
-            return $this->graphqlTypes[$resourceClass]['connection'][$input];
+        if (isset($this->graphqlTypes[$resourceClass]['connection'])) {
+            return $this->graphqlTypes[$resourceClass]['connection'];
         }
 
         $edgeObjectTypeConfiguration = [
@@ -472,7 +469,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'cursor' => GraphQLType::nonNull(GraphQLType::string()),
             ],
         ];
-        $edgeObjectType = $input ? new InputObjectType($edgeObjectTypeConfiguration) : new ObjectType($edgeObjectTypeConfiguration);
+        $edgeObjectType = new ObjectType($edgeObjectTypeConfiguration);
         $pageInfoObjectTypeConfiguration = [
             'name' => "{$shortName}PageInfo",
             'description' => 'Information about the current page.',
@@ -481,7 +478,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 'hasNextPage' => GraphQLType::nonNull(GraphQLType::boolean()),
             ],
         ];
-        $pageInfoObjectType = $input ? new InputObjectType($pageInfoObjectTypeConfiguration) : new ObjectType($pageInfoObjectTypeConfiguration);
+        $pageInfoObjectType = new ObjectType($pageInfoObjectTypeConfiguration);
 
         $configuration = [
             'name' => "{$shortName}Connection",
@@ -492,7 +489,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             ],
         ];
 
-        return $this->graphqlTypes[$resourceClass]['connection'][$input] = $input ? new InputObjectType($configuration) : new ObjectType($configuration);
+        return $this->graphqlTypes[$resourceClass]['connection'] = new ObjectType($configuration);
     }
 
     private function isCollection(Type $type): bool
