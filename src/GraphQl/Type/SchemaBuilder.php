@@ -341,7 +341,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 $graphqlType = $this->graphqlTypes['#iterable'];
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
-                if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
+                if (($input && $depth > 0) || is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     $graphqlType = GraphQLType::string();
                     break;
                 }
