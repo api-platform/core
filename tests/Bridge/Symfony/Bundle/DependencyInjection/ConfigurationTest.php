@@ -130,6 +130,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => false,
                     'varnish_urls' => [],
                     'request_options' => [],
+                    'purger' => 'api_platform.http_cache.purger.varnish',
                 ],
                 'etag' => true,
                 'max_age' => null,
@@ -266,5 +267,25 @@ class ConfigurationTest extends TestCase
 
         $this->assertSame($config['title'], '');
         $this->assertSame($config['description'], '');
+    }
+
+    /**
+     * Test config for the http cache purger.
+     */
+    public function testPurgerConfig()
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'http_cache' => [
+                    'invalidation' => [
+                        'enabled' => true,
+                        'purger' => 'foobar_purger',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($config['http_cache']['invalidation']['enabled']);
+        $this->assertSame('foobar_purger', $config['http_cache']['invalidation']['purger']);
     }
 }

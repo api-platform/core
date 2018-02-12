@@ -371,6 +371,17 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testRegisterHttpCachePurger()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy('my_superbe_foobar_purger');
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['purger'] = 'my_superbe_foobar_purger';
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy($test = false)
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
@@ -588,7 +599,7 @@ class ApiPlatformExtensionTest extends TestCase
         return $containerBuilderProphecy;
     }
 
-    private function getBaseContainerBuilderProphecy()
+    private function getBaseContainerBuilderProphecy($purger = 'varnish')
     {
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
 
@@ -710,7 +721,7 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $aliases = [
-            'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
+            'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.'.$purger,
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',

@@ -64,7 +64,6 @@
         "symfony/twig-bundle": "^3.1 || ^4.0",
         "symfony/validator": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0",
-        "toflar/psr6-symfony-http-cache-store": "^1.0.2",
         "webonyx/graphql-php": "^0.10.2"
     },
     "conflict": {

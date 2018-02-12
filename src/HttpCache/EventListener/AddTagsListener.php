@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\HttpCache\CacheTagsFormattingPurgerInterface;
+use ApiPlatform\Core\HttpCache\PurgerInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -25,16 +27,21 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  * @see https://support.cloudflare.com/hc/en-us/articles/206596608-How-to-Purge-Cache-Using-Cache-Tags-Enterprise-only-
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Yanick Witschi <yanick.witschi@terminal42.ch>
  *
  * @experimental
  */
 final class AddTagsListener
 {
     private $iriConverter;
+    private $purger;
+    private $debug;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(IriConverterInterface $iriConverter, PurgerInterface $purger, bool $debug = false)
     {
         $this->iriConverter = $iriConverter;
+        $this->purger = $purger;
+        $this->debug = $debug;
     }
 
     /**
@@ -66,13 +73,16 @@ final class AddTagsListener
             return;
         }
 
-        // Encode tags for greater compatiblity with different proxies
-        // Some do not allow special characters like / or @ in cache tags and
-        // also it allows to use a , in a tag, if you wish to do so.
-        $resources = array_map(function($resource) {
-            return base64_encode($resource);
-        }, $resources);
+        if ($this->debug) {
+            $event->getResponse()->headers->set('Cache-Tags-Debug', implode(',', $resources));
+        }
 
-        $event->getResponse()->headers->set('Cache-Tags', implode(',', $resources));
+        if ($this->purger instanceof CacheTagsFormattingPurgerInterface) {
+            $formatted = $this->purger->formatTags($resources);
+        } else {
+            $formatted = implode(',', $resources);
+        }
+
+        $event->getResponse()->headers->set('Cache-Tags', $formatted);
     }
 }

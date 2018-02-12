@@ -207,6 +207,7 @@ final class Configuration implements ConfigurationInterface
                             ->info('Enable the tags-based cache invalidation system.')
                             ->canBeEnabled()
                             ->children()
+                                ->scalarNode('purger')->defaultValue('varnish')->cannotBeEmpty()->info('The name of the purger to use.')->end()
                                 ->arrayNode('varnish_urls')
                                     ->defaultValue([])
                                     ->prototype('scalar')->end()
