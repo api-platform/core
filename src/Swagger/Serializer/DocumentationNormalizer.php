@@ -46,7 +46,6 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     const SWAGGER_VERSION = '2.0';
     const FORMAT = 'json';
-    const API_GATEWAY_PATTERN = '/^[a-zA-Z0-9._$-]+$/';
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -67,7 +66,6 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $paginationPageParameterName;
     private $clientItemsPerPage;
     private $itemsPerPageParameterName;
-    private $apiGateway = false;
 
     /**
      * @param ContainerInterface|FilterCollection|null $filterLocator The new filter locator or the deprecated filter collection
@@ -107,7 +105,6 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $this->apiGateway = $context['api_gateway'] ?? false;
         $mimeTypes = $object->getMimeTypes();
         $definitions = new \ArrayObject();
         $paths = new \ArrayObject();
@@ -158,7 +155,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
-                        if (!\in_array($parameter['name'], $parametersMemory, true) && (!$this->apiGateway || preg_match(self::API_GATEWAY_PATTERN, $parameter['name']))) {
+                        if (!\in_array($parameter['name'], $parametersMemory, true)) {
                             $pathOperation['parameters'][] = $parameter;
                         }
                     }
@@ -446,19 +443,18 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
         $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
+
         if (!isset($definitions[$definitionKey])) {
             $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
             $definitions[$definitionKey] = $this->getDefinitionSchema($resourceClass, $resourceMetadata, $definitions, $serializerContext);
         }
 
-        return $this->apiGateway ? str_replace(['_', '-'], '', $definitionKey) : $definitionKey;
+        return $definitionKey;
     }
 
     private function getDefinitionKey(string $resourceShortName, array $groups): string
     {
-        $definitionKey = $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName;
-
-        return $this->apiGateway ? str_replace(['_', '-'], '', $definitionKey) : $definitionKey;
+        return $groups ? sprintf('%s-%s', $resourceShortName, implode('_', $groups)) : $resourceShortName;
     }
 
     /**
@@ -515,7 +511,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
 
-        if (false === $propertyMetadata->isWritable() && !$this->apiGateway) {
+        if (false === $propertyMetadata->isWritable()) {
             $propertySchema['readOnly'] = true;
         }
 
@@ -613,7 +609,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
-            'basePath' => !empty($context['base_url']) ? $context['base_url'] : '/',
+            'basePath' => $context['base_url'] ?? '/',
             'info' => [
                 'title' => $documentation->getTitle(),
                 'version' => $documentation->getVersion(),
@@ -694,9 +690,6 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
-                if ($this->apiGateway && !preg_match(self::API_GATEWAY_PATTERN, $name)) {
-                    continue;
-                }
                 $parameter = [
                     'name' => $name,
                     'in' => 'query',
