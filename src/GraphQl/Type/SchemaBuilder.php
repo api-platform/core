@@ -189,10 +189,10 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return array|null
      */
-    private function getResourceFieldConfiguration(string $resourceClass, ResourceMetadata $resourceMetadata, string $fieldDescription = null, Type $type, string $rootResource, bool $input = false, string $mutationName = null)
+    private function getResourceFieldConfiguration(string $resourceClass, ResourceMetadata $resourceMetadata, string $fieldDescription = null, Type $type, string $rootResource, bool $input = false, string $mutationName = null, int $depth = 0)
     {
         try {
-            if (null === $graphqlType = $this->convertType($type, $input, $mutationName)) {
+            if (null === $graphqlType = $this->convertType($type, $input, $mutationName, $depth)) {
                 return null;
             }
 
@@ -227,7 +227,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
                         $nullable = isset($value['required']) ? !$value['required'] : true;
                         $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
-                        $graphqlFilterType = $this->convertType($filterType);
+                        $graphqlFilterType = $this->convertType($filterType, false, null, $depth);
 
                         if ('[]' === $newKey = substr($key, -2)) {
                             $key = $newKey;
@@ -317,7 +317,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @throws InvalidTypeException
      */
-    private function convertType(Type $type, bool $input = false, string $mutationName = null)
+    private function convertType(Type $type, bool $input = false, string $mutationName = null, int $depth = 0)
     {
         $resourceClass = null;
         switch ($builtinType = $type->getBuiltinType()) {
@@ -357,7 +357,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     return null;
                 }
 
-                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName);
+                $graphqlType = $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
                 break;
             default:
                 throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $builtinType));
@@ -375,7 +375,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
      *
      * @return ObjectType|InputObjectType
      */
-    private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null): GraphQLType
+    private function getResourceObjectType(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): GraphQLType
     {
         if (isset($this->graphqlTypes[$resourceClass][$mutationName][$input])) {
             return $this->graphqlTypes[$resourceClass][$mutationName][$input];
@@ -395,8 +395,8 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'name' => $shortName,
             'description' => $resourceMetadata->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName) {
-                return $this->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $mutationName);
+            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $depth) {
+                return $this->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $mutationName, $depth);
             },
             'interfaces' => [$this->getNodeInterface()],
         ];
@@ -407,7 +407,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
     /**
      * Gets the fields of the type of the given resource.
      */
-    private function getResourceObjectTypeFields(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null): array
+    private function getResourceObjectTypeFields(string $resourceClass, ResourceMetadata $resourceMetadata, bool $input = false, string $mutationName = null, int $depth = 0): array
     {
         $fields = [];
         $idField = ['type' => GraphQLType::nonNull(GraphQLType::id())];
@@ -434,7 +434,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 continue;
             }
 
-            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyType, $resourceClass, $input, $mutationName)) {
+            if ($fieldConfiguration = $this->getResourceFieldConfiguration($resourceClass, $resourceMetadata, $propertyMetadata->getDescription(), $propertyType, $resourceClass, $input, $mutationName, ++$depth)) {
                 $fields['id' === $property ? '_id' : $property] = $fieldConfiguration;
             }
         }
