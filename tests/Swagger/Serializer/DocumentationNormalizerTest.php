@@ -1399,6 +1399,12 @@ class DocumentationNormalizerTest extends TestCase
                 'required' => false,
                 'strategy' => 'partial',
             ]]),
+            'f3' => new DummyFilter(['invalid-for-api-gateway[]' => [
+                'property' => 'foo',
+                'type' => 'int',
+                'required' => false,
+                'strategy' => 'partial',
+            ]]),
         ];
 
         foreach ($filters as $filterId => $filter) {
@@ -1406,7 +1412,7 @@ class DocumentationNormalizerTest extends TestCase
             $filterLocatorProphecy->get($filterId)->willReturn($filter)->shouldBeCalled();
         }
 
-        $filterLocatorProphecy->has('f3')->willReturn(false)->shouldBeCalled();
+        $filterLocatorProphecy->has('f4')->willReturn(false)->shouldBeCalled();
 
         $this->normalizeWithFilters($filterLocatorProphecy->reveal());
     }
@@ -1426,6 +1432,12 @@ class DocumentationNormalizerTest extends TestCase
                 'swagger' => ['x-foo' => 'bar'],
             ]]),
             'f2' => new DummyFilter(['ha' => [
+                'property' => 'foo',
+                'type' => 'int',
+                'required' => false,
+                'strategy' => 'partial',
+            ]]),
+            'f3' => new DummyFilter(['invalid-for-api-gateway[]' => [
                 'property' => 'foo',
                 'type' => 'int',
                 'required' => false,
@@ -1821,7 +1833,7 @@ class DocumentationNormalizerTest extends TestCase
             'This is a dummy.',
             null,
             [],
-            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3']]],
+            ['get' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4']]],
             []
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -1911,7 +1923,7 @@ class DocumentationNormalizerTest extends TestCase
             ]),
         ];
 
-        $this->assertEquals($expected, $normalizer->normalize($documentation));
+        $this->assertEquals($expected, $normalizer->normalize($documentation, null, ['api_gateway' => true]));
     }
 
     public function testNormalizeWithSubResource()
