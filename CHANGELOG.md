@@ -20,7 +20,6 @@
 * Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
 * Add the a new configuration to disable the API entrypoint and the documentation
 * Allow to set maximum items per page at operation/resource level  
-* Add a new `alwaysIdentifier` configuration option for properties that force serializer to generate an IRI for the relation
 
 ## 2.1.6
 
