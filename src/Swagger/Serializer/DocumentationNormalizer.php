@@ -46,6 +46,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     const SWAGGER_VERSION = '2.0';
     const FORMAT = 'json';
+    const API_GATEWAY_PATTERN = '/^[a-zA-Z0-9._$-]+$/';
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -157,7 +158,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
-                        if (!\in_array($parameter['name'], $parametersMemory, true) && (!$this->apiGateway || preg_match('/^[a-zA-Z0-9._$-]+$/', $parameter['name']))) {
+                        if (!\in_array($parameter['name'], $parametersMemory, true) && (!$this->apiGateway || preg_match(self::API_GATEWAY_PATTERN, $parameter['name']))) {
                             $pathOperation['parameters'][] = $parameter;
                         }
                     }
@@ -693,7 +694,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
-                if ($this->apiGateway && !preg_match('/^[a-zA-Z0-9._$-]+$/', $name)) {
+                if ($this->apiGateway && !preg_match(self::API_GATEWAY_PATTERN, $name)) {
                     continue;
                 }
                 $parameter = [
