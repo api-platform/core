@@ -35,13 +35,35 @@ final class AddTagsListener
 {
     private $iriConverter;
     private $purger;
-    private $debug;
+    private $debug = false;
 
-    public function __construct(IriConverterInterface $iriConverter, PurgerInterface $purger, bool $debug = false)
+    public function __construct(IriConverterInterface $iriConverter)
     {
         $this->iriConverter = $iriConverter;
+    }
+
+    public function getPurger(): ?PurgerInterface
+    {
+        return $this->purger;
+    }
+
+    public function setPurger(PurgerInterface $purger): self
+    {
         $this->purger = $purger;
+
+        return $this;
+    }
+
+    public function isDebug(): bool
+    {
+        return $this->debug;
+    }
+
+    public function setDebug(bool $debug): self
+    {
         $this->debug = $debug;
+
+        return $this;
     }
 
     /**
