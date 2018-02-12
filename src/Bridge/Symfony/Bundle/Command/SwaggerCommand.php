@@ -66,11 +66,7 @@ final class SwaggerCommand extends Command
     {
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
         $data = $this->documentationNormalizer->normalize($documentation);
-        if ($input->getOption('yaml')) {
-            $content = Yaml::dump($data);
-        } else {
-            $content = json_encode($data, JSON_PRETTY_PRINT);
-        }
+        $content = $input->getOption('yaml') ? Yaml::dump($data) : json_encode($data, JSON_PRETTY_PRINT);
         $output->writeln($content);
     }
 }
