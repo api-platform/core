@@ -11,7 +11,6 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AlwaysIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
@@ -859,24 +858,6 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $this->manager->persist($dummy);
         }
 
-        $this->manager->flush();
-    }
-
-    /**
-     * @Given there are AlwaysIdentifierDummies
-     */
-    public function thereAreAlwaysIdentifierDummies()
-    {
-        $mainDummy = new AlwaysIdentifierDummy();
-        $relatedDummy = new AlwaysIdentifierDummy();
-
-        $this->manager->persist($relatedDummy);
-
-        $mainDummy->setParent($relatedDummy);
-        $mainDummy->setChildren([$relatedDummy]);
-        $mainDummy->setRelated([$relatedDummy]);
-
-        $this->manager->persist($mainDummy);
         $this->manager->flush();
     }
 

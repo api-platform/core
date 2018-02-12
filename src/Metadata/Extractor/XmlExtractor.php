@@ -73,22 +73,25 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         $operationsParent = $graphql ? 'graphql' : "{$operationType}s";
-
         if (!isset($resource->$operationsParent)) {
             return null;
         }
 
-        return $this->getAttributes($resource->$operationsParent, $operationType);
+        return $this->getAttributes($resource->$operationsParent, $operationType, true);
     }
 
     /**
      * Recursively transforms an attribute structure into an associative array.
      */
-    private function getAttributes(\SimpleXMLElement $resource, string $elementName): array
+    private function getAttributes(\SimpleXMLElement $resource, string $elementName, bool $topLevel = false): array
     {
         $attributes = [];
         foreach ($resource->$elementName as $attribute) {
             $value = isset($attribute->attribute[0]) ? $this->getAttributes($attribute, 'attribute') : XmlUtils::phpize($attribute);
+            // allow empty operations definition, like <collectionOperation name="post" />
+            if ($topLevel && '' === $value) {
+                $value = [];
+            }
             if (isset($attribute['name'])) {
                 $attributes[(string) $attribute['name']] = $value;
             } else {
