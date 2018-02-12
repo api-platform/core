@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.6
+
+* Add a new config option to specify the directories containing resource classes
+* Fix a bug regarding the ordering filter when dealing with embedded fields
+* Allow to autowire the router
+* Fix the base path handling the Swagger/Open API documentation normalizer
+
 ## 2.1.5
 
 * Add support for filters autoconfiguration with Symfony 3.4+
