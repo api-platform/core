@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Swagger\Serializer;
 
-use ApiPlatform\Core\Documentation\Documentation;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -103,6 +102,6 @@ final class ApiGatewayNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return DocumentationNormalizer::FORMAT === $format && $data instanceof Documentation;
+        return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
 }
