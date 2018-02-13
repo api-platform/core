@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\HttpCache\CacheTagsFormattingPurgerInterface;
-use ApiPlatform\Core\HttpCache\PurgerInterface;
+use ApiPlatform\Core\HttpCache\CacheTagsFormattingInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -37,33 +36,11 @@ final class AddTagsListener
     private $purger;
     private $debug = false;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormattingInterface $purger = null, bool $debug = false)
     {
         $this->iriConverter = $iriConverter;
-    }
-
-    public function getPurger(): ?PurgerInterface
-    {
-        return $this->purger;
-    }
-
-    public function setPurger(PurgerInterface $purger): self
-    {
         $this->purger = $purger;
-
-        return $this;
-    }
-
-    public function isDebug(): bool
-    {
-        return $this->debug;
-    }
-
-    public function setDebug(bool $debug): self
-    {
         $this->debug = $debug;
-
-        return $this;
     }
 
     /**
@@ -99,7 +76,7 @@ final class AddTagsListener
             $event->getResponse()->headers->set('Cache-Tags-Debug', implode(',', $resources));
         }
 
-        if ($this->purger instanceof CacheTagsFormattingPurgerInterface) {
+        if ($this->purger instanceof CacheTagsFormattingInterface) {
             $formatted = $this->purger->formatTags($resources);
         } else {
             $formatted = implode(',', $resources);
