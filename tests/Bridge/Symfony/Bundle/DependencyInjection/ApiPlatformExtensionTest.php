@@ -330,6 +330,10 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.collection_data_provider')->shouldBeCalledTimes(1);
 
+        $containerBuilderProphecy->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
+            ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
+        $childDefinitionProphecy->addTag('api_platform.subresource_data_provider')->shouldBeCalledTimes(1);
+
         $containerBuilderProphecy->registerForAutoconfiguration(QueryItemExtensionInterface::class)
             ->willReturn($childDefinitionProphecy)->shouldBeCalledTimes(1);
         $childDefinitionProphecy->addTag('api_platform.doctrine.orm.query_extension.item')->shouldBeCalledTimes(1);
