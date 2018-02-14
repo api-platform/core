@@ -1,0 +1,123 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+{% import _self as apiPlatform %}
+
+{% block toolbar %}
+    {% set icon %}
+        {{ include('@ApiPlatform/DataCollector/api-platform.svg.twig', { width: 24, height: 24 }) }}
+    {% endset %}
+
+    {#
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+        </div>
+    {% endset %}
+    #}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+{% endblock %}
+
+{% block head %}
+    {# Optional. Here you can link to or define your own CSS and JS contents. #}
+    {# Use {{ parent() }} to extend the default styles instead of overriding them. #}
+    {{ parent() }}
+{% endblock %}
+
+{% block menu %}
+    {# This left-hand menu appears when using the full-screen profiler. #}
+    <span class="label">
+        <span class="icon">
+            {{ include('@ApiPlatform/DataCollector/api-platform.svg.twig', { width: 24, height: 24 }) }}
+        </span>
+        <strong>Api Platform</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {# Optional, for showing the most details. #}
+    <h2>Acceptable Content Types</h2>
+    <table>
+        <tr>
+            <th>Content Type</th>
+        </tr>
+
+        {% for type in collector.acceptableContentTypes %}
+        <tr>
+            <td>{{ type }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <table>
+        <tr>
+            <th>
+                Resource class
+            </th>
+            <td>
+                {{ collector.resourceClass|default('Not an api-platform resource') }}
+            </td>
+        <tr>
+    </table>
+
+    {% if collector.resourceMetadata %}
+        <h2>Metadata</h2>
+        <h3>Short name: "{{ collector.resourceMetadata.shortName }}"</h3>
+        <table>
+            <tr>
+                <th>
+                    Item operations
+                </th>
+                <th>
+                    Method / Route name
+                </th>
+            </tr>
+
+            {% for key, itemOperation in collector.resourceMetadata.itemOperations %}
+                {{ apiPlatform.operationLine(key, itemOperation) }}
+            {% endfor %}
+
+            <tr>
+                <th>
+                    Collection operations
+                </th>
+                <th>
+                    Method / Route name
+                </th>
+            </tr>
+
+            {% for key, collectionOperation in collector.resourceMetadata.collectionOperations %}
+                {{ apiPlatform.operationLine(key, collectionOperation) }}
+            {% endfor %}
+        </table>
+
+        <table>
+            <tr>
+                <th>
+                    Filters
+                </th>
+            </tr>
+
+            {% for filter in collector.resourceMetadata.attributes.filters %}
+                <tr>
+                    <td>
+                        {{ filter }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}
+
+{% macro operationLine(key, operation) %}
+    <tr>
+        <td>
+            {{ key }}
+        </td>
+        <td>
+            {% if operation['method'] is defined %}
+                <em>Method:</em> {{ operation['method'] }}
+            {% elseif operation['route_name'] is defined %}
+                <em>Route name:</em> {{ operation['route_name'] }}
+            {% endif %}
+        </td>
+    </tr>
+{% endmacro %}
+
