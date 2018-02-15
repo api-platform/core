@@ -20,6 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInter
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
@@ -95,6 +96,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.item_data_provider');
         $container->registerForAutoconfiguration(CollectionDataProviderInterface::class)
             ->addTag('api_platform.collection_data_provider');
+        $container->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
+            ->addTag('api_platform.subresource_data_provider');
         $container->registerForAutoconfiguration(QueryItemExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.item');
         $container->registerForAutoconfiguration(QueryCollectionExtensionInterface::class)
