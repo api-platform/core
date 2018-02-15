@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 
-class RequiredFooFilter extends AbstractFilter
+class RequiredFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
@@ -27,10 +27,15 @@ class RequiredFooFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         return [
-            'foo' => [
-                'property' => 'foo',
+            'required' => [
+                'property' => 'required',
                 'type' => 'string',
                 'required' => true,
+            ],
+            'not-required' => [
+                'property' => 'not-required',
+                'type' => 'string',
+                'required' => false,
             ],
         ];
     }

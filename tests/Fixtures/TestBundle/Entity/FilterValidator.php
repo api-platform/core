@@ -15,8 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\NotRequiredBarFilter;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFooFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -26,8 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(attributes={
  *     "filters"={
- *         NotRequiredBarFilter::class,
- *         RequiredFooFilter::class
+ *         RequiredFilter::class
  *     }
  * })
  * @ORM\Entity

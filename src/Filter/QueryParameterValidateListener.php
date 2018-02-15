@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Filter;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;
 
 /**
- * Validate query parameters depending on filter description.
+ * Validates query parameters depending on filter description.
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
  */
@@ -32,12 +31,9 @@ class QueryParameterValidateListener
 
     private $resourceMetadataFactory;
 
-    private $validator;
-
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, SymfonyValidatorInterface $validator, $filterLocator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContainerInterface $filterLocator)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->validator = $validator;
         $this->setFilterLocator($filterLocator);
     }
 
@@ -62,14 +58,14 @@ class QueryParameterValidateListener
             }
 
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
-                if ($data['required'] ?? false) {
-                    $requiredConstraint = new Assert\NotNull();
-                    $requiredConstraint->message = sprintf('query parameter `%s` is required', $name);
-                    $errorList = $this->validator->validate($request->query->get($name), $requiredConstraint);
+                $errorList = [];
 
-                    if (count($errorList) > 0) {
-                        throw new ValidationException($errorList);
-                    }
+                if (($data['required'] ?? false) && null === $request->query->get($name)) {
+                    $errorList[] = sprintf('Query parameter "%s" is required', $name);
+                }
+
+                if ($errorList) {
+                    throw new FilterValidationException($errorList);
                 }
             }
         }
