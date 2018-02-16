@@ -39,9 +39,11 @@ final class DocumentationAction
         $this->formats = $formats;
     }
 
-    public function __invoke(Request $request): Documentation
+    public function __invoke(Request $request = null): Documentation
     {
-        $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + ['base_url' => $request->getBaseUrl()]);
+        if (null !== $request) {
+            $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + ['base_url' => $request->getBaseUrl()]);
+        }
 
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
     }
