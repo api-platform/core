@@ -63,7 +63,7 @@ final class ReadListener
         }
 
         if (null === $filters = $request->attributes->get('_api_filters')) {
-            $queryString = $request->getQueryString();
+            $queryString = RequestParser::getQueryString($request);
             $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
         }
 
