@@ -16,9 +16,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriPlainIdentifierAwareConverterInterface;
+use ApiPlatform\Core\Api\IriToIdentifierConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\PlainIdentifierConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
@@ -42,7 +41,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class IriConverter implements IriPlainIdentifierAwareConverterInterface
+final class IriConverter implements IriToIdentifierConverterInterface, IriConverterInterface
 {
     use ClassInfoTrait;
     use OperationDataProviderTrait;
@@ -61,7 +60,7 @@ final class IriConverter implements IriPlainIdentifierAwareConverterInterface
         $this->identifierDenormalizer = $identifierDenormalizer;
 
         if (null === $identifiersExtractor) {
-            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', IdentifiersExtractorInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.', IdentifiersExtractorInterface::class), E_USER_DEPRECATED);
             $this->identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
         }
     }
@@ -114,7 +113,6 @@ final class IriConverter implements IriPlainIdentifierAwareConverterInterface
     public function getIriFromPlainIdentifier($id, string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
-
         try {
             return $this->router->generate($routeName, ['id' => \is_array($id) ? implode(';', $id) : $id], $referenceType);
         } catch (RuntimeException $e) {

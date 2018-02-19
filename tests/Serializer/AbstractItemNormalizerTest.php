@@ -14,10 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriPlainIdentifierAwareConverterInterface;
-use ApiPlatform\Core\Api\PlainIdentifierConverterInterface;
+use ApiPlatform\Core\Api\IriToIdentifierConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -283,6 +284,73 @@ class AbstractItemNormalizerTest extends TestCase
             'name' => 'foo',
             'relatedDummy' => '/dummies/1',
             'relatedDummies' => ['/dummies/2'],
+        ], Dummy::class);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage NotFound exception
+     */
+    public function testDenormalizeNotFound()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['name', 'relatedDummy', 'relatedDummies'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    ArrayCollection::class,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_INT),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+                ),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getItemFromIri('/dummies/1', Argument::type('array'))->willThrow(new ItemNotFoundException('NotFound exception'))->shouldBeCalled();
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->denormalize([
+            'name' => 'foo',
+            'relatedDummy' => '/dummies/1',
         ], Dummy::class);
     }
 
@@ -669,7 +737,7 @@ class AbstractItemNormalizerTest extends TestCase
             return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
         };
 
-        $iriConverterProphecy = $this->prophesize(IriPlainIdentifierAwareConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToIdentifierConverterInterface::class)->willImplement(IriConverterInterface::class);
         $iriConverterProphecy->getItemFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->shouldBeCalled();
         $iriConverterProphecy->getIriFromPlainIdentifier('1', RelatedDummy::class)->shouldBeCalled()->willReturn('/related_dummies/1');
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
@@ -680,8 +748,60 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProviderProphecy->getItem(RelatedDummy::class, 1, null, Argument::type('array'))->shouldNotBeCalled();
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            null,
+            true,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->denormalize(['relatedDummy' => 1], Dummy::class, 'jsonld');
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Item with id "1" not found for class "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy".
+     */
+    public function testDenormalizeNotFoundRelationWithPlainId()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['relatedDummy'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        )->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriToIdentifierConverterInterface::class)->willImplement(IriConverterInterface::class);
+
+        $getItemFromIriSecondArgCallback = function ($arg) {
+            return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
+        };
+
+        $iriConverterProphecy->getItemFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->shouldBeCalled()->willThrow(new ItemNotFoundException('Item with id "1" not found for class "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy".'));
+        $iriConverterProphecy->getIriFromPlainIdentifier('1', RelatedDummy::class)->shouldBeCalled()->willReturn('/related_dummies/1');
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -692,7 +812,7 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            true
+            true,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -701,7 +821,7 @@ class AbstractItemNormalizerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation
+     * @expectedDeprecation Passing a ApiPlatform\Core\DataProvider\ItemDataProviderInterface is deprecated since 2.3 and will not be possible in 3.0.
      */
     public function testTriggerDeprecation()
     {
@@ -722,7 +842,7 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             $itemDataProviderProphecy->reveal(),
-            true
+            true,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
     }
@@ -770,7 +890,7 @@ class AbstractItemNormalizerTest extends TestCase
             $propertyAccessorProphecy->reveal(),
             null,
             null,
-            $itemDataProviderProphecy->reveal(),
+            null,
             false,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());

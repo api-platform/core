@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriPlainIdentifierAwareConverterInterface;
+use ApiPlatform\Core\Api\IriToIdentifierConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\PlainIdentifierConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -46,7 +45,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
     /**
-     * @var IriPlainIdentifierAwareConverterInterface|IriConverterInterface $iriConverter
+     * @var IriToIdentifierConverterInterface|IriConverterInterface
      */
     protected $iriConverter;
     protected $resourceClassResolver;
@@ -65,7 +64,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         if (null !== $itemDataProvider) {
-            @trigger_error(sprintf('Passing a %s is deprecated since 2.3 and will not be possible in 3.0.', ItemDataProviderInterface::class));
+            @trigger_error(sprintf('Passing a %s is deprecated since 2.3 and will not be possible in 3.0.', ItemDataProviderInterface::class), E_USER_DEPRECATED);
         }
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
@@ -316,17 +315,20 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!\is_array($value)) {
-            // repeat the code so that IRIs keep working with the json format
-            if (true === $this->allowPlainIdentifiers && $this->iriConverter instanceof IriPlainIdentifierAwareConverterInterface) {
-                try {
+            try {
+                // repeat the code so that IRIs keep working with the json format
+                if (true === $this->allowPlainIdentifiers && ($this->iriConverter instanceof IriToIdentifierConverterInterface && $this->iriConverter instanceof IriConverterInterface)) {
                     return $this->iriConverter->getItemFromIri($this->iriConverter->getIriFromPlainIdentifier($value, $className), $context + ['fetch_data' => true]);
-                } catch (ItemNotFoundException $e) {
-                    throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-                } catch (InvalidArgumentException $e) {
-                    // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
                 }
-            }
 
+                if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
+                    return $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
+                }
+            } catch (ItemNotFoundException $e) {
+                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            } catch (InvalidArgumentException $e) {
+                // Give a chance to other normalizers (e.g.: DateTimeNormalizer)
+            }
             throw new InvalidArgumentException(sprintf(
                 'Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)
             ));

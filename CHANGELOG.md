@@ -2,8 +2,9 @@
 
 ## 2.3.0
 
-* Introduce a new interface `IriPlainIdentifierAwareConverterInterface`
-* Add `getIriFromPlainIdentifier` in `IriPlainIdentifierAwareConverterInterface` to be able to retrieve an iri from an ID
+* Introduce a new interface `IriToIdentifierConverterInterface`
+* Add `getIriFromPlainIdentifier` in `IriToIdentifierConverterInterface` to be able to retrieve an iri from an ID
+* IriConverter now implements `IriToIdentifierConverterInterface`
 * [deprecated] Passing an implementation of `ItemDataProviderInterface` in an implementation of `AbstractItemNormalizer` is deprecated and will be not possible in 3.0
 
 ## 2.2.5

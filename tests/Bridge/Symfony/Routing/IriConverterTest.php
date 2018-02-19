@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractor;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -22,6 +23,7 @@ use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -82,6 +84,39 @@ class IriConverterTest extends TestCase
 
         $converter = $this->getIriConverter($routerProphecy, null, $itemDataProviderProphecy);
         $converter->getItemFromIri('/users/3');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.
+     * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
+     */
+    public function testIdentifiersExtractorDeprecation()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            null,
+            $identifierDenormalizer->reveal()
+        );
     }
 
     public function testGetItemFromIri()
@@ -193,6 +228,37 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
 
+    public function testGetItemIriFromPlainIdentifier()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('api_dummies_get_item');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('api_dummies_get_item', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies/1');
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
+        );
+        $this->assertEquals($converter->getIriFromPlainIdentifier(1, Dummy::class), '/dummies/1');
+    }
+
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage Unable to generate an IRI for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
@@ -293,25 +359,143 @@ class IriConverterTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.
      * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
      */
     public function testLegacyConstructor()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $routerProphecy = $this->prophesize(RouterInterface::class);
-        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
 
-        new IriConverter(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('dummies');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('dummies', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies/1');
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null
         );
+        $converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unable to generate an IRI for the item of type "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
+     */
+    public function testNotAbleToGenerateAnIriWithGetIriFromPlainIdentifier()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('dummies');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('dummies', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willThrow(new RouteNotFoundException());
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
+        );
+        $converter->getIriFromPlainIdentifier(1, Dummy::class);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unable to generate an IRI for the item of type "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
+     */
+    public function testNotAbleToGenerateGetIriFromItem()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('dummies');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('dummies', ['id' => 'id'], UrlGeneratorInterface::ABS_PATH)->willThrow(new RuntimeException());
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+
+        $dummy = (new Dummy())->setId(1);
+        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifierExtractorProphecy->getIdentifiersFromItem($dummy)->willReturn(['id'])->shouldBeCalled();
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            $identifierExtractorProphecy->reveal(),
+            $identifierDenormalizer->reveal()
+        );
+        $converter->getIriFromItem($dummy);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unable to generate an IRI for the item of type "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
+     */
+    public function testNotAbleToGenerateAnIriWithGetItemIriFromPlainIdentifierRouterException()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+        $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('dummies');
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->generate('dummies', ['id' => 1], UrlGeneratorInterface::ABS_PATH)->willThrow(new RuntimeException());
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null
+        );
+        $converter->getIriFromPlainIdentifier(1, Dummy::class);
     }
 
     private function getResourceClassResolver()
