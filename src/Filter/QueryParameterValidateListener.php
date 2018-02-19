@@ -60,13 +60,7 @@ final class QueryParameterValidateListener
             }
 
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
-                if (!($data['required'] ?? false)) { // property is not required
-                    continue;
-                }
-
-                if (!$this->isRequiredFilterValid($name, $request)) {
-                    $errorList[] = sprintf('Query parameter "%s" is required', $name);
-                }
+                $errorList = $this->checkRequired($errorList, $name, $data, $request);
             }
         }
 
@@ -75,10 +69,32 @@ final class QueryParameterValidateListener
         }
     }
 
+    private function checkRequired(array $errorList, string $name, array $data, Request $request): array
+    {
+        // filter is not required, the `checkRequired` method can not break
+        if (!($data['required'] ?? false)) {
+            return $errorList;
+        }
+
+        // if query param is not given, then break
+        if (!$this->requestHasQueryParameter($request, $name)) {
+            $errorList[] = sprintf('Query parameter "%s" is required', $name);
+
+            return $errorList;
+        }
+
+        // if query param is empty and the configuration does not allow it
+        if (!($data['swagger']['allowEmptyValue'] ?? false) && empty($this->requestGetQueryParameter($request, $name))) {
+            $errorList[] = sprintf('Query parameter "%s" does not allow empty value', $name);
+        }
+
+        return $errorList;
+    }
+
     /**
-     * Test if required filter is valid. It validates array notation too like "required[bar]".
+     * Test if request has required parameter.
      */
-    private function isRequiredFilterValid(string $name, Request $request): bool
+    private function requestHasQueryParameter(Request $request, string $name): bool
     {
         $matches = [];
         parse_str($name, $matches);
@@ -99,6 +115,37 @@ final class QueryParameterValidateListener
             return \is_array($queryParameter) && isset($queryParameter[$keyName]);
         }
 
-        return null !== $request->query->get($rootName);
+        return $request->query->has($rootName);
+    }
+
+    /**
+     * Test if required filter is valid. It validates array notation too like "required[bar]".
+     */
+    private function requestGetQueryParameter(Request $request, string $name)
+    {
+        $matches = [];
+        parse_str($name, $matches);
+        if (!$matches) {
+            return null;
+        }
+
+        $rootName = array_keys($matches)[0] ?? '';
+        if (!$rootName) {
+            return null;
+        }
+
+        if (\is_array($matches[$rootName])) {
+            $keyName = array_keys($matches[$rootName])[0];
+
+            $queryParameter = $request->query->get($rootName);
+
+            if (\is_array($queryParameter) && isset($queryParameter[$keyName])) {
+                return $queryParameter[$keyName];
+            }
+
+            return null;
+        }
+
+        return $request->query->get($rootName);
     }
 }

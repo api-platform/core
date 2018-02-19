@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,7 +26,8 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(attributes={
  *     "filters"={
- *         RequiredFilter::class
+ *         RequiredFilter::class,
+ *         RequiredAllowEmptyFilter::class
  *     }
  * })
  * @ORM\Entity
