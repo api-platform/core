@@ -61,6 +61,7 @@ final class QueryParameterValidateListener
 
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
                 $errorList = $this->checkRequired($errorList, $name, $data, $request);
+                $errorList = $this->checkBounds($errorList, $name, $data, $request);
             }
         }
 
@@ -147,5 +148,34 @@ final class QueryParameterValidateListener
         }
 
         return $request->query->get($rootName);
+    }
+
+    private function checkBounds(array $errorList, string $name, array $data, Request $request): array
+    {
+        $value = $request->query->get($name);
+        if (empty($value) && '0' !== $value) {
+            return $errorList;
+        }
+
+        $maximum = $data['swagger']['maximum'] ?? null;
+        $minimum = $data['swagger']['minimum'] ?? null;
+
+        if (null !== $maximum) {
+            if (($data['swagger']['exclusiveMaximum'] ?? false) && $value >= $maximum) {
+                $errorList[] = sprintf('Query parameter "%s" must be less than %s', $name, $maximum);
+            } elseif ($value > $maximum) {
+                $errorList[] = sprintf('Query parameter "%s" must be less than or equal to %s', $name, $maximum);
+            }
+        }
+
+        if (null !== $minimum) {
+            if (($data['swagger']['exclusiveMinimum'] ?? false) && $value <= $minimum) {
+                $errorList[] = sprintf('Query parameter "%s" must be greater than %s', $name, $minimum);
+            } elseif ($value < $minimum) {
+                $errorList[] = sprintf('Query parameter "%s" must be greater than or equal to %s', $name, $minimum);
+            }
+        }
+
+        return $errorList;
     }
 }

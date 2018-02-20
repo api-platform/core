@@ -144,6 +144,10 @@ services:
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
+    
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
 
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
         resource: '../../TestBundle/Controller'
