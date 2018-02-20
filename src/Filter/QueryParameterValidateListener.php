@@ -62,6 +62,7 @@ final class QueryParameterValidateListener
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
                 $errorList = $this->checkRequired($errorList, $name, $data, $request);
                 $errorList = $this->checkBounds($errorList, $name, $data, $request);
+                $errorList = $this->checkLength($errorList, $name, $data, $request);
             }
         }
 
@@ -178,4 +179,39 @@ final class QueryParameterValidateListener
 
         return $errorList;
     }
+
+    private function checkLength(array $errorList, string $name, array $data, Request $request): array
+    {
+        $maxLength = $data['swagger']['maxLength'] ?? null;
+        $minLength = $data['swagger']['minLength'] ?? null;
+
+        $value = $request->query->get($name);
+        if (empty($value) && '0' !== $value || !\is_string($value)) {
+            return $errorList;
+        }
+
+        // if (!is_string($value)) {
+        //         $errorList[] = sprintf('Query parameter "%s" must be less than or equal to %s', $name, $maximum);
+        //         return $errorList;
+        // }
+
+        if (null !== $maxLength && mb_strlen($value) > $maxLength) {
+            $errorList[] = sprintf('Query parameter "%s" length must be lower than or equal to %s', $name, $maxLength);
+        }
+
+        if (null !== $minLength && mb_strlen($value) < $minLength) {
+            $errorList[] = sprintf('Query parameter "%s" length must be greater than or equal to %s', $name, $minLength);
+        }
+
+        return $errorList;
+    }
+
+    // TODO grouper les filtres required dans une classe
+    // avoir deux entités, une required, une pour le reste
+    // pattern	string	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3.
+    // maxItems	integer	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.2.
+    // minItems	integer	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3.
+    // uniqueItems	boolean	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4.
+    // enum	[*]	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.1.
+    // multipleOf
 }

@@ -64,7 +64,6 @@ Feature: Validate filters based upon filter description
     Then the response status code should be 400
     And the JSON node "detail" should be equal to 'Query parameter "minimum" must be greater than or equal to 5'
 
-  @dropSchema
   Scenario: Test filter bounds: exclusiveMinimum
     When I am on "/filter_validators?required=foo&required-allow-empty&exclusiveMinimum=6"
     Then the response status code should be 200
@@ -72,3 +71,24 @@ Feature: Validate filters based upon filter description
     When I am on "/filter_validators?required=foo&required-allow-empty&exclusiveMinimum=5"
     Then the response status code should be 400
     And the JSON node "detail" should be equal to 'Query parameter "exclusiveMinimum" must be greater than 5'
+
+  Scenario: Test filter bounds: max length
+    When I am on "/filter_validators?required=foo&required-allow-empty&max-length-3=123"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&max-length-3=1234"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "max-length-3" length must be lower than or equal to 3'
+
+  Scenario: Do not throw an error if value is not an array
+    When I am on "/filter_validators?required=foo&required-allow-empty&max-length-3[]=12345"
+    Then the response status code should be 200
+
+  @dropSchema
+  Scenario: Test filter bounds: min length
+    When I am on "/filter_validators?required=foo&required-allow-empty&min-length-3=123"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&min-length-3=12"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "min-length-3" length must be greater than or equal to 3'
