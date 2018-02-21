@@ -18,7 +18,6 @@ use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -32,10 +31,21 @@ final class QueryParameterValidateListener
 
     private $resourceMetadataFactory;
 
+    private $validators;
+
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContainerInterface $filterLocator)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->setFilterLocator($filterLocator);
+
+        $this->validators = [
+            new Validator\Required(),
+            new Validator\Bounds(),
+            new Validator\Length(),
+            new Validator\Pattern(),
+            new Validator\Enum(),
+            new Validator\MultipleOf(),
+        ];
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -60,201 +70,15 @@ final class QueryParameterValidateListener
             }
 
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
-                $errorList = $this->checkRequired($errorList, $name, $data, $request);
-                $errorList = $this->checkBounds($errorList, $name, $data, $request);
-                $errorList = $this->checkLength($errorList, $name, $data, $request);
-                $errorList = $this->checkPattern($errorList, $name, $data, $request);
-                $errorList = $this->checkEnum($errorList, $name, $data, $request);
-                $errorList = $this->checkMultipleOf($errorList, $name, $data, $request);
+                foreach ($this->validators as $validator) {
+                    $errorList = array_merge($errorList, $validator->validate($name, $data, $request));
+                }
             }
         }
 
         if ($errorList) {
             throw new FilterValidationException($errorList);
         }
-    }
-
-    private function checkRequired(array $errorList, string $name, array $data, Request $request): array
-    {
-        // filter is not required, the `checkRequired` method can not break
-        if (!($data['required'] ?? false)) {
-            return $errorList;
-        }
-
-        // if query param is not given, then break
-        if (!$this->requestHasQueryParameter($request, $name)) {
-            $errorList[] = sprintf('Query parameter "%s" is required', $name);
-
-            return $errorList;
-        }
-
-        // if query param is empty and the configuration does not allow it
-        if (!($data['swagger']['allowEmptyValue'] ?? false) && empty($this->requestGetQueryParameter($request, $name))) {
-            $errorList[] = sprintf('Query parameter "%s" does not allow empty value', $name);
-        }
-
-        return $errorList;
-    }
-
-    /**
-     * Test if request has required parameter.
-     */
-    private function requestHasQueryParameter(Request $request, string $name): bool
-    {
-        $matches = [];
-        parse_str($name, $matches);
-        if (!$matches) {
-            return false;
-        }
-
-        $rootName = (string) (array_keys($matches)[0] ?? null);
-        if (!$rootName) {
-            return false;
-        }
-
-        if (\is_array($matches[$rootName])) {
-            $keyName = array_keys($matches[$rootName])[0];
-
-            $queryParameter = $request->query->get($rootName);
-
-            return \is_array($queryParameter) && isset($queryParameter[$keyName]);
-        }
-
-        return $request->query->has($rootName);
-    }
-
-    /**
-     * Test if required filter is valid. It validates array notation too like "required[bar]".
-     */
-    private function requestGetQueryParameter(Request $request, string $name)
-    {
-        $matches = [];
-        parse_str($name, $matches);
-        if (!$matches) {
-            return null;
-        }
-
-        $rootName = array_keys($matches)[0] ?? '';
-        if (!$rootName) {
-            return null;
-        }
-
-        if (\is_array($matches[$rootName])) {
-            $keyName = array_keys($matches[$rootName])[0];
-
-            $queryParameter = $request->query->get($rootName);
-
-            if (\is_array($queryParameter) && isset($queryParameter[$keyName])) {
-                return $queryParameter[$keyName];
-            }
-
-            return null;
-        }
-
-        return $request->query->get($rootName);
-    }
-
-    private function checkBounds(array $errorList, string $name, array $data, Request $request): array
-    {
-        $value = $request->query->get($name);
-        if (empty($value) && '0' !== $value) {
-            return $errorList;
-        }
-
-        $maximum = $data['swagger']['maximum'] ?? null;
-        $minimum = $data['swagger']['minimum'] ?? null;
-
-        if (null !== $maximum) {
-            if (($data['swagger']['exclusiveMaximum'] ?? false) && $value >= $maximum) {
-                $errorList[] = sprintf('Query parameter "%s" must be less than %s', $name, $maximum);
-            } elseif ($value > $maximum) {
-                $errorList[] = sprintf('Query parameter "%s" must be less than or equal to %s', $name, $maximum);
-            }
-        }
-
-        if (null !== $minimum) {
-            if (($data['swagger']['exclusiveMinimum'] ?? false) && $value <= $minimum) {
-                $errorList[] = sprintf('Query parameter "%s" must be greater than %s', $name, $minimum);
-            } elseif ($value < $minimum) {
-                $errorList[] = sprintf('Query parameter "%s" must be greater than or equal to %s', $name, $minimum);
-            }
-        }
-
-        return $errorList;
-    }
-
-    private function checkLength(array $errorList, string $name, array $data, Request $request): array
-    {
-        $maxLength = $data['swagger']['maxLength'] ?? null;
-        $minLength = $data['swagger']['minLength'] ?? null;
-
-        $value = $request->query->get($name);
-        if (empty($value) && '0' !== $value || !\is_string($value)) {
-            return $errorList;
-        }
-
-        // if (!is_string($value)) {
-        //         $errorList[] = sprintf('Query parameter "%s" must be less than or equal to %s', $name, $maximum);
-        //         return $errorList;
-        // }
-
-        if (null !== $maxLength && mb_strlen($value) > $maxLength) {
-            $errorList[] = sprintf('Query parameter "%s" length must be lower than or equal to %s', $name, $maxLength);
-        }
-
-        if (null !== $minLength && mb_strlen($value) < $minLength) {
-            $errorList[] = sprintf('Query parameter "%s" length must be greater than or equal to %s', $name, $minLength);
-        }
-
-        return $errorList;
-    }
-
-    public function checkPattern(array $errorList, string $name, array $data, Request $request): array
-    {
-        $value = $request->query->get($name);
-        if (empty($value) && '0' !== $value || !\is_string($value)) {
-            return $errorList;
-        }
-
-        $pattern = $data['swagger']['pattern'] ?? null;
-
-        if (null !== $pattern && !preg_match($pattern, $value)) {
-            $errorList[] = sprintf('Query parameter "%s" must match pattern %s', $name, $pattern);
-        }
-
-        return $errorList;
-    }
-
-    public function checkEnum(array $errorList, string $name, array $data, Request $request): array
-    {
-        $value = $request->query->get($name);
-        if (empty($value) && '0' !== $value || !\is_string($value)) {
-            return $errorList;
-        }
-
-        $enum = $data['swagger']['enum'] ?? null;
-
-        if (null !== $enum && !\in_array($value, $enum, true)) {
-            $errorList[] = sprintf('Query parameter "%s" must be one of "%s"', $name, implode(', ', $enum));
-        }
-
-        return $errorList;
-    }
-
-    public function checkMultipleOf(array $errorList, string $name, array $data, Request $request): array
-    {
-        $value = $request->query->get($name);
-        if (empty($value) && '0' !== $value || !\is_string($value)) {
-            return $errorList;
-        }
-
-        $multipleOf = $data['swagger']['multipleOf'] ?? null;
-
-        if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
-            $errorList[] = sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf);
-        }
-
-        return $errorList;
     }
 
     // TODO grouper les filtres required dans une classe
