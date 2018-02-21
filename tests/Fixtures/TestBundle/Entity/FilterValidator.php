@@ -16,7 +16,10 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\BoundsFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\EnumFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\LengthFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\PatternFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,7 +32,10 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(attributes={
  *     "filters"={
  *         BoundsFilter::class,
+ *         EnumFilter::class,
  *         LengthFilter::class,
+ *         MultipleOfFilter::class,
+ *         PatternFilter::class,
  *         RequiredFilter::class,
  *         RequiredAllowEmptyFilter::class
  *     }

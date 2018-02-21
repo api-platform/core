@@ -84,7 +84,6 @@ Feature: Validate filters based upon filter description
     When I am on "/filter_validators?required=foo&required-allow-empty&max-length-3[]=12345"
     Then the response status code should be 200
 
-  @dropSchema
   Scenario: Test filter bounds: min length
     When I am on "/filter_validators?required=foo&required-allow-empty&min-length-3=123"
     Then the response status code should be 200
@@ -92,3 +91,29 @@ Feature: Validate filters based upon filter description
     When I am on "/filter_validators?required=foo&required-allow-empty&min-length-3=12"
     Then the response status code should be 400
     And the JSON node "detail" should be equal to 'Query parameter "min-length-3" length must be greater than or equal to 3'
+
+  Scenario: Test filter pattern
+    When I am on "/filter_validators?required=foo&required-allow-empty&pattern=pattern"
+    When I am on "/filter_validators?required=foo&required-allow-empty&pattern=nrettap"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&pattern=not-pattern"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "pattern" must match pattern /^(pattern|nrettap)$/'
+
+  Scenario: Test filter enum
+    When I am on "/filter_validators?required=foo&required-allow-empty&enum=in-enum"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&enum=not-in-enum"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "enum" must be one of "in-enum, mune-ni"'
+
+  @dropSchema
+  Scenario: Test filter multipleOf
+    When I am on "/filter_validators?required=foo&required-allow-empty&multiple-of=4"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&multiple-of=3"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "multiple-of" must multiple of 2'

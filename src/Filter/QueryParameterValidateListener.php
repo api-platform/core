@@ -63,6 +63,9 @@ final class QueryParameterValidateListener
                 $errorList = $this->checkRequired($errorList, $name, $data, $request);
                 $errorList = $this->checkBounds($errorList, $name, $data, $request);
                 $errorList = $this->checkLength($errorList, $name, $data, $request);
+                $errorList = $this->checkPattern($errorList, $name, $data, $request);
+                $errorList = $this->checkEnum($errorList, $name, $data, $request);
+                $errorList = $this->checkMultipleOf($errorList, $name, $data, $request);
             }
         }
 
@@ -206,12 +209,57 @@ final class QueryParameterValidateListener
         return $errorList;
     }
 
+    public function checkPattern(array $errorList, string $name, array $data, Request $request): array
+    {
+        $value = $request->query->get($name);
+        if (empty($value) && '0' !== $value || !\is_string($value)) {
+            return $errorList;
+        }
+
+        $pattern = $data['swagger']['pattern'] ?? null;
+
+        if (null !== $pattern && !preg_match($pattern, $value)) {
+            $errorList[] = sprintf('Query parameter "%s" must match pattern %s', $name, $pattern);
+        }
+
+        return $errorList;
+    }
+
+    public function checkEnum(array $errorList, string $name, array $data, Request $request): array
+    {
+        $value = $request->query->get($name);
+        if (empty($value) && '0' !== $value || !\is_string($value)) {
+            return $errorList;
+        }
+
+        $enum = $data['swagger']['enum'] ?? null;
+
+        if (null !== $enum && !\in_array($value, $enum, true)) {
+            $errorList[] = sprintf('Query parameter "%s" must be one of "%s"', $name, implode(', ', $enum));
+        }
+
+        return $errorList;
+    }
+
+    public function checkMultipleOf(array $errorList, string $name, array $data, Request $request): array
+    {
+        $value = $request->query->get($name);
+        if (empty($value) && '0' !== $value || !\is_string($value)) {
+            return $errorList;
+        }
+
+        $multipleOf = $data['swagger']['multipleOf'] ?? null;
+
+        if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
+            $errorList[] = sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf);
+        }
+
+        return $errorList;
+    }
+
     // TODO grouper les filtres required dans une classe
     // avoir deux entités, une required, une pour le reste
-    // pattern	string	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3.
     // maxItems	integer	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.2.
     // minItems	integer	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3.
     // uniqueItems	boolean	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4.
-    // enum	[*]	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.5.1.
-    // multipleOf
 }
