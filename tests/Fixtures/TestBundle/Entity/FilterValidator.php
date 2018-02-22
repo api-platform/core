@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\BoundsFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\EnumFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\LengthFilter;
@@ -31,6 +32,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ApiResource(attributes={
  *     "filters"={
+ *         ArrayItemsFilter::class,
  *         BoundsFilter::class,
  *         EnumFilter::class,
  *         LengthFilter::class,

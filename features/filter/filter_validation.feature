@@ -109,7 +109,6 @@ Feature: Validate filters based upon filter description
     Then the response status code should be 400
     And the JSON node "detail" should be equal to 'Query parameter "enum" must be one of "in-enum, mune-ni"'
 
-  @dropSchema
   Scenario: Test filter multipleOf
     When I am on "/filter_validators?required=foo&required-allow-empty&multiple-of=4"
     Then the response status code should be 200
@@ -117,3 +116,52 @@ Feature: Validate filters based upon filter description
     When I am on "/filter_validators?required=foo&required-allow-empty&multiple-of=3"
     Then the response status code should be 400
     And the JSON node "detail" should be equal to 'Query parameter "multiple-of" must multiple of 2'
+
+  Scenario: Test filter array items csv format minItems
+    When I am on "/filter_validators?required=foo&required-allow-empty&csv-min-2=a,b"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&csv-min-2=a"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "csv-min-2" must contain more than 2 values'
+
+  Scenario: Test filter array items csv format maxItems
+    When I am on "/filter_validators?required=foo&required-allow-empty&csv-max-3=a,b,c"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&csv-max-3=a,b,c,d"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "csv-max-3" must contain less than 3 values'
+
+  Scenario: Test filter array items tsv format minItems
+    When I am on "/filter_validators?required=foo&required-allow-empty&tsv-min-2=a\tb"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&tsv-min-2=a,b"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "tsv-min-2" must contain more than 2 values'
+
+  Scenario: Test filter array items pipes format minItems
+    When I am on "/filter_validators?required=foo&required-allow-empty&pipes-min-2=a|b"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&pipes-min-2=a,b"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "pipes-min-2" must contain more than 2 values'
+
+  Scenario: Test filter array items ssv format minItems
+    When I am on "/filter_validators?required=foo&required-allow-empty&ssv-min-2=a b"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&ssv-min-2=a,b"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "ssv-min-2" must contain more than 2 values'
+
+  @dropSchema
+  Scenario: Test filter array items unique items
+    When I am on "/filter_validators?required=foo&required-allow-empty&csv-uniques=a,b"
+    Then the response status code should be 200
+
+    When I am on "/filter_validators?required=foo&required-allow-empty&csv-uniques=a,a"
+    Then the response status code should be 400
+    And the JSON node "detail" should be equal to 'Query parameter "csv-uniques" must contain unique values'

@@ -39,12 +39,13 @@ final class QueryParameterValidateListener
         $this->setFilterLocator($filterLocator);
 
         $this->validators = [
-            new Validator\Required(),
+            new Validator\ArrayItems(),
             new Validator\Bounds(),
-            new Validator\Length(),
-            new Validator\Pattern(),
             new Validator\Enum(),
+            new Validator\Length(),
             new Validator\MultipleOf(),
+            new Validator\Pattern(),
+            new Validator\Required(),
         ];
     }
 
@@ -80,10 +81,4 @@ final class QueryParameterValidateListener
             throw new FilterValidationException($errorList);
         }
     }
-
-    // TODO grouper les filtres required dans une classe
-    // avoir deux entités, une required, une pour le reste
-    // maxItems	integer	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.2.
-    // minItems	integer	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.3.
-    // uniqueItems	boolean	See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.3.4.
 }
