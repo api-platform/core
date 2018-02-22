@@ -17,6 +17,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -57,6 +62,31 @@ class DateFilterTest extends AbstractFilterTest
         $filter->apply($queryBuilder, new QueryNameGenerator(), DummyDate::class, null, $request ? [] : ['filters' => $filters]);
 
         $this->assertEquals(new \DateTime('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
+        $this->assertInstanceOf(\DateTime::class, $queryBuilder->getParameters()[0]->getValue());
+    }
+
+    public function testApplyDateImmutable()
+    {
+        $request = Request::create('/api/dummy_immutable_dates', 'GET', [
+            'dummyDate' => [
+                'after' => '2015-04-05',
+            ],
+        ]);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $queryBuilder = $this->repository->createQueryBuilder('o');
+
+        $filter = new DateFilter(
+            $this->managerRegistry,
+            $requestStack,
+            null,
+            ['dummyDate' => null]
+        );
+
+        $filter->apply($queryBuilder, new QueryNameGenerator(), DummyImmutableDate::class);
+        $this->assertEquals(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
     }
 
     public function testGetDescription()
