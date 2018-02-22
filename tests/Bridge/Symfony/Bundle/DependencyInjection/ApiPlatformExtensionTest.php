@@ -723,6 +723,9 @@ class ApiPlatformExtensionTest extends TestCase
             $containerBuilderProphecy->setAlias($alias, $service)->shouldBeCalled();
         }
 
+        $containerBuilderProphecy->hasParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.metadata_cache')->willReturn(true)->shouldBeCalled();
+
         return $containerBuilderProphecy;
     }
 }
