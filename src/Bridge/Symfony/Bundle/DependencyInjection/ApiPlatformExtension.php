@@ -246,13 +246,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function getResourcesToWatch(ContainerBuilder $container, array $resourcesPaths): array
     {
-        // Flex structure
+        $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
+
+        // Flex structure (only if nothing specified)
         $projectDir = $container->getParameter('kernel.project_dir');
-        if (is_dir($dir = "$projectDir/config/api_platform")) {
-            $resourcesPaths[] = $dir;
+        if (!$paths && is_dir($dir = "$projectDir/config/api_platform")) {
+            $paths = [$dir];
         }
 
-        $paths = array_unique(array_merge($resourcesPaths, $this->getBundlesResourcesPaths($container)));
         $resources = ['yml' => [], 'xml' => [], 'dir' => []];
 
         foreach ($paths as $path) {
