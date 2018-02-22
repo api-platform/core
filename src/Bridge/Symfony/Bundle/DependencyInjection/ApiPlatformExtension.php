@@ -468,7 +468,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerCacheConfiguration(ContainerBuilder $container)
     {
         // Don't use system cache pool in dev
-        if (!$container->getParameter('kernel.debug')) {
+        if ($container->hasParameter('api_platform.metadata_cache') ? $container->getParameter('api_platform.metadata_cache') : !$container->getParameter('kernel.debug')) {
             return;
         }
 
