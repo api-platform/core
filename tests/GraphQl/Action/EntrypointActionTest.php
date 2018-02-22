@@ -28,13 +28,23 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class EntrypointActionTest extends TestCase
 {
+    /**
+     * Hack to avoid transient failing test because of Date header.
+     */
+    private function assertEqualsWithoutDateHeader(JsonResponse $expected, JsonResponse $actual)
+    {
+        $expected->headers->remove('Date');
+        $actual->headers->remove('Date');
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testGetAction()
     {
         $request = new Request(['query' => 'graphqlQuery', 'variables' => '["graphqlVariable"]', 'operation' => 'graphqlOperationName']);
         $request->setRequestFormat('json');
         $mockedEntrypoint = $this->getEntrypointAction($request);
 
-        $this->assertEquals(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
+        $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
     public function testPostRawAction()
@@ -44,7 +54,7 @@ class EntrypointActionTest extends TestCase
         $request->headers->set('Content-Type', 'application/graphql');
         $mockedEntrypoint = $this->getEntrypointAction($request);
 
-        $this->assertEquals(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
+        $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
     public function testPostJsonAction()
@@ -54,7 +64,7 @@ class EntrypointActionTest extends TestCase
         $request->headers->set('Content-Type', 'application/json');
         $mockedEntrypoint = $this->getEntrypointAction($request);
 
-        $this->assertEquals(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
+        $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
     public function testBadContentTypePostAction()
