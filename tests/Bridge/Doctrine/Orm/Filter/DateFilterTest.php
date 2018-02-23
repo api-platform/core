@@ -18,10 +18,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -38,12 +34,25 @@ class DateFilterTest extends AbstractFilterTest
         $this->doTestApplyDate(false);
     }
 
+    public function testApplyDateImmutable()
+    {
+        $this->doTestApplyDateImmutable(false);
+    }
+
     /**
      * @group legacy
      */
     public function testRequestApplyDate()
     {
         $this->doTestApplyDate(true);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRequestApplyDateImmutable()
+    {
+        $this->doTestApplyDateImmutable(true);
     }
 
     private function doTestApplyDate(bool $request)
@@ -65,26 +74,21 @@ class DateFilterTest extends AbstractFilterTest
         $this->assertInstanceOf(\DateTime::class, $queryBuilder->getParameters()[0]->getValue());
     }
 
-    public function testApplyDateImmutable()
+    private function doTestApplyDateImmutable(bool $request)
     {
-        $request = Request::create('/api/dummy_immutable_dates', 'GET', [
-            'dummyDate' => [
-                'after' => '2015-04-05',
-            ],
-        ]);
-        $requestStack = new RequestStack();
-        $requestStack->push($request);
+        $filters = ['dummyDate' => ['after' => '2015-04-05']];
+
+        $requestStack = null;
+        if ($request) {
+            $requestStack = new RequestStack();
+            $requestStack->push(Request::create('/api/dummy_immutable_dates', 'GET', $filters));
+        }
 
         $queryBuilder = $this->repository->createQueryBuilder('o');
 
-        $filter = new DateFilter(
-            $this->managerRegistry,
-            $requestStack,
-            null,
-            ['dummyDate' => null]
-        );
+        $filter = new DateFilter($this->managerRegistry, $requestStack, null, ['dummyDate' => null]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), DummyImmutableDate::class, null, $request ? [] : ['filters' => $filters]);
 
-        $filter->apply($queryBuilder, new QueryNameGenerator(), DummyImmutableDate::class);
         $this->assertEquals(new \DateTimeImmutable('2015-04-05'), $queryBuilder->getParameters()[0]->getValue());
         $this->assertInstanceOf(\DateTimeImmutable::class, $queryBuilder->getParameters()[0]->getValue());
     }
