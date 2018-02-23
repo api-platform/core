@@ -44,7 +44,6 @@ Feature: Configurable resource CRUD
     }
     """
 
-  @dropSchema
   Scenario: Retrieve the ConfigDummy resource
     When I send a "GET" request to "/fileconfigdummies/1"
     Then the response status code should be 200

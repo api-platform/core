@@ -17,7 +17,6 @@ Feature: Custom operation
     }
     """
 
-  @dropSchema
   Scenario: Custom normalization operation
     When I send a "GET" request to "/custom/1/normalization"
     Then the JSON should be equal to:

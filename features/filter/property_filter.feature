@@ -11,7 +11,6 @@ Feature: Set properties to include
     And the JSON node "alias" should be equal to "Alias #0"
     And the JSON node "relatedDummies" should not exist
 
-  @dropSchema
   Scenario: Test relation embedding
     When I send a "GET" request to "/dummies/1?properties[]=name&properties[]=alias&properties[relatedDummy][]=name"
     And the JSON node "name" should be equal to "Dummy #1"

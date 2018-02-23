@@ -61,7 +61,6 @@ Feature: Default order
     }
     """
 
-  @dropSchema
   Scenario: Override custom order by association
     Given there are 5 fooDummy objects with fake names
     When I send a "GET" request to "/foo_dummies?itemsPerPage=10"

@@ -4,7 +4,6 @@ Feature: Multiple filters on collections
   I need to retrieve collections filtered by multiple parameters
 
   @createSchema
-  @dropSchema
   Scenario: Get collection filtered by multiple parameters
     Given there are 30 dummy objects with dummyDate and dummyBoolean true
     And there are 20 dummy objects with dummyDate and dummyBoolean false

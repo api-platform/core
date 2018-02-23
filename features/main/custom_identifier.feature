@@ -97,7 +97,6 @@ Feature: Using custom identifier on resource
     And "name" property is readable for Hydra class "CustomIdentifierDummy"
     And "name" property is writable for Hydra class "CustomIdentifierDummy"
 
-  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/custom_identifier_dummies/1"
     Then the response status code should be 204

@@ -514,7 +514,6 @@ Feature: Relations support
     }
     """
 
-  @dropSchema
   Scenario: Issue #1547 Passing wrong argument to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:

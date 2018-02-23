@@ -599,7 +599,6 @@ Feature: Order filter on collections
     }
     """
 
-  @dropSchema
   Scenario: Get collection ordered by a non valid properties and on which order filter has been enabled in whitelist mode
     When I send a "GET" request to "/dummies?order[alias]=asc"
     Then the response status code should be 200

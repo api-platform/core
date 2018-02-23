@@ -4,7 +4,6 @@ Feature: Collections filtering
   I need to be able to set filters
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the boolean filter
     Given there is 1 dummy object with dummyBoolean true
     And there is 1 dummy object with dummyBoolean false
@@ -25,7 +24,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.dummyBoolean" should be false
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the date filter
     Given there are 3 dummy objects with dummyDate
     When I send the following GraphQL request:
@@ -45,7 +43,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.dummyDate" should be equal to "2015-04-02T00:00:00+00:00"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the search filter
     Given there are 10 dummy objects
     When I send the following GraphQL request:
@@ -65,7 +62,6 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.id" should be equal to "/dummies/2"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection filtered using the search filter
     Given there are 3 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:

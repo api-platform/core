@@ -121,7 +121,6 @@ Feature: Handle properly invalid data submitted to the API
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "hydra:description" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
 
-  @dropSchema
   Scenario: According to the JSON spec, allow numbers without explicit floating point for JSON formats
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
