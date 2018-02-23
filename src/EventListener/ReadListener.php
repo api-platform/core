@@ -70,8 +70,8 @@ final class ReadListener
         $context = null === $filters ? [] : ['filters' => $filters];
         if ($this->serializerContextBuilder) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
-            $context['normalization_context'] = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-            $request->attributes->set('_api_normalization_context', $context['normalization_context']);
+            $context += $normalizationContext = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+            $request->attributes->set('_api_normalization_context', $normalizationContext);
         }
 
         $data = [];
