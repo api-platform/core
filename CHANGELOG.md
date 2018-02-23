@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.1
+
+* Autoregister classes implementing `SubresourceDataProviderInterface` 
+* Fix the `DateTimeImmutable` support in the date filter
+* Fix a BC break in `DocumentationAction` impacting NelmioApiDoc
+* Fix the context passed to data providers (improve the eager loading)
+* Fix fix a subresource's metadata cache bug
+* Fix the configuration detection when using a custom directory structure
+
 ## 2.2.0
 
 * Add GraphQL support (including mutations, pagination, filters, access control rules and automatic SQL joins)
