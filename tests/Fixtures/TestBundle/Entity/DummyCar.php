@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  * @ApiFilter(BooleanFilter::class)
  * @ApiFilter(PropertyFilter::class, arguments={"parameterName": "foobar"})
  * @ApiFilter(GroupFilter::class, arguments={"parameterName": "foobargroups"})
+ * @ApiFilter(GroupFilter::class, arguments={"parameterName": "foobargroups_override"}, id="override")
  */
 class DummyCar
 {

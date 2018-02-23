@@ -29,6 +29,11 @@ final class ApiFilter
     /**
      * @var string
      */
+    public $id;
+
+    /**
+     * @var string
+     */
     public $strategy;
 
     /**
