@@ -51,6 +51,6 @@ class ApiResourceTest extends TestCase
         $this->assertSame('http://example.com/res', $resource->iri);
         $this->assertSame(['bar' => ['foo']], $resource->collectionOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
-        $this->assertSame(['foo' => 'bar'], $resource->attributes);
+        $this->assertSame(['foo' => 'bar', 'routePrefix' => '/whatever'], $resource->attributes);
     }
 }
