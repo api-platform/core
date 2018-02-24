@@ -53,6 +53,7 @@ final class DataPersister implements DataPersisterInterface
 
         $manager->persist($data);
         $manager->flush();
+        $manager->refresh($data);
     }
 
     /**

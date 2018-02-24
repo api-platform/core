@@ -78,4 +78,29 @@ class DummyTableInheritanceRelated
 
         return $this;
     }
+
+    /**
+     * @param $child
+     *
+     * @return $this
+     */
+    public function addChild($child)
+    {
+        $this->children->add($child);
+        $child->setParent($this);
+
+        return $this;
+    }
+
+    /**
+     * @param $child
+     *
+     * @return $this
+     */
+    public function removeChild($child)
+    {
+        $this->children->remove($child);
+
+        return $this;
+    }
 }

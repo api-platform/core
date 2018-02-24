@@ -90,7 +90,7 @@ Coverage will be available in `coverage/index.html`.
 The command to launch Behat tests is:
 
 ```
-./vendor/bin/behat --stop-on-failure -vvv
+./vendor/bin/behat --suite=default --stop-on-failure -vvv
 ```
 
 You may need to clear the cache manually before running behat tests because of the temporary sql database. To do so, just remove the `test` cache directory:
