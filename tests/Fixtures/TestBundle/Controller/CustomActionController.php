@@ -62,4 +62,43 @@ class CustomActionController extends Controller
 
         return $object;
     }
+
+    /**
+     * @Route(
+     *     name="short_custom_normalization",
+     *     path="/short_custom/{id}/normalization",
+     *     defaults={"_api_resource_class"=CustomActionDummy::class, "_api_item_operation_name"="custom_normalization"}
+     * )
+     * @Method("GET")
+     */
+    public function shortCustomNormalizationAction(CustomActionDummy $data)
+    {
+        $data->setFoo('short');
+
+        return $this->json($data);
+    }
+
+    /**
+     * @Route(
+     *     name="short_custom_denormalization",
+     *     path="/short_custom/denormalization",
+     *     defaults={
+     *         "_api_resource_class"=CustomActionDummy::class,
+     *         "_api_collection_operation_name"="custom_denormalization",
+     *         "_api_receive"=false
+     *     }
+     * )
+     * @Method("POST")
+     */
+    public function shortCustomDenormalizationAction(Request $request)
+    {
+        if ($request->attributes->has('data')) {
+            throw new \RuntimeException('The "data" attribute must not be set.');
+        }
+
+        $object = new CustomActionDummy();
+        $object->setFoo('short declaration');
+
+        return $object;
+    }
 }
