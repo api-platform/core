@@ -87,7 +87,7 @@ trait AnnotationFilterExtractorTrait
 
         foreach ($this->getFilterAnnotations($reader->getClassAnnotations($reflectionClass)) as $filterAnnotation) {
             $filterClass = $filterAnnotation->filterClass;
-            $id = $this->generateFilterId($reflectionClass, $filterClass);
+            $id = $this->generateFilterId($reflectionClass, $filterClass, $filterAnnotation->id);
 
             if (!isset($filters[$id])) {
                 $filters[$id] = [$filterAnnotation->arguments, $filterClass];
@@ -101,7 +101,7 @@ trait AnnotationFilterExtractorTrait
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
             foreach ($this->getFilterAnnotations($reader->getPropertyAnnotations($reflectionProperty)) as $filterAnnotation) {
                 $filterClass = $filterAnnotation->filterClass;
-                $id = $this->generateFilterId($reflectionClass, $filterClass);
+                $id = $this->generateFilterId($reflectionClass, $filterClass, $filterAnnotation->id);
 
                 if (!isset($filters[$id])) {
                     $filters[$id] = [$filterAnnotation->arguments, $filterClass];
@@ -131,11 +131,14 @@ trait AnnotationFilterExtractorTrait
      *
      * @param \ReflectionClass $reflectionClass the reflection class of a Resource
      * @param string           $filterClass     the filter class
+     * @param string           $filterId        the filter id
      *
      * @return string
      */
-    private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass): string
+    private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, string $filterId = null): string
     {
-        return 'annotated_'.Inflector::tableize(str_replace('\\', '', $reflectionClass->getName().(new \ReflectionClass($filterClass))->getName()));
+        $suffix = null !== $filterId ? '_'.$filterId : $filterId;
+
+        return 'annotated_'.Inflector::tableize(str_replace('\\', '', $reflectionClass->getName().(new \ReflectionClass($filterClass))->getName().$suffix));
     }
 }

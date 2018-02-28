@@ -62,6 +62,10 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
             ['parameterName' => 'foobargroups'],
             GroupFilter::class,
           ],
+          'annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter_override' => [
+            ['parameterName' => 'foobargroups_override'],
+            GroupFilter::class,
+          ],
         ]);
     }
 
