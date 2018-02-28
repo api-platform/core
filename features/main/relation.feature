@@ -72,9 +72,7 @@ Feature: Relations support
       },
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
-      "embeddedDummy": null,
-      "id": 1,
-      "symfony": "symfony",
+      "embeddedDummy": [],
       "age": null
     }
     """
@@ -476,8 +474,7 @@ Feature: Relations support
       },
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
-      "embeddedDummy": null,
-      "symfony": "symfony",
+      "embeddedDummy": [],
       "age": null
     }
     """
