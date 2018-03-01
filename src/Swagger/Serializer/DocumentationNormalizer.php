@@ -451,6 +451,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         } else {
             $definitionKey = $this->getDefinitionKey($resourceMetadata->getShortName(), (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []));
         }
+        $definitionKey = str_replace('/', '-', $definitionKey);
 
         if (!isset($definitions[$definitionKey])) {
             $definitions[$definitionKey] = [];  // Initialize first to prevent infinite loop
