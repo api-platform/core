@@ -129,7 +129,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerApiKeysConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
-        $this->registerJsonLdConfiguration($formats, $loader);
+        $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphqlConfiguration($container, $config, $loader);
@@ -366,10 +366,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     /**
      * Registers the JSON-LD and Hydra configuration.
      *
-     * @param array         $formats
-     * @param XmlFileLoader $loader
+     * @param ContainerBuilder $container
+     * @param array            $formats
+     * @param XmlFileLoader    $loader
+     * @param bool             $docEnabled
      */
-    private function registerJsonLdConfiguration(array $formats, XmlFileLoader $loader)
+    private function registerJsonLdConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled)
     {
         if (!isset($formats['jsonld'])) {
             return;
@@ -377,6 +379,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
+
+        if (!$docEnabled) {
+            $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
+        }
     }
 
     /**
