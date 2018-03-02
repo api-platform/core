@@ -30,6 +30,7 @@ abstract class AbstractContextAwareFilter extends AbstractFilter implements Cont
         }
 
         foreach ($context['filters'] as $property => $value) {
+            $property = str_replace('_', '.', $property);
             $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
