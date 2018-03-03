@@ -121,6 +121,8 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
 
             if ($supported && !isset($operation['method']) && !isset($operation['route_name'])) {
                 $operation['method'] = $upperOperationName;
+            } elseif (!$supported && !isset($operation['method']) && !isset($operation['route_name'])) {
+                $operation['route_name'] = $operationName;
             }
 
             $newOperations[$operationName] = $operation;
