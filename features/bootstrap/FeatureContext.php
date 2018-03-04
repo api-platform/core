@@ -264,7 +264,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
-     * @Given there are :nb dummy objects with JSON data
+     * @Given there are :nb dummy objects with JSON and array data
      */
     public function thereAreDummyObjectsWithJsonData(int $nb)
     {
@@ -273,6 +273,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setName('Dummy #'.$i);
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setJsonData(['foo' => ['bar', 'baz'], 'bar' => 5]);
+            $dummy->setArrayData(['foo', 'bar', 'baz']);
 
             $this->manager->persist($dummy);
         }

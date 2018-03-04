@@ -158,6 +158,7 @@ Feature: Relations support
         "/related_dummies/1"
       ],
       "jsonData": [],
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "Dummy with relations",

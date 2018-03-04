@@ -36,7 +36,7 @@ Feature: GraphQL query support
     And the JSON node "data.node.name" should be equal to "Dummy #1"
 
   Scenario: Retrieve an item with an iterable field
-    Given there are 2 dummy objects with JSON data
+    Given there are 2 dummy objects with JSON and array data
     When I send the following GraphQL request:
     """
     {
@@ -44,6 +44,7 @@ Feature: GraphQL query support
         id
         name
         jsonData
+        arrayData
       }
     }
     """
@@ -54,6 +55,7 @@ Feature: GraphQL query support
     And the JSON node "data.dummy.name" should be equal to "Dummy #1"
     And the JSON node "data.dummy.jsonData.foo" should have 2 elements
     And the JSON node "data.dummy.jsonData.bar" should be equal to 5
+    And the JSON node "data.dummy.arrayData[2]" should be equal to baz
 
   Scenario: Retrieve an item through a GraphQL query with variables
     When I have the following GraphQL request:

@@ -76,6 +76,11 @@ class ExistsFilterTest extends AbstractFilterTest
                 'type' => 'bool',
                 'required' => false,
             ],
+            'arrayData[exists]' => [
+                'property' => 'arrayData',
+                'type' => 'bool',
+                'required' => false,
+            ],
             'nameConverted[exists]' => [
                 'property' => 'nameConverted',
                 'type' => 'bool',
