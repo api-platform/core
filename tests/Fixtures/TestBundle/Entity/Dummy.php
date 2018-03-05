@@ -139,6 +139,13 @@ class Dummy
     public $jsonData;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="simple_array", nullable=true)
+     */
+    public $arrayData;
+
+    /**
      * @var string
      *
      * @ORM\Column(nullable=true)
@@ -153,6 +160,7 @@ class Dummy
     {
         $this->relatedDummies = new ArrayCollection();
         $this->jsonData = [];
+        $this->arrayData = [];
     }
 
     public function getId()
@@ -239,6 +247,16 @@ class Dummy
     public function getJsonData()
     {
         return $this->jsonData;
+    }
+
+    public function setArrayData($arrayData)
+    {
+        $this->arrayData = $arrayData;
+    }
+
+    public function getArrayData()
+    {
+        return $this->arrayData;
     }
 
     public function getRelatedDummy()

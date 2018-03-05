@@ -494,6 +494,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
     private function isCollection(Type $type): bool
     {
-        return $type->isCollection() && null !== $type->getCollectionValueType();
+        return $type->isCollection() && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType();
     }
 }

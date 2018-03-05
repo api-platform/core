@@ -83,11 +83,12 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      createDummy(input: {_id: 2, name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, clientMutationId: "myId"}) {
+      createDummy(input: {_id: 2, name: "A dummy", foo: [], jsonData: {bar:{baz:3,qux:[7.6,false,null]}}, arrayData: ["bar", "baz"], clientMutationId: "myId"}) {
         id
         name
         foo
         jsonData
+        arrayData
         clientMutationId
       }
     }
@@ -102,6 +103,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.jsonData.bar.qux[0]" should be equal to the number 7.6
     And the JSON node "data.createDummy.jsonData.bar.qux[1]" should be false
     And the JSON node "data.createDummy.jsonData.bar.qux[2]" should be null
+    And the JSON node "data.createDummy.arrayData[1]" should be equal to baz
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
   @dropSchema

@@ -93,6 +93,11 @@ class OrderFilterTest extends AbstractFilterTest
                 'type' => 'string',
                 'required' => false,
             ],
+            'order[arrayData]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
             'order[nameConverted]' => [
                 'property' => 'nameConverted',
                 'type' => 'string',

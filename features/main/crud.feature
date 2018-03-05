@@ -42,6 +42,7 @@ Feature: Create-Retrieve-Update-Delete
           "value2"
         ]
       },
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "My Dummy",
@@ -75,6 +76,7 @@ Feature: Create-Retrieve-Update-Delete
           "value2"
         ]
       },
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "My Dummy",
@@ -116,6 +118,7 @@ Feature: Create-Retrieve-Update-Delete
               "value2"
             ]
           },
+          "arrayData": [],
           "name_converted": null,
           "id": 1,
           "name": "My Dummy",
@@ -433,6 +436,7 @@ Feature: Create-Retrieve-Update-Delete
           "key": "value2"
         }
       ],
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "A nice dummy",
@@ -469,6 +473,7 @@ Feature: Create-Retrieve-Update-Delete
           "key": "value2"
         }
       ],
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "A nice dummy",
