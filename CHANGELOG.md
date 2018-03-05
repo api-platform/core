@@ -1,6 +1,13 @@
 # Changelog
 
-## 2.2.1
+## 2.2.3
+
+* Fix object state inconsistency after persistence
+* Allow to use multiple `@ApiFilter` annotations on the same class
+* Fix a BC break when the serialization context builder depends of the retrieved data
+* Fix a bug regarding collections handling in the GraphQL endpoint
+
+## 2.2.2
 
 * Autoregister classes implementing `SubresourceDataProviderInterface` 
 * Fix the `DateTimeImmutable` support in the date filter
@@ -8,6 +15,10 @@
 * Fix the context passed to data providers (improve the eager loading)
 * Fix fix a subresource's metadata cache bug
 * Fix the configuration detection when using a custom directory structure
+
+## 2.2.1
+
+* Merge bug fixes from older branches
 
 ## 2.2.0
 
