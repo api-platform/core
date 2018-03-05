@@ -126,7 +126,11 @@ class ConfigurationTest extends TestCase
                 'paths' => [],
             ],
             'http_cache' => [
-                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
+                'invalidation' => [
+                    'enabled' => false,
+                    'varnish_urls' => [],
+                    'request_options' => [],
+                ],
                 'etag' => true,
                 'max_age' => null,
                 'shared_max_age' => null,

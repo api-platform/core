@@ -505,7 +505,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
             $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
-            $definition->addArgument(['base_uri' => $url]);
+            $definition->addArgument(['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']);
 
             $definitions[] = $definition;
         }
