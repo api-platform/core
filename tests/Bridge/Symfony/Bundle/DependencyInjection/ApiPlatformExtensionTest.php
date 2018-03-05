@@ -73,6 +73,22 @@ class ApiPlatformExtensionTest extends TestCase
         'http_cache' => ['invalidation' => [
             'enabled' => true,
             'varnish_urls' => ['test'],
+            'request_options' => [
+                'allow_redirects' => [
+                    'max' => 5,
+                    'protocols' => ['http', 'https'],
+                    'stric' => false,
+                    'referer' => false,
+                    'track_redirects' => false,
+                ],
+                'http_errors' => true,
+                'decode_content' => false,
+                'verify' => false,
+                'cookies' => true,
+                'headers' => [
+                    'User-Agent' => 'none',
+                ],
+            ],
         ]],
     ]];
 
@@ -340,6 +356,17 @@ class ApiPlatformExtensionTest extends TestCase
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['http_cache']['invalidation']['varnish_urls'] = [];
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
+    public function testRegisterHttpCacheWhenEnabledWithNoRequestOption()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        unset($config['api_platform']['http_cache']['invalidation']['request_options']);
 
         $this->extension->load($config, $containerBuilder);
     }
