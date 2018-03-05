@@ -305,7 +305,6 @@ Feature: Order filter on collections
     Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?order[name]=desc&order[id]=desc"
     Then the response status code should be 200
-    Then print last JSON response
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
     """

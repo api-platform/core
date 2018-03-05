@@ -50,6 +50,7 @@ class DataPersisterTest extends TestCase
         $objectManagerProphecy = $this->prophesize(ObjectManager::class);
         $objectManagerProphecy->persist($dummy)->shouldBeCalled();
         $objectManagerProphecy->flush()->shouldBeCalled();
+        $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();

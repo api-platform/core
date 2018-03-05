@@ -90,7 +90,7 @@ Coverage will be available in `coverage/index.html`.
 The command to launch Behat tests is:
 
 ```
-./vendor/bin/behat --stop-on-failure -vvv
+./vendor/bin/behat --suite=default --stop-on-failure -vvv
 ```
 
 ## Squash your commits

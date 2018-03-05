@@ -39,6 +39,7 @@ Feature: JSON-LD contexts generation
                 "@type": "@id"
             },
             "jsonData": "Dummy/jsonData",
+            "arrayData": "Dummy/arrayData",
             "nameConverted": "Dummy/nameConverted",
             "id": "Dummy/id",
             "name": "http://schema.org/name",

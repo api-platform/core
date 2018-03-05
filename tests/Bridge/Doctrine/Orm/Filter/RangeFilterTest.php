@@ -253,6 +253,31 @@ class RangeFilterTest extends AbstractFilterTest
                 'type' => 'string',
                 'required' => false,
             ],
+            'arrayData[between]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'arrayData[gt]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'arrayData[gte]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'arrayData[lt]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'arrayData[lte]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
             'nameConverted[between]' => [
                 'property' => 'nameConverted',
                 'type' => 'string',

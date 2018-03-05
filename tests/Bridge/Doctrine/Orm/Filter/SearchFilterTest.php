@@ -167,6 +167,18 @@ class SearchFilterTest extends AbstractFilterTest
                 'required' => false,
                 'strategy' => 'exact',
             ],
+            'arrayData' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'arrayData[]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
             'nameConverted' => [
                 'property' => 'nameConverted',
                 'type' => 'string',
@@ -200,6 +212,7 @@ class SearchFilterTest extends AbstractFilterTest
             'dummy' => null,
             'dummyDate' => null,
             'jsonData' => null,
+            'arrayData' => null,
             'nameConverted' => null,
             'foo' => null,
             'relatedDummies.dummyDate' => null,
@@ -275,6 +288,18 @@ class SearchFilterTest extends AbstractFilterTest
             ],
             'jsonData[]' => [
                 'property' => 'jsonData',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'arrayData' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+            ],
+            'arrayData[]' => [
+                'property' => 'arrayData',
                 'type' => 'string',
                 'required' => false,
                 'strategy' => 'exact',

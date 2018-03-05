@@ -49,24 +49,18 @@ Feature: Search filter on collections
         },
 				"hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "\/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],colors.prop,name}",
+        "hydra:template": "\/dummy_cars{?availableAt[before],availableAt[strictly_before],availableAt[after],availableAt[strictly_after],canSell,foobar[],foobargroups[],foobargroups_override[],colors.prop,name}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
             "@type": "IriTemplateMapping",
-            "variable": "availableAt[before]",
-            "property": "availableAt",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "availableAt[strictly_before]",
-            "property": "availableAt",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
             "variable": "availableAt[after]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "availableAt[before]",
             "property": "availableAt",
             "required": false
           },
@@ -78,8 +72,20 @@ Feature: Search filter on collections
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "availableAt[strictly_before]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "canSell",
             "property": "canSell",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "colors.prop",
+            "property": "colors.prop",
             "required": false
           },
           {
@@ -96,8 +102,8 @@ Feature: Search filter on collections
           },
           {
             "@type": "IriTemplateMapping",
-            "variable": "colors.prop",
-            "property": "colors.prop",
+            "variable": "foobargroups_override[]",
+            "property": null,
             "required": false
           },
           {

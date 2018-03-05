@@ -13,6 +13,19 @@ default:
         - 'Behatch\Context\RestContext'
       filters:
         tags: ~@postgres
+    postgres:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'GraphqlContext'
+        - 'JsonContext'
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+      filters:
+        tags: ~@sqlite
   extensions:
     'Behat\Symfony2Extension':
       kernel:

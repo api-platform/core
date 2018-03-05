@@ -31,6 +31,7 @@ Feature: Handle properly invalid data submitted to the API
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": [],
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "Not existing",

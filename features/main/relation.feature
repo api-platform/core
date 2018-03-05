@@ -72,9 +72,7 @@ Feature: Relations support
       },
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
-      "embeddedDummy": null,
-      "id": 1,
-      "symfony": "symfony",
+      "embeddedDummy": [],
       "age": null
     }
     """
@@ -160,6 +158,7 @@ Feature: Relations support
         "/related_dummies/1"
       ],
       "jsonData": [],
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "Dummy with relations",
@@ -476,8 +475,7 @@ Feature: Relations support
       },
       "relatedToDummyFriend": [],
       "dummyBoolean": null,
-      "embeddedDummy": null,
-      "symfony": "symfony",
+      "embeddedDummy": [],
       "age": null
     }
     """
