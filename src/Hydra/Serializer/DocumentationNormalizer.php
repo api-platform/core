@@ -507,7 +507,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'hydra:title' => $propertyName,
             'hydra:required' => $propertyMetadata->isRequired(),
             'hydra:readable' => $propertyMetadata->isReadable(),
-            'hydra:writable' => $propertyMetadata->isWritable(),
+            'hydra:writable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
         ];
 
         if (null !== $range = $this->getRange($propertyMetadata)) {
