@@ -37,8 +37,7 @@ class DocumentationActionTest extends TestCase
         $requestProphecy->attributes = $attributesProphecy->reveal();
         $requestProphecy->query = $queryProphecy->reveal();
         $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
-        $queryProphecy->has('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
-        $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
+        $queryProphecy->getBoolean('api_gateway', false)->willReturn(true)->shouldBeCalledTimes(1);
         $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
         $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true])->shouldBeCalledTimes(1);
         $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0', ['formats' => ['jsonld' => 'application/ld+json']]);

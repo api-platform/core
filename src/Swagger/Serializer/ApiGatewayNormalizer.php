@@ -16,7 +16,11 @@ namespace ApiPlatform\Core\Swagger\Serializer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Override Swagger documentation for API Gateway.
+ * Removes features unsupported by Amazon API Gateway.
+ *
+ * @see https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-known-issues.html
+ *
+ * @internal
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
