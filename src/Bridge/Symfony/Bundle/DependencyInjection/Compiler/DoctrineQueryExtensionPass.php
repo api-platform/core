@@ -57,7 +57,12 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         }
 
         foreach ($itemDataProviders as $itemDataProvider) {
-            $container->getDefinition((string) $itemDataProvider)->replaceArgument(3, $itemExtensions);
+            $definition = $container->getDefinition((string) $itemDataProvider);
+            try {
+                $definition->replaceArgument(3, $itemExtensions);
+            } catch (OutOfBoundsException $exception) {
+                $definition->addArgument($itemExtensions);
+            }
         }
 
         foreach ($subresourceDataProviders as $subresourceDataProvider) {
