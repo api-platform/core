@@ -39,16 +39,35 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
             return;
         }
 
-        $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
-        $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
-        $subresourceDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.subresource_data_provider');
+        $collectionDataProviders = $this->findAndSortTaggedServices('api_platform.collection_data_provider', $container);
+        $itemDataProviders = $this->findAndSortTaggedServices('api_platform.item_data_provider', $container);
+        $subresourceDataProviders = $this->findAndSortTaggedServices('api_platform.subresource_data_provider', $container);
 
         $collectionExtensions = $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.collection', $container);
         $itemExtensions = $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.item', $container);
 
-        $collectionDataProviderDefinition->replaceArgument(1, $collectionExtensions);
-        $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
-        $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);
-        $subresourceDataProviderDefinition->replaceArgument(4, $itemExtensions);
+        foreach ($collectionDataProviders as $collectionDataProvider) {
+            $definition = $container->getDefinition((string) $collectionDataProvider);
+            try {
+                $definition->replaceArgument(1, $collectionExtensions);
+            } catch (OutOfBoundsException $exception) {
+                $definition->addArgument($collectionExtensions);
+            }
+        }
+
+        foreach ($itemDataProviders as $itemDataProvider) {
+            $container->getDefinition((string) $itemDataProvider)->replaceArgument(3, $itemExtensions);
+        }
+
+        foreach ($subresourceDataProviders as $subresourceDataProvider) {
+            $definition = $container->getDefinition((string) $subresourceDataProvider);
+            try {
+                $definition->replaceArgument(3, $collectionExtensions);
+                $definition->replaceArgument(4, $itemExtensions);
+            } catch (OutOfBoundsException $exception) {
+                $definition->addArgument($collectionExtensions);
+                $definition->addArgument($itemExtensions);
+            }
+        }
     }
 }
