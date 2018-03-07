@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity
  * @ApiResource(
  *     attributes={
- *          "normalization_context"={"groups"={"default"}},
- *          "denormalization_context"={"groups"={"default"}}
+ *         "normalization_context"={"groups"={"default"}},
+ *         "denormalization_context"={"groups"={"default"}}
  *     }
  * )
  */

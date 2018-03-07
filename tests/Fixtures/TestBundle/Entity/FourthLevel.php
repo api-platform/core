@@ -39,7 +39,7 @@ class FourthLevel
     /**
      * @var int
      *
-     * @ORM\Column(type = "integer")
+     * @ORM\Column(type="integer")
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 4;
