@@ -68,7 +68,7 @@ class RespondListenerTest extends TestCase
         $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
 
         $request = new Request([], [], ['_api_respond' => true]);
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->setRequestFormat('xml');
 
         $event = new GetResponseForControllerResultEvent(
@@ -96,7 +96,7 @@ class RespondListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
-        $request->setMethod(Request::METHOD_DELETE);
+        $request->setMethod('DELETE');
 
         $event = new GetResponseForControllerResultEvent(
             $kernelProphecy->reveal(),
