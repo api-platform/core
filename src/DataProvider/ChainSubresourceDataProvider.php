@@ -37,14 +37,19 @@ final class ChainSubresourceDataProvider implements SubresourceDataProviderInter
      */
     public function getSubresource(string $resourceClass, array $identifiers, array $context, string $operationName = null)
     {
-        foreach ($this->dataProviders as $dataProviders) {
+        foreach ($this->dataProviders as $dataProvider) {
             try {
-                return $dataProviders->getSubresource($resourceClass, $identifiers, $context, $operationName);
+                if ($dataProvider instanceof RestrictedDataProviderInterface && !$dataProvider->supports($resourceClass, $operationName, $context)) {
+                    continue;
+                }
+
+                return $dataProvider->getSubresource($resourceClass, $identifiers, $context, $operationName);
             } catch (ResourceClassNotSupportedException $e) {
+                @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
                 continue;
             }
         }
 
-        return null;
+        return ($context['collection'] ?? false) ? [] : null;
     }
 }
