@@ -39,6 +39,8 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
             return;
         }
 
+        $collectionExtensionsDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_extensions');
+        $itemExtensionsDefinition = $container->getDefinition('api_platform.doctrine.orm.item_extensions');
         $collectionDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.collection_data_provider');
         $itemDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.item_data_provider');
         $subresourceDataProviderDefinition = $container->getDefinition('api_platform.doctrine.orm.subresource_data_provider');
@@ -46,6 +48,8 @@ final class DoctrineQueryExtensionPass implements CompilerPassInterface
         $collectionExtensions = $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.collection', $container);
         $itemExtensions = $this->findAndSortTaggedServices('api_platform.doctrine.orm.query_extension.item', $container);
 
+        $collectionExtensionsDefinition->replaceArgument(0, $collectionExtensions);
+        $itemExtensionsDefinition->replaceArgument(0, $itemExtensions);
         $collectionDataProviderDefinition->replaceArgument(1, $collectionExtensions);
         $itemDataProviderDefinition->replaceArgument(3, $itemExtensions);
         $subresourceDataProviderDefinition->replaceArgument(3, $collectionExtensions);

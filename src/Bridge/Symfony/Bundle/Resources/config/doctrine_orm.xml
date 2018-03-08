@@ -164,6 +164,17 @@
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="16" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
+
+        <service id="api_platform.doctrine.orm.collection_extensions" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionExtensions" public="false">
+            <argument type="collection" /> <!-- extensions -->
+        </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionExtensions" alias="api_platform.doctrine.orm.collection_extensions" />
+
+        <service id="api_platform.doctrine.orm.item_extensions" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemExtensions" public="false">
+            <argument type="collection" /> <!-- extensions -->
+        </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemExtensions" alias="api_platform.doctrine.orm.item_extensions" />
+
     </services>
 
 </container>
