@@ -169,6 +169,10 @@ services:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']

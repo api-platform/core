@@ -60,7 +60,15 @@ class QueryParameterValidateListener
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
                 $errorList = [];
 
-                if (($data['required'] ?? false) && null === $request->query->get($name)) {
+                if (!($data['required'] ?? false)) { // property is not required
+                    continue;
+                }
+
+                if (false !== strpos($name, '[')) { // array notation of filter
+                    if (!$this->isArrayNotationFilterValid($name, $request)) {
+                        $errorList[] = sprintf('Query parameter "%s" is required', $name);
+                    }
+                } elseif (null === $request->query->get($name)) {
                     $errorList[] = sprintf('Query parameter "%s" is required', $name);
                 }
 
@@ -69,5 +77,16 @@ class QueryParameterValidateListener
                 }
             }
         }
+    }
+
+    private function isArrayNotationFilterValid($name, $request): bool
+    {
+        $matches = [];
+        preg_match('/([^[]+)\[(.*)\]/', $name, $matches);
+        list(, $rootName, $keyName) = $matches;
+        $keyName = $keyName ?: 0; // array without index should test the first key
+        $queryParameter = $request->query->get($rootName);
+
+        return is_array($queryParameter) && isset($queryParameter[$keyName]);
     }
 }
