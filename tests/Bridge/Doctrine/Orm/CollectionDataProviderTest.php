@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionExtensions;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -53,7 +54,7 @@ class CollectionDataProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(QueryCollectionExtensionInterface::class);
         $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), Dummy::class, 'foo', [])->shouldBeCalled();
 
-        $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), new CollectionExtensions([$extensionProphecy->reveal()]));
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
@@ -76,7 +77,7 @@ class CollectionDataProviderTest extends TestCase
         $extensionProphecy->supportsResult(Dummy::class, 'foo', [])->willReturn(true)->shouldBeCalled();
         $extensionProphecy->getResult($queryBuilder, Dummy::class, 'foo', [])->willReturn([])->shouldBeCalled();
 
-        $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), new CollectionExtensions([$extensionProphecy->reveal()]));
         $this->assertEquals([], $dataProvider->getCollection(Dummy::class, 'foo'));
     }
 
@@ -105,7 +106,7 @@ class CollectionDataProviderTest extends TestCase
 
         $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
 
-        $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
+        $dataProvider = new CollectionDataProvider($managerRegistryProphecy->reveal(), new CollectionExtensions([$extensionProphecy->reveal()]));
         $this->assertFalse($dataProvider->supports(Dummy::class, 'foo'));
     }
 }

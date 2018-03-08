@@ -17,7 +17,7 @@ class ItemExtensions implements \IteratorAggregate
 {
     private $itemExtensions;
 
-    public function __construct(array $itemExtensions)
+    public function __construct(array $itemExtensions = [])
     {
         $this->itemExtensions = $itemExtensions;
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionExtensions;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\SubresourceDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -111,7 +112,7 @@ class SubresourceDataProviderTest extends TestCase
         $queryBuilder = $this->prophesize(QueryBuilder::class)->reveal();
         $managerRegistry = $this->getManagerRegistryProphecy($queryBuilder, $identifiers, Dummy::class);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistry, $propertyNameCollectionFactory, $propertyMetadataFactory, []);
+        $dataProvider = new SubresourceDataProvider($managerRegistry, $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
@@ -321,7 +322,7 @@ class SubresourceDataProviderTest extends TestCase
         $extensionProphecy->supportsResult(RelatedDummy::class, null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $extensionProphecy->getResult($queryBuilder, RelatedDummy::class, null, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, new CollectionExtensions([$extensionProphecy->reveal()]));
 
         $context = ['property' => 'relatedDummies', 'identifiers' => [['id', Dummy::class]], 'collection' => true];
 

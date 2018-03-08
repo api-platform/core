@@ -50,13 +50,13 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
      * @param QueryCollectionExtensionInterface[]    $collectionExtensions
      * @param QueryItemExtensionInterface[]          $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $collectionExtensions = [], array $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, CollectionExtensions $collectionExtensions = null, ItemExtensions $itemExtensions = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->collectionExtensions = $collectionExtensions;
-        $this->itemExtensions = $itemExtensions;
+        $this->collectionExtensions = $collectionExtensions ?: [];
+        $this->itemExtensions = $itemExtensions ?: [];
     }
 
     /**

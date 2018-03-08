@@ -36,10 +36,10 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
     /**
      * @param QueryCollectionExtensionInterface[]|ContextAwareQueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, CollectionExtensions $collectionExtensions = null)
     {
         $this->managerRegistry = $managerRegistry;
-        $this->collectionExtensions = $collectionExtensions;
+        $this->collectionExtensions = $collectionExtensions ?: [];
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool

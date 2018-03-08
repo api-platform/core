@@ -46,12 +46,12 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
      * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
      * @param QueryItemExtensionInterface[]          $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemExtensions $itemExtensions = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->itemExtensions = $itemExtensions;
+        $this->itemExtensions = $itemExtensions ?: [];
     }
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool

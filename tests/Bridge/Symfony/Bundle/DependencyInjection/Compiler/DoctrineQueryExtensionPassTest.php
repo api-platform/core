@@ -31,19 +31,6 @@ class DoctrineQueryExtensionPassTest extends TestCase
 
         $this->assertInstanceOf(CompilerPassInterface::class, $dataProviderPass);
 
-        $collectionDataProviderDefinitionProphecy = $this->prophesize(Definition::class);
-        $collectionDataProviderDefinitionProphecy->replaceArgument(1, Argument::type('array'))->shouldBeCalled();
-        $collectionDataProviderDefinition = $collectionDataProviderDefinitionProphecy->reveal();
-
-        $itemDataProviderDefinitionProphecy = $this->prophesize(Definition::class);
-        $itemDataProviderDefinitionProphecy->replaceArgument(3, Argument::type('array'))->shouldBeCalled();
-        $itemDataProviderDefinition = $itemDataProviderDefinitionProphecy->reveal();
-
-        $subresourceDataProviderDefinitionProphecy = $this->prophesize(Definition::class);
-        $subresourceDataProviderDefinitionProphecy->replaceArgument(3, Argument::type('array'))->shouldBeCalled();
-        $subresourceDataProviderDefinitionProphecy->replaceArgument(4, Argument::type('array'))->shouldBeCalled();
-        $subresourceDataProviderDefinition = $subresourceDataProviderDefinitionProphecy->reveal();
-
         $collectionExtensionsDefinition = $this->prophesize(Definition::class);
         $collectionExtensionsDefinition->replaceArgument(0, Argument::type('array'))->shouldBeCalled();
         $itemExtensionsDefinition = $this->prophesize(Definition::class);
@@ -54,9 +41,6 @@ class DoctrineQueryExtensionPassTest extends TestCase
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.doctrine.orm.query_extension.collection', true)->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.doctrine.orm.query_extension.item', true)->willReturn(['foo' => [], 'bar' => ['priority' => 1]])->shouldBeCalled();
 
-        $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.collection_data_provider')->willReturn($collectionDataProviderDefinition)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.item_data_provider')->willReturn($itemDataProviderDefinition)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.subresource_data_provider')->willReturn($subresourceDataProviderDefinition)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.collection_extensions')->willReturn($collectionExtensionsDefinition->reveal())->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.doctrine.orm.item_extensions')->willReturn($itemExtensionsDefinition->reveal())->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
