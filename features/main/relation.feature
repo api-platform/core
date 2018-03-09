@@ -512,7 +512,8 @@ Feature: Relations support
     }
     """
 
-  Scenario: Issue #1547 Passing wrong argument to a relation
+  @dropSchema
+  Scenario: Passing an invalid IRI to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
@@ -523,8 +524,11 @@ Feature: Relations support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain "Expected IRI or nested document"
+    And the JSON node "hydra:description" should contain "Invalid value provided (invalid IRI?)."
 
+  @wip
+  @dropSchema
+  Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
@@ -535,4 +539,4 @@ Feature: Relations support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain "Expected IRI or nested document"
+    And the JSON node "hydra:description" should contain "Invalid value provided (invalid IRI?)."

@@ -160,6 +160,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
+        if (!\is_string($attribute)) {
+            throw new InvalidArgumentException('Invalid value provided (invalid IRI?).');
+        }
+
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
         $type = $propertyMetadata->getType();
 
@@ -299,7 +303,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (
             !$this->resourceClassResolver->isResourceClass($className) ||
-            ($propertyMetadata->isWritableLink() && \is_array($value))
+            $propertyMetadata->isWritableLink()
         ) {
             $context['resource_class'] = $className;
             $context['api_allow_update'] = true;

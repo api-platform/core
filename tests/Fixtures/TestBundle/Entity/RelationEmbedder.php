@@ -24,9 +24,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @ApiResource(
  *     attributes={
- *        "normalization_context"={"groups"={"barcelona"}},
- *        "denormalization_context"={"groups"={"chicago"}},
- *        "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
+ *         "normalization_context"={"groups"={"barcelona"}},
+ *         "denormalization_context"={"groups"={"chicago"}},
+ *         "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
  *     },
  *     itemOperations={
  *         "get",
@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *         "custom_get"={"route_name"="relation_embedded.custom_get"},
  *         "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
  *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
- *    }
+ *     }
  * )
  * @ORM\Entity
  */

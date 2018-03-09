@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(attributes={
- *     "order"={"bar", "name": "DESC"}
+ *     "order"={"bar", "name"="DESC"}
  * })
  * @ORM\Entity
  */
