@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(attributes={"normalization_context"={"groups": {"circular"}}})
+ * @ApiResource(attributes={"normalization_context"={"groups"={"circular"}}})
  * @ORM\Entity
  */
 class CircularReference

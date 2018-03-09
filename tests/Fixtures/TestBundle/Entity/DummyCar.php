@@ -21,8 +21,8 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 /**
  * @ApiResource(
  *     attributes={
- *          "normalization_context"={"groups"={"colors"}},
- *          "filters"={"dummy_car_colors.search_filter"}
+ *         "normalization_context"={"groups"={"colors"}},
+ *         "filters"={"dummy_car_colors.search_filter"}
  *     }
  * )
  * @ORM\Entity

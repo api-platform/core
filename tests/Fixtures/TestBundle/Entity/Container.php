@@ -35,12 +35,12 @@ class Container
     /**
      * @ApiSubresource
      * @ORM\OneToMany(
-     *      targetEntity="Node",
-     *      mappedBy="container",
-     *      indexBy="serial",
-     *      fetch="LAZY",
-     *      cascade={},
-     *      orphanRemoval=false
+     *     targetEntity="Node",
+     *     mappedBy="container",
+     *     indexBy="serial",
+     *     fetch="LAZY",
+     *     cascade={},
+     *     orphanRemoval=false
      * )
      * @ORM\OrderBy({"serial"="ASC"})
      *
