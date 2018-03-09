@@ -526,7 +526,6 @@ Feature: Relations support
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:description" should contain "Invalid value provided (invalid IRI?)."
 
-  @wip
   @dropSchema
   Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"
