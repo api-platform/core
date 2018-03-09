@@ -208,6 +208,7 @@ final class Configuration implements ConfigurationInterface
                             ->canBeEnabled()
                             ->children()
                                 ->scalarNode('purger')->defaultValue('api_platform.http_cache.purger.varnish')->cannotBeEmpty()->info('The service id of the purger to use.')->end()
+                                ->scalarNode('tags_formatter')->defaultValue('api_platform.http_cache.tags_formatter.csv')->cannotBeEmpty()->info('The service id of the cache tags formatter to use.')->end()
                                 ->arrayNode('varnish_urls')
                                     ->defaultValue([])
                                     ->prototype('scalar')->end()

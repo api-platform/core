@@ -5,12 +5,13 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.http_cache.tags_formatter.csv" class="ApiPlatform\Core\HttpCache\CsvFormatter" public="false" />
         <service id="api_platform.http_cache.purger.varnish_client" class="GuzzleHttp\Client" abstract="true" public="false" />
         <service id="api_platform.http_cache.purger.varnish" class="ApiPlatform\Core\HttpCache\VarnishPurger" public="false" />
 
         <service id="api_platform.http_cache.listener.response.add_tags" class="ApiPlatform\Core\HttpCache\EventListener\AddTagsListener">
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.cache_tags_formatter" on-invalid="null" />
+            <argument type="service" id="api_platform.http_cache.tags_formatter" />
             <argument>%kernel.debug%</argument>
 
             <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-2" />

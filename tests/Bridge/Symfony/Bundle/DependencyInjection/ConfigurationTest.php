@@ -131,6 +131,7 @@ class ConfigurationTest extends TestCase
                     'varnish_urls' => [],
                     'request_options' => [],
                     'purger' => 'api_platform.http_cache.purger.varnish',
+                    'tags_formatter' => 'api_platform.http_cache.tags_formatter.csv',
                 ],
                 'etag' => true,
                 'max_age' => null,

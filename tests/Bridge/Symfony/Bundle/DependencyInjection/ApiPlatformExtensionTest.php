@@ -710,6 +710,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.action.ui',
             'api_platform.swagger.command.swagger_command',
             'api_platform.http_cache.listener.response.configure',
+            'api_platform.http_cache.tags_formatter.csv',
             'api_platform.http_cache.purger.varnish',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.listener.response.add_tags',
@@ -722,6 +723,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             'api_platform.http_cache.purger' => $purger,
+            'api_platform.http_cache.tags_formatter' => 'api_platform.http_cache.tags_formatter.csv',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
