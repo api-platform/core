@@ -191,12 +191,12 @@ class AddTagsListenerTest extends TestCase
         $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
     }
 
-    public function testPurgerCacheTagsFormatting()
+    public function testCacheTagsFormatting()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
-        $purger = $this->prophesize(CacheTagsFormattingInterface::class);
-        $purger->formatTags(['/dummies' => '/dummies'])->willReturn('foo,bar')->shouldBeCalled();
+        $formatter = $this->prophesize(CacheTagsFormattingInterface::class);
+        $formatter->formatTags(['/dummies' => '/dummies'])->willReturn('foo,bar')->shouldBeCalled();
 
         $request = new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
 
@@ -208,7 +208,7 @@ class AddTagsListenerTest extends TestCase
         $event->getRequest()->willReturn($request)->shouldBeCalled();
         $event->getResponse()->willReturn($response)->shouldBeCalled();
 
-        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $purger->reveal());
+        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $formatter->reveal());
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('foo,bar', $response->headers->get('Cache-Tags'));

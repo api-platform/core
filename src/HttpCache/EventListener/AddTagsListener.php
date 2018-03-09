@@ -33,13 +33,13 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 final class AddTagsListener
 {
     private $iriConverter;
-    private $purger;
+    private $tagsFormatter;
     private $debug = false;
 
-    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormattingInterface $purger = null, bool $debug = false)
+    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormattingInterface $tagsFormatter = null, bool $debug = false)
     {
         $this->iriConverter = $iriConverter;
-        $this->purger = $purger;
+        $this->tagsFormatter = $tagsFormatter;
         $this->debug = $debug;
     }
 
@@ -76,8 +76,8 @@ final class AddTagsListener
             $event->getResponse()->headers->set('Cache-Tags-Debug', implode(',', $resources));
         }
 
-        if ($this->purger instanceof CacheTagsFormattingInterface) {
-            $formatted = $this->purger->formatTags($resources);
+        if ($this->tagsFormatter instanceof CacheTagsFormattingInterface) {
+            $formatted = $this->tagsFormatter->formatTags($resources);
         } else {
             $formatted = implode(',', $resources);
         }
