@@ -146,29 +146,6 @@ class AddTagsListenerTest extends TestCase
         $listener->onKernelResponse($event->reveal());
 
         $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
-        $this->assertFalse($response->headers->has('Cache-Tags-Debug'));
-    }
-
-    public function testAddCollectionIriWithDebug()
-    {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
-
-        $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
-
-        $response = new Response();
-        $response->setPublic();
-        $response->setEtag('foo');
-
-        $event = $this->prophesize(FilterResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
-
-        $listener = new AddTagsListener($iriConverterProphecy->reveal(), new CsvFormatter(), true);
-        $listener->onKernelResponse($event->reveal());
-
-        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
-        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags-Debug'));
     }
 
     public function testAddCollectionIriWhenCollectionIsEmpty()

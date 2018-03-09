@@ -35,13 +35,11 @@ final class AddTagsListener
 {
     private $iriConverter;
     private $tagsFormatter;
-    private $debug = false;
 
-    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormatterInterface $tagsFormatter = null, bool $debug = false)
+    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormatterInterface $tagsFormatter = null)
     {
         $this->iriConverter = $iriConverter;
         $this->tagsFormatter = $tagsFormatter;
-        $this->debug = $debug;
 
         // BC
         if (null === $this->tagsFormatter) {
@@ -77,10 +75,6 @@ final class AddTagsListener
 
         if (!$resources) {
             return;
-        }
-
-        if ($this->debug) {
-            $event->getResponse()->headers->set('Cache-Tags-Debug', implode(',', $resources));
         }
 
         $event->getResponse()->headers->set('Cache-Tags',
