@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\HttpCache\CacheTagsFormattingInterface;
+use ApiPlatform\Core\HttpCache\CacheTagsFormatterInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -36,7 +36,7 @@ final class AddTagsListener
     private $tagsFormatter;
     private $debug = false;
 
-    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormattingInterface $tagsFormatter = null, bool $debug = false)
+    public function __construct(IriConverterInterface $iriConverter, CacheTagsFormatterInterface $tagsFormatter = null, bool $debug = false)
     {
         $this->iriConverter = $iriConverter;
         $this->tagsFormatter = $tagsFormatter;
@@ -76,7 +76,7 @@ final class AddTagsListener
             $event->getResponse()->headers->set('Cache-Tags-Debug', implode(',', $resources));
         }
 
-        if ($this->tagsFormatter instanceof CacheTagsFormattingInterface) {
+        if ($this->tagsFormatter instanceof CacheTagsFormatterInterface) {
             $formatted = $this->tagsFormatter->formatTags($resources);
         } else {
             $formatted = implode(',', $resources);

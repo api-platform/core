@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\HttpCache\CacheTagsFormattingInterface;
+use ApiPlatform\Core\HttpCache\CacheTagsFormatterInterface;
 use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -195,7 +195,7 @@ class AddTagsListenerTest extends TestCase
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
-        $formatter = $this->prophesize(CacheTagsFormattingInterface::class);
+        $formatter = $this->prophesize(CacheTagsFormatterInterface::class);
         $formatter->formatTags(['/dummies' => '/dummies'])->willReturn('foo,bar')->shouldBeCalled();
 
         $request = new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);

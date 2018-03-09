@@ -19,7 +19,7 @@ namespace ApiPlatform\Core\HttpCache;
  *
  * @author Yanick Witschi <yanick.witschi@terminal42.ch>
  */
-interface CacheTagsFormattingInterface
+interface CacheTagsFormatterInterface
 {
     /**
      * Formats the IRIs so they are compatible with
