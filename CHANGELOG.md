@@ -3,7 +3,7 @@
 ## 2.2.4
 
 * Fix a BC break preventing to pass non-arrays to the builtin Symfony normalizers when using custom normalizers
-* Fix a bug a bug when using `FilterEagerLoadingExtension` with manual joins
+* Fix a bug when using `FilterEagerLoadingExtension` with manual joins
 * Fix some bugs in the AWS API Gateway compatibility mode for Open API/Swagger
 
 ## 2.2.3
