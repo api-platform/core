@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\HttpCache\CacheTagsFormatterInterface;
+use ApiPlatform\Core\HttpCache\CsvFormatter;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -41,6 +42,12 @@ final class AddTagsListener
         $this->iriConverter = $iriConverter;
         $this->tagsFormatter = $tagsFormatter;
         $this->debug = $debug;
+
+        // BC
+        if (null === $this->tagsFormatter) {
+            @trigger_error('Passing no implementation of the CacheTagsFormatterInterface is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+            $this->tagsFormatter = new CsvFormatter();
+        }
     }
 
     /**
@@ -76,12 +83,8 @@ final class AddTagsListener
             $event->getResponse()->headers->set('Cache-Tags-Debug', implode(',', $resources));
         }
 
-        if ($this->tagsFormatter instanceof CacheTagsFormatterInterface) {
-            $formatted = $this->tagsFormatter->formatTags($resources);
-        } else {
-            $formatted = implode(',', $resources);
-        }
-
-        $event->getResponse()->headers->set('Cache-Tags', $formatted);
+        $event->getResponse()->headers->set('Cache-Tags',
+            $this->tagsFormatter->formatTags($resources)
+        );
     }
 }
