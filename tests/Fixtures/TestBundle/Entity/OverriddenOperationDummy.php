@@ -30,15 +30,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "denormalization_context"={"groups"={"overridden_operation_dummy_write"}}
  *     },
  *     collectionOperations={
- *       "get"={"method"="GET"},
- *       "post"={"method"="POST"},
- *       "swagger"= {
- *          "path"="/override/swagger",
- *          "method"="GET",
- *       }
+ *         "get"={"method"="GET"},
+ *         "post"={"method"="POST"},
+ *         "swagger"={
+ *             "path"="/override/swagger",
+ *             "method"="GET",
+ *         }
  *     },
  *     itemOperations={
- *         "swagger"= {
+ *         "swagger"={
  *             "method"="GET",
  *         },
  *         "get"={
@@ -50,8 +50,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *             "method"="PUT",
  *             "normalization_context"={"groups"={"overridden_operation_dummy_put"}},
  *             "denormalization_context"={"groups"={"overridden_operation_dummy_put"}}
- *          },
- *          "delete"={"method"="DELETE"}
+ *         },
+ *         "delete"={"method"="DELETE"}
  *     }
  * )
  * @ORM\Entity
@@ -90,7 +90,7 @@ class OverriddenOperationDummy
      * @var string A short description of the item
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"overridden_operation_dummy_read" ,"overridden_operation_dummy_write", "overridden_operation_dummy_get", "overridden_operation_dummy_put"})
+     * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_write", "overridden_operation_dummy_get", "overridden_operation_dummy_put"})
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;

@@ -27,15 +27,15 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 /**
  * @ApiResource(
  *     attributes={
- *          "normalization_context"={"groups"={"colors"}}
+ *         "normalization_context"={"groups"={"colors"}}
  *     }
  * )
  * @ORM\Entity
  * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
  * @ApiFilter(BooleanFilter::class)
- * @ApiFilter(PropertyFilter::class, arguments={"parameterName": "foobar"})
- * @ApiFilter(GroupFilter::class, arguments={"parameterName": "foobargroups"})
- * @ApiFilter(GroupFilter::class, arguments={"parameterName": "foobargroups_override"}, id="override")
+ * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
+ * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups"})
+ * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
  */
 class DummyCar
 {
@@ -54,7 +54,7 @@ class DummyCar
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
      *
      * @Serializer\Groups({"colors"})
-     * @ApiFilter(SearchFilter::class, properties={"colors.prop": "ipartial"})
+     * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial"})
      */
     private $colors;
 

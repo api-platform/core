@@ -17,6 +17,14 @@ $finder = PhpCsFixer\Finder::create()
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
+        '@DoctrineAnnotation' => true,
+        'doctrine_annotation_array_assignment' => [
+            'operator' => '=',
+        ],
+        'doctrine_annotation_spaces' => [
+            'after_array_assignments_equals' => false,
+            'before_array_assignments_equals' => false,
+        ],
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'array_syntax' => [

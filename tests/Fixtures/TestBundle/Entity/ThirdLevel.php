@@ -40,7 +40,7 @@ class ThirdLevel
     /**
      * @var int
      *
-     * @ORM\Column(type = "integer")
+     * @ORM\Column(type="integer")
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 3;
@@ -48,7 +48,7 @@ class ThirdLevel
     /**
      * @var bool
      *
-     * @ORM\Column(type = "boolean")
+     * @ORM\Column(type="boolean")
      */
     private $test = true;
 
