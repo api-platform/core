@@ -503,10 +503,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('http_cache_tags.xml');
 
         // Load purger
-        $purger = $config['http_cache']['invalidation']['purger'];
-        $container->setAlias('api_platform.http_cache.purger', "api_platform.http_cache.purger.$purger");
+        $container->setAlias('api_platform.http_cache.purger', $config['http_cache']['invalidation']['purger']);
 
-        if ('varnish' !== $purger) {
+        // Additional configuration for built-in Varnish purger
+        if ('api_platform.http_cache.purger.varnish' !== $config['http_cache']['invalidation']['purger']) {
             return;
         }
 
