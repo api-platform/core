@@ -23,13 +23,14 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Core\Serializer\ItemNormalizer as GenericItemNormalizer;
 
 /**
  * GraphQL normalizer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+final class ItemNormalizer extends GenericItemNormalizer
 {
     const FORMAT = 'graphql';
     const ITEM_KEY = '#item';
@@ -39,7 +40,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $data = parent::normalize($object, $format, $context);
+        $data = AbstractItemNormalizer::normalize($object, $format, $context);
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
         return $data;
