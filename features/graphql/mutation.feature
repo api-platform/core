@@ -106,6 +106,22 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.arrayData[1]" should be equal to baz
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
+  Scenario: Create an item with an embedded field
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createRelatedDummy(input: {_id: 2, symfony: "symfony", embeddedDummy: {dummyName: "Embedded"}, clientMutationId: "myId"}) {
+        id
+        clientMutationId
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createRelatedDummy.id" should be equal to "/related_dummies/2"
+    And the JSON node "data.createRelatedDummy.clientMutationId" should be equal to "myId"
+
   Scenario: Delete an item through a mutation
     When I send the following GraphQL request:
     """
