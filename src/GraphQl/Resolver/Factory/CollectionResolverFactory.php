@@ -63,6 +63,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
         return function ($source, $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass) {
+            if (null === $resourceClass) {
+                return null;
+            }
+
             if ($this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
                 $request->attributes->set(
                     '_graphql_collections_args',
@@ -75,7 +79,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $dataProviderContext['attributes'] = $this->fieldsToAttributes($info);
             $dataProviderContext['filters'] = $args;
 
-            if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
+            if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));
                 $subresource = $this->getSubresource($rootClass, $rootResolvedFields, array_keys($rootResolvedFields), $rootProperty, $resourceClass, true, $dataProviderContext);
                 $collection = $subresource ?? [];
