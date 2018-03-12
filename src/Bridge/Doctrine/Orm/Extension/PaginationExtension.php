@@ -21,6 +21,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\Request;
@@ -145,6 +146,24 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
     {
         $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder));
+        $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
+
+        $resourceMetadata = null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass);
+
+        if ($this->isPartialPaginationEnabled($this->requestStack->getCurrentRequest(), $resourceMetadata, $operationName)) {
+            return new class($doctrineOrmPaginator) extends AbstractPaginator {
+            };
+        }
+
+        return new Paginator($doctrineOrmPaginator);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryResult(QueryBuilder $queryBuilder, Query $query, string $resourceClass = null, string $operationName = null, array $context = [])
+    {
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->useFetchJoinCollection($queryBuilder));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         $resourceMetadata = null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass);
