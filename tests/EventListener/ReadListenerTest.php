@@ -77,7 +77,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
@@ -101,7 +101,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json'], [], [], ['QUERY_STRING' => 'foo=bar']);
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
@@ -125,7 +125,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
@@ -149,7 +149,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider->getSubresource('Foo', ['id' => 1], ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar'], 'get')->willReturn($data)->shouldBeCalled();
 
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
@@ -173,7 +173,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 
         $request = new Request([], [], ['id' => 22, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
 
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();

@@ -34,7 +34,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass()]);
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -52,7 +52,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'put'], [], [], [], '');
-        $request->setMethod(Request::METHOD_PUT);
+        $request->setMethod('PUT');
         $request->headers->set('Content-Type', 'application/json');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
@@ -71,7 +71,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass()], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -89,7 +89,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -128,7 +128,7 @@ class DeserializeListenerTest extends TestCase
 
     public function methodProvider()
     {
-        return [[Request::METHOD_POST, false], [Request::METHOD_PUT, true]];
+        return [['POST', false], ['PUT', true]];
     }
 
     public function testContentNegotiation()
@@ -136,7 +136,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->headers->set('Content-Type', 'text/xml');
         $request->setFormat('xml', 'text/xml'); // Workaround to avoid weird behaviors
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -164,7 +164,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/rdf+xml');
         $request->setRequestFormat('xml');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -192,7 +192,7 @@ class DeserializeListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->setRequestFormat('unknown');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 

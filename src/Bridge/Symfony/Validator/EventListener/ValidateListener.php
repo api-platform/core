@@ -18,7 +18,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\EventListener\ValidateListener as MainValidateListener;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -56,7 +55,7 @@ final class ValidateListener
         $request = $event->getRequest();
         if (
             $request->isMethodSafe(false)
-            || $request->isMethod(Request::METHOD_DELETE)
+            || $request->isMethod('DELETE')
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
         ) {
