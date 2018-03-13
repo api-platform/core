@@ -89,7 +89,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
         }
 
         if (null !== $method) {
-            return $method;
+            return strtoupper($method);
         }
 
         if (null === $routeName = $this->getRouteName($resourceMetadata, $operationName, $operationType)) {

@@ -195,7 +195,7 @@ class ValidateListenerTest extends TestCase
             '_api_receive' => $receive,
         ]);
 
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $event = new GetResponseForControllerResultEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
 
         return [$resourceMetadataFactory, $event];

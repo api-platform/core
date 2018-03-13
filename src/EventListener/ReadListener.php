@@ -93,7 +93,7 @@ final class ReadListener
      */
     private function getCollectionData(Request $request, array $attributes, array $context)
     {
-        if ($request->isMethod(Request::METHOD_POST)) {
+        if ($request->isMethod('POST')) {
             return null;
         }
 

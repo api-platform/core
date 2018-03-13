@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
@@ -25,8 +24,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 final class RespondListener
 {
     const METHOD_TO_CODE = [
-        Request::METHOD_POST => Response::HTTP_CREATED,
-        Request::METHOD_DELETE => Response::HTTP_NO_CONTENT,
+        'POST' => Response::HTTP_CREATED,
+        'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
     /**

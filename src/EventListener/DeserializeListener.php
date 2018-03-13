@@ -49,10 +49,10 @@ final class DeserializeListener
         $request = $event->getRequest();
         if (
             $request->isMethodSafe(false)
-            || $request->isMethod(Request::METHOD_DELETE)
+            || $request->isMethod('DELETE')
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || ('' === ($requestContent = $request->getContent()) && $request->isMethod(Request::METHOD_PUT))
+            || ('' === ($requestContent = $request->getContent()) && $request->isMethod('PUT'))
         ) {
             return;
         }
