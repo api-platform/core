@@ -24,7 +24,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\AnnotationsProviderInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -140,7 +139,7 @@ final class ApiPlatformProvider implements AnnotationsProviderInterface
             $data['output'] = sprintf('%s:%s:%s', ApiPlatformParser::OUT_PREFIX, $resourceClass, $operationName);
         }
 
-        if ($collection && Request::METHOD_GET === $method) {
+        if ($collection && 'GET' === $method) {
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
 
             $data['filters'] = [];

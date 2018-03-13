@@ -16,13 +16,15 @@ namespace ApiPlatform\Core\Api;
 use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
- * Resolves the HTTP method associated with an operation.
+ * Resolves the uppercased HTTP method associated with an operation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface OperationMethodResolverInterface
 {
     /**
+     * Resolves the uppercased HTTP method associated with a collection operation.
+     *
      * @param string $resourceClass
      * @param string $operationName
      *
@@ -33,6 +35,8 @@ interface OperationMethodResolverInterface
     public function getCollectionOperationMethod(string $resourceClass, string $operationName): string;
 
     /**
+     * Resolves the uppercased HTTP method associated with an item operation.
+     *
      * @param string $resourceClass
      * @param string $operationName
      *

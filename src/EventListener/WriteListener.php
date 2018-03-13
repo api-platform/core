@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -48,12 +47,12 @@ class WriteListener
         }
 
         switch ($request->getMethod()) {
-            case Request::METHOD_PUT:
-            case Request::METHOD_PATCH:
-            case Request::METHOD_POST:
+            case 'PUT':
+            case 'PATCH':
+            case 'POST':
                 $this->dataPersister->persist($controllerResult);
                 break;
-            case Request::METHOD_DELETE:
+            case 'DELETE':
                 $this->dataPersister->remove($controllerResult);
                 $event->setControllerResult(null);
                 break;

@@ -67,12 +67,12 @@ class SerializerContextBuilderTest extends TestCase
         $expected = ['bar' => 'baz', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
-        $request = Request::create('/foos', Request::METHOD_POST);
+        $request = Request::create('/foos', 'POST');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['bar' => 'baz', 'collection_operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'operation_type' => 'collection', 'uri' => 'http://localhost/foos'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
-        $request = Request::create('/foos', Request::METHOD_PUT);
+        $request = Request::create('/foos', 'PUT');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'put', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['bar' => 'baz', 'collection_operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'operation_type' => 'collection', 'uri' => 'http://localhost/foos'];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));

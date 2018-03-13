@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 use ApiPlatform\Core\EventListener\WriteListener as BaseWriteListener;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -58,10 +57,10 @@ final class WriteListener
         }
 
         switch ($request->getMethod()) {
-            case Request::METHOD_POST:
+            case 'POST':
                 $objectManager->persist($controllerResult);
                 break;
-            case Request::METHOD_DELETE:
+            case 'DELETE':
                 $objectManager->remove($controllerResult);
                 $event->setControllerResult(null);
                 break;

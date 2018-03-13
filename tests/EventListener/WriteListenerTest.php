@@ -45,7 +45,7 @@ class WriteListenerTest extends TestCase
             $dummy
         );
 
-        foreach ([Request::METHOD_PATCH, Request::METHOD_PUT, Request::METHOD_POST] as $httpMethod) {
+        foreach (['PATCH', 'PUT', 'POST'] as $httpMethod) {
             $request->setMethod($httpMethod);
 
             (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
@@ -62,7 +62,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy)->shouldBeCalled();
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_DELETE);
+        $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', Dummy::class);
 
         $event = new GetResponseForControllerResultEvent(
@@ -86,7 +86,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_HEAD);
+        $request->setMethod('HEAD');
         $request->attributes->set('_api_resource_class', Dummy::class);
 
         $event = new GetResponseForControllerResultEvent(
@@ -110,7 +110,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
 
         $event = new GetResponseForControllerResultEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -133,7 +133,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy)->shouldNotBeCalled();
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->attributes->set('_api_resource_class', 'Dummy');
 
         $event = new GetResponseForControllerResultEvent(
