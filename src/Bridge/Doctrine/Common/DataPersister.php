@@ -78,6 +78,6 @@ final class DataPersister implements DataPersisterInterface
      */
     private function getManager($data)
     {
-        return is_object($data) ? $this->managerRegistry->getManagerForClass($this->getObjectClass($data)) : null;
+        return \is_object($data) ? $this->managerRegistry->getManagerForClass($this->getObjectClass($data)) : null;
     }
 }

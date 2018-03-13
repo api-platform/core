@@ -44,5 +44,7 @@ final class ChainSubresourceDataProvider implements SubresourceDataProviderInter
                 continue;
             }
         }
+
+        return null;
     }
 }

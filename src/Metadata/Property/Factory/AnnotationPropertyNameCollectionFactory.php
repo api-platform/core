@@ -42,6 +42,8 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
+        $propertyNameCollection = null;
+
         if ($this->decorated) {
             try {
                 $propertyNameCollection = $this->decorated->create($resourceClass, $options);
@@ -53,7 +55,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
-            if (isset($propertyNameCollection)) {
+            if (null !== $propertyNameCollection) {
                 return $propertyNameCollection;
             }
 
@@ -86,7 +88,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
         }
 
         // Inherited from parent
-        if (isset($propertyNameCollection)) {
+        if (null !== $propertyNameCollection) {
             foreach ($propertyNameCollection as $propertyName) {
                 $propertyNames[$propertyName] = $propertyName;
             }

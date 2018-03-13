@@ -68,7 +68,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $manager) {
-            throw new ResourceClassNotSupportedException();
+            throw new ResourceClassNotSupportedException(sprintf('The object manager associated with the "%s" resource class cannot be retrieved.', $resourceClass));
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -76,7 +76,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
 
-        if (!isset($context['identifiers']) || !isset($context['property'])) {
+        if (!isset($context['identifiers'], $context['property'])) {
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
 

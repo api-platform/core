@@ -44,6 +44,7 @@ trait IdentifierManagerTrait
         $doctrineIdentifierFields = $doctrineClassMetadata->getIdentifier();
         $isOrm = interface_exists(EntityManagerInterface::class) && $manager instanceof EntityManagerInterface;
         $platform = $isOrm ? $manager->getConnection()->getDatabasePlatform() : null;
+        $identifiersMap = null;
 
         if (\count($doctrineIdentifierFields) > 1) {
             $identifiersMap = [];
@@ -69,7 +70,7 @@ trait IdentifierManagerTrait
                 continue;
             }
 
-            $identifier = !isset($identifiersMap) ? $identifierValues[$i] ?? null : $identifiersMap[$propertyName] ?? null;
+            $identifier = null === $identifiersMap ? $identifierValues[$i] ?? null : $identifiersMap[$propertyName] ?? null;
             if (null === $identifier) {
                 throw new PropertyNotFoundException(sprintf('Invalid identifier "%s", "%s" has not been found.', $id, $propertyName));
             }

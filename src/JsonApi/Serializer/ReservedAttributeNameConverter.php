@@ -57,7 +57,7 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
      */
     public function denormalize($propertyName)
     {
-        if (in_array($propertyName, self::JSON_API_RESERVED_ATTRIBUTES, true)) {
+        if (\in_array($propertyName, self::JSON_API_RESERVED_ATTRIBUTES, true)) {
             $propertyName = substr($propertyName, 1);
         }
 
