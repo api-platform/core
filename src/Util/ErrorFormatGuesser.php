@@ -46,12 +46,12 @@ final class ErrorFormatGuesser
         $defaultFormat = [];
 
         foreach ($errorFormats as $format => $errorMimeTypes) {
-            if ([] === $defaultFormat) {
-                $defaultFormat = ['key' => $format, 'value' => $errorMimeTypes];
-            }
-
             if (array_intersect($requestMimeTypes, $errorMimeTypes)) {
                 return ['key' => $format, 'value' => $errorMimeTypes];
+            }
+
+            if (!$defaultFormat) {
+                $defaultFormat = ['key' => $format, 'value' => $errorMimeTypes];
             }
         }
 
