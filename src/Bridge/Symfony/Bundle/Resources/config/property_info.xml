@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <defaults public="false" />
+
+        <service id="api_platform.property_info.constructor_extractor" class="ApiPlatform\Core\PropertyInfo\ConstructorExtractor">
+            <tag name="property_info.access_extractor" priority="-900" />
+        </service>
+    </services>
+</container>

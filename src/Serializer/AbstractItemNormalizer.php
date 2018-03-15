@@ -20,6 +20,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -28,9 +29,12 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Base item normalizer.
@@ -157,6 +161,82 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
+        $this->setValue($object, $attribute, $this->prepareAttributeValue($attribute, $value, $format, $context));
+    }
+
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
+    {
+        if (null !== $object = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
+            unset($context[static::OBJECT_TO_POPULATE]);
+
+            return $object;
+        }
+
+        $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
+        if ($constructor) {
+            $constructorParameters = $constructor->getParameters();
+
+            $params = array();
+            foreach ($constructorParameters as $constructorParameter) {
+                $paramName = $constructorParameter->name;
+                $key = $this->nameConverter ? $this->nameConverter->normalize($paramName) : $paramName;
+
+                $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
+                $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
+                if ($constructorParameter->isVariadic()) {
+                    if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+                        if (!\is_array($data[$paramName])) {
+                            throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.',
+                                $class, $constructorParameter->name));
+                        }
+
+                        $params = array_merge($params, $data[$paramName]);
+                    }
+                } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+                    if (!$this->serializer instanceof DenormalizerInterface) {
+                        throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer',
+                            $constructorParameter->getClass(), static::class));
+                    }
+
+                    $params[] = $this->prepareAttributeValue($key, $data[$key], $format, $context);
+                    // Don't run set for a parameter passed to the constructor
+                    unset($data[$key]);
+                } elseif ($constructorParameter->isDefaultValueAvailable()) {
+                    $params[] = $constructorParameter->getDefaultValue();
+                } else {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
+                            $class,
+                            $constructorParameter->name
+                        )
+                    );
+                }
+            }
+
+            if ($constructor->isConstructor()) {
+                return $reflectionClass->newInstanceArgs($params);
+            } else {
+                return $constructor->invokeArgs(null, $params);
+            }
+        }
+
+        return new $class();
+    }
+
+
+    /**
+     * @param string $attribute
+     * @param mixed $value
+     * @param string|null $format
+     * @param array $context
+     * @return mixed
+     *
+     * @throws PropertyNotFoundException
+     * @throws InvalidArgumentException
+     */
+    protected function prepareAttributeValue($attribute, $value, $format = null, array $context = [])
+    {
         if (!\is_string($attribute)) {
             throw new InvalidValueException('Invalid value provided (invalid IRI?).');
         }
@@ -165,16 +245,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $type = $propertyMetadata->getType();
 
         if (null === $type) {
-            // No type provided, blindly set the value
-            $this->setValue($object, $attribute, $value);
 
-            return;
+            // No type provided, blindly return the value
+            return $value;
         }
 
         if (null === $value && $type->isNullable()) {
-            $this->setValue($object, $attribute, $value);
 
-            return;
+            return $value;
         }
 
         if (
@@ -182,27 +260,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             null !== ($collectionValueType = $type->getCollectionValueType()) &&
             null !== $className = $collectionValueType->getClassName()
         ) {
-            $this->setValue(
-                $object,
-                $attribute,
-                $this->denormalizeCollection($attribute, $propertyMetadata, $type, $className, $value, $format, $context)
-            );
 
-            return;
+            return $this->denormalizeCollection($attribute, $propertyMetadata, $type, $className, $value, $format, $context);
         }
 
         if (null !== $className = $type->getClassName()) {
-            $this->setValue(
-                $object,
-                $attribute,
-                $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $this->createChildContext($context, $attribute))
-            );
 
-            return;
+            return $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $this->createChildContext($context, $attribute));
         }
 
         $this->validateType($attribute, $type, $value, $format);
-        $this->setValue($object, $attribute, $value);
+        return $value;
     }
 
     /**
@@ -487,5 +555,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $iri;
+    }
+
+    protected function createChildContext(array $parentContext, $attribute)
+    {
+        $childContext = parent::createChildContext($parentContext, $attribute);
+        if (isset($childContext['resource_class'])) {
+            unset($childContext['resource_class']);
+        }
+
+        return $childContext;
     }
 }
