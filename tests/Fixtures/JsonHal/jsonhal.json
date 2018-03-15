@@ -1,0 +1,91 @@
+{
+  "type": "object",
+  "properties": {
+    "_links": {
+      "$ref": "#/definitions/links"
+    },
+    "_embedded": {
+      "$ref": "#/definitions/embedded"
+    }
+  },
+  "definitions": {
+    "links": {
+      "title": "HAL Links",
+      "description": "Object of links with the rels as the keys",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/linkObject"
+          },
+          {
+            "$ref": "#/definitions/linkArray"
+          }
+        ]
+      }
+    },
+    "linkArray": {
+      "title": "HAL Link Array",
+      "description": "An array of linkObjects of the same link relation",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/linkObject"
+      }
+    },
+    "linkObject": {
+      "title": "HAL Link Object",
+      "description": "An object with link information",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "http://hyperschema.org/core/base#/definitions/name"
+        },
+        "href": {
+          "anyOf": [
+            {
+              "$ref": "http://hyperschema.org/core/link#/definitions/href"
+            },
+            {
+              "$ref": "http://hyperschema.org/core/link#/definitions/hrefTemplated"
+            }
+          ]
+        },
+        "templated": {
+          "$ref": "http://hyperschema.org/core/link#/definitions/isTemplated"
+        },
+        "type": {
+          "$ref": "http://hyperschema.org/core/base#/definitions/mediaType"
+        },
+        "deprecation": {
+          "$ref": "http://hyperschema.org/core/link#/definitions/isDeprecated"
+        }
+      },
+      "required": [
+        "href"
+      ]
+    },
+    "embedded": {
+      "title": "HAL Embedded Resource",
+      "description": "An embedded HAL resource",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#"
+          },
+          {
+            "$ref": "#/definitions/embeddedArray"
+          }
+        ]
+      }
+    },
+    "embeddedArray": {
+      "title": "HAL Embedded Array",
+      "description": "An array of embedded resources with the same link relation",
+      "type": "array",
+      "items": {
+        "$ref": "#"
+      }
+    }
+  }
+}
