@@ -9,6 +9,7 @@ Feature: HAL support
     And I send a "GET" request to "/"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON node "_links.self.href" should be equal to "/"
     And the JSON node "_links.dummy.href" should be equal to "/dummies"
@@ -49,6 +50,7 @@ Feature: HAL support
     And I send a "GET" request to "/dummies/1"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -91,6 +93,7 @@ Feature: HAL support
     """
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -139,6 +142,7 @@ Feature: HAL support
     And I send a "GET" request to "/relation_embedders/1"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """

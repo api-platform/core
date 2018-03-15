@@ -9,6 +9,7 @@ Feature: HAL Collections support
     When I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -29,6 +30,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -132,6 +134,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?page=3"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -238,6 +241,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?page=4"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -295,6 +299,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?page=2&partial=1"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -394,6 +399,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?pagination=0"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -648,6 +654,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?page=2&itemsPerPage=1"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -708,6 +715,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?id=%2fdummies%2f8"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -756,6 +764,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?name=Dummy%20%238"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
@@ -805,6 +814,7 @@ Feature: HAL Collections support
     And I send a "GET" request to "/dummies?itemsPerPage=0"
     Then the response status code should be 200
     And the response should be in JSON
+    And the JSON should be valid according to the JSON HAL schema
     And the header "Content-Type" should be equal to "application/hal+json; charset=utf-8"
     And the JSON should be equal to:
     """
