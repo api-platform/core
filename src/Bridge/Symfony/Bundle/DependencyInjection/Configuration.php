@@ -247,8 +247,8 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([
                         ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                        AccessDeniedException::class => Response::HTTP_FORBIDDEN,
-                        InsufficientAuthenticationException::class => Response::HTTP_FORBIDDEN,
+                        AccessDeniedException::class => Response::HTTP_UNAUTHORIZED,
+                        InsufficientAuthenticationException::class => Response::HTTP_UNAUTHORIZED,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)

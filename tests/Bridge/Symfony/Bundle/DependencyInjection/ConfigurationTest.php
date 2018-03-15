@@ -69,8 +69,8 @@ class ConfigurationTest extends TestCase
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                AccessDeniedException::class => Response::HTTP_FORBIDDEN,
-                InsufficientAuthenticationException::class => Response::HTTP_FORBIDDEN,
+                AccessDeniedException::class => Response::HTTP_UNAUTHORIZED,
+                InsufficientAuthenticationException::class => Response::HTTP_UNAUTHORIZED,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
