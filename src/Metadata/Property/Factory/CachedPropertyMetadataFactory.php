@@ -50,19 +50,15 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $this->localCache[$localCacheKey] = $cacheItem->get();
-            }
         } catch (CacheException $e) {
-            // do nothing
+            return $this->localCache[$localCacheKey] = $this->decorated->create($resourceClass, $property, $options);
+        }
+
+        if ($cacheItem->isHit()) {
+            return $this->localCache[$localCacheKey] = $cacheItem->get();
         }
 
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-
-        if (!isset($cacheItem)) {
-            return $this->localCache[$localCacheKey] = $propertyMetadata;
-        }
 
         $cacheItem->set($propertyMetadata);
         $this->cacheItemPool->save($cacheItem);

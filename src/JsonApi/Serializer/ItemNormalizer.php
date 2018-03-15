@@ -65,7 +65,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // Get and populate attributes data
         $objectAttributesData = parent::normalize($object, $format, $context);
 
-        if (!is_array($objectAttributesData)) {
+        if (!\is_array($objectAttributesData)) {
             return $objectAttributesData;
         }
 
@@ -107,7 +107,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['data']['id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
+        if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
@@ -145,7 +145,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
-        parent::setAttributeValue($object, $attribute, is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
+        parent::setAttributeValue($object, $attribute, \is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
     }
 
     /**
@@ -162,7 +162,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $this->serializer->denormalize($value, $className, $format, $context);
         }
 
-        if (!is_array($value) || !isset($value['id'], $value['type'])) {
+        if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new InvalidArgumentException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 
@@ -181,7 +181,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, string $format = null, array $context)
     {
         if (null === $relatedObject) {
-            if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] && isset($context['subresource_resources'][$resourceClass])) {
+            if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
                 $iri = $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
             } else {
                 unset($context['resource_class']);

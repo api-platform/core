@@ -215,7 +215,7 @@ final class Configuration implements ConfigurationInterface
                                 ->variableNode('request_options')
                                     ->defaultValue([])
                                     ->validate()
-                                        ->ifTrue(function ($v) { return false === is_array($v); })
+                                        ->ifTrue(function ($v) { return false === \is_array($v); })
                                         ->thenInvalid('The request_options parameter must be an array.')
                                     ->end()
                                     ->info('To pass options to the client charged with the request.')

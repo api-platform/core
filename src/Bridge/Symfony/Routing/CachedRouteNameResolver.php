@@ -44,32 +44,18 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
 
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
-            }
         } catch (CacheException $e) {
-            // do nothing
+            return $this->decorated->getRouteName($resourceClass, $operationType, $context);
         }
 
-        if (\func_num_args() > 2) {
-            $context = func_get_arg(2);
-        } else {
-            $context = [];
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
         }
 
         $routeName = $this->decorated->getRouteName($resourceClass, $operationType, $context);
 
-        if (!isset($cacheItem)) {
-            return $routeName;
-        }
-
-        try {
-            $cacheItem->set($routeName);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
+        $cacheItem->set($routeName);
+        $this->cacheItemPool->save($cacheItem);
 
         return $routeName;
     }

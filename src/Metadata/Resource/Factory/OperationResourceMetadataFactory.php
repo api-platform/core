@@ -107,7 +107,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
         $newOperations = [];
         foreach ($operations as $operationName => $operation) {
             // e.g.: @ApiResource(itemOperations={"get"})
-            if (is_int($operationName) && is_string($operation)) {
+            if (\is_int($operationName) && \is_string($operation)) {
                 $operationName = $operation;
                 $operation = [];
             }
@@ -119,10 +119,8 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 $supported = isset(self::SUPPORTED_ITEM_OPERATION_METHODS[$upperOperationName]) || (isset($this->formats['jsonapi']) && 'PATCH' === $upperOperationName);
             }
 
-            if ($supported && !isset($operation['method']) && !isset($operation['route_name'])) {
-                $operation['method'] = $upperOperationName;
-            } elseif (!$supported && !isset($operation['method']) && !isset($operation['route_name'])) {
-                $operation['route_name'] = $operationName;
+            if (!isset($operation['method']) && !isset($operation['route_name'])) {
+                $supported ? $operation['method'] = $upperOperationName : $operation['route_name'] = $operationName;
             }
 
             $newOperations[$operationName] = $operation;
@@ -134,7 +132,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
     private function normalizeGraphQl(ResourceMetadata $resourceMetadata, array $operations)
     {
         foreach ($operations as $operationName => $operation) {
-            if (is_int($operationName) && is_string($operation)) {
+            if (\is_int($operationName) && \is_string($operation)) {
                 unset($operations[$operationName]);
                 $operations[$operation] = [];
             }
