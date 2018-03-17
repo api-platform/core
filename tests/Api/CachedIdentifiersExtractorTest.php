@@ -81,7 +81,7 @@ class CachedIdentifiersExtractorTest extends TestCase
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
 
-    public function testSecondPassWithRelatedNotCached()
+    public function testFirstPassWithRelated()
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
         $keyRelated = 'iri_identifiers'.md5(RelatedDummy::class);
@@ -114,7 +114,7 @@ class CachedIdentifiersExtractorTest extends TestCase
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
 
-    public function testSecondPassWithRelatedCached()
+    public function testSecondPassWithRelated()
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
         $keyRelated = 'iri_identifiers'.md5(RelatedDummy::class);
