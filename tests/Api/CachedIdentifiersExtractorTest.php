@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\CachedIdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,16 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedIdentifiersExtractorTest extends TestCase
 {
-    public function testFirstPass()
+    public function identifiersProvider()
+    {
+        yield [1, 1];
+        yield [$uuid = new Uuid(), $uuid->__toString()];
+    }
+
+    /**
+     * @dataProvider identifiersProvider
+     */
+    public function testFirstPass($identifier, $identifierValue)
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
 
@@ -39,14 +49,14 @@ class CachedIdentifiersExtractorTest extends TestCase
         $cacheItemPool->save($cacheItem)->shouldBeCalled();
 
         $dummy = new Dummy();
-        $dummy->setId(1);
+        $dummy->setId($identifier);
 
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
-        $decoration->getIdentifiersFromItem($dummy)->shouldBeCalled()->willReturn(['id' => 1]);
+        $decoration->getIdentifiersFromItem($dummy)->shouldBeCalled()->willReturn(['id' => $identifierValue]);
 
         $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
 
-        $expectedResult = ['id' => 1];
+        $expectedResult = ['id' => $identifierValue];
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
 
@@ -57,7 +67,10 @@ class CachedIdentifiersExtractorTest extends TestCase
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class), 'Trigger the local cache');
     }
 
-    public function testSecondPass()
+    /**
+     * @dataProvider identifiersProvider
+     */
+    public function testSecondPass($identifier, $identifierValue)
     {
         $key = 'iri_identifiers'.md5(Dummy::class);
 
@@ -69,14 +82,14 @@ class CachedIdentifiersExtractorTest extends TestCase
         $cacheItemPool->getItem($key)->shouldBeCalled()->willReturn($cacheItem);
 
         $dummy = new Dummy();
-        $dummy->setId(1);
+        $dummy->setId($identifier);
 
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
         $decoration->getIdentifiersFromItem($dummy)->shouldNotBeCalled();
 
         $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
 
-        $expectedResult = ['id' => 1];
+        $expectedResult = ['id' => $identifierValue];
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
     }
