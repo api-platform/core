@@ -106,7 +106,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummy.arrayData[1]" should be equal to baz
     And the JSON node "data.createDummy.clientMutationId" should be equal to "myId"
 
-  @dropSchema
   Scenario: Delete an item through a mutation
     When I send the following GraphQL request:
     """
@@ -123,7 +122,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
-  @createSchema
   @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
@@ -143,7 +141,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteCompositeRelation.clientMutationId" should be equal to "myId"
 
   @createSchema
-  @dropSchema
   Scenario: Modify an item through a mutation
     Given there are 1 dummy objects
     When I send the following GraphQL request:
@@ -167,7 +164,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateDummy.dummyDate" should be equal to "2018-06-05T00:00:00+00:00"
     And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
-  @createSchema
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
