@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -59,11 +60,7 @@ final class SerializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-        $resources = new class() extends \ArrayObject {
-            public function serialize()
-            {
-            }
-        };
+        $resources = new ResourceList();
         $context['resources'] = &$resources;
         $request->attributes->set('_api_normalization_context', $context);
 
