@@ -48,7 +48,24 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy->contains($dummy)->willReturn(false);
         $objectManagerProphecy->persist($dummy)->shouldBeCalled();
+        $objectManagerProphecy->flush()->shouldBeCalled();
+        $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
+
+        (new DataPersister($managerRegistryProphecy->reveal()))->persist($dummy);
+    }
+
+    public function testPersistIfEntityAlreadyManaged()
+    {
+        $dummy = new Dummy();
+
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy->contains($dummy)->willReturn(true);
+        $objectManagerProphecy->persist($dummy)->shouldNotBeCalled();
         $objectManagerProphecy->flush()->shouldBeCalled();
         $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
 
