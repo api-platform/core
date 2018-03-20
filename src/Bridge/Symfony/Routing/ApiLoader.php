@@ -193,7 +193,7 @@ final class ApiLoader extends Loader
             }
         }
 
-        $path = trim(trim($resourceMetadata->getAttribute('routePrefix', '')), '/');
+        $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
         $route = new Route(

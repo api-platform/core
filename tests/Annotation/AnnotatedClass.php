@@ -23,7 +23,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *     itemOperations={"foo"={"bar"}},
  *     collectionOperations={"bar"={"foo"}},
  *     graphql={"query"={"normalization_context"={"groups"={"foo", "bar"}}}},
- *     attributes={"foo"="bar", "routePrefix"="/whatever"},
+ *     attributes={"foo"="bar", "route_prefix"="/whatever"},
  * )
  *
  * @author Marcus Speight <marcus@pmconnect.co.uk>
