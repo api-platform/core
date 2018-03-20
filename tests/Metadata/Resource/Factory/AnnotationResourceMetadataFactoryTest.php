@@ -43,7 +43,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
         $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
-        $this->assertEquals(['a' => 1, 'routePrefix' => '/foobar'], $metadata->getAttributes());
+        $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar'], $metadata->getAttributes());
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
     }
 
@@ -56,7 +56,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $annotation->itemOperations = ['foo' => ['bar' => true]];
         $annotation->collectionOperations = ['baz' => ['tab' => false]];
         $annotation->subresourceOperations = ['sub' => ['bus' => false]];
-        $annotation->attributes = ['a' => 1, 'routePrefix' => '/foobar'];
+        $annotation->attributes = ['a' => 1, 'route_prefix' => '/foobar'];
         $annotation->graphql = ['foo' => 'bar'];
 
         $reader = $this->prophesize(Reader::class);
