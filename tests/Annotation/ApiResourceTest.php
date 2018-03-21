@@ -22,23 +22,65 @@ use PHPUnit\Framework\TestCase;
  */
 class ApiResourceTest extends TestCase
 {
-    public function testAssignation()
+    public function testConstruct()
     {
-        $resource = new ApiResource();
-        $resource->shortName = 'shortName';
-        $resource->description = 'description';
-        $resource->iri = 'http://example.com/res';
-        $resource->itemOperations = ['foo' => ['bar']];
-        $resource->collectionOperations = ['bar' => ['foo']];
-        $resource->graphql = ['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]];
-        $resource->attributes = ['foo' => 'bar'];
+        $resource = new ApiResource([
+            'accessControl' => 'has_role("ROLE_FOO")',
+            'accessControlMessage' => 'You are not foo.',
+            'attributes' => ['foo' => 'bar', 'validation_groups' => ['baz', 'qux']],
+            'collectionOperations' => ['bar' => ['foo']],
+            'denormalizationContext' => ['groups' => ['foo']],
+            'description' => 'description',
+            'fetchPartial' => true,
+            'forceEager' => false,
+            'filters' => ['foo', 'bar'],
+            'graphql' => ['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]],
+            'iri' => 'http://example.com/res',
+            'itemOperations' => ['foo' => ['bar']],
+            'maximumItemsPerPage' => 42,
+            'normalizationContext' => ['groups' => ['bar']],
+            'order' => ['foo', 'bar' => 'ASC'],
+            'paginationClientEnabled' => true,
+            'paginationClientItemsPerPage' => true,
+            'paginationClientPartial' => true,
+            'paginationEnabled' => true,
+            'paginationFetchJoinCollection' => true,
+            'paginationItemsPerPage' => 42,
+            'paginationPartial' => true,
+            'routePrefix' => '/foo',
+            'shortName' => 'shortName',
+            'subresourceOperations' => [],
+            'validationGroups' => ['foo', 'bar'],
+        ]);
 
         $this->assertSame('shortName', $resource->shortName);
         $this->assertSame('description', $resource->description);
         $this->assertSame('http://example.com/res', $resource->iri);
+        $this->assertSame(['foo' => ['bar']], $resource->itemOperations);
         $this->assertSame(['bar' => ['foo']], $resource->collectionOperations);
+        $this->assertSame([], $resource->subresourceOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
-        $this->assertSame(['foo' => 'bar'], $resource->attributes);
+        $this->assertEquals([
+            'access_control' => 'has_role("ROLE_FOO")',
+            'access_control_message' => 'You are not foo.',
+            'denormalization_context' => ['groups' => ['foo']],
+            'fetch_partial' => true,
+            'foo' => 'bar',
+            'force_eager' => false,
+            'filters' => ['foo', 'bar'],
+            'maximum_items_per_page' => 42,
+            'normalization_context' => ['groups' => ['bar']],
+            'order' => ['foo', 'bar' => 'ASC'],
+            'pagination_client_enabled' => true,
+            'pagination_client_items_per_page' => true,
+            'pagination_client_partial' => true,
+            'pagination_enabled' => true,
+            'pagination_fetch_join_collection' => true,
+            'pagination_items_per_page' => 42,
+            'pagination_partial' => true,
+            'route_prefix' => '/foo',
+            'validation_groups' => ['baz', 'qux'],
+        ], $resource->attributes);
     }
 
     public function testApiResourceAnnotation()
@@ -51,6 +93,11 @@ class ApiResourceTest extends TestCase
         $this->assertSame('http://example.com/res', $resource->iri);
         $this->assertSame(['bar' => ['foo']], $resource->collectionOperations);
         $this->assertSame(['query' => ['normalization_context' => ['groups' => ['foo', 'bar']]]], $resource->graphql);
-        $this->assertSame(['foo' => 'bar', 'route_prefix' => '/whatever'], $resource->attributes);
+        $this->assertEquals([
+            'foo' => 'bar',
+            'route_prefix' => '/whatever',
+            'access_control' => "has_role('ROLE_FOO')",
+            'access_control_message' => 'You are not foo.',
+        ], $resource->attributes);
     }
 }
