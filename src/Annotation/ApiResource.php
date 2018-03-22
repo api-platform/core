@@ -54,27 +54,6 @@ use Doctrine\Common\Util\Inflector;
  */
 final class ApiResource
 {
-    const ATTRIBUTES = [
-        'accessControl',
-        'accessControlMessage',
-        'denormalizationContext',
-        'fetchPartial',
-        'forceEager',
-        'filters',
-        'maximumItemsPerPage',
-        'normalizationContext',
-        'order',
-        'paginationClientEnabled',
-        'paginationClientItemsPerPage',
-        'paginationClientPartial',
-        'paginationEnabled',
-        'paginationFetchJoinCollection',
-        'paginationItemsPerPage',
-        'paginationPartial',
-        'routePrefix',
-        'validationGroups',
-    ];
-
     /**
      * @var string
      */
@@ -116,6 +95,132 @@ final class ApiResource
     public $attributes = [];
 
     /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $accessControl;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $accessControlMessage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $denormalizationContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $fetchPartial;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $forceEager;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string[]
+     */
+    private $filters;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $maximumItemsPerPage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $normalizationContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $order;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $paginationClientEnabled;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $paginationClientItemsPerPage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $paginationClientPartial;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $paginationEnabled;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $paginationFetchJoinCollection;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $paginationItemsPerPage;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var int
+     */
+    private $paginationPartial;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $routePrefix;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var mixed
+     */
+    private $validationGroups;
+
+    /**
      * @throws InvalidArgumentException
      */
     public function __construct(array $values = [])
@@ -126,12 +231,16 @@ final class ApiResource
         }
 
         foreach ($values as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
-            } elseif (\in_array($key, self::ATTRIBUTES, true)) {
-                $this->attributes += [Inflector::tableize($key) => $value];
-            } else {
+            if (!property_exists($this, $key)) {
                 throw new InvalidArgumentException(sprintf('Unknown property "%s" on annotation "%s".', $key, self::class));
+            }
+
+            $property = new \ReflectionProperty($this, $key);
+
+            if ($property->isPublic()) {
+                $this->$key = $value;
+            } else {
+                $this->attributes += [Inflector::tableize($key) => $value];
             }
         }
     }

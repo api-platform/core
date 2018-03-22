@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Annotation;
+namespace ApiPlatform\Core\Tests\Fixtures;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 

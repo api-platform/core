@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Tests\Fixtures\AnnotatedClass;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 
@@ -99,5 +100,18 @@ class ApiResourceTest extends TestCase
             'access_control' => "has_role('ROLE_FOO')",
             'access_control_message' => 'You are not foo.',
         ], $resource->attributes);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unknown property "invalidAttribute" on annotation "ApiPlatform\Core\Annotation\ApiResource".
+     */
+    public function testConstructWithInvalidAttribute()
+    {
+        new ApiResource([
+            'shortName' => 'shortName',
+            'routePrefix' => '/foo',
+            'invalidAttribute' => 'exception',
+        ]);
     }
 }
