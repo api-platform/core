@@ -64,11 +64,7 @@ class QueryParameterValidateListener
                     continue;
                 }
 
-                if (false !== strpos($name, '[')) { // array notation of filter
-                    if (!$this->isArrayNotationFilterValid($name, $request)) {
-                        $errorList[] = sprintf('Query parameter "%s" is required', $name);
-                    }
-                } elseif (null === $request->query->get($name)) {
+                if (!$this->isRequiredFilterValid($name, $request)) {
                     $errorList[] = sprintf('Query parameter "%s" is required', $name);
                 }
 
@@ -79,14 +75,30 @@ class QueryParameterValidateListener
         }
     }
 
-    private function isArrayNotationFilterValid($name, $request): bool
+    /**
+     * Test if required filter is valid. It validates array notation too like "required[bar]".
+     */
+    private function isRequiredFilterValid($name, $request): bool
     {
         $matches = [];
-        preg_match('/([^[]+)\[(.*)\]/', $name, $matches);
-        list(, $rootName, $keyName) = $matches;
-        $keyName = $keyName ?: 0; // array without index should test the first key
-        $queryParameter = $request->query->get($rootName);
+        parse_str($name, $matches);
+        if (empty($matches)) {
+            return false;
+        }
 
-        return is_array($queryParameter) && isset($queryParameter[$keyName]);
+        $rootName = array_keys($matches)[0] ?? '';
+        if (!$rootName) {
+            return false;
+        }
+
+        if (is_array($matches[$rootName])) {
+            $keyName = array_keys($matches[$rootName])[0];
+
+            $queryParameter = $request->query->get($rootName);
+
+            return is_array($queryParameter) && isset($queryParameter[$keyName]);
+        }
+
+        return null !== $request->query->get($rootName);
     }
 }
