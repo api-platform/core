@@ -51,7 +51,10 @@ final class DataPersister implements DataPersisterInterface
             return;
         }
 
-        $manager->persist($data);
+        if (!$manager->contains($data)) {
+            $manager->persist($data);
+        }
+
         $manager->flush();
         $manager->refresh($data);
     }

@@ -9,6 +9,7 @@ default:
         - 'SwaggerContext'
         - 'HttpCacheContext'
         - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
@@ -22,6 +23,7 @@ default:
         - 'SwaggerContext'
         - 'HttpCacheContext'
         - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
       filters:
@@ -51,6 +53,7 @@ coverage:
         - 'SwaggerContext'
         - 'HttpCacheContext'
         - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'

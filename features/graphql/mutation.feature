@@ -122,7 +122,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.deleteFoo.id" should be equal to "/foos/1"
     And the JSON node "data.deleteFoo.clientMutationId" should be equal to "anotherId"
 
-  @createSchema
+  @dropSchema
   Scenario: Delete an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
@@ -142,14 +142,15 @@ Feature: GraphQL mutation support
 
   @createSchema
   Scenario: Modify an item through a mutation
-    Given there are 1 foo objects with fake names
+    Given there are 1 dummy objects
     When I send the following GraphQL request:
     """
     mutation {
-      updateFoo(input: {id: "/foos/1", bar: "Modified description.", clientMutationId: "myId"}) {
+      updateDummy(input: {id: "/dummies/1", description: "Modified description.", dummyDate: "2018-06-05", clientMutationId: "myId"}) {
         id
         name
-        bar
+        description
+        dummyDate
         clientMutationId
       }
     }
@@ -157,12 +158,12 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.updateFoo.id" should be equal to "/foos/1"
-    And the JSON node "data.updateFoo.name" should be equal to "Hawsepipe"
-    And the JSON node "data.updateFoo.bar" should be equal to "Modified description."
-    And the JSON node "data.updateFoo.clientMutationId" should be equal to "myId"
+    And the JSON node "data.updateDummy.id" should be equal to "/dummies/1"
+    And the JSON node "data.updateDummy.name" should be equal to "Dummy #1"
+    And the JSON node "data.updateDummy.description" should be equal to "Modified description."
+    And the JSON node "data.updateDummy.dummyDate" should be equal to "2018-06-05T00:00:00+00:00"
+    And the JSON node "data.updateDummy.clientMutationId" should be equal to "myId"
 
-  @createSchema
   Scenario: Modify an item with composite identifiers through a mutation
     Given there are Composite identifier objects
     When I send the following GraphQL request:
