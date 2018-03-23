@@ -124,13 +124,15 @@
             </thead>
 
             <tbody>
-                {% for filter in collector.resourceMetadata.attributes.filters %}
-                    <tr>
-                        <td>
-                            {{ filter }}
-                        </td>
-                    </tr>
-                {% endfor %}
+                {% if collector.resourceMetadata.attributes.filters is defined %}
+                    {% for filter in collector.resourceMetadata.attributes.filters %}
+                        <tr>
+                            <td>
+                                {{ filter }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
             </tbody>
         </table>
 
