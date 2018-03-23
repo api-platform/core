@@ -19,35 +19,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
-class RequestDataCollector extends DataCollector
+final class RequestDataCollector extends DataCollector
 {
-    /**
-     * collectionFactory.
-     *
-     * @var ResourceNameCollectionFactoryInterface
-     */
     private $collectionFactory;
 
-    /**
-     * metadataFactory.
-     *
-     * @var ResourceMetadataFactoryInterface
-     */
     private $metadataFactory;
 
-    /**
-     * __construct.
-     *
-     * @param ResourceNameCollectionFactoryInterface $collectionFactory
-     * @param ResourceMetadataFactoryInterface       $metadataFactory
-     */
     public function __construct(ResourceNameCollectionFactoryInterface $collectionFactory, ResourceMetadataFactoryInterface $metadataFactory)
     {
         $this->collectionFactory = $collectionFactory;
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Exception $exception = null): void
     {
         $resourceClass = $request->attributes->get('_api_resource_class');
         $resourceMetadata = $resourceClass ? $this->metadataFactory->create($resourceClass) : null;
@@ -60,12 +44,12 @@ class RequestDataCollector extends DataCollector
         ];
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->data['method'];
     }
 
-    public function getAcceptableContentTypes()
+    public function getAcceptableContentTypes(): array
     {
         return $this->data['acceptable_content_types'];
     }
@@ -80,7 +64,7 @@ class RequestDataCollector extends DataCollector
         return $this->data['resource_metadata'];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'api_platform.data_collector.request';
     }
@@ -88,7 +72,7 @@ class RequestDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
     }
 }

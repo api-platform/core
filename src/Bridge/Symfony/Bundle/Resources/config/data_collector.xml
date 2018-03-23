@@ -6,7 +6,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector\RequestDataCollector" public="false">
+        <service id="api_platform.data_collector.request" class="ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector\RequestDataCollector" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 

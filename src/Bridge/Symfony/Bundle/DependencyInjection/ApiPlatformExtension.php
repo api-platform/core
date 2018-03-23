@@ -552,10 +552,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     /**
      * Registers the DataCollector configuration.
-     *
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
      */
     private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
