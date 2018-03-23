@@ -19,6 +19,7 @@ use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use Behatch\Json\Json;
+use Behatch\Json\JsonInspector;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use JsonSchema\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -30,6 +31,7 @@ final class JsonApiContext implements Context
      */
     private $restContext;
     private $validator;
+    private $inspector;
     private $jsonApiSchemaFile;
     private $manager;
 
@@ -40,6 +42,7 @@ final class JsonApiContext implements Context
         }
 
         $this->validator = new Validator();
+        $this->inspector = new JsonInspector('javascript');
         $this->jsonApiSchemaFile = $jsonApiSchemaFile;
         $this->manager = $doctrine->getManager();
     }
@@ -61,8 +64,12 @@ final class JsonApiContext implements Context
      */
     public function theJsonShouldBeValidAccordingToTheJsonApiSchema()
     {
-        $json = $this->getJson();
+        $json = $this->getJson()->getContent();
         $this->validator->validate($json, (object) ['$ref' => 'file://'.__DIR__.'/../../'.$this->jsonApiSchemaFile]);
+
+        if (!$this->validator->isValid()) {
+            throw new ExpectationFailedException(sprintf('The JSON is not valid according to the JSON API schema.'));
+        }
     }
 
     /**
@@ -141,8 +148,7 @@ final class JsonApiContext implements Context
 
     private function getValueOfNode($node)
     {
-        $json = $this->getJson();
-        $this->validator->validate($json, $node);
+        return $this->inspector->evaluate($this->getJson(), $node);
     }
 
     private function getJson()
