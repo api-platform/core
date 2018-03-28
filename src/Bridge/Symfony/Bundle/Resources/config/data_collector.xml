@@ -7,14 +7,15 @@
 
     <services>
         <service id="api_platform.data_collector.request" class="ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector\RequestDataCollector" public="false">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
             <tag
                 name="data_collector"
                 template="@ApiPlatform/DataCollector/request.html.twig"
                 id="api_platform.data_collector.request"
+                priority="334"
             />
+            <!-- Priority 334 → Just after the "Request / Response" tab -->
         </service>
     </services>
 </container>
