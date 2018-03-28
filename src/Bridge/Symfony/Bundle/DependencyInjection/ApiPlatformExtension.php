@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -115,6 +116,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $bundles = $container->getParameter('kernel.bundles');
         if (isset($bundles['SecurityBundle'])) {
+            if (class_exists(ExpressionLanguage::class)) {
+                $loader->load('security_expression_language.xml');
+            }
             $loader->load('security.xml');
         }
 
