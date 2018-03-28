@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\GraphQl\Type;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Type\Definition\InputUnionType;
 use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -335,13 +336,24 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 break;
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if (!isset($this->graphqlTypes['#iterable'])) {
-                    $this->graphqlTypes['#iterable'] = new IterableType();
-                }
-                $graphqlType = $this->graphqlTypes['#iterable'];
+                $graphqlType = $this->getIterableType();
                 break;
             case Type::BUILTIN_TYPE_OBJECT:
-                if (($input && $depth > 0) || is_a($type->getClassName(), \DateTimeInterface::class, true)) {
+                if ($input && $depth > 0) {
+                    if (!isset($this->graphqlTypes['#stringIterableUnionInput'])) {
+                        $this->graphqlTypes['#stringIterableUnionInput'] = new InputUnionType([
+                            'name' => 'StringIterableUnionInput',
+                            'description' => 'Resource\'s IRI or data (embedded entities or when updating a related existing resource)',
+                            'types' => [
+                                GraphQLType::string(),
+                                $this->getIterableType(),
+                            ],
+                        ]);
+                    }
+                    $graphqlType = $this->graphqlTypes['#stringIterableUnionInput'];
+                    break;
+                }
+                if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     $graphqlType = GraphQLType::string();
                     break;
                 }
@@ -490,6 +502,15 @@ final class SchemaBuilder implements SchemaBuilderInterface
         ];
 
         return $this->graphqlTypes[$resourceClass]['connection'] = new ObjectType($configuration);
+    }
+
+    private function getIterableType(): IterableType
+    {
+        if (!isset($this->graphqlTypes['#iterable'])) {
+            $this->graphqlTypes['#iterable'] = new IterableType();
+        }
+
+        return $this->graphqlTypes['#iterable'];
     }
 
     private function isCollection(Type $type): bool
