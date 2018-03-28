@@ -76,6 +76,11 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
+            if (method_exists($identifiers[$propertyName], '__toString')) {
+                $identifiers[$propertyName] = (string) $identifiers[$propertyName];
+                continue;
+            }
+
             $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
             if (!$relatedIdentifiers = $this->localCache[$relatedResourceClass] ?? false) {
                 $relatedCacheKey = self::CACHE_KEY_PREFIX.md5($relatedResourceClass);

@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
@@ -76,6 +77,18 @@ class IdentifiersExtractorTest extends TestCase
         $dummy->setId(1);
 
         $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
+    }
+
+    public function testGetStringableIdentifiersFromItem()
+    {
+        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
+
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal());
+
+        $dummy = new Dummy();
+        $dummy->setId(new Uuid());
+
+        $this->assertEquals(['id' => 'foo'], $identifiersExtractor->getIdentifiersFromItem($dummy));
     }
 
     public function testGetCompositeIdentifiersFromItem()
