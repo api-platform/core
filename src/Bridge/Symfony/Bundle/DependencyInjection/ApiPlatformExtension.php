@@ -555,7 +555,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
     {
-        if (!$container->getParameter('kernel.debug')) {
+        if (false === $config['enable_profiler']) {
             return;
         }
 
