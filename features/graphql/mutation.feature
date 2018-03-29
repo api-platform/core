@@ -183,6 +183,44 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateCompositeRelation.value" should be equal to "Modified value."
     And the JSON node "data.updateCompositeRelation.clientMutationId" should be equal to "myId"
 
+  Scenario: Create an item with a custom UUID
+    When I send the following GraphQL request:
+    """
+    mutation {
+      createWritableId(input: {_id: "c6b722fe-0331-48c4-a214-f81f9f1ca082", name: "Foo", clientMutationId: "m"}) {
+        id
+        _id
+        name
+        clientMutationId
+      }
+    }
+    """
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.createWritableId.id" should be equal to "/writable_ids/c6b722fe-0331-48c4-a214-f81f9f1ca082"
+    And the JSON node "data.createWritableId._id" should be equal to "c6b722fe-0331-48c4-a214-f81f9f1ca082"
+    And the JSON node "data.createWritableId.name" should be equal to "Foo"
+    And the JSON node "data.createWritableId.clientMutationId" should be equal to "m"
+
+  Scenario: Update an item with a custom UUID
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateWritableId(input: {id: "/writable_ids/c6b722fe-0331-48c4-a214-f81f9f1ca082", _id: "f8a708b2-310f-416c-9aef-b1b5719dfa47", name: "Foo", clientMutationId: "m"}) {
+        id
+        _id
+        name
+        clientMutationId
+      }
+    }
+    """
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.updateWritableId.id" should be equal to "/writable_ids/f8a708b2-310f-416c-9aef-b1b5719dfa47"
+    And the JSON node "data.updateWritableId._id" should be equal to "f8a708b2-310f-416c-9aef-b1b5719dfa47"
+    And the JSON node "data.updateWritableId.name" should be equal to "Foo"
+    And the JSON node "data.updateWritableId.clientMutationId" should be equal to "m"
+
   @dropSchema
   Scenario: Trigger a validation error
     When I send the following GraphQL request:
