@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
+/**
+ * @author Julien DENIAU <julien.deniau@gmail.com>
+ */
 final class RequestDataCollector extends DataCollector
 {
     private $metadataFactory;
@@ -55,12 +58,12 @@ final class RequestDataCollector extends DataCollector
 
     public function getResourceClass()
     {
-        return $this->data['resource_class'];
+        return $this->data['resource_class'] ?? null;
     }
 
     public function getResourceMetadata()
     {
-        return $this->data['resource_metadata'];
+        return $this->data['resource_metadata'] ?? null;
     }
 
     /**
