@@ -45,12 +45,12 @@ final class RequestDataCollector extends DataCollector
 
     public function getMethod(): string
     {
-        return $this->data['method'];
+        return $this->data['method'] ?? '';
     }
 
     public function getAcceptableContentTypes(): array
     {
-        return $this->data['acceptable_content_types'];
+        return $this->data['acceptable_content_types'] ?? [];
     }
 
     public function getResourceClass()
