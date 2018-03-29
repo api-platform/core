@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionExtensions;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
@@ -23,6 +24,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemExtensions;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
@@ -627,6 +629,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',
             'api_platform.doctrine.orm.collection_data_provider',
+            'api_platform.doctrine.orm.collection_extensions',
             'api_platform.doctrine.orm.data_persister',
             'api_platform.doctrine.orm.date_filter',
             'api_platform.doctrine.orm.default.collection_data_provider',
@@ -634,6 +637,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.exists_filter',
             'api_platform.doctrine.orm.default.subresource_data_provider',
             'api_platform.doctrine.orm.item_data_provider',
+            'api_platform.doctrine.orm.item_extensions',
             'api_platform.doctrine.orm.metadata.property.metadata_factory',
             'api_platform.doctrine.orm.numeric_filter',
             'api_platform.doctrine.orm.order_filter',
@@ -711,9 +715,11 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
+            CollectionExtensions::class => 'api_platform.doctrine.orm.collection_extensions',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
+            ItemExtensions::class => 'api_platform.doctrine.orm.item_extensions',
             PaginationExtension::class => 'api_platform.doctrine.orm.query_extension.pagination',
             OrderExtension::class => 'api_platform.doctrine.orm.query_extension.order',
             ValidatorInterface::class => 'api_platform.validator',
