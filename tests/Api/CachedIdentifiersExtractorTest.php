@@ -15,10 +15,12 @@ namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\CachedIdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -54,7 +56,7 @@ class CachedIdentifiersExtractorTest extends TestCase
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
         $decoration->getIdentifiersFromItem($dummy)->shouldBeCalled()->willReturn(['id' => $identifierValue]);
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
 
         $expectedResult = ['id' => $identifierValue];
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
@@ -87,7 +89,7 @@ class CachedIdentifiersExtractorTest extends TestCase
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
         $decoration->getIdentifiersFromItem($dummy)->shouldNotBeCalled();
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
 
         $expectedResult = ['id' => $identifierValue];
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
@@ -120,7 +122,7 @@ class CachedIdentifiersExtractorTest extends TestCase
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
         $decoration->getIdentifiersFromItem($dummy)->shouldBeCalled()->willReturn(['id' => 1, 'relatedDummy' => 1]);
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
 
         $expectedResult = ['id' => 1, 'relatedDummy' => 1];
         $this->assertEquals(['id' => 1, 'relatedDummy' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
@@ -154,10 +156,36 @@ class CachedIdentifiersExtractorTest extends TestCase
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
         $decoration->getIdentifiersFromItem($dummy)->shouldNotBeCalled();
 
-        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null, $this->getResourceClassResolver());
 
         $expectedResult = ['id' => 1, 'relatedDummy' => 1];
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy));
         $this->assertEquals($expectedResult, $identifiersExtractor->getIdentifiersFromItem($dummy), 'Trigger the local cache');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
+     */
+    public function testDeprecationResourceClassResolver()
+    {
+        $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
+        $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
+
+        $identifiersExtractor = new CachedIdentifiersExtractor($cacheItemPool->reveal(), $decoration->reveal(), null);
+    }
+
+    private function getResourceClassResolver()
+    {
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
+            if (Uuid::class === $args[0]) {
+                return false;
+            }
+
+            return true;
+        });
+
+        return $resourceClassResolver->reveal();
     }
 }

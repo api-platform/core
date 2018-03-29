@@ -32,12 +32,18 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $propertyAccessor;
+    private $resourceClassResolver;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
+        $this->resourceClassResolver = $resourceClassResolver;
+
+        if (null === $this->resourceClassResolver) {
+            @trigger_error(sprintf('Not injecting %s in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.', ResourceClassResolverInterface::class), E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -70,16 +76,17 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $identifier = $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
+
             if (!\is_object($identifier)) {
                 continue;
             }
 
-            if (method_exists($identifier, '__toString')) {
-                $identifiers[$propertyName] = (string) $identifier;
+            $relatedResourceClass = $this->getObjectClass($identifier);
+
+            if (null !== $this->resourceClassResolver && !$this->resourceClassResolver->isResourceClass($relatedResourceClass)) {
                 continue;
             }
 
-            $relatedResourceClass = $this->getObjectClass($identifier);
             $relatedItem = $identifier;
             unset($identifiers[$propertyName]);
             foreach ($this->propertyNameCollectionFactory->create($relatedResourceClass) as $relatedPropertyName) {

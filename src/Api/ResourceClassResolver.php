@@ -28,6 +28,7 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
     use ClassInfoTrait;
 
     private $resourceNameCollectionFactory;
+    private $localIsResourceClassCache = [];
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory)
     {
@@ -68,12 +69,16 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
      */
     public function isResourceClass(string $type): bool
     {
+        if (isset($this->localIsResourceClassCache[$type])) {
+            return $this->localIsResourceClassCache[$type];
+        }
+
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             if ($type === $resourceClass) {
-                return true;
+                return $this->localIsResourceClassCache[$type] = true;
             }
         }
 
-        return false;
+        return $this->localIsResourceClassCache[$type] = false;
     }
 }

@@ -33,14 +33,20 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
     private $cacheItemPool;
     private $propertyAccessor;
     private $decorated;
+    private $resourceClassResolver;
     private $localCache = [];
     private $localResourceCache = [];
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, IdentifiersExtractorInterface $decorated, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, IdentifiersExtractorInterface $decorated, PropertyAccessorInterface $propertyAccessor = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->cacheItemPool = $cacheItemPool;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
         $this->decorated = $decorated;
+        $this->resourceClassResolver = $resourceClassResolver;
+
+        if (null === $this->resourceClassResolver) {
+            @trigger_error(sprintf('Not injecting %s in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.', ResourceClassResolverInterface::class), E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -76,12 +82,12 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            if (method_exists($identifiers[$propertyName], '__toString')) {
-                $identifiers[$propertyName] = (string) $identifiers[$propertyName];
+            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
+
+            if (null !== $this->resourceClassResolver && !$this->resourceClassResolver->isResourceClass($relatedResourceClass)) {
                 continue;
             }
 
-            $relatedResourceClass = $this->getObjectClass($identifiers[$propertyName]);
             if (!$relatedIdentifiers = $this->localCache[$relatedResourceClass] ?? false) {
                 $relatedCacheKey = self::CACHE_KEY_PREFIX.md5($relatedResourceClass);
                 try {
