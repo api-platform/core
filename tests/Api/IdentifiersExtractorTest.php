@@ -57,7 +57,7 @@ class IdentifiersExtractorTest extends TestCase
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
-        $this->assertEquals(['id'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+        $this->assertSame(['id'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
     }
 
     public function testGetCompositeIdentifiersFromResourceClass()
@@ -66,62 +66,90 @@ class IdentifiersExtractorTest extends TestCase
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
-        $this->assertEquals(['id', 'name'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+        $this->assertSame(['id', 'name'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
     }
 
-    public function testGetIdentifiersFromItem()
+    public function itemProvider()
     {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
-
-        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
-
         $dummy = new Dummy();
         $dummy->setId(1);
-
-        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
-    }
-
-    public function testUseObjectIdentifier()
-    {
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
-
-        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
+        yield [$dummy, ['id' => 1]];
 
         $uuid = new Uuid();
         $dummy = new Dummy();
         $dummy->setId($uuid);
-
-        $this->assertEquals(['id' => $uuid], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        yield [$dummy, ['id' => $uuid]];
     }
 
-    public function testGetCompositeIdentifiersFromItem()
+    /**
+     * @dataProvider itemProvider
+     */
+    public function testGetIdentifiersFromItem($item, $expected)
+    {
+        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
+
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
+
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
+    }
+
+    public function itemProviderComposite()
+    {
+        $dummy = new Dummy();
+        $dummy->setId(1);
+        $dummy->setName('foo');
+        yield [$dummy, ['id' => 1, 'name' => 'foo']];
+
+        $dummy = new Dummy();
+        $dummy->setId($uuid = new Uuid());
+        $dummy->setName('foo');
+        yield [$dummy, ['id' => $uuid, 'name' => 'foo']];
+    }
+
+    /**
+     * @dataProvider itemProviderComposite
+     */
+    public function testGetCompositeIdentifiersFromItem($item, $expected)
     {
         list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
 
-        $dummy = new Dummy();
-        $dummy->setId(1);
-        $dummy->setName('foo');
-
-        $this->assertEquals(['id' => 1, 'name' => 'foo'], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
     }
 
-    public function testGetRelatedIdentifiersFromItem()
+    public function itemProviderRelated()
     {
-        $prophecies = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'relatedDummy']);
-        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(RelatedDummy::class, ['id'], $prophecies);
-
-        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
-
         $related = new RelatedDummy();
         $related->setId(2);
 
         $dummy = new Dummy();
         $dummy->setId(1);
         $dummy->setRelatedDummy($related);
+        yield [$dummy, ['id' => 1, 'relatedDummy' => 2]];
 
-        $this->assertEquals(['id' => 1, 'relatedDummy' => 2], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $uuid2 = new Uuid();
+        $related = new RelatedDummy();
+        $related->setId($uuid2);
+
+        $uuid = new Uuid();
+        $dummy = new Dummy();
+        $dummy->setId($uuid);
+        $dummy->setRelatedDummy($related);
+        yield [$dummy, ['id' => $uuid, 'relatedDummy' => $uuid2]];
+    }
+
+    /**
+     * @dataProvider itemProviderRelated
+     */
+    public function testGetRelatedIdentifiersFromItem($item, $expected)
+    {
+        $prophecies = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'relatedDummy']);
+        list($propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy) = $this->getMetadataFactoryProphecies(RelatedDummy::class, ['id'], $prophecies);
+
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $this->getResourceClassResolver());
+
+        $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
     }
 
     /**
@@ -172,6 +200,6 @@ class IdentifiersExtractorTest extends TestCase
         $dummy = new Dummy();
         $dummy->setId(1);
 
-        $this->assertEquals(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
+        $this->assertSame(['id' => 1], $identifiersExtractor->getIdentifiersFromItem($dummy));
     }
 }
