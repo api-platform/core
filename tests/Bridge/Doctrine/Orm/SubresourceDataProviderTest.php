@@ -84,7 +84,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy->getIdentifier()->willReturn($identifiers);
 
         foreach ($identifiers as $id) {
-            $classMetadataProphecy->getTypeOfField($id)->willReturn('interger');
+            $classMetadataProphecy->getTypeOfField($id)->willReturn('integer');
         }
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
