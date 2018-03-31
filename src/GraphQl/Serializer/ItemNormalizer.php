@@ -23,13 +23,14 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Core\Serializer\ItemNormalizer as BaseItemNormalizer;
 
 /**
  * GraphQL normalizer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+final class ItemNormalizer extends BaseItemNormalizer
 {
     const FORMAT = 'graphql';
     const ITEM_KEY = '#item';
@@ -37,9 +38,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
+    public function supportsNormalization($data, $format = null)
+    {
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function normalize($object, $format = null, array $context = [])
     {
-        $data = parent::normalize($object, $format, $context);
+        $data = AbstractItemNormalizer::normalize($object, $format, $context);
         $data[self::ITEM_KEY] = serialize($object); // calling serialize prevent weird normalization process done by Webonyx's GraphQL PHP
 
         return $data;
@@ -57,16 +66,35 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsDenormalization($data, $type, $format = null)
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
+        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
+
+        if (($context['api_denormalize'] ?? false) && false !== ($indexId = array_search('id', $allowedAttributes, true))) {
+            $allowedAttributes[] = '_id';
+            array_splice($allowedAttributes, $indexId, 1);
+        }
+
+        return $allowedAttributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
+    {
+        if ('_id' === $attribute) {
+            $attribute = 'id';
+        }
+
+        parent::setAttributeValue($object, $attribute, $value, $format, $context);
     }
 }
