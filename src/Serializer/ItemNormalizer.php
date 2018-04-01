@@ -18,9 +18,11 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 /**
  * Generic item normalizer.
  *
+ * @final
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ItemNormalizer extends AbstractItemNormalizer
+class ItemNormalizer extends AbstractItemNormalizer
 {
     /**
      * {@inheritdoc}
