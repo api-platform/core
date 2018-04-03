@@ -13,16 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\PaginationTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -34,7 +31,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class PaginationExtension implements ContextAwareQueryResultCollectionExtensionInterface
 {
-    private $managerRegistry;
+    use PaginationTrait;
+
     private $requestStack;
     private $resourceMetadataFactory;
     private $enabled;
@@ -144,20 +142,17 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
     {
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder));
-        $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
-
+        $doctrineOrmPaginator = $this->getDoctrinePaginator($queryBuilder);
         $resourceMetadata = null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass);
 
         if ($this->isPartialPaginationEnabled($this->requestStack->getCurrentRequest(), $resourceMetadata, $operationName)) {
-            return new class($doctrineOrmPaginator) extends AbstractPaginator {
-            };
+            return $this->getPartialPaginator($doctrineOrmPaginator);
         }
 
-        return new Paginator($doctrineOrmPaginator);
+        return $this->getPaginator($doctrineOrmPaginator);
     }
 
-    private function isPartialPaginationEnabled(Request $request = null, ResourceMetadata $resourceMetadata = null, string $operationName = null): bool
+    public function isPartialPaginationEnabled(Request $request = null, ResourceMetadata $resourceMetadata = null, string $operationName = null): bool
     {
         $enabled = $this->partial;
         $clientEnabled = $this->clientPartial;
@@ -177,7 +172,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         return $enabled;
     }
 
-    private function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool
+    public function isPaginationEnabled(Request $request, ResourceMetadata $resourceMetadata, string $operationName = null): bool
     {
         $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
         $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
@@ -187,70 +182,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         return $enabled;
-    }
-
-    /**
-     * Determines whether the Paginator should fetch join collections, if the root entity uses composite identifiers it should not.
-     *
-     * @see https://github.com/doctrine/doctrine2/issues/2910
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
-     */
-    private function useFetchJoinCollection(QueryBuilder $queryBuilder): bool
-    {
-        return !QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry);
-    }
-
-    /**
-     * Determines whether output walkers should be used.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
-     */
-    private function useOutputWalkers(QueryBuilder $queryBuilder): bool
-    {
-        /*
-         * "Cannot count query that uses a HAVING clause. Use the output walkers for pagination"
-         *
-         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/CountWalker.php#L50
-         */
-        if (QueryChecker::hasHavingClause($queryBuilder)) {
-            return true;
-        }
-
-        /*
-         * "Paginating an entity with foreign key as identifier only works when using the Output Walkers. Call Paginator#setUseOutputWalkers(true) before iterating the paginator."
-         *
-         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L87
-         */
-        if (QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder, $this->managerRegistry)) {
-            return true;
-        }
-
-        /*
-         * "Cannot select distinct identifiers from query with LIMIT and ORDER BY on a column from a fetch joined to-many association. Use output walkers."
-         *
-         * @see https://github.com/doctrine/doctrine2/blob/900b55d16afdcdeb5100d435a7166d3a425b9873/lib/Doctrine/ORM/Tools/Pagination/LimitSubqueryWalker.php#L149
-         */
-        if (
-            QueryChecker::hasMaxResults($queryBuilder) &&
-            QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $this->managerRegistry)
-        ) {
-            return true;
-        }
-
-        /*
-         * When using composite identifiers pagination will need Output walkers
-         */
-        if (QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry)) {
-            return true;
-        }
-
-        // Disable output walkers by default (performance)
-        return false;
     }
 
     private function getPaginationParameter(Request $request, string $parameterName, $default = null)
