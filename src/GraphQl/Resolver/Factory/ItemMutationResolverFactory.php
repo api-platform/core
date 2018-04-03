@@ -85,11 +85,6 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             switch ($operationName) {
                 case 'create':
                 case 'update':
-                    unset($args['input']['id']);
-                    if (isset($args['input']['_id'])) {
-                        $args['input']['id'] = $args['input']['_id'];
-                    }
-
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
                     $this->validate($item, $info, $resourceMetadata, $operationName);
