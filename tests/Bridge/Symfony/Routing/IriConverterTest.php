@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
@@ -60,7 +61,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -92,7 +93,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -128,7 +129,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -162,7 +163,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
     }
@@ -191,7 +192,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), '/dummies');
     }
@@ -224,7 +225,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getIriFromResourceClass(Dummy::class);
     }
@@ -253,7 +254,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $this->assertEquals($converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]), '/dummies/1/related_dummies');
     }
@@ -286,7 +287,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]);
     }
@@ -315,7 +316,7 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
@@ -348,8 +349,18 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory)
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
         );
         $converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]);
+    }
+
+    private function getResourceClassResolver()
+    {
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(function ($args) {
+            return true;
+        });
+
+        return $resourceClassResolver->reveal();
     }
 }
