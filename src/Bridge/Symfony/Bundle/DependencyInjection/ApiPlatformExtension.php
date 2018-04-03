@@ -138,6 +138,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config, $loader);
+        $this->registerDataCollector($container, $config, $loader);
     }
 
     /**
@@ -551,5 +552,17 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
+    }
+
+    /**
+     * Registers the DataCollector configuration.
+     */
+    private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['enable_profiler']) {
+            return;
+        }
+
+        $loader->load('data_collector.xml');
     }
 }

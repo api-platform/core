@@ -623,6 +623,7 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $definitions = [
+            'api_platform.data_collector.request',
             'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',

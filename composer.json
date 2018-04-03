@@ -63,6 +63,7 @@
         "symfony/security-bundle": "^3.0 || ^4.0",
         "symfony/twig-bundle": "^3.1 || ^4.0",
         "symfony/validator": "^3.3 || ^4.0",
+        "symfony/web-profiler-bundle": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0",
         "webonyx/graphql-php": "^0.10.2"
     },
@@ -79,6 +80,7 @@
         "symfony/expression-language": "To use authorization features.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
+        "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
     "autoload": {

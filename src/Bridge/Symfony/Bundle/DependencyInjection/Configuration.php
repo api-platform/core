@@ -101,6 +101,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
+                ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
 
                 ->arrayNode('oauth')
                     ->canBeEnabled()
