@@ -12,7 +12,7 @@ const coverage = (event, project) => {
         `composer require --dev --no-update 'phpunit/php-code-coverage:^5.2.2'`,
         'composer update --prefer-dist --no-progress --no-suggest --ansi',
         'phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov',
-        `for f in $(find features -name '*.feature'); do FEATURE=\${f//\\//_} phpdbg -qrr vendor/bin/behat --format=progress --profile coverage $f || exit $?; done`,
+        'phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --format=progress',
         'phpdbg -qrr $(which phpcov) merge --clover build/logs/clover.xml build/cov;',
         'coveralls -v',
     ];
@@ -25,11 +25,11 @@ const coverage = (event, project) => {
 
     const gh = JSON.parse(event.payload);
     if (gh.pull_request) {
-      job.env.CI_PULL_REQUEST = gh.pull_request.number.toString();
-      job.env.CI_BRANCH = gh.pull_request.base.ref;
+        job.env.CI_PULL_REQUEST = gh.pull_request.number.toString();
+        job.env.CI_BRANCH = gh.pull_request.base.ref;
     } else if (gh.ref) {
-      const parts = gh.ref.split('/');
-      job.env.CI_BRANCH = parts[parts.length - 1];
+        const parts = gh.ref.split('/');
+        job.env.CI_BRANCH = parts[parts.length - 1];
     }
 
     job.run();
