@@ -257,16 +257,6 @@ class SearchFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $values = array_map([$this, 'getIdFromValue'], $values);
-
-        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
-            $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
-            ]);
-
-            return;
-        }
-
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
@@ -277,6 +267,18 @@ class SearchFilter extends AbstractContextAwareFilter
         } else {
             $associationAlias = $alias;
             $associationField = $field;
+        }
+
+        foreach ($values as $k => $v) {
+            $values[$k] = $this->getIdFromValue($v, $associationField);
+        }
+
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+            ]);
+
+            return;
         }
 
         if (1 === \count($values)) {
@@ -366,14 +368,15 @@ class SearchFilter extends AbstractContextAwareFilter
      * Gets the ID from an IRI or a raw ID.
      *
      * @param string $value
+     * @param string $identifier
      *
      * @return mixed
      */
-    protected function getIdFromValue(string $value)
+    protected function getIdFromValue(string $value, string $identifier = 'id')
     {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value, ['fetch_data' => false])) {
-                return $this->propertyAccessor->getValue($item, 'id');
+                return $this->propertyAccessor->getValue($item, $identifier);
             }
         } catch (InvalidArgumentException $e) {
             // Do nothing, return the raw value
