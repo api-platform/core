@@ -344,6 +344,20 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testDisabledDocsRemovesAddLinkHeaderService()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->removeDefinition('api_platform.hydra.listener.response.add_link_header')->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_docs', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_docs', true)->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_docs'] = false;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy($test = false)
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
