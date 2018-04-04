@@ -66,15 +66,33 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].in" should be equal to "path"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].required" should be true
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].schema.type" should be equal to "string"
+
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].name" should be equal to "name"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].in" should be equal to "query"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].required" should be false
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[1].schema.type" should be equal to "string"
+
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].name" should be equal to "description"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].in" should be equal to "query"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].required" should be false
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[2].schema.type" should be equal to "string"
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 3 element
+
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].name" should be equal to "page"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].in" should be equal to "query"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].required" should be false
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].schema.type" should be equal to "integer"
+
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].name" should be equal to "itemsPerPage"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].in" should be equal to "query"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].required" should be false
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].schema.type" should be equal to "integer"
+
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].name" should be equal to "pagination"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].in" should be equal to "query"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].required" should be false
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].schema.type" should be equal to "boolean"
+
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
 
     # Subcollection - check schema
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend-fakemanytomany"
