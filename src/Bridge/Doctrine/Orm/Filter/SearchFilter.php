@@ -211,7 +211,9 @@ class SearchFilter extends AbstractContextAwareFilter
 
         if ($metadata->hasField($field)) {
             if ('id' === $field) {
-                $values = array_map([$this, 'getIdFromValue'], $values);
+                foreach ($values as $k => $v) {
+                    $values[$k] = $this->getIdentifierFromValue($v, 'id');
+                }
             }
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -270,7 +272,7 @@ class SearchFilter extends AbstractContextAwareFilter
         }
 
         foreach ($values as $k => $v) {
-            $values[$k] = $this->getIdFromValue($v, $associationField);
+            $values[$k] = $this->getIdentifierFromValue($v, $associationField);
         }
 
         if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -368,11 +370,27 @@ class SearchFilter extends AbstractContextAwareFilter
      * Gets the ID from an IRI or a raw ID.
      *
      * @param string $value
+     *
+     * @return mixed
+     */
+    protected function getIdFromValue(string $value)
+    {
+        @trigger_error('Using "getIdFromValue()" is deprecated. Use "getIdentifierFromValue()" instead.',
+            E_USER_DEPRECATED
+        );
+
+        return $this->getIdentifierFromValue($value, 'id');
+    }
+
+    /**
+     * Gets the identifier from an IRI or a raw identifier.
+     *
+     * @param string $value
      * @param string $identifier
      *
      * @return mixed
      */
-    protected function getIdFromValue(string $value, string $identifier = 'id')
+    protected function getIdentifierFromValue(string $value, string $identifier)
     {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value, ['fetch_data' => false])) {
