@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\DocumentMetadata;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\OptimisticLockException;
@@ -230,6 +231,26 @@ final class Configuration implements ConfigurationInterface
                     ->{class_exists(MercureBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->scalarNode('hub_url')->defaultNull()->info('The URL send in the Link HTTP header. If not set, will default to the URL for the Symfony\'s bundle default hub.')
+                ->end()
+
+                ->arrayNode('elasticsearch')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('host')
+                            ->isRequired()
+                            ->cannotBeEmpty()
+                        ->end()
+                        ->arrayNode('mapping')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('resource_class')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('index')->defaultNull()->end()
+                                    ->scalarNode('type')->defaultValue(DocumentMetadata::DEFAULT_TYPE)->end()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
 
