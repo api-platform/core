@@ -57,3 +57,5 @@ coverage:
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
+      filters:
+        tags: ~@postgres
