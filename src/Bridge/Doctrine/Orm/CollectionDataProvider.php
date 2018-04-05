@@ -27,6 +27,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @final
  */
 class CollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
@@ -36,7 +37,7 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
     /**
      * @param QueryCollectionExtensionInterface[]|ContextAwareQueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, array $collectionExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, /* iterable */ $collectionExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->collectionExtensions = $collectionExtensions;

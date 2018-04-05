@@ -32,6 +32,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
+ * @final
  */
 class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
@@ -46,7 +47,7 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
      * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
      * @param QueryItemExtensionInterface[]          $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, /* iterable */ $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
