@@ -27,7 +27,7 @@ final class ChainItemDataProvider implements ItemDataProviderInterface
     /**
      * @param ItemDataProviderInterface[] $dataProviders
      */
-    public function __construct(array $dataProviders)
+    public function __construct(/* iterable */ $dataProviders)
     {
         $this->dataProviders = $dataProviders;
     }

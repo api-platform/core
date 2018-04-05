@@ -25,7 +25,7 @@ final class ChainDataPersister implements DataPersisterInterface
     /**
      * @param DataPersisterInterface[] $persisters
      */
-    public function __construct(array $persisters)
+    public function __construct(/* iterable */ $persisters)
     {
         $this->persisters = $persisters;
     }
