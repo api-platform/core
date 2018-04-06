@@ -108,8 +108,8 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function normalize($object, $format = null, array $context = [])
     {
         $mimeTypes = $object->getMimeTypes();
-        $definitions = new \ArrayObject();
-        $paths = new \ArrayObject();
+        $definitions = new ArrayObject();
+        $paths = new ArrayObject();
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -136,15 +136,15 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Updates the list of entries in the paths collection.
      *
-     * @param \ArrayObject     $paths
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $paths
+     * @param ArrayObject     $definitions
      * @param string           $resourceClass
      * @param string           $resourceShortName
      * @param ResourceMetadata $resourceMetadata
      * @param array            $mimeTypes
      * @param string           $operationType
      */
-    private function addPaths(\ArrayObject $paths, \ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType)
+    private function addPaths(ArrayObject $paths, ArrayObject $definitions, string $resourceClass, string $resourceShortName, ResourceMetadata $resourceMetadata, array $mimeTypes, string $operationType)
     {
         if (null === $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
             return;
@@ -195,13 +195,13 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param string           $resourceClass
      * @param ResourceMetadata $resourceMetadata
      * @param string[]         $mimeTypes
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function getPathOperation(string $operationName, array $operation, string $method, string $operationType, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, \ArrayObject $definitions): \ArrayObject
+    private function getPathOperation(string $operationName, array $operation, string $method, string $operationType, string $resourceClass, ResourceMetadata $resourceMetadata, array $mimeTypes, ArrayObject $definitions): ArrayObject
     {
-        $pathOperation = new \ArrayObject($operation['swagger_context'] ?? []);
+        $pathOperation = new ArrayObject($operation['swagger_context'] ?? []);
         $resourceShortName = $resourceMetadata->getShortName();
         $pathOperation['tags'] ?? $pathOperation['tags'] = [$resourceShortName];
         $pathOperation['operationId'] ?? $pathOperation['operationId'] = lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
@@ -224,18 +224,18 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param \ArrayObject     $pathOperation
+     * @param ArrayObject     $pathOperation
      * @param array            $mimeTypes
      * @param string           $operationType
      * @param ResourceMetadata $resourceMetadata
      * @param string           $resourceClass
      * @param string           $resourceShortName
      * @param string           $operationName
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function updateGetOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
+    private function updateGetOperation(ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, ArrayObject $definitions): ArrayObject
     {
         $serializerContext = $this->getSerializerContext($operationType, false, $resourceMetadata, $operationName);
         $responseDefinitionKey = $this->getDefinition($definitions, $resourceMetadata, $resourceClass, $serializerContext);
@@ -282,18 +282,18 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param \ArrayObject     $pathOperation
+     * @param ArrayObject     $pathOperation
      * @param array            $mimeTypes
      * @param string           $operationType
      * @param ResourceMetadata $resourceMetadata
      * @param string           $resourceClass
      * @param string           $resourceShortName
      * @param string           $operationName
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function updatePostOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
+    private function updatePostOperation(ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, ArrayObject $definitions)
     {
         $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
@@ -321,18 +321,18 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param \ArrayObject     $pathOperation
+     * @param ArrayObject     $pathOperation
      * @param array            $mimeTypes
      * @param string           $operationType
      * @param ResourceMetadata $resourceMetadata
      * @param string           $resourceClass
      * @param string           $resourceShortName
      * @param string           $operationName
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function updatePutOperation(\ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, \ArrayObject $definitions)
+    private function updatePutOperation(ArrayObject $pathOperation, array $mimeTypes, string $operationType, ResourceMetadata $resourceMetadata, string $resourceClass, string $resourceShortName, string $operationName, ArrayObject $definitions)
     {
         $pathOperation['consumes'] ?? $pathOperation['consumes'] = $mimeTypes;
         $pathOperation['produces'] ?? $pathOperation['produces'] = $mimeTypes;
@@ -368,12 +368,12 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param \ArrayObject $pathOperation
+     * @param ArrayObject $pathOperation
      * @param string       $resourceShortName
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function updateDeleteOperation(\ArrayObject $pathOperation, string $resourceShortName): \ArrayObject
+    private function updateDeleteOperation(ArrayObject $pathOperation, string $resourceShortName): ArrayObject
     {
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Removes the %s resource.', $resourceShortName);
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
@@ -392,14 +392,14 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      * @param ResourceMetadata $resourceMetadata
      * @param string           $resourceClass
      * @param array|null       $serializerContext
      *
      * @return string
      */
-    private function getDefinition(\ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
+    private function getDefinition(ArrayObject $definitions, ResourceMetadata $resourceMetadata, string $resourceClass, array $serializerContext = null): string
     {
         if (isset($serializerContext[self::SWAGGER_DEFINITION_NAME])) {
             $definitionKey = sprintf('%s-%s', $resourceMetadata->getShortName(), $serializerContext[self::SWAGGER_DEFINITION_NAME]);
@@ -427,14 +427,14 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @param string           $resourceClass
      * @param ResourceMetadata $resourceMetadata
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      * @param array|null       $serializerContext
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
+    private function getDefinitionSchema(string $resourceClass, ResourceMetadata $resourceMetadata, ArrayObject $definitions, array $serializerContext = null): ArrayObject
     {
-        $definitionSchema = new \ArrayObject(['type' => 'object']);
+        $definitionSchema = new ArrayObject(['type' => 'object']);
 
         if (null !== $description = $resourceMetadata->getDescription()) {
             $definitionSchema['description'] = $description;
@@ -465,14 +465,14 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject
      *
      * @param PropertyMetadata $propertyMetadata
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      * @param array|null       $serializerContext
      *
-     * @return \ArrayObject
+     * @return ArrayObject
      */
-    private function getPropertySchema(PropertyMetadata $propertyMetadata, \ArrayObject $definitions, array $serializerContext = null): \ArrayObject
+    private function getPropertySchema(PropertyMetadata $propertyMetadata, ArrayObject $definitions, array $serializerContext = null): ArrayObject
     {
-        $propertySchema = new \ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
+        $propertySchema = new ArrayObject($propertyMetadata->getAttributes()['swagger_context'] ?? []);
 
         if (false === $propertyMetadata->isWritable()) {
             $propertySchema['readOnly'] = true;
@@ -497,7 +497,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $valueSchema = $this->getType($builtinType, $isCollection, $className, $propertyMetadata->isReadableLink(), $definitions, $serializerContext);
 
-        return new \ArrayObject((array) $propertySchema + $valueSchema);
+        return new ArrayObject((array) $propertySchema + $valueSchema);
     }
 
     /**
@@ -507,12 +507,12 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param bool         $isCollection
      * @param string       $className
      * @param bool         $readableLink
-     * @param \ArrayObject $definitions
+     * @param ArrayObject $definitions
      * @param array|null   $serializerContext
      *
      * @return array
      */
-    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null, \ArrayObject $definitions, array $serializerContext = null): array
+    private function getType(string $type, bool $isCollection, string $className = null, bool $readableLink = null, ArrayObject $definitions, array $serializerContext = null): array
     {
         if ($isCollection) {
             return ['type' => 'array', 'items' => $this->getType($type, false, $className, $readableLink, $definitions, $serializerContext)];
@@ -562,13 +562,13 @@ final class DocumentationNormalizer implements NormalizerInterface
      * Computes the Swagger documentation.
      *
      * @param Documentation $documentation
-     * @param \ArrayObject  $definitions
-     * @param \ArrayObject  $paths
+     * @param ArrayObject  $definitions
+     * @param ArrayObject  $paths
      * @param array         $context
      *
      * @return array
      */
-    private function computeDoc(Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths, array $context): array
+    private function computeDoc(Documentation $documentation, ArrayObject $definitions, ArrayObject $paths, array $context): array
     {
         $doc = [
             'swagger' => self::SWAGGER_VERSION,
@@ -634,12 +634,12 @@ final class DocumentationNormalizer implements NormalizerInterface
      * @param string           $resourceClass
      * @param string           $operationName
      * @param ResourceMetadata $resourceMetadata
-     * @param \ArrayObject     $definitions
+     * @param ArrayObject     $definitions
      * @param array|null       $serializerContext
      *
      * @return array
      */
-    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata, \ArrayObject $definitions, array $serializerContext = null): array
+    private function getFiltersParameters(string $resourceClass, string $operationName, ResourceMetadata $resourceMetadata, ArrayObject $definitions, array $serializerContext = null): array
     {
         if (null === $this->filterLocator) {
             return [];
