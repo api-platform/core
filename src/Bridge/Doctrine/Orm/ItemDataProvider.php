@@ -20,6 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -71,11 +72,13 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
+        if (!($context[ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER] ?? false)) {
+            $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
+        }
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof EntityManagerInterface) {
-            return $manager->getReference($resourceClass, $identifiers);
+            return $manager->getReference($resourceClass, $id);
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -87,10 +90,10 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
         $queryNameGenerator = new QueryNameGenerator();
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
 
-        $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata);
+        $this->addWhereForIdentifiers($id, $queryBuilder, $doctrineClassMetadata);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $id, $operationName, $context);
 
             if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);

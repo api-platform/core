@@ -35,10 +35,10 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
     {
         // Retrieve the blog post item from somewhere
         $cnr = new ContainNonResource();
-        $cnr->id = $id;
+        $cnr->id = $id['id'];
         $cnr->notAResource = new NotAResource('f1', 'b1');
         $cnr->nested = new ContainNonResource();
-        $cnr->nested->id = "$id-nested";
+        $cnr->nested->id = "{$id['id']}-nested";
         $cnr->nested->notAResource = new NotAResource('f2', 'b2');
 
         return $cnr;

@@ -26,6 +26,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -120,6 +121,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 $loader->load('security_expression_language.xml');
             }
             $loader->load('security.xml');
+        }
+
+        if (!class_exists(Uuid::class)) {
+            $container->removeDefinition('api_platform.identifier.uuid_normalizer');
         }
 
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);

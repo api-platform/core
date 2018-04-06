@@ -23,6 +23,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -152,11 +153,16 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $qb = $manager->createQueryBuilder();
         $alias = $queryNameGenerator->generateJoinAlias($identifier);
         $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
-        $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers(
-            $identifiers[$identifier],
-            $manager,
-            $identifierResourceClass
-        ) : [];
+        $normalizedIdentifiers = [];
+
+        if (isset($identifiers[$identifier])) {
+            // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
+            if ($context[ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER] ?? false) {
+                $normalizedIdentifiers = $identifiers[$identifier];
+            } else {
+                $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);
+            }
+        }
 
         switch ($relationType) {
             // MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved

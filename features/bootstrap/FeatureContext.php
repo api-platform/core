@@ -38,6 +38,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -868,6 +869,18 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $this->manager->persist($dummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a ramsey identified resource with uuid :uuid
+     */
+    public function thereIsARamseyIdentifiedResource(string $uuid)
+    {
+        $dummy = new RamseyUuidDummy();
+        $dummy->setId($uuid);
+
+        $this->manager->persist($dummy);
         $this->manager->flush();
     }
 }

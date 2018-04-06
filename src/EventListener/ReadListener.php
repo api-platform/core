@@ -16,14 +16,16 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Retrieves data from the applicable data provider and sets it as a request parameter called data.
@@ -36,13 +38,20 @@ final class ReadListener
     private $itemDataProvider;
     private $subresourceDataProvider;
     private $serializerContextBuilder;
+    private $identifierNormalizer;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, DenormalizerInterface $identifierNormalizer = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
+
+        if (null === $identifierNormalizer) {
+            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.', ChainIdentifierNormalizer::class), E_USER_DEPRECATED);
+        }
+
+        $this->identifierNormalizer = $identifierNormalizer;
     }
 
     /**
@@ -110,9 +119,16 @@ final class ReadListener
     private function getItemData(Request $request, array $attributes, array $context)
     {
         $id = $request->attributes->get('id');
+        $context = [];
+
         try {
+            if ($this->identifierNormalizer) {
+                $id = $this->identifierNormalizer->denormalize((string) $id, $attributes['resource_class']);
+                $context = [ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER => true];
+            }
+
             $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name'], $context);
-        } catch (PropertyNotFoundException $e) {
+        } catch (InvalidIdentifierException $e) {
             $data = null;
         }
 
@@ -139,10 +155,24 @@ final class ReadListener
 
         $attributes['subresource_context'] += $context;
         $identifiers = [];
-        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, , $hasIdentifier)) {
-            if (true === $hasIdentifier) {
+        if ($this->identifierNormalizer) {
+            $attributes['subresource_context'][ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER] = true;
+        }
+
+        try {
+            foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $resourceClass, $hasIdentifier)) {
+                if (false === $hasIdentifier) {
+                    continue;
+                }
+
                 $identifiers[$id] = $request->attributes->get($id);
+
+                if ($this->identifierNormalizer) {
+                    $identifiers[$id] = $this->identifierNormalizer->denormalize((string) $identifiers[$id], $resourceClass);
+                }
             }
+        } catch (InvalidIdentifierException $e) {
+            throw new NotFoundHttpException('Not Found');
         }
 
         $data = $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $identifiers, $attributes['subresource_context'], $attributes['subresource_operation_name']);

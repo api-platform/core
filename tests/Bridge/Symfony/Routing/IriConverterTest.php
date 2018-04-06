@@ -20,6 +20,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -164,6 +166,44 @@ class IriConverterTest extends TestCase
             $routerProphecy->reveal(),
             null,
             new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+        );
+        $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
+    }
+
+    public function testGetItemFromIriWithIdentifierNormalizer()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', ['id' => 3], null, ['fetch_data' => true, ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER => true])
+            ->willReturn('foo')
+            ->shouldBeCalledTimes(1);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/users/3')->willReturn([
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            'id' => 3,
+        ])->shouldBeCalledTimes(1);
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
+        $identifierNormalizer->denormalize('3', 'AppBundle\Entity\User')->shouldBeCalled()->willReturn(['id' => 3]);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierNormalizer->reveal()
         );
         $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
     }
