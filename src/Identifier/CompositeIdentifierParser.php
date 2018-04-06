@@ -20,12 +20,16 @@ namespace ApiPlatform\Core\Identifier;
  */
 final class CompositeIdentifierParser
 {
+    private function __construct()
+    {
+    }
+
     /*
      * Normalize takes a string and gives back an array of identifiers.
      *
      * For example: foo=0;bar=2 returns ['foo' => 0, 'bar' => 2].
      */
-    public function parse(string $identifier): array
+    public static function parse(string $identifier): array
     {
         $matches = [];
         $identifiers = [];

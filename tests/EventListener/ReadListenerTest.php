@@ -18,12 +18,11 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -32,7 +31,7 @@ class ReadListenerTest extends TestCase
 {
     public function testNotAnApiPlatformRequest()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -46,13 +45,13 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn(new Request())->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.
      */
     public function testLegacyConstructor()
     {
@@ -74,7 +73,7 @@ class ReadListenerTest extends TestCase
 
     public function testDoNotCallWhenReceiveFlagIsFalse()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -91,13 +90,13 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
     public function testRetrieveCollectionPost()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -114,7 +113,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertTrue($request->attributes->has('data'));
@@ -123,7 +122,7 @@ class ReadListenerTest extends TestCase
 
     public function testRetrieveCollectionGet()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection('Foo', 'get', ['filters' => ['foo' => 'bar']])->willReturn([])->shouldBeCalled();
@@ -140,7 +139,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame([], $request->attributes->get('data'));
@@ -148,15 +147,15 @@ class ReadListenerTest extends TestCase
 
     public function testRetrieveItem()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
-        $identifierNormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
         $data = new \stdClass();
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', ['id' => '1'], 'get', [ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER => true])->willReturn($data)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', ['id' => '1'], 'get', [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true])->willReturn($data)->shouldBeCalled();
 
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
@@ -167,7 +166,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
@@ -175,8 +174,8 @@ class ReadListenerTest extends TestCase
 
     public function testRetrieveSubresource()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
-        $identifierNormalizer->denormalize('1', 'Bar')->shouldBeCalled()->willReturn(['id' => '1']);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('1', 'Bar')->shouldBeCalled()->willReturn(['id' => '1']);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -186,7 +185,7 @@ class ReadListenerTest extends TestCase
 
         $data = [new \stdClass()];
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
-        $subresourceDataProvider->getSubresource('Foo', ['id' => ['id' => '1']], ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar', ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER => true], 'get')->willReturn($data)->shouldBeCalled();
+        $subresourceDataProvider->getSubresource('Foo', ['id' => ['id' => '1']], ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar', ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true], 'get')->willReturn($data)->shouldBeCalled();
 
         $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
         $request->setMethod('GET');
@@ -194,7 +193,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
@@ -205,13 +204,13 @@ class ReadListenerTest extends TestCase
      */
     public function testRetrieveItemNotFound()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
-        $identifierNormalizer->denormalize('22', 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('22', 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProvider->getItem('Foo', ['id' => 22], 'get', [ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER => true])->willReturn(null)->shouldBeCalled();
+        $itemDataProvider->getItem('Foo', ['id' => 22], 'get', [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true])->willReturn(null)->shouldBeCalled();
 
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 
@@ -221,7 +220,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
@@ -230,8 +229,8 @@ class ReadListenerTest extends TestCase
      */
     public function testRetrieveBadItemNormalizedIdentifiers()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
-        $identifierNormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willThrow(new InvalidIdentifierException());
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
@@ -243,7 +242,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 
@@ -252,8 +251,8 @@ class ReadListenerTest extends TestCase
      */
     public function testRetrieveBadSubresourceNormalizedIdentifiers()
     {
-        $identifierNormalizer = $this->prophesize(DenormalizerInterface::class);
-        $identifierNormalizer->denormalize(Argument::type('string'), Argument::type('string'))->shouldBeCalled()->willThrow(new InvalidIdentifierException());
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize(Argument::type('string'), Argument::type('string'))->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -271,7 +270,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(GetResponseEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierNormalizer->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierDenormalizer->reveal());
         $listener->onKernelRequest($event->reveal());
     }
 }

@@ -23,10 +23,8 @@ class CompositeIdentifierParserTest extends TestCase
      */
     public function testNormalizeCompositeCorrectly(array $identifiers)
     {
-        $compositeIdentifierNormalizer = new CompositeIdentifierParser();
-
         foreach ($identifiers as $string => $expected) {
-            $this->assertEquals($compositeIdentifierNormalizer->parse($string), $expected);
+            $this->assertEquals(CompositeIdentifierParser::parse($string), $expected);
         }
     }
 

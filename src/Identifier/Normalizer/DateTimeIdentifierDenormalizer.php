@@ -18,14 +18,14 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class DateTimeIdentifierNormalizer extends DateTimeNormalizer implements DenormalizerInterface
+final class DateTimeIdentifierDenormalizer extends DateTimeNormalizer implements DenormalizerInterface
 {
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         try {
             return parent::denormalize($data, $class, $format, $context);
         } catch (InvalidArgumentException $e) {
-            throw new InvalidIdentifierException($e->getMessage());
+            throw new InvalidIdentifierException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

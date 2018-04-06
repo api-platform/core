@@ -22,7 +22,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
@@ -30,7 +30,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * {@inheritdoc}
@@ -45,20 +44,24 @@ final class IriConverter implements IriConverterInterface
     private $routeNameResolver;
     private $router;
     private $identifiersExtractor;
-    private $identifierNormalizer;
+    private $identifierDenormalizer;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, DenormalizerInterface $identifierNormalizer = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, ChainIdentifierDenormalizer $identifierDenormalizer = null)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
         $this->router = $router;
-        $this->identifierNormalizer = $identifierNormalizer;
+        $this->identifierDenormalizer = $identifierDenormalizer;
 
         if (null === $identifiersExtractor) {
             @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
             $this->identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
         } else {
             $this->identifiersExtractor = $identifiersExtractor;
+        }
+
+        if (null === $identifierDenormalizer) {
+            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.', ChainIdentifierDenormalizer::class), E_USER_DEPRECATED);
         }
     }
 
@@ -79,9 +82,9 @@ final class IriConverter implements IriConverterInterface
 
         $identifiers = $parameters['id'];
 
-        if ($this->identifierNormalizer) {
-            $identifiers = $this->identifierNormalizer->denormalize((string) $parameters['id'], $parameters['_api_resource_class']);
-            $context[ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER] = true;
+        if ($this->identifierDenormalizer) {
+            $identifiers = $this->identifierDenormalizer->denormalize((string) $parameters['id'], $parameters['_api_resource_class']);
+            $context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
         }
 
         if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $identifiers, null, $context)) {

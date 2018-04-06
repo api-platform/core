@@ -123,8 +123,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('security.xml');
         }
 
-        if (!class_exists(Uuid::class)) {
-            $container->removeDefinition('api_platform.identifier.uuid_normalizer');
+        if (class_exists(Uuid::class)) {
+            $loader->load('ramsey_uuid.xml');
         }
 
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);

@@ -20,7 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -72,7 +72,7 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        if (!($context[ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER] ?? false)) {
+        if (!($context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] ?? false)) {
             $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
         }
 
