@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,6 +48,7 @@ final class ReadListener
      * @param GetResponseEvent $event
      *
      * @throws NotFoundHttpException
+     * @throws ResourceClassNotSupportedException
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -77,6 +79,8 @@ final class ReadListener
      * @param Request $request
      * @param array   $attributes
      *
+     * @throws ResourceClassNotSupportedException
+     *
      * @return array|\Traversable|null
      */
     private function getCollectionData(Request $request, array $attributes)
@@ -95,6 +99,7 @@ final class ReadListener
      * @param array   $attributes
      *
      * @throws NotFoundHttpException
+     * @throws ResourceClassNotSupportedException
      *
      * @return object|null
      */
@@ -123,6 +128,7 @@ final class ReadListener
      *
      * @throws NotFoundHttpException
      * @throws RuntimeException
+     * @throws ResourceClassNotSupportedException
      *
      * @return object|null
      */
