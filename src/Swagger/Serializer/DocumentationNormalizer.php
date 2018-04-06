@@ -123,49 +123,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $subresourceOperation) {
-                $operationName = 'get';
-                $subResourceMetadata = $this->resourceMetadataFactory->create($subresourceOperation['resource_class']);
-                $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $subResourceMetadata, $operationName);
-                $responseDefinitionKey = $this->getDefinition($definitions, $subResourceMetadata, $subresourceOperation['resource_class'], $serializerContext);
-
-                $pathOperation = new \ArrayObject([]);
-                $pathOperation['tags'] = $subresourceOperation['shortNames'];
-                $pathOperation['operationId'] = $operationId;
-                $pathOperation['produces'] = $mimeTypes;
-                $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
-                $pathOperation['responses'] = [
-                    '200' => $subresourceOperation['collection'] ? [
-                        'description' => sprintf('%s collection response', $subresourceOperation['shortNames'][0]),
-                        'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
-                    ] : [
-                        'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
-                        'schema' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
-                    ],
-                    '404' => ['description' => 'Resource not found'],
-                ];
-
-                // Avoid duplicates parameters when there is a filter on a subresource identifier
-                $parametersMemory = [];
-                $pathOperation['parameters'] = [];
-
-                foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
-                    if (true === $hasIdentifier) {
-                        $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'type' => 'string'];
-                        $parametersMemory[] = $identifier;
-                    }
-                }
-
-                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
-                    foreach ($parameters as $parameter) {
-                        if (!\in_array($parameter['name'], $parametersMemory, true)) {
-                            $pathOperation['parameters'][] = $parameter;
-                        }
-                    }
-                }
-
-                $this->addPaginationParameters($resourceMetadata, $operationName, $pathOperation);
-
-                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] = new \ArrayObject(['get' => $pathOperation]);
+                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] =  $this->addSubresourceOperation($subresourceOperation, $definitions, $operationId, $mimeTypes, $resourceClass, $resourceMetadata);
             }
         }
 
@@ -788,5 +746,63 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $pathOperation['parameters'][] = $this->getItemsParPageParameters();
             }
         }
+    }
+
+    /**
+     * @param array $subresourceOperation
+     * @param ArrayObject $definitions
+     * @param string $operationId
+     * @param array $mimeTypes
+     * @param string $resourceClass
+     * @param ResourceMetadata $resourceMetadata
+     *
+     * @return ArrayObject
+     * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     */
+    private function addSubresourceOperation(array $subresourceOperation, ArrayObject $definitions, string $operationId, array $mimeTypes, string $resourceClass, ResourceMetadata $resourceMetadata): ArrayObject
+    {
+        $operationName = 'get';
+        $subResourceMetadata = $this->resourceMetadataFactory->create($subresourceOperation['resource_class']);
+        $serializerContext = $this->getSerializerContext(OperationType::SUBRESOURCE, false, $subResourceMetadata, $operationName);
+        $responseDefinitionKey = $this->getDefinition($definitions, $subResourceMetadata, $subresourceOperation['resource_class'], $serializerContext);
+
+        $pathOperation = new ArrayObject([]);
+        $pathOperation['tags'] = $subresourceOperation['shortNames'];
+        $pathOperation['operationId'] = $operationId;
+        $pathOperation['produces'] = $mimeTypes;
+        $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
+        $pathOperation['responses'] = [
+            '200' => $subresourceOperation['collection'] ? [
+                'description' => sprintf('%s collection response', $subresourceOperation['shortNames'][0]),
+                'schema'      => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
+            ] : [
+                'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
+                'schema'      => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+            ],
+            '404' => ['description' => 'Resource not found'],
+        ];
+
+        // Avoid duplicates parameters when there is a filter on a subresource identifier
+        $parametersMemory = [];
+        $pathOperation['parameters'] = [];
+
+        foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
+            if (true === $hasIdentifier) {
+                $pathOperation['parameters'][] = ['name' => $identifier, 'in' => 'path', 'required' => true, 'type' => 'string'];
+                $parametersMemory[] = $identifier;
+            }
+        }
+
+        if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
+            foreach ($parameters as $parameter) {
+                if (!\in_array($parameter['name'], $parametersMemory, true)) {
+                    $pathOperation['parameters'][] = $parameter;
+                }
+            }
+        }
+
+        $this->addPaginationParameters($resourceMetadata, $operationName, $pathOperation);
+
+        return new ArrayObject(['get' => $pathOperation]);
     }
 }
