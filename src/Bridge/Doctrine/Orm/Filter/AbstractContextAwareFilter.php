@@ -14,7 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use Dkd\Populate\Exception;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Debug\ExceptionHandler;
+use TYPO3\Flow\Error\DebugExceptionHandler;
 
 abstract class AbstractContextAwareFilter extends AbstractFilter implements ContextAwareFilterInterface
 {
@@ -29,9 +32,21 @@ abstract class AbstractContextAwareFilter extends AbstractFilter implements Cont
             return;
         }
 
+        foreach ($context['filters'] as $filterName => $filterValue) {
+            if (isset($this->properties[$filterName])) {
+                continue;
+            }
+            $alternativeFilterName = str_replace('_', '.', $filterName);
+            if (!isset($this->properties[$alternativeFilterName])) {
+                continue;
+            }
+            unset($context['filters'][$filterName]);
+            $context['filters'][$alternativeFilterName] = $filterValue;
+        }
+
         foreach ($context['filters'] as $property => $value) {
-            $property = str_replace('_', '.', $property);
-            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName,
+                $context);
         }
     }
 }

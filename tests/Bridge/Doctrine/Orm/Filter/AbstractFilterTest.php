@@ -94,6 +94,11 @@ abstract class AbstractFilterTest extends KernelTestCase
             $requestStack = new RequestStack();
             $requestStack->push(Request::create('/api/dummies', 'GET', $filterParameters));
         }
+        var_dump([
+            '$properties' => $properties,
+            '$filterParameters' => $filterParameters,
+            '$expectedParameters' => $expectedParameters
+        ]);
 
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
         $filterCallable = $filterFactory($this->managerRegistry, $requestStack, $properties);
