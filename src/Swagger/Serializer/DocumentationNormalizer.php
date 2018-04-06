@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ArrayObject;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -162,13 +163,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     }
                 }
 
-                if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
-                    $pathOperation['parameters'][] = $this->getPaginationParameters();
-
-                    if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-                        $pathOperation['parameters'][] = $this->getItemsParPageParameters();
-                    }
-                }
+                $this->addPaginationParameters($resourceMetadata, $operationName, $pathOperation);
 
                 $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] = new \ArrayObject(['get' => $pathOperation]);
             }
@@ -305,13 +300,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $pathOperation['parameters'] = $parameters;
             }
 
-            if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
-                $pathOperation['parameters'][] = $this->getPaginationParameters();
-
-                if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-                    $pathOperation['parameters'][] = $this->getItemsParPageParameters();
-                }
-            }
+            $this->addPaginationParameters($resourceMetadata, $operationName, $pathOperation);
 
             return $pathOperation;
         }
@@ -781,5 +770,23 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $resourceMetadata->getItemOperationAttribute($operationName, $contextKey, null, true);
+    }
+
+    /**
+     * @param ResourceMetadata $resourceMetadata
+     * @param string $operationName
+     * @param ArrayObject $pathOperation
+     *
+     * @return void
+     */
+    private function addPaginationParameters(ResourceMetadata $resourceMetadata, string $operationName, ArrayObject $pathOperation)
+    {
+        if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
+            $pathOperation['parameters'][] = $this->getPaginationParameters();
+
+            if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
+                $pathOperation['parameters'][] = $this->getItemsParPageParameters();
+            }
+        }
     }
 }
