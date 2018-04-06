@@ -4,11 +4,11 @@ Feature: Documentation support
   I need to know Hydra specifications of objects I send and receive
 
   Scenario: Checks that the Link pointing to the Hydra documentation is set
-    Given I send a "GET" request to "/"
+    When I send a "GET" request to "/"
     Then the header "Link" should be equal to '<http://example.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'
 
   Scenario: Retrieve the API vocabulary
-    Given I send a "GET" request to "/docs.jsonld"
+    When I send a "GET" request to "/docs.jsonld"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -43,6 +43,7 @@ Feature: Documentation support
     And the Hydra class "CustomNormalizedDummy" exists
     And the Hydra class "CustomWritableIdentifierDummy" exists
     And the Hydra class "Dummy" exists
+    And the Hydra class "NotNullableRelationDummy" exists
     And the Hydra class "RelatedDummy" exists
     And the Hydra class "RelationEmbedder" exists
     And the Hydra class "ThirdLevel" exists
@@ -60,6 +61,7 @@ Feature: Documentation support
     And "name" property is readable for Hydra class "Dummy"
     And "name" property is writable for Hydra class "Dummy"
     And "name" property is required for Hydra class "Dummy"
+    And "dummyFriend" property is required for Hydra class "NotNullableRelationDummy"
     And "plainPassword" property is not readable for Hydra class "User"
     And "plainPassword" property is writable for Hydra class "User"
     And "plainPassword" property is not required for Hydra class "User"
