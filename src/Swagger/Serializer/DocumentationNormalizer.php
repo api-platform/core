@@ -162,7 +162,13 @@ final class DocumentationNormalizer implements NormalizerInterface
                     }
                 }
 
-                $pathOperation = $this->updateGetOperation($pathOperation, $mimeTypes, $subresourceOperation['collection'] ? OperationType::COLLECTION : OperationType::ITEM, $subResourceMetadata, $subresourceOperation['resource_class'], $subresourceOperation['shortNames'][0], $operationName, $definitions);
+                if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
+                    $pathOperation['parameters'][] = $this->getPaginationParameters();
+
+                    if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
+                        $pathOperation['parameters'][] = $this->getItemsParPageParameters();
+                    }
+                }
 
                 $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] = new \ArrayObject(['get' => $pathOperation]);
             }
