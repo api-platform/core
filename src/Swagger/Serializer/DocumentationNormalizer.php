@@ -800,7 +800,9 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
         }
 
-        $this->addPaginationParameters($resourceMetadata, $operationName, $pathOperation);
+        if ($subresourceOperation['collection']) {
+            $this->addPaginationParameters($resourceMetadata, $operationName, $pathOperation);
+        }
 
         return new \ArrayObject(['get' => $pathOperation]);
     }
