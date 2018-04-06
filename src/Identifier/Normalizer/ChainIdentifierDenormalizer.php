@@ -18,52 +18,51 @@ use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Identifier normalizer.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class ChainIdentifierNormalizer implements DenormalizerInterface
+class ChainIdentifierDenormalizer
 {
-    const HAS_IDENTIFIER_NORMALIZER = 'has_normalized_identifier';
+    const HAS_IDENTIFIER_DENORMALIZER = 'has_identifier_denormalizer';
 
     private $propertyMetadataFactory;
     private $identifiersExtractor;
-    private $identifierNormalizers;
-    private $compositeIdentifierParser;
+    private $identifierDenormalizers;
 
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, $identifierNormalizers)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, $identifierDenormalizers)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->identifiersExtractor = $identifiersExtractor;
-        $this->identifierNormalizers = $identifierNormalizers;
-        $this->compositeIdentifierParser = new CompositeIdentifierParser();
+        $this->identifierDenormalizers = $identifierDenormalizers;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws InvalidIdentifierException
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         $keys = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
 
+        if (!$keys) {
+            throw new InvalidIdentifierException(sprintf('Resource "%s" has no identifiers.', $class));
+        }
+
         if (\count($keys) > 1) {
-            $identifiers = $this->compositeIdentifierParser->parse($data);
+            $identifiers = CompositeIdentifierParser::parse($data);
         } else {
             $identifiers = [$keys[0] => $data];
         }
 
         // Normalize every identifier (DateTime, UUID etc.)
         foreach ($keys as $key) {
-            foreach ($this->identifierNormalizers as $normalizer) {
-                if (!isset($identifiers[$key])) {
-                    throw new InvalidIdentifierException(sprintf('Invalid identifier "%s", "%s" was not found.', $key, $key));
-                }
+            if (!isset($identifiers[$key])) {
+                throw new InvalidIdentifierException(sprintf('Invalid identifier "%1$s", "%1$s" was not found.', $key));
+            }
 
+            foreach ($this->identifierDenormalizers as $normalizer) {
                 $metadata = $this->getIdentifierMetadata($class, $key);
 
                 if (!$normalizer->supportsDenormalization($identifiers[$key], $metadata)) {
@@ -81,18 +80,9 @@ final class ChainIdentifierNormalizer implements DenormalizerInterface
         return $identifiers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return true;
-    }
-
     private function getIdentifierMetadata($class, $propertyName)
     {
-        $propertyMetadata = $this->propertyMetadataFactory->create($class, $propertyName);
-        $type = $propertyMetadata->getType();
+        $type = $this->propertyMetadataFactory->create($class, $propertyName)->getType();
 
         return $type && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType() ? $type->getClassName() : null;
     }

@@ -34,7 +34,7 @@ final class UuidNormalizer implements DenormalizerInterface
         try {
             return Uuid::fromString($data);
         } catch (InvalidUuidStringException $e) {
-            throw new InvalidIdentifierException($e->getMessage());
+            throw new InvalidIdentifierException($e->getMessage(), $e->getCode(), $e);
         }
     }
 

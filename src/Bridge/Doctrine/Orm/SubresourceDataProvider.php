@@ -23,7 +23,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -157,7 +157,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         if (isset($identifiers[$identifier])) {
             // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
-            if ($context[ChainIdentifierNormalizer::HAS_IDENTIFIER_NORMALIZER] ?? false) {
+            if ($context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] ?? false) {
                 $normalizedIdentifiers = $identifiers[$identifier];
             } else {
                 $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);

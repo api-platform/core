@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Identifier\Normalizer;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierNormalizer;
-use ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierNormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +24,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ChainIdentifierNormalizerTest extends TestCase
+class ChainIdentifierDenormalizerTest extends TestCase
 {
     public function testCompositeIdentifier()
     {
@@ -42,11 +42,11 @@ class ChainIdentifierNormalizerTest extends TestCase
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['a', 'c', 'd']);
 
-        $identifierNormalizers = [new DateTimeIdentifierNormalizer()];
+        $identifierDenormalizers = [new DateTimeIdentifierDenormalizer()];
 
-        $identifierNormalizer = new ChainIdentifierNormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierNormalizers);
+        $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
-        $this->assertEquals($identifierNormalizer->denormalize($identifier, $class), ['a' => '1', 'c' => '2', 'd' => new \DateTime('2015-04-05')]);
+        $this->assertEquals($identifierDenormalizer->denormalize($identifier, $class), ['a' => '1', 'c' => '2', 'd' => new \DateTime('2015-04-05')]);
     }
 
     public function testSingleDateIdentifier()
@@ -62,9 +62,9 @@ class ChainIdentifierNormalizerTest extends TestCase
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['funkyid']);
 
-        $identifierNormalizers = [new DateTimeIdentifierNormalizer()];
-        $identifierNormalizer = new ChainIdentifierNormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierNormalizers);
+        $identifierDenormalizers = [new DateTimeIdentifierDenormalizer()];
+        $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
-        $this->assertEquals($identifierNormalizer->denormalize($identifier, $class), ['funkyid' => new \DateTime('2015-04-05')]);
+        $this->assertEquals($identifierDenormalizer->denormalize($identifier, $class), ['funkyid' => new \DateTime('2015-04-05')]);
     }
 }
