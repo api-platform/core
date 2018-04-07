@@ -52,14 +52,13 @@ class QueryParameterValidateListener
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
 
+        $errorList = [];
         foreach ($resourceFilters as $filterId) {
             if (!$filter = $this->getFilter($filterId)) {
                 continue;
             }
 
             foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
-                $errorList = [];
-
                 if (!($data['required'] ?? false)) { // property is not required
                     continue;
                 }
@@ -67,11 +66,11 @@ class QueryParameterValidateListener
                 if (!$this->isRequiredFilterValid($name, $request)) {
                     $errorList[] = sprintf('Query parameter "%s" is required', $name);
                 }
-
-                if ($errorList) {
-                    throw new FilterValidationException($errorList);
-                }
             }
+        }
+
+        if ($errorList) {
+            throw new FilterValidationException($errorList);
         }
     }
 
