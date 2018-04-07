@@ -82,7 +82,7 @@ class QueryParameterValidateListener
     {
         $matches = [];
         parse_str($name, $matches);
-        if (empty($matches)) {
+        if (!$matches) {
             return false;
         }
 
@@ -91,12 +91,12 @@ class QueryParameterValidateListener
             return false;
         }
 
-        if (is_array($matches[$rootName])) {
+        if (\is_array($matches[$rootName])) {
             $keyName = array_keys($matches[$rootName])[0];
 
             $queryParameter = $request->query->get($rootName);
 
-            return is_array($queryParameter) && isset($queryParameter[$keyName]);
+            return \is_array($queryParameter) && isset($queryParameter[$keyName]);
         }
 
         return null !== $request->query->get($rootName);

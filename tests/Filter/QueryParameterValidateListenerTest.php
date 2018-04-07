@@ -27,7 +27,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class QueryParameterValidateListenerTest extends TestCase
 {
     private $testedInstance;
-
     private $filterLocatorProphecy;
 
     /**
