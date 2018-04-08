@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -40,15 +41,10 @@ final class RequestDataCollector extends DataCollector
 
         $this->data = [
             'resource_class' => $resourceClass,
-            'resource_metadata' => $resourceMetadata,
-            'method' => $request->getMethod(),
+            'resource_metadata' => $resourceMetadata ? $this->cloneVar($resourceMetadata) : null,
             'acceptable_content_types' => $request->getAcceptableContentTypes(),
+            'request_attributes' => RequestAttributesExtractor::extractAttributes($request),
         ];
-    }
-
-    public function getMethod(): string
-    {
-        return $this->data['method'] ?? '';
     }
 
     public function getAcceptableContentTypes(): array
@@ -64,6 +60,11 @@ final class RequestDataCollector extends DataCollector
     public function getResourceMetadata()
     {
         return $this->data['resource_metadata'] ?? null;
+    }
+
+    public function getRequestAttributes(): array
+    {
+        return $this->data['request_attributes'] ?? [];
     }
 
     /**

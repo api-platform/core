@@ -1,33 +1,9 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% macro operationLine(itemOrCollection, key, operation) %}
+{% macro operationLine(key, operation, actualOperationName) %}
     <tr>
-        <td>
-            {{ key }}
-        </td>
-        <td>
-            {% if operation['method'] is defined %}
-                <em>Method:</em> {{ operation['method'] }}
-            {% elseif operation['route_name'] is defined %}
-                <em>Route name:</em> {{ operation['route_name'] }}
-            {% endif %}
-        </td>
-        <td>
-            <a
-                href="#"
-                class="sf-toggle link-inverse sf-toggle-on"
-                data-toggle-selector="#api-platform-line-{{ itemOrCollection }}-{{ key }}"
-                data-toggle-alt-content="Hide"
-                data-toggle-original-content="Show"
-            >
-                Show
-            </a>
-        </td>
-    </tr>
-    <tr id="api-platform-line-{{ itemOrCollection }}-{{ key }}">
-        <td colspan="3">
-            {{- dump(operation) -}}
-        </td>
+        <th scope="row" {{ key == actualOperationName ? 'class="status-success"' : '' }}>{{ key }}</th>
+        <td {{ key == actualOperationName ? 'class="status-success"' : '' }}>{{- profiler_dump(operation, 1) -}}</td>
     </tr>
 {% endmacro %}
 
@@ -38,19 +14,14 @@
         {{ include('@ApiPlatform/DataCollector/api-platform.svg') }}
     {% endset %}
 
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Resource Class</b>
+            <span>{{ collector.resourceClass|default('Not an API Platform resource') }}</span>
+        </div>
+    {% endset %}
+
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
-{% endblock %}
-
-{% block head %}
-    {# Optional. Here you can link to or define your own CSS and JS contents. #}
-    {# Use {{ parent() }} to extend the default styles instead of overriding them. #}
-    {{ parent() }}
-
-    <style>
-        tr.sf-toggle-content.sf-toggle-visible {
-            display: table-row;
-        }
-    </style>
 {% endblock %}
 
 {% block menu %}
@@ -64,40 +35,12 @@
 {% endblock %}
 
 {% block panel %}
-    {# Optional, for showing the most details. #}
-    <h2>Acceptable Content Types</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Content Type</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for type in collector.acceptableContentTypes %}
-            <tr>
-                <td>{{ type }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <table>
-        <thead>
-            <tr>
-                <th>
-                    Resource class
-                </th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <td>
-                    {{ collector.resourceClass|default('Not an API Platform resource') }}
-                </td>
-            <tr>
-        </tbody>
-    </table>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.resourceClass|default('Not an API Platform resource') }}</span>
+            <span class="label">Resource class</span>
+        </div>
+    </div>
 
     {% if collector.resourceMetadata %}
         <h2>Metadata</h2>
@@ -105,13 +48,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>
+                    <th scope="col" class="key">
                         Item operations
                     </th>
-                    <th>
-                        Method / Route name
-                    </th>
-                    <th>
+                    <th scope="col">
                         Attributes
                     </th>
                 </tr>
@@ -119,7 +59,7 @@
 
             <tbody>
                 {% for key, itemOperation in collector.resourceMetadata.itemOperations %}
-                    {{ apiPlatform.operationLine('item', key, itemOperation) }}
+                    {{ apiPlatform.operationLine(key, itemOperation, collector.requestAttributes.item_operation_name) }}
                 {% endfor %}
             </tbody>
         </table>
@@ -127,13 +67,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>
+                    <th scope="col" class="key">
                         Collection operations
                     </th>
-                    <th>
-                        Method / Route name
-                    </th>
-                    <th>
+                    <th scope="col">
                         Attributes
                     </th>
                 </tr>
@@ -141,7 +78,7 @@
 
             <tbody>
                 {% for key, collectionOperation in collector.resourceMetadata.collectionOperations %}
-                    {{ apiPlatform.operationLine('collection', key, collectionOperation) }}
+                    {{ apiPlatform.operationLine(key, collectionOperation, collector.requestAttributes.collection_operation_name) }}
                 {% endfor %}
             </tbody>
         </table>
@@ -171,23 +108,38 @@
         <table>
             <thead>
                 <tr>
-                    <th colspan="100%">
+                    <th scope="col" class="key">
                         Attributes
                     </th>
+                    <th scope="col" colspan="100%"></th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for key, value in collector.resourceMetadata.attributes if key != 'filters' %}
                     <tr>
-                        <td>
+                        <th scope="row">
                             {{ key }}
-                        </td>
+                        </th>
                         <td>
-                            <pre>
-                                {{- dump(value) -}}
-                            </pre>
+                            {{- profiler_dump(value, 2) -}}
                         </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h2>Acceptable Content Types</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Content Type</th>
+            </tr>
+            </thead>
+
+            <tbody>
+                {% for type in collector.acceptableContentTypes %}
+                    <tr>
+                        <td>{{ type }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
