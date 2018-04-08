@@ -2,8 +2,8 @@
 
 {% macro operationLine(key, operation, actualOperationName) %}
     <tr>
-        <th scope="row" {{ key == actualOperationName ? 'class="status-success"' : '' }}>{{ key }}</th>
-        <td {{ key == actualOperationName ? 'class="status-success"' : '' }}>{{- profiler_dump(operation, 1) -}}</td>
+        <th scope="row"{% if key == actualOperationName %} class="status-success"{% endif %}>{{ key }}</th>
+        <td{% if key == actualOperationName %} class="status-success"{% endif %}>{{- profiler_dump(operation, 1) -}}</td>
     </tr>
 {% endmacro %}
 
@@ -111,7 +111,7 @@
                     <th scope="col" class="key">
                         Attributes
                     </th>
-                    <th scope="col" colspan="100%"></th>
+                    <th scope="col" ></th>
                 </tr>
             </thead>
 
