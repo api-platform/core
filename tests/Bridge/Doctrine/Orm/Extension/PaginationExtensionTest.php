@@ -491,4 +491,38 @@ class PaginationExtensionTest extends TestCase
 
         return $paginationExtension->getResult(...$args);
     }
+
+    /**
+     * @dataProvider getInvalidPageValues
+     */
+    public function testApplyToCollectionWithInvalidPageValue($invalidPageValue)
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['page' => $invalidPageValue]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->setFirstResult(0)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setMaxResults(30)->shouldBeCalled();
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactory
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
+    }
+
+    public function getInvalidPageValues()
+    {
+        return [
+            [0],
+            [-2],
+            ['hi!'],
+        ];
+    }
 }
