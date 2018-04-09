@@ -122,7 +122,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $subresourceOperation) {
-                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] =  $this->addSubresourceOperation($subresourceOperation, $definitions, $operationId, $mimeTypes, $resourceClass, $resourceMetadata);
+                $paths[$this->getPath($subresourceOperation['shortNames'][0], $subresourceOperation['route_name'], $subresourceOperation, OperationType::SUBRESOURCE)] = $this->addSubresourceOperation($subresourceOperation, $definitions, $operationId, $mimeTypes, $resourceClass, $resourceMetadata);
             }
         }
 
@@ -731,10 +731,8 @@ final class DocumentationNormalizer implements NormalizerInterface
 
     /**
      * @param ResourceMetadata $resourceMetadata
-     * @param string $operationName
-     * @param \ArrayObject $pathOperation
-     *
-     * @return void
+     * @param string           $operationName
+     * @param \ArrayObject     $pathOperation
      */
     private function addPaginationParameters(ResourceMetadata $resourceMetadata, string $operationName, \ArrayObject $pathOperation)
     {
@@ -748,15 +746,16 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param array $subresourceOperation
-     * @param \ArrayObject $definitions
-     * @param string $operationId
-     * @param array $mimeTypes
-     * @param string $resourceClass
+     * @param array            $subresourceOperation
+     * @param \ArrayObject     $definitions
+     * @param string           $operationId
+     * @param array            $mimeTypes
+     * @param string           $resourceClass
      * @param ResourceMetadata $resourceMetadata
      *
-     * @return \ArrayObject
      * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
+     *
+     * @return \ArrayObject
      */
     private function addSubresourceOperation(array $subresourceOperation, \ArrayObject $definitions, string $operationId, array $mimeTypes, string $resourceClass, ResourceMetadata $resourceMetadata): \ArrayObject
     {
@@ -773,10 +772,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         $pathOperation['responses'] = [
             '200' => $subresourceOperation['collection'] ? [
                 'description' => sprintf('%s collection response', $subresourceOperation['shortNames'][0]),
-                'schema'      => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
+                'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
             ] : [
                 'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
-                'schema'      => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
+                'schema' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
             ],
             '404' => ['description' => 'Resource not found'],
         ];
