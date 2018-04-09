@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter;
@@ -313,6 +314,121 @@ class ItemNormalizerTest extends TestCase
                                     [
                                         'type' => 'related-dummy',
                                         'id' => '/related_dummies/2',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                Dummy::class,
+                ItemNormalizer::FORMAT
+            )
+        );
+    }
+
+    public function testDenormalizeAllowPlainIdentifiers()
+    {
+        $relatedDummy1 = new RelatedDummy();
+        $relatedDummy1->setId(1);
+        $relatedDummy2 = new RelatedDummy();
+        $relatedDummy2->setId(2);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
+            new PropertyNameCollection(['name', 'ghost', 'relatedDummy', 'relatedDummies'])
+        )->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'ghost', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    ArrayCollection::class,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_INT),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+                ),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        )->shouldBeCalled();
+
+        $itemDataProviderContextParameter = function ($arg) {
+            return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
+        };
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProviderProphecy->getItem(RelatedDummy::class, 1, null, Argument::that($itemDataProviderContextParameter))->willReturn($relatedDummy1)->shouldBeCalled();
+        $itemDataProviderProphecy->getItem(RelatedDummy::class, 2, null, Argument::that($itemDataProviderContextParameter))->willReturn($relatedDummy2)->shouldBeCalled();
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'ghost', 'invisible')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy1)->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummies', [$relatedDummy2])->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $itemDataProviderProphecy->reveal(),
+            true
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->assertInstanceOf(
+            Dummy::class,
+            $normalizer->denormalize(
+                [
+                    'data' => [
+                        'type' => 'dummy',
+                        'attributes' => [
+                            'name' => 'foo',
+                            'ghost' => 'invisible',
+                        ],
+                        'relationships' => [
+                            'relatedDummy' => [
+                                'data' => [
+                                    'type' => 'related-dummy',
+                                    'id' => '1',
+                                ],
+                            ],
+                            'relatedDummies' => [
+                                'data' => [
+                                    [
+                                        'type' => 'related-dummy',
+                                        'id' => '2',
                                     ],
                                 ],
                             ],

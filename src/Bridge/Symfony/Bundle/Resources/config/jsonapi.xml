@@ -39,6 +39,8 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument>%api_platform.allow_plain_identifiers%</argument>
 
             <tag name="serializer.normalizer" priority="8" />
         </service>

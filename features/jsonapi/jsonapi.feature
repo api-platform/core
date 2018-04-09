@@ -120,6 +120,46 @@ Feature: JSON API basic support
     And the JSON node "data.relationships.relatedDummies.data" should have 2 elements
     And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "/related_dummies/2"
 
+  Scenario: Create a dummy with relations and plain identifiers
+    Given there is a RelatedDummy
+    When I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "data": {
+        "type": "dummy",
+        "attributes": {
+          "name": "Dummy with relations",
+          "dummyDate": "2015-03-01T10:00:00+00:00"
+        },
+        "relationships": {
+          "relatedDummy": {
+            "data": {
+              "type": "related-dummy",
+              "id": "/related_dummies/2"
+            }
+          },
+          "relatedDummies": {
+            "data": [
+              {
+                "type": "related-dummy",
+                "id": "1"
+              },
+              {
+                "type": "related-dummy",
+                "id": "2"
+              }
+            ]
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the JSON should be valid according to the JSON API schema
+    And the JSON node "data.relationships.relatedDummies.data" should have 2 elements
+    And the JSON node "data.relationships.relatedDummy.data.id" should be equal to "/related_dummies/2"
+
   Scenario: Update a resource with a many-to-many relationship via PATCH
     When I send a "PATCH" request to "/dummies/1" with body:
     """

@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -40,9 +41,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $componentsCache = [];
     private $resourceMetadataFactory;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, $itemDataProvider, $allowPlainIdentifiers);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
@@ -160,6 +161,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['resource_class'] = $className;
 
             return $this->serializer->denormalize($value, $className, $format, $context);
+        }
+
+        if (true === $this->allowPlainIdentifiers && $this->itemDataProvider && (null !== $item = $this->itemDataProvider->getItem($className, $value['id'], null, $context + ['fetch_data' => true]))) {
+            return $item;
         }
 
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
