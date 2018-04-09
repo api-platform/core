@@ -73,6 +73,8 @@ fos_user:
 parameters:
     container.autowiring.strict_mode: true
     container.dumper.inline_class_loader: true
+    # Enable the metadata cache to speedup the builds
+    api_platform.metadata_cache: true
 
 services:
     contain_non_resource.item_data_provider:
