@@ -18,11 +18,11 @@ matrix:
     - php: '7.1'
     - php: '7.2'
     - php: '7.2'
+      env: coverage=1
+    - php: '7.2'
       env: lint=1
     - php: '7.2'
       env: deps=low
-    - php: '7.2'
-      env: coverage=1
     - php: '7.2'
       env: SYMFONY_DEPRECATIONS_HELPER=0
     - php: '7.2'
@@ -75,9 +75,9 @@ install:
 
 script:
   - if [[ $coverage = 1 ]]; then
-      phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov;
+      APP_ENV=test_phpunit phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov;
     elif [[ $lint != 1 ]]; then
-      vendor/bin/phpunit;
+      APP_ENV=test_phpunit vendor/bin/phpunit;
     fi
   - if [[ $coverage = 1 ]]; then
       for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature'); do
