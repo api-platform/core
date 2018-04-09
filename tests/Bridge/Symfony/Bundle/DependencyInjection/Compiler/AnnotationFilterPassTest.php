@@ -64,6 +64,7 @@ class AnnotationFilterPassTest extends TestCase
             return [];
         });
 
+        $containerBuilderProphecy->has('annotation_reader')->shouldBeCalled()->willReturn(true);
         $containerBuilderProphecy->get('annotation_reader')->shouldBeCalled()->willReturn($reader->reveal());
 
         $containerBuilderProphecy->hasDefinition('annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_api_platform_core_bridge_doctrine_orm_filter_search_filter')->shouldBeCalled()->willReturn(false);
@@ -127,6 +128,7 @@ class AnnotationFilterPassTest extends TestCase
             return [];
         });
 
+        $containerBuilderProphecy->has('annotation_reader')->shouldBeCalled()->willReturn(true);
         $containerBuilderProphecy->get('annotation_reader')->shouldBeCalled()->willReturn($reader->reveal());
 
         $annotationFilterPass->process($containerBuilderProphecy->reveal());
@@ -158,6 +160,7 @@ class AnnotationFilterPassTest extends TestCase
             return [];
         });
 
+        $containerBuilderProphecy->has('annotation_reader')->shouldBeCalled()->willReturn(true);
         $containerBuilderProphecy->get('annotation_reader')->shouldBeCalled()->willReturn($reader->reveal());
 
         $containerBuilderProphecy->hasDefinition('annotated_api_platform_core_tests_fixtures_test_bundle_entity_dummy_api_platform_core_bridge_doctrine_orm_filter_search_filter')->shouldBeCalled()->willReturn(true);
