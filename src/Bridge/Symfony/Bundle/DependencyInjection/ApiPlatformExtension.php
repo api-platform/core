@@ -218,7 +218,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
 
-        if (class_exists(Annotation::class)) {
+        // The "annotation_reader" service is only available if DoctrineBundle is loaded.
+        $bundles = $container->getParameter('kernel.bundles');
+        if (class_exists(Annotation::class) && isset($bundles['DoctrineBundle'])) {
             $loader->load('metadata/annotation.xml');
         }
 
@@ -346,7 +348,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('swagger.xml');
 
-        if ($config['enable_swagger_ui']) {
+        $bundles = $container->getParameter('kernel.bundles');
+        if ($config['enable_swagger_ui'] && isset($bundles['TwigBundle'])) {
             $loader->load('swagger-ui.xml');
             $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
         }
@@ -432,6 +435,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.graphql.graphiql.enabled', $config['graphql']['graphiql']['enabled']);
 
         $loader->load('graphql.xml');
+
+        $bundles = $container->getParameter('kernel.bundles');
+        if (isset($bundles['TwigBundle'])) {
+            $loader->load('graphql-ui.xml');
+        } else {
+            // Required as the GraphQL routing rely on the not loaded EntryPoint service.
+            $container->setParameter('api_platform.graphql.enabled', false);
+        }
     }
 
     /**

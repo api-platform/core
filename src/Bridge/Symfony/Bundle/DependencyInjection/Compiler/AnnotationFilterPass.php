@@ -38,6 +38,9 @@ final class AnnotationFilterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->has('annotation_reader')) {
+            return;
+        }
         $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');
         $reader = $container->get('annotation_reader');
 
