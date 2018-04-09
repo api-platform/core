@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+* Introduce a new interface `IriPlainIdentifierAwareConverterInterface`
+* Add `getIriFromPlainIdentifier` in `IriPlainIdentifierAwareConverterInterface` to be able to retrieve an iri from an ID
+* [deprecated] Passing an implementation of `ItemDataProviderInterface` in an implementation of `AbstractItemNormalizer` is deprecated and will be not possible in 3.0
+
 ## 2.2.5
 
 * Fix a various issues preventing the metadata cache to work properly (performance fix)

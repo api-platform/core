@@ -16,7 +16,9 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriPlainIdentifierAwareConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\PlainIdentifierConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
@@ -40,7 +42,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class IriConverter implements IriConverterInterface
+final class IriConverter implements IriPlainIdentifierAwareConverterInterface
 {
     use ClassInfoTrait;
     use OperationDataProviderTrait;
@@ -104,6 +106,28 @@ final class IriConverter implements IriConverterInterface
         }
 
         throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIriFromPlainIdentifier($id, string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    {
+        $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
+
+        try {
+            return $this->router->generate($routeName, ['id' => \is_array($id) ? implode(';', $id) : $id], $referenceType);
+        } catch (RuntimeException $e) {
+            throw new InvalidArgumentException(sprintf(
+                'Unable to generate an IRI for the item of type "%s"',
+                $resourceClass
+            ), $e->getCode(), $e);
+        } catch (RoutingExceptionInterface $e) {
+            throw new InvalidArgumentException(sprintf(
+                'Unable to generate an IRI for the item of type "%s"',
+                $resourceClass
+            ), $e->getCode(), $e);
+        }
     }
 
     /**
