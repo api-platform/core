@@ -31,7 +31,7 @@ default:
   extensions:
     'Behat\Symfony2Extension':
       kernel:
-        env: '%env(APP_ENV)%'
+        env: 'test'
         debug: 'true'
         path: 'tests/Fixtures/app/AppKernel.php'
         bootstrap: 'tests/Fixtures/app/bootstrap.php'
