@@ -26,7 +26,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 {
     const SUBRESOURCE_SUFFIX = '_subresource';
     const FORMAT_SUFFIX = '.{_format}';
-    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => '', 'controller' => ''];
+    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => '', 'controller' => null];
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
