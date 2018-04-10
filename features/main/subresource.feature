@@ -24,6 +24,12 @@ Feature: Subresource support
     }
     """
 
+  Scenario: Get a non existant subresource
+    Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
+    When I send a "GET" request to "/questions/999999/answer"
+    And the response status code should be 404
+    And the response should be in JSON
+
   Scenario: Get subresource one to one relation
     When I send a "GET" request to "/questions/1/answer/related_questions"
     And the response status code should be 200

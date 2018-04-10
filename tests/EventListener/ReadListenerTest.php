@@ -202,6 +202,30 @@ class ReadListenerTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
+    public function testRetrieveSubresourceNotFound()
+    {
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('1', 'Bar')->willThrow(new InvalidIdentifierException())->shouldBeCalled();
+
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request->setMethod('GET');
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $this->prophesize(SubresourceDataProviderInterface::class)->reveal(), null, $identifierDenormalizer->reveal());
+        $listener->onKernelRequest($event->reveal());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
     public function testRetrieveItemNotFound()
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
