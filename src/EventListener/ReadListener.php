@@ -176,6 +176,10 @@ final class ReadListener
 
         $data = $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $identifiers, $attributes['subresource_context'], $attributes['subresource_operation_name']);
 
+        if (null === $data) {
+            throw new NotFoundHttpException('Not Found.');
+        }
+
         return $data;
     }
 }

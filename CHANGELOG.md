@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.2.5
+
+* Fix a various issues preventing the metadata cache to work properly (performance fix)
+* Fix a cache corruption issue when using subresources
+* Fix non-standard outputs when using the HAL format
+* Persist data in Doctrine DataPersister only if needed
+* Fix identifiers handling in GraphQL mutations
+* Fix client-side ID creation or update when using GraphQL mutations
+* Fix an error that was occuring when the Expression Language component wasn't installed
+* Update the `ChainSubresourceDataProvider` class to take into account `RestrictedDataProviderInterface`
+
 ## 2.2.4
 
 * Fix a BC break preventing to pass non-arrays to the builtin Symfony normalizers when using custom normalizers
