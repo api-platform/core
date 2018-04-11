@@ -153,7 +153,7 @@
             <argument>%api_platform.collection.pagination.client_partial%</argument>
             <argument>%api_platform.collection.pagination.partial_parameter_name%</argument>
 
-            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-64  " />
+            <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-64" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension" alias="api_platform.doctrine.orm.query_extension.pagination" />
 
