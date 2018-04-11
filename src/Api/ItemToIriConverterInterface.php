@@ -15,11 +15,10 @@ namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  *
- * @author Mathieu Dewet <dunglas@gmail.com>
+ * @author Mathieu Dewet <mathieu.dewet@gmail.com>
  */
 interface ItemToIriConverterInterface
 {
