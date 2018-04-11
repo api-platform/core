@@ -110,7 +110,7 @@ final class ApiLoader extends Loader
                 $routeCollection->add($operation['route_name'], new Route(
                     $operation['path'],
                     [
-                        '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
+                        '_controller' => $operation['controller'] ?? null ?: self::DEFAULT_ACTION_PATTERN.'get_subresource',
                         '_format' => null,
                         '_api_resource_class' => $operation['resource_class'],
                         '_api_subresource_operation_name' => $operation['route_name'],
