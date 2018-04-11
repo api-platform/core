@@ -15,7 +15,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -36,7 +37,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class IriConverter implements IriConverterInterface
+final class IriConverter implements IriToItemConverterInterface, ItemToIriConverterInterface
 {
     use ClassInfoTrait;
 

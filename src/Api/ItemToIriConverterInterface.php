@@ -18,9 +18,8 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
- * Converts item and resources to IRI and vice versa.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Mathieu Dewet <dunglas@gmail.com>
  */
 interface ItemToIriConverterInterface
 {
