@@ -56,9 +56,42 @@ class DummyCar
      * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
      *
      * @Serializer\Groups({"colors"})
-     * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial"})
+     * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
     private $colors;
+
+    /**
+     * @var mixed Something else
+     *
+     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
+     *
+     * @Serializer\Groups({"colors"})
+     * @ApiFilter(SearchFilter::class, strategy="exact")
+     */
+    private $secondColors;
+
+    /**
+     * @var mixed Something else
+     *
+     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
+     *
+     * @Serializer\Groups({"colors"})
+     * @ApiFilter(SearchFilter::class, strategy="exact")
+     */
+    private $thirdColors;
+
+    /**
+     * @var mixed Something else
+     *
+     * @ORM\ManyToMany(targetEntity="UuidIdentifierDummy", indexBy="uuid")
+     * * @ORM\JoinTable(name="uuid_cars",
+     *     joinColumns={@ORM\JoinColumn(name="car_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="uuid_uuid", referencedColumnName="uuid")}
+     * )
+     * @Serializer\Groups({"colors"})
+     * @ApiFilter(SearchFilter::class, strategy="exact")
+     */
+    private $uuid;
 
     /**
      * @var string
@@ -104,6 +137,39 @@ class DummyCar
         return $this;
     }
 
+    public function getSecondColors()
+    {
+        return $this->secondColors;
+    }
+
+    public function setSecondColors($secondColors)
+    {
+        $this->secondColors = $secondColors;
+    }
+
+    public function getThirdColors()
+    {
+        return $this->thirdColors;
+    }
+
+    public function setThirdColors($thirdColors)
+    {
+        $this->thirdColors = $thirdColors;
+    }
+
+    public function getUuid()
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    /**
+     * Get name.
+     */
     public function getName(): string
     {
         return $this->name;

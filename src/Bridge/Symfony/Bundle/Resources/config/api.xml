@@ -270,6 +270,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
+        <service id="ApiPlatform\Core\Api\IdentifiersExtractorInterface" alias="api_platform.identifiers_extractor.cached" />
 
         <service id="api_platform.identifier.converter" class="ApiPlatform\Core\Identifier\IdentifierConverter" public="false">
             <argument type="service" id="api_platform.identifiers_extractor.cached" />

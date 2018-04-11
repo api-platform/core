@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -918,6 +919,7 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyFilter::class => 'api_platform.serializer.property_filter',
             GroupFilter::class => 'api_platform.serializer.group_filter',
             OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
+            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
         ];
 
         foreach ($aliases as $alias => $service) {
@@ -1103,7 +1105,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.normalizer.documentation',
             'api_platform.validator',
         ];
-
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
@@ -1134,6 +1135,7 @@ class ApiPlatformExtensionTest extends TestCase
             MongoDbOdmNumericFilter::class => 'api_platform.doctrine_mongodb.odm.numeric_filter',
             MongoDbOdmOrderFilter::class => 'api_platform.doctrine_mongodb.odm.order_filter',
             MongoDbOdmRangeFilter::class => 'api_platform.doctrine_mongodb.odm.range_filter',
+            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
         ];
 
         foreach ($aliases as $alias => $service) {

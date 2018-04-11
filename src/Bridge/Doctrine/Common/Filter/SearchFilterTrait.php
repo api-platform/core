@@ -31,6 +31,7 @@ trait SearchFilterTrait
 
     protected $iriConverter;
     protected $propertyAccessor;
+    protected $identifiersExtractor;
 
     /**
      * {@inheritdoc}
