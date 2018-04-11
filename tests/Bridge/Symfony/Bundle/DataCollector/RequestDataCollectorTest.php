@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Julien DENIAU <julien.deniau@gmail.com>
@@ -51,10 +52,6 @@ class RequestDataCollectorTest extends TestCase
     public function testNoResourceClass()
     {
         $this->apiResourceClassWillReturn(null);
-        $this->request
-            ->getMethod()
-            ->shouldBeCalled()
-            ->willReturn('GET');
 
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal()
@@ -65,7 +62,7 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals($dataCollector->getMethod(), 'GET');
+        $this->assertEquals($dataCollector->getRequestAttributes(), []);
         $this->assertEquals($dataCollector->getAcceptableContentTypes(), ['foo', 'bar']);
         $this->assertNull($dataCollector->getResourceClass());
         $this->assertNull($dataCollector->getResourceMetadata());
@@ -80,7 +77,7 @@ class RequestDataCollectorTest extends TestCase
             $this->metadataFactory->reveal()
         );
 
-        $this->assertEquals($dataCollector->getMethod(), '');
+        $this->assertEquals($dataCollector->getRequestAttributes(), []);
         $this->assertEquals($dataCollector->getAcceptableContentTypes(), []);
         $this->assertNull($dataCollector->getResourceClass());
         $this->assertNull($dataCollector->getResourceMetadata());
@@ -89,10 +86,10 @@ class RequestDataCollectorTest extends TestCase
     public function testWithRessource()
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
-        $this->request
-            ->getMethod()
-            ->shouldBeCalled()
-            ->willReturn('GET');
+        $this->attributes->has('_api_item_operation_name')->shouldBeCalled()->willReturn(true);
+        $this->attributes->get('_api_item_operation_name')->shouldBeCalled()->willReturn('get');
+        $this->attributes->get('_api_receive')->shouldBeCalled()->willReturn(true);
+        $this->request->attributes = $this->attributes->reveal();
 
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal()
@@ -103,17 +100,17 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals($dataCollector->getMethod(), 'GET');
+        $this->assertEquals(['resource_class' => DummyEntity::class,  'item_operation_name' => 'get', 'receive' => true], $dataCollector->getRequestAttributes());
         $this->assertEquals($dataCollector->getAcceptableContentTypes(), ['foo', 'bar']);
         $this->assertEquals($dataCollector->getResourceClass(), DummyEntity::class);
-        $this->assertInstanceOf(ResourceMetadata::class, $dataCollector->getResourceMetadata());
+        $this->assertInstanceOf(Data::class, $dataCollector->getResourceMetadata());
+        $this->assertSame(ResourceMetadata::class, $dataCollector->getResourceMetadata()->getType());
     }
 
     private function apiResourceClassWillReturn($data)
     {
-        $this->attributes->get('_api_resource_class')
-            ->shouldBeCalled()
-            ->willReturn($data);
+        $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
+        $this->attributes->get('_api_subresource_context')->shouldBeCalled()->willReturn(null);
         $this->request->attributes = $this->attributes->reveal();
 
         if (!$data) {
