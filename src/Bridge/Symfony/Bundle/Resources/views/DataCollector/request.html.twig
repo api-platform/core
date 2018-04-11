@@ -59,7 +59,7 @@
 
             <tbody>
                 {% for key, itemOperation in collector.resourceMetadata.itemOperations %}
-                    {{ apiPlatform.operationLine(key, itemOperation, collector.requestAttributes.item_operation_name) }}
+                    {{ apiPlatform.operationLine(key, itemOperation, collector.requestAttributes.item_operation_name|default('')) }}
                 {% endfor %}
             </tbody>
         </table>
@@ -78,7 +78,7 @@
 
             <tbody>
                 {% for key, collectionOperation in collector.resourceMetadata.collectionOperations %}
-                    {{ apiPlatform.operationLine(key, collectionOperation, collector.requestAttributes.collection_operation_name) }}
+                    {{ apiPlatform.operationLine(key, collectionOperation, collector.requestAttributes.collection_operation_name|default('')) }}
                 {% endfor %}
             </tbody>
         </table>
