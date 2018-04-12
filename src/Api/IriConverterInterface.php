@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-
 /**
  * Converts item and resources to IRI and vice versa.
  *

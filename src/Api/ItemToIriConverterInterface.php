@@ -17,7 +17,6 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
- *
  * @author Mathieu Dewet <mathieu.dewet@gmail.com>
  */
 interface ItemToIriConverterInterface

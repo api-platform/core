@@ -17,7 +17,6 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 
 /**
- *
  * @author Mathieu Dewet <mathieu.dewet@gmail.com>
  */
 interface IriToItemConverterInterface
