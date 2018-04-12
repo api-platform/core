@@ -50,7 +50,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter, ItemToIriConverterInterface $itemToIriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter = null, ItemToIriConverterInterface $itemToIriConverter = null, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
