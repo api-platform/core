@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -28,7 +28,7 @@ final class ResourceFieldResolver
 {
     private $iriConverter;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(ItemToIriConverterInterface $iriConverter)
     {
         $this->iriConverter = $iriConverter;
     }

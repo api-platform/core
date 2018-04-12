@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
@@ -32,7 +32,7 @@ final class AddTagsListener
 {
     private $iriConverter;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(ItemToIriConverterInterface $iriConverter)
     {
         $this->iriConverter = $iriConverter;
     }

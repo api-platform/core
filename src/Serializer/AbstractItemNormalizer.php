@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -41,27 +42,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
-    protected $iriConverter;
+    protected $iriToItemConverter;
+    protected $itemToIriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
     protected $localCache = [];
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter, ItemToIriConverterInterface $itemToIriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->iriConverter = $iriConverter;
+        $this->iriToItemConverter = $iriToItemConverter;
+        $this->itemToIriConverter = $itemToIriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
 
         $this->setCircularReferenceHandler(function ($object) {
-            return $this->iriConverter->getIriFromItem($object);
+            return $this->itemToIriConverter->getIriFromItem($object);
         });
     }
 
@@ -93,7 +96,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_normalize'] = true;
 
         if (isset($context['resources'])) {
-            $resource = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
+            $resource = $context['iri'] ?? $this->itemToIriConverter->getIriFromItem($object);
             $context['resources'][$resource] = $resource;
         }
 
@@ -293,7 +296,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (\is_string($value)) {
             try {
-                return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
+                return $this->iriToItemConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
                 throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
@@ -465,7 +468,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // On a subresource, we know the value of the identifiers.
         // If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri
         if (null === $relatedObject && isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
-            return $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
+            return $this->itemToIriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
         }
 
         if (null === $relatedObject || $propertyMetadata->isReadableLink() || !empty($context['attributes'])) {
@@ -478,7 +481,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->serializer->normalize($relatedObject, $format, $context);
         }
 
-        $iri = $this->iriConverter->getIriFromItem($relatedObject);
+        $iri = $this->itemToIriConverter->getIriFromItem($relatedObject);
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
         }

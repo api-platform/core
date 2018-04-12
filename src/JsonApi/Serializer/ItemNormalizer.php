@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -40,9 +41,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $componentsCache = [];
     private $resourceMetadataFactory;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter, ItemToIriConverterInterface $itemToIriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriToItemConverter, $itemToIriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
@@ -78,7 +79,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $context, $components['relationships']);
 
         $item = [
-            'id' => $this->iriConverter->getIriFromItem($object),
+            'id' => $this->itemToIriConverter->getIriFromItem($object),
             'type' => $resourceMetadata->getShortName(),
         ];
 
@@ -112,7 +113,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
+            $context[self::OBJECT_TO_POPULATE] = $this->iriToItemConverter->getItemFromIri(
                 $data['data']['id'],
                 $context + ['fetch_data' => false]
             );
@@ -167,7 +168,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         try {
-            return $this->iriConverter->getItemFromIri($value['id'], $context + ['fetch_data' => true]);
+            return $this->iriToItemConverter->getItemFromIri($value['id'], $context + ['fetch_data' => true]);
         } catch (ItemNotFoundException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
@@ -182,14 +183,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         if (null === $relatedObject) {
             if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
-                $iri = $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
+                $iri = $this->iriToItemConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
             } else {
                 unset($context['resource_class']);
 
                 return $this->serializer->normalize($relatedObject, $format, $context);
             }
         } else {
-            $iri = $this->iriConverter->getIriFromItem($relatedObject);
+            $iri = $this->itemToIriConverter->getIriFromItem($relatedObject);
 
             if (isset($context['resources'])) {
                 $context['resources'][$iri] = $iri;

@@ -17,7 +17,7 @@ namespace ApiPlatform\Core\Api;
 /**
  * Converts item and resources to IRI and vice versa.
  *
- * @deprecated please use ItemToIriConverterInterface or IriToItemConverterInterface to fit your needs instead
+ * @deprecated IriConverterInterface is deprecated since API Platform 2.3 and will be removed in API Platform 3.0, use ItemToIriConverterInterface and/or IriToItemConverterInterface instead.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Mathieu Dewet <mathieu.dewet@gmail.com>

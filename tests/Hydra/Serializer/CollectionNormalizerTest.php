@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
@@ -33,7 +33,7 @@ class CollectionNormalizerTest extends TestCase
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $iriConvert = $this->prophesize(IriConverterInterface::class);
+        $iriConvert = $this->prophesize(ItemToIriConverterInterface::class);
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
         $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foos');
@@ -51,7 +51,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(['foo' => 'bar'], null, true)->willReturn('Foo')->shouldBeCalled();
 
-        $iriConvert = $this->prophesize(IriConverterInterface::class);
+        $iriConvert = $this->prophesize(ItemToIriConverterInterface::class);
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
         $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
@@ -122,7 +122,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($paginator, null, true)->willReturn('Foo')->shouldBeCalled();
 
-        $iriConvert = $this->prophesize(IriConverterInterface::class);
+        $iriConvert = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
 
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
