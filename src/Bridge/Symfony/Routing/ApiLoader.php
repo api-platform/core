@@ -107,10 +107,18 @@ final class ApiLoader extends Loader
             }
 
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+                if (null === $controller = $operation['controller'] ?? null) {
+                    $controller = self::DEFAULT_ACTION_PATTERN.'get_subresource';
+
+                    if (!$this->container->has($controller)) {
+                        throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', OperationType::SUBRESOURCE, 'GET'));
+                    }
+                }
+
                 $routeCollection->add($operation['route_name'], new Route(
                     $operation['path'],
                     [
-                        '_controller' => self::DEFAULT_ACTION_PATTERN.'get_subresource',
+                        '_controller' => $controller,
                         '_format' => null,
                         '_api_resource_class' => $operation['resource_class'],
                         '_api_subresource_operation_name' => $operation['route_name'],
