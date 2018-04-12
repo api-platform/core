@@ -32,6 +32,10 @@ class DateFilterTest extends AbstractFilterTest
     public function testApplyDate()
     {
         $this->doTestApplyDate(false);
+    }
+
+    public function testApplyDateImmutable()
+    {
         $this->doTestApplyDateImmutable(false);
     }
 
@@ -41,6 +45,13 @@ class DateFilterTest extends AbstractFilterTest
     public function testRequestApplyDate()
     {
         $this->doTestApplyDate(true);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testRequestApplyDateImmutable()
+    {
         $this->doTestApplyDateImmutable(true);
     }
 
@@ -70,7 +81,7 @@ class DateFilterTest extends AbstractFilterTest
         $requestStack = null;
         if ($request) {
             $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummy_immutable_date', 'GET', $filters));
+            $requestStack->push(Request::create('/api/dummy_immutable_dates', 'GET', $filters));
         }
 
         $queryBuilder = $this->repository->createQueryBuilder('o');

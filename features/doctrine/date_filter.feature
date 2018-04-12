@@ -264,7 +264,6 @@ Feature: Date filter on collections
     }
     """
 
-  @dropSchema
   Scenario: Get collection filtered by association date
     Given there are 30 dummy objects with dummyDate and relatedDummy
     When I send a "GET" request to "/dummies?relatedDummy.dummyDate[after]=2015-04-28"
@@ -384,7 +383,6 @@ Feature: Date filter on collections
     }
     """
 
-  @dropSchema
   @createSchema
   Scenario: Get collection filtered by association date
     Given there are 2 dummy objects with dummyDate and relatedDummy
@@ -672,7 +670,6 @@ Feature: Date filter on collections
     }
     """
 
-  @dropSchema
   @createSchema
   Scenario: Get collection filtered by date that is not a datetime
     Given there are 30 dummydate objects with dummyDate
@@ -681,7 +678,6 @@ Feature: Date filter on collections
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  @dropSchema
   @createSchema
   Scenario: Get collection filtered by date that is an immutable date variant
     Given there are 30 dummyimmutabledate objects with dummyDate
@@ -690,7 +686,6 @@ Feature: Date filter on collections
     And the JSON node "hydra:totalItems" should be equal to 3
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
-  @dropSchema
   @createSchema
   Scenario: Get collection filtered by embedded date
     Given there are 2 embedded dummy objects with dummyDate and embeddedDummy

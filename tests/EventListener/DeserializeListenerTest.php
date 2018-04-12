@@ -47,12 +47,15 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    public function testDoNotCallWhenPutAndEmptyRequestContent()
+    /**
+     * @dataProvider allowedEmptyRequestMethodsProvider
+     */
+    public function testDoNotCallWhenSendingAndEmptyRequestContent($method)
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'put'], [], [], [], '');
-        $request->setMethod('PUT');
+        $request->setMethod($method);
         $request->headers->set('Content-Type', 'application/json');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
@@ -64,6 +67,11 @@ class DeserializeListenerTest extends TestCase
 
         $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
         $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
+    public function allowedEmptyRequestMethodsProvider()
+    {
+        return [['PUT'], ['POST']];
     }
 
     public function testDoNotCallWhenRequestNotManaged()

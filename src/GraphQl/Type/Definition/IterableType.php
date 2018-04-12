@@ -33,9 +33,13 @@ use GraphQL\Utils\Utils;
  */
 final class IterableType extends ScalarType
 {
-    public $name = 'Iterable';
+    public function __construct()
+    {
+        $this->name = 'Iterable';
+        $this->description = 'The `Iterable` scalar type represents an array or a Traversable with any kind of data.';
 
-    public $description = 'The `Iterable` scalar type represents an array or a Traversable with any kind of data.';
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -77,6 +81,8 @@ final class IterableType extends ScalarType
 
     /**
      * @param StringValueNode|BooleanValueNode|IntValueNode|FloatValueNode|ObjectValueNode|ListValueNode $valueNode
+     *
+     * @return mixed
      */
     private function parseIterableLiteral($valueNode)
     {

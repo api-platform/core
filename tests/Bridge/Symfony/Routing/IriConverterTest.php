@@ -20,6 +20,7 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -53,6 +54,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -61,7 +63,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -85,6 +88,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -93,7 +97,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $converter->getItemFromIri('/users/3');
     }
@@ -109,7 +114,7 @@ class IriConverterTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
-        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', 3, null, [])->shouldBeCalledTimes(1);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', ['id' => 3], null, [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true])->shouldBeCalledTimes(1);
 
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
 
@@ -121,6 +126,8 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('3', 'AppBundle\Entity\User')->shouldBeCalled()->willReturn(['id' => 3]);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -129,11 +136,16 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $converter->getItemFromIri('/users/3');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.
+     */
     public function testGetItemFromIri()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -168,6 +180,43 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
     }
 
+    public function testGetItemFromIriWithIdentifierNormalizer()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', ['id' => 3], null, ['fetch_data' => true, ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true])
+            ->willReturn('foo')
+            ->shouldBeCalledTimes(1);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/users/3')->willReturn([
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            'id' => 3,
+        ])->shouldBeCalledTimes(1);
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('3', 'AppBundle\Entity\User')->shouldBeCalled()->willReturn(['id' => 3]);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
+        );
+        $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
+    }
+
     public function testGetIriFromResourceClass()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -184,6 +233,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -192,7 +242,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), '/dummies');
     }
@@ -217,6 +268,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -225,7 +277,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $converter->getIriFromResourceClass(Dummy::class);
     }
@@ -246,6 +299,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -254,7 +308,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $this->assertEquals($converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]), '/dummies/1/related_dummies');
     }
@@ -279,6 +334,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -287,7 +343,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]);
     }
@@ -308,6 +365,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -316,7 +374,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
@@ -341,6 +400,7 @@ class IriConverterTest extends TestCase
 
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
 
         $converter = new IriConverter(
             $propertyNameCollectionFactory,
@@ -349,7 +409,8 @@ class IriConverterTest extends TestCase
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
             null,
-            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
         );
         $converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]);
     }

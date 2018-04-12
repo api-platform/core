@@ -571,7 +571,6 @@ Feature: Filter with serialization attributes on items and collections
     }
     """
 
-  @dropSchema
   Scenario: Create a resource by attributes foo, bar, group.foo, group.baz and group.qux
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=foo&properties[group][]=baz&properties[group][]=qux" with body:

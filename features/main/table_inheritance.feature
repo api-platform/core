@@ -44,7 +44,6 @@ Feature: Table inheritance
     }
     """
 
-  @dropSchema
   Scenario: Get the parent entity collection
     When I send a "GET" request to "/dummy_table_inheritances"
     Then the response status code should be 200
@@ -237,7 +236,6 @@ Feature: Table inheritance
     }
     """
 
-  @dropSchema
   Scenario: Get the parent entity collection which contains multiple inherited children type
     When I send a "GET" request to "/dummy_table_inheritances"
     Then the response status code should be 200

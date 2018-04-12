@@ -94,6 +94,9 @@ script:
   - if [[ $coverage != 1 && $lint != 1 ]]; then
       tests/Fixtures/app/console api:swagger:export > swagger.json && swagger-cli validate swagger.json && rm swagger.json;
     fi
+  - if [[ $coverage != 1 && $lint != 1 ]]; then
+      tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && swagger-cli validate --no-schema swagger.yaml && rm swagger.yaml;
+    fi
   - if [[ $lint = 1 ]]; then
       php php-cs-fixer.phar fix --dry-run --diff --no-ansi;
     fi

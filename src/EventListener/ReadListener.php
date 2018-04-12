@@ -16,8 +16,9 @@ namespace ApiPlatform\Core\EventListener;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
@@ -36,13 +37,20 @@ final class ReadListener
     private $itemDataProvider;
     private $subresourceDataProvider;
     private $serializerContextBuilder;
+    private $identifierDenormalizer;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, ChainIdentifierDenormalizer $identifierDenormalizer = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
+
+        if (null === $identifierDenormalizer) {
+            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.', ChainIdentifierDenormalizer::class), E_USER_DEPRECATED);
+        }
+
+        $this->identifierDenormalizer = $identifierDenormalizer;
     }
 
     /**
@@ -110,9 +118,16 @@ final class ReadListener
     private function getItemData(Request $request, array $attributes, array $context)
     {
         $id = $request->attributes->get('id');
+        $context = [];
+
         try {
+            if ($this->identifierDenormalizer) {
+                $id = $this->identifierDenormalizer->denormalize((string) $id, $attributes['resource_class']);
+                $context = [ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true];
+            }
+
             $data = $this->itemDataProvider->getItem($attributes['resource_class'], $id, $attributes['item_operation_name'], $context);
-        } catch (PropertyNotFoundException $e) {
+        } catch (InvalidIdentifierException $e) {
             $data = null;
         }
 
@@ -139,9 +154,23 @@ final class ReadListener
 
         $attributes['subresource_context'] += $context;
         $identifiers = [];
-        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, , $hasIdentifier)) {
-            if (true === $hasIdentifier) {
-                $identifiers[$id] = $request->attributes->get($id);
+        if ($this->identifierDenormalizer) {
+            $attributes['subresource_context'][ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
+        }
+
+        foreach ($attributes['subresource_context']['identifiers'] as $key => list($id, $resourceClass, $hasIdentifier)) {
+            if (false === $hasIdentifier) {
+                continue;
+            }
+
+            $identifiers[$id] = $request->attributes->get($id);
+
+            if ($this->identifierDenormalizer) {
+                try {
+                    $identifiers[$id] = $this->identifierDenormalizer->denormalize((string) $identifiers[$id], $resourceClass);
+                } catch (InvalidIdentifierException $e) {
+                    throw new NotFoundHttpException('Not Found');
+                }
             }
         }
 

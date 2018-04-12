@@ -23,6 +23,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -50,7 +51,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
      * @param QueryCollectionExtensionInterface[]    $collectionExtensions
      * @param QueryItemExtensionInterface[]          $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $collectionExtensions = [], array $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, /* iterable */ $collectionExtensions = [], /* iterable */ $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -68,7 +69,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (null === $manager) {
-            throw new ResourceClassNotSupportedException();
+            throw new ResourceClassNotSupportedException(sprintf('The object manager associated with the "%s" resource class cannot be retrieved.', $resourceClass));
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -76,7 +77,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
 
-        if (!isset($context['identifiers']) || !isset($context['property'])) {
+        if (!isset($context['identifiers'], $context['property'])) {
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
 
@@ -152,11 +153,16 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $qb = $manager->createQueryBuilder();
         $alias = $queryNameGenerator->generateJoinAlias($identifier);
         $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
-        $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers(
-            $identifiers[$identifier],
-            $manager,
-            $identifierResourceClass
-        ) : [];
+        $normalizedIdentifiers = [];
+
+        if (isset($identifiers[$identifier])) {
+            // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
+            if ($context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] ?? false) {
+                $normalizedIdentifiers = $identifiers[$identifier];
+            } else {
+                $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);
+            }
+        }
 
         switch ($relationType) {
             // MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved

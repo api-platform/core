@@ -109,7 +109,6 @@ Feature: GraphQL query support
     And I send the GraphQL request with operation "DummyWithId1"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #1"
 
-  @dropSchema
   Scenario: Retrieve an nonexistent item through a GraphQL query
     When I send the following GraphQL request:
     """

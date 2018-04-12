@@ -75,7 +75,7 @@
 * Add support for the immutable date and time types introduced in Doctrine
 * Fix the Doctrine query generated to retrieve nested subresources
 * Fix several bugs in the automatic eager loading support
-* Fix a bug occurring when passing nor an IRI nor an array in an embedded relation
+* Fix a bug occurring when passing neither an IRI nor an array in an embedded relation
 * Allow to request `0` items per page in collections
 * Also copy the `Host` from the Symfony Router
 * `Paginator::getLastPage()` now always returns a `float`

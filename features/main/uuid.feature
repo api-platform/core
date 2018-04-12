@@ -97,8 +97,28 @@ Feature: Using uuid identifier on resource
     }
     """
 
-  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78"
     Then the response status code should be 204
     And the response should be empty
+
+  @createSchema
+  Scenario: Retrieve a resource identified by Ramsey\Uuid\Uuid
+    Given there is a ramsey identified resource with uuid "41B29566-144B-11E6-A148-3E1D05DEFE78"
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  Scenario: Delete a resource identified by a Ramsey\Uuid\Uuid
+    When I send a "DELETE" request to "/ramsey_uuid_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78"
+    Then the response status code should be 204
+    And the response should be empty
+
+  Scenario: Retrieve a resource identified by a bad Ramsey\Uuid\Uuid
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-E1D05DEFE78"
+    Then the response status code should be 404
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
