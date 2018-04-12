@@ -17,6 +17,7 @@ namespace ApiPlatform\Core\Api;
 /**
  * Converts item and resources to IRI and vice versa.
  *
+ * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Mathieu Dewet <mathieu.dewet@gmail.com>
  */
 interface IriConverterInterface extends ItemToIriConverterInterface, IriToItemConverterInterface
