@@ -42,7 +42,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $resourceMetadataFactory;
     private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter, ItemToIriConverterInterface $itemToIriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter = null, ItemToIriConverterInterface $itemToIriConverter = null, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriToItemConverter, $itemToIriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory);
 

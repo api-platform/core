@@ -41,7 +41,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private $componentsCache = [];
     private $resourceMetadataFactory;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter, ItemToIriConverterInterface $itemToIriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriToItemConverterInterface $iriToItemConverter = null, ItemToIriConverterInterface $itemToIriConverter = null, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriToItemConverter, $itemToIriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter);
 
