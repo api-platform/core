@@ -171,7 +171,7 @@ class ApiLoaderTest extends TestCase
         );
 
         $this->assertEquals(
-            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource.{_format}', 'api_platform.action.get_subresource', DummyEntity::class, 'api_related_dummies_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class, true]], 'collection' => false, 'operationId' => 'api_related_dummies_recursivesubresource_get_subresource']),
+            $this->getSubresourceRoute('/related_dummies/{id}/recursivesubresource.{_format}', 'dummy_controller', DummyEntity::class, 'api_related_dummies_recursivesubresource_get_subresource', ['property' => 'recursivesubresource', 'identifiers' => [['id', RelatedDummyEntity::class, true]], 'collection' => false, 'operationId' => 'api_related_dummies_recursivesubresource_get_subresource']),
             $routeCollection->get('api_related_dummies_recursivesubresource_get_subresource')
         );
 
@@ -216,7 +216,14 @@ class ApiLoaderTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(DummyEntity::class)->willReturn($resourceMetadata);
-        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->willReturn((new ResourceMetadata())->withShortName('related_dummies'));
+
+        $relatedDummyEntityMetadata = (new ResourceMetadata())->withShortName('related_dummies')->withSubresourceOperations([
+            'recursivesubresource_get_subresource' => [
+                'controller' => 'dummy_controller',
+            ],
+        ]);
+
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->willReturn($relatedDummyEntityMetadata);
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([DummyEntity::class, RelatedDummyEntity::class]));
