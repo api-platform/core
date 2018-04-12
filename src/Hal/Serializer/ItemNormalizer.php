@@ -46,7 +46,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['cache_key'] = $this->getHalCacheKey($format, $context);
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
-        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+        $context['iri'] = $this->itemToIriConverter->getIriFromItem($object);
         $context['api_normalize'] = true;
 
         $rawData = parent::normalize($object, $format, $context);

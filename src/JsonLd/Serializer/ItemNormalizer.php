@@ -69,7 +69,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         // Use resolved resource class instead of given resource class to support multiple inheritance child types
         $context['resource_class'] = $resourceClass;
-        $context['iri'] = $this->iriConverter->getIriFromItem($object);
+        $context['iri'] = $this->itemToIriConverter->getIriFromItem($object);
 
         $rawData = parent::normalize($object, $format, $context);
         if (!\is_array($rawData)) {
@@ -103,7 +103,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriToItemConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
         }
 
         return parent::denormalize($data, $class, $format, $context);

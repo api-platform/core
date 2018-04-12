@@ -54,7 +54,7 @@ class ItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriToItemConverterProphecy->reveal(),
-            $this->prophesize(ItemToIriConverterInterface::class),
+            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal()
         );
 
@@ -93,7 +93,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IriToItemConverterInterface::class),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $itemToIriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal()
         );
