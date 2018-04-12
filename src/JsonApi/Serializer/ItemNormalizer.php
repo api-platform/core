@@ -183,7 +183,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         if (null === $relatedObject) {
             if (isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
-                $iri = $this->iriToItemConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
+                $iri = $this->itemToIriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
             } else {
                 unset($context['resource_class']);
 

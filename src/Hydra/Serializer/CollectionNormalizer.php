@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\ItemToIriConverterInterface;
-use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
@@ -44,12 +43,11 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     private $resourceClassResolver;
     private $iriConverter;
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, ItemToIriConverterInterface $itemToIriConverter, IriToItemConverterInterface $iriToItemConverter)
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, ItemToIriConverterInterface $itemToIriConverter)
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->itemToIriConverter = $itemToIriConverter;
-        $this->iriToItemConverter = $iriToItemConverter;
     }
 
     /**
@@ -79,7 +77,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
 
         if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
-            $data['@id'] = $this->iriToItemConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
+            $data['@id'] = $this->itemToIriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
         } else {
             $data['@id'] = $this->itemToIriConverter->getIriFromResourceClass($resourceClass);
         }

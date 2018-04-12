@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
@@ -580,6 +582,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.property_info' => 'property_info',
             'api_platform.serializer' => 'serializer',
             IriConverterInterface::class => 'api_platform.iri_converter',
+            IriToItemConverterInterface::class => 'api_platform.iri_converter',
+            ItemToIriConverterInterface::class => 'api_platform.iri_converter',
             UrlGeneratorInterface::class => 'api_platform.router',
             SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
             CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
