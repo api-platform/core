@@ -61,6 +61,8 @@
             <argument type="service" id="api_platform.identifier.denormalizer" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
+        <service id="ApiPlatform\Core\Api\IriToItemConverterInterface" alias="api_platform.iri_converter" />
+        <service id="ApiPlatform\Core\Api\ItemToIriConverterInterface" alias="api_platform.iri_converter" />
 
         <!-- Serializer -->
 
