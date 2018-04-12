@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\ItemResolver;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -77,7 +77,7 @@ class ItemResolverTest extends TestCase
 
     private function createItemResolver($item): ItemResolver
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $getItemFromIri = $iriConverterProphecy->getItemFromIri('/related_dummies/3', ['attributes' => []]);
         null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 

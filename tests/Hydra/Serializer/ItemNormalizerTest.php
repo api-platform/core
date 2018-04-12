@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -40,7 +41,7 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceClassResolverProphecy->getResourceClass(['dummy'], 'Dummy')->willReturn(Dummy::class);
@@ -60,7 +61,7 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -96,7 +97,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

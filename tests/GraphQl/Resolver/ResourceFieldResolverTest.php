@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -26,7 +26,7 @@ class ResourceFieldResolverTest extends TestCase
     {
         $dummy = new Dummy();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $resolveInfo = new ResolveInfo([]);
@@ -39,7 +39,7 @@ class ResourceFieldResolverTest extends TestCase
 
     public function testOriginalId()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $resolveInfo = new ResolveInfo([]);
         $resolveInfo->fieldName = '_id';
@@ -51,7 +51,7 @@ class ResourceFieldResolverTest extends TestCase
 
     public function testDirectAccess()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $resolveInfo = new ResolveInfo([]);
         $resolveInfo->fieldName = 'foo';

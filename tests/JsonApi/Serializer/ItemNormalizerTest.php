@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer;
@@ -50,7 +51,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
@@ -73,7 +74,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
@@ -117,7 +118,7 @@ class ItemNormalizerTest extends TestCase
         $serializerProphecy->normalize(10, null, Argument::type('array'))->willReturn(10)->shouldBeCalled();
         $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null)->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/10')->shouldBeCalled();
 
         $normalizer = new ItemNormalizer(
@@ -159,7 +160,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             new ReservedAttributeNameConverter(),
@@ -204,7 +205,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
             new ReservedAttributeNameConverter(),
@@ -264,7 +265,7 @@ class ItemNormalizerTest extends TestCase
             return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
         };
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $iriConverterProphecy->getItemFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->willReturn($relatedDummy1)->shouldBeCalled();
         $iriConverterProphecy->getItemFromIri('/related_dummies/2', Argument::that($getItemFromIriSecondArgCallback))->willReturn($relatedDummy2)->shouldBeCalled();
 
@@ -334,7 +335,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             null,
             null,
@@ -386,7 +387,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             new ReservedAttributeNameConverter(),
@@ -439,7 +440,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             new ReservedAttributeNameConverter(),
@@ -494,7 +495,7 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             new ReservedAttributeNameConverter(),

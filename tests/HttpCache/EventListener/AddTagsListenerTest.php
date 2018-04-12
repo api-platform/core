@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,7 @@ class AddTagsListenerTest extends TestCase
 {
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $request->setMethod('PUT');
@@ -49,7 +49,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testDoNotSetHeaderWhenResponseNotCacheable()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
 
@@ -67,7 +67,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testDoNotSetHeaderWhenNotAnApiOperation()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar']]);
 
@@ -87,7 +87,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testDoNotSetHeaderWhenEmptyTagList()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $request = new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
 
@@ -107,7 +107,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddTags()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
 
@@ -127,7 +127,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddCollectionIri()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
@@ -148,7 +148,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddCollectionIriWhenCollectionIsEmpty()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
 
         $request = new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);

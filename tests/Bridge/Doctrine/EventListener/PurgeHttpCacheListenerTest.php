@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Core\HttpCache\PurgerInterface;
@@ -50,7 +50,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
         $purgerProphecy->purge(['/dummies' => '/dummies', '/dummies/1' => '/dummies/1', '/dummies/2' => '/dummies/2', '/dummies/3' => '/dummies/3', '/dummies/4' => '/dummies/4'])->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toUpdate1)->willReturn('/dummies/1')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toUpdate2)->willReturn('/dummies/2')->shouldBeCalled();
@@ -89,7 +89,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
         $purgerProphecy->purge(['/dummies' => '/dummies', '/dummies/1' => '/dummies/1', '/related_dummies/old' => '/related_dummies/old', '/related_dummies/new' => '/related_dummies/new'])->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($oldRelatedDummy)->willReturn('/related_dummies/old')->shouldBeCalled();

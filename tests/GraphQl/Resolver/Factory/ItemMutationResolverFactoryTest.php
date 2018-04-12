@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
@@ -67,7 +67,7 @@ class ItemMutationResolverFactoryTest extends TestCase
 
     private function createItemMutationResolverFactory($item, ObjectProphecy $dataPersisterProphecy): ResolverFactoryInterface
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $getItemFromIri = $iriConverterProphecy->getItemFromIri('/dummies/3', ['attributes' => []]);
         null === $item ? $getItemFromIri->willThrow(new ItemNotFoundException()) : $getItemFromIri->willReturn($item);
 

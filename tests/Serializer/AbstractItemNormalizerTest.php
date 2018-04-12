@@ -185,7 +185,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
@@ -325,7 +325,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
@@ -383,7 +383,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -427,7 +427,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -464,7 +464,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT), '', false, true, false, false)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
@@ -495,7 +495,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT), '', false, true, false, false)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'foo', 42)->shouldBeCalled();
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -545,7 +545,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -581,7 +581,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', false, true, false, false)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
@@ -618,7 +618,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);

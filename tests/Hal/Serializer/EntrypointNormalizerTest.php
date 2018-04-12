@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
 use ApiPlatform\Core\Api\Entrypoint;
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -34,7 +34,7 @@ class EntrypointNormalizerTest extends TestCase
         $entrypoint = new Entrypoint($collection);
 
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
         $normalizer = new EntrypointNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
@@ -51,7 +51,7 @@ class EntrypointNormalizerTest extends TestCase
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);

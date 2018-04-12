@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -36,7 +36,7 @@ class SearchFilterTest extends AbstractFilterTest
     protected function filterFactory(ManagerRegistry $managerRegistry, RequestStack $requestStack = null, array $properties = null)
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
 
         $iriConverterProphecy->getItemFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
             if (false !== strpos($args[0], '/related_dummies')) {
