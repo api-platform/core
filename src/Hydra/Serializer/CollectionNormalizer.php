@@ -41,7 +41,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     private $contextBuilder;
     private $resourceClassResolver;
-    private $iriConverter;
+    private itemToIriConverter;
 
     public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, ItemToIriConverterInterface $itemToIriConverter)
     {
