@@ -50,7 +50,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
+        $temToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -62,7 +62,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $temToIriConverterInterface->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -185,8 +186,8 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy)->shouldBeCalled();
@@ -205,7 +206,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class),
+            $itemToIriConverterInterface->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -258,9 +260,9 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
-        $iriConverterProphecy->getItemFromIri('/dummies/1', Argument::type('array'))->willReturn($relatedDummy1)->shouldBeCalled();
-        $iriConverterProphecy->getItemFromIri('/dummies/2', Argument::type('array'))->willReturn($relatedDummy2)->shouldBeCalled();
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface->getItemFromIri('/dummies/1', Argument::type('array'))->willReturn($relatedDummy1)->shouldBeCalled();
+        $iriToItemConverterInterface->getItemFromIri('/dummies/2', Argument::type('array'))->willReturn($relatedDummy2)->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
@@ -275,7 +277,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -325,7 +328,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
@@ -347,7 +350,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -383,7 +387,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -395,7 +399,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -427,7 +432,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -439,7 +444,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -464,7 +470,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT), '', false, true, false, false)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
@@ -474,7 +480,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -495,7 +502,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT), '', false, true, false, false)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'foo', 42)->shouldBeCalled();
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -506,7 +513,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -545,7 +553,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -556,7 +564,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -581,7 +590,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', false, true, false, false)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
@@ -591,7 +600,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $itemToIriConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -618,8 +628,8 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
@@ -636,7 +646,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class),
+            $itemToIriConverterInterface->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);
@@ -667,7 +678,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -682,7 +693,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
             null,
@@ -718,7 +730,7 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -733,7 +745,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
             null,

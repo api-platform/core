@@ -41,13 +41,22 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceClassResolverProphecy->getResourceClass(['dummy'], 'Dummy')->willReturn(Dummy::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name' => 'name']));
 
-        $normalizer = new ItemNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $contextBuilderProphecy->reveal());
+        $normalizer = new ItemNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $itemToIriConverterInterface->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $contextBuilderProphecy->reveal()
+        );
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', ItemNormalizer::FORMAT));
     }
@@ -61,7 +70,8 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -72,7 +82,8 @@ class ItemNormalizerTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $itemToIriConverterInterface->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -97,8 +108,10 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
+
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
@@ -114,7 +127,8 @@ class ItemNormalizerTest extends TestCase
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $itemToIriConverterInterface->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );

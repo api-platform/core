@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -39,13 +40,15 @@ class ItemNormalizerTest extends TestCase
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
+        $iriToItemConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $itemToIriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterProphecy->reveal(),
+            $itemToIriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal()
         );
 
@@ -61,7 +64,8 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
+        $iriToItemConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
+        $itemToIriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy)->willReturn(Dummy::class)->shouldBeCalled();
@@ -70,7 +74,8 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterProphecy->reveal(),
+            $itemToIriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal()
         );
 
@@ -92,8 +97,10 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
+        $iriToItemConverterInterface = $this->prophesize(IriToItemConverterInterface::class);
+        $itemToIriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
+
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
@@ -106,7 +113,8 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterInterface->reveal(),
+            $itemToIriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
@@ -135,8 +143,9 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadataFactory)->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface->getIriFromItem($dummy)->willReturn('/dummies/1988')->shouldBeCalled();
+        $iriToItemConverterProphecy = $this->prophesize(IriToItemConverterInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
@@ -149,7 +158,8 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
+            $iriToItemConverterProphecy->reveal(),
+            $itemToIriConverterInterface->reveal(),
             $resourceClassResolverProphecy->reveal()
         );
         $normalizer->setSerializer($serializerProphecy->reveal());
