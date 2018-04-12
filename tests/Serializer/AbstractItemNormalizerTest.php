@@ -62,7 +62,7 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IriToItemConverterInterface::class),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
             $itemToIriConverterInterface->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),

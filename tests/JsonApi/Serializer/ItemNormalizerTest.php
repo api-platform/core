@@ -75,6 +75,8 @@ class ItemNormalizerTest extends TestCase
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class),
+            $this->prophesize(ItemToIriConverterInterface::class),
             $resourceClassResolverProphecy->reveal(),
             $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             null,
@@ -119,14 +121,14 @@ class ItemNormalizerTest extends TestCase
         $serializerProphecy->normalize(10, null, Argument::type('array'))->willReturn(10)->shouldBeCalled();
         $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null)->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/10')->shouldBeCalled();
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface->getIriFromItem($dummy)->willReturn('/dummies/10')->shouldBeCalled();
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
+            $this->prophesize(IriToItemConverterInterface::class)->reveal(),
+            $itemToIriConverterInterface->reveal(),
             $propertyAccessorProphecy->reveal(),
             new ReservedAttributeNameConverter(),
             $resourceMetadataFactoryProphecy->reveal()
