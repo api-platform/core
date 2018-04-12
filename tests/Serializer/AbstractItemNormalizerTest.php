@@ -401,7 +401,7 @@ class AbstractItemNormalizerTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriToItemConverterInterface->reveal(),
-            $this->prophesize(ItemToIriConverterInterface::class),
+            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
         ]);

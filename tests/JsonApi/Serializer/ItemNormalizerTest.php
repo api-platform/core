@@ -342,6 +342,7 @@ class ItemNormalizerTest extends TestCase
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(IriToItemConverterInterface::class)->reveal(),
+            $this->prophesize(ItemToIriConverterInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
             null,
             null,
