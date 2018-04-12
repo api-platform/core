@@ -78,6 +78,14 @@ final class GraphqlContext implements Context
     }
 
     /**
+     * @When I post the following GraphQL request:
+     */
+    public function IPostTheFollowingGraphqlRequest(PyStringNode $request)
+    {
+        $this->postGraphqlRequest($request);
+    }
+
+    /**
      * @When I send the GraphQL request with variables:
      */
     public function ISendTheGraphqlRequestWithVariables(PyStringNode $variables)
@@ -99,5 +107,13 @@ final class GraphqlContext implements Context
     {
         $this->request->setHttpHeader('Accept', null);
         $this->restContext->iSendARequestTo('GET', '/graphql?'.http_build_query($this->graphqlRequest));
+    }
+
+    private function postGraphqlRequest($body)
+    {
+        $this->request->setHttpHeader('Accept', null);
+        $this->request->setHttpHeader('Content-Type', 'application/json');
+
+        $this->restContext->iSendARequestTo('POST', '/graphql', $body);
     }
 }

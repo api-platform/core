@@ -67,7 +67,7 @@
         "symfony/validator": "^3.3 || ^4.0",
         "symfony/web-profiler-bundle": "^3.3 || ^4.0",
         "symfony/yaml": "^3.3 || ^4.0",
-        "webonyx/graphql-php": "^0.10.2"
+        "webonyx/graphql-php": "^0.11.5"
     },
     "conflict": {
         "symfony/dependency-injection": "<3.4"
