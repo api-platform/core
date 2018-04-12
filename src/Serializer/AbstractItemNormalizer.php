@@ -304,7 +304,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['resource_class'] = $className;
             $context['api_allow_update'] = true;
 
-            return $this->serializer->denormalize($value, $className, $format, $context);
+            try {
+                return $this->serializer->denormalize($value, $className, $format, $context);
+            } catch (InvalidArgumentException $e) {
+                if ('Invalid value provided (invalid IRI?).' !== $e->getMessage()) {
+                    throw $e;
+                }
+
+                if (!$this->allowPlainIdentifiers || null === $this->itemDataProvider) {
+                    throw $e;
+                }
+            }
         }
 
         if (!\is_array($value)) {
