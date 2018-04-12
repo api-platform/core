@@ -512,13 +512,50 @@ Feature: Relations support
     }
     """
 
+  Scenario: Passing a (valid) plain identifier on a relation
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "relatedDummy": "1",
+      "relatedDummies": ["1"],
+      "name": "Dummy with plain relations"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context":"/contexts/Dummy",
+      "@id":"/dummies/2",
+      "@type":"Dummy",
+      "description":null,
+      "dummy":null,
+      "dummyBoolean":null,
+      "dummyDate":null,
+      "dummyFloat":null,
+      "dummyPrice":null,
+      "relatedDummy":"/related_dummies/1",
+      "relatedDummies":["/related_dummies/1"],
+      "jsonData":[],
+      "arrayData":[],
+      "name_converted":null,
+      "id":2,
+      "name":"Dummy with plain relations",
+      "alias":null,
+      "foo":null
+    }
+    """
+
   @dropSchema
   Scenario: Passing an invalid IRI to a relation
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
-      "related": "certainly not an iri"
+      "related": "certainly not an iri and not a plain identifier"
     }
     """
     Then the response status code should be 400
