@@ -11,6 +11,7 @@
 
 {% block toolbar %}
     {% set icon %}
+        {% set status_color = collector.counters.ignored_filters|default(false) ? 'yellow' : 'default' %}
         {{ include('@ApiPlatform/DataCollector/api-platform.svg') }}
     {% endset %}
 
@@ -19,9 +20,15 @@
             <b>Resource Class</b>
             <span>{{ collector.resourceClass|default('Not an API Platform resource') }}</span>
         </div>
+        {% if collector.counters.ignored_filters|default(false) %}
+            <div class="sf-toolbar-info-piece">
+                <b>Ignored Filters</b>
+                <span class="sf-toolbar-status sf-toolbar-status-yellow">{{ collector.counters.ignored_filters }}</span>
+            </div>
+        {% endif %}
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true, status: status_color }) }}
 {% endblock %}
 
 {% block menu %}
@@ -86,22 +93,31 @@
         <table>
             <thead>
                 <tr>
-                    <th>
+                    <th scope="col">
                         Filters
                     </th>
                 </tr>
             </thead>
-
             <tbody>
-                {% if collector.resourceMetadata.attributes.filters is defined %}
-                    {% for filter in collector.resourceMetadata.attributes.filters %}
-                        <tr>
-                            <td>
-                                {{ filter }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
+                {% for id, filter in collector.filters %}
+                    {% set ignored_filter = filter is same as(null) %}
+                    <tr{% if ignored_filter %} class="status-warning"{% endif %}>
+                        <td>
+                            {{ id }}
+                            {% if ignored_filter %}
+                                <span class="newline text-muted">ignored filter</span>
+                            {% else %}
+                                {{ dump(filter) }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>
+                            <span class="text-muted">No available filter declared for this resource</span>
+                        </td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -111,7 +127,7 @@
                     <th scope="col" class="key">
                         Attributes
                     </th>
-                    <th scope="col" ></th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
 
