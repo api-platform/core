@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
@@ -33,12 +34,12 @@ class CollectionNormalizerTest extends TestCase
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $iriConvert = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foos');
+        $itemToIriConverterInterface->getIriFromResourceClass('Foo')->willReturn('/foos');
 
-        $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
+        $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $this->prophesize(IriToItemConverterInterface::class)->reveal(), $itemToIriConverterInterface->reveal());
 
         $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
@@ -51,14 +52,14 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(['foo' => 'bar'], null, true)->willReturn('Foo')->shouldBeCalled();
 
-        $iriConvert = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
+        $itemToIriConverterInterface->getIriFromResourceClass('Foo')->willReturn('/foo/1');
         $itemNormalizer = $this->prophesize(AbstractItemNormalizer::class);
         $itemNormalizer->normalize('bar', null, ['jsonld_has_context' => true, 'api_sub_level' => true, 'resource_class' => 'Foo'])->willReturn(22);
 
-        $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
+        $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $this->prophesize(IriToItemConverterInterface::class)->reveal(), $itemToIriConverterInterface->reveal());
 
         $normalizer->setNormalizer($itemNormalizer->reveal());
         $this->assertEquals(['@context' => '/contexts/Foo', '@id' => '/foo/1', '@type' => 'hydra:Collection', 'hydra:member' => [0 => '22'], 'hydra:totalItems' => 1], $normalizer->normalize(['foo' => 'bar'], null));
@@ -122,8 +123,8 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($paginator, null, true)->willReturn('Foo')->shouldBeCalled();
 
-        $iriConvert = $this->prophesize(ItemToIriConverterInterface::class);
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
+        $itemToIriConverterInterface = $this->prophesize(ItemToIriConverterInterface::class);
+        $itemToIriConverterInterface->getIriFromResourceClass('Foo')->willReturn('/foo/1');
 
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
@@ -131,7 +132,7 @@ class CollectionNormalizerTest extends TestCase
         $itemNormalizer = $this->prophesize(AbstractItemNormalizer::class);
         $itemNormalizer->normalize('foo', null, ['jsonld_has_context' => true, 'api_sub_level' => true, 'resource_class' => 'Foo'])->willReturn(['name' => 'Kévin', 'friend' => 'Smail']);
 
-        $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
+        $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $this->prophesize(IriToItemConverterInterface::class)->reveal(), $itemToIriConverterInterface->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         return $normalizer->normalize($paginator);
