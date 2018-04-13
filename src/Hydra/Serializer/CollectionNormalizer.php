@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
+use ApiPlatform\Core\Api\IriToItemConverterInterface;
 use ApiPlatform\Core\Api\ItemToIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -41,12 +42,14 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     private $contextBuilder;
     private $resourceClassResolver;
-    private itemToIriConverter;
+    private $iriToItemConverter;
+    private $itemToIriConverter;
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, ItemToIriConverterInterface $itemToIriConverter)
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriToItemConverterInterface $iriToItemConverter = null, ItemToIriConverterInterface $itemToIriConverter = null)
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->iriToItemConverter = $iriToItemConverter;
         $this->itemToIriConverter = $itemToIriConverter;
     }
 
