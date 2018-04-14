@@ -86,6 +86,12 @@
             <tbody>
                 {% for key, collectionOperation in collector.resourceMetadata.collectionOperations %}
                     {{ apiPlatform.operationLine(key, collectionOperation, collector.requestAttributes.collection_operation_name|default('')) }}
+                {% else %}
+                    <tr>
+                        <td colspan="2" class="text-muted">
+                            No available collection operation for this resource.
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -113,8 +119,8 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td>
-                            <span class="text-muted">No available filter declared for this resource</span>
+                        <td class="text-muted">
+                            No available filter declared for this resource.
                         </td>
                     </tr>
                 {% endfor %}
