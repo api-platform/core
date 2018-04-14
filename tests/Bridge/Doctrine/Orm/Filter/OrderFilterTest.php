@@ -341,6 +341,18 @@ class OrderFilterTest extends AbstractFilterTest
                 null,
                 $orderFilterFactory,
             ],
+            'not having order should not throw a deprecation (select unchanged)' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                ],
+                [
+                    'name' => 'q',
+                ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
         ];
     }
 }
