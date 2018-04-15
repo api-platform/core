@@ -101,7 +101,7 @@ class PaginationExtensionTest extends TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Page should not be greater than 1 if itemsPegPage is equal to 0
+     * @expectedExceptionMessage Page should not be greater than 1 if itemsPerPage is equal to 0
      */
     public function testApplyToCollectionWithItemPerPageZeroAndPage2()
     {
