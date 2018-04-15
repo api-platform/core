@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Doctrine\Common\Util\Inflector;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ObjectType;
@@ -226,9 +227,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     }
 
                     foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
-                        $nullable = isset($value['required']) ? !$value['required'] : true;
-                        $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
-                        $graphqlFilterType = $this->convertType($filterType, false, null, $depth);
+                        $graphqlFilterType = $this->getGraphQlFilterType($value, $depth);
 
                         if ('[]' === $newKey = substr($key, -2)) {
                             $key = $newKey;
@@ -265,6 +264,26 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         return null;
+    }
+
+    private function getGraphQlFilterType(array $value, int $depth)
+    {
+        $nullable = isset($value['required']) ? !$value['required'] : true;
+
+        if ('enum' === $value['type']) {
+            if (!isset($this->graphqlTypes['#OrderEnumType'])) {
+                $this->graphqlTypes['#OrderEnumType'] = new EnumType([
+                    'name' => 'OrderEnumType',
+                    'values' => $value['values'],
+                ]);
+            }
+
+            return $this->graphqlTypes['#OrderEnumType'];
+        }
+
+        $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
+
+        return $this->convertType($filterType, false, null, $depth);
     }
 
     private function mergeFilterArgs(array $args, array $parsed, ResourceMetadata $resourceMetadata = null, $original = ''): array

@@ -112,7 +112,8 @@ class OrderFilter extends AbstractContextAwareFilter
 
             $description[sprintf('%s[%s]', $this->orderParameterName, $property)] = [
                 'property' => $property,
-                'type' => 'string',
+                'type' => 'enum',
+                'values' => ['ASC', 'DESC'],
                 'required' => false,
             ];
         }
