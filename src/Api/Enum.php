@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
+namespace ApiPlatform\Core\Api;
 
 interface Enum
 {
