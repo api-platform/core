@@ -77,7 +77,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $dataProviderContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
             $dataProviderContext['attributes'] = $this->fieldsToAttributes($info);
-            $dataProviderContext['filters'] = $args;
+            $filters = $args;
+            foreach ($filters as $name => $value) {
+                if (strpos($name, '_')) {
+                    // Gives a chance to relations/nested fields
+                    $filters[str_replace('_', '.', $name)] = $value;
+                }
+            }
+            $dataProviderContext['filters'] = $filters;
 
             if (isset($rootClass, $source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_KEY])) {
                 $rootResolvedFields = $this->identifiersExtractor->getIdentifiersFromItem(unserialize($source[ItemNormalizer::ITEM_KEY]));

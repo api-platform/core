@@ -88,3 +88,27 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges" should have 0 elements
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges" should have 1 element
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy13"
+
+  @createSchema
+  Scenario: Retrieve a collection filtered using the related search filter
+    Given there are 1 dummy objects having each 2 relatedDummies
+    And there are 1 dummy objects having each 3 relatedDummies
+    When I add "Accept" header equal to "application/hal+json"
+    And I send a "GET" request to "/dummies?relatedDummies.name=RelatedDummy31"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "_embedded.item" should have 1 element
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(relatedDummies_name: "RelatedDummy31") {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }
+    """
+    And the response status code should be 200
+    And the JSON node "data.dummies.edges" should have 1 element
