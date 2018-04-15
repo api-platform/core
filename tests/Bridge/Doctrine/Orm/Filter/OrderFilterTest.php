@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\OrderDirection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,14 +33,12 @@ class OrderFilterTest extends AbstractFilterTest
         $this->assertEquals([
             'order[id]' => [
                 'property' => 'id',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[name]' => [
                 'property' => 'name',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));
@@ -52,74 +51,62 @@ class OrderFilterTest extends AbstractFilterTest
         $this->assertEquals([
             'order[id]' => [
                 'property' => 'id',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[name]' => [
                 'property' => 'name',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[alias]' => [
                 'property' => 'alias',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[description]' => [
                 'property' => 'description',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[dummy]' => [
                 'property' => 'dummy',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[dummyDate]' => [
                 'property' => 'dummyDate',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[dummyFloat]' => [
                 'property' => 'dummyFloat',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[dummyPrice]' => [
                 'property' => 'dummyPrice',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[jsonData]' => [
                 'property' => 'jsonData',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[arrayData]' => [
                 'property' => 'arrayData',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[nameConverted]' => [
                 'property' => 'nameConverted',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
             'order[dummyBoolean]' => [
                 'property' => 'dummyBoolean',
-                'type' => 'enum',
-                'values' => ['ASC', 'DESC'],
+                'type' => OrderDirection::class,
                 'required' => false,
             ],
         ], $filter->getDescription($this->resourceClass));

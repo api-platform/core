@@ -4,7 +4,7 @@ Feature: Collections filtering
   I need to be able to set filters
 
   @createSchema
-  Scenario: Retrieve a collection orderes using the order filter
+  Scenario: Retrieve a collection ordered using the order filter
     Given there are 3 dummy objects with dummyDate
     When I send the following GraphQL request:
     """

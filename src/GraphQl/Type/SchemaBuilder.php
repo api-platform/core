@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Enum;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
@@ -227,7 +228,9 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     }
 
                     foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $value) {
-                        $graphqlFilterType = $this->getGraphQlFilterType($value, $depth);
+                        $nullable = isset($value['required']) ? !$value['required'] : true;
+                        $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
+                        $graphqlFilterType = $this->convertType($filterType, false, null, $depth);
 
                         if ('[]' === $newKey = substr($key, -2)) {
                             $key = $newKey;
@@ -264,26 +267,6 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         return null;
-    }
-
-    private function getGraphQlFilterType(array $value, int $depth)
-    {
-        $nullable = isset($value['required']) ? !$value['required'] : true;
-
-        if ('enum' === $value['type']) {
-            if (!isset($this->graphqlTypes['#OrderEnumType'])) {
-                $this->graphqlTypes['#OrderEnumType'] = new EnumType([
-                    'name' => 'OrderEnumType',
-                    'values' => $value['values'],
-                ]);
-            }
-
-            return $this->graphqlTypes['#OrderEnumType'];
-        }
-
-        $filterType = \in_array($value['type'], Type::$builtinTypes, true) ? new Type($value['type'], $nullable) : new Type('object', $nullable, $value['type']);
-
-        return $this->convertType($filterType, false, null, $depth);
     }
 
     private function mergeFilterArgs(array $args, array $parsed, ResourceMetadata $resourceMetadata = null, $original = ''): array
@@ -374,6 +357,19 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 }
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     $graphqlType = GraphQLType::string();
+                    break;
+                }
+
+                if (is_a($typeClass = $type->getClassName(), Enum::class, true)) {
+                    $typeName = $typeClass::getName();
+                    if (!isset($this->graphqlTypes['#'.$typeName])) {
+                        $this->graphqlTypes['#'.$typeName] = new EnumType([
+                            'name' => $typeName,
+                            'values' => $typeClass::getValues(),
+                        ]);
+                    }
+
+                    $graphqlType = $this->graphqlTypes['#'.$typeName];
                     break;
                 }
 
