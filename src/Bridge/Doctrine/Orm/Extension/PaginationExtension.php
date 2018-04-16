@@ -25,6 +25,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Applies pagination on the Doctrine query for resource collection when enabled.
@@ -262,6 +263,10 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     private function getPaginationParameter(Request $request, string $parameterName, $default = null)
     {
         if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
+            if (isset($paginationAttribute['page']) && ((!is_numeric($paginationAttribute['page']) || (1 > (int) $paginationAttribute['page'])))) {
+                throw new BadRequestHttpException('Page request attribute must be a numeric value equal or greater than 1');
+            }
+
             return array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
         }
 
