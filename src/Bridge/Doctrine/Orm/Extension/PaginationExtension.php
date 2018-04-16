@@ -263,8 +263,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     private function getPaginationParameter(Request $request, string $parameterName, $default = null)
     {
         if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
-            if (isset($paginationAttribute['page']) && !is_numeric($paginationAttribute['page'])) {
-                throw new BadRequestHttpException('Page request attribute must be a numeric value');
+            if (isset($paginationAttribute['page']) && ((!is_numeric($paginationAttribute['page']) || (1 > (int) $paginationAttribute['page'])))) {
+                throw new BadRequestHttpException('Page request attribute must be a numeric value equal or greater than 1');
             }
 
             return array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;

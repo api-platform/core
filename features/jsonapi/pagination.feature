@@ -38,4 +38,11 @@ Feature: JSON API pagination handling
     Then the response should be in JSON
     And the response status code should be 400
     And the JSON node title should be equal to 'An error occurred'
-    And the JSON node description should be equal to 'Page request attribute must be a numeric value'
+    And the JSON node description should be equal to 'Page request attribute must be a numeric value equal or greater than 1'
+
+  Scenario: Get a paginated collection with a value lower than 1
+    When I send a "GET" request to "/dummies?page[page]=0"
+    Then the response should be in JSON
+    And the response status code should be 400
+    And the JSON node title should be equal to 'An error occurred'
+    And the JSON node description should be equal to 'Page request attribute must be a numeric value equal or greater than 1'
