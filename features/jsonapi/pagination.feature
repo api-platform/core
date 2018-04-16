@@ -32,3 +32,10 @@ Feature: JSON API pagination handling
     And the JSON node "meta.totalItems" should be equal to the number 10
     And the JSON node "meta.itemsPerPage" should be equal to the number 15
     And the JSON node "meta.currentPage" should be equal to the number 1
+
+  Scenario: Get a paginated collection with an non numeric page request attribute
+    When I send a "GET" request to "/dummies?page[page]=dummie_non_numeric"
+    Then the response should be in JSON
+    And the response status code should be 400
+    And the JSON node title should be equal to 'An error occurred'
+    And the JSON node description should be equal to 'Page request attribute must be a numeric value'
