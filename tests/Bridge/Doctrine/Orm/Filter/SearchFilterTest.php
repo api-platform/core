@@ -732,6 +732,23 @@ class SearchFilterTest extends AbstractFilterTest
                 ],
                 $filterFactory,
             ],
+            'nested property with GraphQL nesting syntax' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'relatedDummy_symfony' => null,
+                ],
+                [
+                    'name' => 'exact',
+                    'relatedDummy.symfony' => 'exact',
+                ],
+                sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummy relatedDummy_a1 WHERE %1$s.name = :name_p1 AND relatedDummy_a1.symfony = :symfony_p2', $this->alias, Dummy::class),
+                [
+                    'name_p1' => 'exact',
+                    'symfony_p2' => 'exact',
+                ],
+                $filterFactory,
+            ],
         ];
     }
 }
