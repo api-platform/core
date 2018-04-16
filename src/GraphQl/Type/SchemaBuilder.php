@@ -498,6 +498,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
             'fields' => [
                 'edges' => GraphQLType::listOf($edgeObjectType),
                 'pageInfo' => GraphQLType::nonNull($pageInfoObjectType),
+                'totalCount' => GraphQLType::nonNull(GraphQLType::int()),
             ],
         ];
 
