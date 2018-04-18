@@ -32,3 +32,7 @@ Feature: JSON API pagination handling
     And the JSON node "meta.totalItems" should be equal to the number 10
     And the JSON node "meta.itemsPerPage" should be equal to the number 15
     And the JSON node "meta.currentPage" should be equal to the number 1
+
+  Scenario: Get an error when provided page number is not valid
+    When I send a "GET" request to "/dummies?page[page]=0"
+    Then the response status code should be 400
