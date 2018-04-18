@@ -168,6 +168,41 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
     }
 
+    public function testGetItemFromIriWithOperationName()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', '3', 'operation_name', ['fetch_data' => true])
+            ->willReturn('foo')
+            ->shouldBeCalledTimes(1);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/users/3')->willReturn([
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_item_operation_name' => 'operation_name',
+            'id' => 3,
+        ])->shouldBeCalledTimes(1);
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver())
+        );
+        $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
+    }
+
     public function testGetIriFromResourceClass()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
