@@ -151,32 +151,37 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $qb = $manager->createQueryBuilder();
         $alias = $queryNameGenerator->generateJoinAlias($identifier);
-        $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
         $normalizedIdentifiers = isset($identifiers[$identifier]) ? $this->normalizeIdentifiers(
             $identifiers[$identifier],
             $manager,
             $identifierResourceClass
         ) : [];
 
-        switch ($relationType) {
-            // MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
-            case ClassMetadataInfo::MANY_TO_MANY:
-                $joinAlias = $queryNameGenerator->generateJoinAlias($previousAssociationProperty);
+        if ($classMetadata->hasAssociation($previousAssociationProperty)) {
+            $relationType = $classMetadata->getAssociationMapping($previousAssociationProperty)['type'];
+            switch ($relationType) {
+                // MANY_TO_MANY relations need an explicit join so that the identifier part can be retrieved
+                case ClassMetadataInfo::MANY_TO_MANY:
+                    $joinAlias = $queryNameGenerator->generateJoinAlias($previousAssociationProperty);
 
-                $qb->select($joinAlias)
-                    ->from($identifierResourceClass, $alias)
-                    ->innerJoin("$alias.$previousAssociationProperty", $joinAlias);
-                break;
-            case ClassMetadataInfo::ONE_TO_MANY:
-                $mappedBy = $classMetadata->getAssociationMapping($previousAssociationProperty)['mappedBy'];
-                $previousAlias = "$previousAlias.$mappedBy";
+                    $qb->select($joinAlias)
+                        ->from($identifierResourceClass, $alias)
+                        ->innerJoin("$alias.$previousAssociationProperty", $joinAlias);
+                    break;
+                case ClassMetadataInfo::ONE_TO_MANY:
+                    $mappedBy = $classMetadata->getAssociationMapping($previousAssociationProperty)['mappedBy'];
+                    $previousAlias = "$previousAlias.$mappedBy";
 
-                $qb->select($alias)
-                    ->from($identifierResourceClass, $alias);
-                break;
-            default:
-                $qb->select("IDENTITY($alias.$previousAssociationProperty)")
-                    ->from($identifierResourceClass, $alias);
+                    $qb->select($alias)
+                        ->from($identifierResourceClass, $alias);
+                    break;
+                default:
+                    $qb->select("IDENTITY($alias.$previousAssociationProperty)")
+                        ->from($identifierResourceClass, $alias);
+            }
+        } elseif ($classMetadata->isIdentifier($previousAssociationProperty)) {
+            $qb->select($alias)
+                ->from($identifierResourceClass, $alias);
         }
 
         // Add where clause for identifiers
