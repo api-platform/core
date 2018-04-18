@@ -103,7 +103,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             throw new InvalidArgumentException('Item per page parameter should not be less than 0');
         }
 
-        $page = $this->getPaginationParameter($request, $this->pageParameterName, 1);
+        if (0 >= $page = $this->getPaginationParameter($request, $this->pageParameterName, 1)) {
+            $page = 1;
+        }
 
         if (0 === $itemsPerPage && 1 < $page) {
             throw new InvalidArgumentException('Page should not be greater than 1 if itemsPegPage is equal to 0');
