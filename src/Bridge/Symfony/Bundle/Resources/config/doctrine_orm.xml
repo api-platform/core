@@ -164,6 +164,7 @@
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="16" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
+        <service id="Doctrine\Common\Persistence\ManagerRegistry" alias="doctrine" />
     </services>
 
 </container>
