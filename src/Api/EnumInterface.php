@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-interface Enum
+interface EnumInterface
 {
     public static function getValues(): array;
 

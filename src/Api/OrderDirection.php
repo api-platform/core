@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-final class OrderDirection implements Enum
+final class OrderDirection implements EnumInterface
 {
     const ASC = 'ASC';
     const DESC = 'DESC';

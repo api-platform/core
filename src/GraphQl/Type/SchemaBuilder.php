@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
-use ApiPlatform\Core\Api\Enum;
+use ApiPlatform\Core\Api\EnumInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
@@ -360,10 +360,12 @@ final class SchemaBuilder implements SchemaBuilderInterface
                     break;
                 }
 
-                if (is_a($typeClass = $type->getClassName(), Enum::class, true)) {
+                if (is_a($typeClass = $type->getClassName(), EnumInterface::class, true)) {
+                    /** @var EnumInterface $typeClass */
                     $typeName = $typeClass::getName();
-                    if (!isset($this->graphqlTypes['#'.$typeName])) {
-                        $this->graphqlTypes['#'.$typeName] = new EnumType([
+                    $graphqlTypeName = '#'.$typeName;
+                    if (!isset($this->graphqlTypes[$graphqlTypeName])) {
+                        $this->graphqlTypes[$graphqlTypeName] = new EnumType([
                             'name' => $typeName,
                             'values' => $typeClass::getValues(),
                         ]);
