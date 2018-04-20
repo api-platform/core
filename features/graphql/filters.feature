@@ -116,3 +116,48 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges" should have 0 elements
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges" should have 1 element
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy13"
+
+  @createSchema
+  @dropSchema
+  Scenario: Retrieve a collection filtered using the related search filter
+    Given there are 1 dummy objects having each 2 relatedDummies
+    And there are 1 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(relatedDummies_name: "RelatedDummy31") {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }
+    """
+    And the response status code should be 200
+    And the JSON node "data.dummies.edges" should have 1 element
+
+  @createSchema
+  @dropSchema
+  Scenario: Retrieve a collection ordered using nested properties
+    Given there are 2 dummy objects with relatedDummy
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(order: {relatedDummy_name: "DESC"}) {
+        edges {
+          node {
+            name
+            relatedDummy {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #2"
+    And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #1"
