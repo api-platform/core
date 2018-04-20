@@ -217,6 +217,44 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
     }
 
+    public function testGetItemFromIriWithIdentifierNormalizerAndOperationName()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', ['id' => 3], 'operation_name', ['fetch_data' => true, ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true])
+            ->willReturn('foo')
+            ->shouldBeCalledTimes(1);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/users/3')->willReturn([
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_item_operation_name' => 'operation_name',
+            'id' => 3,
+        ])->shouldBeCalledTimes(1);
+
+        $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
+        $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('3', 'AppBundle\Entity\User')->shouldBeCalled()->willReturn(['id' => 3]);
+
+        $converter = new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $identifierDenormalizer->reveal()
+        );
+        $converter->getItemFromIri('/users/3', ['fetch_data' => true]);
+    }
+
     public function testGetIriFromResourceClass()
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
