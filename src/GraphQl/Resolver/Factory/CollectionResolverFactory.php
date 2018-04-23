@@ -89,13 +89,6 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $collection, 'query');
 
-            if (null !== $this->resourceAccessChecker) {
-                $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
-                if (null !== $isGranted && !$this->resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $collection])) {
-                    throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
-                }
-            }
-
             if (!$this->paginationEnabled) {
                 $data = [];
                 foreach ($collection as $index => $object) {
