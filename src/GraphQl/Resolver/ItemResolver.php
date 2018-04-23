@@ -19,7 +19,6 @@ use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -70,13 +69,6 @@ final class ItemResolver
         $resourceClass = $this->getObjectClass($item);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $this->canAccess($this->resourceAccessChecker, $resourceMetadata, $resourceClass, $info, $item, 'query');
-
-        if (null !== $this->resourceAccessChecker) {
-            $isGranted = $resourceMetadata->getGraphqlAttribute('query', 'access_control', null, true);
-            if (null !== $isGranted && !$this->resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $item])) {
-                throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
-            }
-        }
 
         $normalizationContext = $resourceMetadata->getGraphqlAttribute('query', 'normalization_context', [], true);
 
