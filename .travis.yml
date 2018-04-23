@@ -1,5 +1,4 @@
 language: php
-
 sudo: false
 
 cache:
@@ -17,8 +16,6 @@ matrix:
     - php: '7.0'
     - php: '7.1'
     - php: '7.2'
-    - php: '7.2'
-      env: coverage=1
     - php: '7.2'
       env: lint=1
     - php: '7.2'
@@ -43,18 +40,6 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - if [[ $coverage != 1 && $lint != 1 ]]; then
-      npm install -g swagger-cli;
-    fi
-  - if [[ $coverage = 1 ]]; then
-      mkdir -p build/logs build/cov;
-    fi
-  - if [[ $coverage = 1 ]]; then
-      wget https://phar.phpunit.de/phpcov.phar;
-    fi
-  - if [[ $coverage = 1 ]]; then
-      wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar;
-    fi
   - if [[ $lint = 1 ]]; then
       wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.8.4/php-cs-fixer.phar;
     fi
@@ -64,9 +49,6 @@ before_install:
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
-  - if [[ $coverage = 1 ]]; then
-      composer require --dev --no-update 'phpunit/php-code-coverage:^5.2.2';
-    fi
   - if [[ $deps = 'low' ]]; then
       composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi;
     else
@@ -74,34 +56,26 @@ install:
     fi
 
 script:
-  - if [[ $coverage = 1 ]]; then
-      APP_ENV=test_phpunit phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov;
-    elif [[ $lint != 1 ]]; then
-      APP_ENV=test_phpunit vendor/bin/phpunit;
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console cache:clear;
     fi
-  - if [[ $coverage = 1 ]]; then
-      for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature'); do
-        FEATURE=${f//\//_} phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --tags=~@postgress --format=progress $f || exit $?;
-      done;
-    elif [[ $APP_ENV = 'postgres' ]]; then
+  - if [[ $lint != 1 ]]; then
+      vendor/bin/phpunit;
+    fi
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console cache:clear;
+    fi
+  - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
     elif [[ $lint != 1 ]]; then
       vendor/bin/behat --suite=default --format=progress;
     fi
-  - if [[ $coverage = 1 ]]; then
-      phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov;
-    fi
-  - if [[ $coverage != 1 && $lint != 1 ]]; then
-      tests/Fixtures/app/console api:swagger:export > swagger.json && swagger-cli validate swagger.json && rm swagger.json;
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json;
     fi
   - if [[ $lint = 1 ]]; then
       php php-cs-fixer.phar fix --dry-run --diff --no-ansi;
     fi
   - if [[ $lint = 1 ]]; then
       phpstan analyse -c phpstan.neon -l5 --ansi src tests;
-    fi
-
-after_success:
-  - if [[ $coverage = 1 ]]; then
-      travis_retry php coveralls.phar;
     fi

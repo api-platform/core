@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  */
-class OrderFilterTest extends AbstractFilterTest
+class OrderFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = OrderFilter::class;
 
