@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedDummy extends ParentDummy
 {
     /**
+     * @ApiSubresource
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")

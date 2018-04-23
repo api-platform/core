@@ -30,7 +30,7 @@ Feature: Subresource support
     And the response status code should be 404
     And the response should be in JSON
 
-  Scenario: Get subresource one to one relation
+  Scenario: Get recursive subresource one to many relation
     When I send a "GET" request to "/questions/1/answer/related_questions"
     And the response status code should be 200
     And the response should be in JSON
@@ -209,7 +209,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get filtered embedded relation collection
+  Scenario: Get filtered embedded relation subresource collection
     When I send a "GET" request to "/dummies/1/related_dummies?name=Hello"
     And the response status code should be 200
     And the response should be in JSON
@@ -272,7 +272,34 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get the embedded relation collection at the third level
+  Scenario: Get the subresource relation item
+    When I send a "GET" request to "/dummies/1/related_dummies/2"
+    And the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/RelatedDummy",
+      "@id": "/related_dummies/2",
+      "@type": "https://schema.org/Product",
+      "id": 2,
+      "name": null,
+      "symfony": "symfony",
+      "dummyDate": null,
+      "thirdLevel": {
+        "@id": "/third_levels/1",
+        "@type": "ThirdLevel",
+        "fourthLevel": "/fourth_levels/1"
+      },
+      "relatedToDummyFriend": [],
+      "dummyBoolean": null,
+      "embeddedDummy": [],
+      "age": null
+    }
+    """
+
+  Scenario: Get the embedded relation subresource item at the third level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
     And the response status code should be 200
     And the response should be in JSON
@@ -290,7 +317,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Get the embedded relation collection at the fourth level
+  Scenario: Get the embedded relation subresource item at the fourth level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level/fourth_level"
     And the response status code should be 200
     And the response should be in JSON
@@ -355,7 +382,7 @@ Feature: Subresource support
     }
     """
 
-  Scenario: test
+  Scenario: Recursive resource
     When I send a "GET" request to "/dummy_products/2"
     And the response status code should be 200
     And the response should be in JSON

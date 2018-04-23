@@ -154,7 +154,7 @@ services:
 
     app.my_dummy_resource.exists_filter:
         parent:    'api_platform.doctrine.orm.exists_filter'
-        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~ } ]
+        arguments: [ { 'description': ~, 'relatedDummy.name': ~, 'dummyBoolean': ~, 'relatedDummy': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.exists' } ]
 
     app.my_dummy_resource.property_filter:

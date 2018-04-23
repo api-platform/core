@@ -87,7 +87,7 @@ final class IriConverter implements IriConverterInterface
             $context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
         }
 
-        if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $identifiers, null, $context)) {
+        if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $identifiers, $parameters['_api_item_operation_name'] ?? null, $context)) {
             return $item;
         }
 
