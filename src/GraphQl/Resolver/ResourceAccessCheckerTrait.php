@@ -52,6 +52,6 @@ trait ResourceAccessCheckerTrait
             return;
         }
 
-        throw Error::createLocatedError('Access Denied.', $info->fieldNodes, $info->path);
+        throw Error::createLocatedError($resourceMetadata->getGraphqlAttribute($operationName ?? '', 'access_control_message', 'Access Denied.'), $info->fieldNodes, $info->path);
     }
 }
