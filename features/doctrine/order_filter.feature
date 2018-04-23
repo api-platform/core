@@ -830,3 +830,55 @@ Feature: Order filter on collections
       }
     }
     """
+
+  @createSchema
+  Scenario: Get collection ordered in descending order on a related property
+    Given there are 2 dummy objects with relatedDummy
+    When I send a "GET" request to "/dummies?order[relatedDummy.name]=desc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/2$"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "@id": {
+                  "type": "string",
+                  "pattern": "^/dummies/1$"
+                }
+              }
+            }
+          ],
+          "additionalItems": false,
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?order%5BrelatedDummy.name%5D=desc"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """

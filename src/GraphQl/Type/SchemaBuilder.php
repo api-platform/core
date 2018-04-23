@@ -292,6 +292,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
     private function convertFilterArgsToTypes(array $args): array
     {
         foreach ($args as $key => $value) {
+            if (strpos($key, '.')) {
+                // Declare relations/nested fields in a GraphQL compatible syntax.
+                $args[str_replace('.', '_', $key)] = $value;
+            }
+        }
+
+        foreach ($args as $key => $value) {
             if (!\is_array($value) || !isset($value['#name'])) {
                 continue;
             }
