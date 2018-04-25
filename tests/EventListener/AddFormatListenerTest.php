@@ -32,7 +32,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['notexist' => 'application/vnd.notexist']);
+        $listener = new AddFormatListener(new Negotiator(), ['notexist' => 'application/vnd.notexist'], []);
         $listener->onKernelRequest($event);
 
         $this->assertNull($request->getFormat('application/vnd.notexist'));
@@ -47,7 +47,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']], []);
         $listener->onKernelRequest($event);
 
         $this->assertSame('xml', $request->getRequestFormat());
@@ -63,7 +63,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']], []);
         $listener->onKernelRequest($event);
 
         $this->assertSame('xml', $request->getRequestFormat());
@@ -83,7 +83,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']], []);
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
@@ -98,7 +98,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']], []);
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
@@ -113,7 +113,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']], []);
         $listener->onKernelRequest($event);
 
         $this->assertSame('binary', $request->getRequestFormat());
@@ -133,7 +133,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']], []);
         $listener->onKernelRequest($event);
     }
 
@@ -150,7 +150,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']], []);
         $listener->onKernelRequest($event);
     }
 
@@ -164,7 +164,7 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['application/xml'], 'json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['application/xml'], 'json' => ['application/json']], []);
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
@@ -182,7 +182,42 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']], []);
         $listener->onKernelRequest($event);
+    }
+
+    public function testSupportedDocumentationAcceptHeader()
+    {
+        $request = new Request([], [], ['_api_respond' => '1', '_api_endpoint_type' => 'documentation']);
+        $request->setRequestFormat('json');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']], ['json' => ['application/json']]);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('json', $request->getRequestFormat());
+        $this->assertSame('application/json', $request->getMimeType($request->getRequestFormat()));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
+     * @expectedExceptionMessage Requested format "application/ld+json" is not supported. Supported MIME types are "application/json".
+     */
+    public function testUnsupportedDocumentationRequestFormat()
+    {
+        $request = new Request([], [], ['_api_respond' => '1', '_api_endpoint_type' => 'documentation']);
+        $request->setRequestFormat('jsonld');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']], ['json' => ['application/json']]);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('json', $request->getRequestFormat());
     }
 }

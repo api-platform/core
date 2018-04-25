@@ -222,6 +222,9 @@ final class Configuration implements ConfigurationInterface
 
         $this->addFormatSection($rootNode, 'formats', [
             'jsonld' => ['mime_types' => ['application/ld+json']],
+        ]);
+        $this->addFormatSection($rootNode, 'documentation_formats', [
+            'jsonld' => ['mime_types' => ['application/ld+json']], // Hydra documentation, admin and PWA generator
             'json' => ['mime_types' => ['application/json']], // Swagger support
             'html' => ['mime_types' => ['text/html']], // Swagger UI support
         ]);

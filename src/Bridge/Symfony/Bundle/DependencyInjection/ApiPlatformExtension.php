@@ -88,7 +88,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $config = $this->processConfiguration($configuration, $configs);
         $formats = $this->getFormats($config['formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
-        $this->handleConfig($container, $config, $formats, $errorFormats);
+        $documentationFormats = $this->getFormats($config['documentation_formats']);
+        $this->handleConfig($container, $config, $formats, $errorFormats, $documentationFormats);
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('api.xml');
@@ -153,8 +154,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param array            $config
      * @param array            $formats
      * @param array            $errorFormats
+     * @param array            $documentationFormats
      */
-    private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats)
+    private function handleConfig(ContainerBuilder $container, array $config, array $formats, array $errorFormats, array $documentationFormats)
     {
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
@@ -164,6 +166,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.exception_to_status', $config['exception_to_status']);
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
+        $container->setParameter('api_platform.documentation_formats', $documentationFormats);
         $container->setParameter('api_platform.allow_plain_identifiers', $config['allow_plain_identifiers']);
         $container->setParameter('api_platform.eager_loading.enabled', $config['eager_loading']['enabled']);
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);

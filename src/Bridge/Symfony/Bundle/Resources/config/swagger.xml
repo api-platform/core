@@ -58,7 +58,7 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
-            <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.documentation_formats%</argument>
             <argument>%api_platform.oauth.enabled%</argument>
             <argument>%api_platform.oauth.clientId%</argument>
             <argument>%api_platform.oauth.clientSecret%</argument>

@@ -28,12 +28,14 @@ final class AddFormatListener
 {
     private $negotiator;
     private $formats;
+    private $documentationFormats;
     private $mimeTypes;
 
-    public function __construct(Negotiator $negotiator, array $formats)
+    public function __construct(Negotiator $negotiator, array $formats, array $documentationFormats = [])
     {
         $this->negotiator = $negotiator;
         $this->formats = $formats;
+        $this->documentationFormats = $documentationFormats;
     }
 
     /**
@@ -51,13 +53,15 @@ final class AddFormatListener
             return;
         }
 
-        $this->populateMimeTypes();
-        $this->addRequestFormats($request, $this->formats);
+        $requestAcceptedFormats = $this->getRequestAcceptedFormats($request);
+
+        $this->populateMimeTypes($requestAcceptedFormats);
+        $this->addRequestFormats($request, $requestAcceptedFormats);
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
             $mimeTypes = array_keys($this->mimeTypes);
-        } elseif (!isset($this->formats[$routeFormat])) {
+        } elseif (!isset($requestAcceptedFormats[$routeFormat])) {
             throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
         } else {
             $mimeTypes = Request::getMimeTypes($routeFormat);
@@ -88,7 +92,7 @@ final class AddFormatListener
         }
 
         // Finally, if no Accept header nor Symfony request format is set, return the default format
-        foreach ($this->formats as $format => $mimeType) {
+        foreach ($requestAcceptedFormats as $format => $mimeType) {
             $request->setRequestFormat($format);
 
             return;
@@ -110,15 +114,17 @@ final class AddFormatListener
 
     /**
      * Populates the $mimeTypes property.
+     *
+     * @param array $requestAcceptedFormats
      */
-    private function populateMimeTypes()
+    private function populateMimeTypes(array $requestAcceptedFormats)
     {
         if (null !== $this->mimeTypes) {
             return;
         }
 
         $this->mimeTypes = [];
-        foreach ($this->formats as $format => $mimeTypes) {
+        foreach ($requestAcceptedFormats as $format => $mimeTypes) {
             foreach ($mimeTypes as $mimeType) {
                 $this->mimeTypes[$mimeType] = $format;
             }
@@ -144,5 +150,17 @@ final class AddFormatListener
             $accept,
             implode('", "', $mimeTypes)
         ));
+    }
+
+    /**
+     * Retrieves the list of accepted format in the request depending on some parameters.
+     */
+    private function getRequestAcceptedFormats(Request $request): array
+    {
+        if (!$request->attributes->has('_api_endpoint_type')) {
+            return $this->formats;
+        }
+
+        return 'documentation' === $request->attributes->get('_api_endpoint_type') ? $this->documentationFormats : $this->formats;
     }
 }

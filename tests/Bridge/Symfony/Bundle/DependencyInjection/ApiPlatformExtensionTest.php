@@ -450,6 +450,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.collection.pagination.partial_parameter_name' => 'partial',
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
+            'api_platform.documentation_formats' => ['jsonld' => ['application/ld+json'], 'json' => ['application/json'], 'html' => ['text/html']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
             'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
             'api_platform.title' => 'title',

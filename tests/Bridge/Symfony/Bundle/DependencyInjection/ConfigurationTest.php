@@ -57,6 +57,9 @@ class ConfigurationTest extends TestCase
             'version' => '1.0.0',
             'formats' => [
                 'jsonld' => ['mime_types' => ['application/ld+json']],
+            ],
+            'documentation_formats' => [
+                'jsonld' => ['mime_types' => ['application/ld+json']],
                 'json' => ['mime_types' => ['application/json']],
                 'html' => ['mime_types' => ['text/html']],
             ],
