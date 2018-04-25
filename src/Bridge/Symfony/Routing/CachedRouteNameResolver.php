@@ -27,6 +27,7 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
 
     private $cacheItemPool;
     private $decorated;
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, RouteNameResolverInterface $decorated)
     {
@@ -42,26 +43,24 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
         $context = \func_num_args() > 2 ? func_get_arg(2) : [];
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $operationType, $context['subresource_resources'] ?? null]));
 
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
+        }
+
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->localCache[$cacheKey] = $cacheItem->get();
             }
         } catch (CacheException $e) {
-            // do nothing
-        }
-
-        if (\func_num_args() > 2) {
-            $context = func_get_arg(2);
-        } else {
-            $context = [];
+            //do nothing
         }
 
         $routeName = $this->decorated->getRouteName($resourceClass, $operationType, $context);
 
         if (!isset($cacheItem)) {
-            return $routeName;
+            return $this->localCache[$cacheKey] = $routeName;
         }
 
         try {
@@ -71,6 +70,6 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
             // do nothing
         }
 
-        return $routeName;
+        return $this->localCache[$cacheKey] = $routeName;
     }
 }
