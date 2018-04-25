@@ -29,38 +29,40 @@ class CachedSubresourceOperationFactoryTest extends TestCase
     public function testCreateWithItemHit()
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
-        $cacheItem->isHit()->willReturn(true)->shouldBeCalled();
-        $cacheItem->get()->willReturn(['foo' => 'bar'])->shouldBeCalled();
+        $cacheItem->isHit()->willReturn(true)->shouldBeCalledTimes(1);
+        $cacheItem->get()->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($this->generateCacheKey())->willReturn($cacheItem->reveal())->shouldBeCalled();
+        $cacheItemPool->getItem($this->generateCacheKey())->willReturn($cacheItem->reveal())->shouldBeCalledTimes(1);
 
         $decoratedSubresourceOperationFactory = $this->prophesize(SubresourceOperationFactoryInterface::class);
         $decoratedSubresourceOperationFactory->create()->shouldNotBeCalled();
 
         $cachedSubresourceOperationFactory = new CachedSubresourceOperationFactory($cacheItemPool->reveal(), $decoratedSubresourceOperationFactory->reveal());
-        $resultedSubresourceOperation = $cachedSubresourceOperationFactory->create(Dummy::class);
 
-        $this->assertEquals(['foo' => 'bar'], $resultedSubresourceOperation);
+        $expectedResult = ['foo' => 'bar'];
+        $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class));
+        $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     public function testCreateWithItemNotHit()
     {
         $cacheItem = $this->prophesize(CacheItemInterface::class);
-        $cacheItem->isHit()->willReturn(false)->shouldBeCalled();
-        $cacheItem->set(['foo' => 'bar'])->willReturn($cacheItem->reveal())->shouldBeCalled();
+        $cacheItem->isHit()->willReturn(false)->shouldBeCalledTimes(1);
+        $cacheItem->set(['foo' => 'bar'])->willReturn($cacheItem->reveal())->shouldBeCalledTimes(1);
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($this->generateCacheKey())->willReturn($cacheItem->reveal())->shouldBeCalled();
-        $cacheItemPool->save($cacheItem->reveal())->willReturn(true)->shouldBeCalled();
+        $cacheItemPool->getItem($this->generateCacheKey())->willReturn($cacheItem->reveal())->shouldBeCalledTimes(1);
+        $cacheItemPool->save($cacheItem->reveal())->willReturn(true)->shouldBeCalledTimes(1);
 
         $decoratedSubresourceOperationFactory = $this->prophesize(SubresourceOperationFactoryInterface::class);
-        $decoratedSubresourceOperationFactory->create(Dummy::class)->shouldBeCalled()->willReturn(['foo' => 'bar']);
+        $decoratedSubresourceOperationFactory->create(Dummy::class)->shouldBeCalledTimes(1)->willReturn(['foo' => 'bar']);
 
         $cachedSubresourceOperationFactory = new CachedSubresourceOperationFactory($cacheItemPool->reveal(), $decoratedSubresourceOperationFactory->reveal());
-        $resultedSubresourceOperation = $cachedSubresourceOperationFactory->create(Dummy::class);
 
-        $this->assertEquals(['foo' => 'bar'], $resultedSubresourceOperation);
+        $expectedResult = ['foo' => 'bar'];
+        $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class));
+        $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     public function testCreateWithGetCacheItemThrowsCacheException()
@@ -69,15 +71,16 @@ class CachedSubresourceOperationFactoryTest extends TestCase
         $cacheException->willExtend(\Exception::class);
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException->reveal())->shouldBeCalled();
+        $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException->reveal())->shouldBeCalledTimes(1);
 
         $decoratedSubresourceOperationFactory = $this->prophesize(SubresourceOperationFactoryInterface::class);
-        $decoratedSubresourceOperationFactory->create(Dummy::class)->shouldBeCalled()->willReturn(['foo' => 'bar']);
+        $decoratedSubresourceOperationFactory->create(Dummy::class)->shouldBeCalledTimes(1)->willReturn(['foo' => 'bar']);
 
         $cachedSubresourceOperationFactory = new CachedSubresourceOperationFactory($cacheItemPool->reveal(), $decoratedSubresourceOperationFactory->reveal());
-        $resultedSubresourceOperation = $cachedSubresourceOperationFactory->create(Dummy::class);
 
-        $this->assertEquals(['foo' => 'bar'], $resultedSubresourceOperation);
+        $expectedResult = ['foo' => 'bar'];
+        $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class));
+        $this->assertEquals($expectedResult, $cachedSubresourceOperationFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     private function generateCacheKey(string $resourceClass = Dummy::class)

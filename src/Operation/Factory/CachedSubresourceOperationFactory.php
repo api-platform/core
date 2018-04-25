@@ -25,6 +25,7 @@ final class CachedSubresourceOperationFactory implements SubresourceOperationFac
 
     private $cacheItemPool;
     private $decorated;
+    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, SubresourceOperationFactoryInterface $decorated)
     {
@@ -39,21 +40,33 @@ final class CachedSubresourceOperationFactory implements SubresourceOperationFac
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
 
+        if (isset($this->localCache[$cacheKey])) {
+            return $this->localCache[$cacheKey];
+        }
+
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                return $this->localCache[$cacheKey] = $cacheItem->get();
             }
         } catch (CacheException $e) {
-            return $this->decorated->create($resourceClass);
+            // do nothing
         }
 
         $subresourceOperations = $this->decorated->create($resourceClass);
 
-        $cacheItem->set($subresourceOperations);
-        $this->cacheItemPool->save($cacheItem);
+        if (!isset($cacheItem)) {
+            return $this->localCache[$cacheKey] = $subresourceOperations;
+        }
 
-        return $subresourceOperations;
+        try {
+            $cacheItem->set($subresourceOperations);
+            $this->cacheItemPool->save($cacheItem);
+        } catch (CacheException $e) {
+            // do nothing
+        }
+
+        return $this->localCache[$cacheKey] = $subresourceOperations;
     }
 }
