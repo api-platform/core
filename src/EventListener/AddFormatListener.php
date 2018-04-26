@@ -88,7 +88,7 @@ final class AddFormatListener
                 return;
             }
 
-            throw $this->getNotAcceptableHttpException($mimeType);
+            throw $this->getNotAcceptableHttpException($mimeType ?? $requestFormat);
         }
 
         // Finally, if no Accept header nor Symfony request format is set, return the default format

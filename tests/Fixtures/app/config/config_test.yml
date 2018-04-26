@@ -36,6 +36,12 @@ api_platform:
         jsonapi:                       ['application/vnd.api+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
+    documentation_formats:
+        jsonld:                        ['application/ld+json']
+        jsonhal:                       ['application/hal+json']
+        jsonapi:                       ['application/vnd.api+json']
+        xml:                           ['application/xml', 'text/xml']
+        json:                          ['application/json']
         html:                          ['text/html']
     error_formats:
         jsonproblem:                   ['application/problem+json']

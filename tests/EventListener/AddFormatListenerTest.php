@@ -204,7 +204,7 @@ class AddFormatListenerTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Requested format "application/ld+json" is not supported. Supported MIME types are "application/json".
+     * @expectedExceptionMessageRegExp /^Requested format "(jsonld|application\/ld\+json)" is not supported. Supported MIME types are "application\/json".$/
      */
     public function testUnsupportedDocumentationRequestFormat()
     {
