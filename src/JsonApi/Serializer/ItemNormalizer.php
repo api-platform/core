@@ -60,7 +60,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getJsonApiCacheKey($format, $context);
+        }
 
         // Get and populate attributes data
         $objectAttributesData = parent::normalize($object, $format, $context);
@@ -221,8 +223,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getComponents($object, string $format = null, array $context)
     {
-        if (isset($this->componentsCache[$context['cache_key']])) {
-            return $this->componentsCache[$context['cache_key']];
+        $cacheKey = \get_class($object).'-'.$context['cache_key'];
+
+        if (isset($this->componentsCache[$cacheKey])) {
+            return $this->componentsCache[$cacheKey];
         }
 
         $attributes = parent::getAttributes($object, $format, $context);
@@ -267,7 +271,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $components['relationships'][] = $relation;
         }
 
-        return $this->componentsCache[$context['cache_key']] = $components;
+        if (false !== $context['cache_key']) {
+            $this->componentsCache[$cacheKey] = $components;
+        }
+
+        return $components;
     }
 
     /**
