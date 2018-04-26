@@ -85,7 +85,13 @@ class ResourceMetadataTest extends TestCase
     public function testGetOperationAttributeFallback()
     {
         $metadata = new ResourceMetadata();
-        $this->assertSame($metadata->getOperationAttribute([], 'doh', 'okay'), 'okay');
+        $this->assertSame('okay', $metadata->getOperationAttribute([], 'doh', 'okay'));
+    }
+
+    public function testGetOperationAttributeFallbackToResourceAttribute()
+    {
+        $metadata = new ResourceMetadata(null, null, null, null, null, ['doh' => 'nuts']);
+        $this->assertSame('nuts', $metadata->getOperationAttribute([], 'doh', 'okay', true));
     }
 
     public function getWithMethods(): array

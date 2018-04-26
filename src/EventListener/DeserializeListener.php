@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Api\FormatsProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,13 +32,27 @@ final class DeserializeListener
 {
     private $serializer;
     private $serializerContextBuilder;
-    private $formats;
+    private $formats = [];
+    private $formatsProvider;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, array $formats)
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, /* FormatsProviderInterface */ $formatsProvider)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->formats = $formats;
+        if (\is_array($formatsProvider)) {
+            @trigger_error('Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
+            $this->formats = $formatsProvider;
+
+            return;
+        }
+        if (!$formatsProvider instanceof FormatsProviderInterface) {
+            throw new InvalidArgumentException(sprintf('The "$formatsProvider" argument is expected to be an implementation of the "%s" interface.', FormatsProviderInterface::class));
+        }
+
+        $this->formatsProvider = $formatsProvider;
     }
 
     /**
@@ -59,6 +75,10 @@ final class DeserializeListener
                )
         ) {
             return;
+        }
+        // BC check to be removed in 3.0
+        if (null !== $this->formatsProvider) {
+            $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
         }
 
         $format = $this->getFormat($request);

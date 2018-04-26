@@ -63,6 +63,11 @@
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
+        <service id="api_platform.formats_provider" class="ApiPlatform\Core\Api\FormatsProvider">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory"></argument>
+            <argument>%api_platform.formats%</argument>
+        </service>
+
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
@@ -130,7 +135,7 @@
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
-            <argument>%api_platform.formats%</argument>
+            <argument type="service" id="api_platform.formats_provider"></argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="7" />
         </service>
@@ -154,7 +159,7 @@
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument>%api_platform.formats%</argument>
+            <argument type="service" id="api_platform.formats_provider" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
@@ -205,7 +210,7 @@
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
             <argument>%api_platform.version%</argument>
-            <argument>%api_platform.formats%</argument>
+            <argument type="service" id="api_platform.formats_provider" />
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">

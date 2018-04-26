@@ -115,3 +115,36 @@ Feature: Content Negotiation support
     And I send a "GET" request to "/dummies/666"
     Then the response status code should be 404
     And the header "Content-Type" should be equal to "text/html; charset=utf-8"
+
+  Scenario: Retrieve a collection in JSON should not be possible if the format has been removed at resource level
+    When I add "Accept" header equal to "application/json"
+    And I send a "GET" request to "/dummy_custom_formats"
+    Then the response status code should be 406
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
+  Scenario: Post an CSV body allowed on a single resource
+    When I add "Accept" header equal to "application/xml"
+    And I add "Content-Type" header equal to "text/csv"
+    And I send a "POST" request to "/dummy_custom_formats" with body:
+    """
+    name
+    Kevin
+    """
+    Then the response status code should be 201
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
+    And the response should be equal to
+    """
+    <?xml version="1.0"?>
+    <response><id>1</id><name>Kevin</name></response>
+    """
+
+  Scenario: Retrieve a collection in CSV should be possible if the format is at resource level
+    When I add "Accept" header equal to "text/csv"
+    And I send a "GET" request to "/dummy_custom_formats"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "text/csv; charset=utf-8"
+    And the response should be equal to
+    """
+    id,name
+    1,Kevin
+    """
