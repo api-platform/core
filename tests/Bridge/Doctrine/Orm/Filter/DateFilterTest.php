@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  */
-class DateFilterTest extends AbstractFilterTest
+class DateFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = DateFilter::class;
 
