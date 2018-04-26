@@ -59,6 +59,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.identifier.denormalizer" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
