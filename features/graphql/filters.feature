@@ -9,18 +9,17 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(order: {dummyDate: DESC}) {
+      dummies(order: {id: DESC}) {
         edges {
           node {
             id
-            dummyDate
           }
         }
       }
     }
     """
     Then the JSON node "data.dummies.edges" should have 3 elements
-    And the JSON node "data.dummies.edges[0].node.dummyDate" should be equal to "2015-04-02T00:00:00+00:00"
+    And the JSON node "data.dummies.edges[0].node.id" should be equal to "/dummies/3"
 
   @createSchema
   Scenario: Retrieve a collection filtered using the boolean filter

@@ -371,7 +371,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         ]);
                     }
 
-                    $graphqlType = $this->graphqlTypes['#'.$typeName];
+                    $graphqlType = $this->graphqlTypes[$graphqlTypeName];
                     break;
                 }
 
