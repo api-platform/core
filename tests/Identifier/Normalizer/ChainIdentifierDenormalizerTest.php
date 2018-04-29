@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Identifier\Normalizer;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer;
+use ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use PHPUnit\Framework\TestCase;
@@ -31,22 +32,25 @@ class ChainIdentifierDenormalizerTest extends TestCase
         $identifier = 'a=1;c=2;d=2015-04-05';
         $class = 'Dummy';
 
+        $integerPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
         $identifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true);
         $dateIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->create($class, 'a')->shouldBeCalled()->willReturn($identifierPropertyMetadata);
+        $propertyMetadataFactory->create($class, 'a')->shouldBeCalled()->willReturn($integerPropertyMetadata);
         $propertyMetadataFactory->create($class, 'c')->shouldBeCalled()->willReturn($identifierPropertyMetadata);
         $propertyMetadataFactory->create($class, 'd')->shouldBeCalled()->willReturn($dateIdentifierPropertyMetadata);
 
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['a', 'c', 'd']);
 
-        $identifierDenormalizers = [new DateTimeIdentifierDenormalizer()];
+        $identifierDenormalizers = [new IntegerDenormalizer(), new DateTimeIdentifierDenormalizer()];
 
         $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
-        $this->assertEquals($identifierDenormalizer->denormalize($identifier, $class), ['a' => '1', 'c' => '2', 'd' => new \DateTime('2015-04-05')]);
+        $result = $identifierDenormalizer->denormalize($identifier, $class);
+        $this->assertEquals(['a' => 1, 'c' => '2', 'd' => new \DateTime('2015-04-05')], $result);
+        $this->assertSame(1, $result['a']);
     }
 
     public function testSingleDateIdentifier()
@@ -66,5 +70,24 @@ class ChainIdentifierDenormalizerTest extends TestCase
         $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
         $this->assertEquals($identifierDenormalizer->denormalize($identifier, $class), ['funkyid' => new \DateTime('2015-04-05')]);
+    }
+
+    public function testIntegerIdentifier()
+    {
+        $identifier = '42';
+        $class = 'Dummy';
+
+        $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create($class, 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);
+
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['id']);
+
+        $identifierDenormalizers = [new IntegerDenormalizer()];
+        $identifierDenormalizer = new ChainIdentifierDenormalizer($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
+
+        $this->assertSame(['id' => 42], $identifierDenormalizer->denormalize($identifier, $class));
     }
 }
