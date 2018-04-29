@@ -500,6 +500,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.filters',
             'api_platform.iri_converter',
             'api_platform.identifier.denormalizer',
+            'api_platform.identifier.integer',
             'api_platform.identifier.date_normalizer',
             'api_platform.identifier.uuid_normalizer',
             'api_platform.identifiers_extractor',

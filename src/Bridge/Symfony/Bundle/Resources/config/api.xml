@@ -236,6 +236,10 @@
             <argument type="tagged" tag="api_platform.identifier.denormalizer" />
         </service>
 
+        <service id="api_platform.identifier.integer" class="ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer" public="false">
+            <tag name="api_platform.identifier.denormalizer" />
+        </service>
+
         <service id="api_platform.identifier.date_normalizer" class="ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer" public="false">
             <tag name="api_platform.identifier.denormalizer" />
         </service>

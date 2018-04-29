@@ -733,6 +733,7 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $relatedDummy2->setName('RelatedDummy without friends');
         $this->manager->persist($relatedDummy2);
         $this->manager->flush();
+        $this->manager->clear();
     }
 
     /**
