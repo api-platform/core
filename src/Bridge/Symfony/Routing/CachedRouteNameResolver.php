@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use Psr\Cache\CacheException;
+use ApiPlatform\Core\Cache\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -23,11 +23,11 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedRouteNameResolver implements RouteNameResolverInterface
 {
+    use CachedTrait;
+
     const CACHE_KEY_PREFIX = 'route_name_';
 
-    private $cacheItemPool;
     private $decorated;
-    private $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, RouteNameResolverInterface $decorated)
     {
@@ -43,33 +43,8 @@ final class CachedRouteNameResolver implements RouteNameResolverInterface
         $context = \func_num_args() > 2 ? func_get_arg(2) : [];
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $operationType, $context['subresource_resources'] ?? null]));
 
-        if (isset($this->localCache[$cacheKey])) {
-            return $this->localCache[$cacheKey];
-        }
-
-        try {
-            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $this->localCache[$cacheKey] = $cacheItem->get();
-            }
-        } catch (CacheException $e) {
-            //do nothing
-        }
-
-        $routeName = $this->decorated->getRouteName($resourceClass, $operationType, $context);
-
-        if (!isset($cacheItem)) {
-            return $this->localCache[$cacheKey] = $routeName;
-        }
-
-        try {
-            $cacheItem->set($routeName);
-            $this->cacheItemPool->save($cacheItem);
-        } catch (CacheException $e) {
-            // do nothing
-        }
-
-        return $this->localCache[$cacheKey] = $routeName;
+        return $this->getCached($cacheKey, function () use ($resourceClass, $operationType, $context) {
+            return $this->decorated->getRouteName($resourceClass, $operationType, $context);
+        });
     }
 }
