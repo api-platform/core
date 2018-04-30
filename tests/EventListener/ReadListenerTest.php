@@ -51,7 +51,6 @@ class ReadListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.
      */
     public function testLegacyConstructor()
     {

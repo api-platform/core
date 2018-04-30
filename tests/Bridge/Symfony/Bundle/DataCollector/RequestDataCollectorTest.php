@@ -91,10 +91,7 @@ class RequestDataCollectorTest extends TestCase
 
     public function testWithResource()
     {
-        $this->apiResourceClassWillReturn(DummyEntity::class);
-        $this->attributes->has('_api_item_operation_name')->shouldBeCalled()->willReturn(true);
-        $this->attributes->get('_api_item_operation_name')->shouldBeCalled()->willReturn('get');
-        $this->attributes->get('_api_receive')->shouldBeCalled()->willReturn(true);
+        $this->apiResourceClassWillReturn(DummyEntity::class, ['_api_item_operation_name' => 'get', '_api_receive' => true]);
         $this->request->attributes = $this->attributes->reveal();
 
         $this->filterLocator->has('foo')->willReturn(false)->shouldBeCalled();
@@ -119,10 +116,12 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame(ResourceMetadata::class, $dataCollector->getResourceMetadata()->getType());
     }
 
-    private function apiResourceClassWillReturn($data)
+    private function apiResourceClassWillReturn($data, $context = [])
     {
         $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
-        $this->attributes->get('_api_subresource_context')->shouldBeCalled()->willReturn(null);
+        $this->attributes->all()->shouldBeCalled()->willReturn([
+            '_api_resource_class' => $data,
+        ] + $context);
         $this->request->attributes = $this->attributes->reveal();
 
         if (!$data) {
