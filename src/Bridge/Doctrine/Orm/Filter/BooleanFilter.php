@@ -96,9 +96,11 @@ class BooleanFilter extends AbstractContextAwareFilter
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
-        $expr = $queryBuilder->expr();
+        $valueParameter = $queryNameGenerator->generateParameterName($field);
+
         $queryBuilder
-            ->andWhere($expr->eq(sprintf('%s.%s', $alias, $field), $expr->literal($value)));
+            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+            ->setParameter($valueParameter, $value);
     }
 
     /**
