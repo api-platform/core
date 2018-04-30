@@ -223,12 +223,15 @@ class AbstractItemNormalizerTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
-            new PropertyNameCollection(['name', 'relatedDummy', 'relatedDummies'])
+            new PropertyNameCollection(['name', 'description', 'relatedDummy', 'relatedDummies'])
         )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', false, true)
         )->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
             new PropertyMetadata(
@@ -262,7 +265,8 @@ class AbstractItemNormalizerTest extends TestCase
         $iriConverterProphecy->getItemFromIri('/dummies/2', Argument::type('array'))->willReturn($relatedDummy2)->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', null)->shouldNotBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'description', 'bar')->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy1)->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummies', [$relatedDummy2])->shouldBeCalled();
 
@@ -281,7 +285,8 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize([
-            'name' => 'foo',
+            'name' => null,
+            'description' => 'bar',
             'relatedDummy' => '/dummies/1',
             'relatedDummies' => ['/dummies/2'],
         ], Dummy::class);

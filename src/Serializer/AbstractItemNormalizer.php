@@ -204,6 +204,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
+        if (null === $value && !$type->isNullable()) {
+            return;
+        }
         $this->validateType($attribute, $type, $value, $format);
         $this->setValue($object, $attribute, $value);
     }
