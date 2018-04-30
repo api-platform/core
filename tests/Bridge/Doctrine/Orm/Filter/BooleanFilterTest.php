@@ -67,7 +67,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => 'true',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = true', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
             'string ("false")' => [
                 [
@@ -78,7 +78,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => 'false',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = false', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
             'non-boolean' => [
                 [
@@ -100,7 +100,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => '0',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = false', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
             'numeric string ("1")' => [
                 [
@@ -111,7 +111,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = true', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
             'nested properties' => [
                 [
@@ -122,7 +122,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                 [
                     'relatedDummy.dummyBoolean' => '1',
                 ],
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyBoolean = true', Dummy::class),
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
             'numeric string ("1") on non-boolean property' => [
                 [
@@ -180,7 +180,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                     'name' => 'true',
                     'id' => '0',
                 ],
-                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = false', Dummy::class),
+                sprintf('SELECT o FROM %s o WHERE o.dummyBoolean = :dummyBoolean_p1', Dummy::class),
             ],
         ];
     }
