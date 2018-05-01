@@ -16,7 +16,10 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Util\IriHelper;
+use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -29,12 +32,14 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class PartialCollectionViewNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     private $collectionNormalizer;
+    private $resourceMetadataFactory;
     private $pageParameterName;
     private $enabledParameterName;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination')
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, string $pageParameterName = 'page', string $enabledParameterName = 'pagination')
     {
         $this->collectionNormalizer = $collectionNormalizer;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
     }
@@ -69,12 +74,39 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
+        $metadata = $this->resourceMetadataFactory->create($context['resource_class']);
+        $isPaginatedWithCursor = $paginated && null !== $cursorPaginationAttribute = $metadata->getAttribute('pagination_via_cursor');
+
         $data['hydra:view'] = [
             '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
             '@type' => 'hydra:PartialCollectionView',
         ];
 
-        if ($paginated) {
+        if ($isPaginatedWithCursor) {
+            $forwardRangeOperator = 'desc' === strtolower($cursorPaginationAttribute['direction']) ? 'lt' : 'gt';
+            $backwardRangeOperator = 'gt' === $forwardRangeOperator ? 'lt' : 'gt';
+
+            $accessor = PropertyAccess::createPropertyAccessor();
+            $objects = iterator_to_array($object);
+            $firstObject = current($objects);
+            $lastObject = end($objects);
+
+            $parsed['parameters'][$cursorPaginationAttribute['field']] = [
+                $backwardRangeOperator.'e' => (string) $accessor->getValue($lastObject, $cursorPaginationAttribute['field']),
+            ];
+
+            $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
+                $cursorPaginationAttribute['field'] => [
+                    $backwardRangeOperator => (string) $accessor->getValue($firstObject, $cursorPaginationAttribute['field']),
+                ],
+            ]));
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
+                $cursorPaginationAttribute['field'] => [
+                    $forwardRangeOperator => (string) $accessor->getValue($lastObject, $cursorPaginationAttribute['field']),
+                ],
+            ]));
+        } elseif ($paginated) {
             if (null !== $lastPage) {
                 $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
                 $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);

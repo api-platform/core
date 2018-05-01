@@ -57,9 +57,9 @@ final class IriHelper
      *
      * @param float $page
      */
-    public static function createIri(array $parts, array $parameters, string $pageParameterName, float $page = null, bool $absoluteUrl = false): string
+    public static function createIri(array $parts, array $parameters, string $pageParameterName = null, float $page = null, bool $absoluteUrl = false): string
     {
-        if (null !== $page) {
+        if (null !== $page && null !== $pageParameterName) {
             $parameters[$pageParameterName] = $page;
         }
 

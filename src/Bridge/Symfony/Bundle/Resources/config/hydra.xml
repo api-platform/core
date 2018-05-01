@@ -62,6 +62,7 @@
 
         <service id="api_platform.hydra.normalizer.partial_collection_view" class="ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
             <argument type="service" id="api_platform.hydra.normalizer.partial_collection_view.inner" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
         </service>
