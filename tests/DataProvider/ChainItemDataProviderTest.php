@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
+use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
@@ -32,6 +34,34 @@ class ChainItemDataProviderTest extends TestCase
         $dummy = new Dummy();
         $dummy->setName('Lucie');
 
+        $firstDataProvider = $this->prophesize(DenormalizedIdentifiersAwareItemDataProviderInterface::class);
+        $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $firstDataProvider->supports(Dummy::class, null, [])->willReturn(false);
+
+        $secondDataProvider = $this->prophesize(DenormalizedIdentifiersAwareItemDataProviderInterface::class);
+        $secondDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $secondDataProvider->supports(Dummy::class, null, [])->willReturn(true);
+        $secondDataProvider->getItem(Dummy::class, ['id' => 1], null, [])->willReturn($dummy);
+
+        $thirdDataProvider = $this->prophesize(DenormalizedIdentifiersAwareItemDataProviderInterface::class);
+        $thirdDataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $thirdDataProvider->supports(Dummy::class, null, [])->willReturn(true);
+        $thirdDataProvider->getItem(Dummy::class, ['id' => 1], null, [])->willReturn(new \stdClass());
+
+        $chainItemDataProvider = new ChainItemDataProvider([
+            $firstDataProvider->reveal(),
+            $secondDataProvider->reveal(),
+            $thirdDataProvider->reveal(),
+        ]);
+
+        $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, ['id' => 1]));
+    }
+
+    public function testGetItemWithoutDenormalizedIdentifiers()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Lucie');
+
         $firstDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $firstDataProvider->willImplement(RestrictedDataProviderInterface::class);
         $firstDataProvider->supports(Dummy::class, null, [])->willReturn(false);
@@ -39,7 +69,7 @@ class ChainItemDataProviderTest extends TestCase
         $secondDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $secondDataProvider->willImplement(RestrictedDataProviderInterface::class);
         $secondDataProvider->supports(Dummy::class, null, [])->willReturn(true);
-        $secondDataProvider->getItem(Dummy::class, 1, null, [])->willReturn($dummy);
+        $secondDataProvider->getItem(Dummy::class, '1', null, [])->willReturn($dummy);
 
         $thirdDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $thirdDataProvider->willImplement(RestrictedDataProviderInterface::class);
@@ -52,7 +82,7 @@ class ChainItemDataProviderTest extends TestCase
             $thirdDataProvider->reveal(),
         ]);
 
-        $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, 1));
+        $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, ['id' => 1]));
     }
 
     public function testGetItemExceptions()
@@ -86,7 +116,27 @@ class ChainItemDataProviderTest extends TestCase
 
         $chainItemDataProvider = new ChainItemDataProvider([$firstDataProvider->reveal(), $secondDataProvider->reveal(), $thirdDataProvider->reveal()]);
 
-        $this->assertEquals($dummy, $chainItemDataProvider->getItem(Dummy::class, 1));
+        $chainItemDataProvider->getItem(Dummy::class, 1);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface".
+     */
+    public function testLegacyGetItemWithoutDenormalizedIdentifiersAndCompositeIdentifier()
+    {
+        $dummy = new CompositePrimitiveItem('Lucie', 1984);
+
+        $dataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $dataProvider->willImplement(RestrictedDataProviderInterface::class);
+        $dataProvider->supports(CompositePrimitiveItem::class, null, [])->willReturn(true);
+        $dataProvider->getItem(CompositePrimitiveItem::class, 'name=Lucie;year=1984', null, [])->willReturn($dummy);
+
+        $chainItemDataProvider = new ChainItemDataProvider([
+            $dataProvider->reveal(),
+        ]);
+
+        $this->assertEquals($dummy, $chainItemDataProvider->getItem(CompositePrimitiveItem::class, ['name' => 'Lucie', 'year' => 1984]));
     }
 
     /**
