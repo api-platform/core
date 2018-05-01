@@ -74,11 +74,11 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
-        $metadata = $this->resourceMetadataFactory->create($context['resource_class']);
-        $isPaginatedWithCursor = $paginated && null !== $cursorPaginationAttribute = $metadata->getAttribute('pagination_via_cursor');
+        $metadata = isset($context['resource_class']) ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
+        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getAttribute('pagination_via_cursor');
 
         $data['hydra:view'] = [
-            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
+            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated && !$isPaginatedWithCursor ? $currentPage : null),
             '@type' => 'hydra:PartialCollectionView',
         ];
 
@@ -91,21 +91,22 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $firstObject = current($objects);
             $lastObject = end($objects);
 
-            $parsed['parameters'][$cursorPaginationAttribute['field']] = [
-                $backwardRangeOperator.'e' => (string) $accessor->getValue($lastObject, $cursorPaginationAttribute['field']),
-            ];
+            if (false !== $lastObject) {
+                $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
+                    $cursorPaginationAttribute['field'] => [
+                        $forwardRangeOperator => (string) $accessor->getValue($lastObject, $cursorPaginationAttribute['field']),
+                    ],
+                ]));
+            }
 
-            $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
-                $cursorPaginationAttribute['field'] => [
-                    $backwardRangeOperator => (string) $accessor->getValue($firstObject, $cursorPaginationAttribute['field']),
-                ],
-            ]));
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
-                $cursorPaginationAttribute['field'] => [
-                    $forwardRangeOperator => (string) $accessor->getValue($lastObject, $cursorPaginationAttribute['field']),
-                ],
-            ]));
+            if (false !== $firstObject) {
+                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
+                    $cursorPaginationAttribute['field'] => [
+                        $backwardRangeOperator => (string) $accessor->getValue($firstObject, $cursorPaginationAttribute['field']),
+                    ],
+                ]));
+            }
         } elseif ($paginated) {
             if (null !== $lastPage) {
                 $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);

@@ -435,3 +435,99 @@ Feature: Collections support
     When I send a "GET" request to "/dummies?itemsPerPage=0&page=2"
     Then the response status code should be 400
     And the JSON node "hydra:description" should be equal to "Page should not be greater than 1 if itemsPerPage is equal to 0"
+
+  Scenario: Cursor-based pagination with an empty collection
+    When I send a "GET" request to "/so_manies"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/SoMany$"},
+        "@id": {"pattern": "^/so_manies$"},
+        "@type": {"pattern": "^hydra:Collection"},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/so_manies$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Cursor-based pagination with items
+    Given there are 10 of these so many objects
+    When I send a "GET" request to "/so_manies?order[id]=desc"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/SoMany$"},
+        "@id": {"pattern": "^/so_manies$"},
+        "@type": {"pattern": "^hydra:Collection"},
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/so_manies\\?order%5Bid%5D=desc$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:previous": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Bgt%5D=10$"},
+            "hydra:next": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Blt%5D=8$"}
+          }
+        }
+      }
+    }
+    """
+
+  @createSchema
+  Scenario: Cursor-based pagination with items
+    Given there are 10 of these so many objects
+    When I send a "GET" request to "/so_manies?order[id]=desc&id[gt]=10"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/SoMany$"},
+        "@id": {"pattern": "^/so_manies$"},
+        "@type": {"pattern": "^hydra:Collection"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/13$"},
+                  {"pattern": "^/dummies/12$"},
+                  {"pattern": "^/dummies/11$"}
+                ]
+              }
+            }
+          },
+          "maxItems": 3
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Bgt%5D=10$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:previous": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Bgt%5D=13$"},
+            "hydra:next": {"pattern": "^/so_manies\\?order%5Bid%5D=desc&id%5Blt%5D=10$"}
+          }
+        }
+      }
+    }
+    """

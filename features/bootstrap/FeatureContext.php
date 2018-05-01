@@ -45,6 +45,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SoMany;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
@@ -131,6 +132,21 @@ final class FeatureContext implements Context, SnippetAcceptingContext
             $dummy->setAlias('Alias #'.($nb - $i));
             $dummy->setDummy('SomeDummyTest'.$i);
             $dummy->setDescription($descriptions[($i - 1) % 2]);
+
+            $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb of these so many objects
+     */
+    public function thereAreOfTheseSoManyObjects(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummy = new SoMany();
+            $dummy->content = 'Many #'.$i;
 
             $this->manager->persist($dummy);
         }

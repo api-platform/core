@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Hydra\Serializer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -31,8 +32,9 @@ class PartialCollectionViewNormalizerTest extends TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, ['jsonld_sub_level' => true])->willReturn(['foo' => 'bar'])->shouldBeCalled();
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['jsonld_sub_level' => true]));
     }
 
@@ -40,8 +42,9 @@ class PartialCollectionViewNormalizerTest extends TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, Argument::type('array'))->willReturn(['foo' => 'bar'])->shouldBeCalled();
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
     }
 
@@ -97,8 +100,9 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->normalize(Argument::type($partial ? PartialPaginatorInterface::class : PaginatorInterface::class), null, Argument::type('array'))->willReturn($decoratedNormalize)->shouldBeCalled();
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), '_page');
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal(), '_page');
 
         return $normalizer->normalize($paginatorProphecy->reveal());
     }
@@ -109,8 +113,9 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null)->willReturn(true)->shouldBeCalled();
         $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
@@ -122,8 +127,9 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->willImplement(NormalizerAwareInterface::class);
         $decoratedNormalizerProphecy->setNormalizer(Argument::type(NormalizerInterface::class))->shouldBeCalled();
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
         $normalizer->setNormalizer($injectedNormalizer);
     }
 }
