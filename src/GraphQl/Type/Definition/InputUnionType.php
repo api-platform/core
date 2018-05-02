@@ -18,7 +18,7 @@ use GraphQL\Error\InvariantViolation;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InputType;
 use GraphQL\Type\Definition\LeafType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Utils\Utils;
 
 /**
@@ -28,7 +28,7 @@ use GraphQL\Utils\Utils;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class InputUnionType extends Type implements InputType, LeafType
+final class InputUnionType extends UnionType implements InputType, LeafType
 {
     /**
      * @var InputObjectType[]
@@ -36,15 +36,12 @@ final class InputUnionType extends Type implements InputType, LeafType
     private $types;
 
     /**
-     * @var array
-     */
-    private $config;
-
-    /**
      * @throws InvariantViolation
      */
     public function __construct(array $config)
     {
+        parent::__construct($config);
+
         if (!isset($config['name'])) {
             $config['name'] = $this->tryInferName();
         }
@@ -85,8 +82,6 @@ final class InputUnionType extends Type implements InputType, LeafType
      */
     public function assertValid()
     {
-        parent::assertValid();
-
         $types = $this->getTypes();
         Utils::invariant(\count($types) > 0, "{$this->name} types must not be empty");
 

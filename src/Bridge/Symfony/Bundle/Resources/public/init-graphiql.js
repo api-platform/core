@@ -61,8 +61,13 @@ function graphQLFetcher(graphQLParams) {
         return response.text();
     }).then(function (responseBody) {
         try {
-            return JSON.parse(responseBody);
+            var jsonResponse = JSON.parse(responseBody);
+            if (jsonResponse.errors !== undefined) {
+                console.error('An error occured when fetching the query:', jsonResponse.errors);
+            }
+            return jsonResponse;
         } catch (error) {
+            console.error(responseBody);
             return responseBody;
         }
     });
