@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -46,8 +47,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $operationMethodResolver;
     private $urlGenerator;
     private $subresourceOperationFactory;
+    private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -56,6 +58,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -192,6 +195,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
                 continue;
+            }
+
+            if ($this->nameConverter) {
+                $propertyName = $this->nameConverter->normalize($propertyName);
             }
 
             $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
