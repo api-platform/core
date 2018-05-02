@@ -23,6 +23,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 
 /**
  * The configuration of the bundle.
@@ -248,6 +250,8 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([
                         ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                        AccessDeniedException::class => Response::HTTP_UNAUTHORIZED,
+                        InsufficientAuthenticationException::class => Response::HTTP_UNAUTHORIZED,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)
