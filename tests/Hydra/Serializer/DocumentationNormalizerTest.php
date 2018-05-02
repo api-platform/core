@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
@@ -44,7 +45,7 @@ class DocumentationNormalizerTest extends TestCase
         $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version, []);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'relatedDummy']));
+        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'nameConverted', 'relatedDummy']));
 
         $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET', 'hydra_context' => ['hydra:foo' => 'bar', 'hydra:title' => 'foobar']], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST']], []);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -54,6 +55,7 @@ class DocumentationNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create('dummy', 'name')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'name', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create('dummy', 'description')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'description', true, true, true, true, false, false, null, null, ['jsonld_context' => ['@type' => '@id']]));
+        $propertyMetadataFactoryProphecy->create('dummy', 'nameConverted')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'name converted', true, true, true, true, false, false, null, null, []));
         $subresourceMetadata = new SubresourceMetadata('relatedDummy', false);
         $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy')->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy')), 'This is a name.', true, true, true, true, false, false, null, null, [], $subresourceMetadata));
 
@@ -94,7 +96,9 @@ class DocumentationNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             $operationMethodResolverProphecy->reveal(),
             $urlGenerator->reveal(),
-            $subresourceOperationFactoryProphecy->reveal());
+            $subresourceOperationFactoryProphecy->reveal(),
+            new CustomConverter()
+        );
 
         $expected = [
             '@context' => [
@@ -167,6 +171,21 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:readable' => true,
                             'hydra:writable' => true,
                             'hydra:description' => 'description',
+                        ],
+                        [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => '#dummy/name_converted',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'name_converted',
+                                'domain' => '#dummy',
+                                'range' => 'xmls:string',
+                            ],
+                            'hydra:title' => 'name_converted',
+                            'hydra:required' => false,
+                            'hydra:readable' => true,
+                            'hydra:writable' => true,
+                            'hydra:description' => 'name converted',
                         ],
                         [
                             '@type' => 'hydra:SupportedProperty',
