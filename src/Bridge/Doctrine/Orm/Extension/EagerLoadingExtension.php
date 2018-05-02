@@ -224,49 +224,46 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();
         $targetClassMetadata = $entityManager->getClassMetadata($entity);
-        if (!empty($targetClassMetadata->subClasses)) {
+        if ($targetClassMetadata->subClasses) {
             $queryBuilder->addSelect($associationAlias);
-
-            return;
-        }
-
-        foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
-
-            if (true === $propertyMetadata->isIdentifier()) {
-                $select[] = $property;
-                continue;
-            }
-
-            //the field test allows to add methods to a Resource which do not reflect real database fields
-            if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
-                $select[] = $property;
-            }
-
-            if (!array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
-                continue;
-            }
-
-            foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+        } else {
+            foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
-                $propertyName = "$property.$embeddedProperty";
-                if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
-                    $select[] = $propertyName;
+
+                if (true === $propertyMetadata->isIdentifier()) {
+                    $select[] = $property;
+                    continue;
+                }
+
+                //the field test allows to add methods to a Resource which do not reflect real database fields
+                if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                    $select[] = $property;
+                }
+
+                if (array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
+                    foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+                        $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+                        $propertyName = "$property.$embeddedProperty";
+                        if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                            $select[] = $propertyName;
+                        }
+                    }
                 }
             }
-        }
 
-        $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+            $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+        }
     }
 
     /**
-     * Gets the serializer context.
+     * Gets serializer context.
      *
      * @param string $contextType normalization_context or denormalization_context
      * @param array  $options     represents the operation name so that groups are the one of the specific operation
      */
     private function getNormalizationContext(string $resourceClass, string $contextType, array $options): array
     {
+        $request = null;
         if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
             return $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
         }

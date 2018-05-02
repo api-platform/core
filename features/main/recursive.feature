@@ -36,6 +36,7 @@ Feature: Max depth handling
     }
     """
 
+  @dropSchema
   Scenario: Make the resource recursive
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "recursives/1" with body:

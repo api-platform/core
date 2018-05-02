@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures;
+namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 
@@ -23,10 +23,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
  *     itemOperations={"foo"={"bar"}},
  *     collectionOperations={"bar"={"foo"}},
  *     graphql={"query"={"normalization_context"={"groups"={"foo", "bar"}}}},
- *     attributes={"foo"="bar", "route_prefix"="/whatever"},
- *     routePrefix="/foo",
- *     accessControl="has_role('ROLE_FOO')",
- *     accessControlMessage="You are not foo."
+ *     attributes={"foo"="bar"}
  * )
  *
  * @author Marcus Speight <marcus@pmconnect.co.uk>

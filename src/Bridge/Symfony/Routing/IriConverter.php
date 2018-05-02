@@ -19,16 +19,11 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Util\AttributesExtractor;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -43,24 +38,23 @@ use Symfony\Component\Routing\RouterInterface;
 final class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
-    use OperationDataProviderTrait;
 
+    private $itemDataProvider;
     private $routeNameResolver;
     private $router;
     private $identifiersExtractor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, ChainIdentifierDenormalizer $identifierDenormalizer = null, SubresourceDataProviderInterface $subresourceDataProvider = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
         $this->router = $router;
-        $this->identifiersExtractor = $identifiersExtractor;
-        $this->identifierDenormalizer = $identifierDenormalizer;
-        $this->subresourceDataProvider = $subresourceDataProvider;
 
         if (null === $identifiersExtractor) {
-            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', IdentifiersExtractorInterface::class), E_USER_DEPRECATED);
+            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
             $this->identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
+        } else {
+            $this->identifiersExtractor = $identifiersExtractor;
         }
     }
 
@@ -75,31 +69,11 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
-        if (!isset($parameters['_api_resource_class'])) {
+        if (!isset($parameters['_api_resource_class'], $parameters['id'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        $attributes = AttributesExtractor::extractAttributes($parameters);
-
-        try {
-            $identifiers = $this->extractIdentifiers($parameters, $attributes);
-        } catch (InvalidIdentifierException $e) {
-            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        if ($this->identifierDenormalizer) {
-            $context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
-        }
-
-        if (isset($attributes['subresource_operation_name'])) {
-            if ($item = $this->getSubresourceData($identifiers, $attributes, $context)) {
-                return $item;
-            }
-
-            throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
-        }
-
-        if ($item = $this->getItemData($identifiers, $attributes, $context)) {
+        if ($item = $this->itemDataProvider->getItem($parameters['_api_resource_class'], $parameters['id'], null, $context)) {
             return $item;
         }
 

@@ -62,7 +62,5 @@ trait FilterLocatorTrait
         if ($this->filterLocator instanceof FilterCollection && $this->filterLocator->offsetExists($filterId)) {
             return $this->filterLocator->offsetGet($filterId);
         }
-
-        return null;
     }
 }

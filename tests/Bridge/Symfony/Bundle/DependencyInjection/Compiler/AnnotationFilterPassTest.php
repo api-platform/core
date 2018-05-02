@@ -58,7 +58,7 @@ class AnnotationFilterPassTest extends TestCase
 
         $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->will(function ($args) {
             if (Dummy::class === $args[0]->name) {
-                return [new ApiFilter(['value' => SearchFilter::class, 'strategy' => 'exact', 'properties' => ['description', 'relatedDummy.name', 'name']]), new ApiResource([]), new ApiFilter(['value' => GroupFilter::class, 'arguments' => ['parameterName' => 'foobar']])];
+                return [new ApiFilter(['value' => SearchFilter::class, 'strategy' => 'exact', 'properties' => ['description', 'relatedDummy.name', 'name']]), new ApiResource(), new ApiFilter(['value' => GroupFilter::class, 'arguments' => ['parameterName' => 'foobar']])];
             }
 
             return [];

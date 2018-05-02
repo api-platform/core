@@ -53,8 +53,87 @@ Feature: Subresource support
     }
     """
 
+  Scenario: Create a fourth level
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/fourth_levels" with body:
+    """
+    {"level": 4}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/FourthLevel",
+      "@id": "/fourth_levels/1",
+      "@type": "FourthLevel",
+      "id": 1,
+      "level": 4
+    }
+    """
+
+  Scenario: Create a third level
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/third_levels" with body:
+    """
+    {"level": 3, "fourthLevel": "/fourth_levels/1"}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/ThirdLevel",
+      "@id": "/third_levels/1",
+      "@type": "ThirdLevel",
+      "fourthLevel": "/fourth_levels/1",
+      "id": 1,
+      "level": 3,
+      "test": true
+    }
+    """
+
+  Scenario: Create a named related dummy
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/related_dummies" with body:
+    """
+    {"name": "Hello", "thirdLevel": "/third_levels/1"}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  Scenario: Create an unnamed related dummy
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/related_dummies" with body:
+    """
+    {"thirdLevel": "/third_levels/1"}
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  Scenario: Create a dummy with relations
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Dummy with relations",
+      "relatedDummy": "http://example.com/related_dummies/1",
+      "relatedDummies": [
+        "/related_dummies/1",
+        "/related_dummies/2"
+      ],
+      "name_converted": null
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
   Scenario: Get the subresource relation collection
-    Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies"
     And the response status code should be 200
     And the response should be in JSON
@@ -220,19 +299,6 @@ Feature: Subresource support
     }
     """
 
-  Scenario: Create a dummy with a relation that is a subresource
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummies" with body:
-    """
-    {
-      "name": "Dummy with relations",
-      "relatedDummy": "/dummies/1/related_dummies/2"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-
   Scenario: Get the embedded relation subresource item at the third level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
     And the response status code should be 200
@@ -316,6 +382,7 @@ Feature: Subresource support
     }
     """
 
+  @dropSchema
   Scenario: Recursive resource
     When I send a "GET" request to "/dummy_products/2"
     And the response status code should be 200

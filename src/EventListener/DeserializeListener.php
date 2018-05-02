@@ -47,16 +47,12 @@ final class DeserializeListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        $method = $request->getMethod();
         if (
             $request->isMethodSafe(false)
-            || 'DELETE' === $method
+            || $request->isMethod('DELETE')
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || (
-                    '' === ($requestContent = $request->getContent())
-                    && ('POST' === $method || 'PUT' === $method)
-               )
+            || ('' === ($requestContent = $request->getContent()) && $request->isMethod('PUT'))
         ) {
             return;
         }

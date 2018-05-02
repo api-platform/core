@@ -80,6 +80,7 @@ Feature: Documentation support
     Then the response status code should be 200
     And I should see text matching "My Dummy API"
 
+  @dropSchema
   Scenario: Swagger UI is enabled for an arbitrary endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies"

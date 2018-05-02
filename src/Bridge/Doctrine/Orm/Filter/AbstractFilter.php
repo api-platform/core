@@ -223,7 +223,6 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
     {
-        $resourceClass = null;
         $parts = explode('.', $property);
 
         if (\func_num_args() > 1) {
@@ -237,7 +236,7 @@ abstract class AbstractFilter implements FilterInterface
             }
         }
 
-        if (null === $resourceClass) {
+        if (!isset($resourceClass)) {
             return [
                 'associations' => \array_slice($parts, 0, -1),
                 'field' => end($parts),
@@ -318,14 +317,13 @@ abstract class AbstractFilter implements FilterInterface
 
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
-        $alias = null;
 
         foreach ($propertyParts['associations'] as $association) {
             $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association);
             $parentAlias = $alias;
         }
 
-        if (null === $alias) {
+        if (!isset($alias)) {
             throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
         }
 

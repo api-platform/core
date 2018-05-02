@@ -169,7 +169,7 @@ class ExistsFilter extends AbstractContextAwareFilter
      */
     private function isAssociationNullable(array $associationMapping): bool
     {
-        if (!empty($associationMapping['id'])) {
+        if (isset($associationMapping['id']) && $associationMapping['id']) {
             return false;
         }
 

@@ -95,11 +95,9 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                     if (isset($identifiers[$propertyName])) {
                         throw new RuntimeException(sprintf('Composite identifiers not supported in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
                     }
-
                     $identifiers[$propertyName] = $this->propertyAccessor->getValue($relatedItem, $relatedPropertyName);
                 }
             }
-
             if (!isset($identifiers[$propertyName])) {
                 throw new RuntimeException(sprintf('No identifier found in "%s" through relation "%s" of "%s" used as identifier', $relatedResourceClass, $propertyName, $resourceClass));
             }

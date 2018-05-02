@@ -358,6 +358,7 @@ Feature: Collections support
     }
     """
 
+  @dropSchema
   Scenario: Filter with non-exact match
     When I send a "GET" request to "/dummies?name=Dummy%20%238"
     Then the response status code should be 200
@@ -395,6 +396,7 @@ Feature: Collections support
     }
     """
 
+  @dropSchema
   @createSchema
   Scenario: Allow passing 0 to `itemsPerPage`
     When I send a "GET" request to "/dummies?itemsPerPage=0"

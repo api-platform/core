@@ -33,13 +33,11 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
@@ -112,9 +110,16 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function createDatabase()
     {
+        $this->schemaTool->createSchema($this->classes);
+    }
+
+    /**
+     * @AfterScenario @dropSchema
+     */
+    public function dropDatabase()
+    {
         $this->schemaTool->dropSchema($this->classes);
         $this->doctrine->getManager()->clear();
-        $this->schemaTool->createSchema($this->classes);
     }
 
     /**
@@ -733,7 +738,6 @@ final class FeatureContext implements Context, SnippetAcceptingContext
         $relatedDummy2->setName('RelatedDummy without friends');
         $this->manager->persist($relatedDummy2);
         $this->manager->flush();
-        $this->manager->clear();
     }
 
     /**
@@ -870,52 +874,6 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
             $this->manager->persist($dummy);
         }
-
-        $this->manager->flush();
-    }
-
-    /**
-     * @Given there is a ramsey identified resource with uuid :uuid
-     */
-    public function thereIsARamseyIdentifiedResource(string $uuid)
-    {
-        $dummy = new RamseyUuidDummy();
-        $dummy->setId($uuid);
-
-        $this->manager->persist($dummy);
-        $this->manager->flush();
-    }
-
-    /**
-     * @Given there is a dummy object with a fourth level relation
-     */
-    public function thereIsADummyObjectWithAFourthLevelRelation()
-    {
-        $fourthLevel = new FourthLevel();
-        $fourthLevel->setLevel(4);
-        $this->manager->persist($fourthLevel);
-
-        $thirdLevel = new ThirdLevel();
-        $thirdLevel->setLevel(3);
-        $thirdLevel->setFourthLevel($fourthLevel);
-        $this->manager->persist($thirdLevel);
-
-        $namedRelatedDummy = new RelatedDummy();
-        $namedRelatedDummy->setName('Hello');
-        $namedRelatedDummy->setThirdLevel($thirdLevel);
-        $this->manager->persist($namedRelatedDummy);
-
-        $relatedDummy = new RelatedDummy();
-        $relatedDummy = new RelatedDummy();
-        $relatedDummy->setThirdLevel($thirdLevel);
-        $this->manager->persist($relatedDummy);
-
-        $dummy = new Dummy();
-        $dummy->setName('Dummy with relations');
-        $dummy->setRelatedDummy($namedRelatedDummy);
-        $dummy->addRelatedDummy($namedRelatedDummy);
-        $dummy->addRelatedDummy($relatedDummy);
-        $this->manager->persist($dummy);
 
         $this->manager->flush();
     }

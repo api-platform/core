@@ -9,5 +9,3 @@ doctrine:
         user:     '%user%'
         password: '%password%'
         host:     '%host%'
-        types:
-            uuid:  Ramsey\Uuid\Doctrine\UuidType
