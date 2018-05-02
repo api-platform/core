@@ -158,6 +158,7 @@ Feature: Using custom normalized entity
     And "alias" property is readable for Hydra class "CustomNormalizedDummy"
     And "alias" property is writable for Hydra class "CustomNormalizedDummy"
 
+  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/custom_normalized_dummies/1"
     Then the response status code should be 204

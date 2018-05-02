@@ -93,6 +93,7 @@ Feature: Cache invalidation through HTTP Cache tags
     Then the response status code should be 201
     And "/relation1s,/relation2s/1" IRIs should be purged
 
+  @dropSchema
   Scenario: Update a Relation1
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/relation1s/1" with body:

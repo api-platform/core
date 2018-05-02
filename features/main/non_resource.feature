@@ -11,7 +11,7 @@ Feature: Non-resources handling
         "@context": "/contexts/ContainNonResource",
         "@id": "/contain_non_resources/1",
         "@type": "ContainNonResource",
-        "id": 1,
+        "id": "1",
         "nested": {
             "@id": "/contain_non_resources/1-nested",
             "@type": "ContainNonResource",

@@ -80,7 +80,6 @@ class ConfigurationTest extends TestCase
             'enable_swagger_ui' => true,
             'enable_entrypoint' => true,
             'enable_docs' => true,
-            'enable_profiler' => true,
             'graphql' => [
                 'enabled' => true,
                 'graphiql' => [
@@ -127,11 +126,7 @@ class ConfigurationTest extends TestCase
                 'paths' => [],
             ],
             'http_cache' => [
-                'invalidation' => [
-                    'enabled' => false,
-                    'varnish_urls' => [],
-                    'request_options' => [],
-                ],
+                'invalidation' => ['enabled' => false, 'varnish_urls' => []],
                 'etag' => true,
                 'max_age' => null,
                 'shared_max_age' => null,

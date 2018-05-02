@@ -488,6 +488,7 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
     Then the response status code should be 204

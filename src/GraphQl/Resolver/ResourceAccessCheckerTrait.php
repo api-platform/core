@@ -37,7 +37,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 trait ResourceAccessCheckerTrait
 {
     /**
-     * @param mixed $object
+     * @param object $object
      *
      * @throws Error
      */
@@ -47,7 +47,7 @@ trait ResourceAccessCheckerTrait
             return;
         }
 
-        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'access_control', null, true);
+        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
         if (null === $isGranted || $resourceAccessChecker->isGranted($resourceClass, $isGranted, ['object' => $object])) {
             return;
         }

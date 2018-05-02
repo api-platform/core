@@ -8,6 +8,7 @@ Feature: JSON API collections support
     And I add "Content-Type" header equal to "application/vnd.api+json"
 
   @createSchema
+  @dropSchema
   Scenario: Correctly serialize a collection
     Given there is a CircularReference
     When I send a "GET" request to "/circular_references/1"

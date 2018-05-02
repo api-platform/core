@@ -24,9 +24,7 @@ trait ErrorNormalizerTrait
 
         if ($debug) {
             return $message;
-        }
-
-        if ($object instanceof FlattenException) {
+        } elseif ($object instanceof FlattenException) {
             $statusCode = $context['statusCode'] ?? $object->getStatusCode();
             if ($statusCode >= 500 && $statusCode < 600) {
                 $message = Response::$statusTexts[$statusCode];

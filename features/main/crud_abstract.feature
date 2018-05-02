@@ -102,6 +102,7 @@ Feature: Create-Retrieve-Update-Delete on abstract resource
       }
       """
 
+  @dropSchema
   Scenario: Delete a resource
     When I send a "DELETE" request to "/abstract_dummies/1"
     Then the response status code should be 204

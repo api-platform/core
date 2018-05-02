@@ -27,7 +27,7 @@ final class ChainSubresourceDataProvider implements SubresourceDataProviderInter
     /**
      * @param SubresourceDataProviderInterface[] $dataProviders
      */
-    public function __construct(/* iterable */ $dataProviders)
+    public function __construct(array $dataProviders)
     {
         $this->dataProviders = $dataProviders;
     }

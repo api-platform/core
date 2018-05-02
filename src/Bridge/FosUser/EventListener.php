@@ -50,11 +50,14 @@ final class EventListener
             return;
         }
 
-        if ('DELETE' === $request->getMethod()) {
-            $this->userManager->deleteUser($user);
-            $event->setControllerResult(null);
-        } else {
-            $this->userManager->updateUser($user);
+        switch ($request->getMethod()) {
+            case 'DELETE':
+                $this->userManager->deleteUser($user);
+                $event->setControllerResult(null);
+                break;
+            default:
+                $this->userManager->updateUser($user);
+                break;
         }
     }
 }

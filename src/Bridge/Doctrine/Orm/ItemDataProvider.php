@@ -20,7 +20,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -33,7 +32,6 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
- * @final
  */
 class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
@@ -48,7 +46,7 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
      * @param PropertyMetadataFactoryInterface       $propertyMetadataFactory
      * @param QueryItemExtensionInterface[]          $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, /* iterable */ $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, array $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -72,13 +70,11 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
-        if (!($context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] ?? false)) {
-            $id = $this->normalizeIdentifiers($id, $manager, $resourceClass);
-        }
+        $identifiers = $this->normalizeIdentifiers($id, $manager, $resourceClass);
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && $manager instanceof EntityManagerInterface) {
-            return $manager->getReference($resourceClass, $id);
+            return $manager->getReference($resourceClass, $identifiers);
         }
 
         $repository = $manager->getRepository($resourceClass);
@@ -90,10 +86,10 @@ class ItemDataProvider implements ItemDataProviderInterface, RestrictedDataProvi
         $queryNameGenerator = new QueryNameGenerator();
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
 
-        $this->addWhereForIdentifiers($id, $queryBuilder, $doctrineClassMetadata);
+        $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $id, $operationName, $context);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
 
             if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);

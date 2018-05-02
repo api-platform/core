@@ -370,6 +370,7 @@ Feature: Boolean filter on collections
     """
     And the JSON node "hydra:totalItems" should be equal to 15
 
+  @dropSchema
   Scenario: Get collection filtered by non valid properties
     When I send a "GET" request to "/dummies?unknown=0"
     Then the response status code should be 200

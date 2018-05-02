@@ -48,14 +48,4 @@ class ErrorFormatGuesserTest extends TestCase
         $this->assertEquals('xml', $format['key']);
         $this->assertEquals('text/xml', $format['value'][0]);
     }
-
-    public function testGuessCustomErrorFormat()
-    {
-        $request = new Request();
-        $request->setRequestFormat('custom_json_format');
-
-        $format = ErrorFormatGuesser::guessErrorFormat($request, ['xml' => ['text/xml'], 'custom_json_format' => ['application/json']]);
-        $this->assertEquals('custom_json_format', $format['key']);
-        $this->assertEquals('application/json', $format['value'][0]);
-    }
 }

@@ -99,6 +99,7 @@ Feature: JSON API order handling
     }
     """
 
+  @dropSchema
   Scenario: Get collection ordered on two properties previously whitelisted
     When I send a "GET" request to "/dummies?sort=description,-id"
     Then the JSON should be valid according to the JSON API schema

@@ -117,18 +117,19 @@ final class CachedIdentifiersExtractor implements IdentifiersExtractorInterface
 
         try {
             $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY_PREFIX.md5($resourceClass));
+            if ($cacheItem->isHit()) {
+                return $this->localCache[$resourceClass] = $cacheItem->get();
+            }
         } catch (CacheException $e) {
-            return $this->localCache[$resourceClass] = array_keys($retriever($item));
-        }
-
-        if ($cacheItem->isHit()) {
-            return $this->localCache[$resourceClass] = $cacheItem->get();
+            // do nothing
         }
 
         $keys = array_keys($retriever($item));
 
-        $cacheItem->set($keys);
-        $this->cacheItemPool->save($cacheItem);
+        if (isset($cacheItem)) {
+            $cacheItem->set($keys);
+            $this->cacheItemPool->save($cacheItem);
+        }
 
         return $this->localCache[$resourceClass] = $keys;
     }

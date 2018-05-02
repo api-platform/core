@@ -4,6 +4,7 @@ Feature: Retrieve data with Composite identifiers
   I need to retrieve all collections
 
   @createSchema
+  @dropSchema
   Scenario: Get a collection with composite identifiers
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_items"
@@ -35,6 +36,7 @@ Feature: Retrieve data with Composite identifiers
     """
 
   @createSchema
+  @dropSchema
   Scenario: Get collection with composite identifiers
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_relations"
@@ -123,6 +125,7 @@ Feature: Retrieve data with Composite identifiers
     When I send a "GET" request to "/composite_relations/compositeLabel=1;"
     Then the response status code should be 404
 
+  @dropSchema
   Scenario: Get first composite item
     Given there are Composite identifier objects
     When I send a "GET" request to "/composite_items/1"

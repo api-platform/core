@@ -97,35 +97,6 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    public function testApiLoaderWithPrefix()
-    {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withShortName('dummy');
-        $resourceMetadata = $resourceMetadata->withItemOperations([
-            'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden']],
-            'put' => ['method' => 'PUT'],
-            'delete' => ['method' => 'DELETE'],
-        ]);
-        $resourceMetadata = $resourceMetadata->withAttributes(['route_prefix' => '/foobar-prefix']);
-
-        $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
-
-        $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value']),
-            $routeCollection->get('api_dummies_get_item')
-        );
-
-        $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
-            $routeCollection->get('api_dummies_delete_item')
-        );
-
-        $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
-            $routeCollection->get('api_dummies_put_item')
-        );
-    }
-
     /**
      * @expectedException \RuntimeException
      */

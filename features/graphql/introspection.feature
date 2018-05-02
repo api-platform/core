@@ -187,6 +187,7 @@ Feature: GraphQL introspection support
     And the JSON node "data.__type.fields[9].name" should be equal to "jsonData"
     And the JSON node "data.__type.fields[9].type.name" should be equal to "Iterable"
 
+  @dropSchema
   Scenario: Retrieve an item through a GraphQL query
     Given there are 4 dummy objects with relatedDummy
     When I send the following GraphQL request:

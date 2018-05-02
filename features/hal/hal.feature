@@ -137,6 +137,7 @@ Feature: HAL support
     """
     Then the response status code should be 201
 
+  @dropSchema
   Scenario: Get the object with the embedded relation
     When I add "Accept" header equal to "application/hal+json"
     And I send a "GET" request to "/relation_embedders/1"

@@ -33,6 +33,7 @@ Feature: Circular references handling
     }
     """
 
+  @dropSchema
   Scenario: Fetch circular reference
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/circular_references" with body:

@@ -47,6 +47,7 @@ Feature: Numeric filter on collections
     }
     """
 
+  @dropSchema
   Scenario: Get collection by non-numeric dummyPrice=marty
     Given there are 10 dummy objects with dummyPrice
     When I send a "GET" request to "/dummies?dummyPrice=marty"

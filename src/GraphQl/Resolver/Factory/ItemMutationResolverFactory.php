@@ -64,15 +64,11 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     public function __invoke(string $resourceClass = null, string $rootClass = null, string $operationName = null): callable
     {
         return function ($root, $args, $context, ResolveInfo $info) use ($resourceClass, $operationName) {
-            if (null === $resourceClass) {
-                return null;
-            }
-
             $data = ['clientMutationId' => $args['input']['clientMutationId'] ?? null];
             $item = null;
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName ?? '', 'normalization_context', [], true);
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute($operationName, 'normalization_context', [], true);
             $normalizationContext['attributes'] = $info->getFieldSelection(PHP_INT_MAX);
 
             if (isset($args['input']['id'])) {

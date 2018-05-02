@@ -4,6 +4,7 @@ Feature: Default values of HTTP cache headers
   I need to be able to set default cache headers values
 
   @createSchema
+  @dropSchema
   Scenario: Cache headers default value
     When I send a "GET" request to "/relation_embedders"
     Then the response status code should be 200

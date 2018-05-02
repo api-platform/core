@@ -464,7 +464,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         // On a subresource, we know the value of the identifiers.
         // If attributeValue is null, meaning that it hasn't been returned by the DataProvider, get the item Iri
-        if (null === $relatedObject && isset($context['operation_type'], $context['subresource_resources'][$resourceClass]) && OperationType::SUBRESOURCE === $context['operation_type']) {
+        if (null === $relatedObject && isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] && isset($context['subresource_resources'][$resourceClass])) {
             return $this->iriConverter->getItemIriFromResourceClass($resourceClass, $context['subresource_resources'][$resourceClass]);
         }
 

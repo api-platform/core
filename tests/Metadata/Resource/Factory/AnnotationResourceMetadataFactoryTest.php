@@ -43,22 +43,21 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
         $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
-        $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar'], $metadata->getAttributes());
+        $this->assertEquals(['a' => 1], $metadata->getAttributes());
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
     }
 
     public function getCreateDependencies()
     {
-        $annotation = new ApiResource([
-            'shortName' => 'shortName',
-            'description' => 'description',
-            'iri' => 'http://example.com',
-            'itemOperations' => ['foo' => ['bar' => true]],
-            'collectionOperations' => ['baz' => ['tab' => false]],
-            'subresourceOperations' => ['sub' => ['bus' => false]],
-            'attributes' => ['a' => 1, 'route_prefix' => '/foobar'],
-            'graphql' => ['foo' => 'bar'],
-        ]);
+        $annotation = new ApiResource();
+        $annotation->shortName = 'shortName';
+        $annotation->description = 'description';
+        $annotation->iri = 'http://example.com';
+        $annotation->itemOperations = ['foo' => ['bar' => true]];
+        $annotation->collectionOperations = ['baz' => ['tab' => false]];
+        $annotation->subresourceOperations = ['sub' => ['bus' => false]];
+        $annotation->attributes = ['a' => 1];
+        $annotation->graphql = ['foo' => 'bar'];
 
         $reader = $this->prophesize(Reader::class);
         $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();

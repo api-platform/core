@@ -85,6 +85,7 @@ Feature: Error handling
     And the JSON node "hydra:description" should exist
     And the JSON node "trace" should exist
 
+    @dropSchema
     Scenario: Get an error during update of an existing resource with a non-allowed update operation
       When I add "Content-Type" header equal to "application/ld+json"
       And I send a "POST" request to "/dummies" with body:
@@ -118,6 +119,7 @@ Feature: Error handling
       And the JSON node "@id" should be equal to "/related_dummies/1"
       And the JSON node "symfony" should be equal to "laravel"
 
+    @dropSchema
     Scenario: Do not get an error during update of an existing relation with a non-allowed update operation
       When I add "Content-Type" header equal to "application/ld+json"
       And I send a "POST" request to "/relation_embedders" with body:

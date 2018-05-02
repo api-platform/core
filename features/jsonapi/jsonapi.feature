@@ -230,6 +230,7 @@ Feature: JSON API basic support
     And the JSON node "data.attributes.name" should be equal to "Jane Doe"
     And the JSON node "data.attributes.age" should be equal to the number 23
 
+  @dropSchema
   Scenario: Embed a relation in a parent object
     When I send a "POST" request to "/relation_embedders" with body:
     """
