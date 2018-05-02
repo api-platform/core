@@ -211,7 +211,9 @@ class SearchFilter extends AbstractContextAwareFilter
 
         if ($metadata->hasField($field)) {
             if ('id' === $field) {
-                $values = array_map([$this, 'getIdFromValue'], $values);
+                foreach ($values as $k => $v) {
+                    $values[$k] = $this->getIdentifierFromValue($v, 'id');
+                }
             }
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
@@ -257,25 +259,28 @@ class SearchFilter extends AbstractContextAwareFilter
             return;
         }
 
-        $values = array_map([$this, 'getIdFromValue'], $values);
-
-        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
-            $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
-            ]);
-
-            return;
-        }
-
         $association = $field;
         $valueParameter = $queryNameGenerator->generateParameterName($association);
 
         if ($metadata->isCollectionValuedAssociation($association)) {
             $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $association);
-            $associationField = 'id';
+            $targetEntityMetaData = $this->getClassMetadata($metadata->getAssociationMapping($association)['targetEntity']);
+            $associationField = $targetEntityMetaData->getIdentifier()[0];
         } else {
             $associationAlias = $alias;
             $associationField = $field;
+        }
+
+        foreach ($values as $k => $v) {
+            $values[$k] = $this->getIdentifierFromValue($v, $associationField);
+        }
+
+        if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+            ]);
+
+            return;
         }
 
         if (1 === \count($values)) {
@@ -370,9 +375,26 @@ class SearchFilter extends AbstractContextAwareFilter
      */
     protected function getIdFromValue(string $value)
     {
+        @trigger_error('Using "getIdFromValue()" is deprecated. Use "getIdentifierFromValue()" instead.',
+            E_USER_DEPRECATED
+        );
+
+        return $this->getIdentifierFromValue($value, 'id');
+    }
+
+    /**
+     * Gets the identifier from an IRI or a raw identifier.
+     *
+     * @param string $value
+     * @param string $identifier
+     *
+     * @return mixed
+     */
+    protected function getIdentifierFromValue(string $value, string $identifier)
+    {
         try {
             if ($item = $this->iriConverter->getItemFromIri($value, ['fetch_data' => false])) {
-                return $this->propertyAccessor->getValue($item, 'id');
+                return $this->propertyAccessor->getValue($item, $identifier);
             }
         } catch (InvalidArgumentException $e) {
             // Do nothing, return the raw value
