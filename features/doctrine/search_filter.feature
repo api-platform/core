@@ -10,6 +10,7 @@ Feature: Search filter on collections
     And I send a "GET" request to "/related_dummies?relatedToDummyFriend.dummyFriend=/dummy_friends/4"
     Then the response status code should be 200
     And the JSON node "_embedded.item" should have 1 element
+    And the JSON node "_embedded.item[0].id" should be equal to the number 1
     And the JSON node "_embedded.item[0]._links.relatedToDummyFriend" should have 4 elements
     And the JSON node "_embedded.item[0]._embedded.relatedToDummyFriend" should have 4 elements
 

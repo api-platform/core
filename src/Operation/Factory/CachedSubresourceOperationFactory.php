@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation\Factory;
 
-use Psr\Cache\CacheException;
+use ApiPlatform\Core\Cache\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -21,9 +21,9 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedSubresourceOperationFactory implements SubresourceOperationFactoryInterface
 {
-    const CACHE_KEY_PREFIX = 'subresource_operations_';
+    use CachedTrait;
 
-    private $cacheItemPool;
+    const CACHE_KEY_PREFIX = 'subresource_operations_';
     private $decorated;
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, SubresourceOperationFactoryInterface $decorated)
@@ -39,21 +39,8 @@ final class CachedSubresourceOperationFactory implements SubresourceOperationFac
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
 
-        try {
-            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
-            }
-        } catch (CacheException $e) {
+        return $this->getCached($cacheKey, function () use ($resourceClass) {
             return $this->decorated->create($resourceClass);
-        }
-
-        $subresourceOperations = $this->decorated->create($resourceClass);
-
-        $cacheItem->set($subresourceOperations);
-        $this->cacheItemPool->save($cacheItem);
-
-        return $subresourceOperations;
+        });
     }
 }

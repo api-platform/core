@@ -1,0 +1,191 @@
+version: 2
+
+reusable-steps:
+  - &clear-test-app-cache
+    run:
+      name: Clear test app cache
+      command: tests/Fixtures/app/console cache:clear
+  - &disable-php-memory-limit
+    run:
+      name: Disable PHP memory limit
+      command: echo 'memory_limit=-1' | sudo tee -a /usr/local/etc/php/php.ini
+  - &disable-xdebug-php-extension
+    run:
+      name: Disable Xdebug PHP extension
+      command: sudo rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+  - &restore-composer-cache
+    restore_cache:
+      keys:
+        - composer-cache-{{ .Revision }}
+        - composer-cache-{{ .Branch }}
+        - composer-cache
+  - &restore-npm-cache
+    restore_cache:
+      keys:
+        - npm-cache-{{ .Revision }}
+        - npm-cache-{{ .Branch }}
+        - npm-cache
+  - &save-composer-cache-by-branch
+    save_cache:
+      paths:
+        - ~/.composer/cache
+      key: composer-cache-{{ .Branch }}-{{ .BuildNum }}
+  - &save-composer-cache-by-revision
+    save_cache:
+      paths:
+        - ~/.composer/cache
+      key: composer-cache-{{ .Revision }}-{{ .BuildNum }}
+  - &save-npm-cache-by-branch
+    save_cache:
+      paths:
+        - ~/.npm
+      key: npm-cache-{{ .Branch }}-{{ .BuildNum }}
+  - &save-npm-cache-by-revision
+    save_cache:
+      paths:
+        - ~/.npm
+      key: npm-cache-{{ .Revision }}-{{ .BuildNum }}
+  - &update-composer
+    run:
+      name: Update Composer
+      command: composer self-update
+  - &update-project-dependencies
+    run:
+      name: Update project dependencies
+      command: composer update --prefer-dist --no-progress --no-suggest --ansi
+
+jobs:
+  phpunit-php-7.2-coverage:
+    docker:
+      - image: circleci/php:7.2-node-browsers
+    environment:
+      SYMFONY_DEPRECATIONS_HELPER: weak_vendors
+      APP_ENV: test
+    parallelism: 2
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - *restore-composer-cache
+      - *restore-npm-cache
+      - *disable-xdebug-php-extension
+      - *disable-php-memory-limit
+      - *update-composer
+      - *update-project-dependencies
+      - *save-composer-cache-by-revision
+      - *save-composer-cache-by-branch
+      - *clear-test-app-cache
+      - run:
+          name: Run PHPUnit tests
+          command: |-
+            mkdir -p build/logs/tmp build/cov
+            find tests -name '*Test.php' | circleci tests split --split-by=timings | parallel -j10% --rpl '{_} s/\//_/g;' \
+              phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-{_}.cov --log-junit build/logs/tmp/{_}.xml --colors=always {}
+      - run:
+          name: Merge PHPUnit test reports
+          command: |-
+            mkdir -p build/logs/phpunit
+            npx junit-merge --out build/logs/phpunit/junit.xml --dir build/logs/tmp
+            rm -r build/logs/tmp
+      - store_test_results:
+          path: build/logs
+      - store_artifacts:
+          path: build/logs/phpunit/junit.xml
+          destination: build/logs/phpunit/junit.xml
+      - persist_to_workspace:
+          root: build
+          paths:
+            - cov
+      - *save-npm-cache-by-revision
+      - *save-npm-cache-by-branch
+
+  behat-php-7.2-coverage:
+    docker:
+      - image: circleci/php:7.2-node-browsers
+    environment:
+      SYMFONY_DEPRECATIONS_HELPER: weak_vendors
+      APP_ENV: test
+    parallelism: 2
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - *restore-composer-cache
+      - *restore-npm-cache
+      - *disable-xdebug-php-extension
+      - *disable-php-memory-limit
+      - *update-composer
+      - *update-project-dependencies
+      - *save-composer-cache-by-revision
+      - *save-composer-cache-by-branch
+      - *clear-test-app-cache
+      - run:
+          name: Run Behat tests
+          command: |-
+            mkdir -p build/logs/tmp build/cov
+            for f in $(find features -name '*.feature' -not -path 'features/main/exposed_state.feature' | circleci tests split --split-by=timings); do
+              _f=${f//\//_}
+              FEATURE="${_f}" phpdbg -qrr vendor/bin/behat --profile=coverage --suite=default --tags=~@postgres --format=progress --out=std --format=junit --out=build/logs/tmp/"${_f}" "$f"
+            done
+      - run:
+          name: Merge Behat test reports
+          command: |-
+            mkdir -p build/logs/behat
+            npx junit-merge --out build/logs/behat/junit.xml --dir build/logs/tmp --recursive
+            rm -r build/logs/tmp
+      - store_test_results:
+          path: build/logs
+      - store_artifacts:
+          path: build/logs/behat/junit.xml
+          destination: build/logs/behat/junit.xml
+      - persist_to_workspace:
+          root: build
+          paths:
+            - cov
+      - *save-npm-cache-by-revision
+      - *save-npm-cache-by-branch
+
+  merge-and-upload-coverage:
+    docker:
+      - image: circleci/php:7.2-node-browsers
+    working_directory: ~/api-platform/core
+    steps:
+      - checkout
+      - *restore-npm-cache
+      - *disable-xdebug-php-extension
+      - *disable-php-memory-limit
+      - run:
+          name: Download phpcov
+          command: wget https://phar.phpunit.de/phpcov.phar
+      - attach_workspace:
+          at: build
+      - run:
+          name: Merge code coverage reports
+          command: |-
+            mkdir -p build/logs
+            phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov
+      - store_artifacts:
+          path: build/logs/clover.xml
+          destination: build/logs/clover.xml
+      - run:
+          name: Upload code coverage report to Coveralls
+          command: |-
+            if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
+              npx @cedx/coveralls build/logs/clover.xml
+            else
+              echo 'Skipped'
+            fi
+      - run:
+          name: Upload code coverage report to Codecov
+          command: npx codecov --file=build/logs/clover.xml --disable=gcov
+      - *save-npm-cache-by-revision
+      - *save-npm-cache-by-branch
+
+workflows:
+  version: 2
+  test-with-coverage:
+    jobs:
+      - phpunit-php-7.2-coverage
+      - behat-php-7.2-coverage
+      - merge-and-upload-coverage:
+          requires:
+            - phpunit-php-7.2-coverage
+            - behat-php-7.2-coverage
