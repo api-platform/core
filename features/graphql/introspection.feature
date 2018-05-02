@@ -9,20 +9,13 @@ Feature: GraphQL introspection support
     And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid"
 
   Scenario: Introspect the GraphQL schema
-    When I send the following GraphQL request:
-    """
-    {
-      __schema {
-        types {
-          name
-        }
-      }
-    }
-    """
+    When I send the query to introspect the schema
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.__schema.types" should exist
+    And the JSON node "data.__schema.queryType.name" should be equal to "Query"
+    And the JSON node "data.__schema.mutationType.name" should be equal to "Mutation"
 
   Scenario: Introspect types
     When I send the following GraphQL request:
