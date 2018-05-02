@@ -59,6 +59,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.identifier.denormalizer" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
@@ -233,6 +234,10 @@
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.identifier.denormalizer" />
+        </service>
+
+        <service id="api_platform.identifier.integer" class="ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer" public="false">
+            <tag name="api_platform.identifier.denormalizer" />
         </service>
 
         <service id="api_platform.identifier.date_normalizer" class="ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer" public="false">

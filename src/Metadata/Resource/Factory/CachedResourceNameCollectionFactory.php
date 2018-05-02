@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Cache\CachedTrait;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -24,11 +24,11 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedResourceNameCollectionFactory implements ResourceNameCollectionFactoryInterface
 {
+    use CachedTrait;
+
     const CACHE_KEY = 'resource_name_collection';
 
-    private $cacheItemPool;
     private $decorated;
-    private $localCache;
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceNameCollectionFactoryInterface $decorated)
     {
@@ -41,25 +41,8 @@ final class CachedResourceNameCollectionFactory implements ResourceNameCollectio
      */
     public function create(): ResourceNameCollection
     {
-        if (null !== $this->localCache) {
-            return $this->localCache;
-        }
-
-        try {
-            $cacheItem = $this->cacheItemPool->getItem(self::CACHE_KEY);
-        } catch (CacheException $e) {
-            return $this->localCache = $this->decorated->create();
-        }
-
-        if ($cacheItem->isHit()) {
-            return $this->localCache = $cacheItem->get();
-        }
-
-        $resourceNameCollection = $this->decorated->create();
-
-        $cacheItem->set($resourceNameCollection);
-        $this->cacheItemPool->save($cacheItem);
-
-        return $this->localCache = $resourceNameCollection;
+        return $this->getCached(self::CACHE_KEY, function () {
+            return $this->decorated->create();
+        });
     }
 }
