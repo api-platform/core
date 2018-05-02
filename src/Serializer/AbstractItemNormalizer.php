@@ -22,6 +22,7 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -37,6 +38,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  */
 abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
+    use ClassInfoTrait;
     use ContextTrait;
 
     protected $propertyNameCollectionFactory;
@@ -74,13 +76,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        try {
-            $this->resourceClassResolver->getResourceClass($data);
-        } catch (InvalidArgumentException $e) {
-            return false;
-        }
-
-        return true;
+        return $this->resourceClassResolver->isResourceClass($this->getObjectClass($data));
     }
 
     /**
