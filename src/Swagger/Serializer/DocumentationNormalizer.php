@@ -759,16 +759,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         $pathOperation['operationId'] = $operationId;
         $pathOperation['produces'] = $mimeTypes;
         $pathOperation['summary'] = sprintf('Retrieves %s%s resource%s.', $subresourceOperation['collection'] ? 'the collection of ' : 'a ', $subresourceOperation['shortNames'][0], $subresourceOperation['collection'] ? 's' : '');
-        $pathOperation['responses'] = [
-            '200' => $subresourceOperation['collection'] ? [
-                'description' => sprintf('%s collection response', $subresourceOperation['shortNames'][0]),
-                'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)]],
-            ] : [
-                'description' => sprintf('%s resource response', $subresourceOperation['shortNames'][0]),
-                'schema' => ['$ref' => sprintf('#/definitions/%s', $responseDefinitionKey)],
-            ],
-            '404' => ['description' => 'Resource not found'],
-        ];
+        $pathOperation['responses'] = $this->getSubresourceResponse($subresourceOperation['collection'], $subresourceOperation['shortNames'][0], $responseDefinitionKey);
 
         // Avoid duplicates parameters when there is a filter on a subresource identifier
         $parametersMemory = [];
@@ -794,5 +785,22 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return new \ArrayObject(['get' => $pathOperation]);
+    }
+
+    private function getSubresourceResponse(bool $collection, string $shortName, string $definitionKey): array
+    {
+        if ($collection) {
+            $okResponse = [
+                'description' => sprintf('%s collection response', $shortName),
+                'schema' => ['type' => 'array', 'items' => ['$ref' => sprintf('#/definitions/%s', $definitionKey)]],
+            ];
+        } else {
+            $okResponse = [
+                'description' => sprintf('%s resource response', $shortName),
+                'schema' => ['$ref' => sprintf('#/definitions/%s', $definitionKey)],
+            ];
+        }
+
+        return ['200' => $okResponse, '404' => ['description' => 'Resource not found']];
     }
 }
