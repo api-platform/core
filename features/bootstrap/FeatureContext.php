@@ -33,6 +33,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Node;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
@@ -874,6 +875,40 @@ final class FeatureContext implements Context, SnippetAcceptingContext
 
             $this->manager->persist($dummy);
         }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a dummy object with a fourth level relation
+     */
+    public function thereIsADummyObjectWithAFourthLevelRelation()
+    {
+        $fourthLevel = new FourthLevel();
+        $fourthLevel->setLevel(4);
+        $this->manager->persist($fourthLevel);
+
+        $thirdLevel = new ThirdLevel();
+        $thirdLevel->setLevel(3);
+        $thirdLevel->setFourthLevel($fourthLevel);
+        $this->manager->persist($thirdLevel);
+
+        $namedRelatedDummy = new RelatedDummy();
+        $namedRelatedDummy->setName('Hello');
+        $namedRelatedDummy->setThirdLevel($thirdLevel);
+        $this->manager->persist($namedRelatedDummy);
+
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setThirdLevel($thirdLevel);
+        $this->manager->persist($relatedDummy);
+
+        $dummy = new Dummy();
+        $dummy->setName('Dummy with relations');
+        $dummy->setRelatedDummy($namedRelatedDummy);
+        $dummy->addRelatedDummy($namedRelatedDummy);
+        $dummy->addRelatedDummy($relatedDummy);
+        $this->manager->persist($dummy);
 
         $this->manager->flush();
     }
