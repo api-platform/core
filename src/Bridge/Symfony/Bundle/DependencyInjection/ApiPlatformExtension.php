@@ -337,8 +337,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * Registers the Swagger and Swagger UI configuration.
      *
      * @param ContainerBuilder $container
-     * @param array            $config
-     * @param XmlFileLoader    $loader
+     * @param array $config
+     * @param XmlFileLoader $loader
      * @param array $bundles
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
@@ -349,10 +349,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('swagger.xml');
 
-        if ($config['enable_swagger_ui'] && isset($bundles['TwigBundle'])) {
-            $loader->load('swagger-ui.xml');
-            $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
+        if ($config['enable_swagger_ui'] && !isset($bundles['TwigBundle'])) {
+            throw new \LogicException(
+                'You have set "enable_swagger_ui" to "true", but you\'re missing the "symfony/twig-bundle" package!
+                Please install the missing dependency to fix this.'
+            );
         }
+        $loader->load('swagger-ui.xml');
+        $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
 
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
     }
