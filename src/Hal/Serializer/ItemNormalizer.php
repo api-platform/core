@@ -174,24 +174,29 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 continue;
             }
 
+            $relationName = $relation['name'];
+            if ($this->nameConverter) {
+                $relationName = $this->nameConverter->normalize($relationName);
+            }
+
             if ('one' === $relation['cardinality']) {
                 if ('links' === $type) {
-                    $data[$key][$relation['name']]['href'] = $this->getRelationIri($attributeValue);
+                    $data[$key][$relationName]['href'] = $this->getRelationIri($attributeValue);
                     continue;
                 }
 
-                $data[$key][$relation['name']] = $attributeValue;
+                $data[$key][$relationName] = $attributeValue;
                 continue;
             }
 
             // many
-            $data[$key][$relation['name']] = [];
+            $data[$key][$relationName] = [];
             foreach ($attributeValue as $rel) {
                 if ('links' === $type) {
                     $rel = ['href' => $this->getRelationIri($rel)];
                 }
 
-                $data[$key][$relation['name']][] = $rel;
+                $data[$key][$relationName][] = $rel;
             }
         }
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 
@@ -61,7 +62,11 @@ trait OperationDataProviderTrait
      */
     private function getItemData($identifiers, array $attributes, array $context)
     {
-        return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
+        try {
+            return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
+        } catch (PropertyNotFoundException $e) {
+            return null;
+        }
     }
 
     /**

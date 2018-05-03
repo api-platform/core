@@ -58,8 +58,8 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
-            <argument type="service" id="api_platform.identifier.denormalizer" />
-            <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
+            <argument type="service" id="api_platform.identifier.denormalizer" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 

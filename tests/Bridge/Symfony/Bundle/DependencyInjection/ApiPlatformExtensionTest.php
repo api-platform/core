@@ -498,6 +498,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.filter_locator',
             'api_platform.filter_collection_factory',
             'api_platform.filters',
+            'api_platform.identifiers_extractor',
+            'api_platform.identifiers_extractor.cached',
             'api_platform.iri_converter',
             'api_platform.identifier.denormalizer',
             'api_platform.identifier.integer',
