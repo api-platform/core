@@ -26,7 +26,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 {
     const SUBRESOURCE_SUFFIX = '_subresource';
     const FORMAT_SUFFIX = '.{_format}';
-    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => ''];
+    const ROUTE_OPTIONS = ['defaults' => [], 'requirements' => [], 'options' => [], 'host' => '', 'schemes' => [], 'condition' => '', 'controller' => null];
 
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -79,6 +79,12 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             $subresource = $propertyMetadata->getSubresource();
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
+            $isLastItem = $resourceClass === $parentOperation['resource_class'] && $propertyMetadata->isIdentifier();
+
+            // A subresource that is also an identifier can't be a start point
+            if ($isLastItem && (null === $parentOperation || false === $parentOperation['collection'])) {
+                continue;
+            }
 
             $visiting = "$resourceClass $property $subresourceClass";
 
@@ -135,10 +141,12 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             } else {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 $operation['identifiers'] = $parentOperation['identifiers'];
-                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $parentOperation['collection']];
-
-                $operation['operation_name'] = str_replace('get'.self::SUBRESOURCE_SUFFIX, RouteNameGenerator::inflector($property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX, $parentOperation['operation_name']);
-
+                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $isLastItem ? true : $parentOperation['collection']];
+                $operation['operation_name'] = str_replace(
+                    'get'.self::SUBRESOURCE_SUFFIX,
+                    RouteNameGenerator::inflector($isLastItem ? 'item' : $property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX,
+                    $parentOperation['operation_name']
+                );
                 $operation['route_name'] = str_replace($parentOperation['operation_name'], $operation['operation_name'], $parentOperation['route_name']);
 
                 if (!\in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {
@@ -151,11 +159,17 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     $operation['path'] = $subresourceOperation['path'];
                 } else {
                     $operation['path'] = str_replace(self::FORMAT_SUFFIX, '', $parentOperation['path']);
+
                     if ($parentOperation['collection']) {
                         list($key) = end($operation['identifiers']);
                         $operation['path'] .= sprintf('/{%s}', $key);
                     }
-                    $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
+
+                    if ($isLastItem) {
+                        $operation['path'] .= self::FORMAT_SUFFIX;
+                    } else {
+                        $operation['path'] .= sprintf('/%s%s', $this->pathSegmentNameGenerator->getSegmentName($property, $operation['collection']), self::FORMAT_SUFFIX);
+                    }
                 }
             }
 

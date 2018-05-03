@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
@@ -24,10 +26,12 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 final class RequestDataCollector extends DataCollector
 {
     private $metadataFactory;
+    private $filterLocator;
 
-    public function __construct(ResourceMetadataFactoryInterface $metadataFactory)
+    public function __construct(ResourceMetadataFactoryInterface $metadataFactory, ContainerInterface $filterLocator)
     {
         $this->metadataFactory = $metadataFactory;
+        $this->filterLocator = $filterLocator;
     }
 
     /**
@@ -35,20 +39,29 @@ final class RequestDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        $counters = ['ignored_filters' => 0];
         $resourceClass = $request->attributes->get('_api_resource_class');
         $resourceMetadata = $resourceClass ? $this->metadataFactory->create($resourceClass) : null;
 
+        $filters = [];
+        foreach ($resourceMetadata ? $resourceMetadata->getAttribute('filters', []) : [] as $id) {
+            if ($this->filterLocator->has($id)) {
+                $filters[$id] = get_class($this->filterLocator->get($id));
+                continue;
+            }
+
+            $filters[$id] = null;
+            ++$counters['ignored_filters'];
+        }
+
         $this->data = [
             'resource_class' => $resourceClass,
-            'resource_metadata' => $resourceMetadata,
-            'method' => $request->getMethod(),
+            'resource_metadata' => $resourceMetadata ? $this->cloneVar($resourceMetadata) : null,
             'acceptable_content_types' => $request->getAcceptableContentTypes(),
+            'request_attributes' => RequestAttributesExtractor::extractAttributes($request),
+            'filters' => $filters,
+            'counters' => $counters,
         ];
-    }
-
-    public function getMethod(): string
-    {
-        return $this->data['method'] ?? '';
     }
 
     public function getAcceptableContentTypes(): array
@@ -64,6 +77,21 @@ final class RequestDataCollector extends DataCollector
     public function getResourceMetadata()
     {
         return $this->data['resource_metadata'] ?? null;
+    }
+
+    public function getRequestAttributes(): array
+    {
+        return $this->data['request_attributes'] ?? [];
+    }
+
+    public function getFilters(): array
+    {
+        return $this->data['filters'] ?? [];
+    }
+
+    public function getCounters(): array
+    {
+        return $this->data['counters'] ?? [];
     }
 
     /**

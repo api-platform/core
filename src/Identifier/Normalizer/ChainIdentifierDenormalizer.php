@@ -62,9 +62,8 @@ class ChainIdentifierDenormalizer
                 throw new InvalidIdentifierException(sprintf('Invalid identifier "%1$s", "%1$s" was not found.', $key));
             }
 
+            $metadata = $this->getIdentifierMetadata($class, $key);
             foreach ($this->identifierDenormalizers as $normalizer) {
-                $metadata = $this->getIdentifierMetadata($class, $key);
-
                 if (!$normalizer->supportsDenormalization($identifiers[$key], $metadata)) {
                     continue;
                 }
@@ -82,8 +81,10 @@ class ChainIdentifierDenormalizer
 
     private function getIdentifierMetadata($class, $propertyName)
     {
-        $type = $this->propertyMetadataFactory->create($class, $propertyName)->getType();
+        if (!$type = $this->propertyMetadataFactory->create($class, $propertyName)->getType()) {
+            return null;
+        }
 
-        return $type && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType() ? $type->getClassName() : null;
+        return Type::BUILTIN_TYPE_OBJECT === ($builtInType = $type->getBuiltinType()) ? $type->getClassName() : $builtInType;
     }
 }

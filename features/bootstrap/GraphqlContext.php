@@ -17,6 +17,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\RestContext;
 use Behatch\HttpCall\Request;
+use GraphQL\Type\Introspection;
 
 /**
  * Context for GraphQL.
@@ -92,6 +93,15 @@ final class GraphqlContext implements Context
     public function ISendTheGraphqlRequestWithOperation(string $operation)
     {
         $this->graphqlRequest['operation'] = $operation;
+        $this->sendGraphqlRequest();
+    }
+
+    /**
+     * @When I send the query to introspect the schema
+     */
+    public function ISendTheQueryToIntrospectTheSchema()
+    {
+        $this->graphqlRequest = ['query' => Introspection::getIntrospectionQuery()];
         $this->sendGraphqlRequest();
     }
 

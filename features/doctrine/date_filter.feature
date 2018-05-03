@@ -404,7 +404,7 @@ Feature: Date filter on collections
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],dummyFloat,dummyPrice,order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,properties[]}",
+        "hydra:template": "/dummies{?dummyBoolean,relatedDummy.embeddedDummy.dummyBoolean,dummyDate[before],dummyDate[strictly_before],dummyDate[after],dummyDate[strictly_after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyPrice,order[id],order[name],order[description],order[relatedDummy.name],order[relatedDummy.symfony],order[dummyDate],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name,properties[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -483,6 +483,12 @@ Feature: Date filter on collections
             "@type": "IriTemplateMapping",
             "variable": "dummyBoolean[exists]",
             "property": "dummyBoolean",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "relatedDummy[exists]",
+            "property": "relatedDummy",
             "required": false
           },
           {
@@ -716,7 +722,7 @@ Feature: Date filter on collections
           },
           "hydra:search": {
               "@type": "hydra:IriTemplate",
-              "hydra:template": "/dummies{?dummyBoolean,dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],dummyFloat,dummyPrice,order[id],order[name],order[relatedDummy.symfony],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name}",
+              "hydra:template": "/dummies{?dummyBoolean,dummyDate[before],dummyDate[after],relatedDummy.dummyDate[before],relatedDummy.dummyDate[strictly_before],relatedDummy.dummyDate[after],relatedDummy.dummyDate[strictly_after],description[exists],relatedDummy.name[exists],dummyBoolean[exists],relatedDummy[exists],dummyFloat,dummyPrice,order[id],order[name],order[relatedDummy.symfony],dummyFloat[between],dummyFloat[gt],dummyFloat[gte],dummyFloat[lt],dummyFloat[lte],dummyPrice[between],dummyPrice[gt],dummyPrice[gte],dummyPrice[lt],dummyPrice[lte],id,id[],name,alias,description,relatedDummy.name,relatedDummy.name[],relatedDummies,relatedDummies[],dummy,relatedDummies.name}",
               "hydra:variableRepresentation": "BasicRepresentation",
               "hydra:mapping": [
                   {
@@ -784,6 +790,12 @@ Feature: Date filter on collections
                       "variable": "relatedDummy.name[exists]",
                       "property": "relatedDummy.name",
                       "required": false
+                  },
+                  {
+                    "@type": "IriTemplateMapping",
+                    "variable": "relatedDummy[exists]",
+                    "property": "relatedDummy",
+                    "required": false
                   },
                   {
                       "@type": "IriTemplateMapping",

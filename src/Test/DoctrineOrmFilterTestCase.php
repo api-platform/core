@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Test;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractFilterTest extends KernelTestCase
+abstract class DoctrineOrmFilterTestCase extends KernelTestCase
 {
     /**
      * @var ManagerRegistry

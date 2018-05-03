@@ -51,7 +51,6 @@ class ReadListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3.
      */
     public function testLegacyConstructor()
     {
@@ -172,6 +171,32 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function testRetrieveItemNoIdentifier()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+        $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
+        $request->setMethod('GET');
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal());
+        $listener->onKernelRequest($event->reveal());
+
+        $request->attributes->get('data');
+    }
+
     public function testRetrieveSubresource()
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
@@ -197,6 +222,53 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
 
         $this->assertSame($data, $request->attributes->get('data'));
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
+     */
+    public function testRetrieveSubresourceNoDataProvider()
+    {
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request->setMethod('GET');
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener->onKernelRequest($event->reveal());
+
+        $request->attributes->get('data');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function testRetrieveSubresourceNotFound()
+    {
+        $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
+        $identifierDenormalizer->denormalize('1', 'Bar')->willThrow(new InvalidIdentifierException())->shouldBeCalled();
+
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+        $collectionDataProvider->getCollection()->shouldNotBeCalled();
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem()->shouldNotBeCalled();
+
+        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request->setMethod('GET');
+
+        $event = $this->prophesize(GetResponseEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $this->prophesize(SubresourceDataProviderInterface::class)->reveal(), null, $identifierDenormalizer->reveal());
+        $listener->onKernelRequest($event->reveal());
     }
 
     /**

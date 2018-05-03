@@ -81,8 +81,11 @@ class OrderFilter extends AbstractContextAwareFilter
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
+        if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
+            return;
+        }
+
         if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
-            $context['filters'] = null;
             parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 
             return;

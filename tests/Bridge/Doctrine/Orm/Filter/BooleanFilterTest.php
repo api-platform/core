@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class BooleanFilterTest extends AbstractFilterTest
+class BooleanFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = BooleanFilter::class;
 

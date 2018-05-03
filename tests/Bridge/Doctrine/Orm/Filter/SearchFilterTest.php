@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -28,7 +29,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Julien Deniau <julien.deniau@mapado.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  */
-class SearchFilterTest extends AbstractFilterTest
+class SearchFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $alias = 'oo';
     protected $filterClass = SearchFilter::class;

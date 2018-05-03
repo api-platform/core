@@ -375,6 +375,20 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testDisabledDocsRemovesAddLinkHeaderService()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->removeDefinition('api_platform.hydra.listener.response.add_link_header')->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_docs', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_docs', true)->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_docs'] = false;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy($test = false)
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
@@ -489,7 +503,15 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.filter_locator',
             'api_platform.filter_collection_factory',
             'api_platform.filters',
+            'api_platform.identifiers_extractor',
+            'api_platform.identifiers_extractor.cached',
             'api_platform.iri_converter',
+            'api_platform.identifier.denormalizer',
+            'api_platform.identifier.integer',
+            'api_platform.identifier.date_normalizer',
+            'api_platform.identifier.uuid_normalizer',
+            'api_platform.identifiers_extractor',
+            'api_platform.identifiers_extractor.cached',
             'api_platform.item_data_provider',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
@@ -517,11 +539,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_factory.xml',
             'api_platform.metadata.resource.name_collection_factory.cached',
             'api_platform.metadata.resource.name_collection_factory.xml',
-            'api_platform.identifier.denormalizer',
-            'api_platform.identifier.date_normalizer',
-            'api_platform.identifier.uuid_normalizer',
-            'api_platform.identifiers_extractor',
-            'api_platform.identifiers_extractor.cached',
             'api_platform.negotiator',
             'api_platform.operation_method_resolver',
             'api_platform.operation_path_resolver.custom',

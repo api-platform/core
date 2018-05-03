@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  */
-class OrderFilterTest extends AbstractFilterTest
+class OrderFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = OrderFilter::class;
 
@@ -338,6 +339,18 @@ class OrderFilterTest extends AbstractFilterTest
                     ],
                 ],
                 sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'not having order should not throw a deprecation (select unchanged)' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                ],
+                [
+                    'name' => 'q',
+                ],
+                sprintf('SELECT o FROM %s o', Dummy::class),
                 null,
                 $orderFilterFactory,
             ],

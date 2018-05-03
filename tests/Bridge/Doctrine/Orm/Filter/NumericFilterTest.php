@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class NumericFilterTest extends AbstractFilterTest
+class NumericFilterTest extends DoctrineOrmFilterTestCase
 {
     protected $filterClass = NumericFilter::class;
 
