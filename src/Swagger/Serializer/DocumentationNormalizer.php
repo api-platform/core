@@ -20,6 +20,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -729,33 +730,22 @@ final class DocumentationNormalizer implements NormalizerInterface
         return $resourceMetadata->getItemOperationAttribute($operationName, $contextKey, null, true);
     }
 
-    /**
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationName
-     * @param \ArrayObject     $pathOperation
-     */
     private function addPaginationParameters(ResourceMetadata $resourceMetadata, string $operationName, \ArrayObject $pathOperation)
     {
-        if ($this->paginationEnabled && $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
-            $pathOperation['parameters'][] = $this->getPaginationParameters();
-
-            if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-                $pathOperation['parameters'][] = $this->getItemsParPageParameters();
-            }
+        if (!$this->paginationEnabled || !$resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', true, true)) {
+            return;
         }
+
+        $pathOperation['parameters'][] = $this->getPaginationParameters();
+
+        if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
+            $pathOperation['parameters'][] = $this->getItemsParPageParameters();
+        }
+
     }
 
     /**
-     * @param array            $subresourceOperation
-     * @param \ArrayObject     $definitions
-     * @param string           $operationId
-     * @param array            $mimeTypes
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     *
-     * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
-     *
-     * @return \ArrayObject
+     * @throws ResourceClassNotFoundException
      */
     private function addSubresourceOperation(array $subresourceOperation, \ArrayObject $definitions, string $operationId, array $mimeTypes, string $resourceClass, ResourceMetadata $resourceMetadata): \ArrayObject
     {
