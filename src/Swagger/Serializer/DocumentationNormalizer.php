@@ -741,7 +741,6 @@ final class DocumentationNormalizer implements NormalizerInterface
         if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
             $pathOperation['parameters'][] = $this->getItemsParPageParameters();
         }
-
     }
 
     /**
