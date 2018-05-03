@@ -81,14 +81,14 @@ final class IriConverter implements IriConverterInterface
 
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
-        if ($this->identifierDenormalizer) {
-            $context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
-        }
-
         try {
             $identifiers = $this->extractIdentifiers($parameters, $attributes);
         } catch (InvalidIdentifierException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+        }
+
+        if ($this->identifierDenormalizer) {
+            $context[ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER] = true;
         }
 
         if (isset($attributes['subresource_operation_name'])) {
