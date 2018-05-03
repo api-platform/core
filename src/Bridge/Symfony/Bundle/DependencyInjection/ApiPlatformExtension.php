@@ -129,15 +129,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
-        $this->registerMetadataConfiguration($container, $config, $loader);
+        $this->registerMetadataConfiguration($container, $config, $loader, $bundles);
         $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerApiKeysConfiguration($container, $config, $loader);
-        $this->registerSwaggerConfiguration($container, $config, $loader);
+        $this->registerSwaggerConfiguration($container, $config, $loader, $bundles);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($formats, $loader);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphqlConfiguration($container, $config, $loader);
+        $this->registerGraphqlConfiguration($container, $config, $loader, $bundles);
         $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
@@ -202,8 +202,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
+     * @param array            $bundles
      */
-    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
@@ -219,7 +220,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
 
         // The "annotation_reader" service is only available if DoctrineBundle is loaded.
-        $bundles = $container->getParameter('kernel.bundles');
         if (class_exists(Annotation::class) && isset($bundles['DoctrineBundle'])) {
             $loader->load('metadata/annotation.xml');
         }
@@ -339,8 +339,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
+     * @param array $bundles
      */
-    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
         if (!$config['enable_swagger']) {
             return;
@@ -348,7 +349,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('swagger.xml');
 
-        $bundles = $container->getParameter('kernel.bundles');
         if ($config['enable_swagger_ui'] && isset($bundles['TwigBundle'])) {
             $loader->load('swagger-ui.xml');
             $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
@@ -424,8 +424,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
+     * @param array            $bundles
      */
-    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
         if (!$config['graphql']) {
             return;
@@ -436,7 +437,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('graphql.xml');
 
-        $bundles = $container->getParameter('kernel.bundles');
         if (isset($bundles['TwigBundle'])) {
             $loader->load('graphql-ui.xml');
         } else {
