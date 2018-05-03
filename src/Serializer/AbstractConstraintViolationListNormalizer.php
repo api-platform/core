@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -28,9 +29,11 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     const FORMAT = null; // Must be overrode
 
     private $serializePayloadFields;
+    private $nameConverter;
 
-    public function __construct(array $serializePayloadFields = null)
+    public function __construct(array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
+        $this->nameConverter = $nameConverter;
         $this->serializePayloadFields = $serializePayloadFields;
     }
 
@@ -47,7 +50,10 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         $violations = $messages = [];
 
         foreach ($constraintViolationList as $violation) {
-            $violationData = ['propertyPath' => $violation->getPropertyPath(), 'message' => $violation->getMessage()];
+            $violationData = [
+                'propertyPath' => $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath()) : $violation->getPropertyPath(),
+                'message' => $violation->getMessage(),
+            ];
 
             $constraint = $violation->getConstraint();
             if ($this->serializePayloadFields && $constraint && $constraint->payload) {
