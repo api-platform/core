@@ -337,9 +337,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * Registers the Swagger and Swagger UI configuration.
      *
      * @param ContainerBuilder $container
-     * @param array $config
-     * @param XmlFileLoader $loader
-     * @param array $bundles
+     * @param array            $config
+     * @param XmlFileLoader    $loader
+     * @param array            $bundles
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
