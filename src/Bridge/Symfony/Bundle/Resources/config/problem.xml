@@ -14,6 +14,7 @@
 
         <service id="api_platform.problem.normalizer.constraint_violation_list" class="ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             
             <tag name="serializer.normalizer" priority="16" />
         </service>
