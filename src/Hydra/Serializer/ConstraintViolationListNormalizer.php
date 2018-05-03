@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} to a Hydra error representation.
@@ -27,9 +28,9 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 
     private $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null)
+    public function __construct(UrlGeneratorInterface $urlGenerator, array $serializePayloadFields = null, NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($serializePayloadFields);
+        parent::__construct($serializePayloadFields, $nameConverter);
 
         $this->urlGenerator = $urlGenerator;
     }
