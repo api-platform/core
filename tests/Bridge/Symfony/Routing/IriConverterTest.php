@@ -101,6 +101,30 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
 
+    public function testGetItemFromIriWithOperationName()
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProviderProphecy->getItem('AppBundle\Entity\User', '3', 'operation_name', ['fetch_data' => true])
+            ->willReturn('foo')
+            ->shouldBeCalledTimes(1);
+
+        $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
+
+        $routerProphecy = $this->prophesize(RouterInterface::class);
+        $routerProphecy->match('/users/3')->willReturn([
+            '_api_resource_class' => 'AppBundle\Entity\User',
+            '_api_item_operation_name' => 'operation_name',
+            'id' => 3,
+        ])->shouldBeCalledTimes(1);
+
+        $converter = $this->getIriConverter($routerProphecy, null, $itemDataProviderProphecy);
+        $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), 'foo');
+    }
+
     public function testGetIriFromResourceClass()
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
@@ -199,7 +223,7 @@ class IriConverterTest extends TestCase
             'id' => 3,
         ])->shouldBeCalledTimes(1);
 
-        $converter = $this->getIriConverter($routerProphecy, null, $itemDataProviderProphecy, $identifierDenormalizerProphecy);
+        $converter = $this->getIriConverter($routerProphecy, null, $itemDataProviderProphecy, null, $identifierDenormalizerProphecy);
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
 
@@ -216,11 +240,9 @@ class IriConverterTest extends TestCase
             '_api_subresource_operation_name' => 'get_subresource',
             'id' => 3,
         ])->shouldBeCalledTimes(1);
-        $identifierDenormalizerProphecy = $this->prophesize(ChainIdentifierDenormalizer::class);
-        $identifierDenormalizerProphecy->denormalize('3', Dummy::class)->shouldBeCalled()->willReturn(['id' => 3]);
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
-        $subresourceDataProviderProphecy->getSubresource(Dummy::class, ['id' => ['id' => 3]], $subresourceContext + ['fetch_data' => true, ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true], 'get_subresource')->shouldBeCalled()->willReturn($item);
-        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $identifierDenormalizerProphecy, $subresourceDataProviderProphecy);
+        $subresourceDataProviderProphecy->getSubresource(Dummy::class, ['id' => 3], $subresourceContext + ['fetch_data' => true], 'get_subresource')->shouldBeCalled()->willReturn($item);
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $subresourceDataProviderProphecy);
         $this->assertEquals($converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]), $item);
     }
 
@@ -244,7 +266,7 @@ class IriConverterTest extends TestCase
         $identifierDenormalizerProphecy->denormalize('3', Dummy::class)->shouldBeCalled()->willReturn(['id' => 3]);
         $subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProviderProphecy->getSubresource(Dummy::class, ['id' => ['id' => 3]], $subresourceContext + ['fetch_data' => true, ChainIdentifierDenormalizer::HAS_IDENTIFIER_DENORMALIZER => true], 'get_subresource')->shouldBeCalled()->willReturn(null);
-        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $identifierDenormalizerProphecy, $subresourceDataProviderProphecy);
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $subresourceDataProviderProphecy, $identifierDenormalizerProphecy);
         $converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]);
     }
 
@@ -265,7 +287,7 @@ class IriConverterTest extends TestCase
         ])->shouldBeCalledTimes(1);
         $identifierDenormalizerProphecy = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizerProphecy->denormalize('3', Dummy::class)->shouldBeCalled()->willThrow(new InvalidIdentifierException('fail'));
-        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, $identifierDenormalizerProphecy);
+        $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, null, $identifierDenormalizerProphecy);
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
 
@@ -302,7 +324,7 @@ class IriConverterTest extends TestCase
         return $resourceClassResolver->reveal();
     }
 
-    private function getIriConverter($routerProphecy = null, $routeNameResolverProphecy = null, $itemDataProviderProphecy = null, $identifierDenormalizerProphecy = null, $subresourceDataProviderProphecy = null)
+    private function getIriConverter($routerProphecy = null, $routeNameResolverProphecy = null, $itemDataProviderProphecy = null, $subresourceDataProviderProphecy = null, $identifierDenormalizerProphecy = null)
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -328,8 +350,8 @@ class IriConverterTest extends TestCase
             $routerProphecy->reveal(),
             null,
             new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
-            $identifierDenormalizerProphecy ? $identifierDenormalizerProphecy->reveal() : null,
-            $subresourceDataProviderProphecy ? $subresourceDataProviderProphecy->reveal() : null
+            $subresourceDataProviderProphecy ? $subresourceDataProviderProphecy->reveal() : null,
+            $identifierDenormalizerProphecy ? $identifierDenormalizerProphecy->reveal() : null
         );
     }
 }
