@@ -294,6 +294,17 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
             ],
+            'include null before and after (include_null_before_and_after)' => [
+                [
+                    'dummyDate' => 'include_null_before_and_after',
+                ],
+                [
+                    'dummyDate' => [
+                        'after' => '2015-04-05',
+                    ],
+                ],
+                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
+            ],
             'bad date format' => [
                 [
                     'dummyDate' => null,
