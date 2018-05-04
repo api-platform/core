@@ -43,7 +43,6 @@ use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
-use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\FileLocator;
@@ -227,7 +226,7 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $builder = new ContainerBuilder();
 
-        $loader = new XmlFileLoader($builder, new FileLocator(\dirname(__DIR__) . '/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
+        $loader = new XmlFileLoader($builder, new FileLocator(\dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
         $loader->load('api.xml');
         $loader->load('fos_user.xml');
 
@@ -420,7 +419,7 @@ class ApiPlatformExtensionTest extends TestCase
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
             $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
-            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.' . $format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
         $definitions = [
             'api_platform.swagger.normalizer.documentation',
@@ -480,7 +479,7 @@ class ApiPlatformExtensionTest extends TestCase
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
             $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
-            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.' . $format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
         $definitions = [
             'api_platform.jsonld.normalizer.item',
@@ -585,7 +584,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.bundles_metadata')->willReturn([
             'TestBundle' => [
                 'parent' => null,
-                'path' => realpath(__DIR__ . '/../../../../Fixtures/TestBundle'),
+                'path' => realpath(__DIR__.'/../../../../Fixtures/TestBundle'),
                 'namespace' => TestBundle::class,
             ],
         ])->shouldBeCalled();
@@ -799,7 +798,7 @@ class ApiPlatformExtensionTest extends TestCase
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
             $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
-            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.' . $format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
 
         $definitions = [
