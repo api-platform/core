@@ -114,7 +114,7 @@ final class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class))->info('To enable or disable GraphQL.')->end()
+                        ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class) && class_exists(TwigBundle::class))->info('To enable or disable GraphQL.')->end()
                         ->arrayNode('graphiql')
                             ->canBeEnabled()
                             ->addDefaultsIfNotSet()

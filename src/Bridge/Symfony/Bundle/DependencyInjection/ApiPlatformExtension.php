@@ -348,6 +348,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('swagger.xml');
+        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
 
         if ($config['enable_swagger_ui'] && !isset($bundles['TwigBundle'])) {
             throw new \LogicException(
@@ -357,8 +358,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
         $loader->load('swagger-ui.xml');
         $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
-
-        $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
     }
 
     /**
@@ -442,17 +441,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        if ($config['graphql']['enabled'] && !isset($bundles['TwigBundle'])) {
+            throw new \LogicException(
+                'You have set "graphql.enabled" to "true", but you\'re missing the "symfony/twig-bundle" package!
+                Please install the missing dependency to fix this.'
+            );
+        }
         $container->setParameter('api_platform.graphql.enabled', $config['graphql']['enabled']);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $config['graphql']['graphiql']['enabled']);
 
         $loader->load('graphql.xml');
-
-        if (isset($bundles['TwigBundle'])) {
-            $loader->load('graphql-ui.xml');
-        } else {
-            // Required as the GraphQL routing rely on the not loaded EntryPoint service.
-            $container->setParameter('api_platform.graphql.enabled', false);
-        }
     }
 
     /**

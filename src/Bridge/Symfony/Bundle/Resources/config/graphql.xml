@@ -53,6 +53,17 @@
             <argument>%api_platform.collection.pagination.enabled%</argument>
         </service>
 
+        <!-- Action -->
+
+        <service id="api_platform.graphql.action.entrypoint" class="ApiPlatform\Core\GraphQl\Action\EntrypointAction" public="true">
+            <argument type="service" id="api_platform.graphql.schema_builder" />
+            <argument type="service" id="api_platform.graphql.executor" />
+            <argument type="service" id="twig" />
+            <argument>%kernel.debug%</argument>
+            <argument>%api_platform.graphql.graphiql.enabled%</argument>
+            <argument>%api_platform.title%</argument>
+        </service>
+
         <!-- Serializer -->
 
         <service id="api_platform.graphql.normalizer.item" class="ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer" public="false">
