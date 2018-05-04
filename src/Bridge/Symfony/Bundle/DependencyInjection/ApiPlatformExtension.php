@@ -355,8 +355,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 'You have set "enable_swagger_ui" to "true", but you\'re missing the "symfony/twig-bundle" package!
                 Please install the missing dependency to fix this.'
             );
+        } elseif ($config['enable_swagger_ui']) {
+            $loader->load('swagger-ui.xml');
         }
-        $loader->load('swagger-ui.xml');
         $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
     }
 
