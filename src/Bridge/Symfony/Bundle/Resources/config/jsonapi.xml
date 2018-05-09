@@ -57,6 +57,9 @@
         </service>
 
         <!-- Event listener -->
+        <service id="api_platform.jsonapi.listener.request.include_parameters" class="ApiPlatform\Core\JsonApi\EventListener\IncludeParametersListener">
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
+        </service>
 
         <service id="api_platform.jsonapi.listener.request.transform_pagination_parameters" class="ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
