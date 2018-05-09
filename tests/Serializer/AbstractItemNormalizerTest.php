@@ -737,9 +737,10 @@ class AbstractItemNormalizerTest extends TestCase
             return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
         };
 
-        $iriConverterProphecy = $this->prophesize(IriToIdentifierConverterInterface::class)->willImplement(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getItemFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->shouldBeCalled();
-        $iriConverterProphecy->getIriFromPlainIdentifier('1', RelatedDummy::class)->shouldBeCalled()->willReturn('/related_dummies/1');
+        $iriToIdentifierConverterProphecy = $this->prophesize(IriToIdentifierConverterInterface::class);
+        $iriToIdentifierConverterProphecy->getIriFromPlainIdentifier([1], RelatedDummy::class)->shouldBeCalled()->willReturn('/related_dummies/1');
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -758,6 +759,7 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             true,
+            $iriToIdentifierConverterProphecy->reveal(),
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -787,14 +789,15 @@ class AbstractItemNormalizerTest extends TestCase
             )
         )->shouldBeCalled();
 
-        $iriConverterProphecy = $this->prophesize(IriToIdentifierConverterInterface::class)->willImplement(IriConverterInterface::class);
 
         $getItemFromIriSecondArgCallback = function ($arg) {
             return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
         };
 
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getItemFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->shouldBeCalled()->willThrow(new ItemNotFoundException('Item with id "1" not found for class "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy".'));
-        $iriConverterProphecy->getIriFromPlainIdentifier('1', RelatedDummy::class)->shouldBeCalled()->willReturn('/related_dummies/1');
+        $iriToIdentifierConverterProphecy = $this->prophesize(IriToIdentifierConverterInterface::class);
+        $iriToIdentifierConverterProphecy->getIriFromPlainIdentifier([1], RelatedDummy::class)->shouldBeCalled()->willReturn('/related_dummies/1');
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -813,6 +816,7 @@ class AbstractItemNormalizerTest extends TestCase
             null,
             null,
             true,
+            $iriToIdentifierConverterProphecy->reveal(),
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 

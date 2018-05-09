@@ -44,17 +44,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
-    /**
-     * @var IriToIdentifierConverterInterface|IriConverterInterface
-     */
     protected $iriConverter;
     protected $resourceClassResolver;
     protected $propertyAccessor;
     protected $localCache = [];
     protected $itemDataProvider;
     protected $allowPlainIdentifiers;
+    protected $iriToIdentifierConverter;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, IriToIdentifierConverterInterface $iriToIdentifierConverter = null)
     {
         parent::__construct($classMetadataFactory, $nameConverter);
 
@@ -68,6 +66,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
         $this->itemDataProvider = $itemDataProvider;
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
+        $this->iriToIdentifierConverter = $iriToIdentifierConverter;
 
         $this->setCircularReferenceHandler(function ($object) {
             return $this->iriConverter->getIriFromItem($object);
@@ -317,11 +316,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (!\is_array($value)) {
             try {
                 // repeat the code so that IRIs keep working with the json format
-                if (true === $this->allowPlainIdentifiers && ($this->iriConverter instanceof IriToIdentifierConverterInterface && $this->iriConverter instanceof IriConverterInterface)) {
-                    return $this->iriConverter->getItemFromIri($this->iriConverter->getIriFromPlainIdentifier($value, $className), $context + ['fetch_data' => true]);
+                if (($allowPlainIdentifiers = true === $this->allowPlainIdentifiers) && $this->iriToIdentifierConverter) {
+                    return $this->iriConverter->getItemFromIri($this->iriToIdentifierConverter->getIriFromPlainIdentifier((array) $value, $className), $context + ['fetch_data' => true]);
                 }
 
-                if (true === $this->allowPlainIdentifiers && $this->itemDataProvider) {
+                if ($allowPlainIdentifiers && $this->itemDataProvider) {
                     return $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
                 }
             } catch (ItemNotFoundException $e) {

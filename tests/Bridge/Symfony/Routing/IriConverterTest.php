@@ -88,7 +88,7 @@ class IriConverterTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3.
      * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
      */
     public function testIdentifiersExtractorDeprecation()
@@ -113,6 +113,7 @@ class IriConverterTest extends TestCase
             $itemDataProviderProphecy->reveal(),
             $routeNameResolverProphecy->reveal(),
             $routerProphecy->reveal(),
+            null,
             null,
             null,
             $identifierDenormalizer->reveal()
@@ -254,9 +255,10 @@ class IriConverterTest extends TestCase
             $routerProphecy->reveal(),
             null,
             new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            null,
             $identifierDenormalizer->reveal()
         );
-        $this->assertEquals($converter->getIriFromPlainIdentifier(1, Dummy::class), '/dummies/1');
+        $this->assertEquals($converter->getIriFromPlainIdentifier([1], Dummy::class), '/dummies/1');
     }
 
     /**
@@ -359,7 +361,7 @@ class IriConverterTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3.
      * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
      */
     public function testLegacyConstructor()
@@ -421,9 +423,10 @@ class IriConverterTest extends TestCase
             $routerProphecy->reveal(),
             null,
             new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            null,
             $identifierDenormalizer->reveal()
         );
-        $converter->getIriFromPlainIdentifier(1, Dummy::class);
+        $converter->getIriFromPlainIdentifier([1], Dummy::class);
     }
 
     /**
@@ -459,6 +462,7 @@ class IriConverterTest extends TestCase
             $routerProphecy->reveal(),
             null,
             $identifierExtractorProphecy->reveal(),
+            null,
             $identifierDenormalizer->reveal()
         );
         $converter->getIriFromItem($dummy);
@@ -466,7 +470,7 @@ class IriConverterTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3.
+     * @expectedDeprecation Not injecting "ApiPlatform\Core\Api\IdentifiersExtractorInterface" is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3.
      * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
      * @expectedExceptionMessage Unable to generate an IRI for the item of type "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
      */
@@ -495,7 +499,7 @@ class IriConverterTest extends TestCase
             $routerProphecy->reveal(),
             null
         );
-        $converter->getIriFromPlainIdentifier(1, Dummy::class);
+        $converter->getIriFromPlainIdentifier([1], Dummy::class);
     }
 
     private function getResourceClassResolver()
