@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -157,7 +158,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
         if (!\is_string($attribute)) {
-            throw new InvalidArgumentException('Invalid value provided (invalid IRI?).');
+            throw new InvalidValueException('Invalid value provided (invalid IRI?).');
         }
 
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
@@ -304,7 +305,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['resource_class'] = $className;
             $context['api_allow_update'] = true;
 
-            return $this->serializer->denormalize($value, $className, $format, $context);
+            try {
+                return $this->serializer->denormalize($value, $className, $format, $context);
+            } catch (InvalidValueException $e) {
+                if (!$this->allowPlainIdentifiers || null === $this->itemDataProvider) {
+                    throw $e;
+                }
+            }
         }
 
         if (!\is_array($value)) {
