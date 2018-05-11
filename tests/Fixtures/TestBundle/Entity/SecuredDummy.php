@@ -30,6 +30,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     },
  *     itemOperations={
  *         "get"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"}
+ *     },
+ *     graphql={
+ *         "query"={},
+ *         "delete"={},
+ *         "update"={},
+ *         "create"={"access_control"="has_role('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
  *     }
  * )
  * @ORM\Entity

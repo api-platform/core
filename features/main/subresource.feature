@@ -221,17 +221,17 @@ Feature: Subresource support
     """
 
   Scenario: Create a dummy with a relation that is a subresource
-       When I add "Content-Type" header equal to "application/ld+json"
-       And I send a "POST" request to "/dummies" with body:
-       """
-       {
-         "name": "Dummy with relations",
-         "relatedDummy": "/dummies/1/related_dummies/2"
-       }
-       """
-       Then the response status code should be 201
-       And the response should be in JSON
-       And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Dummy with relations",
+      "relatedDummy": "/dummies/1/related_dummies/2"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
 
   Scenario: Get the embedded relation subresource item at the third level
     When I send a "GET" request to "/dummies/1/related_dummies/1/third_level"
@@ -316,7 +316,6 @@ Feature: Subresource support
     }
     """
 
-  @dropSchema
   Scenario: Recursive resource
     When I send a "GET" request to "/dummy_products/2"
     And the response status code should be 200

@@ -31,7 +31,6 @@ Feature: FOSUser integration
     """
     And the password "azerty" for user 1 should be hashed
 
-  @dropSchema
   Scenario: Delete a user
     When I send a "DELETE" request to "/users/1"
     Then the response status code should be 204

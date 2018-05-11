@@ -122,7 +122,7 @@ class SchemaBuilderTest extends TestCase
         $schema = $mockedSchemaBuilder->getSchema();
         $queryFields = $schema->getConfig()->getQuery()->getFields();
 
-        $this->assertEquals([
+        $this->assertSame([
             'node',
             'shortName1',
             'shortName1s',
@@ -135,7 +135,7 @@ class SchemaBuilderTest extends TestCase
         /** @var ObjectType $type */
         $type = $queryFields['shortName2']->getType();
         $resourceTypeFields = $type->getFields();
-        $this->assertEquals(
+        $this->assertSame(
             ['id', 'intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty'],
             array_keys($resourceTypeFields)
         );
@@ -146,30 +146,25 @@ class SchemaBuilderTest extends TestCase
         if ($paginationEnabled) {
             /** @var ObjectType $objectPropertyFieldType */
             $objectPropertyFieldType = $type->getFields()['objectProperty']->getType();
-            $this->assertEquals($objectPropertyFieldType->name, 'ShortName1Connection');
+            $this->assertSame('ShortName1Connection', $objectPropertyFieldType->name);
+            $this->assertEquals(GraphQLType::nonNull(GraphQLType::int()), $objectPropertyFieldType->getField('totalCount')->getType());
             /** @var ListOfType $edgesType */
             $edgesType = $objectPropertyFieldType->getFields()['edges']->getType();
             $edgeType = $edgesType->getWrappedType();
-            $this->assertEquals($edgeType->name, 'ShortName1Edge');
-            $this->assertEquals($edgeType->getFields()['cursor']->getType(), GraphQLType::nonNull(GraphQLType::string()));
-            $this->assertEquals(
-                $type,
-                $edgeType->getFields()['node']->getType()
-            );
+            $this->assertSame('ShortName1Edge', $edgeType->name);
+            $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $edgeType->getField('cursor')->getType());
+            $this->assertEquals($type, $edgeType->getField('node')->getType());
         } else {
             /** @var ListOfType $objectPropertyFieldType */
             $objectPropertyFieldType = $type->getFields()['objectProperty']->getType();
-            $this->assertEquals(
-                $type,
-                $objectPropertyFieldType->getWrappedType()
-            );
+            $this->assertEquals($type, $objectPropertyFieldType->getWrappedType());
         }
 
         // DateTime is considered as a string instead of an object.
         /** @var ObjectType $type */
         $type = $queryFields['shortName3']->getType();
         /** @var ListOfType $objectPropertyFieldType */
-        $objectPropertyFieldType = $type->getFields()['objectProperty']->getType();
+        $objectPropertyFieldType = $type->getField('objectProperty')->getType();
         $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $objectPropertyFieldType);
     }
 

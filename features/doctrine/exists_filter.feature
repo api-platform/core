@@ -34,7 +34,6 @@ Feature: Exists filter on collections
     }
     """
 
-  @dropSchema
   Scenario: Get collection where exists does exist
     When I send a "GET" request to "/dummies?dummyBoolean[exists]=1"
     Then the response status code should be 200

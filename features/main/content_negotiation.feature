@@ -110,7 +110,6 @@ Feature: Content Negotiation support
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
-  @dropSchema
   Scenario: If the request format is HTML, the error should be in HTML
     When I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies/666"

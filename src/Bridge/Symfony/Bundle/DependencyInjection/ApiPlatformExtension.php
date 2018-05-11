@@ -26,6 +26,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\Version;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -122,6 +123,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('security.xml');
         }
 
+        if (class_exists(Uuid::class)) {
+            $loader->load('ramsey_uuid.xml');
+        }
+
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
         $this->registerMetadataConfiguration($container, $config, $loader);
@@ -138,6 +143,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
         $this->registerHttpCache($container, $config, $loader, $useDoctrine);
         $this->registerValidatorConfiguration($container, $config, $loader);
+        $this->registerDataCollector($container, $config, $loader);
     }
 
     /**
@@ -204,7 +210,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         list($xmlResources, $yamlResources) = $this->getResourcesToWatch($container, $config['mapping']['paths']);
 
-        if (isset($config['resource_class_directories']) && $config['resource_class_directories']) {
+        if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
                 $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
             ));
@@ -515,7 +521,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
             $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
-            $definition->addArgument(['base_uri' => $url]);
+            $definition->addArgument(['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']);
 
             $definitions[] = $definition;
         }
@@ -557,5 +563,17 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
+    }
+
+    /**
+     * Registers the DataCollector configuration.
+     */
+    private function registerDataCollector(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    {
+        if (!$config['enable_profiler']) {
+            return;
+        }
+
+        $loader->load('data_collector.xml');
     }
 }

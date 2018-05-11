@@ -424,6 +424,14 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
+    public function testGetResultWithoutFetchJoinCollection()
+    {
+        $result = $this->getPaginationExtensionResult(false, false, false);
+
+        $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
+        $this->assertInstanceOf(PaginatorInterface::class, $result);
+    }
+
     public function testGetResultWithPartial()
     {
         $result = $this->getPaginationExtensionResult(true);
@@ -440,7 +448,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    private function getPaginationExtensionResult(bool $partial = false, bool $legacy = false)
+    private function getPaginationExtensionResult(bool $partial = false, bool $legacy = false, bool $fetchJoinCollection = true)
     {
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['partial' => $partial]));
@@ -448,7 +456,7 @@ class PaginationExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         if (!$legacy) {
-            $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], ['pagination_partial' => false, 'pagination_client_partial' => true]))->shouldBeCalled();
+            $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], ['pagination_partial' => false, 'pagination_client_partial' => true, 'pagination_fetch_join_collection' => $fetchJoinCollection]))->shouldBeCalled();
         }
 
         $configuration = new Configuration();

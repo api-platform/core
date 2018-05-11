@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 
@@ -63,11 +61,7 @@ trait OperationDataProviderTrait
      */
     private function getItemData($identifiers, array $attributes, array $context)
     {
-        try {
-            return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
-        } catch (PropertyNotFoundException $e) {
-            return null;
-        }
+        return $this->itemDataProvider->getItem($attributes['resource_class'], $identifiers, $attributes['item_operation_name'], $context);
     }
 
     /**
@@ -96,10 +90,16 @@ trait OperationDataProviderTrait
     {
         if (isset($attributes['item_operation_name'])) {
             if (!isset($parameters['id'])) {
-                throw new InvalidArgumentException('Parameter "id" not found');
+                throw new InvalidIdentifierException('Parameter "id" not found');
             }
 
-            return $parameters['id'];
+            $id = $parameters['id'];
+
+            if ($this->identifierDenormalizer) {
+                return $this->identifierDenormalizer->denormalize((string) $id, $attributes['resource_class']);
+            }
+
+            return $id;
         }
 
         $identifiers = [];
@@ -110,6 +110,10 @@ trait OperationDataProviderTrait
             }
 
             $identifiers[$id] = $parameters[$id];
+
+            if ($this->identifierDenormalizer) {
+                $identifiers[$id] = $this->identifierDenormalizer->denormalize((string) $identifiers[$id], $resourceClass);
+            }
         }
 
         return $identifiers;

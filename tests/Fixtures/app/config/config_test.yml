@@ -13,9 +13,11 @@ framework:
 
 doctrine:
     dbal:
-        driver:   'pdo_sqlite'
-        path:     '%kernel.cache_dir%/db.sqlite'
-        charset:  'UTF8'
+        driver:                       'pdo_sqlite'
+        path:                         '%kernel.cache_dir%/db.sqlite'
+        charset:                      'UTF8'
+        types:
+            uuid:  Ramsey\Uuid\Doctrine\UuidType
 
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'

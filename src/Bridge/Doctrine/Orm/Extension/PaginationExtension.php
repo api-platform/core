@@ -148,7 +148,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
     {
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder));
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($queryBuilder, $this->useFetchJoinCollection($queryBuilder, $resourceClass, $operationName));
         $doctrineOrmPaginator->setUseOutputWalkers($this->useOutputWalkers($queryBuilder));
 
         $resourceMetadata = null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass);
@@ -197,14 +197,20 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      * Determines whether the Paginator should fetch join collections, if the root entity uses composite identifiers it should not.
      *
      * @see https://github.com/doctrine/doctrine2/issues/2910
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return bool
      */
-    private function useFetchJoinCollection(QueryBuilder $queryBuilder): bool
+    private function useFetchJoinCollection(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null): bool
     {
-        return !QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry);
+        if (QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder, $this->managerRegistry)) {
+            return false;
+        }
+
+        if (null === $resourceClass) {
+            return true;
+        }
+
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        return  $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', true, true);
     }
 
     /**

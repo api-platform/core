@@ -301,7 +301,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $pathOperation['parameters'][] = $this->getPaginationParameters();
 
                 if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-                    $pathOperation['parameters'][] = $this->getItemsParPageParameters();
+                    $pathOperation['parameters'][] = $this->getItemsPerPageParameters();
                 }
             }
 
@@ -737,7 +737,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      *
      * @return array
      */
-    private function getItemsParPageParameters(): array
+    private function getItemsPerPageParameters(): array
     {
         return [
             'name' => $this->itemsPerPageParameterName,

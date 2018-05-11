@@ -1,6 +1,5 @@
 Feature: GraphQL collection support
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection through a GraphQL query
     Given there are 4 dummy objects with relatedDummy and its thirdLevel
     When I send the following GraphQL request:
@@ -34,7 +33,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.edges[2].node.relatedDummy.thirdLevel.level" should be equal to 3
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve an nonexistent collection through a GraphQL query
     When I send the following GraphQL request:
     """
@@ -60,7 +58,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be false
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection with a nested collection through a GraphQL query
     Given there are 4 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:
@@ -89,7 +86,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.edges[2].node.relatedDummies.edges[1].node.name" should be equal to "RelatedDummy23"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a collection and an item through a GraphQL query
     Given there are 3 dummy objects with dummyDate
     And there are 2 dummy group objects
@@ -117,7 +113,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummyGroup.foo" should be equal to "Foo #2"
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a specific number of items in a collection through a GraphQL query
     Given there are 4 dummy objects
     When I send the following GraphQL request:
@@ -138,7 +133,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.edges" should have 2 elements
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve a specific number of items in a nested collection through a GraphQL query
     Given there are 2 dummy objects having each 5 relatedDummies
     When I send the following GraphQL request:
@@ -167,7 +161,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.edges[0].node.relatedDummies.edges" should have 2 elements
 
   @createSchema
-  @dropSchema
   Scenario: Paginate through collections through a GraphQL query
     Given there are 4 dummy objects having each 4 relatedDummies
     When I send the following GraphQL request:
@@ -184,6 +177,7 @@ Feature: GraphQL collection support
                 }
                 cursor
               }
+              totalCount
               pageInfo {
                 endCursor
                 hasNextPage
@@ -192,6 +186,7 @@ Feature: GraphQL collection support
           }
           cursor
         }
+        totalCount
         pageInfo {
           endCursor
           hasNextPage
@@ -204,10 +199,12 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.pageInfo.endCursor" should be equal to "Mw=="
     And the JSON node "data.dummies.pageInfo.hasNextPage" should be true
+    And the JSON node "data.dummies.totalCount" should be equal to 4
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #2"
     And the JSON node "data.dummies.edges[1].cursor" should be equal to "MQ=="
     And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.endCursor" should be equal to "Mw=="
     And the JSON node "data.dummies.edges[1].node.relatedDummies.pageInfo.hasNextPage" should be true
+    And the JSON node "data.dummies.edges[1].node.relatedDummies.totalCount" should be equal to 4
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy12"
     And the JSON node "data.dummies.edges[1].node.relatedDummies.edges[0].cursor" should be equal to "MA=="
     When I send the following GraphQL request:
@@ -321,7 +318,6 @@ Feature: GraphQL collection support
     And the JSON node "data.dummies.edges" should have 0 element
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve an item with composite primitive identifiers through a GraphQL query
     Given there are composite primitive identifiers objects
     When I send the following GraphQL request:
@@ -338,7 +334,6 @@ Feature: GraphQL collection support
     And the JSON node "data.compositePrimitiveItem.description" should be equal to "This is bar."
 
   @createSchema
-  @dropSchema
   Scenario: Retrieve an item with composite identifiers through a GraphQL query
     Given there are Composite identifier objects
     When I send the following GraphQL request:

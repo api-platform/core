@@ -40,29 +40,28 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
      */
     public function getResourceClass($value, string $resourceClass = null, bool $strict = false): string
     {
-        if (\is_object($value) && !$value instanceof \Traversable) {
-            $typeToFind = $type = $this->getObjectClass($value);
-            if (null === $resourceClass) {
-                $resourceClass = $typeToFind;
-            }
-        } elseif (null === $resourceClass) {
+        $type = \is_object($value) && !$value instanceof \Traversable ? $this->getObjectClass($value) : $resourceClass;
+        $resourceClass = $resourceClass ?? $type;
+
+        if (null === $resourceClass) {
             throw new InvalidArgumentException(sprintf('No resource class found.'));
-        } else {
-            $typeToFind = $type = $resourceClass;
         }
 
-        if (($strict && isset($type) && $resourceClass !== $type) || false === $isResourceClass = $this->isResourceClass($typeToFind)) {
-            if (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass)) {
-                return $type;
-            }
-            if ($isResourceClass ?? $this->isResourceClass($typeToFind)) {
-                return $typeToFind;
-            }
-
-            throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $typeToFind));
+        if (
+            null === $type
+            || ((!$strict || $resourceClass === $type) && $isResourceClass = $this->isResourceClass($type))
+        ) {
+            return $resourceClass;
         }
 
-        return $resourceClass;
+        if (
+            ($isResourceClass ?? $this->isResourceClass($type))
+            || (is_subclass_of($type, $resourceClass) && $this->isResourceClass($resourceClass))
+        ) {
+            return $type;
+        }
+
+        throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $type));
     }
 
     /**

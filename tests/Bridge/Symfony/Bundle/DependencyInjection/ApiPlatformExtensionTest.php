@@ -73,6 +73,22 @@ class ApiPlatformExtensionTest extends TestCase
         'http_cache' => ['invalidation' => [
             'enabled' => true,
             'varnish_urls' => ['test'],
+            'request_options' => [
+                'allow_redirects' => [
+                    'max' => 5,
+                    'protocols' => ['http', 'https'],
+                    'stric' => false,
+                    'referer' => false,
+                    'track_redirects' => false,
+                ],
+                'http_errors' => true,
+                'decode_content' => false,
+                'verify' => false,
+                'cookies' => true,
+                'headers' => [
+                    'User-Agent' => 'none',
+                ],
+            ],
         ]],
     ]];
 
@@ -344,6 +360,17 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testRegisterHttpCacheWhenEnabledWithNoRequestOption()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        unset($config['api_platform']['http_cache']['invalidation']['request_options']);
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     public function testDisabledDocsRemovesAddLinkHeaderService()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
@@ -474,6 +501,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.identifiers_extractor',
             'api_platform.identifiers_extractor.cached',
             'api_platform.iri_converter',
+            'api_platform.identifier.denormalizer',
+            'api_platform.identifier.integer',
+            'api_platform.identifier.date_normalizer',
+            'api_platform.identifier.uuid_normalizer',
+            'api_platform.identifiers_extractor',
+            'api_platform.identifiers_extractor.cached',
             'api_platform.item_data_provider',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
@@ -610,6 +643,7 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $definitions = [
+            'api_platform.data_collector.request',
             'api_platform.doctrine.listener.http_cache.purge',
             'api_platform.doctrine.metadata_factory',
             'api_platform.doctrine.orm.boolean_filter',

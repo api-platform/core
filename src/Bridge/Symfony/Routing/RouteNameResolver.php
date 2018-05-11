@@ -71,10 +71,6 @@ final class RouteNameResolver implements RouteNameResolverInterface
             $currentSubresources[] = $identiferContext[1];
         }
 
-        if ($currentSubresources === $subresources) {
-            return true;
-        }
-
-        return false;
+        return $currentSubresources === $subresources;
     }
 }
