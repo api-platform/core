@@ -112,7 +112,7 @@ class SchemaBuilderTest extends TestCase
                 ),
                 "{$builtinType}Description",
                 true,
-                null,
+                true,
                 null,
                 null,
                 null
@@ -121,6 +121,7 @@ class SchemaBuilderTest extends TestCase
         $mockedSchemaBuilder = $this->createSchemaBuilder($propertyMetadataMockBuilder, $paginationEnabled);
         $schema = $mockedSchemaBuilder->getSchema();
         $queryFields = $schema->getConfig()->getQuery()->getFields();
+        $mutationFields = $schema->getConfig()->getMutation()->getFields();
 
         $this->assertEquals([
             'node',
@@ -132,11 +133,17 @@ class SchemaBuilderTest extends TestCase
             'shortName3s',
         ], array_keys($queryFields));
 
+        $this->assertEquals([
+            'createShortName1',
+            'createShortName2',
+            'createShortName3',
+        ], array_keys($mutationFields));
+
         /** @var ObjectType $type */
         $type = $queryFields['shortName2']->getType();
         $resourceTypeFields = $type->getFields();
         $this->assertEquals(
-            ['id', 'intProperty', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty'],
+            ['id', '_id', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty'],
             array_keys($resourceTypeFields)
         );
 
@@ -171,6 +178,14 @@ class SchemaBuilderTest extends TestCase
         /** @var ListOfType $objectPropertyFieldType */
         $objectPropertyFieldType = $type->getFields()['objectProperty']->getType();
         $this->assertEquals(GraphQLType::nonNull(GraphQLType::string()), $objectPropertyFieldType);
+
+        /** @var ObjectType $type */
+        $type = $mutationFields['createShortName2']->getType();
+        $resourceTypeFields = $type->getFields();
+        $this->assertEquals(
+            ['id', '_id', 'floatProperty', 'stringProperty', 'boolProperty', 'objectProperty', 'arrayProperty', 'iterableProperty', 'clientMutationId'],
+            array_keys($resourceTypeFields)
+        );
     }
 
     public function paginationProvider(): array
@@ -202,16 +217,17 @@ class SchemaBuilderTest extends TestCase
                 null,
                 null,
                 null,
-                ['query' => []]
+                ['query' => [], 'create' => []]
             );
             $resourceMetadataFactoryProphecy->create($resourceClassName)->willReturn($resourceMetadata);
             $resourceMetadataFactoryProphecy->create('unknownResource')->willThrow(new ResourceClassNotFoundException());
 
             $propertyNames = [];
             foreach (Type::$builtinTypes as $builtinType) {
-                $propertyName = "{$builtinType}Property";
+                $propertyName = Type::BUILTIN_TYPE_INT === $builtinType ? 'id' : "{$builtinType}Property";
                 $propertyNames[] = $propertyName;
-                $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName)->willReturn($propertyMetadataMockBuilder($builtinType, $resourceClassName));
+                $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName, ['graphql_operation_name' => 'query'])->willReturn($propertyMetadataMockBuilder($builtinType, $resourceClassName));
+                $propertyMetadataFactoryProphecy->create($resourceClassName, $propertyName, ['graphql_operation_name' => 'create'])->willReturn($propertyMetadataMockBuilder($builtinType, $resourceClassName));
             }
             $propertyNameCollection = new PropertyNameCollection($propertyNames);
             $propertyNameCollectionFactoryProphecy->create($resourceClassName)->willReturn($propertyNameCollection);
