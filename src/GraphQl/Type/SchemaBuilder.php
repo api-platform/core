@@ -432,7 +432,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['graphql_operation_name' => $mutationName ?? 'query']);
             if (
                 null === ($propertyType = $propertyMetadata->getType())
                 || (!$input && null === $mutationName && false === $propertyMetadata->isReadable())
