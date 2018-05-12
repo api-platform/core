@@ -102,7 +102,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy->normalize(Argument::type($partial ? PartialPaginatorInterface::class : PaginatorInterface::class), null, Argument::type('array'))->willReturn($decoratedNormalize)->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal(), '_page');
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), '_page', 'pagination', $resourceMetadataFactory->reveal());
 
         return $normalizer->normalize($paginatorProphecy->reveal());
     }
@@ -115,7 +115,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertTrue($normalizer->supportsNormalization(new \stdClass()));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
@@ -129,7 +129,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy->setNormalizer(Argument::type(NormalizerInterface::class))->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $normalizer->setNormalizer($injectedNormalizer);
     }
 }

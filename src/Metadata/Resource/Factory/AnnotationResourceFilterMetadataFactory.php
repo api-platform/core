@@ -62,7 +62,6 @@ final class AnnotationResourceFilterMetadataFactory implements ResourceMetadataF
         }
 
         $filters = array_keys($this->readFilterAnnotations($reflectionClass, $this->reader));
-
         if (!$filters) {
             return $parentResourceMetadata;
         }

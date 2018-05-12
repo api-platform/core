@@ -20,6 +20,7 @@ use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -32,16 +33,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class PartialCollectionViewNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     private $collectionNormalizer;
-    private $resourceMetadataFactory;
     private $pageParameterName;
     private $enabledParameterName;
+    private $resourceMetadataFactory;
+    private $propertyAccessor;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, string $pageParameterName = 'page', string $enabledParameterName = 'pagination')
+    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', ResourceMetadataFactoryInterface $resourceMetadataFactory = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->collectionNormalizer = $collectionNormalizer;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -74,8 +77,8 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
-        $metadata = isset($context['resource_class']) ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
-        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getAttribute('pagination_via_cursor');
+        $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
+        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute('pagination_via_cursor');
 
         $data['hydra:view'] = [
             '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated && !$isPaginatedWithCursor ? $currentPage : null),
@@ -86,16 +89,16 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $forwardRangeOperator = 'desc' === strtolower($cursorPaginationAttribute['direction']) ? 'lt' : 'gt';
             $backwardRangeOperator = 'gt' === $forwardRangeOperator ? 'lt' : 'gt';
 
-            $accessor = PropertyAccess::createPropertyAccessor();
             $objects = iterator_to_array($object);
             $firstObject = current($objects);
             $lastObject = end($objects);
 
+            $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+
             if (false !== $lastObject) {
-                $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
                 $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
                     $cursorPaginationAttribute['field'] => [
-                        $forwardRangeOperator => (string) $accessor->getValue($lastObject, $cursorPaginationAttribute['field']),
+                        $forwardRangeOperator => (string) $this->propertyAccessor->getValue($lastObject, $cursorPaginationAttribute['field']),
                     ],
                 ]));
             }
@@ -103,7 +106,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             if (false !== $firstObject) {
                 $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
                     $cursorPaginationAttribute['field'] => [
-                        $backwardRangeOperator => (string) $accessor->getValue($firstObject, $cursorPaginationAttribute['field']),
+                        $backwardRangeOperator => (string) $this->propertyAccessor->getValue($firstObject, $cursorPaginationAttribute['field']),
                     ],
                 ]));
             }
