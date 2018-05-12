@@ -24,8 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(attributes={
  *     "pagination_partial"=true,
  *     "pagination_via_cursor"={
- *         "field"="id",
- *         "direction"="DESC"
+ *         {"field"="id", "direction"="DESC"}
  *     }
  * })
  *

@@ -34,7 +34,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, ['jsonld_sub_level' => true])->willReturn(['foo' => 'bar'])->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['jsonld_sub_level' => true]));
     }
 
@@ -44,7 +44,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         $decoratedNormalizerProphecy->normalize(Argument::any(), null, Argument::type('array'))->willReturn(['foo' => 'bar'])->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), $resourceMetadataFactory->reveal());
+        $normalizer = new PartialCollectionViewNormalizer($decoratedNormalizerProphecy->reveal(), 'page', 'pagination', $resourceMetadataFactory->reveal());
         $this->assertEquals(['foo' => 'bar'], $normalizer->normalize(new \stdClass(), null, ['request_uri' => '/?page=1&pagination=1']));
     }
 

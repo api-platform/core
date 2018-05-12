@@ -78,7 +78,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
-        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute('pagination_via_cursor');
+        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'], 'pagination_via_cursor', null, true);
 
         $data['hydra:view'] = [
             '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated && !$isPaginatedWithCursor ? $currentPage : null),
@@ -86,9 +86,6 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         ];
 
         if ($isPaginatedWithCursor) {
-            $forwardRangeOperator = 'desc' === strtolower($cursorPaginationAttribute['direction']) ? 'lt' : 'gt';
-            $backwardRangeOperator = 'gt' === $forwardRangeOperator ? 'lt' : 'gt';
-
             $objects = iterator_to_array($object);
             $firstObject = current($objects);
             $lastObject = end($objects);
@@ -96,19 +93,11 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
 
             if (false !== $lastObject) {
-                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
-                    $cursorPaginationAttribute['field'] => [
-                        $forwardRangeOperator => (string) $this->propertyAccessor->getValue($lastObject, $cursorPaginationAttribute['field']),
-                    ],
-                ]));
+                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
             }
 
             if (false !== $firstObject) {
-                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], [
-                    $cursorPaginationAttribute['field'] => [
-                        $backwardRangeOperator => (string) $this->propertyAccessor->getValue($firstObject, $cursorPaginationAttribute['field']),
-                    ],
-                ]));
+                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
             }
         } elseif ($paginated) {
             if (null !== $lastPage) {
@@ -152,5 +141,23 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         if ($this->collectionNormalizer instanceof NormalizerAwareInterface) {
             $this->collectionNormalizer->setNormalizer($normalizer);
         }
+    }
+
+    private function cursorPaginationFields(array $fields, int $direction, $object)
+    {
+        $paginationFilters = [];
+
+        foreach ($fields as $field) {
+            $forwardRangeOperator = 'desc' === strtolower($field['direction']) ? 'lt' : 'gt';
+            $backwardRangeOperator = 'gt' === $forwardRangeOperator ? 'lt' : 'gt';
+
+            $operator = $direction > 0 ? $forwardRangeOperator : $backwardRangeOperator;
+
+            $paginationFilters[$field['field']] = [
+                $operator => (string) $this->propertyAccessor->getValue($object, $field['field']),
+            ];
+        }
+
+        return $paginationFilters;
     }
 }
