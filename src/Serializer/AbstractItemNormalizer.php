@@ -420,7 +420,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
         }
 
-        if ($type && ($className = $type->getClassName())) {
+        if ($type && $className = $type->getClassName()) {
             if ($this->resourceClassResolver->isResourceClass($className)) {
                 return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
             }
