@@ -206,7 +206,7 @@ services:
 
     app.related_dummy_to_friend_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'name': 'ipartial' } ]
+        arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
 
     logger:

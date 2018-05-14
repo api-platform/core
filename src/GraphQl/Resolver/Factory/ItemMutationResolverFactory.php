@@ -90,6 +90,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 case 'create':
                 case 'update':
                     $context = null === $item ? ['resource_class' => $resourceClass] : ['resource_class' => $resourceClass, 'object_to_populate' => $item];
+                    $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
                     $this->validate($item, $info, $resourceMetadata, $operationName);
                     $this->dataPersister->persist($item);

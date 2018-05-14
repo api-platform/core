@@ -109,6 +109,22 @@ Feature: GraphQL query support
     And I send the GraphQL request with operation "DummyWithId1"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #1"
 
+  Scenario: Use serialization groups
+    Given there are 1 dummy group objects
+    When I send the following GraphQL request:
+    """
+    {
+      dummyGroup(id: "/dummy_groups/1") {
+        foo
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummyGroup.foo" should be equal to "Foo #1"
+
+  @dropSchema
   Scenario: Retrieve an nonexistent item through a GraphQL query
     When I send the following GraphQL request:
     """
