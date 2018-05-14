@@ -154,7 +154,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                     }
                 }
 
-                if ($parameters = $this->getFiltersParameters($resourceClass, $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
+                if ($parameters = $this->getFiltersParameters($subresourceOperation['resource_class'], $operationName, $subResourceMetadata, $definitions, $serializerContext)) {
                     foreach ($parameters as $parameter) {
                         if (!\in_array($parameter['name'], $parametersMemory, true)) {
                             $pathOperation['parameters'][] = $parameter;

@@ -38,6 +38,14 @@ class RelatedToDummyFriend
     private $name;
 
     /**
+     * @var string|null The dummy description
+     *
+     * @ORM\Column(nullable=true)
+     * @Groups({"fakemanytomany", "friends"})
+     */
+    private $description;
+
+    /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="DummyFriend")
      * @ORM\JoinColumn(name="dummyfriend_id", referencedColumnName="id", nullable=false)
@@ -62,6 +70,22 @@ class RelatedToDummyFriend
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param null|string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**
