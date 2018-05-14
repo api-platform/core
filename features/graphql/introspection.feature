@@ -187,6 +187,70 @@ Feature: GraphQL introspection support
     And the JSON node "data.__type.fields[9].name" should be equal to "jsonData"
     And the JSON node "data.__type.fields[9].type.name" should be equal to "Iterable"
 
+  Scenario: Retrieve entity - using serialization groups - fields
+    When I send the following GraphQL request:
+    """
+    {
+      typeQuery: __type(name: "DummyGroup") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+      typeCreateInput: __type(name: "createDummyGroupInput") {
+        description,
+        inputFields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+      typeCreatePayload: __type(name: "createDummyGroupPayload") {
+        description,
+        fields {
+          name
+          type {
+            name
+            kind
+            ofType {
+              name
+              kind
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.typeQuery.fields" should have 2 elements
+    And the JSON node "data.typeQuery.fields[0].name" should be equal to "id"
+    And the JSON node "data.typeQuery.fields[1].name" should be equal to "foo"
+    And the JSON node "data.typeCreateInput.inputFields" should have 3 elements
+    And the JSON node "data.typeCreateInput.inputFields[0].name" should be equal to "bar"
+    And the JSON node "data.typeCreateInput.inputFields[1].name" should be equal to "baz"
+    And the JSON node "data.typeCreateInput.inputFields[2].name" should be equal to "clientMutationId"
+    And the JSON node "data.typeCreatePayload.fields" should have 4 elements
+    And the JSON node "data.typeCreatePayload.fields[0].name" should be equal to "id"
+    And the JSON node "data.typeCreatePayload.fields[1].name" should be equal to "bar"
+    And the JSON node "data.typeCreatePayload.fields[2].name" should be equal to "baz"
+    And the JSON node "data.typeCreatePayload.fields[3].name" should be equal to "clientMutationId"
+
   @dropSchema
   Scenario: Retrieve an item through a GraphQL query
     Given there are 4 dummy objects with relatedDummy
