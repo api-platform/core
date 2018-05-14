@@ -424,9 +424,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($this->resourceClassResolver->isResourceClass($className)) {
                 return $this->normalizeRelation($propertyMetadata, $attributeValue, $className, $format, $this->createChildContext($context, $attribute));
             }
-            else {
-                $context = $this->createChildContext($context, $attribute);
-            }
+            $context = $this->createChildContext($context, $attribute);
         }
 
         unset($context['resource_class']);
