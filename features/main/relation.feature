@@ -97,6 +97,7 @@ Feature: Relations support
       "@id": "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1",
       "@type": "RelatedToDummyFriend",
       "name": "Friends relation",
+      "description": null,
       "dummyFriend": {
         "@id": "/dummy_friends/1",
         "@type": "DummyFriend",
@@ -117,6 +118,7 @@ Feature: Relations support
       "@id": "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1",
       "@type": "RelatedToDummyFriend",
       "name": "Friends relation",
+      "description": null,
       "dummyFriend": {
         "@id": "/dummy_friends/1",
         "@type": "DummyFriend",
