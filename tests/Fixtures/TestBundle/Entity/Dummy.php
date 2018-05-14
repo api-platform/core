@@ -132,6 +132,13 @@ class Dummy
     public $relatedDummies;
 
     /**
+     * @var NonApiResourceDummy A related non api resource dummy.
+     *
+     * @ORM\ManyToOne(targetEntity="NonApiResourceDummy")
+     */
+    public $nonApiResourceDummy;
+
+    /**
      * @var array serialize data
      *
      * @ORM\Column(type="json_array", nullable=true)
@@ -272,6 +279,16 @@ class Dummy
     public function addRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummies->add($relatedDummy);
+    }
+
+    public function getNonApiResourceDummy()
+    {
+        return $this->nonApiResourceDummy;
+    }
+
+    public function setNonApiResourceDummy(NonApiResourceDummy $nonApiResourceDummy)
+    {
+        $this->nonApiResourceDummy = $nonApiResourceDummy;
     }
 
     /**

@@ -24,6 +24,7 @@ use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NonApiResourceDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
@@ -72,16 +73,18 @@ class AbstractItemNormalizerTest extends TestCase
     public function testNormalize()
     {
         $relatedDummy = new RelatedDummy();
+        $nonApiResourceDummy = new NonApiResourceDummy();
 
         $dummy = new Dummy();
         $dummy->setName('foo');
         $dummy->setAlias('ignored');
         $dummy->setRelatedDummy($relatedDummy);
         $dummy->relatedDummies->add(new RelatedDummy());
+        $dummy->setNonApiResourceDummy($nonApiResourceDummy);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(
-            new PropertyNameCollection(['name', 'alias', 'relatedDummy', 'relatedDummies'])
+            new PropertyNameCollection(['name', 'alias', 'relatedDummy', 'relatedDummies', 'nonApiResourceDummy'])
         )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -109,6 +112,9 @@ class AbstractItemNormalizerTest extends TestCase
                 false
             )
         )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'nonApiResourceDummy', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, NonApiResourceDummy::class), '', true, false, false)
+        )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
@@ -120,15 +126,19 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn(
             new ArrayCollection([$relatedDummy])
         )->shouldBeCalled();
+        $propertyAccessorProphecy->getValue($dummy, 'nonApiResourceDummy')->willReturn($nonApiResourceDummy)->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null, true)->willReturn(Dummy::class)->shouldBeCalled();
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(RelatedDummy::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->isResourceClass(NonApiResourceDummy::class)->willReturn(FALSE)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
         $serializerProphecy->normalize(['/dummies/2'], null, Argument::type('array'))->willReturn(['/dummies/2'])->shouldBeCalled();
+        $serializerProphecy->normalize($nonApiResourceDummy, null, Argument::type('array'))->willReturn(['id' => null])->shouldBeCalled();
+        $serializerProphecy->normalize(['id' => null], null, Argument::type('array'))->willReturn(['id' => null])->shouldBeCalled();
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -144,6 +154,7 @@ class AbstractItemNormalizerTest extends TestCase
             'name' => 'foo',
             'relatedDummy' => '/dummies/2',
             'relatedDummies' => ['/dummies/2'],
+            'nonApiResourceDummy' => ['id' => null],
         ], $normalizer->normalize($dummy, null, ['resources' => []]));
     }
 
