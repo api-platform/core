@@ -21,6 +21,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -514,14 +515,39 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
+        $updateAllowed = isset($context['api_allow_update']) && true !== $context['api_allow_update'];
         $identifiers = $this->getIdentifiersForDenormalization($class);
+        $writeableIdentifiers = [];
 
-        if (0 === \count(array_intersect(array_keys($data), $identifiers))) {
+        foreach ($identifiers as $id) {
+            try {
+                $metaData = $this->propertyMetadataFactory->create($class, $id);
+            } catch (PropertyNotFoundException $e) {
+            }
+
+            if ($metaData->isWritable()) {
+                $writeableIdentifiers[] = $id;
+            }
+        }
+
+        // No writeable identifiers found, abort
+        if (0 === \count($writeableIdentifiers)) {
+            return;
+        }
+
+        // Check if all writeable identifiers were provided
+        if (0 === \count(array_intersect(array_keys($data), $writeableIdentifiers))) {
+            // If update is not allowed, the provided data is invalid
+            if (!$updateAllowed) {
+                throw new InvalidArgumentException('Update is not allowed for this operation.');
+            }
+
+            // Otherwise we just ignore it
             return;
         }
 
         $identifiersData = [];
-        foreach ($identifiers as $id) {
+        foreach ($writeableIdentifiers as $id) {
             $identifiersData[] = $data[$id];
         }
 
@@ -537,7 +563,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
-        if (null !== $object && isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
+        if (null !== $object && $updateAllowed) {
             throw new InvalidArgumentException('Update is not allowed for this operation.');
         }
 
@@ -546,8 +572,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Returns the identifiers used when denormalizing an object.
-     * Usually this is just what the IdentifiersExtractor provides but you might want to override this
-     * method in your normalizer depending on the format used (e.g. json-ld uses "@id" by definition).
+     * Usually this is just what the IdentifiersExtractor provides but you might want to override this method in your
+     * normalizer depending on the format used. Note: They also have to be writeable to serve as proper identifier.
      */
     protected function getIdentifiersForDenormalization(string $class): array
     {
