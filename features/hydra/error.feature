@@ -68,6 +68,7 @@ Feature: Error handling
     And the JSON node "hydra:description" should be equal to 'Nested documents for attribute "relatedDummies" are not allowed. Use IRIs instead.'
     And the JSON node "trace" should exist
 
+  @dropSchema
   Scenario: Get an error because of an invalid JSON
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
@@ -85,8 +86,10 @@ Feature: Error handling
     And the JSON node "hydra:description" should exist
     And the JSON node "trace" should exist
 
-    @dropSchema
-    Scenario: Get an error during update of an existing resource with a non-allowed update operation
+  @dropSchema
+  @createSchema
+  Scenario: Get an error during update of an existing resource with a non-allowed update operation
+      Given there are 1 dummy objects
       When I add "Content-Type" header equal to "application/ld+json"
       And I send a "POST" request to "/dummies" with body:
       """
@@ -105,6 +108,7 @@ Feature: Error handling
       And the JSON node "trace" should exist
 
     @createSchema
+    @dropSchema
     Scenario: Populate database with related dummies. Check that id will be "/related_dummies/1"
       Given I add "Content-Type" header equal to "application/ld+json"
       And I send a "POST" request to "/related_dummies" with body:
@@ -119,7 +123,8 @@ Feature: Error handling
       And the JSON node "@id" should be equal to "/related_dummies/1"
       And the JSON node "symfony" should be equal to "laravel"
 
-    @dropSchema
+  @createSchema
+  @dropSchema
     Scenario: Do not get an error during update of an existing relation with a non-allowed update operation
       When I add "Content-Type" header equal to "application/ld+json"
       And I send a "POST" request to "/relation_embedders" with body:
