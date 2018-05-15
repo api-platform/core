@@ -75,10 +75,12 @@ trait IdentifierManagerTrait
                 throw new PropertyNotFoundException(sprintf('Invalid identifier "%s", "%s" was not found.', $id, $propertyName));
             }
 
-            $doctrineTypeName = $doctrineClassMetadata->getTypeOfField($propertyName);
+            if ($this->shouldConvert($propertyMetadata->getAttributes())) {
+                $doctrineTypeName = $doctrineClassMetadata->getTypeOfField($propertyName);
 
-            if ($isOrm && null !== $doctrineTypeName && DBALType::hasType($doctrineTypeName)) {
-                $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
+                if ($isOrm && null !== $doctrineTypeName && DBALType::hasType($doctrineTypeName)) {
+                    $identifier = DBALType::getType($doctrineTypeName)->convertToPHPValue($identifier, $platform);
+                }
             }
 
             $identifiers[$propertyName] = $identifier;
@@ -86,5 +88,25 @@ trait IdentifierManagerTrait
         }
 
         return $identifiers;
+    }
+
+    /**
+     * Check if attributes contains convert to false.
+     *
+     * @param array $attributes
+     *
+     * @return bool
+     */
+    private function shouldConvert(array $attributes = null): bool
+    {
+        foreach ((array) $attributes as $attribute) {
+            foreach ($attribute as $key => $value) {
+                if ($key === 'convert' && $value === false) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
