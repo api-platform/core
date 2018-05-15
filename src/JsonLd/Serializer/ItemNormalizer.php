@@ -89,11 +89,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getIdentifiersForDenormalization(string $class): array
+    public function getIdentifiersForDenormalization(string $class): array
     {
-        return ['@id'];
+        return array_merge(parent::getIdentifiersForDenormalization($class), ['@id']);
     }
 }
