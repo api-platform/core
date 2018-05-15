@@ -43,14 +43,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $context['cache_key'] = $this->getHalCacheKey($format, $context);
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getHalCacheKey($format, $context);
+        }
+
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $context = $this->initContext($resourceClass, $context);
         $context['iri'] = $this->iriConverter->getIriFromItem($object);
         $context['api_normalize'] = true;
 
         $rawData = parent::normalize($object, $format, $context);
-        if (!is_array($rawData)) {
+        if (!\is_array($rawData)) {
             return $rawData;
         }
 
@@ -83,7 +86,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributes($object, $format, array $context)
+    protected function getAttributes($object, $format = null, array $context)
     {
         return $this->getComponents($object, $format, $context)['states'];
     }
@@ -99,8 +102,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function getComponents($object, string $format = null, array $context)
     {
-        if (false !== $context['cache_key'] && isset($this->componentsCache[$context['cache_key']])) {
-            return $this->componentsCache[$context['cache_key']];
+        $cacheKey = \get_class($object).'-'.$context['cache_key'];
+
+        if (isset($this->componentsCache[$cacheKey])) {
+            return $this->componentsCache[$cacheKey];
         }
 
         $attributes = parent::getAttributes($object, $format, $context);
@@ -142,7 +147,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         if (false !== $context['cache_key']) {
-            $this->componentsCache[$context['cache_key']] = $components;
+            $this->componentsCache[$cacheKey] = $components;
         }
 
         return $components;
@@ -169,24 +174,29 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 continue;
             }
 
+            $relationName = $relation['name'];
+            if ($this->nameConverter) {
+                $relationName = $this->nameConverter->normalize($relationName);
+            }
+
             if ('one' === $relation['cardinality']) {
                 if ('links' === $type) {
-                    $data[$key][$relation['name']]['href'] = $this->getRelationIri($attributeValue);
+                    $data[$key][$relationName]['href'] = $this->getRelationIri($attributeValue);
                     continue;
                 }
 
-                $data[$key][$relation['name']] = $attributeValue;
+                $data[$key][$relationName] = $attributeValue;
                 continue;
             }
 
             // many
-            $data[$key][$relation['name']] = [];
+            $data[$key][$relationName] = [];
             foreach ($attributeValue as $rel) {
                 if ('links' === $type) {
                     $rel = ['href' => $this->getRelationIri($rel)];
                 }
 
-                $data[$key][$relation['name']][] = $rel;
+                $data[$key][$relationName][] = $rel;
             }
         }
 

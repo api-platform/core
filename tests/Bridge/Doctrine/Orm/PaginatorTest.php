@@ -16,8 +16,9 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Tests\Fixtures\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
+use PHPUnit\Framework\TestCase;
 
-class PaginatorTest extends \PHPUnit_Framework_TestCase
+class PaginatorTest extends TestCase
 {
     /**
      * @dataProvider initializeProvider
@@ -31,6 +32,24 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($maxResults, $paginator->getItemsPerPage());
     }
 
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage "Doctrine\ORM\Query::setFirstResult()" or/and "Doctrine\ORM\Query::setMaxResults()" was/were not applied to the query.
+     */
+    public function testInitializeWithQueryFirstResultNotApplied()
+    {
+        $this->getPaginatorWithMalformedQuery(false);
+    }
+
+    /**
+     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
+     * @expectedExceptionMessage "Doctrine\ORM\Query::setFirstResult()" or/and "Doctrine\ORM\Query::setMaxResults()" was/were not applied to the query.
+     */
+    public function testInitializeWithQueryMaxResultsNotApplied()
+    {
+        $this->getPaginatorWithMalformedQuery(true);
+    }
+
     public function testGetIterator()
     {
         $paginator = $this->getPaginator();
@@ -38,7 +57,7 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    public function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42)
+    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42)
     {
         $query = $this->prophesize(Query::class);
         $query->getFirstResult()->willReturn($firstResult)->shouldBeCalled();
@@ -47,13 +66,28 @@ class PaginatorTest extends \PHPUnit_Framework_TestCase
         $doctrinePaginator = $this->prophesize(DoctrinePaginator::class);
 
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
-        $doctrinePaginator->count()->willReturn($totalItems)->shouldBeCalled();
+        $doctrinePaginator->count()->willReturn($totalItems);
 
         $doctrinePaginator->getIterator()->will(function () {
             return new \ArrayIterator();
         });
 
         return new Paginator($doctrinePaginator->reveal());
+    }
+
+    private function getPaginatorWithMalformedQuery($maxResults = false)
+    {
+        $query = $this->prophesize(Query::class);
+        $query->getFirstResult()->willReturn($maxResults ? 42 : null)->shouldBeCalled();
+
+        if ($maxResults) {
+            $query->getMaxResults()->willReturn(null)->shouldBeCalled();
+        }
+
+        $doctrinePaginator = $this->prophesize(DoctrinePaginator::class);
+        $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
+
+        new Paginator($doctrinePaginator->reveal());
     }
 
     public function initializeProvider()

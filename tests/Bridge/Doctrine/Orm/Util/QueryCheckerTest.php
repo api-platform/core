@@ -14,14 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\TestCase;
 
-class QueryCheckerTest extends \PHPUnit_Framework_TestCase
+class QueryCheckerTest extends TestCase
 {
     public function testHasHavingClauseWithHavingClause()
     {
@@ -152,5 +154,46 @@ class QueryCheckerTest extends \PHPUnit_Framework_TestCase
         $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
 
         $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+    }
+
+    public function testHasOrderByOnToManyJoinWithClassLeftJoin()
+    {
+        $queryBuilder = $this->prophesize(QueryBuilder::class);
+        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootAliases()->willReturn(['d']);
+        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => [new Join('LEFT_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = d.name')]]);
+        $queryBuilder->getDQLPart('orderBy')->willReturn(['a_1.name' => new OrderBy('a_1.name', 'asc')]);
+        $classMetadata = $this->prophesize(ClassMetadata::class);
+        $classMetadata->getAssociationsByTargetClass(RelatedDummy::class)->willReturn(['relatedDummy' => ['targetEntity' => RelatedDummy::class]]);
+        $relatedClassMetadata = $this->prophesize(ClassMetadata::class);
+        $relatedClassMetadata->isCollectionValuedAssociation('relatedDummy')->willReturn(true);
+        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
+        $objectManager->getClassMetadata(RelatedDummy::class)->willReturn($relatedClassMetadata->reveal());
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass(RelatedDummy::class)->willReturn($objectManager->reveal());
+
+        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
+    }
+
+    /**
+     * Adds a test on the fix referenced in https://github.com/api-platform/core/pull/1449.
+     */
+    public function testOrderByOnToManyWithRelationAsBasis()
+    {
+        $queryBuilder = $this->prophesize(QueryBuilder::class);
+        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootAliases()->willReturn(['d']);
+        $queryBuilder->getDQLPart('join')->willReturn(['d' => [new Join('LEFT_JOIN', 'd.relatedDummy', 'a_1')]]);
+        $queryBuilder->getDQLPart('orderBy')->willReturn(['a_1.name' => new OrderBy('a_1.name', 'asc')]);
+        $classMetadata = $this->prophesize(ClassMetadata::class);
+        $classMetadata->isCollectionValuedAssociation('relatedDummy')->willReturn(true);
+        $objectManager = $this->prophesize(ObjectManager::class);
+        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
+        $managerRegistry = $this->prophesize(ManagerRegistry::class);
+        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+
+        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 }

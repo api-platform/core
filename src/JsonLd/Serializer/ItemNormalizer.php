@@ -71,7 +71,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['iri'] = $this->iriConverter->getIriFromItem($object);
 
         $rawData = parent::normalize($object, $format, $context);
-        if (!is_array($rawData)) {
+        if (!\is_array($rawData)) {
             return $rawData;
         }
 
@@ -97,12 +97,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         // Avoid issues with proxies if we populated the object
-        if (isset($data['@id']) && !isset($context['object_to_populate'])) {
+        if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
             if (isset($context['api_allow_update']) && true !== $context['api_allow_update']) {
                 throw new InvalidArgumentException('Update is not allowed for this operation.');
             }
 
-            $context['object_to_populate'] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
         }
 
         return parent::denormalize($data, $class, $format, $context);

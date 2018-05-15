@@ -23,13 +23,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(
- *     attributes={"is_granted"="has_role('ROLE_USER')"},
+ *     attributes={"access_control"="has_role('ROLE_USER')"},
  *     collectionOperations={
- *         "get"={"method"="GET"},
- *         "post"={"method"="POST", "is_granted"="has_role('ROLE_ADMIN')"}
+ *         "get",
+ *         "post"={"access_control"="has_role('ROLE_ADMIN')"}
  *     },
  *     itemOperations={
- *         "get"={"method"="GET", "is_granted"="has_role('ROLE_USER') and object.getOwner() == user"}
+ *         "get"={"access_control"="has_role('ROLE_USER') and object.getOwner() == user"}
+ *     },
+ *     graphql={
+ *         "query"={},
+ *         "delete"={},
+ *         "update"={},
+ *         "create"={"access_control"="has_role('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
  *     }
  * )
  * @ORM\Entity

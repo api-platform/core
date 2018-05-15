@@ -15,15 +15,17 @@ namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\DeserializeListener;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
+class DeserializeListenerTest extends TestCase
 {
     const FORMATS = ['json' => ['application/json']];
 
@@ -32,7 +34,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass()]);
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -45,12 +47,39 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
+    /**
+     * @dataProvider allowedEmptyRequestMethodsProvider
+     */
+    public function testDoNotCallWhenSendingAndEmptyRequestContent($method)
+    {
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+
+        $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'put'], [], [], [], '');
+        $request->setMethod($method);
+        $request->headers->set('Content-Type', 'application/json');
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->deserialize()->shouldNotBeCalled();
+
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->shouldNotBeCalled();
+
+        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
+    public function allowedEmptyRequestMethodsProvider()
+    {
+        return [['PUT'], ['POST']];
+    }
+
     public function testDoNotCallWhenRequestNotManaged()
     {
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass()], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -68,7 +97,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['data' => new \stdClass(), '_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_receive' => false]);
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -95,7 +124,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $context = $populateObject ? ['object_to_populate' => $populateObject] : [];
+        $context = $populateObject ? [AbstractNormalizer::OBJECT_TO_POPULATE => $populateObject] : [];
         $serializerProphecy->deserialize('{}', 'Foo', 'json', $context)->willReturn($result)->shouldBeCalled();
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
@@ -107,7 +136,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function methodProvider()
     {
-        return [[Request::METHOD_POST, false], [Request::METHOD_PUT, true]];
+        return [['POST', false], ['PUT', true]];
     }
 
     public function testContentNegotiation()
@@ -115,7 +144,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->headers->set('Content-Type', 'text/xml');
         $request->setFormat('xml', 'text/xml'); // Workaround to avoid weird behaviors
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -143,7 +172,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/rdf+xml');
         $request->setRequestFormat('xml');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -171,7 +200,7 @@ class DeserializeListenerTest extends \PHPUnit_Framework_TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->setRequestFormat('unknown');
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 

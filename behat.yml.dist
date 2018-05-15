@@ -3,18 +3,37 @@ default:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'GraphqlContext'
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
+        - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'
+      filters:
+        tags: ~@postgres
+    postgres:
+      contexts:
+        - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'GraphqlContext'
+        - 'JsonContext'
+        - 'HydraContext'
+        - 'SwaggerContext'
+        - 'HttpCacheContext'
+        - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'Behatch\Context\RestContext'
+      filters:
+        tags: ~@sqlite
   extensions:
     'Behat\Symfony2Extension':
       kernel:
-        env:       'test'
-        debug:     'true'
-        path:      'tests/Fixtures/app/AppKernel.php'
+        env: 'test'
+        debug: 'true'
+        path: 'tests/Fixtures/app/AppKernel.php'
         bootstrap: 'tests/Fixtures/app/bootstrap.php'
     'Behat\MinkExtension':
       base_url: "http://example.com/"
@@ -28,10 +47,15 @@ coverage:
     default:
       contexts:
         - 'FeatureContext': { doctrine: '@doctrine' }
+        - 'GraphqlContext'
+        - 'JsonContext'
         - 'HydraContext'
         - 'SwaggerContext'
         - 'HttpCacheContext'
+        - 'JsonApiContext': { doctrine: '@doctrine', jsonApiSchemaFile: 'tests/Fixtures/JsonSchema/jsonapi.json' }
+        - 'JsonHalContext': { schemaFile: 'tests/Fixtures/JsonHal/jsonhal.json' }
         - 'CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'Behatch\Context\RestContext'
-        - 'Behatch\Context\JsonContext'
+      filters:
+        tags: ~@postgres

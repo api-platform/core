@@ -129,7 +129,11 @@ final class PurgeHttpCacheListener
 
     private function addTagsFor($value)
     {
-        if (!is_array($value) && !$value instanceof \Traversable) {
+        if (!$value) {
+            return;
+        }
+
+        if (!\is_array($value) && !$value instanceof \Traversable) {
             $this->addTagForItem($value);
 
             return;

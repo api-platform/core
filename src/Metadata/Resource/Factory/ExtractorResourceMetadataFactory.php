@@ -84,7 +84,7 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
-        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
             if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
                 continue;
             }

@@ -13,13 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hal\Serializer;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
-use ApiPlatform\Core\Serializer\ContextTrait;
+use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalizes collections in the HAL format.
@@ -27,90 +22,62 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Kevin Dunglas <dunglas@gmail.com>
  * @author Hamza Amrouche <hamza@les-tilleuls.coop>
  */
-final class CollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
-    use ContextTrait;
-    use NormalizerAwareTrait;
-
     const FORMAT = 'jsonhal';
 
-    private $resourceClassResolver;
-    private $pageParameterName;
-
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName)
-    {
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->pageParameterName = $pageParameterName;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    protected function getPaginationData($object, array $context = []): array
     {
-        return self::FORMAT === $format && (is_array($data) || ($data instanceof \Traversable));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($object, $format = null, array $context = [])
-    {
-        $data = [];
-        if (isset($context['api_sub_level'])) {
-            foreach ($object as $index => $obj) {
-                $data[$index] = $this->normalizer->normalize($obj, $format, $context);
-            }
-
-            return $data;
-        }
-
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
-        $context = $this->initContext($resourceClass, $context);
+        list($paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems) = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
-        $paginated = $isPaginator = $object instanceof PaginatorInterface;
-
-        $currentPage = $lastPage = $itemsPerPage = null;
-        if ($isPaginator) {
-            $currentPage = $object->getCurrentPage();
-            $lastPage = $object->getLastPage();
-            $itemsPerPage = $object->getItemsPerPage();
-
-            $paginated = 1. !== $lastPage;
-        }
 
         $data = [
             '_links' => [
-                'self' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null),
+                'self' => ['href' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null)],
             ],
         ];
 
         if ($paginated) {
-            $data['_links']['first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-            $data['_links']['last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            if (null !== $lastPage) {
+                $data['_links']['first']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+                $data['_links']['last']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+            }
 
             if (1. !== $currentPage) {
-                $data['_links']['prev'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
+                $data['_links']['prev']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
-            if ($currentPage !== $lastPage) {
-                $data['_links']['next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
+            if ((null !== $lastPage && $currentPage !== $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
+                $data['_links']['next']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
+
+        if (null !== $totalItems) {
+            $data['totalItems'] = $totalItems;
+        }
+
+        if ($paginator) {
+            $data['itemsPerPage'] = (int) $itemsPerPage;
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getItemsData($object, string $format = null, array $context = []): array
+    {
+        $data = [];
 
         foreach ($object as $obj) {
             $item = $this->normalizer->normalize($obj, $format, $context);
 
             $data['_embedded']['item'][] = $item;
             $data['_links']['item'][] = $item['_links']['self'];
-        }
-
-        if (is_array($object) || $object instanceof \Countable) {
-            $data['totalItems'] = $object instanceof PaginatorInterface ? (int) $object->getTotalItems() : count($object);
-        }
-
-        if ($isPaginator) {
-            $data['itemsPerPage'] = (int) $itemsPerPage;
         }
 
         return $data;

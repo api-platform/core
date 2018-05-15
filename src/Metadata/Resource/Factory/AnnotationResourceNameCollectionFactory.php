@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -46,7 +47,6 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
     public function create(): ResourceNameCollection
     {
         $classes = [];
-        $includedFiles = [];
 
         if ($this->decorated) {
             foreach ($this->decorated->create() as $resourceClass) {
@@ -54,34 +54,8 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
             }
         }
 
-        foreach ($this->paths as $path) {
-            $iterator = new \RegexIterator(
-                new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
-                    \RecursiveIteratorIterator::LEAVES_ONLY
-                ),
-                '/^.+\.php$/i',
-                \RecursiveRegexIterator::GET_MATCH
-            );
-
-            foreach ($iterator as $file) {
-                $sourceFile = $file[0];
-
-                if (!preg_match('(^phar:)i', $sourceFile)) {
-                    $sourceFile = realpath($sourceFile);
-                }
-
-                require_once $sourceFile;
-
-                $includedFiles[$sourceFile] = true;
-            }
-        }
-
-        $declared = get_declared_classes();
-        foreach ($declared as $className) {
-            $reflectionClass = new \ReflectionClass($className);
-            $sourceFile = $reflectionClass->getFileName();
-            if (isset($includedFiles[$sourceFile]) && $this->reader->getClassAnnotation($reflectionClass, ApiResource::class)) {
+        foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($this->paths) as $className => $reflectionClass) {
+            if ($this->reader->getClassAnnotation($reflectionClass, ApiResource::class)) {
                 $classes[$className] = true;
             }
         }

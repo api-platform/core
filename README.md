@@ -9,8 +9,6 @@ It natively supports popular open formats including [JSON for Linked Data (JSON-
 Build a working and fully-featured CRUD API in minutes. Leverage the awesome features of the tool to develop complex and
 high performance API-first projects. Extend or override everything you want.
 
-[![JSON-LD enabled](http://json-ld.org/images/json-ld-button-88.png)](http://json-ld.org)
-[![Join the chat at https://gitter.im/api-platform/api-platform](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/api-platform/api-platform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/api-platform/core.svg?branch=master)](https://travis-ci.org/api-platform/core)
 [![Build status](https://ci.appveyor.com/api/projects/status/grwuyprts3wdqx5l?svg=true)](https://ci.appveyor.com/project/dunglas/dunglasapibundle)
 [![Coverage Status](https://coveralls.io/repos/github/api-platform/core/badge.svg)](https://coveralls.io/github/api-platform/core)
@@ -20,4 +18,4 @@ high performance API-first projects. Extend or override everything you want.
 
 ## Documentation
 
-The documentation of API Platform can be browsed [on the official website](https://api-platform.com/docs/).
+The documentation of API Platform Core Library can be browsed [on the official website](https://api-platform.com/docs/core).

@@ -11,6 +11,7 @@
             <argument type="service" id="api_platform.cache.metadata.resource" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.cached.inner" />
         </service>
+        <service id="ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface" alias="api_platform.metadata.resource.name_collection_factory" />
 
         <!-- Resource metadata -->
 
@@ -20,6 +21,7 @@
 
         <service id="api_platform.metadata.resource.metadata_factory.operation" class="ApiPlatform\Core\Metadata\Resource\Factory\OperationResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="10" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.operation.inner" />
+            <argument>%api_platform.formats%</argument>
         </service>
 
         <service id="api_platform.metadata.resource.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceMetadataFactory" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="-10" public="false">
@@ -27,9 +29,12 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.cached.inner" />
         </service>
 
+        <service id="ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" alias="api_platform.metadata.resource.metadata_factory" />
+
         <!-- Property name collection -->
 
         <service id="api_platform.metadata.property.name_collection_factory" alias="api_platform.metadata.property.name_collection_factory.property_info" />
+        <service id="ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface" alias="api_platform.metadata.property.name_collection_factory" />
 
         <service id="api_platform.metadata.property.name_collection_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory" public="false">
             <argument type="service" id="api_platform.property_info" />
@@ -68,6 +73,8 @@
             <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.inner" />
         </service>
+
+        <service id="ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface" alias="api_platform.metadata.property.metadata_factory" />
 
         <!-- Cache -->
 

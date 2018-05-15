@@ -25,7 +25,7 @@ use Doctrine\Common\Util\Inflector;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class RouteNameGenerator
+final class RouteNameGenerator
 {
     const ROUTE_NAME_PREFIX = 'api_';
 
@@ -47,15 +47,29 @@ class RouteNameGenerator
     public static function generate(string $operationName, string $resourceShortName, $operationType): string
     {
         if (OperationType::SUBRESOURCE === $operationType = OperationTypeDeprecationHelper::getOperationType($operationType)) {
-            throw new InvalidArgumentException(sprintf('%s::SUBRESOURCE is not supported as operation type by %s().', OperationType::class, __METHOD__));
+            throw new InvalidArgumentException('Subresource operations are not supported by the RouteNameGenerator.');
         }
 
         return sprintf(
             '%s%s_%s_%s',
             static::ROUTE_NAME_PREFIX,
-            Inflector::pluralize(Inflector::tableize($resourceShortName)),
+            self::inflector($resourceShortName),
             $operationName,
             $operationType
         );
+    }
+
+    /**
+     * Transforms a given string to a tableized, pluralized string.
+     *
+     * @param string $name usually a ResourceMetadata shortname
+     *
+     * @return string A string that is a part of the route name
+     */
+    public static function inflector(string $name, bool $pluralize = true): string
+    {
+        $name = Inflector::tableize($name);
+
+        return $pluralize ? Inflector::pluralize($name) : $name;
     }
 }

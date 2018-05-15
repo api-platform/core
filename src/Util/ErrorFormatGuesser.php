@@ -37,14 +37,24 @@ final class ErrorFormatGuesser
     public static function guessErrorFormat(Request $request, array $errorFormats): array
     {
         $requestFormat = $request->getRequestFormat('');
+
         if ('' !== $requestFormat && isset($errorFormats[$requestFormat])) {
             return ['key' => $requestFormat, 'value' => $errorFormats[$requestFormat]];
         }
 
-        foreach ($errorFormats as $key => $value) {
-            return ['key' => $key, 'value' => $value];
+        $requestMimeTypes = Request::getMimeTypes($request->getRequestFormat());
+        $defaultFormat = [];
+
+        foreach ($errorFormats as $format => $errorMimeTypes) {
+            if (array_intersect($requestMimeTypes, $errorMimeTypes)) {
+                return ['key' => $format, 'value' => $errorMimeTypes];
+            }
+
+            if (!$defaultFormat) {
+                $defaultFormat = ['key' => $format, 'value' => $errorMimeTypes];
+            }
         }
 
-        return [];
+        return $defaultFormat;
     }
 }

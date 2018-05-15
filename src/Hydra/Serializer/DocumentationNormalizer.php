@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Documentation\Documentation;
@@ -21,9 +22,13 @@ use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -41,8 +46,10 @@ final class DocumentationNormalizer implements NormalizerInterface
     private $resourceClassResolver;
     private $operationMethodResolver;
     private $urlGenerator;
+    private $subresourceOperationFactory;
+    private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -50,6 +57,8 @@ final class DocumentationNormalizer implements NormalizerInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->nameConverter = $nameConverter;
     }
 
     /**
@@ -96,11 +105,11 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'domain' => '#Entrypoint',
                 'rdfs:label' => "The collection of $shortName resources",
                 'rdfs:range' => [
-                    'hydra:PagedCollection',
+                    ['@id' => 'hydra:Collection'],
                     [
                         'owl:equivalentClass' => [
-                            'owl:onProperty' => 'hydra:member',
-                            'owl:allValuesFrom' => "#$shortName",
+                            'owl:onProperty' => ['@id' => 'hydra:member'],
+                            'owl:allValuesFrom' => ['@id' => $prefixedShortName],
                         ],
                     ],
                 ],
@@ -152,15 +161,17 @@ final class DocumentationNormalizer implements NormalizerInterface
         $attributes = $resourceMetadata->getAttributes();
         $context = [];
 
-        if (isset($attributes['normalization_context']['groups'])) {
-            $context['serializer_groups'] = $attributes['normalization_context']['groups'];
+        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
+            $context['serializer_groups'] = $attributes['normalization_context'][AbstractNormalizer::GROUPS];
         }
 
-        if (isset($attributes['denormalization_context']['groups'])) {
+        if (isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
             if (isset($context['serializer_groups'])) {
-                $context['serializer_groups'] += $attributes['denormalization_context']['groups'];
+                foreach ($attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
+                    $context['serializer_groups'][] = $groupName;
+                }
             } else {
-                $context['serializer_groups'] = $attributes['denormalization_context']['groups'];
+                $context['serializer_groups'] = $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
             }
         }
 
@@ -184,6 +195,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             if (true === $propertyMetadata->isIdentifier() && false === $propertyMetadata->isWritable()) {
                 continue;
+            }
+
+            if ($this->nameConverter) {
+                $propertyName = $this->nameConverter->normalize($propertyName);
             }
 
             $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName);
@@ -210,7 +225,15 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $hydraOperations = [];
         foreach ($operations as $operationName => $operation) {
-            $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection);
+            $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection ? OperationType::COLLECTION : OperationType::ITEM);
+        }
+
+        if (null !== $this->subresourceOperationFactory) {
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+                $subresourceMetadata = $this->resourceMetadataFactory->create($operation['resource_class']);
+                $propertyMetadata = $this->propertyMetadataFactory->create(end($operation['identifiers'])[1], $operation['property']);
+                $hydraOperations[] = $this->getHydraOperation($resourceClass, $subresourceMetadata, $operation['route_name'], $operation, "#{$subresourceMetadata->getShortName()}", OperationType::SUBRESOURCE, $propertyMetadata->getSubresource());
+            }
         }
 
         return $hydraOperations;
@@ -219,58 +242,76 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Gets and populates if applicable a Hydra operation.
      *
-     * @param string           $resourceClass
-     * @param ResourceMetadata $resourceMetadata
-     * @param string           $operationName
-     * @param array            $operation
-     * @param string           $prefixedShortName
-     * @param bool             $collection
+     * @param string              $resourceClass
+     * @param ResourceMetadata    $resourceMetadata
+     * @param string              $operationName
+     * @param array               $operation
+     * @param string              $prefixedShortName
+     * @param string              $operationType
+     * @param SubresourceMetadata $subresourceMetadata
      *
      * @return array
      */
-    private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, bool $collection): array
+    private function getHydraOperation(string $resourceClass, ResourceMetadata $resourceMetadata, string $operationName, array $operation, string $prefixedShortName, string $operationType, SubresourceMetadata $subresourceMetadata = null): array
     {
-        if ($collection) {
+        if (OperationType::COLLECTION === $operationType) {
             $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
-        } else {
+        } elseif (OperationType::ITEM === $operationType) {
             $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+        } else {
+            $method = 'GET';
         }
 
         $hydraOperation = $operation['hydra_context'] ?? [];
         $shortName = $resourceMetadata->getShortName();
 
-        if ('GET' === $method && $collection) {
-            $hydraOperation = [
+        if ('GET' === $method && OperationType::COLLECTION === $operationType) {
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves the collection of $shortName resources.",
-                'returns' => 'hydra:PagedCollection',
-            ] + $hydraOperation;
+                'returns' => 'hydra:Collection',
+            ];
+        } elseif ('GET' === $method && OperationType::SUBRESOURCE === $operationType) {
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
+                'hydra:title' => $subresourceMetadata && $subresourceMetadata->isCollection() ? "Retrieves the collection of $shortName resources." : "Retrieves a $shortName resource.",
+                'returns' => "#$shortName",
+            ];
         } elseif ('GET' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves $shortName resource.",
                 'returns' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
+        } elseif ('PATCH' === $method) {
+            $hydraOperation += [
+                '@type' => 'hydra:Operation',
+                'hydra:title' => "Updates the $shortName resource.",
+                'returns' => $prefixedShortName,
+                'expects' => $prefixedShortName,
+            ];
         } elseif ('POST' === $method) {
-            $hydraOperation = [
-                '@type' => 'hydra:CreateResourceOperation',
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:CreateAction'],
                 'hydra:title' => "Creates a $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('PUT' === $method) {
-            $hydraOperation = [
-                '@type' => 'hydra:ReplaceResourceOperation',
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                 'hydra:title' => "Replaces the $shortName resource.",
                 'returns' => $prefixedShortName,
                 'expects' => $prefixedShortName,
-            ] + $hydraOperation;
+            ];
         } elseif ('DELETE' === $method) {
-            $hydraOperation = [
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:DeleteAction'],
                 'hydra:title' => "Deletes the $shortName resource.",
                 'returns' => 'owl:Nothing',
-            ] + $hydraOperation;
+            ];
         }
 
-        $hydraOperation['@type'] ?? $hydraOperation['@type'] = 'hydra:Operation';
         $hydraOperation['hydra:method'] ?? $hydraOperation['hydra:method'] = $method;
 
         if (!isset($hydraOperation['rdfs:label']) && isset($hydraOperation['hydra:title'])) {
@@ -330,6 +371,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 }
                 break;
         }
+
+        return null;
     }
 
     /**
@@ -474,7 +517,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function computeDoc(Documentation $object, array $classes): array
     {
-        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT])];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT]), '@type' => 'hydra:ApiDocumentation'];
 
         if ('' !== $object->getTitle()) {
             $doc['hydra:title'] = $object->getTitle();
@@ -504,6 +547,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'rdfs' => ContextBuilderInterface::RDFS_NS,
             'xmls' => ContextBuilderInterface::XML_NS,
             'owl' => ContextBuilderInterface::OWL_NS,
+            'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
             'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
             'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
             'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],

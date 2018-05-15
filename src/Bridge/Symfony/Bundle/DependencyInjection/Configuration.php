@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use FOS\UserBundle\FOSUserBundle;
+use GraphQL\GraphQL;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -40,12 +42,35 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('title')->defaultValue('')->info('The title of the API.')->end()
-                ->scalarNode('description')->defaultValue('')->info('The description of the API.')->end()
-                ->scalarNode('version')->defaultValue('0.0.0')->info('The version of the API.')->end()
-                ->scalarNode('default_operation_path_resolver')->defaultValue('api_platform.operation_path_resolver.underscore')->info('Specify the default operation path resolver to use for generating resources operations path.')->end()
+                ->scalarNode('title')
+                    ->info('The title of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('description')
+                    ->info('The description of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('')
+                ->end()
+                ->scalarNode('version')
+                    ->info('The version of the API.')
+                    ->cannotBeEmpty()
+                    ->defaultValue('0.0.0')
+                ->end()
+                ->scalarNode('default_operation_path_resolver')
+                    ->defaultValue('api_platform.operation_path_resolver.underscore')
+                    ->setDeprecated('The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.')
+                    ->info('Specify the default operation path resolver to use for generating resources operations path.')
+                ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
-                ->scalarNode('api_resources_directory')->defaultValue('Entity')->info('The name of the directory within the bundles that contains the api resources.')->end()
+                ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
+                ->booleanNode('allow_plain_identifiers')->defaultFalse()->info('Allow plain identifiers, for example "id" instead of "@id" when denormalizing a relation.')->end()
+                ->arrayNode('validator')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->variableNode('serialize_payload_fields')->defaultValue([])->info('Enable the serialization of payload fields when a validation error is thrown.')->end()
+                    ->end()
+                ->end()
                 ->arrayNode('eager_loading')
                     ->canBeDisabled()
                     ->addDefaultsIfNotSet()
@@ -56,10 +81,17 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
-                ->booleanNode('enable_fos_user')->defaultValue(false)->info('Enable the FOSUserBundle integration.')->end()
-                ->booleanNode('enable_nelmio_api_doc')->defaultValue(false)->info('Enable the Nelmio Api doc integration.')->end()
+                ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('enable_nelmio_api_doc')
+                    ->defaultValue(false)
+                    ->setDeprecated('Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.')
+                    ->info('Enable the NelmioApiDocBundle integration.')
+                ->end()
                 ->booleanNode('enable_swagger')->defaultValue(true)->info('Enable the Swagger documentation and export.')->end()
                 ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger ui.')->end()
+                ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
+                ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
+                ->booleanNode('enable_profiler')->defaultTrue()->info('Enable the data collector and the WebProfilerBundle integration.')->end()
 
                 ->arrayNode('oauth')
                     ->canBeEnabled()
@@ -78,6 +110,40 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
 
+                ->arrayNode('graphql')
+                    ->canBeEnabled()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class))->info('To enable or disable GraphQL.')->end()
+                        ->arrayNode('graphiql')
+                            ->canBeEnabled()
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled')->defaultValue(class_exists(GraphQL::class) && class_exists(TwigBundle::class))->info('To enable or disable GraphiQL.')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('swagger')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                             ->arrayNode('api_keys')
+                                 ->prototype('array')
+                                    ->children()
+                                    ->scalarNode('name')
+                                        ->info('The name of the header or query parameter containing the api key.')
+                                    ->end()
+                                    ->enumNode('type')
+                                        ->info('Whether the api key should be a query parameter or a header.')
+                                        ->values(['query', 'header'])
+                                    ->end()
+                                ->end()
+                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+
                 ->arrayNode('collection')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -88,31 +154,32 @@ final class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->booleanNode('enabled')->defaultTrue()->info('To enable or disable pagination for all resource collections by default.')->end()
+                                ->booleanNode('partial')->defaultFalse()->info('To enable or disable partial pagination for all resource collections by default when pagination is enabled.')->end()
                                 ->booleanNode('client_enabled')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
                                 ->booleanNode('client_items_per_page')->defaultFalse()->info('To allow the client to set the number of items per page.')->end()
+                                ->booleanNode('client_partial')->defaultFalse()->info('To allow the client to enable or disable partial pagination.')->end()
                                 ->integerNode('items_per_page')->defaultValue(30)->info('The default number of items per page.')->end()
                                 ->integerNode('maximum_items_per_page')->defaultNull()->info('The maximum number of items per page.')->end()
                                 ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The default name of the parameter handling the page number.')->end()
                                 ->scalarNode('enabled_parameter_name')->defaultValue('pagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
                                 ->scalarNode('items_per_page_parameter_name')->defaultValue('itemsPerPage')->cannotBeEmpty()->info('The name of the query parameter to set the number of items per page.')->end()
+                                ->scalarNode('partial_parameter_name')->defaultValue('partial')->cannotBeEmpty()->info('The name of the query parameter to enable or disable partial pagination.')->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
 
-                ->arrayNode('loader_paths')
+                ->arrayNode('mapping')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('annotation')
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('yaml')
-                            ->prototype('scalar')->end()
-                        ->end()
-                        ->arrayNode('xml')
+                        ->arrayNode('paths')
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
+                ->end()
+
+                ->arrayNode('resource_class_directories')
+                    ->prototype('scalar')->end()
                 ->end()
 
                 ->arrayNode('http_cache')
@@ -135,6 +202,14 @@ final class Configuration implements ConfigurationInterface
                                     ->defaultValue([])
                                     ->prototype('scalar')->end()
                                     ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
+                                ->end()
+                                ->variableNode('request_options')
+                                    ->defaultValue([])
+                                    ->validate()
+                                        ->ifTrue(function ($v) { return false === \is_array($v); })
+                                        ->thenInvalid('The request_options parameter must be an array.')
+                                    ->end()
+                                    ->info('To pass options to the client charged with the request.')
                                 ->end()
                             ->end()
                         ->end()
@@ -181,12 +256,14 @@ final class Configuration implements ConfigurationInterface
                         ->ifArray()
                         ->then(function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as &$httpStatusCode) {
-                                if (is_int($httpStatusCode)) {
+                                if (\is_int($httpStatusCode)) {
                                     continue;
                                 }
 
-                                if (defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
-                                    $httpStatusCode = constant($httpStatusCodeConstant);
+                                if (\defined($httpStatusCodeConstant = sprintf('%s::%s', Response::class, $httpStatusCode))) {
+                                    @trigger_error(sprintf('Using a string "%s" as a constant of the "%s" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony\'s custom YAML extension for PHP constants instead (i.e. "!php/const:%s").', $httpStatusCode, Response::class, $httpStatusCodeConstant), E_USER_DEPRECATED);
+
+                                    $httpStatusCode = \constant($httpStatusCodeConstant);
                                 }
                             }
 

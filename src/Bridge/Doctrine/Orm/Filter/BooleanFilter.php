@@ -30,7 +30,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class BooleanFilter extends AbstractFilter
+class BooleanFilter extends AbstractContextAwareFilter
 {
     /**
      * {@inheritdoc}
@@ -72,9 +72,9 @@ class BooleanFilter extends AbstractFilter
             return;
         }
 
-        if (in_array($value, ['true', '1'], true)) {
+        if (\in_array($value, [true, 'true', '1'], true)) {
             $value = true;
-        } elseif (in_array($value, ['false', '0'], true)) {
+        } elseif (\in_array($value, [false, 'false', '0'], true)) {
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [
@@ -89,7 +89,7 @@ class BooleanFilter extends AbstractFilter
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Cache\CachedTrait;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -24,9 +24,10 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInterface
 {
+    use CachedTrait;
+
     const CACHE_KEY_PREFIX = 'resource_metadata_';
 
-    private $cacheItemPool;
     private $decorated;
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceMetadataFactoryInterface $decorated)
@@ -40,27 +41,10 @@ final class CachedResourceMetadataFactory implements ResourceMetadataFactoryInte
      */
     public function create(string $resourceClass): ResourceMetadata
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass]));
+        $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
 
-        try {
-            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
-            }
-        } catch (CacheException $e) {
-            // do nothing
-        }
-
-        $resourceMetadata = $this->decorated->create($resourceClass);
-
-        if (!isset($cacheItem)) {
-            return $resourceMetadata;
-        }
-
-        $cacheItem->set($resourceMetadata);
-        $this->cacheItemPool->save($cacheItem);
-
-        return $resourceMetadata;
+        return $this->getCached($cacheKey, function () use ($resourceClass) {
+            return $this->decorated->create($resourceClass);
+        });
     }
 }

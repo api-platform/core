@@ -162,6 +162,9 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         } elseif (isset($options['item_operation_name'])) {
             $normalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'normalization_context', null, true);
             $denormalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'denormalization_context', null, true);
+        } elseif (isset($options['graphql_operation_name'])) {
+            $normalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'normalization_context', null, true);
+            $denormalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'denormalization_context', null, true);
         } else {
             $normalizationContext = $resourceMetadata->getAttribute('normalization_context');
             $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');

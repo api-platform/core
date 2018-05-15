@@ -30,7 +30,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class ExistsFilter extends AbstractFilter
+class ExistsFilter extends AbstractContextAwareFilter
 {
     const QUERY_PARAMETER_KEY = 'exists';
 
@@ -75,9 +75,9 @@ class ExistsFilter extends AbstractFilter
             return;
         }
 
-        if (in_array($value[self::QUERY_PARAMETER_KEY], ['true', '1', '', null], true)) {
+        if (\in_array($value[self::QUERY_PARAMETER_KEY], [true, 'true', '1', '', null], true)) {
             $value = true;
-        } elseif (in_array($value[self::QUERY_PARAMETER_KEY], ['false', '0'], true)) {
+        } elseif (\in_array($value[self::QUERY_PARAMETER_KEY], [false, 'false', '0'], true)) {
             $value = false;
         } else {
             $this->logger->notice('Invalid filter ignored', [
@@ -92,7 +92,7 @@ class ExistsFilter extends AbstractFilter
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
@@ -169,7 +169,7 @@ class ExistsFilter extends AbstractFilter
      */
     private function isAssociationNullable(array $associationMapping): bool
     {
-        if (isset($associationMapping['id']) && $associationMapping['id']) {
+        if (!empty($associationMapping['id'])) {
             return false;
         }
 

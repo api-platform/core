@@ -28,6 +28,7 @@ interface ContextBuilderInterface
     const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
     const XML_NS = 'http://www.w3.org/2001/XMLSchema#';
     const OWL_NS = 'http://www.w3.org/2002/07/owl#';
+    const SCHEMA_ORG_NS = 'http://schema.org/';
 
     /**
      * Gets the base context.

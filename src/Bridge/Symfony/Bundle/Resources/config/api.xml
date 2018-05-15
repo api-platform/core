@@ -36,11 +36,15 @@
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.resource_class_directories%</argument>
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.subresource_operation_factory" />
+            <argument>%api_platform.graphql.enabled%</argument>
+            <argument>%api_platform.enable_entrypoint%</argument>
+            <argument>%api_platform.enable_docs%</argument>
 
             <tag name="routing.loader" />
         </service>
+
+        <service id="ApiPlatform\Core\Api\UrlGeneratorInterface" alias="api_platform.router" />
 
         <service id="api_platform.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
@@ -54,13 +58,17 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
+            <argument type="service" id="api_platform.identifier.denormalizer" on-invalid="ignore" />
         </service>
+        <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
+        <service id="ApiPlatform\Core\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
         <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Core\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -80,6 +88,8 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+            <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
+            <argument>%api_platform.allow_plain_identifiers%</argument>
 
             <tag name="serializer.normalizer" />
         </service>
@@ -91,14 +101,29 @@
         <service id="api_platform.operation_path_resolver.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver" public="false">
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.operation_path_resolver.custom" />
+            <argument type="service" id="api_platform.subresource_operation_factory" />
         </service>
 
         <service id="api_platform.operation_path_resolver.custom" class="ApiPlatform\Core\PathResolver\CustomOperationPathResolver" public="false">
-            <argument type="service" id="api_platform.operation_path_resolver.default" />
+            <argument type="service" id="api_platform.operation_path_resolver.generator" />
         </service>
 
-        <service id="api_platform.operation_path_resolver.underscore" class="ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver" public="false" />
-        <service id="api_platform.operation_path_resolver.dash" class="ApiPlatform\Core\PathResolver\DashOperationPathResolver" public="false" />
+        <service id="api_platform.operation_path_resolver.generator" class="ApiPlatform\Core\PathResolver\OperationPathResolver" public="false">
+            <argument type="service" id="api_platform.path_segment_name_generator" />
+        </service>
+
+        <service id="api_platform.operation_path_resolver.underscore" class="ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver" public="false">
+            <deprecated>The "%service_id%" service is deprecated since API Platform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.underscore" instead.</deprecated>
+        </service>
+
+        <service id="api_platform.operation_path_resolver.dash" class="ApiPlatform\Core\PathResolver\DashOperationPathResolver" public="false">
+            <deprecated>The "%service_id%" service is deprecated since API Platform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.dash" instead.</deprecated>
+        </service>
+
+        <!-- Path name generator -->
+
+        <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator" public="false" />
+        <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Core\Operation\DashPathSegmentNameGenerator" public="false" />
 
         <!-- Event listeners -->
 
@@ -114,8 +139,16 @@
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument type="service" id="api_platform.identifier.denormalizer" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
+        </service>
+
+        <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
+            <argument type="service" id="api_platform.data_persister" />
+
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
 
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
@@ -154,19 +187,20 @@
 
         <!-- Action -->
 
-        <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" />
-        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" />
-        <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" />
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" public="true" />
+        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction">
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
 
-        <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction">
+        <service id="api_platform.action.documentation" class="ApiPlatform\Core\Documentation\Action\DocumentationAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.description%</argument>
@@ -174,24 +208,54 @@
             <argument>%api_platform.formats%</argument>
         </service>
 
-        <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction">
+        <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.error_formats%</argument>
             <argument>%api_platform.exception_to_status%</argument>
         </service>
 
-        <!-- Identifiers extractor -->
+        <!-- Identifiers -->
 
         <service id="api_platform.identifiers_extractor" class="ApiPlatform\Core\Api\IdentifiersExtractor" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
 
         <service id="api_platform.identifiers_extractor.cached" class="ApiPlatform\Core\Api\CachedIdentifiersExtractor" decorates="api_platform.identifiers_extractor" public="false">
             <argument type="service" id="api_platform.cache.identifiers_extractor" />
             <argument type="service" id="api_platform.identifiers_extractor.cached.inner" />
             <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+        </service>
+
+        <service id="api_platform.identifier.denormalizer" class="ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer" public="false">
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="tagged" tag="api_platform.identifier.denormalizer" />
+        </service>
+
+        <service id="api_platform.identifier.integer" class="ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer" public="false">
+            <tag name="api_platform.identifier.denormalizer" />
+        </service>
+
+        <service id="api_platform.identifier.date_normalizer" class="ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer" public="false">
+            <tag name="api_platform.identifier.denormalizer" />
+        </service>
+
+        <!-- Subresources -->
+
+        <service id="api_platform.subresource_operation_factory" class="ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.path_segment_name_generator" />
+        </service>
+
+        <service id="api_platform.subresource_operation_factory.cached" class="ApiPlatform\Core\Operation\Factory\CachedSubresourceOperationFactory" decorates="api_platform.subresource_operation_factory" decoration-priority="-10" public="false">
+            <argument type="service" id="api_platform.cache.subresource_operation_factory" />
+            <argument type="service" id="api_platform.subresource_operation_factory.cached.inner" />
         </service>
 
         <!-- Cache -->
@@ -201,6 +265,10 @@
         </service>
 
         <service id="api_platform.cache.identifiers_extractor" parent="cache.system" public="false">
+            <tag name="cache.pool" />
+        </service>
+
+        <service id="api_platform.cache.subresource_operation_factory" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
     </services>

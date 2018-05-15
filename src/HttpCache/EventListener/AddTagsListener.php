@@ -51,11 +51,11 @@ final class AddTagsListener
             !$request->isMethodCacheable()
             || !$response->isCacheable()
             || (!$attributes = RequestAttributesExtractor::extractAttributes($request))
-            || !$resources = $request->attributes->get('_resources')
         ) {
             return;
         }
 
+        $resources = $request->attributes->get('_resources');
         if (isset($attributes['collection_operation_name'])) {
             // Allows to purge collections
             $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);

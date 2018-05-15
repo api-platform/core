@@ -10,6 +10,13 @@
         my_collection_op:
             method: 'POST'
             path: 'the/collection/path'
+    subresourceOperations:
+        my_collection_subresource:
+            path: 'the/subresource/path'
+    graphql:
+        query:
+            normalization_context:
+                groups: ['graphql']
     attributes:
         normalization_context:
             groups: ['default']

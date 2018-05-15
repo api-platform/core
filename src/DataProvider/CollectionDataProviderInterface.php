@@ -25,9 +25,6 @@ interface CollectionDataProviderInterface
     /**
      * Retrieves a collection.
      *
-     * @param string      $resourceClass
-     * @param string|null $operationName
-     *
      * @throws ResourceClassNotSupportedException
      *
      * @return array|\Traversable

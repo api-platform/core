@@ -14,24 +14,25 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ContainNonResourceItemDataProvider implements ItemDataProviderInterface
+class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
+    {
+        return ContainNonResource::class === $resourceClass;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        if (ContainNonResource::class !== $resourceClass) {
-            throw new ResourceClassNotSupportedException();
-        }
-
         // Retrieve the blog post item from somewhere
         $cnr = new ContainNonResource();
         $cnr->id = $id;

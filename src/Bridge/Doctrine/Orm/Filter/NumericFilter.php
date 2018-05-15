@@ -29,7 +29,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-class NumericFilter extends AbstractFilter
+class NumericFilter extends AbstractContextAwareFilter
 {
     /**
      * Type of numeric in Doctrine.
@@ -60,12 +60,10 @@ class NumericFilter extends AbstractFilter
             if (!$this->isPropertyMapped($property, $resourceClass) || !$this->isNumericField($property, $resourceClass)) {
                 continue;
             }
-            $propertyParts = $this->splitPropertyParts($property, $resourceClass);
-            $metadata = $this->getNestedMetadata($resourceClass, $propertyParts['associations']);
 
             $description[$property] = [
                 'property' => $property,
-                'type' => $this->getType($metadata->getTypeOfField($propertyParts['field'])),
+                'type' => $this->getType($this->getDoctrineFieldType($property, $resourceClass)),
                 'required' => false,
             ];
         }
@@ -80,9 +78,9 @@ class NumericFilter extends AbstractFilter
      *
      * @return string
      */
-    private function getType(string $doctrineType): string
+    private function getType(string $doctrineType = null): string
     {
-        if (DBALType::DECIMAL === $doctrineType) {
+        if (null === $doctrineType || DBALType::DECIMAL === $doctrineType) {
             return 'string';
         }
 
@@ -100,31 +98,39 @@ class NumericFilter extends AbstractFilter
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
-            !$this->isPropertyMapped($property, $resourceClass) ||
-            !$this->isNumericField($property, $resourceClass)
+            !$this->isPropertyMapped($property, $resourceClass)
         ) {
             return;
         }
 
         if (!is_numeric($value)) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
+                'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s::%s" property', $resourceClass, $property)),
             ]);
 
             return;
         }
 
-        $alias = 'o';
+        $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
             list($alias, $field) = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
+
+        if (!isset(self::DOCTRINE_NUMERIC_TYPES[$this->getDoctrineFieldType($property, $resourceClass)])) {
+            $this->logger->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('The field "%s" of class "%s" is not a doctrine numeric type.', $field, $resourceClass)),
+            ]);
+
+            return;
+        }
+
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         $queryBuilder
             ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value);
+            ->setParameter($valueParameter, $value, $this->getDoctrineFieldType($property, $resourceClass));
     }
 
     /**

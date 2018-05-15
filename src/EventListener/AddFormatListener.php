@@ -47,7 +47,7 @@ final class AddFormatListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond')) {
+        if (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond') && !$request->attributes->has('_graphql')) {
             return;
         }
 
@@ -58,7 +58,7 @@ final class AddFormatListener
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
             $mimeTypes = array_keys($this->mimeTypes);
         } elseif (!isset($this->formats[$routeFormat])) {
-            throw new NotFoundHttpException('Not Found');
+            throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
         } else {
             $mimeTypes = Request::getMimeTypes($routeFormat);
         }

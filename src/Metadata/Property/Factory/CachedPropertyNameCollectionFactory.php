@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
+use ApiPlatform\Core\Cache\CachedTrait;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -24,9 +24,10 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 final class CachedPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
+    use CachedTrait;
+
     const CACHE_KEY_PREFIX = 'property_name_collection_';
 
-    private $cacheItemPool;
     private $decorated;
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, PropertyNameCollectionFactoryInterface $decorated)
@@ -42,25 +43,8 @@ final class CachedPropertyNameCollectionFactory implements PropertyNameCollectio
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
 
-        try {
-            $cacheItem = $this->cacheItemPool->getItem($cacheKey);
-
-            if ($cacheItem->isHit()) {
-                return $cacheItem->get();
-            }
-        } catch (CacheException $e) {
-            // do nothing
-        }
-
-        $propertyNameCollection = $this->decorated->create($resourceClass, $options);
-
-        if (!isset($cacheItem)) {
-            return $propertyNameCollection;
-        }
-
-        $cacheItem->set($propertyNameCollection);
-        $this->cacheItemPool->save($cacheItem);
-
-        return $propertyNameCollection;
+        return $this->getCached($cacheKey, function () use ($resourceClass, $options) {
+            return $this->decorated->create($resourceClass, $options);
+        });
     }
 }

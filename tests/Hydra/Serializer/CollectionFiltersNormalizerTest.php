@@ -20,13 +20,14 @@ use ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CollectionFiltersNormalizerTest extends \PHPUnit_Framework_TestCase
+class CollectionFiltersNormalizerTest extends TestCase
 {
     public function testSupportsNormalization()
     {

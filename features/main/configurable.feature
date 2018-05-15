@@ -1,6 +1,6 @@
 Feature: Configurable resource CRUD
   As a client software developer
-  I need to be able to configure api resources through Yaml
+  I need to be able to configure api resources through YAML
 
   @createSchema
   Scenario: Retrieve the ConfigDummy resource
@@ -44,7 +44,6 @@ Feature: Configurable resource CRUD
     }
     """
 
-  @dropSchema
   Scenario: Retrieve the ConfigDummy resource
     When I send a "GET" request to "/fileconfigdummies/1"
     Then the response status code should be 200

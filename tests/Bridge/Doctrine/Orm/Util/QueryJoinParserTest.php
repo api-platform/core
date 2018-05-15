@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -21,8 +22,9 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use phpmock\phpunit\PHPMock;
+use PHPUnit\Framework\TestCase;
 
-class QueryJoinParserTest extends \PHPUnit_Framework_TestCase
+class QueryJoinParserTest extends TestCase
 {
     use PHPMock;
 
@@ -31,7 +33,7 @@ class QueryJoinParserTest extends \PHPUnit_Framework_TestCase
         $queryBuilder = $this->prophesize(QueryBuilder::class);
         $queryBuilder->getRootEntities()->willReturn(['Dummy']);
         $queryBuilder->getRootAliases()->willReturn(['d']);
-        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name')]);
+        $queryBuilder->getDQLPart('join')->willReturn(['a_1' => [new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name')]]);
         $classMetadata = $this->prophesize(ClassMetadata::class);
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata->reveal());
@@ -43,21 +45,33 @@ class QueryJoinParserTest extends \PHPUnit_Framework_TestCase
 
     public function testGetJoinRelationshipWithJoin()
     {
-        $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
-        $this->assertEquals('relatedDummy', QueryJoinParser::getJoinRelationship($join));
+        $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
+        $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
+    }
+
+    public function testGetJoinRelationshipWithClassJoin()
+    {
+        $join = new Join('INNER_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
+        $this->assertEquals(RelatedDummy::class, QueryJoinParser::getJoinRelationship($join));
     }
 
     public function testGetJoinRelationshipWithReflection()
     {
         $methodExist = $this->getFunctionMock('ApiPlatform\Core\Bridge\Doctrine\Orm\Util', 'method_exists');
         $methodExist->expects($this->any())->with(Join::class, 'getJoin')->willReturn('false');
-        $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
-        $this->assertEquals('relatedDummy', QueryJoinParser::getJoinRelationship($join));
+        $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
+        $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
     }
 
     public function testGetJoinAliasWithJoin()
     {
         $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
+        $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
+    }
+
+    public function testGetJoinAliasWithClassJoin()
+    {
+        $join = new Join('LEFT_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 

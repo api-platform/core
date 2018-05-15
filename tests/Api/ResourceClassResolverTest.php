@@ -18,13 +18,15 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
+class ResourceClassResolverTest extends TestCase
 {
     public function testGetResourceClassWithIntendedClassName()
     {
@@ -35,6 +37,18 @@ class ResourceClassResolverTest extends \PHPUnit_Framework_TestCase
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
         $resourceClass = $resourceClassResolver->getResourceClass($dummy, Dummy::class);
+        $this->assertEquals($resourceClass, Dummy::class);
+    }
+
+    public function testGetResourceClassWithOtherClassName()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Smail');
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
+
+        $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
+        $resourceClass = $resourceClassResolver->getResourceClass($dummy, DummyCar::class, true);
         $this->assertEquals($resourceClass, Dummy::class);
     }
 

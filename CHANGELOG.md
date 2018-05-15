@@ -1,5 +1,157 @@
 # Changelog
 
+## 2.2.6
+
+* Fix identifiers creation and update when using GraphQL
+* Fix nested properties support when using filters with GraphQL
+* Fix a bug preventing the `ExistFilter` to work properly with GraphQL
+* Fix a bug preventing to use a custom denormalization context when using GraphQL
+* Enforce the compliance with the JSONAPI spec by throwing a 400 error when using the "inclusion of related resources" feature
+* Update `ChainSubresourceDataProvider` to take into account `RestrictedDataProviderInterface`
+* Fix the cached identifiers extractor support for stringable identifiers
+* Allow a `POST` request to have an empty body
+* Fix a crash when the ExpressionLanguage component isn't installed
+* Enable item route on collection's subresources
+* Fix an issue with subresource filters, was incorrectly adding filters for the parent instead of the subresource
+* Throw when a subresources identifier is not found
+* Allow subresource items in the `IriConverter`
+* Don't send the `Link` HTTP header pointing to the Hydra documentation if docs are disabled
+* Fix relations denormalization with plain identifiers
+* Prevent the `OrderFilter` to trigger faulty deprecation notices
+* Respect the `fetchEager=false` directive on an association in the `EagerLoadingExtension`
+* Use the configured name converter (if any) for relations in the HAL's `ItemNormalizer`
+* Use the configured name converter (if any) in the `ConstraintViolationListNormalizer`
+* Dramatically improve the overall performance by fixing the normalizer's cache key generation
+* Improve the performance `CachedRouteNameResolver` and `CachedSubresourceOperationFactory` by adding a local memory cache layer
+* Improve the performance of access control checking when using GraphQL
+* Improve the performance by using `isResourceClass` when possible
+* Remove a useless `try/catch` in the `CachedTrait`
+* Forward the operation name to the `IriConverter`
+* Fix some more code quality issues
+
+## 2.2.5
+
+* Fix a various issues preventing the metadata cache to work properly (performance fix)
+* Fix a cache corruption issue when using subresources
+* Fix non-standard outputs when using the HAL format
+* Persist data in Doctrine DataPersister only if needed
+* Fix identifiers handling in GraphQL mutations
+* Fix client-side ID creation or update when using GraphQL mutations
+* Fix an error that was occuring when the Expression Language component wasn't installed
+* Update the `ChainSubresourceDataProvider` class to take into account `RestrictedDataProviderInterface`
+
+## 2.2.4
+
+* Fix a BC break preventing to pass non-arrays to the builtin Symfony normalizers when using custom normalizers
+* Fix a bug when using `FilterEagerLoadingExtension` with manual joins
+* Fix some bugs in the AWS API Gateway compatibility mode for Open API/Swagger
+
+## 2.2.3
+
+* Fix object state inconsistency after persistence
+* Allow to use multiple `@ApiFilter` annotations on the same class
+* Fix a BC break when the serialization context builder depends of the retrieved data
+* Fix a bug regarding collections handling in the GraphQL endpoint
+
+## 2.2.2
+
+* Autoregister classes implementing `SubresourceDataProviderInterface` 
+* Fix the `DateTimeImmutable` support in the date filter
+* Fix a BC break in `DocumentationAction` impacting NelmioApiDoc
+* Fix the context passed to data providers (improve the eager loading)
+* Fix fix a subresource's metadata cache bug
+* Fix the configuration detection when using a custom directory structure
+
+## 2.2.1
+
+* Merge bug fixes from older branches
+
+## 2.2.0
+
+* Add GraphQL support (including mutations, pagination, filters, access control rules and automatic SQL joins)
+* Fully implement the GraphQL Relay Server specification
+* Add JSONAPI support
+* Add a new `@ApiFilter` annotation to directly configure filters from resource classes
+* Add a partial paginator that prevents `COUNT()` SQL queries
+* Add a new simplified way to configure operations
+* Add an option to serialize Validator's payloads (e.g. error levels)
+* Add support for generators in data providers
+* Add a new `allow_plain_identifiers` option to allow using plain IDs as identifier instead of IRIs
+* Add support for resource names without namespace
+* Automatically enable FOSUser support if the bundle is installed
+* Add an `AbstractCollectionNormalizer` to help supporting custom formats
+* Deprecate NelmioApiDocBundle 2 support (upgrade to v3, it has native API Platform support)
+* Deprecate the `ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener` class in favor of the new `ApiPlatform\Core\EventListener\WriteListener` class.
+* Remove the `api_platform.doctrine.listener.view.write` event listener service.
+* Add a data persistence layer with a new `ApiPlatform\Core\DataPersister\DataPersisterInterface` interface.
+* Add the a new configuration to disable the API entrypoint and the documentation
+* Allow to set maximum items per page at operation/resource level  
+* Add the ability to customize the message when configuring an access control rule trough the `access_control_message` attribute
+* Allow empty operations in XML configs 
+
+## 2.1.6
+
+* Add a new config option to specify the directories containing resource classes
+* Fix a bug regarding the ordering filter when dealing with embedded fields
+* Allow to autowire the router
+* Fix the base path handling the Swagger/Open API documentation normalizer
+
+## 2.1.5
+
+* Add support for filters autoconfiguration with Symfony 3.4+
+* Add service aliases required to use the autowiring with Symfony 3.4+
+* Allow updating nested resource when issuing a `POST` HTTP request
+* Add support for the immutable date and time types introduced in Doctrine
+* Fix the Doctrine query generated to retrieve nested subresources
+* Fix several bugs in the automatic eager loading support
+* Fix a bug occurring when passing neither an IRI nor an array in an embedded relation
+* Allow to request `0` items per page in collections
+* Also copy the `Host` from the Symfony Router
+* `Paginator::getLastPage()` now always returns a `float`
+* Minor performance improvements
+* Minor quality fixes
+
+## 2.1.4
+
+* Symfony 3.4 and 4.0 compatibility
+* Autowiring strict mode compatibility 
+* Fix a bug preventing to create resource classes in the global namespace
+* Fix Doctrine type conversion in filter's WHERE clauses
+* Fix filters when using eager loading and non-association composite identifier
+* Fix Doctrine type resolution for identifiers (for custom DBALType) 
+* Add missing Symfony Routing options to operations configuration
+* Add SubresourceOperations to metadata
+* Fix disabling of cache pools with the dev environment 
+
+## 2.1.3
+
+* Don't use dynamic values in Varnish-related service keys (improves Symfony 3.3 compatibility)
+* Hydra: Fix the value of `owl:allValuesFrom` in the API documentation
+* Swagger: Include the context even when the type is `null`
+* Minor code and PHPDoc cleanups
+
+## 2.1.2
+
+* PHP 7.2 compatibility
+* Symfony 4 compatibility
+* Fix the Swagger UI documentation for specific routes (the API request wasn't executed automatically anymore)
+* Add a missing cache tag on empty collections
+* Fix a missing service when no Varnish URL is defined
+* Fix the whitelist comparison in the property filer
+* Fix some bugs regarding subresources in the Swagger and Hydra normalizers
+* Make route requirements configurable
+* Make possible to configure the Swagger context for properties
+* Better exception messages when there is a content negotiation error
+* Use the `PriorityTaggedServiceTrait` provided by Symfony instead of a custom implementation
+* Test upstream libs deprecations
+* Various quality fixes and tests cleanup
+
+## 2.1.1
+
+* Fix path generators
+* Fix some method signatures related to subresources
+* Improve performance of the deserialization mechanism
+
 ## 2.1.0
 
 * Add a builtin HTTP cache invalidation system able to store all requests in Varnish (or any other proxy supporting cache tags) and purge it instantly when needed
@@ -24,6 +176,31 @@
 * Improve the performance of the filters subsystem by using a PSR-11 service locator and deprecate the `FilterCollection` class
 * Add compatibility with Symfony Flex and Symfony 4
 * Allow the Symfony Dependency Injection component to autoconfigure data providers and query extensions
+* Allow to use service for dynamic validation groups
+* Allow using PHP constants in YAML resources files
+* Upgrade to the latest version of the Hydra spec
+* Add `pagination` and `itemPerPage` parameters in the Swagger/Open API documentation
+* Add support for API key authentication in Swagger UI
+* Allow to specify a whitelist of serialization groups
+* Allow to use the new immutable date and time types of Doctrine in filters
+* Update swagger definition keys to more verbose ones (ie `Resource-md5($groups)` => `Resource-groupa_groupb`) - see https://github.com/api-platform/core/pull/1207
+
+## 2.0.11
+
+* Ensure PHP 7.2 compatibility
+* Fix some bug regarding Doctrine joins
+* Let the `hydra_context` option take precedence over operation metadata
+* Fix relations handling by the non-hypermedia `ItemNormalizer` (raw JSON, XML)
+* Fix a bug in the JSON-LD context: should not be prefixed by `#`
+* Fix a bug regarding serialization groups in Hydra docs
+
+## 2.0.10
+
+* Performance improvement
+* Swagger: Allow non-numeric IDs (such as UUIDs) in URLs
+* Fix a bug when a composite identifier is missing
+* `ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter::extractProperties` now always return an array
+* Fix NelmioApiDocParser recursive relations
 
 ## 2.0.9
 

@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\EventListener;
 
 use ApiPlatform\Core\EventListener\SerializeListener;
+use ApiPlatform\Core\Serializer\ResourceList;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +27,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class SerializeListenerTest extends \PHPUnit_Framework_TestCase
+class SerializeListenerTest extends TestCase
 {
     public function testDoNotSerializeResponse()
     {
@@ -102,9 +104,24 @@ class SerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeCollectionOperation()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get', 'resources' => []];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize(Argument::any(), 'xml', $expectedContext)->willReturn('bar')->shouldBeCalled();
+
+        $serializerProphecy
+            ->serialize(
+                Argument::any(),
+                'xml',
+                Argument::allOf(
+                    Argument::that(function (array $context) {
+                        return $context['resources'] instanceof ResourceList;
+                    }),
+                    Argument::withEntry('request_uri', ''),
+                    Argument::withEntry('resource_class', 'Foo'),
+                    Argument::withEntry('collection_operation_name', 'get')
+                )
+            )
+            ->willReturn('bar')
+            ->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
@@ -123,9 +140,23 @@ class SerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeItemOperation()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get', 'resources' => []];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize(Argument::any(), 'xml', $expectedContext)->willReturn('bar')->shouldBeCalled();
+        $serializerProphecy
+            ->serialize(
+                Argument::any(),
+                'xml',
+                Argument::allOf(
+                    Argument::that(function (array $context) {
+                        return $context['resources'] instanceof ResourceList;
+                    }),
+                    Argument::withEntry('request_uri', ''),
+                    Argument::withEntry('resource_class', 'Foo'),
+                    Argument::withEntry('item_operation_name', 'get')
+                )
+            )
+            ->willReturn('bar')
+            ->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
         $request->setRequestFormat('xml');

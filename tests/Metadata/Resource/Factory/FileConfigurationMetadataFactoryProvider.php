@@ -14,13 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Resource metadata provider for file configured factories tests.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framework_TestCase
+abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 {
     public function resourceMetadataProvider()
     {
@@ -36,13 +38,23 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
             'collectionOperations' => [
                 'my_collection_op' => ['method' => 'POST', 'path' => 'the/collection/path'],
             ],
+            'subresourceOperations' => [
+                'my_collection_subresource' => ['path' => 'the/subresource/path'],
+            ],
+            'graphql' => [
+                'query' => [
+                    'normalization_context' => [
+                        AbstractNormalizer::GROUPS => ['graphql'],
+                    ],
+                ],
+            ],
             'iri' => 'someirischema',
             'attributes' => [
                 'normalization_context' => [
-                    'groups' => ['default'],
+                    AbstractNormalizer::GROUPS => ['default'],
                 ],
                 'denormalization_context' => [
-                    'groups' => ['default'],
+                    AbstractNormalizer::GROUPS => ['default'],
                 ],
                 'hydra_context' => [
                     '@type' => 'hydra:Operation',
@@ -51,7 +63,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends \PHPUnit_Framewo
             ],
         ];
 
-        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'iri', 'attributes'] as $property) {
+        foreach (['shortName', 'description', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'iri', 'attributes'] as $property) {
             $wither = 'with'.ucfirst($property);
             $resourceMetadata = $resourceMetadata->$wither($metadata[$property]);
         }

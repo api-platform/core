@@ -38,7 +38,7 @@ final class RequestParser
      */
     public static function parseAndDuplicateRequest(Request $request): Request
     {
-        $query = self::parseRequestParams($request->getQueryString() ?? '');
+        $query = self::parseRequestParams(self::getQueryString($request) ?? '');
         $body = self::parseRequestParams($request->getContent());
 
         return $request->duplicate($query, $body);
@@ -49,7 +49,7 @@ final class RequestParser
      *
      * @author Rok Kralj
      *
-     * @see http://stackoverflow.com/a/18209799/1529493
+     * @see https://stackoverflow.com/a/18209799/1529493
      *
      * @param string $source
      *
@@ -57,9 +57,9 @@ final class RequestParser
      */
     public static function parseRequestParams(string $source): array
     {
-        // '[' is urlencoded in the input, but we must urldecode it in order
+        // '[' is urlencoded ('%5B') in the input, but we must urldecode it in order
         // to find it when replacing names with the regexp below.
-        $source = str_replace(urlencode('['), '[', $source);
+        $source = str_replace('%5B', '[', $source);
 
         $source = preg_replace_callback(
             '/(^|(?<=&))[^=[&]+/',
@@ -73,5 +73,43 @@ final class RequestParser
         parse_str($source, $params);
 
         return array_combine(array_map('hex2bin', array_keys($params)), $params);
+    }
+
+    /**
+     * Generates the normalized query string for the Request.
+     *
+     * It builds a normalized query string, where keys/value pairs are alphabetized
+     * and have consistent escaping.
+     *
+     * @return string|null A normalized query string for the Request
+     */
+    public static function getQueryString(Request $request)
+    {
+        $qs = $request->server->get('QUERY_STRING', '');
+        if ('' === $qs) {
+            return null;
+        }
+
+        $parts = [];
+
+        foreach (explode('&', $qs) as $param) {
+            if ('' === $param || '=' === $param[0]) {
+                // Ignore useless delimiters, e.g. "x=y&".
+                // Also ignore pairs with empty key, even if there was a value, e.g. "=value", as such nameless values cannot be retrieved anyway.
+                // PHP also does not include them when building _GET.
+                continue;
+            }
+
+            $keyValuePair = explode('=', $param, 2);
+
+            // GET parameters, that are submitted from a HTML form, encode spaces as "+" by default (as defined in enctype application/x-www-form-urlencoded).
+            // PHP also converts "+" to spaces when filling the global _GET or when using the function parse_str. This is why we use urldecode and then normalize to
+            // RFC 3986 with rawurlencode.
+            $parts[] = isset($keyValuePair[1]) ?
+                rawurlencode(urldecode($keyValuePair[0])).'='.rawurlencode(urldecode($keyValuePair[1])) :
+                rawurlencode(urldecode($keyValuePair[0]));
+        }
+
+        return implode('&', $parts);
     }
 }

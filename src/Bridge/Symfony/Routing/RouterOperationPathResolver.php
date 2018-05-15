@@ -42,30 +42,26 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
     {
-        if (func_num_args() >= 4) {
-            $operationName = func_get_arg(3);
+        if (\func_num_args() >= 4) {
+            $operationName = (string) func_get_arg(3);
         } else {
             @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
 
             $operationName = null;
         }
 
-        if (OperationType::SUBRESOURCE === $operationType = OperationTypeDeprecationHelper::getOperationType($operationType)) {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
-        }
-
         if (isset($operation['route_name'])) {
             $routeName = $operation['route_name'];
-        } elseif (null !== $operationName) {
-            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
+        } elseif (OperationType::SUBRESOURCE === $operationType) {
+            throw new InvalidArgumentException('Subresource operations are not supported by the RouterOperationPathResolver without a route name.');
+        } elseif (null === $operationName) {
+            return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
         } else {
-            return $this->deferred->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
+            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
         }
 
         if (!$route = $this->router->getRouteCollection()->get($routeName)) {
-            throw new InvalidArgumentException(
-                sprintf('The route "%s" of the resource "%s" was not found.', $routeName, $resourceShortName)
-            );
+            throw new InvalidArgumentException(sprintf('The route "%s" of the resource "%s" was not found.', $routeName, $resourceShortName));
         }
 
         return $route->getPath();

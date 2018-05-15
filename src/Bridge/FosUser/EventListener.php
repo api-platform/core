@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\FosUser;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
@@ -51,14 +50,11 @@ final class EventListener
             return;
         }
 
-        switch ($request->getMethod()) {
-            case Request::METHOD_DELETE:
-                $this->userManager->deleteUser($user);
-                $event->setControllerResult(null);
-                break;
-            default:
-                $this->userManager->updateUser($user);
-                break;
+        if ('DELETE' === $request->getMethod()) {
+            $this->userManager->deleteUser($user);
+            $event->setControllerResult(null);
+        } else {
+            $this->userManager->updateUser($user);
         }
     }
 }

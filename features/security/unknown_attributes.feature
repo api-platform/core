@@ -4,7 +4,6 @@ Feature: Ignore unknown attributes
   I can send unsupported attributes that will be ignored
 
   @createSchema
-  @dropSchema
   Scenario: Create a resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:
@@ -32,9 +31,11 @@ Feature: Ignore unknown attributes
       "relatedDummy": null,
       "relatedDummies": [],
       "jsonData": [],
+      "arrayData": [],
       "name_converted": null,
       "id": 1,
       "name": "Not existing",
-      "alias": null
+      "alias": null,
+      "foo": null
     }
     """

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer\Filter;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Group filter.
@@ -24,11 +25,13 @@ final class GroupFilter implements FilterInterface
 {
     private $overrideDefaultGroups;
     private $parameterName;
+    private $whitelist;
 
-    public function __construct(string $parameterName = 'groups', bool $overrideDefaultGroups = false)
+    public function __construct(string $parameterName = 'groups', bool $overrideDefaultGroups = false, array $whitelist = null)
     {
         $this->overrideDefaultGroups = $overrideDefaultGroups;
         $this->parameterName = $parameterName;
+        $this->whitelist = $whitelist;
     }
 
     /**
@@ -36,15 +39,25 @@ final class GroupFilter implements FilterInterface
      */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context)
     {
-        if (!is_array($groups = $request->query->get($this->parameterName))) {
+        if (array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
+            $groups = $commonAttribute[$this->parameterName];
+        } else {
+            $groups = $request->query->get($this->parameterName);
+        }
+
+        if (!\is_array($groups)) {
             return;
         }
 
-        if (!$this->overrideDefaultGroups && isset($context['groups'])) {
-            $groups = array_merge((array) $context['groups'], $groups);
+        if (null !== $this->whitelist) {
+            $groups = array_intersect($this->whitelist, $groups);
         }
 
-        $context['groups'] = $groups;
+        if (!$this->overrideDefaultGroups && isset($context[AbstractNormalizer::GROUPS])) {
+            $groups = array_merge((array) $context[AbstractNormalizer::GROUPS], $groups);
+        }
+
+        $context[AbstractNormalizer::GROUPS] = $groups;
     }
 
     /**
@@ -53,7 +66,7 @@ final class GroupFilter implements FilterInterface
     public function getDescription(string $resourceClass): array
     {
         return [
-            $this->parameterName.'[]' => [
+            "$this->parameterName[]" => [
                 'property' => null,
                 'type' => 'string',
                 'required' => false,

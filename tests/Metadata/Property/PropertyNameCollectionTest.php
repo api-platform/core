@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyNameCollectionTest extends \PHPUnit_Framework_TestCase
+class PropertyNameCollectionTest extends TestCase
 {
     public function testValueObject()
     {

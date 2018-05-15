@@ -17,20 +17,21 @@ use ApiPlatform\Core\Bridge\FosUser\EventListener;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class EventListenerTest extends \PHPUnit_Framework_TestCase
+class EventListenerTest extends TestCase
 {
     public function testDelete()
     {
         $user = $this->prophesize(UserInterface::class);
 
         $request = new Request([], [], ['_api_resource_class' => User::class, '_api_item_operation_name' => 'delete']);
-        $request->setMethod(Request::METHOD_DELETE);
+        $request->setMethod('DELETE');
 
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->deleteUser($user)->shouldBeCalled();
@@ -49,7 +50,7 @@ class EventListenerTest extends \PHPUnit_Framework_TestCase
         $user = $this->prophesize(UserInterface::class);
 
         $request = new Request([], [], ['_api_resource_class' => User::class, '_api_item_operation_name' => 'put']);
-        $request->setMethod(Request::METHOD_PUT);
+        $request->setMethod('PUT');
 
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->updateUser($user)->shouldBeCalled();
@@ -81,7 +82,7 @@ class EventListenerTest extends \PHPUnit_Framework_TestCase
     public function testNotUser()
     {
         $request = new Request([], [], ['_api_resource_class' => User::class, '_api_item_operation_name' => 'put']);
-        $request->setMethod(Request::METHOD_PUT);
+        $request->setMethod('PUT');
 
         $manager = $this->prophesize(UserManagerInterface::class);
         $manager->deleteUser()->shouldNotBeCalled();

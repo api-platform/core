@@ -82,28 +82,21 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             $method = $resourceMetadata->getItemOperationAttribute($operationName, 'method');
         } else {
             $method = $resourceMetadata->getCollectionOperationAttribute($operationName, 'method');
         }
 
         if (null !== $method) {
-            return $method;
+            return strtoupper($method);
         }
 
         if (null === $routeName = $this->getRouteName($resourceMetadata, $operationName, $operationType)) {
             throw new RuntimeException(sprintf('Either a "route_name" or a "method" operation attribute must exist for the operation "%s" of the resource "%s".', $operationName, $resourceClass));
         }
 
-        $route = $this->getRoute($routeName);
-        $methods = $route->getMethods();
-
-        if (empty($methods)) {
-            return 'GET';
-        }
-
-        return $methods[0];
+        return $this->getRoute($routeName)->getMethods()[0] ?? 'GET';
     }
 
     /**
@@ -149,7 +142,7 @@ final class OperationMethodResolver implements OperationMethodResolverInterface
      */
     private function getRouteName(ResourceMetadata $resourceMetadata, string $operationName, string $operationType)
     {
-        if ($operationType === OperationType::ITEM) {
+        if (OperationType::ITEM === $operationType) {
             return $resourceMetadata->getItemOperationAttribute($operationName, 'route_name');
         }
 

@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -24,7 +25,7 @@ use Psr\Cache\CacheItemPoolInterface;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class CachedResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class CachedResourceMetadataFactoryTest extends TestCase
 {
     public function testCreateWithItemHit()
     {
@@ -63,7 +64,10 @@ class CachedResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resultedResourceMetadata);
-        $this->assertEquals(new ResourceMetadata(null, 'Dummy.'), $resultedResourceMetadata);
+
+        $expectedResult = new ResourceMetadata(null, 'Dummy.');
+        $this->assertEquals($expectedResult, $resultedResourceMetadata);
+        $this->assertEquals($expectedResult, $cachedResourceMetadataFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     public function testCreateWithGetCacheItemThrowsCacheException()
@@ -81,11 +85,14 @@ class CachedResourceMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $resultedResourceMetadata = $cachedResourceMetadataFactory->create(Dummy::class);
 
         $this->assertInstanceOf(ResourceMetadata::class, $resultedResourceMetadata);
-        $this->assertEquals(new ResourceMetadata(null, 'Dummy.'), $resultedResourceMetadata);
+
+        $expectedResult = new ResourceMetadata(null, 'Dummy.');
+        $this->assertEquals($expectedResult, $resultedResourceMetadata);
+        $this->assertEquals($expectedResult, $cachedResourceMetadataFactory->create(Dummy::class), 'Trigger the local cache');
     }
 
     private function generateCacheKey(string $resourceClass = Dummy::class)
     {
-        return CachedResourceMetadataFactory::CACHE_KEY_PREFIX.md5(serialize([$resourceClass]));
+        return CachedResourceMetadataFactory::CACHE_KEY_PREFIX.md5($resourceClass);
     }
 }

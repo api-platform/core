@@ -40,6 +40,10 @@ final class ShortNameResourceMetadataFactory implements ResourceMetadataFactoryI
             return $resourceMetadata;
         }
 
-        return $resourceMetadata->withShortName(substr($resourceClass, strrpos($resourceClass, '\\') + 1));
+        if (false !== $pos = strrpos($resourceClass, '\\')) {
+            return $resourceMetadata->withShortName(substr($resourceClass, $pos + 1));
+        }
+
+        return $resourceMetadata->withShortName($resourceClass);
     }
 }

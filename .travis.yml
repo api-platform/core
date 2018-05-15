@@ -1,5 +1,4 @@
 language: php
-
 sudo: false
 
 cache:
@@ -7,38 +6,79 @@ cache:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+env:
+  global:
+    - SYMFONY_DEPRECATIONS_HELPER=weak_vendors
+    - APP_ENV=test
+
 matrix:
   include:
     - php: '7.0'
     - php: '7.1'
-      env: coverage=1 lint=1
-    - php: '7.1'
-      env: deps='low'
+    - php: '7.2'
+    - php: '7.2'
+      env: lint=1
+    - php: '7.2'
+      env: deps=low
+    - php: '7.2'
+      env: SYMFONY_DEPRECATIONS_HELPER=0
+    - php: '7.2'
+      services:
+        - postgresql
+      before_script:
+        - psql -c 'create database api_platform_test;' -U postgres
+      env: APP_ENV=postgres
+    - php: '7.2'
+      services:
+        - mysql
+      before_script:
+        - mysql -e 'CREATE DATABASE api_platform_test;'
+      env: APP_ENV=mysql
+  allow_failures:
+      env: SYMFONY_DEPRECATIONS_HELPER=0
 
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - npm install -g swagger-cli
-  - if [[ $coverage = 1 ]]; then mkdir -p build/logs build/cov; fi
-  - if [[ $coverage = 1 ]]; then wget https://phar.phpunit.de/phpcov.phar; fi
-  - if [[ $coverage = 1 ]]; then wget https://github.com/satooshi/php-coveralls/releases/download/v1.0.1/coveralls.phar; fi
-  - if [[ $lint = 1 ]]; then wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.3.1/php-cs-fixer.phar; fi
-  - if [[ $lint = 1 ]]; then composer global require phpstan/phpstan; fi
+  - if [[ $lint = 1 ]]; then
+      wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.8.4/php-cs-fixer.phar;
+    fi
+  - if [[ $lint = 1 ]]; then
+      composer global require --dev 'phpstan/phpstan:^0.8';
+    fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
-  - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
 install:
-  - if [[ $coverage = 1 ]]; then composer require --dev --no-update 'phpunit/php-code-coverage:^4.0.1'; fi
-  - if [[ ! $deps ]]; then composer update --prefer-dist --no-progress --no-suggest --ansi; fi
-  - if [[ $deps = 'low' ]]; then composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi; fi
+  - if [[ $deps = 'low' ]]; then
+      composer update --prefer-dist --no-progress --no-suggest --prefer-stable --prefer-lowest --ansi;
+    else
+      composer update --prefer-dist --no-progress --no-suggest --ansi;
+    fi
 
 script:
-  - if [[ $coverage = 1 ]]; then phpdbg -qrr vendor/bin/phpunit --coverage-php build/cov/coverage-phpunit.cov; else vendor/bin/phpunit; fi
-  - if [[ $coverage = 1 ]]; then for f in $(find features -name '*.feature'); do FEATURE=${f//\//_} phpdbg -qrr vendor/bin/behat --profile coverage $f || exit $?; done; else vendor/bin/behat; fi
-  - if [[ $coverage = 1 ]]; then phpdbg -qrr phpcov.phar merge --clover build/logs/clover.xml build/cov; fi
-  - tests/Fixtures/app/console api:swagger:export > swagger.json && swagger validate swagger.json && rm swagger.json
-  - if [[ $lint = 1 ]]; then php php-cs-fixer.phar fix --dry-run --diff --no-ansi; fi
-  - if [[ $lint = 1 ]]; then phpstan analyse -c phpstan.neon -l5 --ansi src tests; fi
-
-after_success:
-  - if [[ $coverage = 1 ]]; then travis_retry php coveralls.phar; fi
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console cache:clear;
+    fi
+  - if [[ $lint != 1 ]]; then
+      vendor/bin/phpunit;
+    fi
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console cache:clear;
+    fi
+  - if [[ $APP_ENV = 'postgres' ]]; then
+      vendor/bin/behat --suite=postgres --format=progress;
+    elif [[ $lint != 1 ]]; then
+      vendor/bin/behat --suite=default --format=progress;
+    fi
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json;
+    fi
+  - if [[ $lint != 1 ]]; then
+      tests/Fixtures/app/console api:swagger:export --yaml > swagger.yaml && npx swagger-cli validate --no-schema swagger.yaml && rm swagger.yaml;
+    fi
+  - if [[ $lint = 1 ]]; then
+      php php-cs-fixer.phar fix --dry-run --diff --no-ansi;
+    fi
+  - if [[ $lint = 1 ]]; then
+      phpstan analyse -c phpstan.neon -l5 --ansi src tests;
+    fi

@@ -63,22 +63,57 @@ final class IriHelper
      * @param array  $parameters
      * @param string $pageParameterName
      * @param float  $page
+     * @param bool   $absoluteUrl
      *
      * @return string
      */
-    public static function createIri(array $parts, array $parameters, string $pageParameterName, float $page = null): string
+    public static function createIri(array $parts, array $parameters, string $pageParameterName, float $page = null, bool $absoluteUrl = false): string
     {
         if (null !== $page) {
             $parameters[$pageParameterName] = $page;
         }
 
         $query = http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
-        $parts['query'] = preg_replace('/%5B[0-9]+%5D/', '%5B%5D', $query);
+        $parts['query'] = preg_replace('/%5B\d+%5D/', '%5B%5D', $query);
 
-        $url = $parts['path'];
+        $url = '';
+
+        if ($absoluteUrl && isset($parts['host'])) {
+            if (isset($parts['scheme'])) {
+                $url .= $parts['scheme'];
+            } elseif (isset($parts['port']) && 443 === $parts['port']) {
+                $url .= 'https';
+            } else {
+                $url .= 'http';
+            }
+
+            $url .= '://';
+
+            if (isset($parts['user'])) {
+                $url .= $parts['user'];
+
+                if (isset($parts['pass'])) {
+                    $url .= ':'.$parts['pass'];
+                }
+
+                $url .= '@';
+            }
+
+            $url .= $parts['host'];
+
+            if (isset($parts['port'])) {
+                $url .= ':'.$parts['port'];
+            }
+        }
+
+        $url .= $parts['path'];
 
         if ('' !== $parts['query']) {
             $url .= '?'.$parts['query'];
+        }
+
+        if (isset($parts['fragment'])) {
+            $url .= '#'.$parts['fragment'];
         }
 
         return $url;

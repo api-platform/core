@@ -52,7 +52,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
             $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), ApiSubresource::class);
 
             if (null !== $annotation) {
-                return $this->updateMetadata($annotation, $propertyMetadata);
+                return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass);
             }
         }
 
@@ -70,19 +70,25 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
             $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiSubresource::class);
 
             if (null !== $annotation) {
-                return $this->updateMetadata($annotation, $propertyMetadata);
+                return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass);
             }
         }
 
         return $propertyMetadata;
     }
 
-    private function updateMetadata(ApiSubresource $annotation, PropertyMetadata $propertyMetadata): PropertyMetadata
+    private function updateMetadata(ApiSubresource $annotation, PropertyMetadata $propertyMetadata, string $originResourceClass): PropertyMetadata
     {
         $type = $propertyMetadata->getType();
         $isCollection = $type->isCollection();
         $resourceClass = $isCollection ? $type->getCollectionValueType()->getClassName() : $type->getClassName();
+        $maxDepth = $annotation->maxDepth;
+        // @ApiSubresource is on the class identifier (/collection/{id}/subcollection/{subcollectionId})
+        if (null === $resourceClass) {
+            $resourceClass = $originResourceClass;
+            $isCollection = false;
+        }
 
-        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection));
+        return $propertyMetadata->withSubresource(new SubresourceMetadata($resourceClass, $isCollection, $maxDepth));
     }
 }
