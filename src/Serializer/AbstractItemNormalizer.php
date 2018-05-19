@@ -336,7 +336,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->denormalizeRelation($attribute, $propertyMetadata, $className, $value, $format, $this->createChildContext($context, $attribute));
         }
 
-        $this->validateType($attribute, $type, $value, $format);
+        if (empty($context[static::DISABLE_TYPE_ENFORCEMENT])) {
+            $this->validateType($attribute, $type, $value, $format);
+        }
 
         return $value;
     }
