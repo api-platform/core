@@ -3,6 +3,7 @@
 window.onload = () => {
   const data = JSON.parse(document.getElementById('swagger-data').innerText);
   const ui = SwaggerUIBundle({
+    oauth2RedirectUrl: data.oauth.redirectUrl,
     spec: data.spec,
     dom_id: '#swagger-ui',
     validatorUrl: null,
