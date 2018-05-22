@@ -61,10 +61,29 @@ Feature: Circular references handling
           "@type": "CircularReference",
           "parent": "/circular_references/1",
           "children": [
-              "/circular_references/1",
-              "/circular_references/2"
+              "/circular_references/1"
           ]
       },
       "children": []
+    }
+    """
+    And I send a "GET" request to "/circular_references/1"
+    Then the response status code should be 200
+    And the JSON should be equal to:
+    """
+    {
+        "@context": "/contexts/CircularReference",
+        "@id": "/circular_references/1",
+        "@type": "CircularReference",
+        "parent": "/circular_references/1",
+        "children": [
+            "/circular_references/1",
+            {
+                "@id": "/circular_references/2",
+                "@type": "CircularReference",
+                "parent": "/circular_references/1",
+                "children": []
+            }
+        ]
     }
     """
