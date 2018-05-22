@@ -76,6 +76,65 @@ Feature: GraphQL introspection support
     And the JSON node "data.type3.fields[1].name" should be equal to "cursor"
     And the JSON node "data.type3.fields[0].type.name" should be equal to "DummyAggregateOffer"
 
+  Scenario: Introspect deprecated queries
+    When I send the following GraphQL request:
+    """
+    {
+      __type (name: "Query") {
+        name
+        fields(includeDeprecated: true) {
+          name
+          isDeprecated
+          deprecationReason
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the GraphQL field "deprecatedResource" is deprecated for the reason "This resource is deprecated"
+    And the GraphQL field "deprecatedResources" is deprecated for the reason "This resource is deprecated"
+
+  Scenario: Introspect deprecated mutations
+    When I send the following GraphQL request:
+    """
+    {
+      __type (name: "Mutation") {
+        name
+        fields(includeDeprecated: true) {
+          name
+          isDeprecated
+          deprecationReason
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the GraphQL field "deleteDeprecatedResource" is deprecated for the reason "This resource is deprecated"
+    And the GraphQL field "updateDeprecatedResource" is deprecated for the reason "This resource is deprecated"
+    And the GraphQL field "createDeprecatedResource" is deprecated for the reason "This resource is deprecated"
+
+  Scenario: Introspect a deprecated field
+    When I send the following GraphQL request:
+    """
+    {
+      __type(name: "DeprecatedResource") {
+        fields(includeDeprecated: true) {
+          name
+          isDeprecated
+          deprecationReason
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the GraphQL field "deprecatedField" is deprecated for the reason "This field is deprecated"
+
   Scenario: Retrieve the Relay's node interface
     When I send the following GraphQL request:
     """
