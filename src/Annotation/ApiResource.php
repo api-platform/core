@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Annotation;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Common\Annotations\Annotation\Attribute;
 
 /**
  * ApiResource annotation.
@@ -34,6 +33,7 @@ use Doctrine\Common\Util\Inflector;
  *     @Attribute("forceEager", type="bool"),
  *     @Attribute("filters", type="string[]"),
  *     @Attribute("graphql", type="array"),
+ *     @Attribute("hydraContext", type="array"),
  *     @Attribute("iri", type="string"),
  *     @Attribute("itemOperations", type="array"),
  *     @Attribute("maximumItemsPerPage", type="int"),
@@ -49,11 +49,14 @@ use Doctrine\Common\Util\Inflector;
  *     @Attribute("routePrefix", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("subresourceOperations", type="array"),
+ *     @Attribute("swaggerContext", type="array"),
  *     @Attribute("validationGroups", type="mixed")
  * )
  */
 final class ApiResource
 {
+    use AttributesHydratorTrait;
+
     /**
      * @var string
      */
@@ -88,11 +91,6 @@ final class ApiResource
      * @var array
      */
     public $graphql;
-
-    /**
-     * @var array
-     */
-    public $attributes = [];
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
@@ -135,6 +133,13 @@ final class ApiResource
      * @var string[]
      */
     private $filters;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string[]
+     */
+    private $hydraContext;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
@@ -216,32 +221,14 @@ final class ApiResource
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
      *
+     * @var array
+     */
+    private $swaggerContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
      * @var mixed
      */
     private $validationGroups;
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function __construct(array $values = [])
-    {
-        if (isset($values['attributes'])) {
-            $this->attributes = $values['attributes'];
-            unset($values['attributes']);
-        }
-
-        foreach ($values as $key => $value) {
-            if (!property_exists($this, $key)) {
-                throw new InvalidArgumentException(sprintf('Unknown property "%s" on annotation "%s".', $key, self::class));
-            }
-
-            $property = new \ReflectionProperty($this, $key);
-
-            if ($property->isPublic()) {
-                $this->$key = $value;
-            } else {
-                $this->attributes += [Inflector::tableize($key) => $value];
-            }
-        }
-    }
 }

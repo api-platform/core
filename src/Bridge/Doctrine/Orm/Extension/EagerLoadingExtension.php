@@ -170,7 +170,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
-            if (false === $fetchEager = $propertyMetadata->getAttribute('fetchEager')) {
+            // Calls to getAttribute are nested for compatibility with the old camelCased notation
+            if (false === $fetchEager = $propertyMetadata->getAttribute('fetchEager', $propertyMetadata->getAttribute('fetch_eager'))) {
                 continue;
             }
 

@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyTest extends TestCase
+class ApiPropertyTest extends TestCase
 {
     public function testAssignation()
     {
@@ -43,5 +43,23 @@ class PropertyTest extends TestCase
         $this->assertEquals('http://example.com/prop', $property->iri);
         $this->assertTrue($property->identifier);
         $this->assertEquals(['foo' => 'bar'], $property->attributes);
+    }
+
+    public function testConstruct()
+    {
+        $property = new ApiProperty([
+            'fetcheable' => true,
+            'fetchEager' => false,
+            'jsonldContext' => ['foo' => 'bar'],
+            'swaggerContext' => ['foo' => 'baz'],
+            'attributes' => ['unknown' => 'unknown', 'fetcheable' => false],
+        ]);
+        $this->assertEquals([
+            'fetcheable' => false,
+            'fetch_eager' => false,
+            'jsonld_context' => ['foo' => 'bar'],
+            'swagger_context' => ['foo' => 'baz'],
+            'unknown' => 'unknown',
+        ], $property->attributes);
     }
 }
