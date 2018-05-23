@@ -48,14 +48,14 @@ class ApiPropertyTest extends TestCase
     public function testConstruct()
     {
         $property = new ApiProperty([
-            'fetcheable' => true,
+            'fetchable' => true,
             'fetchEager' => false,
             'jsonldContext' => ['foo' => 'bar'],
             'swaggerContext' => ['foo' => 'baz'],
-            'attributes' => ['unknown' => 'unknown', 'fetcheable' => false],
+            'attributes' => ['unknown' => 'unknown', 'fetchable' => false],
         ]);
         $this->assertEquals([
-            'fetcheable' => false,
+            'fetchable' => false,
             'fetch_eager' => false,
             'jsonld_context' => ['foo' => 'bar'],
             'swagger_context' => ['foo' => 'baz'],

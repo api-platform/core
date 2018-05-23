@@ -21,7 +21,7 @@ namespace ApiPlatform\Core\Annotation;
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
  * @Attributes(
- *     @Attribute("fetcheable", type="bool"),
+ *     @Attribute("fetchable", type="bool"),
  *     @Attribute("fetchEager", type="bool"),
  *     @Attribute("jsonldContext", type="array"),
  *     @Attribute("swaggerContext", type="array")
@@ -76,7 +76,7 @@ final class ApiProperty
      *
      * @var bool
      */
-    private $fetcheable;
+    private $fetchable;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
