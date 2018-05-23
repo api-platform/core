@@ -810,6 +810,19 @@ class EagerLoadingExtensionTest extends TestCase
 
     public function testApplyToCollectionWithANonRedableButFetchEagerProperty()
     {
+        $this->doTestApplyToCollectionWithANonRedableButFetchEagerProperty(false);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyApplyToCollectionWithANonRedableButFetchEagerProperty()
+    {
+        $this->doTestApplyToCollectionWithANonRedableButFetchEagerProperty(true);
+    }
+
+    private function doTestApplyToCollectionWithANonRedableButFetchEagerProperty(bool $legacy)
+    {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
@@ -817,7 +830,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $relationPropertyMetadata = new PropertyMetadata();
-        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => true]);
+        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes([$legacy ? 'fetchEager' : 'fetch_eager' => true]);
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
         $relationPropertyMetadata = $relationPropertyMetadata->withReadable(false);
 
@@ -853,6 +866,19 @@ class EagerLoadingExtensionTest extends TestCase
 
     public function testApplyToCollectionWithARedableButNotFetchEagerProperty()
     {
+        $this->doTestApplyToCollectionWithARedableButNotFetchEagerProperty(false);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLeacyApplyToCollectionWithARedableButNotFetchEagerProperty()
+    {
+        $this->doTestApplyToCollectionWithARedableButNotFetchEagerProperty(true);
+    }
+
+    private function doTestApplyToCollectionWithARedableButNotFetchEagerProperty(bool $legacy)
+    {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
@@ -860,7 +886,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $relationPropertyMetadata = new PropertyMetadata();
-        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => false]);
+        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes([$legacy ? 'fetchEager' : 'fetch_eager' => false]);
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
         $relationPropertyMetadata = $relationPropertyMetadata->withReadable(true);
 
