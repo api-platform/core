@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Annotation;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\Common\Annotations\Annotation\Attribute;
 
 /**
@@ -28,6 +29,7 @@ use Doctrine\Common\Annotations\Annotation\Attribute;
  *     @Attribute("attributes", type="array"),
  *     @Attribute("collectionOperations", type="array"),
  *     @Attribute("denormalizationContext", type="array"),
+ *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("description", type="string"),
  *     @Attribute("fetchPartial", type="bool"),
  *     @Attribute("forceEager", type="bool"),
@@ -112,6 +114,13 @@ final class ApiResource
      * @var array
      */
     private $denormalizationContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $deprecationReason;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112

@@ -18,6 +18,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\RestContext;
 use Behatch\HttpCall\Request;
 use GraphQL\Type\Introspection;
+use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Context for GraphQL.
@@ -103,6 +104,20 @@ final class GraphqlContext implements Context
     {
         $this->graphqlRequest = ['query' => Introspection::getIntrospectionQuery()];
         $this->sendGraphqlRequest();
+    }
+
+    /**
+     * @Then the GraphQL field :fieldName is deprecated for the reason :reason
+     */
+    public function theGraphQLFieldIsDeprecatedForTheReason(string $fieldName, string $reason)
+    {
+        foreach (json_decode($this->request->getContent(), true)['data']['__type']['fields'] as $field) {
+            if ($fieldName === $field['name'] && $field['isDeprecated'] && $reason === $field['deprecationReason']) {
+                return;
+            }
+        }
+
+        throw new ExpectationFailedException(sprintf('The field "%s" is not deprecated.', $fieldName));
     }
 
     private function sendGraphqlRequest()
