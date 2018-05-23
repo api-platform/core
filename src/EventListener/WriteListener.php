@@ -50,10 +50,13 @@ class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $event->setControllerResult(
-                    $this->dataPersister->persist($controllerResult)
-                    ?? $controllerResult
-                );
+                $persistResult = $this->dataPersister->persist($controllerResult);
+
+                if (null === $persistResult) {
+                    @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                }
+
+                $event->setControllerResult($persistResult ?? $controllerResult);
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);

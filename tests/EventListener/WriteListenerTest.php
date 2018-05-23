@@ -33,6 +33,37 @@ class WriteListenerTest extends TestCase
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
+        $dataPersisterProphecy->persist($dummy)->willReturn($dummy)->shouldBeCalled();
+
+        $request = new Request();
+        $request->attributes->set('_api_resource_class', Dummy::class);
+
+        $event = new GetResponseForControllerResultEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
+
+        foreach (['PATCH', 'PUT', 'POST'] as $httpMethod) {
+            $request->setMethod($httpMethod);
+
+            (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
+            $this->assertSame($dummy, $event->getControllerResult());
+        }
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Returning void from ApiPlatform\Core\DataPersister\DataPersisterInterface::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.
+     */
+    public function testOnKernelViewWithControllerResultAndPersistReturningVoid()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Dummyrino');
+
+        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
         $dataPersisterProphecy->persist($dummy)->shouldBeCalled();
 
         $request = new Request();

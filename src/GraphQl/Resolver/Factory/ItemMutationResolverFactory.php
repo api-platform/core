@@ -93,9 +93,13 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                     $context += $resourceMetadata->getGraphqlAttribute($operationName, 'denormalization_context', [], true);
                     $item = $this->normalizer->denormalize($args['input'], $resourceClass, ItemNormalizer::FORMAT, $context);
                     $this->validate($item, $info, $resourceMetadata, $operationName);
-                    $persistResult = $this->dataPersister->persist($item) ?? $item;
+                    $persistResult = $this->dataPersister->persist($item);
 
-                    return $this->normalizer->normalize($persistResult, ItemNormalizer::FORMAT, $normalizationContext) + $data;
+                    if (null === $persistResult) {
+                        @trigger_error(sprintf('Returning void from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3, an object should always be returned.', DataPersisterInterface::class), E_USER_DEPRECATED);
+                    }
+
+                    return $this->normalizer->normalize($persistResult ?? $item, ItemNormalizer::FORMAT, $normalizationContext) + $data;
                 case 'delete':
                     if ($item) {
                         $this->dataPersister->remove($item);
