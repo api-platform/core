@@ -32,7 +32,7 @@ trait AttributesHydratorTrait
     /**
      * @throws InvalidArgumentException
      */
-    public function __construct(array $values = [])
+    private function hydrateAttributes(array $values = [])
     {
         if (isset($values['attributes'])) {
             $this->attributes = $values['attributes'];

@@ -29,7 +29,9 @@ namespace ApiPlatform\Core\Annotation;
  */
 final class ApiProperty
 {
-    use AttributesHydratorTrait;
+    use AttributesHydratorTrait {
+        hydrateAttributes as public __construct;
+    }
 
     /**
      * @var string

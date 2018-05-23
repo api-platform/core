@@ -55,7 +55,9 @@ use Doctrine\Common\Annotations\Annotation\Attribute;
  */
 final class ApiResource
 {
-    use AttributesHydratorTrait;
+    use AttributesHydratorTrait {
+        hydrateAttributes as public __construct;
+    }
 
     /**
      * @var string
