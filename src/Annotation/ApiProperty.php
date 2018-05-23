@@ -20,9 +20,17 @@ namespace ApiPlatform\Core\Annotation;
  *
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
+ * @Attributes(
+ *     @Attribute("fetchable", type="bool"),
+ *     @Attribute("fetchEager", type="bool"),
+ *     @Attribute("jsonldContext", type="array"),
+ *     @Attribute("swaggerContext", type="array")
+ * )
  */
 final class ApiProperty
 {
+    use AttributesHydratorTrait;
+
     /**
      * @var string
      */
@@ -64,7 +72,38 @@ final class ApiProperty
     public $identifier;
 
     /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $fetchable;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var bool
+     */
+    private $fetchEager;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
      * @var array
      */
-    public $attributes = [];
+    private $jsonldContext;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $swaggerContext;
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(array $values = [])
+    {
+        $this->hydrateAttributes($values);
+    }
 }

@@ -335,7 +335,7 @@ SQL;
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), false);
         $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, 'get');
 
-        $expected = <<<SQL
+        $expected = <<<DQL
 SELECT o
 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o
 INNER JOIN o.compositeItem item
@@ -354,7 +354,7 @@ WHERE o.item IN(
     LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
     WHERE item_2.field1 = :foo
 )
-SQL;
+DQL;
 
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }

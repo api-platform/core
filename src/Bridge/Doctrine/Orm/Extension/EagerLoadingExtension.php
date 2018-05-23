@@ -170,7 +170,14 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
-            if (false === $fetchEager = $propertyMetadata->getAttribute('fetchEager')) {
+            if (
+                (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
+                (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
+            ) {
+                @trigger_error('The "fetchEager" attribute is deprecated since 2.3. Please use "fetch_eager" instead.', E_USER_DEPRECATED);
+            }
+
+            if (false === $fetchEager) {
                 continue;
             }
 
