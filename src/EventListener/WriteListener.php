@@ -50,7 +50,10 @@ class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $this->dataPersister->persist($controllerResult);
+                $event->setControllerResult(
+                    $this->dataPersister->persist($controllerResult)
+                    ?? $controllerResult
+                );
                 break;
             case 'DELETE':
                 $this->dataPersister->remove($controllerResult);

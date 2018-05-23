@@ -49,6 +49,46 @@ class WriteListenerTest extends TestCase
             $request->setMethod($httpMethod);
 
             (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
+            $this->assertSame($dummy, $event->getControllerResult());
+        }
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/1799
+     */
+    public function testOnKernelViewWithControllerResultAndPersistWithImmutableResource()
+    {
+        $dummy = new Dummy();
+        $dummy->setName('Dummyrino');
+
+        $dummy2 = new Dummy();
+        $dummy2->setName('Dummyferoce');
+
+        $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $dataPersisterProphecy->supports($dummy)->willReturn(true)->shouldBeCalled();
+
+        $dataPersisterProphecy
+            ->persist($dummy)
+            ->willReturn($dummy2) // Persist is not mutating $dummy, but return a brand new technically unrelated object instead
+            ->shouldBeCalled()
+        ;
+
+        $request = new Request();
+        $request->attributes->set('_api_resource_class', Dummy::class);
+
+        foreach (['PATCH', 'PUT', 'POST'] as $httpMethod) {
+            $event = new GetResponseForControllerResultEvent(
+                $this->prophesize(HttpKernelInterface::class)->reveal(),
+                $request,
+                HttpKernelInterface::MASTER_REQUEST,
+                $dummy
+            );
+
+            $request->setMethod($httpMethod);
+
+            (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
+
+            $this->assertSame($dummy2, $event->getControllerResult());
         }
     }
 
