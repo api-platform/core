@@ -29,9 +29,7 @@ namespace ApiPlatform\Core\Annotation;
  */
 final class ApiProperty
 {
-    use AttributesHydratorTrait {
-        hydrateAttributes as public __construct;
-    }
+    use AttributesHydratorTrait;
 
     /**
      * @var string
@@ -100,4 +98,12 @@ final class ApiProperty
      * @var array
      */
     private $swaggerContext;
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(array $values = [])
+    {
+        $this->hydrateAttributes($values);
+    }
 }

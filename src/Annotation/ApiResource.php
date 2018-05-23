@@ -55,9 +55,7 @@ use Doctrine\Common\Annotations\Annotation\Attribute;
  */
 final class ApiResource
 {
-    use AttributesHydratorTrait {
-        hydrateAttributes as public __construct;
-    }
+    use AttributesHydratorTrait;
 
     /**
      * @var string
@@ -233,4 +231,12 @@ final class ApiResource
      * @var mixed
      */
     private $validationGroups;
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function __construct(array $values = [])
+    {
+        $this->hydrateAttributes($values);
+    }
 }
