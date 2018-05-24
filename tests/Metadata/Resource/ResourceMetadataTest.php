@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
 
@@ -29,12 +30,14 @@ class ResourceMetadataTest extends TestCase
         $this->assertSame('http://example.com/foo', $metadata->getIri());
         $this->assertSame(['iop1' => ['foo' => 'a'], 'iop2' => ['bar' => 'b']], $metadata->getItemOperations());
         $this->assertSame('a', $metadata->getItemOperationAttribute('iop1', 'foo', 'z', false));
+        $this->assertSame('a', $metadata->getTypedOperationAttribute(OperationType::ITEM, 'iop1', 'foo', 'z', false));
         $this->assertSame('bar', $metadata->getItemOperationAttribute('iop1', 'baz', 'z', true));
         $this->assertSame('bar', $metadata->getItemOperationAttribute(null, 'baz', 'z', true));
         $this->assertSame('z', $metadata->getItemOperationAttribute('iop1', 'notExist', 'z', true));
         $this->assertSame('z', $metadata->getItemOperationAttribute('notExist', 'notExist', 'z', true));
         $this->assertSame(['cop1' => ['foo' => 'c'], 'cop2' => ['bar' => 'd']], $metadata->getCollectionOperations());
         $this->assertSame('c', $metadata->getCollectionOperationAttribute('cop1', 'foo', 'z', false));
+        $this->assertSame('c', $metadata->getTypedOperationAttribute(OperationType::COLLECTION, 'cop1', 'foo', 'z', false));
         $this->assertSame('bar', $metadata->getCollectionOperationAttribute('cop1', 'baz', 'z', true));
         $this->assertSame('bar', $metadata->getCollectionOperationAttribute(null, 'baz', 'z', true));
         $this->assertSame('z', $metadata->getCollectionOperationAttribute('cop1', 'notExist', 'z', true));
@@ -44,6 +47,7 @@ class ResourceMetadataTest extends TestCase
         $this->assertSame('z', $metadata->getAttribute('notExist', 'z'));
         $this->assertSame(['sop1' => ['sub' => 'bus']], $metadata->getSubresourceOperations());
         $this->assertSame('bus', $metadata->getSubresourceOperationAttribute('sop1', 'sub'));
+        $this->assertSame('bus', $metadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, 'sop1', 'sub'));
         $this->assertSame('sub', $metadata->getSubresourceOperationAttribute('sop1', 'bus', 'sub', false));
         $this->assertSame('bar', $metadata->getSubresourceOperationAttribute('sop1', 'baz', 'sub', true));
         $this->assertSame('graphql', $metadata->getGraphqlAttribute('query', 'foo'));

@@ -78,6 +78,15 @@ Feature: Documentation support
     # Subcollection - check schema
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.schema.items.$ref" should be equal to "#/definitions/RelatedToDummyFriend-fakemanytomany"
 
+    # Deprecations
+    And the JSON node "paths./dummies.get.deprecated" should not exist
+    And the JSON node "paths./deprecated_resources.get.deprecated" should be true
+    And the JSON node "paths./deprecated_resources.post.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.get.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.delete.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.put.deprecated" should be true
+    And the JSON node "paths./deprecated_resources/{id}.patch.deprecated" should be true
+
   Scenario: Swagger UI is enabled for docs endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/docs"
