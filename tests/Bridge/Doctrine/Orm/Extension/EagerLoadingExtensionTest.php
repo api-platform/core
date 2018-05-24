@@ -97,8 +97,8 @@ class EagerLoadingExtensionTest extends TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ('id' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
+            if ('id' !== $property && 'embeddedDummy' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase'], true))->shouldBeCalled();
             }
         }
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();
@@ -183,8 +183,8 @@ class EagerLoadingExtensionTest extends TestCase
         $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
 
         foreach ($relatedNameCollection as $property) {
-            if ('id' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase', 'embeddedDummy'], true))->shouldBeCalled();
+            if ('id' !== $property && 'embeddedDummy' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(!\in_array($property, ['notindatabase'], true))->shouldBeCalled();
             }
         }
         $relatedClassMetadataProphecy->hasField('embeddedDummy.name')->willReturn(true)->shouldBeCalled();

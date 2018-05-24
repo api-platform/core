@@ -228,46 +228,51 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();
         $targetClassMetadata = $entityManager->getClassMetadata($entity);
-        if ($targetClassMetadata->subClasses) {
+        if (!empty($targetClassMetadata->subClasses)) {
             $queryBuilder->addSelect($associationAlias);
-        } else {
-            foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
-                $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
 
-                if (true === $propertyMetadata->isIdentifier()) {
-                    $select[] = $property;
-                    continue;
-                }
+            return;
+        }
 
+        foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+
+            if (true === $propertyMetadata->isIdentifier()) {
+                $select[] = $property;
+                continue;
+            }
+
+            // If it's an embedded property see below
+            if (!array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
                 //the field test allows to add methods to a Resource which do not reflect real database fields
                 if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
                     $select[] = $property;
                 }
 
-                if (array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
-                    foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
-                        $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
-                        $propertyName = "$property.$embeddedProperty";
-                        if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
-                            $select[] = $propertyName;
-                        }
-                    }
-                }
+                continue;
             }
 
-            $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+            // It's an embedded property, select relevent subfields
+            foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+                $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
+                $propertyName = "$property.$embeddedProperty";
+                if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                    $select[] = $propertyName;
+                }
+            }
         }
+
+        $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
     }
 
     /**
-     * Gets serializer context.
+     * Gets the serializer context.
      *
      * @param string $contextType normalization_context or denormalization_context
      * @param array  $options     represents the operation name so that groups are the one of the specific operation
      */
     private function getNormalizationContext(string $resourceClass, string $contextType, array $options): array
     {
-        $request = null;
         if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
             return $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
         }
