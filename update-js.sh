@@ -30,8 +30,8 @@ if [ -d $dest ]; then
   rm -Rf $dest
 fi
 mkdir -p $dest
-cp node_modules/react/dist/react.min.js $dest
-cp node_modules/react-dom/dist/react-dom.min.js $dest
+cp node_modules/react/cjs/react.production.min.js $dest
+cp node_modules/react-dom/cjs/react-dom.production.min.js $dest
 
 dest=src/Bridge/Symfony/Bundle/Resources/public/graphiql/
 if [ -d $dest ]; then
