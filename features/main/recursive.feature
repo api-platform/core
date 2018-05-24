@@ -4,7 +4,7 @@ Feature: Max depth handling
   I need to be able to limit their depth with @maxDepth
 
   @createSchema
-  Scenario: Create a non-recursive resource
+  Scenario: Create a resource with 1 level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/recursives" with body:
     """
@@ -27,25 +27,26 @@ Feature: Max depth handling
       "id": 1,
       "name": "Fry's grandpa",
       "child": {
-        "@id": "/recursive_children/1",
-        "@type": "RecursiveChild",
-        "id": 1,
-        "name": "Fry",
-        "parent": null
+        "@id": "/recursives/2",
+        "@type": "Recursive",
+        "id": 2,
+        "name": "Fry"
       }
     }
     """
 
   @dropSchema
-  Scenario: Make the resource recursive
+  Scenario: Add a 2nd level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "recursives/1" with body:
     """
     {
       "@id": "/recursives/1",
       "child": {
-        "@id": "/recursive_children/1",
-        "parent": "/recursives/1"
+        "@id": "/recursives/2",
+        "child": {
+          "name": "Fry's child"
+        }
       }
     }
     """
@@ -61,11 +62,11 @@ Feature: Max depth handling
       "id": 1,
       "name": "Fry's grandpa",
       "child": {
-        "@id": "/recursive_children/1",
-        "@type": "RecursiveChild",
-        "id": 1,
-        "name": "Fry",
-        "parent": "/recursives/1"
+        "@id": "/recursives/2",
+        "@type": "Recursive",
+        "id": 2,
+        "name": "Fry"
       }
     }
     """
+

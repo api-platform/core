@@ -46,9 +46,9 @@ class Recursive
     public $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="RecursiveChild", inversedBy="parent", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Recursive", cascade={"persist"})
      * @Groups({"default"})
-     * @MaxDepth(2)
+     * @MaxDepth(1)
      */
     public $child;
 
