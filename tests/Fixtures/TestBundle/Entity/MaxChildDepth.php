@@ -18,9 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
-/**
- * Recursive.
- *
+/** *
  * @ApiResource(attributes={
  *     "normalization_context"={"groups"={"default"}, "enable_max_depth"=true},
  *     "denormalization_context"={"groups"={"default"}, "enable_max_depth"=true}
@@ -29,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *
  * @author Brian Fox <brian@brianfox.fr>
  */
-class Recursive
+class MaxChildDepth
 {
     /**
      * @ORM\Column(type="integer")
@@ -46,7 +44,7 @@ class Recursive
     public $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Recursive", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="MaxChildDepth", cascade={"persist"})
      * @Groups({"default"})
      * @MaxDepth(1)
      */

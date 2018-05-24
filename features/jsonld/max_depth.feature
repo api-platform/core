@@ -1,12 +1,12 @@
 Feature: Max depth handling
-  In order to handle recursive resources
+  In order to handle MaxChildDepth resources
   As a developer
   I need to be able to limit their depth with @maxDepth
 
   @createSchema
   Scenario: Create a resource with 1 level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/recursives" with body:
+    And I send a "POST" request to "/max_child_depths" with body:
     """
     {
       "name": "Fry's grandpa",
@@ -21,14 +21,14 @@ Feature: Max depth handling
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/Recursive",
-      "@id": "/recursives/1",
-      "@type": "Recursive",
+      "@context": "/contexts/MaxChildDepth",
+      "@id": "/max_child_depths/1",
+      "@type": "MaxChildDepth",
       "id": 1,
       "name": "Fry's grandpa",
       "child": {
-        "@id": "/recursives/2",
-        "@type": "Recursive",
+        "@id": "/max_child_depths/2",
+        "@type": "MaxChildDepth",
         "id": 2,
         "name": "Fry"
       }
@@ -38,12 +38,12 @@ Feature: Max depth handling
   @dropSchema
   Scenario: Add a 2nd level of descendants
     When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "PUT" request to "recursives/1" with body:
+    And I send a "PUT" request to "max_child_depths/1" with body:
     """
     {
-      "@id": "/recursives/1",
+      "@id": "/max_child_depths/1",
       "child": {
-        "@id": "/recursives/2",
+        "@id": "/max_child_depths/2",
         "child": {
           "name": "Fry's child"
         }
@@ -56,14 +56,14 @@ Feature: Max depth handling
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/Recursive",
-      "@id": "/recursives/1",
-      "@type": "Recursive",
+      "@context": "/contexts/MaxChildDepth",
+      "@id": "/max_child_depths/1",
+      "@type": "MaxChildDepth",
       "id": 1,
       "name": "Fry's grandpa",
       "child": {
-        "@id": "/recursives/2",
-        "@type": "Recursive",
+        "@id": "/max_child_depths/2",
+        "@type": "MaxChildDepth",
         "id": 2,
         "name": "Fry"
       }
