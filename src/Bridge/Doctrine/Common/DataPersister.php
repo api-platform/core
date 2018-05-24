@@ -48,7 +48,7 @@ final class DataPersister implements DataPersisterInterface
     public function persist($data)
     {
         if (!$manager = $this->getManager($data)) {
-            return;
+            return $data;
         }
 
         if (!$manager->contains($data)) {
@@ -57,6 +57,8 @@ final class DataPersister implements DataPersisterInterface
 
         $manager->flush();
         $manager->refresh($data);
+
+        return $data;
     }
 
     /**
