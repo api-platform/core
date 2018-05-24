@@ -207,9 +207,13 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $queryBuilder->addSelect($associationAlias);
             }
 
-            // Avoid recursion
+            // Avoid recursive joins
             if ($mapping['targetEntity'] === $resourceClass) {
-                $queryBuilder->addSelect($associationAlias);
+                // Avoid joining the same association twice (see #1959)
+                if (!\in_array($associationAlias, $queryBuilder->getAllAliases(), true)) {
+                    $queryBuilder->addSelect($associationAlias);
+                }
+
                 continue;
             }
 
@@ -245,15 +249,17 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 continue;
             }
 
-            //the field test allows to add methods to a Resource which do not reflect real database fields
-            if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
-                $select[] = $property;
-            }
-
+            // If it's an embedded property see below
             if (!array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
+                //the field test allows to add methods to a Resource which do not reflect real database fields
+                if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                    $select[] = $property;
+                }
+
                 continue;
             }
 
+            // It's an embedded property, select relevent subfields
             foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
                 $propertyName = "$property.$embeddedProperty";
