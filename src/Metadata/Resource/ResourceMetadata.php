@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource;
 
+use ApiPlatform\Core\Api\OperationType;
+
 /**
  * Resource metadata.
  *
@@ -261,6 +263,25 @@ final class ResourceMetadata
         }
 
         return $defaultValue;
+    }
+
+    /**
+     * Gets an attribute for a given operation type and operation name.
+     *
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public function getTypedOperationAttribute(string $operationType, string $operationName, string $key, $defaultValue = null, bool $resourceFallback = false)
+    {
+        switch ($operationType) {
+            case OperationType::COLLECTION:
+                return $this->getCollectionOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
+            case OperationType::ITEM:
+                return $this->getItemOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
+            default:
+                return $this->getSubresourceOperationAttribute($operationName, $key, $defaultValue, $resourceFallback);
+        }
     }
 
     /**

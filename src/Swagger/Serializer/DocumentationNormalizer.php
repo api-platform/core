@@ -244,6 +244,9 @@ final class DocumentationNormalizer implements NormalizerInterface
         $resourceShortName = $resourceMetadata->getShortName();
         $pathOperation['tags'] ?? $pathOperation['tags'] = [$resourceShortName];
         $pathOperation['operationId'] ?? $pathOperation['operationId'] = lcfirst($operationName).ucfirst($resourceShortName).ucfirst($operationType);
+        if ($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
+            $pathOperation['deprecated'] = true;
+        }
 
         switch ($method) {
             case 'GET':
