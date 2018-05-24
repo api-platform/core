@@ -30,6 +30,7 @@ class EmbeddableDummy
      * @var string The dummy name
      *
      * @ORM\Column(nullable=true)
+     * @Groups({"embed"})
      */
     private $dummyName;
 
