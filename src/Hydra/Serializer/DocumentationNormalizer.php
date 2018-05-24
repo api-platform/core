@@ -97,7 +97,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             return;
         }
 
-        $entrypointProperties[] = [
+        $entrypointProperty = [
             '@type' => 'hydra:SupportedProperty',
             'hydra:property' => [
                 '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
@@ -119,6 +119,12 @@ final class DocumentationNormalizer implements NormalizerInterface
             'hydra:readable' => true,
             'hydra:writable' => false,
         ];
+
+        if ($resourceMetadata->getCollectionOperationAttribute('GET', 'deprecation_reason', null, true)) {
+            $entrypointProperty['owl:deprecated'] = true;
+        }
+
+        $entrypointProperties[] = $entrypointProperty;
     }
 
     /**
@@ -263,6 +269,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         $hydraOperation = $operation['hydra_context'] ?? [];
+        if ($resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
+            $hydraOperation['owl:deprecated'] = true;
+        }
+
         $shortName = $resourceMetadata->getShortName();
 
         if ('GET' === $method && OperationType::COLLECTION === $operationType) {
@@ -502,6 +512,10 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if (null !== $description = $propertyMetadata->getDescription()) {
             $property['hydra:description'] = $description;
+        }
+
+        if ($propertyMetadata->getAttribute('deprecation_reason')) {
+            $property['owl:deprecated'] = true;
         }
 
         return $property;

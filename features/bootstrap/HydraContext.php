@@ -82,6 +82,14 @@ final class HydraContext implements Context
     }
 
     /**
+     * @Then the boolean value of the node :node of the property :prop of the Hydra class :class is true
+     */
+    public function assertPropertyNodeValueIsTrue(string $nodeName, string $propertyName, string $className)
+    {
+        Assert::assertTrue($this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName));
+    }
+
+    /**
      * @Then the value of the node :node of the property :prop of the Hydra class :class is :value
      */
     public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value)
@@ -90,6 +98,14 @@ final class HydraContext implements Context
             $this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName),
             $value
         );
+    }
+
+    /**
+     * @Then the boolean value of the node :node of the operation :operation of the Hydra class :class is true
+     */
+    public function assertOperationNodeBooleanValueIs(string $nodeName, string $operationMethod, string $className)
+    {
+        Assert::assertTrue($this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName));
     }
 
     /**
