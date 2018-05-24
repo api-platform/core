@@ -110,8 +110,8 @@ Feature: Content Negotiation support
     Then the response status code should be 406
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
-  Scenario: If the request format is HTML, the error should be in HTML
-    When I add "Accept" header equal to "text/html"
+  Scenario: If the request format is XML, the error should be in XML
+    When I add "Accept" header equal to "application/xml"
     And I send a "GET" request to "/dummies/666"
     Then the response status code should be 404
-    And the header "Content-Type" should be equal to "text/html; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"

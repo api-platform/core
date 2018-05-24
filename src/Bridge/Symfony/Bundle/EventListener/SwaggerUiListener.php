@@ -34,17 +34,4 @@ final class SwaggerUiListener
 
         $request->attributes->set('_controller', 'api_platform.swagger.action.ui');
     }
-
-    public function addEndpointTypeToRequest(GetResponseEvent $event)
-    {
-        $request = $event->getRequest();
-        if (
-            'html' !== $request->getRequestFormat('') ||
-            (!$request->attributes->has('_api_resource_class') && !$request->attributes->has('_api_respond'))
-        ) {
-            return;
-        }
-
-        $request->attributes->set('_api_endpoint_type', 'documentation');
-    }
 }

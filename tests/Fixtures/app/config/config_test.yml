@@ -36,6 +36,7 @@ api_platform:
         jsonapi:                       ['application/vnd.api+json']
         xml:                           ['application/xml', 'text/xml']
         json:                          ['application/json']
+        html:                          ['text/html']
     documentation_formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
@@ -47,6 +48,7 @@ api_platform:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
         jsonapi:                       ['application/vnd.api+json']
+        xml:                           ['application/xml', 'text/xml']
     graphql:                           true
     name_converter:                    'app.name_converter'
     enable_fos_user:                   true
