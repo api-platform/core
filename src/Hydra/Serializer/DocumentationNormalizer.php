@@ -152,6 +152,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             $class['hydra:description'] = $description;
         }
 
+        if ($resourceMetadata->getAttribute('deprecation_reason')) {
+            $class['owl:deprecated'] = true;
+        }
+
         return $class;
     }
 
