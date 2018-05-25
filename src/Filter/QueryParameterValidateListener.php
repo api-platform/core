@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
  */
-class QueryParameterValidateListener
+final class QueryParameterValidateListener
 {
     use FilterLocatorTrait;
 

@@ -166,12 +166,12 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
 
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
 
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
 
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'

@@ -23,7 +23,7 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
         </service>
 
-        <service id="ApiPlatform\Core\Filter\QueryParameterValidateListener">
+        <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Core\Filter\QueryParameterValidateListener" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 

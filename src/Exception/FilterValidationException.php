@@ -18,7 +18,7 @@ namespace ApiPlatform\Core\Exception;
  *
  * @author Julien DENIAU <julien.deniau@gmail.com>
  */
-class FilterValidationException extends \Exception implements ExceptionInterface
+final class FilterValidationException extends \Exception implements ExceptionInterface
 {
     private $constraintViolationList;
 
