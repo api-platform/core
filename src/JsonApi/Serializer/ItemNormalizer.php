@@ -77,7 +77,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         // Get and populate relations
         $components = $this->getComponents($object, $format, $context);
-        $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $context, $components['relationships']);
+        $populatedRelationContext = $context;
+        $objectRelationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $components['relationships']);
+        $objectRelatedResources = $this->getRelatedResources($object, $format, $context, $components['relationships']);
 
         $item = [
             'id' => $this->iriConverter->getIriFromItem($object),
@@ -92,7 +94,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $item['relationships'] = $objectRelationshipsData;
         }
 
-        return ['data' => $item];
+        $data = ['data' => $item];
+
+        if ($objectRelatedResources) {
+            $data['included'] = $objectRelatedResources;
+        }
+
+        return $data;
     }
 
     /**
@@ -196,6 +204,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
             if (isset($context['resources'])) {
                 $context['resources'][$iri] = $iri;
             }
+            if (isset($context['api_included'])) {
+                $context['api_sub_level'] = true;
+                $data = $this->serializer->normalize($relatedObject, $format, $context);
+                unset($context['api_sub_level']);
+
+                return $data;
+            }
         }
 
         return ['data' => [
@@ -294,6 +309,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $data = [];
 
+        if (!isset($context['resource_class'])) {
+            return $data;
+        }
+
+        unset($context['api_included']);
         foreach ($relationships as $relationshipDataArray) {
             $relationshipName = $relationshipDataArray['name'];
 
@@ -313,6 +333,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
+                unset($attributeValue['data']['attributes']);
                 $data[$relationshipName] = $attributeValue;
 
                 continue;
@@ -323,12 +344,52 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 if (!isset($attributeValueElement['data'])) {
                     throw new InvalidArgumentException(sprintf('The JSON API attribute \'%s\' must contain a "data" key.', $relationshipName));
                 }
-
+                unset($attributeValueElement['data']['attributes']);
                 $data[$relationshipName]['data'][] = $attributeValueElement['data'];
             }
         }
 
         return $data;
+    }
+
+    /**
+     * Populates included keys.
+     */
+    private function getRelatedResources($object, string $format = null, array $context, array $relationships): array
+    {
+        if (!isset($context['api_included'])) {
+            return [];
+        }
+
+        $included = [];
+        foreach ($relationships as $relationshipDataArray) {
+            if (!\in_array($relationshipDataArray['name'], $context['api_included'], true)) {
+                continue;
+            }
+
+            $relationshipName = $relationshipDataArray['name'];
+            $relationContext = $context;
+            $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $relationContext);
+
+            if (!$attributeValue) {
+                continue;
+            }
+
+            // Many to one relationship
+            if ('one' === $relationshipDataArray['cardinality']) {
+                $included[] = $attributeValue['data'];
+
+                continue;
+            }
+            // Many to many relationship
+            foreach ($attributeValue as $attributeValueElement) {
+                if (isset($attributeValueElement['data'])) {
+                    $included[] = $attributeValueElement['data'];
+                }
+            }
+        }
+
+        return $included;
     }
 
     /**

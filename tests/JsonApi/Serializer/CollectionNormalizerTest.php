@@ -225,6 +225,76 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
     }
 
+    public function testNormalizeIncludedData()
+    {
+        $data = ['foo'];
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, null, true)->willReturn('Foo')->shouldBeCalled();
+
+        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
+        $itemNormalizer
+            ->normalize(
+                'foo',
+                CollectionNormalizer::FORMAT,
+                [
+                    'request_uri' => '/foos',
+                    'api_sub_level' => true,
+                    'resource_class' => 'Foo',
+                ]
+            )
+            ->willReturn([
+                'data' => [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Baptiste',
+                    ],
+                ],
+                'included' => [
+                    [
+                        'type' => 'Bar',
+                        'id' => 1,
+                        'attributes' => [
+                            'id' => 1,
+                            'name' => 'Anto',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer->setNormalizer($itemNormalizer->reveal());
+
+        $expected = [
+            'links' => ['self' => '/foos'],
+            'data' => [
+                [
+                    'type' => 'Foo',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Baptiste',
+                    ],
+                ],
+            ],
+            'meta' => ['totalItems' => 1],
+            'included' => [
+                [
+                    'type' => 'Bar',
+                    'id' => 1,
+                    'attributes' => [
+                        'id' => 1,
+                        'name' => 'Anto',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
+    }
+
     public function testNormalizeWithoutDataKey()
     {
         $this->expectException(InvalidArgumentException::class);
