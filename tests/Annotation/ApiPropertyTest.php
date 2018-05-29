@@ -48,6 +48,7 @@ class ApiPropertyTest extends TestCase
     public function testConstruct()
     {
         $property = new ApiProperty([
+            'deprecationReason' => 'this field is deprecated',
             'fetchable' => true,
             'fetchEager' => false,
             'jsonldContext' => ['foo' => 'bar'],
@@ -55,6 +56,7 @@ class ApiPropertyTest extends TestCase
             'attributes' => ['unknown' => 'unknown', 'fetchable' => false],
         ]);
         $this->assertEquals([
+            'deprecation_reason' => 'this field is deprecated',
             'fetchable' => false,
             'fetch_eager' => false,
             'jsonld_context' => ['foo' => 'bar'],
