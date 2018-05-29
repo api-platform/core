@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Annotation;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\Common\Annotations\Annotation\Attribute;
 
 /**
  * ApiProperty annotation.
@@ -24,6 +23,7 @@ use Doctrine\Common\Annotations\Annotation\Attribute;
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
  * @Attributes(
+ *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("fetchable", type="bool"),
  *     @Attribute("fetchEager", type="bool"),
  *     @Attribute("jsonldContext", type="array"),
@@ -73,6 +73,13 @@ final class ApiProperty
      * @var bool
      */
     public $identifier;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var string
+     */
+    private $deprecationReason;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
