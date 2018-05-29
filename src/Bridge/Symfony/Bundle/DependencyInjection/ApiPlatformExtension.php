@@ -95,6 +95,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('data_persister.xml');
         $loader->load('data_provider.xml');
         $loader->load('filter.xml');
+        $loader->load('property_info.xml');
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');

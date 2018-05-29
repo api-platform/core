@@ -558,6 +558,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.subresource_operation_factory.cached',
             'api_platform.serializer_locator',
             'api_platform.validator',
+            'api_platform.property_info.constructor_extractor',
         ];
 
         foreach ($definitions as $definition) {
@@ -724,6 +725,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.listener.response.add_tags',
             'api_platform.validator',
+            'api_platform.property_info.constructor_extractor',
         ];
 
         foreach ($definitions as $definition) {
