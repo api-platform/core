@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Problem\Serializer;
 
 use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -23,7 +24,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ErrorNormalizer implements NormalizerInterface
+final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonproblem';
 
@@ -60,5 +61,13 @@ final class ErrorNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

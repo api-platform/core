@@ -31,6 +31,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -40,7 +41,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DocumentationNormalizer implements NormalizerInterface
+final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     use FilterLocatorTrait;
 
@@ -757,6 +758,14 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return self::FORMAT === $format && $data instanceof Documentation;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 
     /**
