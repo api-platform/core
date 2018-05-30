@@ -23,6 +23,9 @@ doctrine:
         auto_generate_proxy_classes:   '%kernel.debug%'
         auto_mapping:                  true
 
+twig:
+    strict_variables: '%kernel.debug%'
+
 api_platform:
     title:                             'My Dummy API'
     description:                       'This is a test API.'

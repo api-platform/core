@@ -27,7 +27,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Http\Firewall\ContextListener;
 
 /**
  * AppKernel for tests.
@@ -119,9 +118,6 @@ class AppKernel extends Kernel
             ],
         ];
 
-        if (method_exists(ContextListener::class, 'setLogoutOnUserChange')) {
-            $securityConfig['firewalls']['default']['logout_on_user_change'] = true;
-        }
         $c->loadFromExtension('security', $securityConfig);
 
         if ($_SERVER['LEGACY'] ?? true) {
