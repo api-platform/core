@@ -31,6 +31,8 @@ class EventPrioritiesTest extends TestCase
         $this->assertEquals(63, EventPriorities::POST_VALIDATE);
         $this->assertEquals(33, EventPriorities::PRE_WRITE);
         $this->assertEquals(31, EventPriorities::POST_WRITE);
+        $this->assertEquals(17, EventPriorities::PRE_SERIALIZE);
+        $this->assertEquals(15, EventPriorities::POST_SERIALIZE);
         $this->assertEquals(9, EventPriorities::PRE_RESPOND);
         $this->assertEquals(0, EventPriorities::POST_RESPOND);
     }
