@@ -15,6 +15,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\JsonContext as BaseJsonContext;
 use Behatch\HttpCall\HttpCallResultPool;
 use Behatch\Json\Json;
+use PHPUnit\Framework\Assert;
 
 final class JsonContext extends BaseJsonContext
 {
@@ -64,5 +65,14 @@ final class JsonContext extends BaseJsonContext
             (string) $actual,
             "The json is equal to:\n".$actual->encode()
         );
+    }
+
+    /**
+     * @Then /^the JSON should be a superset of:$/
+     */
+    public function theJsonIsASupersetOf(PyStringNode $content)
+    {
+        $actual = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
+        Assert::assertArraySubset(json_decode($content->getRaw(), true), $actual);
     }
 }
