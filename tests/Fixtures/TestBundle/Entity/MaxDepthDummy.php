@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  *
  * @author Brian Fox <brian@brianfox.fr>
  */
-class MaxChildDepth
+class MaxDepthDummy
 {
     /**
      * @ORM\Column(type="integer")
@@ -44,7 +44,7 @@ class MaxChildDepth
     public $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="MaxChildDepth", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="MaxDepthDummy", cascade={"persist"})
      * @Groups({"default"})
      * @MaxDepth(1)
      */

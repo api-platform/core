@@ -7,7 +7,7 @@ Feature: Max depth handling
   Scenario: Create a resource with 1 level of descendants
     When I add "Accept" header equal to "application/hal+json"
     And I add "Content-Type" header equal to "application/json"
-    And I send a "POST" request to "/max_child_depths" with body:
+    And I send a "POST" request to "/max_depth_dummies" with body:
     """
     {
       "name": "Fry's grandpa",
@@ -24,17 +24,17 @@ Feature: Max depth handling
     {
       "_links": {
         "self": {
-          "href": "\/max_child_depths\/1"
+          "href": "\/max_depth_dummies\/1"
         },
         "child": {
-          "href": "\/max_child_depths\/2"
+          "href": "\/max_depth_dummies\/2"
         }
       },
       "_embedded": {
         "child": {
           "_links": {
             "self": {
-              "href": "\/max_child_depths\/2"
+              "href": "\/max_depth_dummies\/2"
             }
           },
           "id": 2,
@@ -50,12 +50,12 @@ Feature: Max depth handling
   Scenario: Add a 2nd level of descendants
     When I add "Accept" header equal to "application/hal+json"
     And I add "Content-Type" header equal to "application/json"
-    And I send a "PUT" request to "max_child_depths/1" with body:
+    And I send a "PUT" request to "max_depth_dummies/1" with body:
     """
     {
-      "id": "/max_child_depths/1",
+      "id": "/max_depth_dummies/1",
       "child": {
-        "id": "/max_child_depths/2",
+        "id": "/max_depth_dummies/2",
         "child": {
           "name": "Fry's child"
         }
@@ -70,17 +70,17 @@ Feature: Max depth handling
     {
       "_links": {
         "self": {
-          "href": "\/max_child_depths\/1"
+          "href": "\/max_depth_dummies\/1"
         },
         "child": {
-          "href": "\/max_child_depths\/2"
+          "href": "\/max_depth_dummies\/2"
         }
       },
       "_embedded": {
         "child": {
           "_links": {
             "self": {
-              "href": "\/max_child_depths\/2"
+              "href": "\/max_depth_dummies\/2"
             }
           },
           "id": 2,
