@@ -136,7 +136,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             //Don't join if max depth is enabled and the current depth limit is reached
-            if (0 === $currentDepth && isset($normalizationContext[AbstractObjectNormalizer::ENABLE_MAX_DEPTH])) {
+            if (0 === $currentDepth && ($normalizationContext[AbstractObjectNormalizer::ENABLE_MAX_DEPTH] ?? false)) {
                 continue;
             }
 
