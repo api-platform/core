@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Hal\Serializer;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 
 /**
  * Converts between objects and array including HAL metadata.
@@ -167,8 +168,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
+        $class = \get_class($object);
+        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : null;
+
         $key = '_'.$type;
         foreach ($components[$type] as $relation) {
+            if (null !== $attributesMetadata && $this->isMaxDepthReached($attributesMetadata, $class, $relation['name'], $context)) {
+                continue;
+            }
+
             $attributeValue = $this->getAttributeValue($object, $relation['name'], $format, $context);
             if (empty($attributeValue)) {
                 continue;
@@ -231,5 +239,36 @@ final class ItemNormalizer extends AbstractItemNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
+    }
+
+    /**
+     * Is the max depth reached for the given attribute?
+     *
+     * @param AttributeMetadataInterface[] $attributesMetadata
+     */
+    private function isMaxDepthReached(array $attributesMetadata, string $class, string $attribute, array &$context): bool
+    {
+        if (
+            !($context[static::ENABLE_MAX_DEPTH] ?? false) ||
+            !isset($attributesMetadata[$attribute]) ||
+            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+        ) {
+            return false;
+        }
+
+        $key = sprintf(static::DEPTH_KEY_PATTERN, $class, $attribute);
+        if (!isset($context[$key])) {
+            $context[$key] = 1;
+
+            return false;
+        }
+
+        if ($context[$key] === $maxDepth) {
+            return true;
+        }
+
+        ++$context[$key];
+
+        return false;
     }
 }
