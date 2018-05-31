@@ -108,7 +108,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return true;
+        return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 
     /**

@@ -115,6 +115,6 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
      */
     public function hasCacheableSupportsMethod(): bool
     {
-        return true;
+        return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
     }
 }

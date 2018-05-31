@@ -86,6 +86,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonhal'));
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertFalse($normalizer->supportsNormalization($std, 'jsonhal'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()

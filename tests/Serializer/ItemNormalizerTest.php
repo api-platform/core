@@ -60,6 +60,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()

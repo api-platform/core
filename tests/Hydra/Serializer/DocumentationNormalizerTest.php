@@ -89,7 +89,7 @@ class DocumentationNormalizerTest extends TestCase
             ],
         ]);
 
-        $apiDocumentationBuilder = new DocumentationNormalizer(
+        $documentationNormalizer = new DocumentationNormalizer(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
@@ -347,6 +347,9 @@ class DocumentationNormalizerTest extends TestCase
             ],
             'hydra:entrypoint' => '/',
         ];
-        $this->assertEquals($expected, $apiDocumentationBuilder->normalize($documentation));
+        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation));
+        $this->assertTrue($documentationNormalizer->supportsNormalization($documentation, 'jsonld'));
+        $this->assertFalse($documentationNormalizer->supportsNormalization($documentation, 'hal'));
+        $this->assertTrue($documentationNormalizer->hasCacheableSupportsMethod());
     }
 }

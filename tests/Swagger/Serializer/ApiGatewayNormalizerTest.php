@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Swagger\Serializer;
 use ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -41,6 +42,8 @@ final class ApiGatewayNormalizerTest extends TestCase
     protected function setUp()
     {
         $this->documentationNormalizerMock = $this->prophesize(NormalizerInterface::class);
+        $this->documentationNormalizerMock->willImplement(CacheableSupportsMethodInterface::class);
+        $this->documentationNormalizerMock->hasCacheableSupportsMethod()->willReturn(true);
         $this->objectMock = $this->prophesize(\stdClass::class);
         $this->normalizer = new ApiGatewayNormalizer($this->documentationNormalizerMock->reveal());
     }
@@ -49,6 +52,7 @@ final class ApiGatewayNormalizerTest extends TestCase
     {
         $this->documentationNormalizerMock->supportsNormalization('foo', 'bar')->willReturn(true)->shouldBeCalledTimes(1);
         $this->assertTrue($this->normalizer->supportsNormalization('foo', 'bar'));
+        $this->assertTrue($this->normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalizeWithoutApiGateway()
