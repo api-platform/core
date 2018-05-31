@@ -10,9 +10,9 @@ Feature: Max depth handling
     And I send a "POST" request to "/max_depth_dummies" with body:
     """
     {
-      "name": "Fry's grandpa",
+      "name": "level 1",
       "child": {
-        "name": "Fry"
+        "name": "level 2"
       }
     }
     """
@@ -38,11 +38,11 @@ Feature: Max depth handling
             }
           },
           "id": 2,
-          "name": "Fry"
+          "name": "level 2"
         }
       },
       "id": 1,
-      "name": "Fry's grandpa"
+      "name": "level 1"
     }
     """
 
@@ -57,7 +57,7 @@ Feature: Max depth handling
       "child": {
         "id": "/max_depth_dummies/2",
         "child": {
-          "name": "Fry's child"
+          "name": "level 3"
         }
       }
     }
@@ -84,10 +84,10 @@ Feature: Max depth handling
             }
           },
           "id": 2,
-          "name": "Fry"
+          "name": "level 2"
         }
       },
       "id": 1,
-      "name": "Fry's grandpa"
+      "name": "level 1"
     }
     """
