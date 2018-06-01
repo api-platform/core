@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-abstract class AbstractCollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+abstract class AbstractCollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     use ContextTrait { initContext as protected; }
     use NormalizerAwareTrait;
@@ -50,6 +51,14 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     public function supportsNormalization($data, $format = null)
     {
         return static::FORMAT === $format && (\is_array($data) || $data instanceof \Traversable);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 
     /**

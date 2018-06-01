@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -25,7 +26,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class EntrypointNormalizer implements NormalizerInterface
+final class EntrypointNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonld';
 
@@ -73,5 +74,13 @@ final class EntrypointNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return self::FORMAT === $format && $data instanceof Entrypoint;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

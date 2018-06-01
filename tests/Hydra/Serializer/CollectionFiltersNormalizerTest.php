@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -32,7 +33,9 @@ class CollectionFiltersNormalizerTest extends TestCase
     public function testSupportsNormalization()
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
         $decoratedProphecy->supportsNormalization('foo', 'abc')->willReturn(true)->shouldBeCalled();
+        $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
@@ -42,6 +45,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         );
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testDoNothingIfSubLevel()

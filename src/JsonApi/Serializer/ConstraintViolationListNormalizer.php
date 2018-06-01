@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
-final class ConstraintViolationListNormalizer implements NormalizerInterface
+final class ConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonapi';
 
@@ -58,6 +59,14 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 
     private function getSourcePointerFromViolation(ConstraintViolationInterface $violation)

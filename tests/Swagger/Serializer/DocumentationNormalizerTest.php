@@ -1304,6 +1304,7 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization($documentation, 'json'));
         $this->assertFalse($normalizer->supportsNormalization($documentation));
         $this->assertFalse($normalizer->supportsNormalization(new Dummy(), 'json'));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNoOperations()

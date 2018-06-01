@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Identifier\Normalizer;
 
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class IntegerDenormalizer implements DenormalizerInterface
+final class IntegerDenormalizer implements DenormalizerInterface, CacheableSupportsMethodInterface
 {
     public function denormalize($data, $class, $format = null, array $context = []): int
     {
@@ -29,5 +30,13 @@ final class IntegerDenormalizer implements DenormalizerInterface
     public function supportsDenormalization($data, $type, $format = null): bool
     {
         return Type::BUILTIN_TYPE_INT === $type && \is_string($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

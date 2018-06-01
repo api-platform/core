@@ -14,18 +14,25 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Identifier\Normalizer;
 
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class DateTimeIdentifierDenormalizer extends DateTimeNormalizer implements DenormalizerInterface
+final class DateTimeIdentifierDenormalizer extends DateTimeNormalizer
 {
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         try {
             return parent::denormalize($data, $class, $format, $context);
-        } catch (InvalidArgumentException $e) {
+        } catch (NotNormalizableValueException $e) {
             throw new InvalidIdentifierException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

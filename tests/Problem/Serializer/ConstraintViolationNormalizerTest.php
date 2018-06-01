@@ -34,6 +34,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsNormalization(new ConstraintViolationList(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization(new ConstraintViolationList(), 'xml'));
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT));
+        $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
     public function testNormalize()

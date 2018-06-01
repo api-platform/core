@@ -20,6 +20,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -28,7 +29,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
+final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
     use JsonLdContextTrait;
     use FilterLocatorTrait;
@@ -55,6 +56,14 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     public function supportsNormalization($data, $format = null)
     {
         return $this->collectionNormalizer->supportsNormalization($data, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return $this->collectionNormalizer instanceof CacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 
     /**

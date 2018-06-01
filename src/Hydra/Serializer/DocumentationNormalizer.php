@@ -29,6 +29,7 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -36,7 +37,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DocumentationNormalizer implements NormalizerInterface
+final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     const FORMAT = 'jsonld';
 
@@ -580,5 +581,13 @@ final class DocumentationNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return self::FORMAT === $format && $data instanceof Documentation;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return true;
     }
 }

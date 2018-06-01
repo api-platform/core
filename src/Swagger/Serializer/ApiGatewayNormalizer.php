@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Swagger\Serializer;
 
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class ApiGatewayNormalizer implements NormalizerInterface
+final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     private $documentationNormalizer;
 
@@ -107,5 +108,13 @@ final class ApiGatewayNormalizer implements NormalizerInterface
     public function supportsNormalization($data, $format = null)
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCacheableSupportsMethod(): bool
+    {
+        return $this->documentationNormalizer instanceof CacheableSupportsMethodInterface && $this->documentationNormalizer->hasCacheableSupportsMethod();
     }
 }
