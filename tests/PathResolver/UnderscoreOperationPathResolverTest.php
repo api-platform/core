@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
 use PHPUnit\Framework\TestCase;
 
@@ -46,12 +47,12 @@ class UnderscoreOperationPathResolverTest extends TestCase
 
     /**
      * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator instead.
-     *
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedMessage Subresource operations are not supported by the OperationPathResolver.
      */
     public function testResolveSubresourceOperationPath()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Subresource operations are not supported by the OperationPathResolver.');
+
         $dashOperationPathResolver = new UnderscoreOperationPathResolver();
 
         $dashOperationPathResolver->resolveOperationPath('ShortName', ['property' => 'relatedFoo', 'identifiers' => [['id', 'class']], 'collection' => true], OperationType::SUBRESOURCE, 'get');

@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(itemOperations={
  *     "get",
  *     "custom_normalization"={"route_name"="custom_normalization"}
- *     }, collectionOperations={
+ * }, collectionOperations={
  *     "get",
  *     "custom_denormalization"={"route_name"="custom_denormalization"}
  * })

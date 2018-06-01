@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidateListener;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
@@ -150,11 +151,10 @@ class ValidateListenerTest extends TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException
-     */
     public function testThrowsValidationExceptionWithViolationsFound()
     {
+        $this->expectException(ValidationException::class);
+
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
 

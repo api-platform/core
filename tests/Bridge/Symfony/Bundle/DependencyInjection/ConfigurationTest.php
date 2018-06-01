@@ -18,6 +18,8 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -187,11 +189,12 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeProvider
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessageRegExp /The HTTP status code ".+" is not valid\./
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageRegExp('/The HTTP status code ".+" is not valid\\./');
+
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'exception_to_status' => [
@@ -215,11 +218,12 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidTypeException
-     * @expectedExceptionMessageRegExp /Invalid type for path "api_platform\.exception_to_status\.Exception". Expected int, but got .+\./
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
     {
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessageRegExp('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected int, but got .+\\./');
+
         $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'exception_to_status' => [

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -157,12 +158,11 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['id' => '/dummies/12', 'name' => 'hello'], Dummy::class, null, $context));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Update is not allowed for this operation.
-     */
     public function testDenormalizeWithIdAndUpdateNotAllowed()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Update is not allowed for this operation.');
+
         $context = ['resource_class' => Dummy::class, 'api_allow_update' => false];
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);

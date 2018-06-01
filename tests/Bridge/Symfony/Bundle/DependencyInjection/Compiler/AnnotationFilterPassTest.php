@@ -19,6 +19,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\AnotherDummyFilter;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -97,12 +98,11 @@ class AnnotationFilterPassTest extends TestCase
         $annotationFilterPass->process($containerBuilderProphecy->reveal());
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The filter class "ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\AnotherDummyFilter" does not implement "ApiPlatform\Core\Api\FilterInterface".
-     */
     public function testProcessWrongFilter()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The filter class "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Doctrine\\Orm\\Filter\\AnotherDummyFilter" does not implement "ApiPlatform\\Core\\Api\\FilterInterface".');
+
         $annotationFilterPass = new AnnotationFilterPass();
 
         $this->assertInstanceOf(CompilerPassInterface::class, $annotationFilterPass);

@@ -35,12 +35,11 @@ class RouteNameResolverTest extends TestCase
         $this->assertInstanceOf(RouteNameResolverInterface::class, $routeNameResolver);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No item route associated with the type "AppBundle\Entity\User".
-     */
     public function testGetRouteNameForItemRouteWithNoMatchingRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('No item route associated with the type "AppBundle\\Entity\\User".');
+
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_collection_route', new Route('/some/collection/path', [
             '_api_resource_class' => 'AppBundle\Entity\User',
@@ -100,12 +99,11 @@ class RouteNameResolverTest extends TestCase
         $this->assertSame('some_item_route', $actual);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage No collection route associated with the type "AppBundle\Entity\User".
-     */
     public function testGetRouteNameForCollectionRouteWithNoMatchingRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('No collection route associated with the type "AppBundle\\Entity\\User".');
+
         $routeCollection = new RouteCollection();
         $routeCollection->add('some_item_route', new Route('/some/item/path/{id}', [
             '_api_resource_class' => 'AppBundle\Entity\User',

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
@@ -32,21 +33,19 @@ class PaginatorTest extends TestCase
         $this->assertEquals($maxResults, $paginator->getItemsPerPage());
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage "Doctrine\ORM\Query::setFirstResult()" or/and "Doctrine\ORM\Query::setMaxResults()" was/were not applied to the query.
-     */
     public function testInitializeWithQueryFirstResultNotApplied()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
+
         $this->getPaginatorWithMalformedQuery(false);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage "Doctrine\ORM\Query::setFirstResult()" or/and "Doctrine\ORM\Query::setMaxResults()" was/were not applied to the query.
-     */
     public function testInitializeWithQueryMaxResultsNotApplied()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"Doctrine\\ORM\\Query::setFirstResult()" or/and "Doctrine\\ORM\\Query::setMaxResults()" was/were not applied to the query.');
+
         $this->getPaginatorWithMalformedQuery(true);
     }
 

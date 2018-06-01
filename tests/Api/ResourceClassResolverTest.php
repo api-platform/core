@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolver;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -93,12 +94,11 @@ class ResourceClassResolverTest extends TestCase
         $this->assertEquals($resourceClass, Dummy::class);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found for object of type "stdClass".
-     */
     public function testGetResourceClassWithWrongClassName()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource class found for object of type "stdClass".');
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
@@ -106,12 +106,11 @@ class ResourceClassResolverTest extends TestCase
         $resourceClassResolver->getResourceClass(new \stdClass(), null);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found.
-     */
     public function testGetResourceClassWithNoResourceClassName()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource class found.');
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());
@@ -140,12 +139,11 @@ class ResourceClassResolverTest extends TestCase
         $this->assertFalse($resourceClass);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource class found.
-     */
     public function testGetResourceClassWithNoResourceClassNameAndNoObject()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource class found.');
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
 
         $resourceClassResolver = new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal());

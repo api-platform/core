@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Util;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\IriHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -69,12 +70,11 @@ class IriHelperTest extends TestCase
         $this->assertEquals('https://foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., true));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The request URI "http:///" is malformed.
-     */
     public function testParseIriWithInvalidUrl()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The request URI "http:///" is malformed.');
+
         IriHelper::parseIri('http:///', 'page');
     }
 }

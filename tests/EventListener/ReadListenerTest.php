@@ -17,9 +17,11 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
+use ApiPlatform\Core\Exception\RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -136,11 +138,10 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveItemNoIdentifier()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
@@ -186,11 +187,10 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     */
     public function testRetrieveSubresourceNoDataProvider()
     {
+        $this->expectException(RuntimeException::class);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
@@ -209,11 +209,10 @@ class ReadListenerTest extends TestCase
         $request->attributes->get('data');
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveSubresourceNotFound()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
@@ -233,11 +232,10 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveItemNotFound()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
