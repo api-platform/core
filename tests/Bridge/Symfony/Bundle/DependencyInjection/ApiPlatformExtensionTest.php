@@ -28,6 +28,7 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -451,7 +452,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.description' => 'description',
             'api_platform.error_formats' => ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']],
             'api_platform.formats' => ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
-            'api_platform.exception_to_status' => [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST],
+            'api_platform.exception_to_status' => [
+                ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
+                InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                FilterValidationException::class => Response::HTTP_BAD_REQUEST,
+            ],
             'api_platform.title' => 'title',
             'api_platform.version' => 'version',
             'api_platform.allow_plain_identifiers' => false,
@@ -516,6 +521,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.validate',
+            'api_platform.listener.view.validate_query_parameters',
             'api_platform.listener.view.write',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.metadata_factory.cached',

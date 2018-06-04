@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -67,6 +68,7 @@ class ConfigurationTest extends TestCase
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                FilterValidationException::class => Response::HTTP_BAD_REQUEST,
             ],
             'default_operation_path_resolver' => 'api_platform.operation_path_resolver.underscore',
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',

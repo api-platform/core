@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
@@ -248,6 +249,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([
                         ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
+                        FilterValidationException::class => Response::HTTP_BAD_REQUEST,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
                     ->normalizeKeys(false)

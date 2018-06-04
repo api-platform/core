@@ -55,6 +55,7 @@ api_platform:
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: 400
         ApiPlatform\Core\Exception\InvalidArgumentException: 400
+        ApiPlatform\Core\Exception\FilterValidationException: 400
         # Use this syntax with Symfony YAML 3.4+:
         #ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
     http_cache:
@@ -163,6 +164,14 @@ services:
     app.my_dummy_resource.property_filter:
         parent:    'api_platform.serializer.property_filter'
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
 
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
