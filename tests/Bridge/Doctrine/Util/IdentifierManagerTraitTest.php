@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Util;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -80,12 +81,11 @@ class IdentifierManagerTraitTest extends TestCase
         $this->assertEquals($identifierManager->normalizeIdentifiers('ida=1;idb=2', $objectManager, Dummy::class), ['ida' => 1, 'idb' => 2]);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\PropertyNotFoundException
-     * @expectedExceptionMessage Invalid identifier "idbad=1;idb=2", "ida" has not been found.
-     */
     public function testInvalidIdentifier()
     {
+        $this->expectException(PropertyNotFoundException::class);
+        $this->expectExceptionMessage('Invalid identifier "idbad=1;idb=2", "ida" has not been found.');
+
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'ida',
             'idb',

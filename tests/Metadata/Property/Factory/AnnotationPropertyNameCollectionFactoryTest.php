@@ -94,12 +94,11 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotFoundException
-     * @expectedExceptionMessage The resource class "\DoNotExist" does not exist.
-     */
     public function testClassDoesNotExist()
     {
+        $this->expectException(ResourceClassNotFoundException::class);
+        $this->expectExceptionMessage('The resource class "\\DoNotExist" does not exist.');
+
         $reader = $this->prophesize(Reader::class);
 
         $factory = new AnnotationPropertyNameCollectionFactory($reader->reveal());

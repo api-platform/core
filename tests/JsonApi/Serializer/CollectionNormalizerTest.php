@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -224,12 +224,11 @@ class CollectionNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($data, CollectionNormalizer::FORMAT, ['request_uri' => '/foos']));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The JSON API document must contain a "data" key.
-     */
     public function testNormalizeWithoutDataKey()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The JSON API document must contain a "data" key.');
+
         $data = ['foo'];
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

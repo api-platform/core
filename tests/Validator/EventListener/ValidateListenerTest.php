@@ -82,11 +82,10 @@ class ValidateListenerTest extends TestCase
         $validationViewListener->onKernelView($event);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Validator\Exception\ValidationException
-     */
     public function testThrowsValidationExceptionWithViolationsFound()
     {
+        $this->expectException(ValidationException::class);
+
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
 

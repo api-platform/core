@@ -17,6 +17,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -124,11 +126,10 @@ class ItemDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getItem(Dummy::class, 'ida=1;idb=2', 'foo'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\PropertyNotFoundException
-     */
     public function testGetItemWrongCompositeIdentifier()
     {
+        $this->expectException(PropertyNotFoundException::class);
+
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'ida',
             'idb',
@@ -196,12 +197,11 @@ class ItemDataProviderTest extends TestCase
         $this->assertFalse($dataProvider->supports(Dummy::class, 'foo'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The repository class must have a "createQueryBuilder" method.
-     */
     public function testCannotCreateQueryBuilder()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');
+
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->willReturn([

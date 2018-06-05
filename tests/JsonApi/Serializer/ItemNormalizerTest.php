@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -181,11 +182,10 @@ class ItemNormalizerTest extends TestCase
         ));
     }
 
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     */
     public function testNormalizeThrowsNoSuchPropertyException()
     {
+        $this->expectException(NoSuchPropertyException::class);
+
         $foo = new \stdClass();
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -324,12 +324,11 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Update is not allowed for this operation.
-     */
     public function testDenormalizeUpdateOperationNotAllowed()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Update is not allowed for this operation.');
+
         $normalizer = new ItemNormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
@@ -355,12 +354,11 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type of the "relatedDummies" attribute must be "array", "string" given.
-     */
     public function testDenormalizeCollectionIsNotArray()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The type of the "relatedDummies" attribute must be "array", "string" given.');
+
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummies']))->shouldBeCalled();
 
@@ -408,12 +406,11 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The type of the key "0" must be "string", "integer" given.
-     */
     public function testDenormalizeCollectionWithInvalidKey()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The type of the key "0" must be "string", "integer" given.');
+
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummies']))->shouldBeCalled();
 
@@ -466,12 +463,11 @@ class ItemNormalizerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.
-     */
     public function testDenormalizeRelationIsNotResourceLinkage()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
+
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']))->shouldBeCalled();
 

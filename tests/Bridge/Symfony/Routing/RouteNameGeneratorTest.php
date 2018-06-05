@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,12 +38,11 @@ class RouteNameGeneratorTest extends TestCase
         $this->assertEquals('api_foos_get_collection', RouteNameGenerator::generate('get', 'Foo', true));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedMessage Subresource operations are not supported by the RouteNameGenerator.
-     */
     public function testGenerateWithSubresource()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Subresource operations are not supported by the RouteNameGenerator.');
+
         $this->assertEquals('api_foos_bar_get_subresource', RouteNameGenerator::generate('get', 'Foo', OperationType::SUBRESOURCE));
     }
 }
