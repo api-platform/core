@@ -17,8 +17,6 @@ matrix:
     - php: '7.1'
     - php: '7.2'
     - php: '7.2'
-      env: lint=1
-    - php: '7.2'
       env: deps=low
     - php: '7.2'
       env: SYMFONY_DEPRECATIONS_HELPER=0
@@ -40,12 +38,6 @@ matrix:
 before_install:
   - phpenv config-rm xdebug.ini || echo "xdebug not available"
   - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  - if [[ $lint = 1 ]]; then
-      wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v2.12.0/php-cs-fixer.phar;
-    fi
-  - if [[ $lint = 1 ]]; then
-      composer global require --dev 'phpstan/phpstan:^0.8';
-    fi
   - export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 install:
@@ -56,26 +48,12 @@ install:
     fi
 
 script:
-  - if [[ $lint != 1 ]]; then
-      tests/Fixtures/app/console cache:clear;
-    fi
-  - if [[ $lint != 1 ]]; then
-      vendor/bin/phpunit;
-    fi
-  - if [[ $lint != 1 ]]; then
-      tests/Fixtures/app/console cache:clear;
-    fi
+  - tests/Fixtures/app/console cache:clear
+  - vendor/bin/phpunit
+  - tests/Fixtures/app/console cache:clear
   - if [[ $APP_ENV = 'postgres' ]]; then
       vendor/bin/behat --suite=postgres --format=progress;
-    elif [[ $lint != 1 ]]; then
+    else
       vendor/bin/behat --suite=default --format=progress;
     fi
-  - if [[ $lint != 1 ]]; then
-      tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json;
-    fi
-  - if [[ $lint = 1 ]]; then
-      php php-cs-fixer.phar fix --dry-run --diff --no-ansi;
-    fi
-  - if [[ $lint = 1 ]]; then
-      phpstan analyse -c phpstan.neon -l5 --ansi src tests;
-    fi
+  - tests/Fixtures/app/console api:swagger:export > swagger.json && npx swagger-cli validate swagger.json && rm swagger.json
