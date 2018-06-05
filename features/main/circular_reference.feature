@@ -61,7 +61,8 @@ Feature: Circular references handling
           "@type": "CircularReference",
           "parent": "/circular_references/1",
           "children": [
-              "/circular_references/1"
+              "/circular_references/1",
+              "/circular_references/2"
           ]
       },
       "children": []
