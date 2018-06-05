@@ -49,7 +49,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public function supportsNormalization($data, $format = null)
     {
-        return static::FORMAT === $format && (is_array($data) || $data instanceof \Traversable);
+        return static::FORMAT === $format && (\is_array($data) || $data instanceof \Traversable);
     }
 
     /**
@@ -97,13 +97,13 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
                 $paginated = 1. !== $lastPage = $object->getLastPage();
                 $totalItems = $object->getTotalItems();
             } else {
-                $pageTotalItems = (float) count($object);
+                $pageTotalItems = (float) \count($object);
             }
 
             $currentPage = $object->getCurrentPage();
             $itemsPerPage = $object->getItemsPerPage();
-        } elseif (is_array($object) || $object instanceof \Countable) {
-            $totalItems = count($object);
+        } elseif (\is_array($object) || $object instanceof \Countable) {
+            $totalItems = \count($object);
         }
 
         return [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems];
