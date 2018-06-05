@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
@@ -87,11 +88,10 @@ class DenyAccessListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testIsNotGranted()
     {
+        $this->expectException(AccessDeniedException::class);
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -110,12 +110,11 @@ class DenyAccessListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     * @expectedExceptionMessage You are not admin.
-     */
     public function testAccessControlMessage()
     {
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('You are not admin.');
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -160,10 +159,11 @@ class DenyAccessListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     public function testIsNotGrantedLegacy()
     {
+        $this->expectException(AccessDeniedException::class);
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -183,11 +183,12 @@ class DenyAccessListenerTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
      * @group legacy
      */
     public function testSecurityComponentNotAvailable()
     {
+        $this->expectException(\LogicException::class);
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -204,11 +205,12 @@ class DenyAccessListenerTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
      * @group legacy
      */
     public function testExpressionLanguageNotInstalled()
     {
+        $this->expectException(\LogicException::class);
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
@@ -229,11 +231,12 @@ class DenyAccessListenerTest extends TestCase
     }
 
     /**
-     * @expectedException \LogicException
      * @group legacy
      */
     public function testNotBehindAFirewall()
     {
+        $this->expectException(\LogicException::class);
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);

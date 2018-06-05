@@ -23,6 +23,8 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -37,24 +39,22 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class IriConverterTest extends TestCase
 {
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No route matches "/users/3".
-     */
     public function testGetItemFromIriNoRouteException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No route matches "/users/3".');
+
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3')->willThrow(new RouteNotFoundException())->shouldBeCalledTimes(1);
         $converter = $this->getIriConverter($routerProphecy);
         $converter->getItemFromIri('/users/3');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage No resource associated to "/users/3".
-     */
     public function testGetItemFromIriNoResourceException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No resource associated to "/users/3".');
+
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/users/3')->willReturn([])->shouldBeCalledTimes(1);
 
@@ -62,12 +62,11 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ItemNotFoundException
-     * @expectedExceptionMessage Item not found for "/users/3".
-     */
     public function testGetItemFromIriItemNotFoundException()
     {
+        $this->expectException(ItemNotFoundException::class);
+        $this->expectExceptionMessage('Item not found for "/users/3".');
+
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProviderProphecy
             ->getItem(Dummy::class, 3, 'get', [])
@@ -137,12 +136,11 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getIriFromResourceClass(Dummy::class), '/dummies');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unable to generate an IRI for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
-     */
     public function testNotAbleToGenerateGetIriFromResourceClass()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to generate an IRI for "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy"');
+
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::COLLECTION)->willReturn('dummies');
 
@@ -165,12 +163,11 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]), '/dummies/1/related_dummies');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unable to generate an IRI for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
-     */
     public function testNotAbleToGenerateGetSubresourceIriFromResourceClass()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to generate an IRI for "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy"');
+
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::SUBRESOURCE, Argument::type('array'))->willReturn('dummies');
 
@@ -193,12 +190,11 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unable to generate an IRI for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy"
-     */
     public function testNotAbleToGenerateGetItemIriFromResourceClass()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unable to generate an IRI for "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy"');
+
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $routeNameResolverProphecy->getRouteName(Dummy::class, OperationType::ITEM)->willReturn('dummies');
 
@@ -246,12 +242,11 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]), $item);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ItemNotFoundException
-     * @expectedExceptionMessage Item not found for "/users/3/adresses".
-     */
     public function testGetItemFromIriWithSubresourceDataProviderNotFound()
     {
+        $this->expectException(ItemNotFoundException::class);
+        $this->expectExceptionMessage('Item not found for "/users/3/adresses".');
+
         $subresourceContext = ['identifiers' => [['id', Dummy::class, true]]];
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
@@ -270,12 +265,11 @@ class IriConverterTest extends TestCase
         $converter->getItemFromIri('/users/3/adresses', ['fetch_data' => true]);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage fail
-     */
     public function testGetItemFromIriBadIdentifierException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item not found for "/users/3".');
+
         $item = new \StdClass();
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);

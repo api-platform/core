@@ -98,12 +98,12 @@ class ApiPlatformProviderTest extends TestCase
 
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
      */
     public function testConstructWithInvalidFilterLocator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
+
         new ApiPlatformProvider(
             $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(NormalizerInterface::class)->reveal(),

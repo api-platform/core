@@ -18,6 +18,8 @@ use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -70,12 +72,11 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('text/xml', $request->getMimeType($request->getRequestFormat()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Requested format "text/xml" is not supported. Supported MIME types are "application/json".
-     */
     public function testUnsupportedRequestFormat()
     {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('Requested format "text/xml" is not supported. Supported MIME types are "application/json".');
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->setRequestFormat('xml');
 
@@ -120,12 +121,11 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('application/octet-stream', $request->getMimeType($request->getRequestFormat()));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Requested format "text/html, application/xhtml+xml, application/xml;q=0.9" is not supported. Supported MIME types are "application/octet-stream", "application/json".
-     */
     public function testUnsupportedAcceptHeader()
     {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('Requested format "text/html, application/xhtml+xml, application/xml;q=0.9" is not supported. Supported MIME types are "application/octet-stream", "application/json".');
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'text/html, application/xhtml+xml, application/xml;q=0.9');
 
@@ -137,12 +137,11 @@ class AddFormatListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage Requested format "invalid" is not supported. Supported MIME types are "application/json".
-     */
     public function testInvalidAcceptHeader()
     {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('Requested format "invalid" is not supported. Supported MIME types are "application/json".');
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo']);
         $request->headers->set('Accept', 'invalid');
 
@@ -170,12 +169,11 @@ class AddFormatListenerTest extends TestCase
         $this->assertSame('json', $request->getRequestFormat());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Format "invalid" is not supported
-     */
     public function testInvalidRouteFormat()
     {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Format "invalid" is not supported');
+
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_format' => 'invalid']);
 
         $eventProphecy = $this->prophesize(GetResponseEvent::class);

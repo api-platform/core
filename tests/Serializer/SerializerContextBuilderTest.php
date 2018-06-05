@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Serializer;
 
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilder;
@@ -83,11 +84,10 @@ class SerializerContextBuilderTest extends TestCase
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     */
     public function testThrowExceptionOnInvalidRequest()
     {
+        $this->expectException(RuntimeException::class);
+
         $this->builder->createFromRequest(new Request(), false);
     }
 
