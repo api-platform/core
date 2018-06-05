@@ -93,7 +93,7 @@ class IdentifierManagerTraitTest extends TestCase
     public function testInvalidIdentifier()
     {
         $this->expectException(PropertyNotFoundException::class);
-        $this->expectExceptionMessage('Invalid identifier "idbad=1;idb=2", "ida" has not been found.');
+        $this->expectExceptionMessage('Invalid identifier "idbad=1;idb=2", "ida" was not found.');
 
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataFactories(Dummy::class, [
             'ida',

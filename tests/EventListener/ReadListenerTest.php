@@ -18,8 +18,8 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -292,11 +292,10 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveBadItemNormalizedIdentifiers()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 
@@ -314,11 +313,10 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveBadSubresourceNormalizedIdentifiers()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize(Argument::type('string'), Argument::type('string'))->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 

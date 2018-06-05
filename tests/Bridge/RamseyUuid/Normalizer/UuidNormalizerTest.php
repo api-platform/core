@@ -34,11 +34,10 @@ class UuidNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsDenormalization($uuid, ''));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidIdentifierException
-     */
     public function testFailDenormalizeUuid()
     {
+        $this->expectException(\ApiPlatform\Core\Exception\InvalidIdentifierException::class);
+
         $uuid = 'notanuuid';
         $normalizer = new UuidNormalizer();
         $this->assertTrue($normalizer->supportsDenormalization($uuid, Uuid::class));

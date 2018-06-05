@@ -21,11 +21,10 @@ use PHPUnit\Framework\TestCase;
  */
 class DateTimeIdentifierNormalizerTest extends TestCase
 {
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidIdentifierException
-     */
     public function testDenormalize()
     {
+        $this->expectException(\ApiPlatform\Core\Exception\InvalidIdentifierException::class);
+
         $normalizer = new DateTimeIdentifierDenormalizer();
         $normalizer->denormalize('not valid', \DateTimeImmutable::class);
     }

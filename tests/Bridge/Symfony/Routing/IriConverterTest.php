@@ -21,10 +21,10 @@ use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -280,7 +280,7 @@ class IriConverterTest extends TestCase
             'id' => 3,
         ])->shouldBeCalledTimes(1);
         $identifierDenormalizerProphecy = $this->prophesize(ChainIdentifierDenormalizer::class);
-        $identifierDenormalizerProphecy->denormalize('3', Dummy::class)->shouldBeCalled()->willThrow(new InvalidIdentifierException('fail'));
+        $identifierDenormalizerProphecy->denormalize('3', Dummy::class)->shouldBeCalled()->willThrow(new InvalidIdentifierException('Item not found for "/users/3".'));
         $converter = $this->getIriConverter($routerProphecy, $routeNameResolverProphecy, null, null, $identifierDenormalizerProphecy);
         $this->assertEquals($converter->getItemFromIri('/users/3', ['fetch_data' => true]), $item);
     }
