@@ -322,7 +322,7 @@ class EagerLoadingExtensionTest extends TestCase
 
     /**
      * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary, or use the "max_depth" option of the Symfony serializer.
+     * @expectedExceptionMessage The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).
      */
     public function testMaxJoinsReached()
     {
