@@ -107,11 +107,15 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         ];
 
         foreach ($metadataAccessors as $metadataKey => $accessorPrefix) {
-            if (null === $metadata[$metadataKey] || null !== $propertyMetadata->{$accessorPrefix.ucfirst($metadataKey)}()) {
+            if (null === $metadata[$metadataKey]) {
                 continue;
             }
 
             $propertyMetadata = $propertyMetadata->{'with'.ucfirst($metadataKey)}($metadata[$metadataKey]);
+        }
+
+        if ($propertyMetadata->hasSubresource()) {
+            return $propertyMetadata;
         }
 
         return $propertyMetadata->withSubresource($this->createSubresourceMetadata($metadata['subresource'], $propertyMetadata));
