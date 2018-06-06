@@ -42,16 +42,23 @@ return PhpCsFixer\Config::create()
             'location' => 'after_open',
         ],
         'modernize_types_casting' => true,
-        'no_extra_consecutive_blank_lines' => [
-            'break',
-            'continue',
-            'curly_brace_block',
-            'extra',
-            'parenthesis_brace_block',
-            'return',
-            'square_brace_block',
-            'throw',
-            'use',
+        'native_function_invocation' => [
+            'include' => [
+                '@compiler_optimized',
+            ],
+        ],
+        'no_extra_blank_lines' => [
+            'tokens' => [
+                'break',
+                'continue',
+                'curly_brace_block',
+                'extra',
+                'parenthesis_brace_block',
+                'return',
+                'square_brace_block',
+                'throw',
+                'use',
+            ],
         ],
         'no_useless_else' => true,
         'no_useless_return' => true,

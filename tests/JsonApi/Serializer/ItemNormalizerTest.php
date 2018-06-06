@@ -261,7 +261,7 @@ class ItemNormalizerTest extends TestCase
         )->shouldBeCalled();
 
         $getItemFromIriSecondArgCallback = function ($arg) {
-            return is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
+            return \is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
         };
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

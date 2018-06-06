@@ -304,7 +304,7 @@ class ApiPlatformExtensionTest extends TestCase
                 return $arg;
             }
 
-            if (!in_array('foobar', $arg, true)) {
+            if (!\in_array('foobar', $arg, true)) {
                 throw new \Exception('"foobar" should be in "resource_class_directories"');
             }
 
