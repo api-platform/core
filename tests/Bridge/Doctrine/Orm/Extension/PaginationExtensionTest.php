@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -99,12 +100,11 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Page should not be greater than 1 if itemsPerPage is equal to 0
-     */
     public function testApplyToCollectionWithItemPerPageZeroAndPage2()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Page should not be greater than 1 if itemsPerPage is equal to 0');
+
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]));
 
@@ -135,12 +135,11 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Item per page parameter should not be less than 0
-     */
     public function testApplyToCollectionWithItemPerPageLessThen0()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item per page parameter should not be less than 0');
+
         $requestStack = new RequestStack();
         $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]));
 
@@ -472,7 +471,7 @@ class PaginationExtensionTest extends TestCase
         $queryBuilderProphecy->getRootEntities()->willReturn([])->shouldBeCalled();
         $queryBuilderProphecy->getQuery()->willReturn($query)->shouldBeCalled();
         $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
-            return in_array($arg, ['having', 'orderBy', 'join'], true);
+            return \in_array($arg, ['having', 'orderBy', 'join'], true);
         }))->willReturn('')->shouldBeCalled();
         $queryBuilderProphecy->getMaxResults()->willReturn(42)->shouldBeCalled();
 

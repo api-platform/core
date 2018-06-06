@@ -18,11 +18,13 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\EventListener\ReadListener;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -171,11 +173,10 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveItemNoIdentifier()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
@@ -224,11 +225,10 @@ class ReadListenerTest extends TestCase
         $this->assertSame($data, $request->attributes->get('data'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     */
     public function testRetrieveSubresourceNoDataProvider()
     {
+        $this->expectException(RuntimeException::class);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
@@ -247,13 +247,11 @@ class ReadListenerTest extends TestCase
         $request->attributes->get('data');
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveSubresourceNotFound()
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('1', 'Bar')->willThrow(new InvalidIdentifierException())->shouldBeCalled();
+        $this->expectException(NotFoundHttpException::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -271,13 +269,11 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveItemNotFound()
     {
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('22', 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
+        $this->expectException(NotFoundHttpException::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
 
@@ -296,11 +292,10 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveBadItemNormalizedIdentifiers()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize('1', 'Foo')->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 
@@ -318,11 +313,10 @@ class ReadListenerTest extends TestCase
         $listener->onKernelRequest($event->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRetrieveBadSubresourceNormalizedIdentifiers()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $identifierDenormalizer = $this->prophesize(ChainIdentifierDenormalizer::class);
         $identifierDenormalizer->denormalize(Argument::type('string'), Argument::type('string'))->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 

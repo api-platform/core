@@ -58,22 +58,24 @@ class FilterLocatorTraitTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface.
      */
     public function testSetFilterLocatorWithNullAndNullNotAllowed()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
+
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(null);
     }
 
     /**
      * @group legacy
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "$filterLocator" argument is expected to be an implementation of the "Psr\Container\ContainerInterface" interface or null.
      */
     public function testSetFilterLocatorWithInvalidFilterLocator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface or null.');
+
         $filterLocatorTraitImpl = $this->getFilterLocatorTraitImpl();
         $filterLocatorTraitImpl->setFilterLocator(new \ArrayObject(), true);
     }

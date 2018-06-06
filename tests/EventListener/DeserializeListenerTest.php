@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -163,12 +164,11 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage The content-type "application/rdf+xml" is not supported. Supported MIME types are "application/ld+json", "text/xml".
-     */
     public function testNotSupportedContentType()
     {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('The content-type "application/rdf+xml" is not supported. Supported MIME types are "application/ld+json", "text/xml".');
+
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');
@@ -191,12 +191,11 @@ class DeserializeListenerTest extends TestCase
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException
-     * @expectedExceptionMessage The "Content-Type" header must exist.
-     */
     public function testNoContentType()
     {
+        $this->expectException(NotAcceptableHttpException::class);
+        $this->expectExceptionMessage('The "Content-Type" header must exist.');
+
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post'], [], [], [], '{}');

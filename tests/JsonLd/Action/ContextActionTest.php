@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -63,11 +64,10 @@ class ContextActionTest extends TestCase
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testContextActionWithThrown()
     {
+        $this->expectException(NotFoundHttpException::class);
+
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

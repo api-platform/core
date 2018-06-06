@@ -17,7 +17,6 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -31,7 +30,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
-    use JsonLdContextTrait;
     use FilterLocatorTrait;
 
     private $collectionNormalizer;

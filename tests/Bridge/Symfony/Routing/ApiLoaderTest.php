@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -126,11 +127,10 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testNoMethodApiLoader()
     {
+        $this->expectException(\RuntimeException::class);
+
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
 
@@ -145,11 +145,10 @@ class ApiLoaderTest extends TestCase
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testWrongMethodApiLoader()
     {
+        $this->expectException(\RuntimeException::class);
+
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
 
@@ -164,11 +163,10 @@ class ApiLoaderTest extends TestCase
         $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidResourceException
-     */
     public function testNoShortNameApiLoader()
     {
+        $this->expectException(InvalidResourceException::class);
+
         $this->getApiLoaderWithResourceMetadata(new ResourceMetadata())->load(null);
     }
 

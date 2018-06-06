@@ -30,6 +30,7 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -303,7 +304,7 @@ class ApiPlatformExtensionTest extends TestCase
                 return $arg;
             }
 
-            if (!in_array('foobar', $arg, true)) {
+            if (!\in_array('foobar', $arg, true)) {
                 throw new \Exception('"foobar" should be in "resource_class_directories"');
             }
 
@@ -314,24 +315,22 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['resource_class_directories' => ['foobar']]]), $containerBuilder);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessageRegExp /Unsupported mapping type in ".+", supported types are XML & Yaml\./
-     */
     public function testResourcesToWatchWithUnsupportedMappingType()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageRegExp('/Unsupported mapping type in ".+", supported types are XML & Yaml\\./');
+
         $this->extension->load(
             array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => [__FILE__]]]]),
             $this->getPartialContainerBuilderProphecy(false)->reveal()
         );
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage Could not open file or directory "fake_file.xml".
-     */
     public function testResourcesToWatchWithNonExistentFile()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not open file or directory "fake_file.xml".');
+
         $this->extension->load(
             array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['mapping' => ['paths' => ['fake_file.xml']]]]),
             $this->getPartialContainerBuilderProphecy()->reveal()

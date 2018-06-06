@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\SubresourceDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\Normalizer\ChainIdentifierDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -97,12 +99,11 @@ class SubresourceDataProviderTest extends TestCase
         return $managerRegistryProphecy->reveal();
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotSupportedException
-     * @expectedExceptionMessage The given resource class is not a subresource.
-     */
     public function testNotASubresource()
     {
+        $this->expectException(ResourceClassNotSupportedException::class);
+        $this->expectExceptionMessage('The given resource class is not a subresource.');
+
         $identifiers = ['id'];
         list($propertyNameCollectionFactory, $propertyMetadataFactory) = $this->getMetadataProphecies([Dummy::class => $identifiers]);
         $queryBuilder = $this->prophesize(QueryBuilder::class)->reveal();
@@ -321,12 +322,11 @@ class SubresourceDataProviderTest extends TestCase
         $this->assertEquals([], $dataProvider->getSubresource(RelatedDummy::class, ['id' => ['id' => 1]], $context));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     * @expectedExceptionMessage The repository class must have a "createQueryBuilder" method.
-     */
     public function testCannotCreateQueryBuilder()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The repository class must have a "createQueryBuilder" method.');
+
         $identifiers = ['id'];
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
 
@@ -342,11 +342,10 @@ class SubresourceDataProviderTest extends TestCase
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\ResourceClassNotSupportedException
-     */
     public function testThrowResourceClassNotSupportedException()
     {
+        $this->expectException(ResourceClassNotSupportedException::class);
+
         $identifiers = ['id'];
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();

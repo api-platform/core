@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Hal\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Hal\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -40,11 +41,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\RuntimeException
-     */
     public function testDoesNotSupportDenormalization()
     {
+        $this->expectException(RuntimeException::class);
+
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -41,12 +42,11 @@ class RouterOperationPathResolverTest extends TestCase
         $this->assertEquals('/foos', $operationPathResolver->resolveOperationPath('Foo', ['route_name' => 'foos'], OperationType::COLLECTION, 'get'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedMessage Subresource operations are not supported by the RouterOperationPathResolver.
-     */
     public function testResolveOperationPathWithSubresource()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Subresource operations are not supported by the RouterOperationPathResolver without a route name.');
+
         $routerProphecy = $this->prophesize(RouterInterface::class);
 
         $operationPathResolver = new RouterOperationPathResolver($routerProphecy->reveal(), $this->prophesize(OperationPathResolverInterface::class)->reveal());
@@ -67,12 +67,11 @@ class RouterOperationPathResolverTest extends TestCase
         $this->assertEquals('/foos', $operationPathResolver->resolveOperationPath('Foo', [], OperationType::COLLECTION, 'get'));
     }
 
-    /**
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The route "api_foos_get_collection" of the resource "Foo" was not found.
-     */
     public function testResolveOperationPathWithRouteNotFound()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The route "api_foos_get_collection" of the resource "Foo" was not found.');
+
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->getRouteCollection()->willReturn(new RouteCollection())->shouldBeCalled();
 

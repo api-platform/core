@@ -107,6 +107,10 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
         }
 
+        if (empty($context[AbstractNormalizer::GROUPS]) && !isset($context[AbstractNormalizer::ATTRIBUTES])) {
+            return;
+        }
+
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
     }
 

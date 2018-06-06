@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
-use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
@@ -29,8 +28,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class PartialCollectionViewNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
-    use JsonLdContextTrait;
-
     private $collectionNormalizer;
     private $pageParameterName;
     private $enabledParameterName;

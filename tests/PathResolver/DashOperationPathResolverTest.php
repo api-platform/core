@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\DashOperationPathResolver;
 use PHPUnit\Framework\TestCase;
 
@@ -46,12 +47,12 @@ class DashOperationPathResolverTest extends TestCase
 
     /**
      * @expectedDeprecation The use of ApiPlatform\Core\PathResolver\DashOperationPathResolver is deprecated since 2.1. Please use ApiPlatform\Core\Operation\DashPathSegmentNameGenerator instead.
-     *
-     * @expectedException \ApiPlatform\Core\Exception\InvalidArgumentException
-     * @expectedMessage Subresource operations are not supported by the OperationPathResolver.
      */
     public function testResolveSubresourceOperationPath()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Subresource operations are not supported by the OperationPathResolver.');
+
         $dashOperationPathResolver = new DashOperationPathResolver();
 
         $dashOperationPathResolver->resolveOperationPath('ShortName', ['property' => 'bar', 'identifiers' => [['id', 'class'], ['relatedId', 'class']], 'collection' => false], OperationType::SUBRESOURCE, 'get');

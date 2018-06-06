@@ -46,7 +46,7 @@ final class RequestDataCollector extends DataCollector
         $filters = [];
         foreach ($resourceMetadata ? $resourceMetadata->getAttribute('filters', []) : [] as $id) {
             if ($this->filterLocator->has($id)) {
-                $filters[$id] = get_class($this->filterLocator->get($id));
+                $filters[$id] = \get_class($this->filterLocator->get($id));
                 continue;
             }
 
