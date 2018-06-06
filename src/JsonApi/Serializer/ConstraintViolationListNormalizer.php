@@ -71,7 +71,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(
                 // Im quite sure this requires some thought in case of validations over relationships
-                get_class($violation->getRoot()),
+                \get_class($violation->getRoot()),
                 $fieldName
             );
 

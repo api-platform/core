@@ -463,7 +463,7 @@ class PaginationExtensionTest extends TestCase
         $queryBuilderProphecy->getRootEntities()->willReturn([])->shouldBeCalled();
         $queryBuilderProphecy->getQuery()->willReturn($query)->shouldBeCalled();
         $queryBuilderProphecy->getDQLPart(Argument::that(function ($arg) {
-            return in_array($arg, ['having', 'orderBy', 'join'], true);
+            return \in_array($arg, ['having', 'orderBy', 'join'], true);
         }))->willReturn('')->shouldBeCalled();
         $queryBuilderProphecy->getMaxResults()->willReturn(42)->shouldBeCalled();
 

@@ -67,7 +67,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // Get and populate attributes data
         $objectAttributesData = parent::normalize($object, $format, $context);
 
-        if (!is_array($objectAttributesData)) {
+        if (!\is_array($objectAttributesData)) {
             return $objectAttributesData;
         }
 
@@ -147,7 +147,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
-        parent::setAttributeValue($object, $attribute, is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
+        parent::setAttributeValue($object, $attribute, \is_array($value) && array_key_exists('data', $value) ? $value['data'] : $value, $format, $context);
     }
 
     /**
@@ -164,7 +164,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $this->serializer->denormalize($value, $className, $format, $context);
         }
 
-        if (!is_array($value) || !isset($value['id'], $value['type'])) {
+        if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new InvalidArgumentException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
         }
 

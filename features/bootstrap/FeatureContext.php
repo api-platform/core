@@ -386,9 +386,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -496,9 +496,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -524,9 +524,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -551,9 +551,9 @@ final class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
