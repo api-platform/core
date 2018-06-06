@@ -128,8 +128,8 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
                     'dummyPrice' => null,
                 ],
                 [
-                   'dummyPrice' => 10,
-                   'name' => '15toto',
+                    'dummyPrice' => 10,
+                    'name' => '15toto',
                 ],
                 sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
             ],

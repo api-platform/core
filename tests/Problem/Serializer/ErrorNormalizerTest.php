@@ -42,9 +42,9 @@ class ErrorNormalizerTest extends TestCase
 
         $this->assertEquals(
             [
-            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
-            'detail' => 'Hello',
+                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+                'title' => 'An error occurred',
+                'detail' => 'Hello',
             ],
             $normalizer->normalize(new \Exception('Hello'))
         );

@@ -61,18 +61,18 @@ class CollectionNormalizerTest extends TestCase
                     'prev' => ['href' => '/?page=2'],
                     'next' => ['href' => '/?page=4'],
                     'item' => [
-                            '/me',
-                        ],
+                        '/me',
+                    ],
                 ],
                 '_embedded' => [
-                        'item' => [
-                            [
-                                '_links' => [
-                                        'self' => '/me',
-                                    ],
-                                'name' => 'Kévin',
+                    'item' => [
+                        [
+                            '_links' => [
+                                'self' => '/me',
                             ],
+                            'name' => 'Kévin',
                         ],
+                    ],
                 ],
                 'totalItems' => 1312,
                 'itemsPerPage' => 12,
