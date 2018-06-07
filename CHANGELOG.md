@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.7
+
+* Compatibility with Symfony 4.1
+* Compatibility with webonyx/graphql-php 0.12
+* Add missing `ApiPlatform\Core\EventListener\EventPriorities`'s `PRE_SERIALIZE` and `POST_SERIALIZE` constants
+* Disable eager loading when no groups are specified to avoid recursive joins
+* Fix embeddable entities eager loading with groups
+* Don't join the same association twice when eager loading
+* Fix max depth handling when using HAL
+* Check the value of `enable_max_depth` if defined
+* Minor performance and quality improvements
+
 ## 2.2.6
 
 * Fix identifiers creation and update when using GraphQL
