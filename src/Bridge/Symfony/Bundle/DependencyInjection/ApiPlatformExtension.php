@@ -129,15 +129,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $useDoctrine = isset($bundles['DoctrineBundle']) && class_exists(Version::class);
 
-        $this->registerMetadataConfiguration($container, $config, $loader);
+        $this->registerMetadataConfiguration($container, $config, $loader, $bundles);
         $this->registerOAuthConfiguration($container, $config, $loader);
         $this->registerApiKeysConfiguration($container, $config, $loader);
-        $this->registerSwaggerConfiguration($container, $config, $loader);
+        $this->registerSwaggerConfiguration($container, $config, $loader, $bundles);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdConfiguration($container, $formats, $loader, $config['enable_docs']);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
-        $this->registerGraphqlConfiguration($container, $config, $loader);
+        $this->registerGraphqlConfiguration($container, $config, $loader, $bundles);
         $this->registerBundlesConfiguration($bundles, $config, $loader, $useDoctrine);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineExtensionConfiguration($container, $config, $useDoctrine);
@@ -202,8 +202,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
+     * @param array            $bundles
      */
-    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
         $loader->load('metadata/metadata.xml');
         $loader->load('metadata/xml.xml');
@@ -218,7 +219,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->getDefinition('api_platform.metadata.extractor.xml')->addArgument($xmlResources);
 
-        if (class_exists(Annotation::class)) {
+        // The "annotation_reader" service is only available if DoctrineBundle is loaded.
+        if (class_exists(Annotation::class) && isset($bundles['DoctrineBundle'])) {
             $loader->load('metadata/annotation.xml');
         }
 
@@ -337,21 +339,26 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
+     * @param array            $bundles
      */
-    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
         if (!$config['enable_swagger']) {
             return;
         }
 
         $loader->load('swagger.xml');
-
-        if ($config['enable_swagger_ui']) {
-            $loader->load('swagger-ui.xml');
-            $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
-        }
-
         $container->setParameter('api_platform.enable_swagger', $config['enable_swagger']);
+
+        if ($config['enable_swagger_ui'] && !isset($bundles['TwigBundle'])) {
+            throw new \LogicException(
+                'You have set "enable_swagger_ui" to "true", but you\'re missing the "symfony/twig-bundle" package!
+                Please install the missing dependency to fix this.'
+            );
+        } elseif ($config['enable_swagger_ui']) {
+            $loader->load('swagger-ui.xml');
+        }
+        $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
     }
 
     /**
@@ -427,13 +434,20 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      * @param XmlFileLoader    $loader
+     * @param array            $bundles
      */
-    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader)
+    private function registerGraphqlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $bundles)
     {
         if (!$config['graphql']) {
             return;
         }
 
+        if ($config['graphql']['enabled'] && !isset($bundles['TwigBundle'])) {
+            throw new \LogicException(
+                'You have set "graphql.enabled" to "true", but you\'re missing the "symfony/twig-bundle" package!
+                Please install the missing dependency to fix this.'
+            );
+        }
         $container->setParameter('api_platform.graphql.enabled', $config['graphql']['enabled']);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $config['graphql']['graphiql']['enabled']);
 

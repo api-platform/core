@@ -46,6 +46,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -215,6 +216,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'FOSUserBundle' => FOSUserBundle::class,
+            'TwigBundle' => TwigBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.fos_user.event_listener', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -251,6 +253,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'NelmioApiDocBundle' => NelmioApiDocBundle::class,
+            'TwigBundle' => TwigBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
@@ -283,6 +286,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
             'SecurityBundle' => SecurityBundle::class,
+            'TwigBundle' => TwigBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.security.resource_access_checker', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias(ResourceAccessCheckerInterface::class, 'api_platform.security.resource_access_checker')->shouldBeCalled();
@@ -385,6 +389,158 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessageRegExp /enable_swagger_ui.*symfony\/twig-bundle/i
+     */
+    public function testSwaggerUiShouldMissTwigBundle()
+    {
+        $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => DoctrineBundle::class,
+        ])->shouldBeCalled();
+        $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
+        $parameters = [
+            'api_platform.oauth.enabled' => false,
+            'api_platform.oauth.clientId' => '',
+            'api_platform.oauth.clientSecret' => '',
+            'api_platform.oauth.type' => 'oauth2',
+            'api_platform.oauth.flow' => 'application',
+            'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
+            'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
+            'api_platform.oauth.scopes' => [],
+            'api_platform.swagger.api_keys' => [],
+            'api_platform.enable_swagger' => true,
+            'api_platform.resource_class_directories' => Argument::type('array'),
+        ];
+        foreach ($parameters as $key => $value) {
+            $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
+        }
+        foreach (['yaml', 'xml'] as $format) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+        }
+        $definitions = [
+            'api_platform.swagger.normalizer.documentation',
+            'api_platform.swagger.normalizer.api_gateway',
+            'api_platform.swagger.command.swagger_command',
+            'api_platform.metadata.extractor.yaml',
+            'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory.yaml',
+            'api_platform.metadata.property.name_collection_factory.yaml',
+            'api_platform.metadata.resource.filter_metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.resource.metadata_factory.php_doc',
+            'api_platform.metadata.resource.metadata_factory.short_name',
+            'api_platform.metadata.resource.metadata_factory.yaml',
+            'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.metadata.subresource.metadata_factory.annotation',
+        ];
+
+        foreach ($definitions as $definition) {
+            $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
+        }
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(self::DEFAULT_CONFIG, ['api_platform' => ['enable_swagger_ui' => true]]), $containerBuilder);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessageRegExp /graphql\.enabled.*symfony\/twig-bundle/i
+     */
+    public function testGraphQLShouldMissTwigBundle()
+    {
+        $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy();
+        $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
+            'DoctrineBundle' => DoctrineBundle::class,
+        ])->shouldBeCalled();
+        $containerBuilderProphecy->addResource(Argument::type(DirectoryResource::class))->shouldBeCalled();
+        $parameters = [
+            'api_platform.oauth.enabled' => false,
+            'api_platform.oauth.clientId' => '',
+            'api_platform.oauth.clientSecret' => '',
+            'api_platform.oauth.type' => 'oauth2',
+            'api_platform.oauth.flow' => 'application',
+            'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
+            'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
+            'api_platform.oauth.scopes' => [],
+            'api_platform.swagger.api_keys' => [],
+            'api_platform.enable_swagger' => true,
+            'api_platform.enable_swagger_ui' => false,
+            'api_platform.resource_class_directories' => Argument::type('array'),
+        ];
+        foreach ($parameters as $key => $value) {
+            $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
+        }
+        foreach (['yaml', 'xml'] as $format) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->addArgument(Argument::type('array'))->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+        }
+        $definitions = [
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.encoder',
+            'api_platform.jsonld.action.context',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.swagger.normalizer.documentation',
+            'api_platform.swagger.normalizer.api_gateway',
+            'api_platform.swagger.command.swagger_command',
+            'api_platform.hal.encoder',
+            'api_platform.hal.normalizer.collection',
+            'api_platform.hal.normalizer.entrypoint',
+            'api_platform.hal.normalizer.item',
+            'api_platform.hydra.listener.response.add_link_header',
+            'api_platform.hydra.normalizer.collection',
+            'api_platform.hydra.normalizer.collection_filters',
+            'api_platform.hydra.normalizer.constraint_violation_list',
+            'api_platform.hydra.normalizer.documentation',
+            'api_platform.hydra.normalizer.entrypoint',
+            'api_platform.hydra.normalizer.error',
+            'api_platform.hydra.normalizer.partial_collection_view',
+            'api_platform.jsonld.action.context',
+            'api_platform.jsonld.context_builder',
+            'api_platform.jsonld.encoder',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.jsonld.normalizer.item',
+            'api_platform.metadata.extractor.yaml',
+            'api_platform.metadata.property.metadata_factory.annotation',
+            'api_platform.metadata.property.metadata_factory.yaml',
+            'api_platform.metadata.property.name_collection_factory.yaml',
+            'api_platform.metadata.resource.filter_metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.annotation',
+            'api_platform.metadata.resource.metadata_factory.operation',
+            'api_platform.metadata.resource.metadata_factory.php_doc',
+            'api_platform.metadata.resource.metadata_factory.short_name',
+            'api_platform.metadata.resource.metadata_factory.yaml',
+            'api_platform.metadata.resource.name_collection_factory.annotation',
+            'api_platform.metadata.resource.name_collection_factory.yaml',
+            'api_platform.metadata.subresource.metadata_factory.annotation',
+            'api_platform.problem.encoder',
+            'api_platform.problem.normalizer.constraint_violation_list',
+            'api_platform.problem.normalizer.error',
+            'api_platform.swagger.command.swagger_command',
+        ];
+
+        foreach ($definitions as $definition) {
+            $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
+        }
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $this->extension->load(array_merge_recursive(
+            self::DEFAULT_CONFIG,
+            ['api_platform' => [
+                'enable_swagger_ui' => false,
+                'graphql' => ['enabled' => true],
+            ]]),
+            $containerBuilder
+        );
+    }
+
     private function getPartialContainerBuilderProphecy($test = false)
     {
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
@@ -420,6 +576,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
+            'TwigBundle' => TwigBundle::class,
         ])->shouldBeCalled();
 
         $containerBuilderProphecy->getParameter('kernel.bundles_metadata')->willReturn([
