@@ -119,9 +119,9 @@ class ItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $expected = ['@context' => '/contexts/Dummy',
-                     '@id' => '/dummies/1988',
-                     '@type' => 'Dummy',
-                     'name' => 'hello',
+            '@id' => '/dummies/1988',
+            '@type' => 'Dummy',
+            'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }

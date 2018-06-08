@@ -131,7 +131,7 @@ class BooleanFilterTest extends DoctrineOrmFilterTestCase
                     'dummyBoolean' => null,
                 ],
                 [
-                   'name' => '1',
+                    'name' => '1',
                 ],
                 sprintf('SELECT o FROM %s o', Dummy::class),
             ],
