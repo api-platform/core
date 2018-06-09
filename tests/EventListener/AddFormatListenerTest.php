@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\EventListener;
 
+use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\EventListener\AddFormatListener;
 use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +35,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['notexist' => 'application/vnd.notexist']);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes()->shouldNotBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertNull($request->getFormat('application/vnd.notexist'));
@@ -49,7 +53,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['xml' => ['text/xml']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('xml', $request->getRequestFormat());
@@ -65,7 +72,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['xml' => ['text/xml']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('xml', $request->getRequestFormat());
@@ -83,8 +93,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy = $this->prophesize(GetResponseEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['json' => ['application/json']])->shouldBeCalled();
 
-        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
@@ -99,7 +111,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
@@ -114,7 +129,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('binary', $request->getRequestFormat());
@@ -133,7 +151,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['binary' => ['application/octet-stream'], 'json' => ['application/json']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['binary' => ['application/octet-stream'], 'json' => ['application/json']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
     }
 
@@ -149,7 +170,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['json' => ['application/json']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
     }
 
@@ -163,7 +187,10 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['xml' => ['application/xml'], 'json' => ['application/json']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['xml' => ['application/xml'], 'json' => ['application/json']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
 
         $this->assertSame('json', $request->getRequestFormat());
@@ -180,7 +207,46 @@ class AddFormatListenerTest extends TestCase
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
         $event = $eventProphecy->reveal();
 
-        $listener = new AddFormatListener(new Negotiator(), ['json' => ['application/json']]);
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes([])->willReturn(['json' => ['application/json']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
         $listener->onKernelRequest($event);
+    }
+
+    public function testResourceClassSupportedRequestFormat()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+        $request->setRequestFormat('csv');
+
+        $eventProphecy = $this->prophesize(GetResponseEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
+        $formatsProviderProphecy->getFormatsFromAttributes(['resource_class' => 'Foo', 'collection_operation_name' => 'get', 'receive' => true])->willReturn(['csv' => ['text/csv']])->shouldBeCalled();
+
+        $listener = new AddFormatListener(new Negotiator(), $formatsProviderProphecy->reveal());
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('csv', $request->getRequestFormat());
+        $this->assertSame('text/csv', $request->getMimeType($request->getRequestFormat()));
+    }
+
+    public function testBadFormatsProviderParameterThrowsException()
+    {
+        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$formatsProvider" argument is expected to be an implementation of the "ApiPlatform\\Core\\Api\\FormatsProviderInterface" interface.');
+
+        new AddFormatListener(new Negotiator(), 'foo');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using an array as formats provider is deprecated since API Platform 2.3 and will not be possible anymore in API Platform 3
+     */
+    public function testLegacyFormatsParameter()
+    {
+        new AddFormatListener(new Negotiator(), ['xml' => ['text/xml']]);
     }
 }

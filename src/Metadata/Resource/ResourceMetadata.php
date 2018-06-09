@@ -262,6 +262,10 @@ final class ResourceMetadata
             return $this->getSubresourceOperationAttribute($attributes['subresource_operation_name'], $key, $defaultValue, $resourceFallback);
         }
 
+        if ($resourceFallback && isset($this->attributes[$key])) {
+            return $this->attributes[$key];
+        }
+
         return $defaultValue;
     }
 

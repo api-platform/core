@@ -499,6 +499,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.cache.route_name_resolver',
             'api_platform.cache.subresource_operation_factory',
             'api_platform.collection_data_provider',
+            'api_platform.formats_provider',
             'api_platform.filter_locator',
             'api_platform.filter_collection_factory',
             'api_platform.filters',

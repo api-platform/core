@@ -32,6 +32,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("description", type="string"),
  *     @Attribute("fetchPartial", type="bool"),
  *     @Attribute("forceEager", type="bool"),
+ *     @Attribute("formats", type="array"),
  *     @Attribute("filters", type="string[]"),
  *     @Attribute("graphql", type="array"),
  *     @Attribute("hydraContext", type="array"),
@@ -134,6 +135,13 @@ final class ApiResource
      * @var bool
      */
     private $forceEager;
+
+    /**
+     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
+     *
+     * @var array
+     */
+    private $formats;
 
     /**
      * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
