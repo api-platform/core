@@ -36,6 +36,7 @@ class ReservedAttributeNameConverterTest extends TestCase
             ['type', '_type'],
             ['links', '_links'],
             ['relationships', '_relationships'],
+            ['included', '_included'],
             ['foo', 'foo'],
             ['bar', 'bar'],
             ['baz', 'baz'],

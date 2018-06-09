@@ -88,6 +88,10 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
             }
 
             $data['data'][] = $item['data'];
+
+            if (isset($item['included'])) {
+                $data['included'] = array_merge($data['included'] ?? [], $item['included']);
+            }
         }
 
         return $data;

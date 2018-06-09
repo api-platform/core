@@ -219,6 +219,39 @@ final class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * @Given there are :nb dummy property objects with :nb2 groups
+     */
+    public function thereAreDummyPropertyObjectsWithGroups(int $nb, int $nb2)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $dummyProperty = new DummyProperty();
+            $dummyGroup = new DummyGroup();
+
+            foreach (['foo', 'bar', 'baz'] as $property) {
+                $dummyProperty->$property = $dummyGroup->$property = ucfirst($property).' #'.$i;
+            }
+
+            $dummyProperty->group = $dummyGroup;
+
+            $this->manager->persist($dummyGroup);
+            for ($j = 1; $j <= $nb2; ++$j) {
+                $dummyGroup = new DummyGroup();
+
+                foreach (['foo', 'bar', 'baz'] as $property) {
+                    $dummyGroup->$property = ucfirst($property).' #'.$i.$j;
+                }
+
+                $dummyProperty->groups[] = $dummyGroup;
+                $this->manager->persist($dummyGroup);
+            }
+
+            $this->manager->persist($dummyProperty);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there are :nb embedded dummy objects
      */
     public function thereAreEmbeddedDummyObjects(int $nb)

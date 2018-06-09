@@ -27,6 +27,7 @@ final class ReservedAttributeNameConverter implements NameConverterInterface
         'type' => '_type',
         'links' => '_links',
         'relationships' => '_relationships',
+        'included' => '_included',
     ];
 
     private $nameConverter;

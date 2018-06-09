@@ -60,6 +60,9 @@ final class SerializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
+        if ($included = $request->attributes->get('_api_included')) {
+            $context['api_included'] = $included;
+        }
         $resources = new ResourceList();
         $context['resources'] = &$resources;
         $request->attributes->set('_api_normalization_context', $context);
