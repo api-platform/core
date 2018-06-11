@@ -30,6 +30,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     const FORMAT = 'jsonhal';
 
     private $componentsCache = [];
+    private $attributesMetadataCache = [];
 
     /**
      * {@inheritdoc}
@@ -169,7 +170,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
     private function populateRelation(array $data, $object, string $format = null, array $context, array $components, string $type): array
     {
         $class = \get_class($object);
-        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : null;
+
+        $attributesMetadata = \array_key_exists($class, $this->attributesMetadataCache) ?
+            $this->attributesMetadataCache[$class] :
+            $this->attributesMetadataCache[$class] = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($object)->getAttributesMetadata() : null;
 
         $key = '_'.$type;
         foreach ($components[$type] as $relation) {
