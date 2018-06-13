@@ -130,7 +130,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
-     * @dataProvider decoratedPropertyMetadataProvider
+     * @dataProvider typedPropertyMetadataProvider
      */
     public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
     {
@@ -161,7 +161,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     }
 
     /**
-     * @dataProvider decoratedPropertyMetadataProvider
+     * @dataProvider typedPropertyMetadataProvider
      */
     public function testCreateWithTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
     {
