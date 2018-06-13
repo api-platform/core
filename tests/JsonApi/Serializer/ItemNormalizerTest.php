@@ -349,6 +349,8 @@ class ItemNormalizerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');
 
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class)->willReturn(['id'])->shouldBeCalled();
 

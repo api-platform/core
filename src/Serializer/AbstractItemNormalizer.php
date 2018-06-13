@@ -21,7 +21,6 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidValueException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -517,57 +516,39 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $updateAllowed = $context['api_allow_update'] ?? false;
         $identifiers = $this->getIdentifiersForDenormalization($class);
-        $writeableIdentifiers = [];
+        $identifiersData = \array_intersect_key($data, array_flip($identifiers));
 
-        foreach ($identifiers as $id) {
-            try {
-                $metaData = $this->propertyMetadataFactory->create($class, $id);
-            } catch (PropertyNotFoundException $e) {
-            }
-
-            if ($metaData->isWritable()) {
-                $writeableIdentifiers[] = $id;
-            }
-        }
-
-        // No writeable identifiers found, abort
-        if (0 === \count($writeableIdentifiers)) {
+        if (0 === \count($identifiersData)) {
             return;
         }
 
-        // Check if all writeable identifiers were provided
-        if (0 === \count(array_intersect(array_keys($data), $writeableIdentifiers))) {
-            // If update is not allowed, the provided data is invalid
-            if (!$updateAllowed) {
-                throw new InvalidArgumentException('Update is not allowed for this operation.');
-            }
-
-            // Otherwise we just ignore it
-            return;
-        }
-
-        $identifiersData = [];
-        foreach ($writeableIdentifiers as $id) {
-            $identifiersData[] = $data[$id];
-        }
-
-        $iri = implode(';', $identifiersData); // TODO: use $this->iriConverter->getIriFromPlainIdentifier() once https://github.com/api-platform/core/pull/1837 got merged.
-
-        try {
-            $object = $this->iriConverter->getItemFromIri($iri, $context + ['fetch_data' => true]);
-        } catch (ItemNotFoundException $e) {
-            // IRI was valid but no item was found, do not populate
-            return;
-        } catch (InvalidArgumentException $e) {
-            // IRI was invalid
-            return;
-        }
-
-        if (null !== $object && $updateAllowed) {
+        if (!$updateAllowed) {
             throw new InvalidArgumentException('Update is not allowed for this operation.');
         }
 
-        $context[self::OBJECT_TO_POPULATE] = $object;
+        // TODO: use $this->iriConverter->getIriFromPlainIdentifier() once https://github.com/api-platform/core/pull/1837 is merged.
+        $iri = implode(';', $identifiersData);
+
+        try {
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, $context + ['fetch_data' => true]);
+        } catch (InvalidArgumentException $e) {
+            // https://github.com/api-platform/core/issues/857
+            $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
+            $identifiersData = \array_intersect_key($data, array_flip($identifiers));
+            if (0 === \count($identifiersData)) {
+                throw $e;
+            }
+
+            // TODO: use $this->iriConverter->getIriFromPlainIdentifier() once https://github.com/api-platform/core/pull/1837 is merged.
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
+                sprintf(
+                    '%s/%s',
+                    $this->iriConverter->getIriFromResourceClass($context['resource_class']),
+                    implode(';', $identifiersData)
+                ),
+                $context + ['fetch_data' => true]
+            );
+        }
     }
 
     /**

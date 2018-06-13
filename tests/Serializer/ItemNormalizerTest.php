@@ -205,7 +205,6 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getItemFromIri('/dummies/12', ['api_allow_update' => false, 'api_denormalize' => true, 'resource_class' => Dummy::class, 'fetch_data' => true])->willReturn(new Dummy())->shouldBeCalled();
 
         $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class)->willReturn(['id'])->shouldBeCalled();
