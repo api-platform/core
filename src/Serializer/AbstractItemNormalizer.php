@@ -509,7 +509,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @param array  $context
      * @param array  $identifiers
      */
-    protected function setObjectToPopulate($data, $class, array $context = [])
+    protected function setObjectToPopulate($data, $class, array &$context)
     {
         if (isset($context[self::OBJECT_TO_POPULATE]) || !\is_array($data)) {
             return;
