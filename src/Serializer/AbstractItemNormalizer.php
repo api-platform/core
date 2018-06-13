@@ -515,7 +515,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return;
         }
 
-        $updateAllowed = isset($context['api_allow_update']) && true !== $context['api_allow_update'];
+        $updateAllowed = $context['api_allow_update'] ?? false;
         $identifiers = $this->getIdentifiersForDenormalization($class);
         $writeableIdentifiers = [];
 
