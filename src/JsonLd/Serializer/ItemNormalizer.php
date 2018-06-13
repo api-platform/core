@@ -91,6 +91,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public function getIdentifiersForDenormalization(string $class): array
     {
-        return array_merge(parent::getIdentifiersForDenormalization($class), ['@id']);
+        return ['@id'];
     }
 }
