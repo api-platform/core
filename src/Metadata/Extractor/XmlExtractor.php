@@ -145,7 +145,7 @@ final class XmlExtractor extends AbstractExtractor
             case 'string':
                 return (string) $array[$key];
             case 'integer':
-                return (integer) $array[$key];
+                return (int) $array[$key];
             case 'bool':
                 return (bool) XmlUtils::phpize($array[$key]);
         }
