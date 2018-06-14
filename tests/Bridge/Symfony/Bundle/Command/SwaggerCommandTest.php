@@ -54,6 +54,16 @@ class SwaggerCommandTest extends KernelTestCase
         $this->assertYaml($this->tester->getDisplay());
     }
 
+    public function testWriteToFile()
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
+
+        $this->tester->run(['command' => 'api:swagger:export', '--output' => $tmpFile]);
+
+        $this->assertJson(file_get_contents($tmpFile));
+        @unlink($tmpFile);
+    }
+
     /**
      * @param string $data
      */
