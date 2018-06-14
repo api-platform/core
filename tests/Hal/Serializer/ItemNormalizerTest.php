@@ -294,7 +294,10 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
-            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))
+            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
+            null,
+            false,
+            $this->prophesize(IdentifiersExtractorInterface::class)->reveal()
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
