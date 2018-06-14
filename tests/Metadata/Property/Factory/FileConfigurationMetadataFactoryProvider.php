@@ -61,24 +61,6 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
         return [[$this->getPropertyMetadata($metadata)]];
     }
 
-    public function typedPropertyMetadataProvider()
-    {
-        // for Type we can't configure maxDepth, maxDepth is always null
-        $metadata = [
-            'description' => 'The dummy foo',
-            'readable' => true,
-            'writable' => true,
-            'readableLink' => true,
-            'writableLink' => false,
-            'required' => true,
-            'identifier' => false,
-            'attributes' => ['Foo'],
-            'subresource' => new SubresourceMetadata('Foo', true),
-        ];
-
-        return [[$this->getPropertyMetadata($metadata)]];
-    }
-
     private function getPropertyMetadata(array $metadata): PropertyMetadata
     {
         $propertyMetadata = new PropertyMetadata();
