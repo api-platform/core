@@ -38,7 +38,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
             ],
-            'subresource' => new SubresourceMetadata('Foo', true),
+            'subresource' => new SubresourceMetadata('Foo', true, 1),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];
@@ -55,7 +55,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'required' => true,
             'identifier' => false,
             'attributes' => ['Foo'],
-            'subresource' => new SubresourceMetadata('Foo', true),
+            'subresource' => new SubresourceMetadata('Foo', true, 1),
         ];
 
         return [[$this->getPropertyMetadata($metadata)]];

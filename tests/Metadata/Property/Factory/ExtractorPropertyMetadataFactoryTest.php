@@ -145,7 +145,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
                 );
 
         $expectedPropertyMetadata = $expectedPropertyMetadata->withType($collectionType);
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, true));
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, true, 1));
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
@@ -170,7 +170,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
 
         $expectedPropertyMetadata = $expectedPropertyMetadata->withType($type);
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, false));
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, false, 1));
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated

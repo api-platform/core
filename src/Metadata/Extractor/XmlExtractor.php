@@ -122,6 +122,7 @@ final class XmlExtractor extends AbstractExtractor
                 'subresource' => $property->subresource ? [
                     'collection' => $this->phpize($property->subresource, 'collection', 'bool'),
                     'resourceClass' => $this->phpize($property->subresource, 'resourceClass', 'string'),
+                    'maxDepth' => $this->phpize($property->subresource, 'maxDepth', 'integer'),
                 ] : null,
             ];
         }
@@ -143,6 +144,8 @@ final class XmlExtractor extends AbstractExtractor
         switch ($type) {
             case 'string':
                 return (string) $array[$key];
+            case 'integer':
+                return (int) $array[$key];
             case 'bool':
                 return (bool) XmlUtils::phpize($array[$key]);
         }
