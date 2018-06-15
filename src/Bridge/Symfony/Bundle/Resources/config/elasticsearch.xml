@@ -86,6 +86,8 @@
         <service id="api_platform.elasticsearch.query_extension.sort" class="ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.order%</argument>
 
             <tag name="api_platform.elasticsearch.query_extension.collection" priority="10" />
