@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\JsonLd\Serializer;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -89,7 +90,34 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
     }
 
-    public function getIdentifiersForDenormalization(string $class): array
+    /**
+     * {@inheritdoc}
+     */
+    protected function setObjectToPopulate($data, string $class, array &$context)
+    {
+        try {
+            parent::setObjectToPopulate($data, $class, $context);
+        } catch (InvalidArgumentException $e) {
+            // https://github.com/api-platform/core/issues/857
+            $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($class);
+            $identifiersData = \array_intersect_key($data, array_flip($identifiers));
+            if (0 === \count($identifiersData)) {
+                throw $e;
+            }
+
+            // TODO: use $this->iriConverter->getIriFromPlainIdentifier() once https://github.com/api-platform/core/pull/1837 is merged.
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
+                sprintf(
+                    '%s/%s',
+                    $this->iriConverter->getIriFromResourceClass($context['resource_class']),
+                    implode(';', $identifiersData)
+                ),
+                $context + ['fetch_data' => true]
+            );
+        }
+    }
+
+    protected function getIdentifiersForDenormalization(string $class): array
     {
         return ['@id'];
     }
