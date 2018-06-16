@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Filter;
 
 use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Core\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Core\Exception\FilterValidationException;
-use ApiPlatform\Core\Filter\QueryParameterValidateListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;

@@ -15,27 +15,22 @@ namespace ApiPlatform\Core\Filter;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Exception\FilterValidationException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Validates query parameters depending on filter description.
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
  */
-final class QueryParameterValidateListener
+class QueryParameterValidator
 {
     use FilterLocatorTrait;
 
-    private $resourceMetadataFactory;
-
     private $validators;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContainerInterface $filterLocator)
+    public function __construct(ContainerInterface $filterLocator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->setFilterLocator($filterLocator);
 
         $this->validators = [
@@ -49,28 +44,15 @@ final class QueryParameterValidateListener
         ];
     }
 
-    public function onKernelRequest(RequestEvent $event): void
+    public function validateFilters(string $resourceClass, array $resourceFilters, Request $request)
     {
-        $request = $event->getRequest();
-        if (
-            !$request->isMethodSafe()
-            || !($attributes = RequestAttributesExtractor::extractAttributes($request))
-            || !isset($attributes['collection_operation_name'])
-            || 'get' !== ($operationName = $attributes['collection_operation_name'])
-        ) {
-            return;
-        }
-
-        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-
         $errorList = [];
         foreach ($resourceFilters as $filterId) {
             if (!$filter = $this->getFilter($filterId)) {
                 continue;
             }
 
-            foreach ($filter->getDescription($attributes['resource_class']) as $name => $data) {
+            foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 foreach ($this->validators as $validator) {
                     $errorList = array_merge($errorList, $validator->validate($name, $data, $request));
                 }

@@ -1236,6 +1236,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.action.ui',
             'api_platform.swagger.listener.ui',
             'api_platform.validator',
+            'api_platform.validator.query_parameter_validator',
             'test.api_platform.client',
         ];
 
